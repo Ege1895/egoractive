@@ -10,16 +10,10 @@ class AuthController extends _$AuthController {
   @override
   AuthState build() => const AuthState();
 
-  void appendDigit(String digit) {
-    if (state.phoneDigits.length >= 10) return;
-    state = state.copyWith(phoneDigits: state.phoneDigits + digit);
-  }
-
-  void removeLastDigit() {
-    if (state.phoneDigits.isEmpty) return;
-    state = state.copyWith(
-      phoneDigits: state.phoneDigits.substring(0, state.phoneDigits.length - 1),
-    );
+  /// Native numeric klavyeden gelen ham metni 10 haneye kırpıp state'e yazar.
+  void setPhoneDigits(String rawInput) {
+    final digits = rawInput.replaceAll(RegExp(r'[^0-9]'), '');
+    state = state.copyWith(phoneDigits: digits.length > 10 ? digits.substring(0, 10) : digits);
   }
 
   Future<void> requestLogin() async {

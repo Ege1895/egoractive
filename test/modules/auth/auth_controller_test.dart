@@ -5,28 +5,27 @@ import 'package:egoractive/modules/auth/controller/auth_controller.dart';
 
 void main() {
   group('AuthController', () {
-    test('appendDigit stops at 10 digits, removeLastDigit trims one', () {
+    test('setPhoneDigits strips non-digits and caps at 10 digits', () {
       final container = ProviderContainer();
       addTearDown(container.dispose);
       final notifier = container.read(authControllerProvider.notifier);
 
-      for (final d in '5324187605123'.split('')) {
-        notifier.appendDigit(d);
-      }
+      notifier.setPhoneDigits('532 418 76 05 123');
       expect(container.read(authControllerProvider).phoneDigits, '5324187605');
       expect(container.read(authControllerProvider).isPhoneComplete, isTrue);
 
-      notifier.removeLastDigit();
-      expect(container.read(authControllerProvider).phoneDigits, '532418760');
+      notifier.setPhoneDigits('53241876');
+      expect(container.read(authControllerProvider).phoneDigits, '53241876');
       expect(container.read(authControllerProvider).isPhoneComplete, isFalse);
     });
 
-    test('removeLastDigit on empty digits is a no-op', () {
+    test('setPhoneDigits with empty input clears the number', () {
       final container = ProviderContainer();
       addTearDown(container.dispose);
       final notifier = container.read(authControllerProvider.notifier);
 
-      notifier.removeLastDigit();
+      notifier.setPhoneDigits('5324187605');
+      notifier.setPhoneDigits('');
       expect(container.read(authControllerProvider).phoneDigits, '');
     });
 
@@ -44,9 +43,7 @@ void main() {
       addTearDown(container.dispose);
       final notifier = container.read(authControllerProvider.notifier);
 
-      for (final d in '5324187605'.split('')) {
-        notifier.appendDigit(d);
-      }
+      notifier.setPhoneDigits('5324187605');
 
       final future = notifier.requestLogin();
       expect(container.read(authControllerProvider).isRequestingLogin, isTrue);

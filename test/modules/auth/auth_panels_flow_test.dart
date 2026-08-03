@@ -6,8 +6,8 @@ import 'package:egoractive/main.dart';
 
 void main() {
   testWidgets(
-    'Splash auto-transitions to phone login, keypad fills the number, '
-    'login pushes the waiting screen, and cancel returns',
+    'Splash auto-transitions to phone login, native keyboard input fills the '
+    'number, login pushes the waiting screen, and cancel returns',
     (tester) async {
       await tester.pumpWidget(const ProviderScope(child: EgoractiveApp()));
       await tester.pump();
@@ -22,10 +22,9 @@ void main() {
       final loginButtonFinder = find.text('Giriş yap');
       expect(loginButtonFinder, findsOneWidget);
 
-      for (final digit in '5324187605'.split('')) {
-        await tester.tap(find.byKey(ValueKey('keypad-$digit')));
-        await tester.pump();
-      }
+      await tester.tap(find.byType(TextField));
+      await tester.enterText(find.byType(TextField), '5324187605');
+      await tester.pump();
       expect(find.text('532 418 76 05'), findsOneWidget);
 
       await tester.tap(loginButtonFinder);
