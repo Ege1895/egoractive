@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'base_panel.dart';
 import 'panel_stack_controller.dart';
+import 'shell/role_picker_panel.dart';
 import '../theme/component_showcase_panel.dart';
 
 class DemoRootPanel extends BasePanel {
@@ -54,13 +55,14 @@ class DemoPanelC extends BasePanel {
 class _DemoPanelCState extends BasePanelState<DemoPanelC> {
   @override
   Widget build(BuildContext context) {
+    final controller = ref.read(panelStackControllerProvider.notifier);
     return _DemoScaffold(
       label: 'C',
       onPushNext: null,
-      secondaryLabel: 'Bileşenleri gör',
-      onPushSecondary: () => ref
-          .read(panelStackControllerProvider.notifier)
-          .push(const ComponentShowcasePanel()),
+      extraActions: [
+        ('Bileşenleri gör', () => controller.push(const ComponentShowcasePanel())),
+        ('Rolleri gör', () => controller.push(const RolePickerPanel())),
+      ],
     );
   }
 }
@@ -69,14 +71,12 @@ class _DemoScaffold extends StatelessWidget {
   const _DemoScaffold({
     required this.label,
     required this.onPushNext,
-    this.secondaryLabel,
-    this.onPushSecondary,
+    this.extraActions = const [],
   });
 
   final String label;
   final VoidCallback? onPushNext;
-  final String? secondaryLabel;
-  final VoidCallback? onPushSecondary;
+  final List<(String, VoidCallback)> extraActions;
 
   @override
   Widget build(BuildContext context) {
@@ -92,10 +92,10 @@ class _DemoScaffold extends StatelessWidget {
                 onPressed: onPushNext,
                 child: const Text('Sonrakine git'),
               ),
-            if (onPushSecondary != null)
-              ElevatedButton(
-                onPressed: onPushSecondary,
-                child: Text(secondaryLabel!),
+            for (final (label, onPressed) in extraActions)
+              Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: ElevatedButton(onPressed: onPressed, child: Text(label)),
               ),
           ],
         ),
