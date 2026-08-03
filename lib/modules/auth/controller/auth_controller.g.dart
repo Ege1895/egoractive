@@ -1,27 +1,26 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'panel_stack_controller.dart';
+part of 'auth_controller.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$panelStackControllerHash() =>
-    r'd69a8d7ee318992ac7fa7cdd2f1be5c42f6e691d';
+String _$authControllerHash() => r'c1a8a3b915456937686f0a8df9ad90ca65b2d084';
 
-/// See also [PanelStackController].
-@ProviderFor(PanelStackController)
-final panelStackControllerProvider =
-    NotifierProvider<PanelStackController, List<BasePanel>>.internal(
-      PanelStackController.new,
-      name: r'panelStackControllerProvider',
+/// See also [AuthController].
+@ProviderFor(AuthController)
+final authControllerProvider =
+    AutoDisposeNotifierProvider<AuthController, AuthState>.internal(
+      AuthController.new,
+      name: r'authControllerProvider',
       debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
           ? null
-          : _$panelStackControllerHash,
+          : _$authControllerHash,
       dependencies: null,
       allTransitiveDependencies: null,
     );
 
-typedef _$PanelStackController = Notifier<List<BasePanel>>;
+typedef _$AuthController = AutoDisposeNotifier<AuthState>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

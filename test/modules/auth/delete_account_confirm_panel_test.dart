@@ -1,0 +1,88 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_test/flutter_test.dart';
+
+import 'package:egoractive/core/panels/panel_stack_controller.dart';
+import 'package:egoractive/core/panels/panel_stack_view.dart';
+import 'package:egoractive/core/theme/app_color_scheme.dart';
+import 'package:egoractive/core/theme/app_theme.dart';
+import 'package:egoractive/core/theme/app_typography.dart';
+import 'package:egoractive/core/panels/base_panel.dart';
+import 'package:egoractive/modules/auth/ui/panels/delete_account_confirm_panel.dart';
+
+class _RootPanel extends BasePanel {
+  const _RootPanel();
+
+  @override
+  ConsumerState<_RootPanel> createState() => _RootPanelState();
+}
+
+class _RootPanelState extends BasePanelState<_RootPanel> {
+  @override
+  Widget build(BuildContext context) => const Scaffold(body: SizedBox.shrink());
+}
+
+void main() {
+  testWidgets(
+    'Hesabımı sil is disabled until the checkbox is acknowledged, then pops on completion',
+    (tester) async {
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
+      final notifier = container.read(panelStackControllerProvider.notifier);
+      notifier.push(const _RootPanel());
+      notifier.push(const DeleteAccountConfirmPanel());
+
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: MaterialApp(
+            theme: AppTheme.build(colors: AppColorScheme.defaultScheme(), typography: AppTypography.standard()),
+            home: const PanelStackView(),
+          ),
+        ),
+      );
+      await tester.pump();
+
+      expect(find.text('Hesabını silmek geri alınamaz'), findsOneWidget);
+
+      // Onay kutusu işaretlenmeden "Hesabımı sil" hiçbir şey yapmamalı.
+      await tester.tap(find.text('Hesabımı sil'));
+      await tester.pump();
+      expect(find.text('Hesabını silmek geri alınamaz'), findsOneWidget);
+
+      await tester.tap(find.text('Anladım, hesabım ve tüm verilerim silinsin.'));
+      await tester.pump();
+
+      await tester.tap(find.text('Hesabımı sil'));
+      await tester.pump(); // isDeletingAccount: true
+      await tester.pump(const Duration(seconds: 2)); // mock çağrı tamamlanır
+      await tester.pump();
+
+      expect(find.text('Hesabını silmek geri alınamaz'), findsNothing);
+    },
+  );
+
+  testWidgets('Vazgeç pops without deleting anything', (tester) async {
+    final container = ProviderContainer();
+    addTearDown(container.dispose);
+    final notifier = container.read(panelStackControllerProvider.notifier);
+    notifier.push(const _RootPanel());
+    notifier.push(const DeleteAccountConfirmPanel());
+
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: MaterialApp(
+          theme: AppTheme.build(colors: AppColorScheme.defaultScheme(), typography: AppTypography.standard()),
+          home: const PanelStackView(),
+        ),
+      ),
+    );
+    await tester.pump();
+
+    await tester.tap(find.text('Vazgeç'));
+    await tester.pump();
+
+    expect(find.text('Hesabını silmek geri alınamaz'), findsNothing);
+  });
+}

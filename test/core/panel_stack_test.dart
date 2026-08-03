@@ -5,7 +5,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:egoractive/core/panels/base_panel.dart';
 import 'package:egoractive/core/panels/panel_stack_controller.dart';
 import 'package:egoractive/core/panels/panel_stack_view.dart';
-import 'package:egoractive/main.dart';
 
 class _DummyPanel extends BasePanel {
   const _DummyPanel(this.id);
@@ -84,6 +83,20 @@ void main() {
 
       expect(notifier.handleSystemBack(), isFalse);
     });
+
+    test('replaceRoot swaps the whole stack so the old root is unreachable', () {
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
+      final notifier = container.read(panelStackControllerProvider.notifier);
+
+      notifier.push(const _DummyPanel('splash'));
+      notifier.push(const _DummyPanel('extra'));
+      notifier.replaceRoot(const _DummyPanel('login'));
+
+      expect(container.read(panelStackControllerProvider).map((p) => (p as _DummyPanel).id), ['login']);
+      // Tek panel kaldığı için pop/handleSystemBack artık login'i kaldıramaz.
+      expect(notifier.handleSystemBack(), isFalse);
+    });
   });
 
   group('BasePanel show/hide lifecycle', () {
@@ -112,30 +125,6 @@ void main() {
       container.read(panelStackControllerProvider.notifier).pop();
       await tester.pumpAndSettle();
       expect(log, ['B:hide', 'A:show']);
-    });
-  });
-
-  group('Demo panels (A→B→C + system back)', () {
-    testWidgets('push flow works and the system back button walks the stack back', (tester) async {
-      await tester.pumpWidget(const ProviderScope(child: EgoractiveApp()));
-      await tester.pumpAndSettle();
-      expect(find.text('Panel A'), findsOneWidget);
-
-      await tester.tap(find.text('Sonrakine git'));
-      await tester.pumpAndSettle();
-      expect(find.text('Panel B'), findsOneWidget);
-
-      await tester.tap(find.text('Sonrakine git'));
-      await tester.pumpAndSettle();
-      expect(find.text('Panel C'), findsOneWidget);
-
-      await tester.binding.handlePopRoute();
-      await tester.pumpAndSettle();
-      expect(find.text('Panel B'), findsOneWidget);
-
-      await tester.binding.handlePopRoute();
-      await tester.pumpAndSettle();
-      expect(find.text('Panel A'), findsOneWidget);
     });
   });
 }

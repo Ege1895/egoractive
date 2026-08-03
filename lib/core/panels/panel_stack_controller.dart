@@ -26,6 +26,11 @@ class PanelStackController extends _$PanelStackController {
     _updateStack([state.first]);
   }
 
+  /// Tüm stack'i tek bir kökle değiştirir — eski kök geri tuşuyla
+  /// erişilemez olur. Splash → giriş ekranı ve rol değişince stack
+  /// sıfırlanması (F1-11) bu metodu kullanır.
+  void replaceRoot(BasePanel panel) => _updateStack([panel]);
+
   void registerActiveBackHandler(bool Function()? handler) {
     _activeBackHandler = handler;
   }
