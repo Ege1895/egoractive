@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'base_panel.dart';
 import 'panel_stack_controller.dart';
+import '../theme/component_showcase_panel.dart';
 
 class DemoRootPanel extends BasePanel {
   const DemoRootPanel({super.key});
@@ -53,15 +54,29 @@ class DemoPanelC extends BasePanel {
 class _DemoPanelCState extends BasePanelState<DemoPanelC> {
   @override
   Widget build(BuildContext context) {
-    return const _DemoScaffold(label: 'C', onPushNext: null);
+    return _DemoScaffold(
+      label: 'C',
+      onPushNext: null,
+      secondaryLabel: 'Bileşenleri gör',
+      onPushSecondary: () => ref
+          .read(panelStackControllerProvider.notifier)
+          .push(const ComponentShowcasePanel()),
+    );
   }
 }
 
 class _DemoScaffold extends StatelessWidget {
-  const _DemoScaffold({required this.label, required this.onPushNext});
+  const _DemoScaffold({
+    required this.label,
+    required this.onPushNext,
+    this.secondaryLabel,
+    this.onPushSecondary,
+  });
 
   final String label;
   final VoidCallback? onPushNext;
+  final String? secondaryLabel;
+  final VoidCallback? onPushSecondary;
 
   @override
   Widget build(BuildContext context) {
@@ -76,6 +91,11 @@ class _DemoScaffold extends StatelessWidget {
               ElevatedButton(
                 onPressed: onPushNext,
                 child: const Text('Sonrakine git'),
+              ),
+            if (onPushSecondary != null)
+              ElevatedButton(
+                onPressed: onPushSecondary,
+                child: Text(secondaryLabel!),
               ),
           ],
         ),

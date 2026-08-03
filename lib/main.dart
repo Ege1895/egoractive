@@ -4,6 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/panels/demo_panels.dart';
 import 'core/panels/panel_stack_controller.dart';
 import 'core/panels/panel_stack_view.dart';
+import 'core/theme/app_color_scheme.dart';
+import 'core/theme/app_theme.dart';
+import 'core/theme/app_typography.dart';
 
 void main() {
   runApp(const ProviderScope(child: EgoractiveApp()));
@@ -16,12 +19,9 @@ class EgoractiveApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Egoractive',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF05A6FA),
-          brightness: Brightness.dark,
-        ),
-        useMaterial3: true,
+      theme: AppTheme.build(
+        colors: AppColorScheme.defaultScheme(),
+        typography: AppTypography.standard(),
       ),
       home: const _AppRoot(),
     );
