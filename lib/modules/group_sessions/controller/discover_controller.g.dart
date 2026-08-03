@@ -1,26 +1,30 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'auth_controller.dart';
+part of 'discover_controller.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$authControllerHash() => r'991348113f2a3a924548d7b86d31e161bbe0a1ed';
+String _$discoverControllerHash() =>
+    r'1aa5c0a2e8498f0941ef40b72225c235dbdd7cb4';
 
-/// See also [AuthController].
-@ProviderFor(AuthController)
-final authControllerProvider =
-    AutoDisposeNotifierProvider<AuthController, AuthState>.internal(
-      AuthController.new,
-      name: r'authControllerProvider',
+/// See also [DiscoverController].
+@ProviderFor(DiscoverController)
+final discoverControllerProvider =
+    AutoDisposeNotifierProvider<
+      DiscoverController,
+      List<DiscoverItem>
+    >.internal(
+      DiscoverController.new,
+      name: r'discoverControllerProvider',
       debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
           ? null
-          : _$authControllerHash,
+          : _$discoverControllerHash,
       dependencies: null,
       allTransitiveDependencies: null,
     );
 
-typedef _$AuthController = AutoDisposeNotifier<AuthState>;
+typedef _$DiscoverController = AutoDisposeNotifier<List<DiscoverItem>>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

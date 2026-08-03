@@ -33,4 +33,17 @@ class AuthController extends _$AuthController {
     await ref.read(authRepositoryProvider).deleteAccount();
     state = state.copyWith(isDeletingAccount: false);
   }
+
+  void selectAvatar(int index) {
+    state = state.copyWith(selectedAvatarIndex: index);
+  }
+
+  void toggleSessionReminder() {
+    state = state.copyWith(sessionReminderEnabled: !state.sessionReminderEnabled);
+  }
+
+  /// Oturumu kapatır — F1-10'da gerçek `FirebaseAuth.signOut()` çağıracak.
+  void logout() {
+    state = const AuthState();
+  }
 }

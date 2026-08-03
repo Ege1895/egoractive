@@ -9,6 +9,8 @@ class AuthState with _$AuthState {
     @Default(false) bool isRequestingLogin,
     @Default(false) bool deleteAccountAcknowledged,
     @Default(false) bool isDeletingAccount,
+    @Default(0) int selectedAvatarIndex,
+    @Default(true) bool sessionReminderEnabled,
   }) = _AuthState;
 
   const AuthState._();
