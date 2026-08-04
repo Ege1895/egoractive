@@ -9,6 +9,7 @@ import '../../theme/app_theme.dart';
 import '../../../shared/widgets/app_button.dart';
 import '../base_panel.dart';
 import '../panel_stack_controller.dart';
+import '../../../modules/gyms/ui/panels/gym_setup_panel.dart';
 import 'admin_shell_panel.dart';
 import 'member_shell_panel.dart';
 import 'trainer_shell_panel.dart';
@@ -44,6 +45,12 @@ class _RolePickerPanelState extends BasePanelState<RolePickerPanel> {
               AppButton(label: 'Antrenör', onPressed: () => controller.push(const TrainerShellPanel())),
               const SizedBox(height: AppSpacing.sm),
               AppButton(label: 'Admin', onPressed: () => controller.push(const AdminShellPanel())),
+              const SizedBox(height: AppSpacing.sm),
+              AppButton(
+                label: 'Admin · Salon Kurulumu (ilk kurulum)',
+                variant: AppButtonVariant.secondary,
+                onPressed: () => controller.push(const GymSetupPanel()),
+              ),
             ],
           ),
         ),

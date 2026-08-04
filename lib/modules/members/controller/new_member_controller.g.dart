@@ -1,0 +1,30 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
+
+part of 'new_member_controller.dart';
+
+// **************************************************************************
+// RiverpodGenerator
+// **************************************************************************
+
+String _$newMemberControllerHash() =>
+    r'e759abb76b7e1a6694a7d2ce9efb33871371ea49';
+
+/// Yeni üye kayıt akışının (P4-5 → P4-6 → P4-7) formu — geri tuşuyla önceki
+/// adıma dönüldüğünde veri kaybolmasın diye tek bir kalıcı state'te tutulur.
+///
+/// Copied from [NewMemberController].
+@ProviderFor(NewMemberController)
+final newMemberControllerProvider =
+    AutoDisposeNotifierProvider<NewMemberController, NewMemberForm>.internal(
+      NewMemberController.new,
+      name: r'newMemberControllerProvider',
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$newMemberControllerHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
+
+typedef _$NewMemberController = AutoDisposeNotifier<NewMemberForm>;
+// ignore_for_file: type=lint
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
