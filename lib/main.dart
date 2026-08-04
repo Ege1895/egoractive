@@ -3,24 +3,25 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'core/panels/panel_stack_controller.dart';
 import 'core/panels/panel_stack_view.dart';
-import 'core/theme/app_color_scheme.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/app_typography.dart';
+import 'core/theme/theme_controller.dart';
 import 'modules/auth/ui/panels/splash_panel.dart';
 
 void main() {
   runApp(const ProviderScope(child: EgoractiveApp()));
 }
 
-class EgoractiveApp extends StatelessWidget {
+class EgoractiveApp extends ConsumerWidget {
   const EgoractiveApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final colors = ref.watch(themeControllerProvider);
     return MaterialApp(
       title: 'Egoractive',
       theme: AppTheme.build(
-        colors: AppColorScheme.defaultScheme(),
+        colors: colors,
         typography: AppTypography.standard(),
       ),
       home: const _AppRoot(),
