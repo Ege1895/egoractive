@@ -7,7 +7,7 @@ part of 'panel_stack_controller.dart';
 // **************************************************************************
 
 String _$panelStackControllerHash() =>
-    r'b64ac355ef793cbe63c65a6ca39de4e2f37f3778';
+    r'd69a8d7ee318992ac7fa7cdd2f1be5c42f6e691d';
 
 /// See also [PanelStackController].
 @ProviderFor(PanelStackController)
