@@ -212,3 +212,11 @@ functions/                # Cloud Functions (TypeScript)
 - **Controller:** Modülün state yöneticisi (Riverpod Notifier)
 - **Manager:** Controller ile eşanlamlı, bazı task açıklamalarında bu isim geçebilir
 - **RC:** Remote Config
+
+## graphify
+
+Bu projede `graphify-out/graph.json` mevcut. Kod tabanı, mimari veya dosyalar arası ilişkilerle ilgili herhangi bir soruda:
+- ÖNCE `graphify query "<soru>"` çalıştır (geniş bağlam için), gerekirse `graphify path "A" "B"` (iki kavram arası yol) veya `graphify explain "X"` (bir node'un açıklaması) kullan.
+- Ham dosyaları `grep`/`find`/`Read` ile taramadan ÖNCE bunu dene — token tasarrufu sağlar.
+- Sadece grafik sorgusu yetersiz kalırsa (çok spesifik bir satır, güncel olmayan bir alan vb.) ham dosyaya dön.
+- Kod önemli ölçüde değiştiyse `/graphify . --update` ile grafiği güncelle (tam yeniden taramadan çok daha ucuz).
