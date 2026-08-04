@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../shared/widgets/trend_bar_chart.dart';
 import '../../controller/measurements_controller.dart';
 import '../../domain/measurement_metric.dart';
 import '../../domain/measurements_state.dart';
@@ -193,8 +194,6 @@ class _ChartView extends ConsumerWidget {
     final state = ref.watch(measurementsControllerProvider);
     final controller = ref.read(measurementsControllerProvider.notifier);
     final series = state.series[state.selectedMetric]!;
-    final minVal = series.values.reduce((a, b) => a < b ? a : b);
-    final maxVal = series.values.reduce((a, b) => a > b ? a : b);
     final lastValue = series.values.last;
     final prevValue = series.values.length > 1 ? series.values[series.values.length - 2] : lastValue;
     final diff = lastValue - prevValue;
@@ -275,51 +274,10 @@ class _ChartView extends ConsumerWidget {
                 ],
               ),
               const SizedBox(height: AppSpacing.lg),
-              SizedBox(
-                height: 160,
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    for (var i = 0; i < series.values.length; i++)
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              Text(
-                                series.values[i].toStringAsFixed(1).replaceAll('.', ','),
-                                textAlign: TextAlign.center,
-                                style: typography.dataSmall.copyWith(
-                                  fontSize: 12,
-                                  color: i == series.values.length - 1 ? colors.onPrimaryContainer : colors.onSurfaceMuted,
-                                ),
-                              ),
-                              const SizedBox(height: AppSpacing.xs),
-                              Expanded(
-                                child: FractionallySizedBox(
-                                  alignment: Alignment.bottomCenter,
-                                  heightFactor: 0.22 + ((series.values[i] - minVal) / ((maxVal - minVal) == 0 ? 1 : (maxVal - minVal))) * 0.68,
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      color: i == series.values.length - 1 ? colors.primary : colors.primary.withValues(alpha: 0.28),
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: AppSpacing.xs),
-                              Text(
-                                series.months[i],
-                                textAlign: TextAlign.center,
-                                style: typography.caption.copyWith(color: colors.onSurfaceMuted, fontSize: 11),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
+              TrendBarChart(
+                values: series.values,
+                labels: series.months,
+                valueFormatter: (value) => value.toStringAsFixed(1).replaceAll('.', ','),
               ),
             ],
           ),

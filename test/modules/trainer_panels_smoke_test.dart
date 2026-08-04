@@ -1,0 +1,107 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_test/flutter_test.dart';
+
+import 'package:egoractive/core/theme/app_color_scheme.dart';
+import 'package:egoractive/core/theme/app_theme.dart';
+import 'package:egoractive/core/theme/app_typography.dart';
+import 'package:egoractive/modules/group_sessions/ui/panels/create_group_session_panel.dart';
+import 'package:egoractive/modules/sessions/ui/panels/attendance_notification_detail_panel.dart';
+import 'package:egoractive/modules/sessions/ui/panels/session_completion_panel.dart';
+import 'package:egoractive/modules/sessions/ui/panels/trainer_notifications_panel.dart';
+import 'package:egoractive/modules/sessions/domain/trainer_notification.dart';
+import 'package:egoractive/modules/trainers/ui/panels/trainer_calendar_panel.dart';
+import 'package:egoractive/modules/trainers/ui/panels/trainer_home_panel.dart';
+import 'package:egoractive/modules/trainers/ui/panels/trainer_member_detail_panel.dart';
+import 'package:egoractive/modules/trainers/ui/panels/trainer_members_list_panel.dart';
+import 'package:egoractive/modules/trainers/ui/panels/trainer_profile_panel.dart';
+import 'package:egoractive/modules/trainers/ui/panels/trainer_report_panel.dart';
+
+Widget _wrap(Widget child) {
+  return ProviderScope(
+    child: MaterialApp(
+      theme: AppTheme.build(colors: AppColorScheme.defaultScheme(), typography: AppTypography.standard()),
+      home: Scaffold(body: child),
+    ),
+  );
+}
+
+const _sampleNotification = TrainerNotification(
+  id: 'notif-test',
+  title: 'Ayşe Yılmaz geleceğini bildirdi',
+  body: '4 Ağustos 18:30 · Birebir · Stüdyo 2',
+  memberInitials: 'AY',
+  memberName: 'Ayşe Yılmaz',
+  sessionMeta: '4 Ağustos 18:30 · Birebir · Stüdyo 2',
+  answerLabel: 'Gelicem',
+  answerIsPositive: true,
+  answeredAt: '3 Ağu 21:04',
+  note: '5 dakika gecikebilirim, trafik yoğun.',
+);
+
+void main() {
+  final panels = <String, Widget>{
+    'TrainerHomePanel': const TrainerHomePanel(),
+    'TrainerCalendarPanel': const TrainerCalendarPanel(),
+    'TrainerMembersListPanel': const TrainerMembersListPanel(),
+    'TrainerMemberDetailPanel': const TrainerMemberDetailPanel(memberId: 'ayse-yilmaz'),
+    'TrainerReportPanel': const TrainerReportPanel(),
+    'TrainerProfilePanel': const TrainerProfilePanel(),
+    'CreateGroupSessionPanel': const CreateGroupSessionPanel(),
+    'TrainerNotificationsPanel': const TrainerNotificationsPanel(),
+    'AttendanceNotificationDetailPanel': const AttendanceNotificationDetailPanel(notification: _sampleNotification),
+    'SessionCompletionPanel': const SessionCompletionPanel(
+      time: '18:30',
+      memberInitials: 'AY',
+      memberName: 'Ayşe Yılmaz',
+      meta: 'Birebir · 3 Ağustos 18:30',
+      remainingBefore: 6,
+    ),
+  };
+
+  for (final entry in panels.entries) {
+    testWidgets('${entry.key} renders without overflow or render errors', (tester) async {
+      await tester.pumpWidget(_wrap(entry.value));
+      await tester.pump();
+      expect(tester.takeException(), isNull, reason: '${entry.key} threw during initial render');
+    });
+
+    testWidgets('${entry.key} renders without overflow on iPhone SE-sized screens', (tester) async {
+      await tester.binding.setSurfaceSize(const Size(375, 667));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+      await tester.pumpWidget(_wrap(entry.value));
+      await tester.pump();
+      expect(tester.takeException(), isNull, reason: '${entry.key} threw on a small screen');
+    });
+  }
+
+  testWidgets('TrainerCalendarPanel month view renders without overflow', (tester) async {
+    await tester.pumpWidget(_wrap(const TrainerCalendarPanel()));
+    await tester.pump();
+    await tester.tap(find.text('Ay'));
+    await tester.pump();
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('TrainerMembersListPanel filter chips render without overflow', (tester) async {
+    await tester.pumpWidget(_wrap(const TrainerMembersListPanel()));
+    await tester.pump();
+    await tester.tap(find.text('Paketi bitiyor'));
+    await tester.pump();
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('SessionCompletionPanel answer flow renders without overflow', (tester) async {
+    await tester.pumpWidget(_wrap(const SessionCompletionPanel(
+      time: '18:30',
+      memberInitials: 'AY',
+      memberName: 'Ayşe Yılmaz',
+      meta: 'Birebir · 3 Ağustos 18:30',
+      remainingBefore: 6,
+    )));
+    await tester.pump();
+    await tester.tap(find.text('Tamamlandı'));
+    await tester.pump();
+    expect(tester.takeException(), isNull);
+  });
+}
