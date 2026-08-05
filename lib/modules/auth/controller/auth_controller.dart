@@ -33,11 +33,23 @@ class AuthController extends _$AuthController {
     state = state.copyWith(deleteAccountAcknowledged: !state.deleteAccountAcknowledged);
   }
 
-  Future<void> deleteAccount() async {
-    if (!state.deleteAccountAcknowledged || state.isDeletingAccount) return;
-    state = state.copyWith(isDeletingAccount: true);
-    await ref.read(authRepositoryProvider).deleteAccount();
-    state = state.copyWith(isDeletingAccount: false);
+  /// Başarılıysa `true` döner (çağıran taraf login ekranına yönlendirir).
+  Future<bool> deleteAccount() async {
+    if (!state.deleteAccountAcknowledged || state.isDeletingAccount) return false;
+    state = state.copyWith(isDeletingAccount: true, deleteAccountErrorMessage: null);
+    try {
+      await ref.read(authRepositoryProvider).deleteAccount();
+      state = state.copyWith(isDeletingAccount: false);
+      return true;
+    } catch (_) {
+      state = state.copyWith(
+        isDeletingAccount: false,
+        deleteAccountErrorMessage: ref.read(remoteConfigServiceProvider).getText(
+              RemoteConfigKeys.authDeleteAccountErrorGeneric,
+            ),
+      );
+      return false;
+    }
   }
 
   void selectAvatar(int index) {

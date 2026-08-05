@@ -671,6 +671,18 @@
       },
       "valueType": "STRING"
     },
+    "lbl_auth_delete_account_error_generic_tr": {
+      "defaultValue": {
+        "value": "Hesap silinemedi. Bağlantını kontrol edip tekrar dene."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_delete_account_error_generic_en": {
+      "defaultValue": {
+        "value": "Could not delete account. Check your connection and try again."
+      },
+      "valueType": "STRING"
+    },
     "lbl_badges_title_tr": {
       "defaultValue": {
         "value": "Rozetlerim"

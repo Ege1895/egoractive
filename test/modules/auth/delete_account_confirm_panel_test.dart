@@ -8,6 +8,7 @@ import 'package:egoractive/core/theme/app_color_scheme.dart';
 import 'package:egoractive/core/theme/app_theme.dart';
 import 'package:egoractive/core/theme/app_typography.dart';
 import 'package:egoractive/core/panels/base_panel.dart';
+import 'package:egoractive/modules/auth/repository/auth_repository.dart';
 import 'package:egoractive/modules/auth/ui/panels/delete_account_confirm_panel.dart';
 
 class _RootPanel extends BasePanel {
@@ -22,11 +23,23 @@ class _RootPanelState extends BasePanelState<_RootPanel> {
   Widget build(BuildContext context) => const Scaffold(body: SizedBox.shrink());
 }
 
+/// Gerçek Firebase çağrısı (F2-8) yapmayan sahte repository — bu dosya
+/// panel geçişlerini test eder, Firebase entegrasyonunu değil.
+class _FakeAuthRepository implements AuthRepository {
+  @override
+  Future<void> login(String phoneDigits) => Future<void>.delayed(const Duration(seconds: 2));
+
+  @override
+  Future<void> deleteAccount() => Future<void>.delayed(const Duration(seconds: 2));
+}
+
 void main() {
   testWidgets(
-    'Hesabımı sil is disabled until the checkbox is acknowledged, then pops on completion',
+    'Hesabımı sil is disabled until the checkbox is acknowledged, then navigates to login on completion',
     (tester) async {
-      final container = ProviderContainer();
+      final container = ProviderContainer(
+        overrides: [authRepositoryProvider.overrideWith((ref) => _FakeAuthRepository())],
+      );
       addTearDown(container.dispose);
       final notifier = container.read(panelStackControllerProvider.notifier);
       notifier.push(const _RootPanel());
@@ -59,6 +72,7 @@ void main() {
       await tester.pump();
 
       expect(find.text('Hesabını silmek geri alınamaz'), findsNothing);
+      expect(find.text('Telefonunla giriş yap'), findsOneWidget);
     },
   );
 
