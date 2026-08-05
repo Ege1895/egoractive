@@ -4,13 +4,17 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
+import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/utils/phone_number_formatter.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_loading_indicator.dart';
 import '../../controller/auth_controller.dart';
 
-/// Ortak 3 · Giriş Bekleniyor — kod/token bekleme durumu.
+/// Ortak 3 · Giriş Bekleniyor — `requestCustomToken` çağrısı sürerken
+/// gösterilir. Başarılı girişte yönlendirme main.dart'taki global rol
+/// dinleyicisi (F1-11) tarafından yapılır — bu panel sadece hata durumunu
+/// (callable `not-found`/`resource-exhausted` vb. dönerse) kendi gösterir.
 class LoginWaitingPanel extends BasePanel {
   const LoginWaitingPanel({super.key});
 
@@ -23,7 +27,11 @@ class _LoginWaitingPanelState extends BasePanelState<LoginWaitingPanel> {
   Widget build(BuildContext context) {
     final colors = context.appColors;
     final typography = context.appTypography;
-    final phoneDigits = ref.watch(authControllerProvider).phoneDigits;
+    final authState = ref.watch(authControllerProvider);
+
+    if (authState.loginErrorMessage != null) {
+      return _LoginErrorView(message: authState.loginErrorMessage!);
+    }
 
     return Scaffold(
       body: SafeArea(
@@ -43,7 +51,7 @@ class _LoginWaitingPanelState extends BasePanelState<LoginWaitingPanel> {
                     ),
                     const SizedBox(height: AppSpacing.sm),
                     Text(
-                      '+90 ${formatTrPhoneDigits(phoneDigits)} numarası stüdyoda aranıyor.',
+                      '+90 ${formatTrPhoneDigits(authState.phoneDigits)} numarası stüdyoda aranıyor.',
                       style: typography.bodyMedium.copyWith(color: colors.onSurfaceVariant),
                       textAlign: TextAlign.center,
                     ),
@@ -93,6 +101,52 @@ class _LoginWaitingPanelState extends BasePanelState<LoginWaitingPanel> {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _LoginErrorView extends ConsumerWidget {
+  const _LoginErrorView({required this.message});
+
+  final String message;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final colors = context.appColors;
+    final typography = context.appTypography;
+    final rc = ref.watch(remoteConfigServiceProvider);
+
+    return Scaffold(
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xxl),
+          child: Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 64,
+                  height: 64,
+                  decoration: BoxDecoration(color: colors.errorContainer, shape: BoxShape.circle),
+                  alignment: Alignment.center,
+                  child: Icon(Icons.error_outline, color: colors.onErrorContainer, size: 32),
+                ),
+                const SizedBox(height: AppSpacing.xl),
+                Text(
+                  message,
+                  style: typography.bodyMedium.copyWith(color: colors.onSurfaceVariant),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: AppSpacing.xl),
+                AppButton(
+                  label: rc.getText(RemoteConfigKeys.authRetryButton),
+                  onPressed: () => ref.read(panelStackControllerProvider.notifier).pop(),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );

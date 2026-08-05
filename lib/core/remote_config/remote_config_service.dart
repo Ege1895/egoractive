@@ -73,7 +73,6 @@ abstract final class RemoteConfigKeys {
   static const authProfileTitle = 'lbl_auth_profile_title';
   static const authPhoneNumberLabel = 'lbl_auth_phone_number_label';
   static const authLoginButton = 'lbl_auth_login_button';
-  static const authDevMenuButton = 'lbl_auth_dev_menu_button';
   static const authSelectAvatarLabel = 'lbl_auth_select_avatar_label';
   static const authBadgesNavLabel = 'lbl_auth_badges_nav_label';
   static const authGiveFeedbackNavLabel = 'lbl_auth_give_feedback_nav_label';
@@ -83,6 +82,10 @@ abstract final class RemoteConfigKeys {
       'lbl_auth_session_reminders_toggle_description';
   static const authDeleteAccountConfirmTitle =
       'lbl_auth_delete_account_confirm_title';
+  static const authLoginErrorNotFound = 'lbl_auth_login_error_not_found';
+  static const authLoginErrorRateLimited = 'lbl_auth_login_error_rate_limited';
+  static const authLoginErrorGeneric = 'lbl_auth_login_error_generic';
+  static const authRetryButton = 'lbl_auth_retry_button';
   static const badgesTitle = 'lbl_badges_title';
   static const eventsAdminListTitle = 'lbl_events_admin_list_title';
   static const eventsAddEventButton = 'lbl_events_add_event_button';
@@ -488,7 +491,6 @@ class RemoteConfigService {
     'lbl_auth_profile_title_tr': 'Profilim',
     'lbl_auth_phone_number_label_tr': 'Telefon numarası',
     'lbl_auth_login_button_tr': 'Giriş yap',
-    'lbl_auth_dev_menu_button_tr': 'Geliştirici menüsü',
     'lbl_auth_select_avatar_label_tr': 'Avatarını seç',
     'lbl_auth_badges_nav_label_tr': 'Rozetlerim',
     'lbl_auth_give_feedback_nav_label_tr': 'Geri bildirim ver',
@@ -496,6 +498,13 @@ class RemoteConfigService {
     'lbl_auth_session_reminders_toggle_description_tr':
         'Dersinden 2 saat önce bildirim',
     'lbl_auth_delete_account_confirm_title_tr': 'Profilim',
+    'lbl_auth_login_error_not_found_tr':
+        'Bu numarayla kayıtlı bir hesap bulunamadı. Stüdyo yönetimi seni eklemeli.',
+    'lbl_auth_login_error_rate_limited_tr':
+        'Çok fazla deneme yapıldı. Bir dakika sonra tekrar dene.',
+    'lbl_auth_login_error_generic_tr':
+        'Giriş yapılamadı. Bağlantını kontrol edip tekrar dene.',
+    'lbl_auth_retry_button_tr': 'Tekrar dene',
     'lbl_badges_title_tr': 'Rozetlerim',
     'lbl_events_admin_list_title_tr': 'Etkinlikler',
     'lbl_events_add_event_button_tr': '+ Etkinlik',
@@ -781,7 +790,6 @@ class RemoteConfigService {
     'lbl_auth_profile_title_en': 'My Profile',
     'lbl_auth_phone_number_label_en': 'Phone number',
     'lbl_auth_login_button_en': 'Log in',
-    'lbl_auth_dev_menu_button_en': 'Developer menu',
     'lbl_auth_select_avatar_label_en': 'Choose your avatar',
     'lbl_auth_badges_nav_label_en': 'My Badges',
     'lbl_auth_give_feedback_nav_label_en': 'Give feedback',
@@ -789,6 +797,11 @@ class RemoteConfigService {
     'lbl_auth_session_reminders_toggle_description_en':
         'Notification 2 hours before your session',
     'lbl_auth_delete_account_confirm_title_en': 'My Profile',
+    'lbl_auth_login_error_not_found_en':
+        'No account found with this number. The gym staff needs to add you first.',
+    'lbl_auth_login_error_rate_limited_en': 'Too many attempts. Try again in a minute.',
+    'lbl_auth_login_error_generic_en': 'Could not log in. Check your connection and try again.',
+    'lbl_auth_retry_button_en': 'Try again',
     'lbl_badges_title_en': 'My Badges',
     'lbl_events_admin_list_title_en': 'Events',
     'lbl_events_add_event_button_en': '+ Event',

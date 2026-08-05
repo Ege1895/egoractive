@@ -19,6 +19,7 @@ final _privateConstructorUsedError = UnsupportedError(
 mixin _$AuthState {
   String get phoneDigits => throw _privateConstructorUsedError;
   bool get isRequestingLogin => throw _privateConstructorUsedError;
+  String? get loginErrorMessage => throw _privateConstructorUsedError;
   bool get deleteAccountAcknowledged => throw _privateConstructorUsedError;
   bool get isDeletingAccount => throw _privateConstructorUsedError;
   int get selectedAvatarIndex => throw _privateConstructorUsedError;
@@ -39,6 +40,7 @@ abstract class $AuthStateCopyWith<$Res> {
   $Res call({
     String phoneDigits,
     bool isRequestingLogin,
+    String? loginErrorMessage,
     bool deleteAccountAcknowledged,
     bool isDeletingAccount,
     int selectedAvatarIndex,
@@ -63,6 +65,7 @@ class _$AuthStateCopyWithImpl<$Res, $Val extends AuthState>
   $Res call({
     Object? phoneDigits = null,
     Object? isRequestingLogin = null,
+    Object? loginErrorMessage = freezed,
     Object? deleteAccountAcknowledged = null,
     Object? isDeletingAccount = null,
     Object? selectedAvatarIndex = null,
@@ -78,6 +81,10 @@ class _$AuthStateCopyWithImpl<$Res, $Val extends AuthState>
                 ? _value.isRequestingLogin
                 : isRequestingLogin // ignore: cast_nullable_to_non_nullable
                       as bool,
+            loginErrorMessage: freezed == loginErrorMessage
+                ? _value.loginErrorMessage
+                : loginErrorMessage // ignore: cast_nullable_to_non_nullable
+                      as String?,
             deleteAccountAcknowledged: null == deleteAccountAcknowledged
                 ? _value.deleteAccountAcknowledged
                 : deleteAccountAcknowledged // ignore: cast_nullable_to_non_nullable
@@ -112,6 +119,7 @@ abstract class _$$AuthStateImplCopyWith<$Res>
   $Res call({
     String phoneDigits,
     bool isRequestingLogin,
+    String? loginErrorMessage,
     bool deleteAccountAcknowledged,
     bool isDeletingAccount,
     int selectedAvatarIndex,
@@ -135,6 +143,7 @@ class __$$AuthStateImplCopyWithImpl<$Res>
   $Res call({
     Object? phoneDigits = null,
     Object? isRequestingLogin = null,
+    Object? loginErrorMessage = freezed,
     Object? deleteAccountAcknowledged = null,
     Object? isDeletingAccount = null,
     Object? selectedAvatarIndex = null,
@@ -150,6 +159,10 @@ class __$$AuthStateImplCopyWithImpl<$Res>
             ? _value.isRequestingLogin
             : isRequestingLogin // ignore: cast_nullable_to_non_nullable
                   as bool,
+        loginErrorMessage: freezed == loginErrorMessage
+            ? _value.loginErrorMessage
+            : loginErrorMessage // ignore: cast_nullable_to_non_nullable
+                  as String?,
         deleteAccountAcknowledged: null == deleteAccountAcknowledged
             ? _value.deleteAccountAcknowledged
             : deleteAccountAcknowledged // ignore: cast_nullable_to_non_nullable
@@ -177,6 +190,7 @@ class _$AuthStateImpl extends _AuthState {
   const _$AuthStateImpl({
     this.phoneDigits = '',
     this.isRequestingLogin = false,
+    this.loginErrorMessage,
     this.deleteAccountAcknowledged = false,
     this.isDeletingAccount = false,
     this.selectedAvatarIndex = 0,
@@ -189,6 +203,8 @@ class _$AuthStateImpl extends _AuthState {
   @override
   @JsonKey()
   final bool isRequestingLogin;
+  @override
+  final String? loginErrorMessage;
   @override
   @JsonKey()
   final bool deleteAccountAcknowledged;
@@ -204,7 +220,7 @@ class _$AuthStateImpl extends _AuthState {
 
   @override
   String toString() {
-    return 'AuthState(phoneDigits: $phoneDigits, isRequestingLogin: $isRequestingLogin, deleteAccountAcknowledged: $deleteAccountAcknowledged, isDeletingAccount: $isDeletingAccount, selectedAvatarIndex: $selectedAvatarIndex, sessionReminderEnabled: $sessionReminderEnabled)';
+    return 'AuthState(phoneDigits: $phoneDigits, isRequestingLogin: $isRequestingLogin, loginErrorMessage: $loginErrorMessage, deleteAccountAcknowledged: $deleteAccountAcknowledged, isDeletingAccount: $isDeletingAccount, selectedAvatarIndex: $selectedAvatarIndex, sessionReminderEnabled: $sessionReminderEnabled)';
   }
 
   @override
@@ -216,6 +232,8 @@ class _$AuthStateImpl extends _AuthState {
                 other.phoneDigits == phoneDigits) &&
             (identical(other.isRequestingLogin, isRequestingLogin) ||
                 other.isRequestingLogin == isRequestingLogin) &&
+            (identical(other.loginErrorMessage, loginErrorMessage) ||
+                other.loginErrorMessage == loginErrorMessage) &&
             (identical(
                   other.deleteAccountAcknowledged,
                   deleteAccountAcknowledged,
@@ -234,6 +252,7 @@ class _$AuthStateImpl extends _AuthState {
     runtimeType,
     phoneDigits,
     isRequestingLogin,
+    loginErrorMessage,
     deleteAccountAcknowledged,
     isDeletingAccount,
     selectedAvatarIndex,
@@ -253,6 +272,7 @@ abstract class _AuthState extends AuthState {
   const factory _AuthState({
     final String phoneDigits,
     final bool isRequestingLogin,
+    final String? loginErrorMessage,
     final bool deleteAccountAcknowledged,
     final bool isDeletingAccount,
     final int selectedAvatarIndex,
@@ -264,6 +284,8 @@ abstract class _AuthState extends AuthState {
   String get phoneDigits;
   @override
   bool get isRequestingLogin;
+  @override
+  String? get loginErrorMessage;
   @override
   bool get deleteAccountAcknowledged;
   @override

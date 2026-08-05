@@ -7,6 +7,7 @@ class AuthState with _$AuthState {
   const factory AuthState({
     @Default('') String phoneDigits,
     @Default(false) bool isRequestingLogin,
+    String? loginErrorMessage,
     @Default(false) bool deleteAccountAcknowledged,
     @Default(false) bool isDeletingAccount,
     @Default(0) int selectedAvatarIndex,

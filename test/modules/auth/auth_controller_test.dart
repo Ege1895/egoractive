@@ -2,11 +2,24 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:egoractive/modules/auth/controller/auth_controller.dart';
+import 'package:egoractive/modules/auth/repository/auth_repository.dart';
+
+/// Gerçek Firebase çağrısı (F1-10) yapmayan sahte repository — bu dosya
+/// controller'ın state geçişlerini test eder, Firebase entegrasyonunu değil.
+class _FakeAuthRepository implements AuthRepository {
+  @override
+  Future<void> login(String phoneDigits) => Future<void>.delayed(const Duration(seconds: 2));
+
+  @override
+  Future<void> deleteAccount() => Future<void>.delayed(const Duration(seconds: 2));
+}
 
 void main() {
   group('AuthController', () {
     test('setPhoneDigits strips non-digits and caps at 10 digits', () {
-      final container = ProviderContainer();
+      final container = ProviderContainer(
+        overrides: [authRepositoryProvider.overrideWith((ref) => _FakeAuthRepository())],
+      );
       addTearDown(container.dispose);
       final notifier = container.read(authControllerProvider.notifier);
 
@@ -20,7 +33,9 @@ void main() {
     });
 
     test('setPhoneDigits with empty input clears the number', () {
-      final container = ProviderContainer();
+      final container = ProviderContainer(
+        overrides: [authRepositoryProvider.overrideWith((ref) => _FakeAuthRepository())],
+      );
       addTearDown(container.dispose);
       final notifier = container.read(authControllerProvider.notifier);
 
@@ -30,7 +45,9 @@ void main() {
     });
 
     test('requestLogin is a no-op until the phone number is complete', () async {
-      final container = ProviderContainer();
+      final container = ProviderContainer(
+        overrides: [authRepositoryProvider.overrideWith((ref) => _FakeAuthRepository())],
+      );
       addTearDown(container.dispose);
       final notifier = container.read(authControllerProvider.notifier);
 
@@ -39,7 +56,9 @@ void main() {
     });
 
     test('requestLogin toggles isRequestingLogin around the mock call', () async {
-      final container = ProviderContainer();
+      final container = ProviderContainer(
+        overrides: [authRepositoryProvider.overrideWith((ref) => _FakeAuthRepository())],
+      );
       addTearDown(container.dispose);
       final notifier = container.read(authControllerProvider.notifier);
 
@@ -52,7 +71,9 @@ void main() {
     });
 
     test('deleteAccount requires acknowledgement first', () async {
-      final container = ProviderContainer();
+      final container = ProviderContainer(
+        overrides: [authRepositoryProvider.overrideWith((ref) => _FakeAuthRepository())],
+      );
       addTearDown(container.dispose);
       final notifier = container.read(authControllerProvider.notifier);
 
