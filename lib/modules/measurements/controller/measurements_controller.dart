@@ -1,15 +1,115 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../core/router/app_router.dart';
 import '../domain/measurement_metric.dart';
+import '../domain/measurement_point.dart';
+import '../domain/measurement_series.dart';
 import '../domain/measurements_state.dart';
 import '../repository/measurements_repository.dart';
+import '../service/measurements_write_service.dart';
 
 part 'measurements_controller.g.dart';
 
+const _monthAbbrev = {
+  1: 'Oca', 2: 'Şub', 3: 'Mar', 4: 'Nis', 5: 'May', 6: 'Haz',
+  7: 'Tem', 8: 'Ağu', 9: 'Eyl', 10: 'Eki', 11: 'Kas', 12: 'Ara',
+};
+
+/// Silüet üzerindeki tıklanabilir nokta konumları — gerçek ölçüm verisiyle
+/// hiçbir ilgisi yok, sadece görsel bir yerleşim sabiti (mock'takiyle aynı).
+const _avatarLayout = {
+  MeasurementMetric.gogus: (fx: 0.50, fy: 0.255, side: AvatarSide.right),
+  MeasurementMetric.kol: (fx: 0.335, fy: 0.345, side: AvatarSide.left),
+  MeasurementMetric.bel: (fx: 0.50, fy: 0.395, side: AvatarSide.right),
+  MeasurementMetric.kalca: (fx: 0.50, fy: 0.475, side: AvatarSide.left),
+  MeasurementMetric.bacak: (fx: 0.435, fy: 0.615, side: AvatarSide.right),
+};
+
+typedef _Entry = (DateTime date, Map<MeasurementMetric, double> values);
+
+@riverpod
+Stream<List<_Entry>> _measurementEntries(_MeasurementEntriesRef ref, String uid) {
+  return FirebaseFirestore.instance
+      .collection('measurements')
+      .doc(uid)
+      .collection('entries')
+      .orderBy('date')
+      .snapshots()
+      .map((snapshot) => snapshot.docs.map((doc) {
+            final data = doc.data();
+            final date = (data['date'] as Timestamp).toDate();
+            final values = <MeasurementMetric, double>{};
+            for (final metric in MeasurementMetric.values) {
+              final raw = data[metric.name];
+              if (raw is num) values[metric] = raw.toDouble();
+            }
+            return (date, values);
+          }).toList());
+}
+
+MeasurementsState _toState(List<_Entry> entries) {
+  final series = <MeasurementMetric, MeasurementSeries>{};
+  final points = <MeasurementMetric, MeasurementPoint>{};
+
+  for (final metric in MeasurementMetric.values) {
+    final withMetric = entries.where((e) => e.$2.containsKey(metric)).toList();
+    if (withMetric.isEmpty) continue;
+
+    final months = withMetric.map((e) => _monthAbbrev[e.$1.month] ?? '').toList();
+    final values = withMetric.map((e) => e.$2[metric]!).toList();
+    final totalDelta = values.last - values.first;
+    series[metric] = MeasurementSeries(
+      metric: metric,
+      months: months,
+      values: values,
+      totalDeltaLabel: _formatDelta(totalDelta, zeroLabel: '0 cm'),
+    );
+
+    final layout = _avatarLayout[metric];
+    if (layout == null) continue;
+    final latest = values.last;
+    final previous = values.length > 1 ? values[values.length - 2] : latest;
+    final diff = latest - previous;
+    points[metric] = MeasurementPoint(
+      metric: metric,
+      value: latest.toStringAsFixed(1).replaceAll('.', ','),
+      delta: _formatDelta(diff, zeroLabel: 'değişim yok'),
+      isImprovement: diff <= 0,
+      since: 'Son ölçüm ${withMetric.last.$1.day} ${_monthAbbrev[withMetric.last.$1.month]}',
+      fx: layout.fx,
+      fy: layout.fy,
+      side: layout.side,
+    );
+  }
+
+  return MeasurementsState(points: points, series: series);
+}
+
+String _formatDelta(double diff, {required String zeroLabel}) {
+  if (diff == 0) return zeroLabel;
+  final formatted = diff.abs().toStringAsFixed(1).replaceAll('.', ',');
+  return '${diff < 0 ? '−' : '+'}$formatted cm';
+}
+
+/// F4-1 — üyenin kendi ölçümleri gerçek zamanlı `measurements/{uid}/entries`
+/// alt koleksiyonundan okunur. Hiç ölçüm yoksa (yeni üye) mock veriye
+/// düşülür — boş bir avatar/grafik göstermek yerine örnek bir başlangıç
+/// durumu sunar.
 @riverpod
 class MeasurementsController extends _$MeasurementsController {
   @override
-  MeasurementsState build() => ref.watch(measurementsRepositoryProvider).loadInitial();
+  MeasurementsState build() {
+    final uid = ref.watch(authStateProvider).valueOrNull?.uid;
+    final mock = ref.watch(measurementsRepositoryProvider).loadInitial();
+    if (uid == null) return mock;
+
+    final entries = ref.watch(_measurementEntriesProvider(uid)).valueOrNull;
+    if (entries == null || entries.isEmpty) return mock;
+
+    final real = _toState(entries);
+    return mock.copyWith(points: real.points, series: real.series);
+  }
 
   void selectPoint(MeasurementMetric metric) {
     state = state.copyWith(selectedMetric: metric);
@@ -19,32 +119,11 @@ class MeasurementsController extends _$MeasurementsController {
     state = state.copyWith(viewMode: mode);
   }
 
-  /// Yeni ölçüm ekle formundan gelen değerleri ilgili metriklere işler —
-  /// boş bırakılan alanlar atlanır (grafikte kırılma olmaz).
-  void addMeasurement(Map<MeasurementMetric, double> newValues) {
-    final updatedSeries = {...state.series};
-    final updatedPoints = {...state.points};
-
-    for (final entry in newValues.entries) {
-      final series = updatedSeries[entry.key];
-      if (series == null) continue;
-      final previous = series.values.isNotEmpty ? series.values.last : entry.value;
-      final nextValues = [...series.values, entry.value];
-      updatedSeries[entry.key] = series.copyWith(values: nextValues);
-
-      final diff = entry.value - previous;
-      final formattedDiff = diff.abs().toStringAsFixed(1).replaceAll('.', ',');
-      final point = updatedPoints[entry.key];
-      if (point != null) {
-        updatedPoints[entry.key] = point.copyWith(
-          value: entry.value.toStringAsFixed(1).replaceAll('.', ','),
-          delta: diff == 0 ? 'değişim yok' : '${diff < 0 ? '−' : '+'}$formattedDiff cm',
-          isImprovement: diff <= 0,
-          since: 'Az önce eklendi',
-        );
-      }
-    }
-
-    state = state.copyWith(series: updatedSeries, points: updatedPoints);
+  /// Yeni ölçüm ekle formundan gelen değerleri gerçek Firestore'a yazar —
+  /// boş bırakılan alanlar atlanır.
+  Future<void> addMeasurement(Map<MeasurementMetric, double> newValues) async {
+    final uid = ref.read(authStateProvider).valueOrNull?.uid;
+    if (uid == null || newValues.isEmpty) return;
+    await ref.read(measurementsWriteServiceProvider).addEntry(uid: uid, date: DateTime.now(), values: newValues);
   }
 }

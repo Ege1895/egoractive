@@ -123,5 +123,12 @@ service cloud.firestore {
         isCompletingOwnSession()
       );
     }
+
+    // measurements/{uid}/entries/{entryId} — F4-1. Vücut ölçümü kişisel/
+    // hassas sağlık verisi (F0-4 gizlilik politikası kapsamında) — sadece
+    // sahibi okuyup yazabilir, admin/antrenör dahil hiç kimseye açık değil.
+    match /measurements/{uid}/entries/{entryId} {
+      allow read, write: if isSignedIn() && request.auth.uid == uid;
+    }
   }
 }

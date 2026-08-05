@@ -143,14 +143,15 @@ class _AddMeasurementPanelState extends BasePanelState<AddMeasurementPanel> {
     );
   }
 
-  void _save() {
+  Future<void> _save() async {
     final values = <MeasurementMetric, double>{};
     for (final entry in _controllers.entries) {
       final raw = entry.value.text.trim().replaceAll(',', '.');
       final parsed = double.tryParse(raw);
       if (parsed != null) values[entry.key] = parsed;
     }
-    ref.read(measurementsControllerProvider.notifier).addMeasurement(values);
+    await ref.read(measurementsControllerProvider.notifier).addMeasurement(values);
+    if (!mounted) return;
     ref.read(panelStackControllerProvider.notifier).pop();
   }
 
