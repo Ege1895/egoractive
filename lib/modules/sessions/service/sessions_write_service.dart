@@ -26,6 +26,7 @@ class SessionsWriteService {
       'memberName': memberName,
       'startTime': Timestamp.fromDate(startTime),
       'status': 'planned',
+      'confirmationRequested': false,
       'createdAt': FieldValue.serverTimestamp(),
     });
   }

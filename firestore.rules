@@ -85,11 +85,24 @@ service cloud.firestore {
       return resource.data.startTime - request.time > duration.value(24, 'h');
     }
 
+    // F3-4 — üye "Gelicem"/"Gelmeyeceğim" derken sadece kendi seansının
+    // memberConfirmation alanını değiştiriyor; bu, 24 saatlik iptal
+    // penceresinden bağımsız (dersten 1 saat önce de onay verebilmeli).
+    function isOwnMemberSession() {
+      return myRole() == 'member' && resource.data.memberId == request.auth.uid;
+    }
+
+    function onlyChangesConfirmation() {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(['memberConfirmation']);
+    }
+
     match /sessions/{sessionId} {
       allow read: if isSignedIn() && resource.data.gymId == myGymId();
       allow create: if isSignedIn() && myRole() == 'admin' && request.resource.data.gymId == myGymId();
       allow update, delete: if isSignedIn() && resource.data.gymId == myGymId() && (
-        myRole() == 'admin' || (isOwnSession() && withinCancellationWindow())
+        myRole() == 'admin' ||
+        (isOwnSession() && withinCancellationWindow()) ||
+        (isOwnMemberSession() && onlyChangesConfirmation())
       );
     }
   }

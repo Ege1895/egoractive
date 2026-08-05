@@ -20,13 +20,11 @@ async function readReminderMinutesBefore(): Promise<number> {
 }
 
 /**
- * F2-7 — 15 dakikada bir çalışır: F1-7'deki `sessionReminderMinutesBefore`
- * RC değerine göre, başlangıcı yaklaşan (henüz hatırlatma gönderilmemiş)
- * seansları bulur ve üyenin kayıtlı FCM token'larına push gönderir.
- *
- * Gerçek seans verisi henüz yok (F3'te dolacak) — `gyms/{gymId}/sessions`
- * alt koleksiyonundaki herhangi bir (mock/dummy) dokümanla uçtan uca
- * çalışır; şema hazır olduğunda değişiklik gerekmiyor.
+ * F3-4 — 15 dakikada bir çalışır: F1-7'deki `sessionReminderMinutesBefore`
+ * RC değerine göre, başlangıcı yaklaşan ve henüz bildirim gönderilmemiş
+ * (`confirmationRequested: false`) planlı seansları bulur, üyenin kayıtlı
+ * FCM token'larına push gönderir ve `confirmationRequested: true` yapar —
+ * bu alan aynı seans için ikinci kez bildirim gitmesini engeller.
  */
 export const sessionReminderCheck = onSchedule("every 15 minutes", async () => {
   const minutesBefore = await readReminderMinutesBefore();
@@ -36,10 +34,11 @@ export const sessionReminderCheck = onSchedule("every 15 minutes", async () => {
   const windowEnd = Timestamp.fromMillis(now.toMillis() + minutesBefore * 60_000);
 
   const dueSessions = await db
-    .collectionGroup("sessions")
-    .where("startsAt", ">=", now)
-    .where("startsAt", "<=", windowEnd)
-    .where("reminderSent", "==", false)
+    .collection("sessions")
+    .where("status", "==", "planned")
+    .where("confirmationRequested", "==", false)
+    .where("startTime", ">=", now)
+    .where("startTime", "<=", windowEnd)
     .get();
 
   if (dueSessions.empty) {
@@ -55,6 +54,7 @@ export const sessionReminderCheck = onSchedule("every 15 minutes", async () => {
     const fcmTokens = (memberDoc.data()?.fcmTokens as string[] | undefined) ?? [];
     if (fcmTokens.length === 0) {
       logger.info(`Üye ${memberId} için kayıtlı FCM token yok, atlandı.`);
+      await sessionDoc.ref.update({ confirmationRequested: true });
       continue;
     }
 
@@ -64,9 +64,9 @@ export const sessionReminderCheck = onSchedule("every 15 minutes", async () => {
         title: "Dersin yaklaşıyor",
         body: "Yaklaşan dersin için gelip gelmeyeceğini bildir.",
       },
-      data: { type: "session_reminder" },
+      data: { type: "session_reminder", sessionId: sessionDoc.id },
     });
 
-    await sessionDoc.ref.update({ reminderSent: true });
+    await sessionDoc.ref.update({ confirmationRequested: true });
   }
 });

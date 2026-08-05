@@ -155,11 +155,14 @@ class _SessionsForMemberProviderElement
 }
 
 String _$sessionsControllerHash() =>
-    r'a1d1857217a6884908cbd9e0368a5e59c6460af3';
+    r'5187d13241c78d964eab066de72c48118f533570';
 
 /// F3-3 — üyenin kendi seansları gerçek zamanlı `sessions` koleksiyonundan
 /// (memberId == kendi uid'si) okunur. `week`/`paymentWarning` bu task'ın
 /// kapsamı dışında (ayrı devam eden mock alanlar).
+///
+/// F3-4 — `attendanceAnswer` artık ayrı bir yerel state değil, sıradaki
+/// seansın Firestore'daki `memberConfirmation` alanından türetiliyor.
 ///
 /// Copied from [SessionsController].
 @ProviderFor(SessionsController)

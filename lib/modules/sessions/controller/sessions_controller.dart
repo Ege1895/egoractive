@@ -54,6 +54,12 @@ Session _toSession(String id, Map<String, dynamic> data, DateTime startTime) {
     'completed' => SessionStatus.completed,
     _ => SessionStatus.planned,
   };
+  final confirmationStr = data['memberConfirmation'] as String?;
+  final confirmation = switch (confirmationStr) {
+    'coming' => AttendanceAnswer.coming,
+    'notComing' => AttendanceAnswer.notComing,
+    _ => AttendanceAnswer.pending,
+  };
   final time = '${startTime.hour.toString().padLeft(2, '0')}:${startTime.minute.toString().padLeft(2, '0')}';
   return Session(
     id: id,
@@ -62,12 +68,16 @@ Session _toSession(String id, Map<String, dynamic> data, DateTime startTime) {
     title: 'Birebir · $time',
     meta: (data['trainerName'] as String?) ?? '',
     status: status,
+    confirmation: confirmation,
   );
 }
 
 /// F3-3 — üyenin kendi seansları gerçek zamanlı `sessions` koleksiyonundan
 /// (memberId == kendi uid'si) okunur. `week`/`paymentWarning` bu task'ın
 /// kapsamı dışında (ayrı devam eden mock alanlar).
+///
+/// F3-4 — `attendanceAnswer` artık ayrı bir yerel state değil, sıradaki
+/// seansın Firestore'daki `memberConfirmation` alanından türetiliyor.
 @riverpod
 class SessionsController extends _$SessionsController {
   @override
@@ -77,10 +87,12 @@ class SessionsController extends _$SessionsController {
     if (uid == null) return mock;
 
     final (upcoming, past) = ref.watch(_sessionsForMemberProvider(uid)).valueOrNull ?? (const <Session>[], const <Session>[]);
+    final nextSession = upcoming.isEmpty ? _emptyNextSession : upcoming.first;
     return mock.copyWith(
-      nextSession: upcoming.isEmpty ? _emptyNextSession : upcoming.first,
+      nextSession: nextSession,
       upcoming: upcoming,
       past: past,
+      attendanceAnswer: nextSession.confirmation,
     );
   }
 
@@ -88,11 +100,21 @@ class SessionsController extends _$SessionsController {
     state = state.copyWith(viewMode: mode);
   }
 
-  void confirmAttendance(bool coming) {
-    state = state.copyWith(attendanceAnswer: coming ? AttendanceAnswer.coming : AttendanceAnswer.notComing);
+  Future<void> confirmAttendance(bool coming) async {
+    final sessionId = state.nextSession.id;
+    if (sessionId == 'none') return;
+    final answer = coming ? AttendanceAnswer.coming : AttendanceAnswer.notComing;
+    state = state.copyWith(attendanceAnswer: answer);
+    await FirebaseFirestore.instance
+        .collection('sessions')
+        .doc(sessionId)
+        .update({'memberConfirmation': coming ? 'coming' : 'notComing'});
   }
 
-  void resetAttendance() {
+  Future<void> resetAttendance() async {
+    final sessionId = state.nextSession.id;
     state = state.copyWith(attendanceAnswer: AttendanceAnswer.pending);
+    if (sessionId == 'none') return;
+    await FirebaseFirestore.instance.collection('sessions').doc(sessionId).update({'memberConfirmation': FieldValue.delete()});
   }
 }
