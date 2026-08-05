@@ -208,7 +208,13 @@ class _CreateGroupSessionPanelState extends BasePanelState<CreateGroupSessionPan
             ),
             Padding(
               padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.md, AppSpacing.screenEdge, AppSpacing.lg),
-              child: AppButton(label: 'Grup dersini oluştur', onPressed: () => panelStack.pop()),
+              child: AppButton(
+                label: 'Grup dersini oluştur',
+                onPressed: () async {
+                  final success = await controller.submit();
+                  if (success) panelStack.pop();
+                },
+              ),
             ),
           ],
         ),

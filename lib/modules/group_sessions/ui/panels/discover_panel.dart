@@ -152,7 +152,11 @@ class _DiscoverCard extends StatelessWidget {
     final String btnLabel;
     final Color btnBg;
     final Color btnFg;
-    if (item.isFull) {
+    if (item.isLocked) {
+      btnLabel = 'Kilitli · Başlangıç yaklaştı';
+      btnBg = colors.surfaceRaised;
+      btnFg = colors.onSurfaceMuted;
+    } else if (item.isFull) {
       btnLabel = 'Yedek listesine yaz';
       btnBg = colors.surfaceRaised;
       btnFg = colors.onSurfaceVariant;
@@ -234,7 +238,7 @@ class _DiscoverCard extends StatelessWidget {
             color: btnBg,
             borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
             child: InkWell(
-              onTap: onToggleJoin,
+              onTap: item.isLocked ? null : onToggleJoin,
               borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
               child: Container(
                 width: double.infinity,

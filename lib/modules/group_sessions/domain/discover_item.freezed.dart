@@ -27,6 +27,11 @@ mixin _$DiscoverItem {
   int get capacity => throw _privateConstructorUsedError;
   bool get joined => throw _privateConstructorUsedError;
 
+  /// Grup dersi ise gerçek başlangıç zamanı — kilit kontrolü için.
+  /// Etkinlikler (F4-3, henüz mock) için null.
+  DateTime? get startTime => throw _privateConstructorUsedError;
+  int get lockHoursBefore => throw _privateConstructorUsedError;
+
   /// Create a copy of DiscoverItem
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -51,6 +56,8 @@ abstract class $DiscoverItemCopyWith<$Res> {
     int taken,
     int capacity,
     bool joined,
+    DateTime? startTime,
+    int lockHoursBefore,
   });
 }
 
@@ -78,6 +85,8 @@ class _$DiscoverItemCopyWithImpl<$Res, $Val extends DiscoverItem>
     Object? taken = null,
     Object? capacity = null,
     Object? joined = null,
+    Object? startTime = freezed,
+    Object? lockHoursBefore = null,
   }) {
     return _then(
       _value.copyWith(
@@ -117,6 +126,14 @@ class _$DiscoverItemCopyWithImpl<$Res, $Val extends DiscoverItem>
                 ? _value.joined
                 : joined // ignore: cast_nullable_to_non_nullable
                       as bool,
+            startTime: freezed == startTime
+                ? _value.startTime
+                : startTime // ignore: cast_nullable_to_non_nullable
+                      as DateTime?,
+            lockHoursBefore: null == lockHoursBefore
+                ? _value.lockHoursBefore
+                : lockHoursBefore // ignore: cast_nullable_to_non_nullable
+                      as int,
           )
           as $Val,
     );
@@ -142,6 +159,8 @@ abstract class _$$DiscoverItemImplCopyWith<$Res>
     int taken,
     int capacity,
     bool joined,
+    DateTime? startTime,
+    int lockHoursBefore,
   });
 }
 
@@ -168,6 +187,8 @@ class __$$DiscoverItemImplCopyWithImpl<$Res>
     Object? taken = null,
     Object? capacity = null,
     Object? joined = null,
+    Object? startTime = freezed,
+    Object? lockHoursBefore = null,
   }) {
     return _then(
       _$DiscoverItemImpl(
@@ -207,6 +228,14 @@ class __$$DiscoverItemImplCopyWithImpl<$Res>
             ? _value.joined
             : joined // ignore: cast_nullable_to_non_nullable
                   as bool,
+        startTime: freezed == startTime
+            ? _value.startTime
+            : startTime // ignore: cast_nullable_to_non_nullable
+                  as DateTime?,
+        lockHoursBefore: null == lockHoursBefore
+            ? _value.lockHoursBefore
+            : lockHoursBefore // ignore: cast_nullable_to_non_nullable
+                  as int,
       ),
     );
   }
@@ -225,6 +254,8 @@ class _$DiscoverItemImpl extends _DiscoverItem {
     required this.taken,
     required this.capacity,
     this.joined = false,
+    this.startTime,
+    this.lockHoursBefore = 24,
   }) : super._();
 
   @override
@@ -247,9 +278,17 @@ class _$DiscoverItemImpl extends _DiscoverItem {
   @JsonKey()
   final bool joined;
 
+  /// Grup dersi ise gerçek başlangıç zamanı — kilit kontrolü için.
+  /// Etkinlikler (F4-3, henüz mock) için null.
+  @override
+  final DateTime? startTime;
+  @override
+  @JsonKey()
+  final int lockHoursBefore;
+
   @override
   String toString() {
-    return 'DiscoverItem(id: $id, category: $category, day: $day, month: $month, title: $title, meta: $meta, taken: $taken, capacity: $capacity, joined: $joined)';
+    return 'DiscoverItem(id: $id, category: $category, day: $day, month: $month, title: $title, meta: $meta, taken: $taken, capacity: $capacity, joined: $joined, startTime: $startTime, lockHoursBefore: $lockHoursBefore)';
   }
 
   @override
@@ -267,7 +306,11 @@ class _$DiscoverItemImpl extends _DiscoverItem {
             (identical(other.taken, taken) || other.taken == taken) &&
             (identical(other.capacity, capacity) ||
                 other.capacity == capacity) &&
-            (identical(other.joined, joined) || other.joined == joined));
+            (identical(other.joined, joined) || other.joined == joined) &&
+            (identical(other.startTime, startTime) ||
+                other.startTime == startTime) &&
+            (identical(other.lockHoursBefore, lockHoursBefore) ||
+                other.lockHoursBefore == lockHoursBefore));
   }
 
   @override
@@ -282,6 +325,8 @@ class _$DiscoverItemImpl extends _DiscoverItem {
     taken,
     capacity,
     joined,
+    startTime,
+    lockHoursBefore,
   );
 
   /// Create a copy of DiscoverItem
@@ -304,6 +349,8 @@ abstract class _DiscoverItem extends DiscoverItem {
     required final int taken,
     required final int capacity,
     final bool joined,
+    final DateTime? startTime,
+    final int lockHoursBefore,
   }) = _$DiscoverItemImpl;
   const _DiscoverItem._() : super._();
 
@@ -325,6 +372,13 @@ abstract class _DiscoverItem extends DiscoverItem {
   int get capacity;
   @override
   bool get joined;
+
+  /// Grup dersi ise gerçek başlangıç zamanı — kilit kontrolü için.
+  /// Etkinlikler (F4-3, henüz mock) için null.
+  @override
+  DateTime? get startTime;
+  @override
+  int get lockHoursBefore;
 
   /// Create a copy of DiscoverItem
   /// with the given fields replaced by the non-null parameter values.

@@ -2,7 +2,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const test = require("node:test");
 const assert = require("node:assert/strict");
-const { setDoc, updateDoc, getDoc, doc, Timestamp } = require("firebase/firestore");
+const { setDoc, updateDoc, getDoc, doc, Timestamp, runTransaction, arrayUnion } = require("firebase/firestore");
 const {
   initializeTestEnvironment,
   assertSucceeds,
@@ -54,6 +54,9 @@ test.beforeEach(async () => {
       name: "Member A2",
     });
     await setDoc(doc(db, "users/admin-b"), { role: "admin", gymId: "gym-b" });
+    for (let i = 1; i <= 10; i++) {
+      await setDoc(doc(db, `users/load-${i}`), { role: "member", gymId: "gym-a", trainerId: "trainer-a" });
+    }
   });
 });
 
@@ -382,4 +385,109 @@ test("admin of a different gym cannot read a member's measurement entry (negativ
   });
   const db = contextFor("admin-b", { role: "admin", gymId: "gym-b" }).firestore();
   await assertFails(getDoc(doc(db, "measurements/member-a1/entries/e1")));
+});
+
+// --- groupSessions/{id} (F4-2) ---
+
+async function seedGroupSession(id, { capacity, attendeeIds = [] }) {
+  await testEnv.withSecurityRulesDisabled(async (context) => {
+    await setDoc(context.firestore().doc(`groupSessions/${id}`), {
+      gymId: "gym-a",
+      title: "Reformer Grup",
+      trainerName: "Selin Kara",
+      capacity,
+      attendeeIds,
+    });
+  });
+}
+
+test("admin can create a group session for their own gym (positive)", async () => {
+  const db = contextFor("admin-a", { role: "admin", gymId: "gym-a" }).firestore();
+  await assertSucceeds(
+    setDoc(doc(db, "groupSessions/gs1"), { gymId: "gym-a", title: "Mat Pilates", capacity: 8, attendeeIds: [] }),
+  );
+});
+
+test("trainer can create a group session for their own gym (positive)", async () => {
+  const db = contextFor("trainer-a", { role: "trainer", gymId: "gym-a" }).firestore();
+  await assertSucceeds(
+    setDoc(doc(db, "groupSessions/gs1"), { gymId: "gym-a", title: "Mat Pilates", capacity: 8, attendeeIds: [] }),
+  );
+});
+
+test("member cannot create a group session (negative)", async () => {
+  const db = contextFor("member-a1", { role: "member", gymId: "gym-a" }).firestore();
+  await assertFails(
+    setDoc(doc(db, "groupSessions/gs1"), { gymId: "gym-a", title: "Mat Pilates", capacity: 8, attendeeIds: [] }),
+  );
+});
+
+test("member can join a group session with room left (positive)", async () => {
+  await seedGroupSession("gs1", { capacity: 2, attendeeIds: [] });
+  const db = contextFor("member-a1", { role: "member", gymId: "gym-a" }).firestore();
+  await assertSucceeds(updateDoc(doc(db, "groupSessions/gs1"), { attendeeIds: arrayUnion("member-a1") }));
+});
+
+test("member cannot join a full group session (negative — kontenjan dolu)", async () => {
+  await seedGroupSession("gs1", { capacity: 1, attendeeIds: ["member-a2"] });
+  const db = contextFor("member-a1", { role: "member", gymId: "gym-a" }).firestore();
+  await assertFails(updateDoc(doc(db, "groupSessions/gs1"), { attendeeIds: arrayUnion("member-a1") }));
+});
+
+test("member cannot join on behalf of another member (negative)", async () => {
+  await seedGroupSession("gs1", { capacity: 8, attendeeIds: [] });
+  const db = contextFor("member-a1", { role: "member", gymId: "gym-a" }).firestore();
+  await assertFails(updateDoc(doc(db, "groupSessions/gs1"), { attendeeIds: arrayUnion("member-a2") }));
+});
+
+test("member can leave a group session they joined (positive)", async () => {
+  await seedGroupSession("gs1", { capacity: 8, attendeeIds: ["member-a1"] });
+  const db = contextFor("member-a1", { role: "member", gymId: "gym-a" }).firestore();
+  await assertSucceeds(
+    updateDoc(doc(db, "groupSessions/gs1"), { attendeeIds: [] }),
+  );
+});
+
+test("member cannot change other fields while joining (negative — sadece attendeeIds)", async () => {
+  await seedGroupSession("gs1", { capacity: 8, attendeeIds: [] });
+  const db = contextFor("member-a1", { role: "member", gymId: "gym-a" }).firestore();
+  await assertFails(
+    updateDoc(doc(db, "groupSessions/gs1"), { attendeeIds: arrayUnion("member-a1"), capacity: 100 }),
+  );
+});
+
+test("YÜK TESTİ: 10 eşzamanlı katılım isteğinde kontenjan (capacity=5) hiçbir zaman aşılmıyor", async () => {
+  await seedGroupSession("gs-load", { capacity: 5, attendeeIds: [] });
+
+  async function join(uid) {
+    const db = contextFor(uid, { role: "member", gymId: "gym-a" }).firestore();
+    const ref = doc(db, "groupSessions/gs-load");
+    try {
+      await runTransaction(db, async (transaction) => {
+        const snapshot = await transaction.get(ref);
+        const data = snapshot.data();
+        const attendeeIds = data.attendeeIds || [];
+        if (attendeeIds.includes(uid)) return;
+        if (attendeeIds.length >= data.capacity) {
+          throw new Error("Kontenjan doldu.");
+        }
+        transaction.update(ref, { attendeeIds: arrayUnion(uid) });
+      });
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  const uids = Array.from({ length: 10 }, (_, i) => `load-${i + 1}`);
+  const results = await Promise.all(uids.map(join));
+  const succeeded = results.filter(Boolean).length;
+
+  await testEnv.withSecurityRulesDisabled(async (context) => {
+    const finalSnapshot = await getDoc(context.firestore().doc("groupSessions/gs-load"));
+    const finalAttendees = finalSnapshot.data().attendeeIds || [];
+    assert.equal(finalAttendees.length, 5, "kontenjan (5) ile bitmeli, aşmamalı ya da eksik kalmamalı");
+    assert.equal(succeeded, 5, "sadece 5 istek başarılı olmalı");
+    assert.equal(new Set(finalAttendees).size, 5, "attendeeIds içinde tekrar olmamalı");
+  });
 });
