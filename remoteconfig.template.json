@@ -1,0 +1,3363 @@
+{
+  "parameters": {
+    "cfg_session_reminder_minutes_before": {
+      "defaultValue": {
+        "value": "60"
+      },
+      "description": "Ders/seans onay bildiriminin kaç dakika önce gönderileceği.",
+      "valueType": "NUMBER"
+    },
+    "cfg_default_group_session_capacity": {
+      "defaultValue": {
+        "value": "6"
+      },
+      "description": "Grup dersi oluştururken varsayılan kontenjan.",
+      "valueType": "NUMBER"
+    },
+    "cfg_feedback_reminder_day_of_month": {
+      "defaultValue": {
+        "value": "-1"
+      },
+      "description": "Aylık geri bildirim hatırlatmasının gönderileceği gün. -1 = ayın son günü.",
+      "valueType": "NUMBER"
+    },
+    "cfg_free_version_ads_enabled": {
+      "defaultValue": {
+        "value": "true"
+      },
+      "description": "Ücretsiz sürümde reklam gösterilsin mi.",
+      "valueType": "BOOLEAN"
+    },
+    "cfg_feature_flags": {
+      "defaultValue": {
+        "value": "{}"
+      },
+      "description": "Feature flag'lerin tutulduğu JSON obje (esnek, sabit alanı yok).",
+      "valueType": "JSON"
+    },
+    "lbl_common_vazgec_tr": {
+      "defaultValue": {
+        "value": "Vazgeç"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_common_vazgec_en": {
+      "defaultValue": {
+        "value": "Cancel"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_common_kaydet_tr": {
+      "defaultValue": {
+        "value": "Kaydet"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_common_kaydet_en": {
+      "defaultValue": {
+        "value": "Save"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_common_duzenle_tr": {
+      "defaultValue": {
+        "value": "Düzenle"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_common_duzenle_en": {
+      "defaultValue": {
+        "value": "Edit"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_common_kapat_tr": {
+      "defaultValue": {
+        "value": "Kapat"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_common_kapat_en": {
+      "defaultValue": {
+        "value": "Close"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_common_degistir_tr": {
+      "defaultValue": {
+        "value": "Değiştir"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_common_degistir_en": {
+      "defaultValue": {
+        "value": "Change"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_common_cikis_yap_tr": {
+      "defaultValue": {
+        "value": "Çıkış yap"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_common_cikis_yap_en": {
+      "defaultValue": {
+        "value": "Sign out"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_common_hesabimi_sil_tr": {
+      "defaultValue": {
+        "value": "Hesabımı sil"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_common_hesabimi_sil_en": {
+      "defaultValue": {
+        "value": "Delete my account"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_common_studyo_kurallari_nav_tr": {
+      "defaultValue": {
+        "value": "Stüdyo kuralları"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_common_studyo_kurallari_nav_en": {
+      "defaultValue": {
+        "value": "Studio rules"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_common_seansi_ertele_tr": {
+      "defaultValue": {
+        "value": "Seansı ertele"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_common_seansi_ertele_en": {
+      "defaultValue": {
+        "value": "Postpone session"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_common_gelicem_tr": {
+      "defaultValue": {
+        "value": "Gelicem"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_common_gelicem_en": {
+      "defaultValue": {
+        "value": "I'm coming"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_common_gelmeyecegim_tr": {
+      "defaultValue": {
+        "value": "Gelmeyeceğim"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_common_gelmeyecegim_en": {
+      "defaultValue": {
+        "value": "I'm not coming"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_common_ana_sayfa_tab_tr": {
+      "defaultValue": {
+        "value": "Ana Sayfa"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_common_ana_sayfa_tab_en": {
+      "defaultValue": {
+        "value": "Home"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_common_profil_tab_tr": {
+      "defaultValue": {
+        "value": "Profil"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_common_profil_tab_en": {
+      "defaultValue": {
+        "value": "Profile"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_common_telefon_label_tr": {
+      "defaultValue": {
+        "value": "Telefon"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_common_telefon_label_en": {
+      "defaultValue": {
+        "value": "Phone"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_common_tumu_filter_tr": {
+      "defaultValue": {
+        "value": "Tümü"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_common_tumu_filter_en": {
+      "defaultValue": {
+        "value": "All"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_common_tamamlandi_tr": {
+      "defaultValue": {
+        "value": "Tamamlandı"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_common_tamamlandi_en": {
+      "defaultValue": {
+        "value": "Completed"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_common_iptal_label_tr": {
+      "defaultValue": {
+        "value": "İptal"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_common_iptal_label_en": {
+      "defaultValue": {
+        "value": "Canceled"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_common_kalan_ders_label_tr": {
+      "defaultValue": {
+        "value": "Kalan ders"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_common_kalan_ders_label_en": {
+      "defaultValue": {
+        "value": "Remaining sessions"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_common_paketi_yok_filter_tr": {
+      "defaultValue": {
+        "value": "Paketi yok"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_common_paketi_yok_filter_en": {
+      "defaultValue": {
+        "value": "No package"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_common_seans_sayisi_label_tr": {
+      "defaultValue": {
+        "value": "Seans sayısı"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_common_seans_sayisi_label_en": {
+      "defaultValue": {
+        "value": "Session count"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_common_add_seans_button_tr": {
+      "defaultValue": {
+        "value": "+ Seans"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_common_add_seans_button_en": {
+      "defaultValue": {
+        "value": "+ Session"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_common_olcum_6_ay_section_header_tr": {
+      "defaultValue": {
+        "value": "ÖLÇÜM · 6 AY"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_common_olcum_6_ay_section_header_en": {
+      "defaultValue": {
+        "value": "MEASUREMENT · 6 MO"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_common_ders_gecmisi_section_header_tr": {
+      "defaultValue": {
+        "value": "DERS GEÇMİŞİ"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_common_ders_gecmisi_section_header_en": {
+      "defaultValue": {
+        "value": "SESSION HISTORY"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_common_uye_detayi_title_tr": {
+      "defaultValue": {
+        "value": "Üye detayı"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_common_uye_detayi_title_en": {
+      "defaultValue": {
+        "value": "Member detail"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_common_bu_gunde_seans_yok_tr": {
+      "defaultValue": {
+        "value": "Bu günde seans yok."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_common_bu_gunde_seans_yok_en": {
+      "defaultValue": {
+        "value": "No sessions on this day."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_common_bitis_label_tr": {
+      "defaultValue": {
+        "value": "Bitiş"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_common_bitis_label_en": {
+      "defaultValue": {
+        "value": "End"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_shell_member_tab_derslerim_tr": {
+      "defaultValue": {
+        "value": "Derslerim"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_shell_member_tab_derslerim_en": {
+      "defaultValue": {
+        "value": "My Sessions"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_shell_member_tab_olcumlerim_tr": {
+      "defaultValue": {
+        "value": "Ölçümlerim"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_shell_member_tab_olcumlerim_en": {
+      "defaultValue": {
+        "value": "My Measurements"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_shell_member_tab_kesfet_tr": {
+      "defaultValue": {
+        "value": "Keşfet"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_shell_member_tab_kesfet_en": {
+      "defaultValue": {
+        "value": "Discover"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_shell_trainer_tab_takvimim_tr": {
+      "defaultValue": {
+        "value": "Takvimim"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_shell_trainer_tab_takvimim_en": {
+      "defaultValue": {
+        "value": "My Calendar"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_shell_trainer_tab_uyelerim_tr": {
+      "defaultValue": {
+        "value": "Üyelerim"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_shell_trainer_tab_uyelerim_en": {
+      "defaultValue": {
+        "value": "My Members"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_shell_trainer_tab_raporum_tr": {
+      "defaultValue": {
+        "value": "Raporum"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_shell_trainer_tab_raporum_en": {
+      "defaultValue": {
+        "value": "My Report"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_shell_admin_tab_uyeler_tr": {
+      "defaultValue": {
+        "value": "Üyeler"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_shell_admin_tab_uyeler_en": {
+      "defaultValue": {
+        "value": "Members"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_shell_admin_tab_seanslar_tr": {
+      "defaultValue": {
+        "value": "Seanslar"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_shell_admin_tab_seanslar_en": {
+      "defaultValue": {
+        "value": "Sessions"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_shell_admin_tab_finans_tr": {
+      "defaultValue": {
+        "value": "Finans"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_shell_admin_tab_finans_en": {
+      "defaultValue": {
+        "value": "Finance"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_shell_admin_tab_ayarlar_tr": {
+      "defaultValue": {
+        "value": "Ayarlar"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_shell_admin_tab_ayarlar_en": {
+      "defaultValue": {
+        "value": "Settings"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_shell_role_picker_member_button_tr": {
+      "defaultValue": {
+        "value": "Üye"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_shell_role_picker_member_button_en": {
+      "defaultValue": {
+        "value": "Member"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_shell_role_picker_trainer_button_tr": {
+      "defaultValue": {
+        "value": "Antrenör"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_shell_role_picker_trainer_button_en": {
+      "defaultValue": {
+        "value": "Trainer"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_shell_role_picker_admin_button_tr": {
+      "defaultValue": {
+        "value": "Admin"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_shell_role_picker_admin_button_en": {
+      "defaultValue": {
+        "value": "Admin"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_shell_role_picker_gym_setup_button_tr": {
+      "defaultValue": {
+        "value": "Admin · Salon Kurulumu (ilk kurulum)"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_shell_role_picker_gym_setup_button_en": {
+      "defaultValue": {
+        "value": "Admin · Gym Setup (first-time setup)"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_profile_title_tr": {
+      "defaultValue": {
+        "value": "Profilim"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_profile_title_en": {
+      "defaultValue": {
+        "value": "My Profile"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_phone_number_label_tr": {
+      "defaultValue": {
+        "value": "Telefon numarası"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_phone_number_label_en": {
+      "defaultValue": {
+        "value": "Phone number"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_login_button_tr": {
+      "defaultValue": {
+        "value": "Giriş yap"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_login_button_en": {
+      "defaultValue": {
+        "value": "Log in"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_dev_menu_button_tr": {
+      "defaultValue": {
+        "value": "Geliştirici menüsü"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_dev_menu_button_en": {
+      "defaultValue": {
+        "value": "Developer menu"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_select_avatar_label_tr": {
+      "defaultValue": {
+        "value": "Avatarını seç"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_select_avatar_label_en": {
+      "defaultValue": {
+        "value": "Choose your avatar"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_badges_nav_label_tr": {
+      "defaultValue": {
+        "value": "Rozetlerim"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_badges_nav_label_en": {
+      "defaultValue": {
+        "value": "My Badges"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_give_feedback_nav_label_tr": {
+      "defaultValue": {
+        "value": "Geri bildirim ver"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_give_feedback_nav_label_en": {
+      "defaultValue": {
+        "value": "Give feedback"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_session_reminders_toggle_title_tr": {
+      "defaultValue": {
+        "value": "Ders hatırlatmaları"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_session_reminders_toggle_title_en": {
+      "defaultValue": {
+        "value": "Session reminders"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_session_reminders_toggle_description_tr": {
+      "defaultValue": {
+        "value": "Dersinden 2 saat önce bildirim"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_session_reminders_toggle_description_en": {
+      "defaultValue": {
+        "value": "Notification 2 hours before your session"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_delete_account_confirm_title_tr": {
+      "defaultValue": {
+        "value": "Profilim"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_delete_account_confirm_title_en": {
+      "defaultValue": {
+        "value": "My Profile"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_badges_title_tr": {
+      "defaultValue": {
+        "value": "Rozetlerim"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_badges_title_en": {
+      "defaultValue": {
+        "value": "My Badges"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_events_admin_list_title_tr": {
+      "defaultValue": {
+        "value": "Etkinlikler"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_events_admin_list_title_en": {
+      "defaultValue": {
+        "value": "Events"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_events_add_event_button_tr": {
+      "defaultValue": {
+        "value": "+ Etkinlik"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_events_add_event_button_en": {
+      "defaultValue": {
+        "value": "+ Event"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_events_attending_label_tr": {
+      "defaultValue": {
+        "value": "Katılan"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_events_attending_label_en": {
+      "defaultValue": {
+        "value": "Attending"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_events_capacity_label_tr": {
+      "defaultValue": {
+        "value": "Kontenjan"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_events_capacity_label_en": {
+      "defaultValue": {
+        "value": "Capacity"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_events_create_title_tr": {
+      "defaultValue": {
+        "value": "Etkinlik oluştur"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_events_create_title_en": {
+      "defaultValue": {
+        "value": "Create event"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_events_capacity_empty_means_unlimited_helper_tr": {
+      "defaultValue": {
+        "value": "Boş bırakırsanız sınırsız olur"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_events_capacity_empty_means_unlimited_helper_en": {
+      "defaultValue": {
+        "value": "Leave empty for unlimited"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_events_name_field_label_tr": {
+      "defaultValue": {
+        "value": "Etkinlik adı"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_events_name_field_label_en": {
+      "defaultValue": {
+        "value": "Event name"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_events_location_field_label_tr": {
+      "defaultValue": {
+        "value": "Lokasyon"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_events_location_field_label_en": {
+      "defaultValue": {
+        "value": "Location"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_events_date_field_label_tr": {
+      "defaultValue": {
+        "value": "Tarih"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_events_date_field_label_en": {
+      "defaultValue": {
+        "value": "Date"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_events_time_field_label_tr": {
+      "defaultValue": {
+        "value": "Saat"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_events_time_field_label_en": {
+      "defaultValue": {
+        "value": "Time"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_events_description_field_label_tr": {
+      "defaultValue": {
+        "value": "Açıklama"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_events_description_field_label_en": {
+      "defaultValue": {
+        "value": "Description"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_events_create_submit_button_tr": {
+      "defaultValue": {
+        "value": "Etkinliği oluştur"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_events_create_submit_button_en": {
+      "defaultValue": {
+        "value": "Create event"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_expenses_list_title_tr": {
+      "defaultValue": {
+        "value": "Giderler"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_expenses_list_title_en": {
+      "defaultValue": {
+        "value": "Expenses"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_expenses_add_expense_button_tr": {
+      "defaultValue": {
+        "value": "+ Gider"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_expenses_add_expense_button_en": {
+      "defaultValue": {
+        "value": "+ Expense"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_expenses_categories_section_header_tr": {
+      "defaultValue": {
+        "value": "KATEGORİLER"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_expenses_categories_section_header_en": {
+      "defaultValue": {
+        "value": "CATEGORIES"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_expenses_recent_entries_section_header_tr": {
+      "defaultValue": {
+        "value": "SON KAYITLAR"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_expenses_recent_entries_section_header_en": {
+      "defaultValue": {
+        "value": "RECENT ENTRIES"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_expenses_add_title_tr": {
+      "defaultValue": {
+        "value": "Gider ekle"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_expenses_add_title_en": {
+      "defaultValue": {
+        "value": "Add expense"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_expenses_category_field_label_tr": {
+      "defaultValue": {
+        "value": "Kategori"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_expenses_category_field_label_en": {
+      "defaultValue": {
+        "value": "Category"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_expenses_recurring_toggle_label_tr": {
+      "defaultValue": {
+        "value": "Her ay tekrar et"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_expenses_recurring_toggle_label_en": {
+      "defaultValue": {
+        "value": "Repeat every month"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_expenses_recurring_toggle_description_tr": {
+      "defaultValue": {
+        "value": "Kira ve fatura gibi sabit giderler için"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_expenses_recurring_toggle_description_en": {
+      "defaultValue": {
+        "value": "For fixed expenses like rent and bills"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_expenses_amount_field_label_tr": {
+      "defaultValue": {
+        "value": "Tutar (₺)"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_expenses_amount_field_label_en": {
+      "defaultValue": {
+        "value": "Amount (₺)"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_expenses_description_field_label_tr": {
+      "defaultValue": {
+        "value": "Açıklama"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_expenses_description_field_label_en": {
+      "defaultValue": {
+        "value": "Description"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_expenses_date_field_label_tr": {
+      "defaultValue": {
+        "value": "Tarih"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_expenses_date_field_label_en": {
+      "defaultValue": {
+        "value": "Date"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_expenses_submit_button_tr": {
+      "defaultValue": {
+        "value": "Gideri kaydet"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_expenses_submit_button_en": {
+      "defaultValue": {
+        "value": "Save expense"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_feedback_admin_list_title_tr": {
+      "defaultValue": {
+        "value": "Geri bildirimler"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_feedback_admin_list_title_en": {
+      "defaultValue": {
+        "value": "Feedback"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_feedback_member_form_title_tr": {
+      "defaultValue": {
+        "value": "Geri bildirim"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_feedback_member_form_title_en": {
+      "defaultValue": {
+        "value": "Feedback"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_feedback_comment_section_header_tr": {
+      "defaultValue": {
+        "value": "YORUMUN (İSTEĞE BAĞLI)"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_feedback_comment_section_header_en": {
+      "defaultValue": {
+        "value": "YOUR COMMENT (OPTIONAL)"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_admin_list_title_tr": {
+      "defaultValue": {
+        "value": "Grup dersleri"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_admin_list_title_en": {
+      "defaultValue": {
+        "value": "Group Sessions"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_add_group_session_button_tr": {
+      "defaultValue": {
+        "value": "+ Grup dersi"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_add_group_session_button_en": {
+      "defaultValue": {
+        "value": "+ Group Session"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_capacity_suffix_label_tr": {
+      "defaultValue": {
+        "value": "kontenjan"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_capacity_suffix_label_en": {
+      "defaultValue": {
+        "value": "capacity"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_view_participants_link_tr": {
+      "defaultValue": {
+        "value": "Katılımcıları gör"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_view_participants_link_en": {
+      "defaultValue": {
+        "value": "View participants"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_discover_title_tr": {
+      "defaultValue": {
+        "value": "Keşfet"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_discover_title_en": {
+      "defaultValue": {
+        "value": "Discover"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_discover_tab_group_sessions_tr": {
+      "defaultValue": {
+        "value": "Grup dersleri"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_discover_tab_group_sessions_en": {
+      "defaultValue": {
+        "value": "Group Sessions"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_discover_tab_events_tr": {
+      "defaultValue": {
+        "value": "Etkinlikler"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_discover_tab_events_en": {
+      "defaultValue": {
+        "value": "Events"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_create_title_tr": {
+      "defaultValue": {
+        "value": "Grup dersi oluştur"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_create_title_en": {
+      "defaultValue": {
+        "value": "Create group session"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_days_field_label_tr": {
+      "defaultValue": {
+        "value": "Günler"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_days_field_label_en": {
+      "defaultValue": {
+        "value": "Days"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_capacity_field_label_tr": {
+      "defaultValue": {
+        "value": "Kontenjan"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_capacity_field_label_en": {
+      "defaultValue": {
+        "value": "Capacity"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_online_booking_toggle_label_tr": {
+      "defaultValue": {
+        "value": "Online rezervasyona açık"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_online_booking_toggle_label_en": {
+      "defaultValue": {
+        "value": "Open for online booking"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_online_booking_toggle_description_tr": {
+      "defaultValue": {
+        "value": "Üyeler Keşfet'ten katılabilir"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_online_booking_toggle_description_en": {
+      "defaultValue": {
+        "value": "Members can join from Discover"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_default_location_label_tr": {
+      "defaultValue": {
+        "value": "Stüdyo"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_default_location_label_en": {
+      "defaultValue": {
+        "value": "Studio"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_name_field_label_tr": {
+      "defaultValue": {
+        "value": "Ders adı"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_name_field_label_en": {
+      "defaultValue": {
+        "value": "Session name"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_start_time_field_label_tr": {
+      "defaultValue": {
+        "value": "Başlangıç saati"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_start_time_field_label_en": {
+      "defaultValue": {
+        "value": "Start time"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_duration_field_label_tr": {
+      "defaultValue": {
+        "value": "Süre"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_duration_field_label_en": {
+      "defaultValue": {
+        "value": "Duration"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_create_submit_button_tr": {
+      "defaultValue": {
+        "value": "Grup dersini oluştur"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_create_submit_button_en": {
+      "defaultValue": {
+        "value": "Create group session"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_admin_home_completed_word_tr": {
+      "defaultValue": {
+        "value": "tamamlanan"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_admin_home_completed_word_en": {
+      "defaultValue": {
+        "value": "completed"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_admin_home_trainer_performance_section_tr": {
+      "defaultValue": {
+        "value": "ANTRENÖR PERFORMANSI"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_admin_home_trainer_performance_section_en": {
+      "defaultValue": {
+        "value": "TRAINER PERFORMANCE"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_admin_home_upcoming_payments_section_tr": {
+      "defaultValue": {
+        "value": "ÖDEME VAKTİ YAKLAŞAN"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_admin_home_upcoming_payments_section_en": {
+      "defaultValue": {
+        "value": "PAYMENT DUE SOON"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_admin_home_pending_feedback_label_tr": {
+      "defaultValue": {
+        "value": "Bekleyen geri bildirim"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_admin_home_pending_feedback_label_en": {
+      "defaultValue": {
+        "value": "Pending feedback"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_admin_home_total_sessions_label_tr": {
+      "defaultValue": {
+        "value": "Toplam seans"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_admin_home_total_sessions_label_en": {
+      "defaultValue": {
+        "value": "Total sessions"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_admin_home_completed_label_tr": {
+      "defaultValue": {
+        "value": "Tamamlanan"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_admin_home_completed_label_en": {
+      "defaultValue": {
+        "value": "Completed"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_admin_home_estimated_revenue_label_tr": {
+      "defaultValue": {
+        "value": "Tahmini ciro"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_admin_home_estimated_revenue_label_en": {
+      "defaultValue": {
+        "value": "Estimated revenue"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_admin_home_expense_label_tr": {
+      "defaultValue": {
+        "value": "Gider"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_admin_home_expense_label_en": {
+      "defaultValue": {
+        "value": "Expense"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_permissions_title_tr": {
+      "defaultValue": {
+        "value": "Yetki ayarları"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_permissions_title_en": {
+      "defaultValue": {
+        "value": "Permission settings"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_permissions_reminder_dropdown_label_tr": {
+      "defaultValue": {
+        "value": "Seans bitimi eğitmene ne zaman hatırlatılsın?"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_permissions_reminder_dropdown_label_en": {
+      "defaultValue": {
+        "value": "When should the trainer be reminded after a session ends?"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_permissions_reminder_description_tr": {
+      "defaultValue": {
+        "value": "Bildirim seans bitiminden sonra gider"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_permissions_reminder_description_en": {
+      "defaultValue": {
+        "value": "Notification is sent after the session ends"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_settings_title_tr": {
+      "defaultValue": {
+        "value": "Ayarlar"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_settings_title_en": {
+      "defaultValue": {
+        "value": "Settings"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_settings_nav_gym_info_tr": {
+      "defaultValue": {
+        "value": "Salon bilgileri"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_settings_nav_gym_info_en": {
+      "defaultValue": {
+        "value": "Gym information"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_settings_nav_trainer_management_tr": {
+      "defaultValue": {
+        "value": "Antrenör yönetimi"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_settings_nav_trainer_management_en": {
+      "defaultValue": {
+        "value": "Trainer management"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_settings_nav_studio_packages_tr": {
+      "defaultValue": {
+        "value": "Stüdyo paketleri"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_settings_nav_studio_packages_en": {
+      "defaultValue": {
+        "value": "Studio packages"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_settings_nav_session_management_tr": {
+      "defaultValue": {
+        "value": "Ders / seans yönetimi"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_settings_nav_session_management_en": {
+      "defaultValue": {
+        "value": "Session management"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_settings_nav_group_sessions_tr": {
+      "defaultValue": {
+        "value": "Grup dersleri"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_settings_nav_group_sessions_en": {
+      "defaultValue": {
+        "value": "Group sessions"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_settings_nav_events_tr": {
+      "defaultValue": {
+        "value": "Etkinlikler"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_settings_nav_events_en": {
+      "defaultValue": {
+        "value": "Events"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_settings_nav_permissions_tr": {
+      "defaultValue": {
+        "value": "Yetki ayarları"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_settings_nav_permissions_en": {
+      "defaultValue": {
+        "value": "Permission settings"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_settings_nav_feedback_tr": {
+      "defaultValue": {
+        "value": "Geri bildirimler"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_settings_nav_feedback_en": {
+      "defaultValue": {
+        "value": "Feedback"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_settings_nav_send_notification_tr": {
+      "defaultValue": {
+        "value": "Bildirim gönder"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_settings_nav_send_notification_en": {
+      "defaultValue": {
+        "value": "Send notification"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_info_title_tr": {
+      "defaultValue": {
+        "value": "Salon bilgileri"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_info_title_en": {
+      "defaultValue": {
+        "value": "Gym information"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_info_logo_section_tr": {
+      "defaultValue": {
+        "value": "LOGO"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_info_logo_section_en": {
+      "defaultValue": {
+        "value": "LOGO"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_info_logo_helper_tr": {
+      "defaultValue": {
+        "value": "Kare, en az 512×512 px PNG yükleyin."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_info_logo_helper_en": {
+      "defaultValue": {
+        "value": "Upload a square PNG, at least 512×512 px."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_info_change_logo_button_tr": {
+      "defaultValue": {
+        "value": "Logoyu değiştir"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_info_change_logo_button_en": {
+      "defaultValue": {
+        "value": "Change logo"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_info_theme_color_section_tr": {
+      "defaultValue": {
+        "value": "TEMA RENGİ"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_info_theme_color_section_en": {
+      "defaultValue": {
+        "value": "THEME COLOR"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_info_preview_label_tr": {
+      "defaultValue": {
+        "value": "Önizleme"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_info_preview_label_en": {
+      "defaultValue": {
+        "value": "Preview"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_info_primary_button_label_tr": {
+      "defaultValue": {
+        "value": "Birincil buton"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_info_primary_button_label_en": {
+      "defaultValue": {
+        "value": "Primary button"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_info_see_all_themes_link_tr": {
+      "defaultValue": {
+        "value": "Tüm temaları gör ›"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_info_see_all_themes_link_en": {
+      "defaultValue": {
+        "value": "See all themes ›"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_info_name_field_label_tr": {
+      "defaultValue": {
+        "value": "Salon adı"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_info_name_field_label_en": {
+      "defaultValue": {
+        "value": "Gym name"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_info_address_field_label_tr": {
+      "defaultValue": {
+        "value": "Adres"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_info_address_field_label_en": {
+      "defaultValue": {
+        "value": "Address"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_setup_step_header_tr": {
+      "defaultValue": {
+        "value": "KURULUM 1 / 1"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_setup_step_header_en": {
+      "defaultValue": {
+        "value": "SETUP 1 / 1"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_setup_title_tr": {
+      "defaultValue": {
+        "value": "Salonunu tanımla"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_setup_title_en": {
+      "defaultValue": {
+        "value": "Define your gym"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_setup_logo_label_tr": {
+      "defaultValue": {
+        "value": "Salon logosu"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_setup_logo_label_en": {
+      "defaultValue": {
+        "value": "Gym logo"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_setup_choose_logo_button_tr": {
+      "defaultValue": {
+        "value": "Logo seç"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_setup_choose_logo_button_en": {
+      "defaultValue": {
+        "value": "Choose logo"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_setup_theme_color_label_tr": {
+      "defaultValue": {
+        "value": "Tema rengi"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_setup_theme_color_label_en": {
+      "defaultValue": {
+        "value": "Theme color"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_setup_city_field_label_tr": {
+      "defaultValue": {
+        "value": "Şehir"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_setup_city_field_label_en": {
+      "defaultValue": {
+        "value": "City"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_setup_submit_button_tr": {
+      "defaultValue": {
+        "value": "Salonu oluştur ve girişi tamamla"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_setup_submit_button_en": {
+      "defaultValue": {
+        "value": "Create gym and finish setup"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_themes_title_tr": {
+      "defaultValue": {
+        "value": "Temalar"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_themes_title_en": {
+      "defaultValue": {
+        "value": "Themes"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_themes_member_preview_section_tr": {
+      "defaultValue": {
+        "value": "ÜYE EKRANI ÖNİZLEMESİ"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_themes_member_preview_section_en": {
+      "defaultValue": {
+        "value": "MEMBER SCREEN PREVIEW"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_themes_show_logo_silhouette_toggle_label_tr": {
+      "defaultValue": {
+        "value": "Logo silüetini arka planda göster"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_themes_show_logo_silhouette_toggle_label_en": {
+      "defaultValue": {
+        "value": "Show logo silhouette in background"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_themes_show_logo_silhouette_toggle_description_tr": {
+      "defaultValue": {
+        "value": "Üye ve antrenör ekranlarında %25 opaklıkla"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_themes_show_logo_silhouette_toggle_description_en": {
+      "defaultValue": {
+        "value": "At 25% opacity on member and trainer screens"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_themes_apply_to_all_button_tr": {
+      "defaultValue": {
+        "value": "Temayı tüm üyelere uygula"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_themes_apply_to_all_button_en": {
+      "defaultValue": {
+        "value": "Apply theme to all members"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_add_theme_title_tr": {
+      "defaultValue": {
+        "value": "Tema ekle"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_add_theme_title_en": {
+      "defaultValue": {
+        "value": "Add theme"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_add_theme_palette_label_tr": {
+      "defaultValue": {
+        "value": "Palet"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_add_theme_palette_label_en": {
+      "defaultValue": {
+        "value": "Palette"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_add_theme_color_code_label_tr": {
+      "defaultValue": {
+        "value": "Renk kodu"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_add_theme_color_code_label_en": {
+      "defaultValue": {
+        "value": "Color code"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_add_theme_color_helper_tr": {
+      "defaultValue": {
+        "value": "Paletten seçin ya da kendi HEX kodunuzu yazın."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_add_theme_color_helper_en": {
+      "defaultValue": {
+        "value": "Choose from the palette or enter your own HEX code."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_add_theme_use_logo_question_tr": {
+      "defaultValue": {
+        "value": "Salon logosu kullanılsın mı?"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_add_theme_use_logo_question_en": {
+      "defaultValue": {
+        "value": "Use gym logo?"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_add_theme_preview_section_tr": {
+      "defaultValue": {
+        "value": "ÖNİZLEME"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_add_theme_preview_section_en": {
+      "defaultValue": {
+        "value": "PREVIEW"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_add_theme_use_logo_option_tr": {
+      "defaultValue": {
+        "value": "Evet, logoyu kullan"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_add_theme_use_logo_option_en": {
+      "defaultValue": {
+        "value": "Yes, use the logo"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_add_theme_flat_background_option_tr": {
+      "defaultValue": {
+        "value": "Hayır, düz zemin"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_add_theme_flat_background_option_en": {
+      "defaultValue": {
+        "value": "No, flat background"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_add_theme_submit_button_tr": {
+      "defaultValue": {
+        "value": "Temayı kaydet ve uygula"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_add_theme_submit_button_en": {
+      "defaultValue": {
+        "value": "Save and apply theme"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_add_theme_name_field_label_tr": {
+      "defaultValue": {
+        "value": "Tema adı"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_add_theme_name_field_label_en": {
+      "defaultValue": {
+        "value": "Theme name"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_studio_rules_title_tr": {
+      "defaultValue": {
+        "value": "Stüdyo kuralları"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_studio_rules_title_en": {
+      "defaultValue": {
+        "value": "Studio rules"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_edit_studio_rules_title_tr": {
+      "defaultValue": {
+        "value": "Kuralları düzenle"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_edit_studio_rules_title_en": {
+      "defaultValue": {
+        "value": "Edit rules"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_measurements_add_title_tr": {
+      "defaultValue": {
+        "value": "Yeni ölçüm"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_measurements_add_title_en": {
+      "defaultValue": {
+        "value": "New measurement"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_measurements_measurement_date_label_tr": {
+      "defaultValue": {
+        "value": "Ölçüm tarihi"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_measurements_measurement_date_label_en": {
+      "defaultValue": {
+        "value": "Measurement date"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_measurements_measurements_section_tr": {
+      "defaultValue": {
+        "value": "ÖLÇÜLER"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_measurements_measurements_section_en": {
+      "defaultValue": {
+        "value": "MEASUREMENTS"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_measurements_unit_cm_tr": {
+      "defaultValue": {
+        "value": "cm"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_measurements_unit_cm_en": {
+      "defaultValue": {
+        "value": "cm"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_measurements_title_tr": {
+      "defaultValue": {
+        "value": "Ölçümlerim"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_measurements_title_en": {
+      "defaultValue": {
+        "value": "My Measurements"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_measurements_selected_point_label_tr": {
+      "defaultValue": {
+        "value": "Seçili nokta"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_measurements_selected_point_label_en": {
+      "defaultValue": {
+        "value": "Selected point"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_measurements_history_section_tr": {
+      "defaultValue": {
+        "value": "ÖLÇÜM GEÇMİŞİ"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_measurements_history_section_en": {
+      "defaultValue": {
+        "value": "MEASUREMENT HISTORY"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_detail_payment_status_label_tr": {
+      "defaultValue": {
+        "value": "Ödeme durumu"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_detail_payment_status_label_en": {
+      "defaultValue": {
+        "value": "Payment status"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_detail_remaining_sessions_label_tr": {
+      "defaultValue": {
+        "value": "Kalan ders"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_detail_remaining_sessions_label_en": {
+      "defaultValue": {
+        "value": "Remaining sessions"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_detail_makeup_label_tr": {
+      "defaultValue": {
+        "value": "Telafi"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_detail_makeup_label_en": {
+      "defaultValue": {
+        "value": "Makeup"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_detail_total_label_tr": {
+      "defaultValue": {
+        "value": "Toplam"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_detail_total_label_en": {
+      "defaultValue": {
+        "value": "Total"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_detail_paid_label_tr": {
+      "defaultValue": {
+        "value": "Ödendi"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_detail_paid_label_en": {
+      "defaultValue": {
+        "value": "Paid"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_detail_remaining_amount_label_tr": {
+      "defaultValue": {
+        "value": "Kalan"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_detail_remaining_amount_label_en": {
+      "defaultValue": {
+        "value": "Remaining"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_list_title_tr": {
+      "defaultValue": {
+        "value": "Üyeler"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_list_title_en": {
+      "defaultValue": {
+        "value": "Members"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_add_member_button_tr": {
+      "defaultValue": {
+        "value": "+ Üye ekle"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_add_member_button_en": {
+      "defaultValue": {
+        "value": "+ Add member"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_list_empty_state_tr": {
+      "defaultValue": {
+        "value": "Bu filtreye uyan üye yok."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_list_empty_state_en": {
+      "defaultValue": {
+        "value": "No members match this filter."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_filter_active_tr": {
+      "defaultValue": {
+        "value": "Aktif"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_filter_active_en": {
+      "defaultValue": {
+        "value": "Active"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_filter_expiring_tr": {
+      "defaultValue": {
+        "value": "Bitiyor"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_filter_expiring_en": {
+      "defaultValue": {
+        "value": "Expiring"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_info_step_indicator_1_tr": {
+      "defaultValue": {
+        "value": "1 / 3"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_info_step_indicator_1_en": {
+      "defaultValue": {
+        "value": "1 / 3"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_info_login_helper_tr": {
+      "defaultValue": {
+        "value": "Üye bu numarayla giriş yapar, şifre yok."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_info_login_helper_en": {
+      "defaultValue": {
+        "value": "The member logs in with this number, no password needed."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_gender_field_label_tr": {
+      "defaultValue": {
+        "value": "Cinsiyet"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_gender_field_label_en": {
+      "defaultValue": {
+        "value": "Gender"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_trainer_field_label_tr": {
+      "defaultValue": {
+        "value": "Antrenör"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_trainer_field_label_en": {
+      "defaultValue": {
+        "value": "Trainer"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_registration_date_field_label_tr": {
+      "defaultValue": {
+        "value": "Kayıt tarihi"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_registration_date_field_label_en": {
+      "defaultValue": {
+        "value": "Registration date"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_select_trainer_button_tr": {
+      "defaultValue": {
+        "value": "Antrenör seç"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_select_trainer_button_en": {
+      "defaultValue": {
+        "value": "Select trainer"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_first_name_field_label_tr": {
+      "defaultValue": {
+        "value": "Ad"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_first_name_field_label_en": {
+      "defaultValue": {
+        "value": "First name"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_last_name_field_label_tr": {
+      "defaultValue": {
+        "value": "Soyad"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_last_name_field_label_en": {
+      "defaultValue": {
+        "value": "Last name"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_birth_year_field_label_tr": {
+      "defaultValue": {
+        "value": "Doğum yılı"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_birth_year_field_label_en": {
+      "defaultValue": {
+        "value": "Birth year"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_height_field_label_tr": {
+      "defaultValue": {
+        "value": "Boy"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_height_field_label_en": {
+      "defaultValue": {
+        "value": "Height"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_note_field_label_tr": {
+      "defaultValue": {
+        "value": "Not (isteğe bağlı)"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_note_field_label_en": {
+      "defaultValue": {
+        "value": "Note (optional)"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_payment_title_tr": {
+      "defaultValue": {
+        "value": "Ödeme bilgisi"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_payment_title_en": {
+      "defaultValue": {
+        "value": "Payment information"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_payment_step_indicator_3_tr": {
+      "defaultValue": {
+        "value": "3 / 3"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_payment_step_indicator_3_en": {
+      "defaultValue": {
+        "value": "3 / 3"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_payment_total_label_tr": {
+      "defaultValue": {
+        "value": "Toplam tutar"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_payment_total_label_en": {
+      "defaultValue": {
+        "value": "Total amount"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_payment_paid_label_tr": {
+      "defaultValue": {
+        "value": "Ödendi"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_payment_paid_label_en": {
+      "defaultValue": {
+        "value": "Paid"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_payment_remaining_label_tr": {
+      "defaultValue": {
+        "value": "Kalan ödeme"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_payment_remaining_label_en": {
+      "defaultValue": {
+        "value": "Remaining payment"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_payment_auto_calculated_helper_tr": {
+      "defaultValue": {
+        "value": "Otomatik hesaplanır"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_payment_auto_calculated_helper_en": {
+      "defaultValue": {
+        "value": "Calculated automatically"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_payment_due_date_field_label_tr": {
+      "defaultValue": {
+        "value": "Son ödeme tarihi"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_payment_due_date_field_label_en": {
+      "defaultValue": {
+        "value": "Due date"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_payment_enter_amount_helper_tr": {
+      "defaultValue": {
+        "value": "Ödenen tutarı gir"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_payment_enter_amount_helper_en": {
+      "defaultValue": {
+        "value": "Enter amount paid"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_payment_full_option_tr": {
+      "defaultValue": {
+        "value": "Tam ödendi"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_payment_full_option_en": {
+      "defaultValue": {
+        "value": "Paid in full"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_payment_half_option_tr": {
+      "defaultValue": {
+        "value": "Yarısı"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_payment_half_option_en": {
+      "defaultValue": {
+        "value": "Half"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_payment_other_option_tr": {
+      "defaultValue": {
+        "value": "Diğer"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_payment_other_option_en": {
+      "defaultValue": {
+        "value": "Other"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_new_membership_title_tr": {
+      "defaultValue": {
+        "value": "Yeni üyelik"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_new_membership_title_en": {
+      "defaultValue": {
+        "value": "New membership"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_new_membership_step_indicator_2_tr": {
+      "defaultValue": {
+        "value": "2 / 3"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_new_membership_step_indicator_2_en": {
+      "defaultValue": {
+        "value": "2 / 3"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_package_select_section_tr": {
+      "defaultValue": {
+        "value": "PAKET SEÇ"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_package_select_section_en": {
+      "defaultValue": {
+        "value": "SELECT PACKAGE"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_makeup_session_count_label_tr": {
+      "defaultValue": {
+        "value": "Telafi seans sayısı"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_makeup_session_count_label_en": {
+      "defaultValue": {
+        "value": "Makeup session count"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_makeup_session_helper_tr": {
+      "defaultValue": {
+        "value": "Paket bitince kullanılabilir"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_makeup_session_helper_en": {
+      "defaultValue": {
+        "value": "Usable after the package ends"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_start_date_field_label_tr": {
+      "defaultValue": {
+        "value": "Başlangıç tarihi"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_start_date_field_label_en": {
+      "defaultValue": {
+        "value": "Start date"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_end_date_field_label_tr": {
+      "defaultValue": {
+        "value": "Bitiş tarihi"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_end_date_field_label_en": {
+      "defaultValue": {
+        "value": "End date"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_go_to_payment_button_tr": {
+      "defaultValue": {
+        "value": "Ödeme bilgisine geç"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_go_to_payment_button_en": {
+      "defaultValue": {
+        "value": "Continue to payment"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notifications_title_tr": {
+      "defaultValue": {
+        "value": "Bildirim gönder"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notifications_title_en": {
+      "defaultValue": {
+        "value": "Send notification"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notifications_target_question_label_tr": {
+      "defaultValue": {
+        "value": "Kime gidecek?"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notifications_target_question_label_en": {
+      "defaultValue": {
+        "value": "Who should receive it?"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notifications_target_single_member_option_tr": {
+      "defaultValue": {
+        "value": "Tek üye"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notifications_target_single_member_option_en": {
+      "defaultValue": {
+        "value": "Single member"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notifications_target_whole_gym_option_tr": {
+      "defaultValue": {
+        "value": "Tüm salon"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notifications_target_whole_gym_option_en": {
+      "defaultValue": {
+        "value": "Whole gym"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notifications_preview_label_tr": {
+      "defaultValue": {
+        "value": "Önizleme"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notifications_preview_label_en": {
+      "defaultValue": {
+        "value": "Preview"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notifications_select_member_button_tr": {
+      "defaultValue": {
+        "value": "Üye seç"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notifications_select_member_button_en": {
+      "defaultValue": {
+        "value": "Select member"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notifications_title_field_label_tr": {
+      "defaultValue": {
+        "value": "Başlık"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notifications_title_field_label_en": {
+      "defaultValue": {
+        "value": "Title"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notifications_message_field_label_tr": {
+      "defaultValue": {
+        "value": "Mesaj"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notifications_message_field_label_en": {
+      "defaultValue": {
+        "value": "Message"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_packages_list_title_tr": {
+      "defaultValue": {
+        "value": "Paketler"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_packages_list_title_en": {
+      "defaultValue": {
+        "value": "Packages"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_packages_add_package_button_tr": {
+      "defaultValue": {
+        "value": "+ Paket ekle"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_packages_add_package_button_en": {
+      "defaultValue": {
+        "value": "+ Add package"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_packages_edit_session_type_field_label_tr": {
+      "defaultValue": {
+        "value": "Ders tipi"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_packages_edit_session_type_field_label_en": {
+      "defaultValue": {
+        "value": "Session type"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_packages_edit_on_sale_toggle_label_tr": {
+      "defaultValue": {
+        "value": "Satışta"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_packages_edit_on_sale_toggle_label_en": {
+      "defaultValue": {
+        "value": "On sale"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_packages_edit_on_sale_toggle_description_tr": {
+      "defaultValue": {
+        "value": "Kapalıysa yeni üyeliklerde görünmez"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_packages_edit_on_sale_toggle_description_en": {
+      "defaultValue": {
+        "value": "Hidden from new memberships when off"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_packages_delete_package_button_tr": {
+      "defaultValue": {
+        "value": "Paketi sil"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_packages_delete_package_button_en": {
+      "defaultValue": {
+        "value": "Delete package"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_packages_edit_name_field_label_tr": {
+      "defaultValue": {
+        "value": "Paket adı"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_packages_edit_name_field_label_en": {
+      "defaultValue": {
+        "value": "Package name"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_packages_edit_validity_days_field_label_tr": {
+      "defaultValue": {
+        "value": "Geçerlilik (gün)"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_packages_edit_validity_days_field_label_en": {
+      "defaultValue": {
+        "value": "Validity (days)"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_packages_edit_price_field_label_tr": {
+      "defaultValue": {
+        "value": "Fiyat (₺)"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_packages_edit_price_field_label_en": {
+      "defaultValue": {
+        "value": "Price (₺)"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_packages_member_package_title_tr": {
+      "defaultValue": {
+        "value": "Paketim"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_packages_member_package_title_en": {
+      "defaultValue": {
+        "value": "My Package"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_packages_remaining_word_tr": {
+      "defaultValue": {
+        "value": "kalan"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_packages_remaining_word_en": {
+      "defaultValue": {
+        "value": "remaining"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_packages_trainer_owner_label_tr": {
+      "defaultValue": {
+        "value": "Antrenörün"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_packages_trainer_owner_label_en": {
+      "defaultValue": {
+        "value": "Your trainer"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_packages_start_label_tr": {
+      "defaultValue": {
+        "value": "Başlangıç"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_packages_start_label_en": {
+      "defaultValue": {
+        "value": "Start"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_calendar_title_tr": {
+      "defaultValue": {
+        "value": "Takvim"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_calendar_title_en": {
+      "defaultValue": {
+        "value": "Calendar"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_calendar_slot_time_label_tr": {
+      "defaultValue": {
+        "value": "Saat"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_calendar_slot_time_label_en": {
+      "defaultValue": {
+        "value": "Time"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_calendar_slot_status_label_tr": {
+      "defaultValue": {
+        "value": "Durum"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_calendar_slot_status_label_en": {
+      "defaultValue": {
+        "value": "Status"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_attendance_answer_label_tr": {
+      "defaultValue": {
+        "value": "Cevabı"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_attendance_answer_label_en": {
+      "defaultValue": {
+        "value": "Answer"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_attendance_answer_time_label_tr": {
+      "defaultValue": {
+        "value": "Cevap saati"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_attendance_answer_time_label_en": {
+      "defaultValue": {
+        "value": "Answer time"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_attendance_member_note_label_tr": {
+      "defaultValue": {
+        "value": "Üyenin notu"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_attendance_member_note_label_en": {
+      "defaultValue": {
+        "value": "Member's note"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_attendance_back_to_calendar_button_tr": {
+      "defaultValue": {
+        "value": "Takvime dön"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_attendance_back_to_calendar_button_en": {
+      "defaultValue": {
+        "value": "Back to calendar"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_management_title_tr": {
+      "defaultValue": {
+        "value": "Seanslar"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_management_title_en": {
+      "defaultValue": {
+        "value": "Sessions"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_management_empty_state_tr": {
+      "defaultValue": {
+        "value": "Bu güne uyan seans yok."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_management_empty_state_en": {
+      "defaultValue": {
+        "value": "No sessions match this day."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_filter_scheduled_tr": {
+      "defaultValue": {
+        "value": "Planlandı"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_filter_scheduled_en": {
+      "defaultValue": {
+        "value": "Scheduled"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_change_trainer_action_tr": {
+      "defaultValue": {
+        "value": "Antrenörü değiştir"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_change_trainer_action_en": {
+      "defaultValue": {
+        "value": "Change trainer"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_cancel_session_action_tr": {
+      "defaultValue": {
+        "value": "Seansı iptal et"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_cancel_session_action_en": {
+      "defaultValue": {
+        "value": "Cancel session"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_confirm_title_tr": {
+      "defaultValue": {
+        "value": "Ders onayı"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_confirm_title_en": {
+      "defaultValue": {
+        "value": "Session confirmation"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_confirm_attending_answer_text_tr": {
+      "defaultValue": {
+        "value": "Geleceğini bildirdin"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_confirm_attending_answer_text_en": {
+      "defaultValue": {
+        "value": "You confirmed you're coming"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_confirm_not_attending_answer_text_tr": {
+      "defaultValue": {
+        "value": "Gelmeyeceğini bildirdin"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_confirm_not_attending_answer_text_en": {
+      "defaultValue": {
+        "value": "You confirmed you're not coming"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_confirm_change_answer_button_tr": {
+      "defaultValue": {
+        "value": "Cevabımı değiştir"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_confirm_change_answer_button_en": {
+      "defaultValue": {
+        "value": "Change my answer"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_member_home_this_week_section_tr": {
+      "defaultValue": {
+        "value": "BU HAFTA"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_member_home_this_week_section_en": {
+      "defaultValue": {
+        "value": "THIS WEEK"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_member_home_see_package_button_tr": {
+      "defaultValue": {
+        "value": "Paketimi gör"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_member_home_see_package_button_en": {
+      "defaultValue": {
+        "value": "View my package"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_trainer_notifications_title_tr": {
+      "defaultValue": {
+        "value": "Bildirimler"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_trainer_notifications_title_en": {
+      "defaultValue": {
+        "value": "Notifications"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_completion_title_tr": {
+      "defaultValue": {
+        "value": "Seans onayı"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_completion_title_en": {
+      "defaultValue": {
+        "value": "Session confirmation"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_completion_member_no_show_option_tr": {
+      "defaultValue": {
+        "value": "Üye gelmedi"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_completion_member_no_show_option_en": {
+      "defaultValue": {
+        "value": "Member didn't show"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_completion_undo_button_tr": {
+      "defaultValue": {
+        "value": "Geri al"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_completion_undo_button_en": {
+      "defaultValue": {
+        "value": "Undo"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_list_title_tr": {
+      "defaultValue": {
+        "value": "Derslerim"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_list_title_en": {
+      "defaultValue": {
+        "value": "My Sessions"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_list_view_toggle_tr": {
+      "defaultValue": {
+        "value": "Liste"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_list_view_toggle_en": {
+      "defaultValue": {
+        "value": "List"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_calendar_view_toggle_tr": {
+      "defaultValue": {
+        "value": "Takvim"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_calendar_view_toggle_en": {
+      "defaultValue": {
+        "value": "Calendar"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_upcoming_section_tr": {
+      "defaultValue": {
+        "value": "YAKLAŞAN"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_upcoming_section_en": {
+      "defaultValue": {
+        "value": "UPCOMING"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_past_section_tr": {
+      "defaultValue": {
+        "value": "GEÇMİŞ"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_past_section_en": {
+      "defaultValue": {
+        "value": "PAST"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_management_title_tr": {
+      "defaultValue": {
+        "value": "Antrenörler"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_management_title_en": {
+      "defaultValue": {
+        "value": "Trainers"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_add_trainer_button_tr": {
+      "defaultValue": {
+        "value": "+ Antrenör ekle"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_add_trainer_button_en": {
+      "defaultValue": {
+        "value": "+ Add trainer"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_specialty_field_label_tr": {
+      "defaultValue": {
+        "value": "Uzmanlık"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_specialty_field_label_en": {
+      "defaultValue": {
+        "value": "Specialty"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_add_trainer_form_title_tr": {
+      "defaultValue": {
+        "value": "Antrenör ekle"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_add_trainer_form_title_en": {
+      "defaultValue": {
+        "value": "Add trainer"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_full_name_field_label_tr": {
+      "defaultValue": {
+        "value": "Ad soyad"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_full_name_field_label_en": {
+      "defaultValue": {
+        "value": "Full name"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_add_trainer_submit_button_tr": {
+      "defaultValue": {
+        "value": "Antrenörü ekle"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_add_trainer_submit_button_en": {
+      "defaultValue": {
+        "value": "Add trainer"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_home_awaiting_approval_section_tr": {
+      "defaultValue": {
+        "value": "ONAYINIZI BEKLİYOR"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_home_awaiting_approval_section_en": {
+      "defaultValue": {
+        "value": "AWAITING YOUR APPROVAL"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_home_today_schedule_section_tr": {
+      "defaultValue": {
+        "value": "BUGÜNKÜ PROGRAMINIZ"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_home_today_schedule_section_en": {
+      "defaultValue": {
+        "value": "TODAY'S SCHEDULE"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_home_no_show_label_tr": {
+      "defaultValue": {
+        "value": "Gelmedi"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_home_no_show_label_en": {
+      "defaultValue": {
+        "value": "No-show"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_home_today_sessions_label_tr": {
+      "defaultValue": {
+        "value": "Bugünkü seans"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_home_today_sessions_label_en": {
+      "defaultValue": {
+        "value": "Today's sessions"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_home_completed_label_tr": {
+      "defaultValue": {
+        "value": "Tamamlanan"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_home_completed_label_en": {
+      "defaultValue": {
+        "value": "Completed"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_home_free_slot_label_tr": {
+      "defaultValue": {
+        "value": "Boş saat"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_home_free_slot_label_en": {
+      "defaultValue": {
+        "value": "Free slot"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_member_detail_create_session_button_tr": {
+      "defaultValue": {
+        "value": "Seans oluştur"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_member_detail_create_session_button_en": {
+      "defaultValue": {
+        "value": "Create session"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_member_detail_add_measurement_button_tr": {
+      "defaultValue": {
+        "value": "Ölçüm ekle"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_member_detail_add_measurement_button_en": {
+      "defaultValue": {
+        "value": "Add measurement"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_member_detail_remaining_sessions_label_tr": {
+      "defaultValue": {
+        "value": "Kalan ders"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_member_detail_remaining_sessions_label_en": {
+      "defaultValue": {
+        "value": "Remaining sessions"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_member_detail_package_end_label_tr": {
+      "defaultValue": {
+        "value": "Paket bitişi"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_member_detail_package_end_label_en": {
+      "defaultValue": {
+        "value": "Package end date"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_calendar_title_tr": {
+      "defaultValue": {
+        "value": "Takvimim"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_calendar_title_en": {
+      "defaultValue": {
+        "value": "My Calendar"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_calendar_week_toggle_tr": {
+      "defaultValue": {
+        "value": "Hafta"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_calendar_week_toggle_en": {
+      "defaultValue": {
+        "value": "Week"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_calendar_month_toggle_tr": {
+      "defaultValue": {
+        "value": "Ay"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_calendar_month_toggle_en": {
+      "defaultValue": {
+        "value": "Month"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_calendar_mark_completed_action_tr": {
+      "defaultValue": {
+        "value": "Tamamlandı işaretle"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_calendar_mark_completed_action_en": {
+      "defaultValue": {
+        "value": "Mark as completed"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_members_list_title_tr": {
+      "defaultValue": {
+        "value": "Üyelerim"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_members_list_title_en": {
+      "defaultValue": {
+        "value": "My Members"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_members_filter_expiring_tr": {
+      "defaultValue": {
+        "value": "Paketi bitiyor"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_members_filter_expiring_en": {
+      "defaultValue": {
+        "value": "Package expiring"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_members_remaining_sessions_suffix_tr": {
+      "defaultValue": {
+        "value": "kalan ders"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_members_remaining_sessions_suffix_en": {
+      "defaultValue": {
+        "value": "remaining sessions"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_report_title_tr": {
+      "defaultValue": {
+        "value": "Seans raporum"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_report_title_en": {
+      "defaultValue": {
+        "value": "My session report"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_report_earned_commission_label_tr": {
+      "defaultValue": {
+        "value": "Kazanılan prim"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_report_earned_commission_label_en": {
+      "defaultValue": {
+        "value": "Commission earned"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_report_detail_link_tr": {
+      "defaultValue": {
+        "value": "Detay"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_report_detail_link_en": {
+      "defaultValue": {
+        "value": "Detail"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_report_start_date_field_label_tr": {
+      "defaultValue": {
+        "value": "Başlangıç t."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_report_start_date_field_label_en": {
+      "defaultValue": {
+        "value": "Start"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_report_end_date_field_label_tr": {
+      "defaultValue": {
+        "value": "Bitiş t."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_report_end_date_field_label_en": {
+      "defaultValue": {
+        "value": "End"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_report_one_on_one_toggle_tr": {
+      "defaultValue": {
+        "value": "Birebir"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_report_one_on_one_toggle_en": {
+      "defaultValue": {
+        "value": "One-on-one"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_report_group_toggle_tr": {
+      "defaultValue": {
+        "value": "Grup"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_report_group_toggle_en": {
+      "defaultValue": {
+        "value": "Group"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_profile_footer_text_tr": {
+      "defaultValue": {
+        "value": "Egoractive · Egora Games · Sürüm 1.0"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_profile_footer_text_en": {
+      "defaultValue": {
+        "value": "Egoractive · Egora Games · Version 1.0"
+      },
+      "valueType": "STRING"
+    }
+  }
+}
