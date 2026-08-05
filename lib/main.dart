@@ -7,6 +7,7 @@ import 'core/panels/panel_stack_controller.dart';
 import 'core/panels/panel_stack_view.dart';
 import 'core/remote_config/remote_config_service.dart';
 import 'core/router/app_router.dart';
+import 'core/theme/app_color_scheme.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/app_typography.dart';
 import 'core/theme/theme_controller.dart';
@@ -26,7 +27,7 @@ class EgoractiveApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final colors = ref.watch(themeControllerProvider);
+    final colors = ref.watch(themeControllerProvider).valueOrNull ?? AppColorScheme.defaultScheme();
     return MaterialApp(
       title: 'Egoractive',
       theme: AppTheme.build(

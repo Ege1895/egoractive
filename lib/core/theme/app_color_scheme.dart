@@ -107,6 +107,19 @@ class AppColorScheme extends ThemeExtension<AppColorScheme> {
   final Color errorContainer;
   final Color onErrorContainer;
 
+  /// Varsayılan temayı [primary] vurgu rengine göre türetir — koyu zemin ve
+  /// durum renkleri (success/warning/error) sabit kalır, sadece vurgu ve
+  /// ondan türeyen roller değişir. `ThemeController.setAccentColor` ve
+  /// Firestore `gyms/{gymId}.themeColors` dinleyicisi bunu paylaşır.
+  factory AppColorScheme.withAccent(Color primary) {
+    return AppColorScheme.defaultScheme().copyWith(
+      primary: primary,
+      primaryContainer: primary.withValues(alpha: 0.14),
+      onPrimaryContainer: Color.lerp(primary, Colors.white, 0.35)!,
+      secondary: Color.lerp(primary, Colors.white, 0.25)!,
+    );
+  }
+
   /// Kart kenarlığı.
   final Color outline;
 
