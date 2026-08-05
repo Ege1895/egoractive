@@ -1,0 +1,13 @@
+{
+  "name": "firestore-tests",
+  "private": true,
+  "scripts": {
+    "test": "cd .. && firebase emulators:exec --only firestore --project egoractive-e92bd \"node --test firestore-tests/test/\""
+  },
+  "devDependencies": {
+    "@firebase/rules-unit-testing": "^4.0.1"
+  },
+  "dependencies": {
+    "firebase": "^12.17.1"
+  }
+}
