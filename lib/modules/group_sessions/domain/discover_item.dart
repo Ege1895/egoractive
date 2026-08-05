@@ -16,9 +16,21 @@ class DiscoverItem with _$DiscoverItem {
     required int taken,
     required int capacity,
     @Default(false) bool joined,
+    /// Grup dersi ise gerçek başlangıç zamanı — kilit kontrolü için.
+    /// Etkinlikler (F4-3, henüz mock) için null.
+    DateTime? startTime,
+    @Default(24) int lockHoursBefore,
   }) = _DiscoverItem;
 
   const DiscoverItem._();
 
   bool get isFull => taken >= capacity;
+
+  /// F4-2 — başlangıca `lockHoursBefore` saatten az kaldıysa (veya
+  /// geçtiyse) katılım/ayrılma UI'da kilitlenir.
+  bool get isLocked {
+    final start = startTime;
+    if (start == null) return false;
+    return DateTime.now().isAfter(start.subtract(Duration(hours: lockHoursBefore)));
+  }
 }

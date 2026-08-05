@@ -20,6 +20,9 @@ abstract final class RemoteConfigKeys {
       'cfg_session_reminder_minutes_before';
   static const defaultGroupSessionCapacity =
       'cfg_default_group_session_capacity';
+  /// F4-2 — grup dersine katılım/ayrılma başlangıca kaç saat kalana kadar
+  /// açık (sonrasında UI'da kilitli görünür).
+  static const groupSessionLockHoursBefore = 'cfg_group_session_lock_hours_before';
   static const feedbackReminderDayOfMonth =
       'cfg_feedback_reminder_day_of_month';
   static const freeVersionAdsEnabled = 'cfg_free_version_ads_enabled';
@@ -473,6 +476,7 @@ class RemoteConfigService {
   static const Map<String, Object> _defaults = {
     RemoteConfigKeys.sessionReminderMinutesBefore: 60,
     RemoteConfigKeys.defaultGroupSessionCapacity: 6,
+    RemoteConfigKeys.groupSessionLockHoursBefore: 24,
     RemoteConfigKeys.cancellationDeadlineHours: 24,
     RemoteConfigKeys.defaultTrainerReminderDelayMinutes: 30,
     RemoteConfigKeys.defaultOnlineBookingEnabled: true,
@@ -1106,6 +1110,10 @@ class RemoteConfigService {
   /// Grup dersi oluştururken varsayılan kontenjan.
   int get defaultGroupSessionCapacity =>
       getInt(RemoteConfigKeys.defaultGroupSessionCapacity);
+
+  /// Grup dersine katılım/ayrılma başlangıca kaç saat kalana kadar açık.
+  int get groupSessionLockHoursBefore =>
+      getInt(RemoteConfigKeys.groupSessionLockHoursBefore);
 
   /// Üye/antrenör seansı en fazla kaç saat öncesine kadar iptal edebilir.
   int get cancellationDeadlineHours =>
