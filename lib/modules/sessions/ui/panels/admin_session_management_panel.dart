@@ -9,6 +9,8 @@ import '../../../../shared/widgets/app_back_button.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../controller/admin_calendar_controller.dart';
 import '../../domain/admin_calendar_state.dart';
+import '../../service/sessions_write_service.dart';
+import '../widgets/create_session_sheet.dart';
 
 const _monthAbbrev = {
   1: 'Ocak', 2: 'Şubat', 3: 'Mart', 4: 'Nisan', 5: 'Mayıs', 6: 'Haziran',
@@ -28,7 +30,7 @@ class AdminSessionManagementPanel extends BasePanel {
 }
 
 class _AdminSessionManagementPanelState extends BasePanelState<AdminSessionManagementPanel> {
-  DateTime _date = DateTime(2026, 8, 3);
+  DateTime _date = DateTime.now();
   _SessionFilter _filter = _SessionFilter.all;
 
   @override
@@ -53,12 +55,19 @@ class _AdminSessionManagementPanelState extends BasePanelState<AdminSessionManag
                       AppBackButton(onTap: () => ref.read(panelStackControllerProvider.notifier).pop()),
                       const SizedBox(width: AppSpacing.md),
                       Expanded(child: Text('Seanslar', style: typography.headingSmall.copyWith(color: colors.onSurface, fontSize: 22))),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-                        constraints: const BoxConstraints(minHeight: 40),
-                        decoration: BoxDecoration(color: colors.primary, borderRadius: BorderRadius.circular(AppSpacing.radiusInner)),
-                        alignment: Alignment.center,
-                        child: Text('+ Seans', style: typography.headingSmall.copyWith(fontSize: 14, color: colors.onPrimary)),
+                      Material(
+                        color: colors.primary,
+                        borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+                          onTap: () => showCreateSessionSheet(context, ref, _date),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+                            constraints: const BoxConstraints(minHeight: 40),
+                            alignment: Alignment.center,
+                            child: Text('+ Seans', style: typography.headingSmall.copyWith(fontSize: 14, color: colors.onPrimary)),
+                          ),
+                        ),
                       ),
                     ],
                   ),
@@ -116,6 +125,11 @@ class _AdminSessionManagementPanelState extends BasePanelState<AdminSessionManag
     );
   }
 
+  DateTime _slotStartTime(AdminSessionSlot slot) {
+    final parts = slot.time.split(':');
+    return DateTime(_date.year, _date.month, _date.day, int.parse(parts[0]), int.parse(parts[1]));
+  }
+
   bool _matchesFilter(AdminSessionSlot slot) {
     return switch (_filter) {
       _SessionFilter.all => true,
@@ -143,7 +157,14 @@ class _AdminSessionManagementPanelState extends BasePanelState<AdminSessionManag
               const SizedBox(height: AppSpacing.xs),
               Text(slot.meta, style: typography.bodyMedium.copyWith(color: colors.onSurfaceMuted)),
               const SizedBox(height: AppSpacing.lg),
-              AppButton(label: 'Seansı ertele', variant: AppButtonVariant.secondary, onPressed: () => Navigator.of(sheetContext).pop()),
+              AppButton(
+                label: 'Seansı ertele',
+                variant: AppButtonVariant.secondary,
+                onPressed: () async {
+                  Navigator.of(sheetContext).pop();
+                  await showRescheduleSessionSheet(context, ref, sessionId: slot.id, currentStart: _slotStartTime(slot));
+                },
+              ),
               const SizedBox(height: AppSpacing.sm),
               AppButton(label: 'Antrenörü değiştir', variant: AppButtonVariant.secondary, onPressed: () => Navigator.of(sheetContext).pop()),
               const SizedBox(height: AppSpacing.sm),
@@ -151,7 +172,10 @@ class _AdminSessionManagementPanelState extends BasePanelState<AdminSessionManag
                 color: colors.errorContainer,
                 borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
                 child: InkWell(
-                  onTap: () => Navigator.of(sheetContext).pop(),
+                  onTap: () async {
+                    Navigator.of(sheetContext).pop();
+                    await ref.read(sessionsWriteServiceProvider).cancelSession(slot.id);
+                  },
                   borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
                   child: Container(
                     width: double.infinity,

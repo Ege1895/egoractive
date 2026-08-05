@@ -23,6 +23,12 @@ abstract final class RemoteConfigKeys {
       'cfg_feedback_reminder_day_of_month';
   static const freeVersionAdsEnabled = 'cfg_free_version_ads_enabled';
   static const featureFlags = 'cfg_feature_flags';
+  /// F3-3 — üye/antrenör için seans iptali son kaç saate kadar açık.
+  /// Gerçek zorlama `firestore.rules`'ta (Security Rules Remote Config'e
+  /// erişemediği için orada sabit 24 olarak tutuluyor) — bu değer sadece
+  /// client-side gösterim/erken uyarı için kullanılır, ikisi değiştirilirse
+  /// birlikte güncellenmeli.
+  static const cancellationDeadlineHours = 'cfg_cancellation_deadline_hours';
 
   static const commonVazgec = 'lbl_common_vazgec';
   static const commonKaydet = 'lbl_common_kaydet';
@@ -445,6 +451,7 @@ class RemoteConfigService {
   static const Map<String, Object> _defaults = {
     RemoteConfigKeys.sessionReminderMinutesBefore: 60,
     RemoteConfigKeys.defaultGroupSessionCapacity: 6,
+    RemoteConfigKeys.cancellationDeadlineHours: 24,
     RemoteConfigKeys.feedbackReminderDayOfMonth: -1,
     RemoteConfigKeys.freeVersionAdsEnabled: true,
     RemoteConfigKeys.featureFlags: '{}',
@@ -1063,6 +1070,10 @@ class RemoteConfigService {
   /// Grup dersi oluştururken varsayılan kontenjan.
   int get defaultGroupSessionCapacity =>
       getInt(RemoteConfigKeys.defaultGroupSessionCapacity);
+
+  /// Üye/antrenör seansı en fazla kaç saat öncesine kadar iptal edebilir.
+  int get cancellationDeadlineHours =>
+      getInt(RemoteConfigKeys.cancellationDeadlineHours);
 
   /// Aylık geri bildirim hatırlatmasının gönderileceği gün. -1 = ayın son günü.
   int get feedbackReminderDayOfMonth =>
