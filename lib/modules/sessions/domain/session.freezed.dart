@@ -23,6 +23,7 @@ mixin _$Session {
   String get title => throw _privateConstructorUsedError;
   String get meta => throw _privateConstructorUsedError;
   SessionStatus get status => throw _privateConstructorUsedError;
+  AttendanceAnswer get confirmation => throw _privateConstructorUsedError;
 
   /// Create a copy of Session
   /// with the given fields replaced by the non-null parameter values.
@@ -42,6 +43,7 @@ abstract class $SessionCopyWith<$Res> {
     String title,
     String meta,
     SessionStatus status,
+    AttendanceAnswer confirmation,
   });
 }
 
@@ -66,6 +68,7 @@ class _$SessionCopyWithImpl<$Res, $Val extends Session>
     Object? title = null,
     Object? meta = null,
     Object? status = null,
+    Object? confirmation = null,
   }) {
     return _then(
       _value.copyWith(
@@ -93,6 +96,10 @@ class _$SessionCopyWithImpl<$Res, $Val extends Session>
                 ? _value.status
                 : status // ignore: cast_nullable_to_non_nullable
                       as SessionStatus,
+            confirmation: null == confirmation
+                ? _value.confirmation
+                : confirmation // ignore: cast_nullable_to_non_nullable
+                      as AttendanceAnswer,
           )
           as $Val,
     );
@@ -114,6 +121,7 @@ abstract class _$$SessionImplCopyWith<$Res> implements $SessionCopyWith<$Res> {
     String title,
     String meta,
     SessionStatus status,
+    AttendanceAnswer confirmation,
   });
 }
 
@@ -137,6 +145,7 @@ class __$$SessionImplCopyWithImpl<$Res>
     Object? title = null,
     Object? meta = null,
     Object? status = null,
+    Object? confirmation = null,
   }) {
     return _then(
       _$SessionImpl(
@@ -164,6 +173,10 @@ class __$$SessionImplCopyWithImpl<$Res>
             ? _value.status
             : status // ignore: cast_nullable_to_non_nullable
                   as SessionStatus,
+        confirmation: null == confirmation
+            ? _value.confirmation
+            : confirmation // ignore: cast_nullable_to_non_nullable
+                  as AttendanceAnswer,
       ),
     );
   }
@@ -179,6 +192,7 @@ class _$SessionImpl implements _Session {
     required this.title,
     required this.meta,
     required this.status,
+    this.confirmation = AttendanceAnswer.pending,
   });
 
   @override
@@ -193,10 +207,13 @@ class _$SessionImpl implements _Session {
   final String meta;
   @override
   final SessionStatus status;
+  @override
+  @JsonKey()
+  final AttendanceAnswer confirmation;
 
   @override
   String toString() {
-    return 'Session(id: $id, day: $day, month: $month, title: $title, meta: $meta, status: $status)';
+    return 'Session(id: $id, day: $day, month: $month, title: $title, meta: $meta, status: $status, confirmation: $confirmation)';
   }
 
   @override
@@ -209,12 +226,22 @@ class _$SessionImpl implements _Session {
             (identical(other.month, month) || other.month == month) &&
             (identical(other.title, title) || other.title == title) &&
             (identical(other.meta, meta) || other.meta == meta) &&
-            (identical(other.status, status) || other.status == status));
+            (identical(other.status, status) || other.status == status) &&
+            (identical(other.confirmation, confirmation) ||
+                other.confirmation == confirmation));
   }
 
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, id, day, month, title, meta, status);
+  int get hashCode => Object.hash(
+    runtimeType,
+    id,
+    day,
+    month,
+    title,
+    meta,
+    status,
+    confirmation,
+  );
 
   /// Create a copy of Session
   /// with the given fields replaced by the non-null parameter values.
@@ -233,6 +260,7 @@ abstract class _Session implements Session {
     required final String title,
     required final String meta,
     required final SessionStatus status,
+    final AttendanceAnswer confirmation,
   }) = _$SessionImpl;
 
   @override
@@ -247,6 +275,8 @@ abstract class _Session implements Session {
   String get meta;
   @override
   SessionStatus get status;
+  @override
+  AttendanceAnswer get confirmation;
 
   /// Create a copy of Session
   /// with the given fields replaced by the non-null parameter values.

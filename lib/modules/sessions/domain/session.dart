@@ -15,5 +15,6 @@ class Session with _$Session {
     required String title,
     required String meta,
     required SessionStatus status,
+    @Default(AttendanceAnswer.pending) AttendanceAnswer confirmation,
   }) = _Session;
 }

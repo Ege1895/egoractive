@@ -247,3 +247,23 @@ test("member can read a session in their own gym (positive)", async () => {
   const db = contextFor("member-a1", { role: "member", gymId: "gym-a" }).firestore();
   await assertSucceeds(getDoc(doc(db, "sessions/s1")));
 });
+
+// --- sessions/{sessionId}.memberConfirmation (F3-4) ---
+
+test("member can set memberConfirmation on their own session even 1 hour before (positive — 24h kuralına tabi değil)", async () => {
+  await seedSession("s1", { trainerId: "trainer-a", memberId: "member-a1", startTime: hoursFromNow(1) });
+  const db = contextFor("member-a1", { role: "member", gymId: "gym-a" }).firestore();
+  await assertSucceeds(updateDoc(doc(db, "sessions/s1"), { memberConfirmation: "coming" }));
+});
+
+test("member cannot set memberConfirmation on another member's session (negative)", async () => {
+  await seedSession("s1", { trainerId: "trainer-a", memberId: "member-a2", startTime: hoursFromNow(1) });
+  const db = contextFor("member-a1", { role: "member", gymId: "gym-a" }).firestore();
+  await assertFails(updateDoc(doc(db, "sessions/s1"), { memberConfirmation: "coming" }));
+});
+
+test("member cannot change status while setting memberConfirmation (negative — sadece o alanı değiştirebilir)", async () => {
+  await seedSession("s1", { trainerId: "trainer-a", memberId: "member-a1", startTime: hoursFromNow(1) });
+  const db = contextFor("member-a1", { role: "member", gymId: "gym-a" }).firestore();
+  await assertFails(updateDoc(doc(db, "sessions/s1"), { memberConfirmation: "coming", status: "cancelled" }));
+});
