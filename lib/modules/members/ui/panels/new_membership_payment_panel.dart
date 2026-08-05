@@ -8,10 +8,9 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_back_button.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_text_field.dart';
-import '../../controller/admin_members_controller.dart';
+import '../../controller/member_registration_controller.dart';
 import '../../controller/new_member_controller.dart';
 import '../../controller/new_membership_controller.dart';
-import '../../domain/admin_member_summary.dart';
 
 /// Admin 7 · Yeni üyelik — Ödeme — ödeme çipleri kalan tutarı hesaplar.
 class NewMembershipPaymentPanel extends BasePanel {
@@ -206,20 +205,11 @@ class _NewMembershipPaymentPanelState extends BasePanelState<NewMembershipPaymen
                 label: 'Kaydet',
                 onPressed: package == null
                     ? null
-                    : () {
-                        final name = '${memberForm.firstName} ${memberForm.lastName}'.trim();
-                        ref.read(adminMembersControllerProvider.notifier).addMember(
-                              AdminMemberSummary(
-                                id: name.toLowerCase().replaceAll(' ', '-'),
-                                initials: _initialsOf(name),
-                                name: name,
-                                phone: memberForm.phoneDigits,
-                                trainerName: memberForm.trainerName,
-                                remainingSessions: package.sessionCount,
-                                packageEndDate: '${membership.endDate.day}.${membership.endDate.month}.${membership.endDate.year}',
-                                status: MemberPackageStatus.active,
-                              ),
-                            );
+                    : () async {
+                        final memberId = ref.read(memberRegistrationControllerProvider).createdMemberId;
+                        if (memberId == null) return;
+                        final success = await membershipController.save(memberId);
+                        if (!success || !mounted) return;
                         ref.read(newMemberControllerProvider.notifier).reset();
                         ref.read(newMembershipControllerProvider.notifier).reset();
                         ref.read(panelStackControllerProvider.notifier).popToRoot();

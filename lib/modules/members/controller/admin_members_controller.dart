@@ -22,17 +22,18 @@ Stream<List<AdminMemberSummary>> _membersForGym(_MembersForGymRef ref, String gy
 AdminMemberSummary _toSummary(QueryDocumentSnapshot<Map<String, dynamic>> doc) {
   final data = doc.data();
   final name = (data['name'] as String?)?.trim() ?? '';
+  final remainingSessions = (data['remainingSessions'] as num?)?.toInt() ?? 0;
+  final packageEndDateIso = data['packageEndDate'] as String?;
+  final packageEndDate = packageEndDateIso == null ? null : DateTime.tryParse(packageEndDateIso);
   return AdminMemberSummary(
     id: doc.id,
     initials: _initialsFor(name),
     name: name,
     phone: (data['phoneNumber'] as String?) ?? '',
-    // trainerId F2-2 kapsamında bilerek boş bırakılıyor — atama ayrı bir akış.
-    trainerName: '',
-    // Paket/seans verisi henüz gerçek değil (F3'te dolacak) — placeholder.
-    remainingSessions: 0,
-    packageEndDate: '—',
-    status: MemberPackageStatus.none,
+    trainerName: (data['trainerName'] as String?) ?? '',
+    remainingSessions: remainingSessions,
+    packageEndDate: packageEndDate == null ? '—' : '${packageEndDate.day}.${packageEndDate.month}.${packageEndDate.year}',
+    status: remainingSessions > 0 ? MemberPackageStatus.active : MemberPackageStatus.none,
   );
 }
 
@@ -58,6 +59,4 @@ class AdminMembersController extends _$AdminMembersController {
     }
     return ref.watch(_membersForGymProvider(gymId)).valueOrNull ?? const [];
   }
-
-  void addMember(AdminMemberSummary member) => state = [...state, member];
 }

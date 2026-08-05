@@ -58,5 +58,15 @@ service cloud.firestore {
 
       allow delete: if isSignedIn() && myRole() == 'admin' && resource.data.gymId == myGymId();
     }
+
+    // memberPackages/{id} — F3-2. Fiyat alanları (totalAmount/paidAmount/
+    // dueAmount) içerdiği için sadece admin erişebilir; üye kendi paketini
+    // ayrı, fiyatsız bir görünümden (users/{uid} üzerindeki denormalize
+    // remainingSessions/packageEndDate alanları) okur, bu koleksiyona hiç
+    // dokunmaz.
+    match /memberPackages/{packageId} {
+      allow read, update, delete: if isSignedIn() && myRole() == 'admin' && resource.data.gymId == myGymId();
+      allow create: if isSignedIn() && myRole() == 'admin' && request.resource.data.gymId == myGymId();
+    }
   }
 }
