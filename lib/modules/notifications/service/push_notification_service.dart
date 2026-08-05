@@ -1,3 +1,5 @@
+import 'dart:ui' show PlatformDispatcher;
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -60,11 +62,17 @@ class PushNotificationService {
     if (initialMessage != null) _navigateToReminderPanel(container);
   }
 
+  /// `locale` de burada kaydediliyor — Cloud Functions'ın gönderdiği push
+  /// metinlerini kullanıcının cihaz diline göre seçebilmesi için (F3-4).
   Future<void> _saveToken(String token) async {
     final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid == null) return;
+    final locale = PlatformDispatcher.instance.locale.languageCode == 'en' ? 'en' : 'tr';
     await FirebaseFirestore.instance.collection('users').doc(uid).set(
-      {'fcmTokens': FieldValue.arrayUnion([token])},
+      {
+        'fcmTokens': FieldValue.arrayUnion([token]),
+        'locale': locale,
+      },
       SetOptions(merge: true),
     );
   }

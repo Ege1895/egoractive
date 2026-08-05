@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ui' show PlatformDispatcher;
 
 import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -38,6 +39,12 @@ abstract final class RemoteConfigKeys {
       'cfg_default_allow_sessions_after_package_expiry';
   static const defaultMemberCanCancelSession =
       'cfg_default_member_can_cancel_session';
+
+  /// F3-4 — sessionReminderCheck Cloud Function'ının gönderdiği push metni.
+  /// Admin SDK'dan (Cloud Functions) da okunabildiği için diğer `lbl_*`
+  /// metinlerinden farklı olarak isimlendirmede `notif` öneki kullanılıyor.
+  static const notifSessionReminderTitle = 'lbl_notif_session_reminder_title';
+  static const notifSessionReminderBody = 'lbl_notif_session_reminder_body';
 
   static const commonVazgec = 'lbl_common_vazgec';
   static const commonKaydet = 'lbl_common_kaydet';
@@ -468,6 +475,8 @@ class RemoteConfigService {
     RemoteConfigKeys.feedbackReminderDayOfMonth: -1,
     RemoteConfigKeys.freeVersionAdsEnabled: true,
     RemoteConfigKeys.featureFlags: '{}',
+    'lbl_notif_session_reminder_title_tr': 'Dersin yaklaşıyor',
+    'lbl_notif_session_reminder_body_tr': 'Yaklaşan dersin için gelip gelmeyeceğini bildir.',
     'lbl_common_vazgec_tr': 'Vazgeç',
     'lbl_common_kaydet_tr': 'Kaydet',
     'lbl_common_duzenle_tr': 'Düzenle',
@@ -769,6 +778,8 @@ class RemoteConfigService {
     'lbl_trainers_report_group_toggle_tr': 'Grup',
     'lbl_trainers_profile_footer_text_tr':
         'Egoractive · Egora Games · Sürüm 1.0',
+    'lbl_notif_session_reminder_title_en': 'Your session is coming up',
+    'lbl_notif_session_reminder_body_en': 'Let us know if you can make your upcoming session.',
     'lbl_common_vazgec_en': 'Cancel',
     'lbl_common_kaydet_en': 'Save',
     'lbl_common_duzenle_en': 'Edit',
@@ -1072,9 +1083,12 @@ class RemoteConfigService {
         'Egoractive · Egora Games · Version 1.0',
   };
 
-  /// Şu anki dil. Uygulamada henüz bir dil seçici olmadığından sabit 'tr' —
-  /// gerçek locale sistemi eklendiğinde burası ona bağlanacak.
-  String get currentLocale => 'tr';
+  /// Şu anki dil — cihazın dilinden okunur. RC'de sadece `_tr`/`_en`
+  /// çiftleri olduğu için desteklenmeyen her dilde 'tr'ye düşülür
+  /// (uygulamanın hedef kitlesi Türkiye). Uygulama içi ayrı bir dil
+  /// seçici henüz yok.
+  String get currentLocale =>
+      PlatformDispatcher.instance.locale.languageCode == 'en' ? 'en' : 'tr';
 
   /// Ders/seans onay bildiriminin kaç dakika önce gönderileceği.
   int get sessionReminderMinutesBefore =>

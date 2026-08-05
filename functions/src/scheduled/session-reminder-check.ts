@@ -1,22 +1,37 @@
 import { getFirestore, Timestamp } from "firebase-admin/firestore";
 import { getMessaging } from "firebase-admin/messaging";
-import { getRemoteConfig } from "firebase-admin/remote-config";
+import { getRemoteConfig, RemoteConfigTemplate } from "firebase-admin/remote-config";
 import { onSchedule } from "firebase-functions/v2/scheduler";
 import * as logger from "firebase-functions/logger";
 
 const DEFAULT_REMINDER_MINUTES = 60;
 
-async function readReminderMinutesBefore(): Promise<number> {
-  try {
-    const template = await getRemoteConfig().getTemplate();
-    const param = template.parameters["sessionReminderMinutesBefore"];
-    const raw = param?.defaultValue && "value" in param.defaultValue ? param.defaultValue.value : undefined;
-    const parsed = raw ? Number.parseInt(raw, 10) : NaN;
-    return Number.isFinite(parsed) ? parsed : DEFAULT_REMINDER_MINUTES;
-  } catch (error) {
-    logger.warn("Remote Config okunamadı, varsayılan kullanılıyor.", error);
-    return DEFAULT_REMINDER_MINUTES;
-  }
+const DEFAULT_TEXT: Record<string, { tr: string; en: string }> = {
+  lbl_notif_session_reminder_title: { tr: "Dersin yaklaşıyor", en: "Your session is coming up" },
+  lbl_notif_session_reminder_body: {
+    tr: "Yaklaşan dersin için gelip gelmeyeceğini bildir.",
+    en: "Let us know if you can make your upcoming session.",
+  },
+};
+
+function readParam(template: RemoteConfigTemplate, key: string): string | undefined {
+  const param = template.parameters[key];
+  return param?.defaultValue && "value" in param.defaultValue ? param.defaultValue.value : undefined;
+}
+
+function readReminderMinutesBefore(template: RemoteConfigTemplate): number {
+  const parsed = Number.parseInt(readParam(template, "sessionReminderMinutesBefore") ?? "", 10);
+  return Number.isFinite(parsed) ? parsed : DEFAULT_REMINDER_MINUTES;
+}
+
+/**
+ * F3-4 — bildirim metnini kullanıcının `users/{uid}.locale` alanına göre
+ * seçer (client bunu FCM token kaydederken cihaz dilinden yazıyor).
+ * RC'de karşılığı yoksa kod içindeki varsayılana düşer.
+ */
+function readNotificationText(template: RemoteConfigTemplate, baseKey: string, locale: string): string {
+  const lang = locale === "en" ? "en" : "tr";
+  return readParam(template, `${baseKey}_${lang}`) ?? DEFAULT_TEXT[baseKey][lang];
 }
 
 /**
@@ -27,8 +42,16 @@ async function readReminderMinutesBefore(): Promise<number> {
  * bu alan aynı seans için ikinci kez bildirim gitmesini engeller.
  */
 export const sessionReminderCheck = onSchedule("every 15 minutes", async () => {
-  const minutesBefore = await readReminderMinutesBefore();
   const db = getFirestore();
+
+  let template: RemoteConfigTemplate;
+  try {
+    template = await getRemoteConfig().getTemplate();
+  } catch (error) {
+    logger.warn("Remote Config okunamadı, varsayılanlar kullanılıyor.", error);
+    template = { parameters: {} } as RemoteConfigTemplate;
+  }
+  const minutesBefore = readReminderMinutesBefore(template);
 
   const now = Timestamp.now();
   const windowEnd = Timestamp.fromMillis(now.toMillis() + minutesBefore * 60_000);
@@ -58,11 +81,12 @@ export const sessionReminderCheck = onSchedule("every 15 minutes", async () => {
       continue;
     }
 
+    const locale = (memberDoc.data()?.locale as string | undefined) ?? "tr";
     await getMessaging().sendEachForMulticast({
       tokens: fcmTokens,
       notification: {
-        title: "Dersin yaklaşıyor",
-        body: "Yaklaşan dersin için gelip gelmeyeceğini bildir.",
+        title: readNotificationText(template, "lbl_notif_session_reminder_title", locale),
+        body: readNotificationText(template, "lbl_notif_session_reminder_body", locale),
       },
       data: { type: "session_reminder", sessionId: sessionDoc.id },
     });
