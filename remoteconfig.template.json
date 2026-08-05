@@ -21,6 +21,34 @@
       "description": "Üye/antrenör seansı en fazla kaç saat öncesine kadar iptal edebilir. firestore.rules'taki sabitle senkron tutulmalı.",
       "valueType": "NUMBER"
     },
+    "cfg_default_trainer_reminder_delay_minutes": {
+      "defaultValue": {
+        "value": "30"
+      },
+      "description": "F3-6 — Yetki Ayarları'nda bir salon override yazmadıysa antrenör hatırlatma süresi (dakika).",
+      "valueType": "NUMBER"
+    },
+    "cfg_default_online_booking_enabled": {
+      "defaultValue": {
+        "value": "true"
+      },
+      "description": "F3-6 — bir salon override yazmadıysa online rezervasyon varsayılanı.",
+      "valueType": "BOOLEAN"
+    },
+    "cfg_default_allow_sessions_after_package_expiry": {
+      "defaultValue": {
+        "value": "false"
+      },
+      "description": "F3-6 — bir salon override yazmadıysa paket süresi bitince seans oluşturulabilsin mi varsayılanı.",
+      "valueType": "BOOLEAN"
+    },
+    "cfg_default_member_can_cancel_session": {
+      "defaultValue": {
+        "value": "true"
+      },
+      "description": "F3-6 — bir salon override yazmadıysa üye kendi seansını iptal edebilsin mi varsayılanı.",
+      "valueType": "BOOLEAN"
+    },
     "cfg_feedback_reminder_day_of_month": {
       "defaultValue": {
         "value": "-1"
