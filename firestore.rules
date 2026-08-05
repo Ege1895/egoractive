@@ -1,12 +1,62 @@
 rules_version = '2';
 
-// F1-8 — temel Security Rules. Rol/salon bazlı ince kapsam F2-6'da eklenecek
-// (custom claims F1-11/F2-5'te bağlanana kadar burada sadece "giriş yapmış
-// kullanıcı" kontrolü var — herkese açık okuma/yazma yok).
+// F2-6 — Faz 2 kapsamında ince taneli rol/salon bazlı kurallar.
+// Custom claim'ler (role/gymId) F2-5'teki trigger ile setCustomUserClaims'e
+// yazılıyor; burada request.auth.token.role / .gymId olarak okunuyor.
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /{document=**} {
-      allow read, write: if request.auth != null;
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function myRole() {
+      return request.auth.token.role;
+    }
+
+    function myGymId() {
+      return request.auth.token.gymId;
+    }
+
+    // gyms/{gymId} — sadece o salonun admin'i yazabilir, kimliği doğrulanmış
+    // herkes kendi salonu için okuyabilir. Alt koleksiyonlar (themes vb.)
+    // aynı kurala tabi.
+    match /gyms/{gymId} {
+      allow read: if isSignedIn() && myGymId() == gymId;
+      allow write: if isSignedIn() && myRole() == 'admin' && myGymId() == gymId;
+
+      match /{document=**} {
+        allow read: if isSignedIn() && myGymId() == gymId;
+        allow write: if isSignedIn() && myRole() == 'admin' && myGymId() == gymId;
+      }
+    }
+
+    // users/{uid} — F1-10 (telefon numarasıyla kendi kaydını arama, Admin
+    // SDK ile — kurallara tabi değil) ve F2-1/F2-2 (admin başka kullanıcı
+    // dokümanı oluşturuyor) ile uyumlu:
+    // - herkes kendi dokümanını okuyabilir
+    // - admin kendi salonundaki (gymId eşleşen) herkesi okuyabilir/yazabilir
+    // - antrenör sadece trainerId == kendi uid'si olan üyeleri okuyabilir
+    match /users/{uid} {
+      allow read: if isSignedIn() && (
+        request.auth.uid == uid ||
+        (myRole() == 'admin' && resource.data.gymId == myGymId()) ||
+        (myRole() == 'trainer' && resource.data.trainerId == request.auth.uid)
+      );
+
+      allow create: if isSignedIn() && (
+        request.auth.uid == uid ||
+        (myRole() == 'admin' && request.resource.data.gymId == myGymId())
+      );
+
+      allow update: if isSignedIn() && (
+        request.auth.uid == uid ||
+        (myRole() == 'admin' &&
+          resource.data.gymId == myGymId() &&
+          request.resource.data.gymId == myGymId())
+      );
+
+      allow delete: if isSignedIn() && myRole() == 'admin' && resource.data.gymId == myGymId();
     }
   }
 }
