@@ -3,6 +3,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:firebase_messaging/firebase_messaging.dart';
+
 import 'core/panels/panel_stack_controller.dart';
 import 'core/panels/panel_stack_view.dart';
 import 'core/remote_config/remote_config_service.dart';
@@ -14,12 +16,20 @@ import 'core/theme/theme_controller.dart';
 import 'firebase_options.dart';
 import 'modules/auth/ui/panels/phone_login_panel.dart';
 import 'modules/auth/ui/panels/splash_panel.dart';
+import 'modules/notifications/service/push_notification_service.dart';
+
+/// Widget ağacı dışından (bildirim servisi gibi) `PanelStackController`'a
+/// erişebilmek için paylaşılan container — `UncontrolledProviderScope` bunu
+/// widget ağacına da bağlıyor.
+final _providerContainer = ProviderContainer();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await const RemoteConfigService().init();
-  runApp(const ProviderScope(child: EgoractiveApp()));
+  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+  await PushNotificationService().init(_providerContainer);
+  runApp(UncontrolledProviderScope(container: _providerContainer, child: const EgoractiveApp()));
 }
 
 class EgoractiveApp extends ConsumerWidget {
