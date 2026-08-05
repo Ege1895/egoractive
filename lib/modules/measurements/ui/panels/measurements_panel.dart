@@ -43,6 +43,7 @@ class _MeasurementsPanelState extends BasePanelState<MeasurementsPanel> {
   void onPanelHide() {
     if (widget.memberId != null) {
       ref.read(measurementsViewedUidProvider.notifier).set(null);
+      ref.read(measurementsControllerProvider.notifier).selectDate(null);
     }
   }
 
@@ -130,6 +131,93 @@ class _ViewToggleChip extends StatelessWidget {
   }
 }
 
+const _monthNames = {
+  1: 'Ocak', 2: 'Şubat', 3: 'Mart', 4: 'Nisan', 5: 'Mayıs', 6: 'Haziran',
+  7: 'Temmuz', 8: 'Ağustos', 9: 'Eylül', 10: 'Ekim', 11: 'Kasım', 12: 'Aralık',
+};
+
+String _formatDate(DateTime date) => '${date.day} ${_monthNames[date.month]} ${date.year}';
+
+/// F4-1 — üyenin geçmiş ölçüm kayıtlarından birini seçip avatar ekranında
+/// o tarihe ait değerleri görüntülemek için (en son kayıt varsayılan).
+void _showDatePicker(BuildContext context, WidgetRef ref, List<DateTime> dates, DateTime? selected) {
+  final colors = context.appColors;
+  final typography = context.appTypography;
+  showModalBottomSheet<void>(
+    context: context,
+    backgroundColor: colors.surface,
+    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
+    builder: (sheetContext) {
+      return SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Tarih seç', style: typography.headingMedium.copyWith(color: colors.onSurface, fontSize: 20)),
+              const SizedBox(height: AppSpacing.md),
+              _DateOption(
+                label: 'Son kayıt',
+                selected: selected == null,
+                onTap: () {
+                  ref.read(measurementsControllerProvider.notifier).selectDate(null);
+                  Navigator.of(sheetContext).pop();
+                },
+              ),
+              for (final date in dates)
+                _DateOption(
+                  label: _formatDate(date),
+                  selected: selected != null &&
+                      selected.year == date.year &&
+                      selected.month == date.month &&
+                      selected.day == date.day,
+                  onTap: () {
+                    ref.read(measurementsControllerProvider.notifier).selectDate(date);
+                    Navigator.of(sheetContext).pop();
+                  },
+                ),
+            ],
+          ),
+        ),
+      );
+    },
+  );
+}
+
+class _DateOption extends StatelessWidget {
+  const _DateOption({required this.label, required this.selected, required this.onTap});
+
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+    final typography = context.appTypography;
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        constraints: const BoxConstraints(minHeight: 52),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              label,
+              style: (selected ? typography.headingSmall : typography.bodyLarge).copyWith(
+                color: selected ? colors.primary : colors.onSurface,
+                fontSize: 15,
+              ),
+            ),
+            if (selected) Icon(Icons.check, size: 18, color: colors.primary),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _AvatarView extends ConsumerWidget {
   const _AvatarView();
 
@@ -140,10 +228,39 @@ class _AvatarView extends ConsumerWidget {
     final state = ref.watch(measurementsControllerProvider);
     final controller = ref.read(measurementsControllerProvider.notifier);
     final selectedPoint = state.points[state.selectedMetric]!;
+    final isLatest = state.selectedDate == null;
 
     return ListView(
       padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.md, AppSpacing.screenEdge, AppSpacing.lg),
       children: [
+        if (state.recordedDates.length > 1)
+          Padding(
+            padding: const EdgeInsets.only(bottom: AppSpacing.md),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+              onTap: () => _showDatePicker(context, ref, state.recordedDates, state.selectedDate),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
+                decoration: BoxDecoration(
+                  color: colors.surfaceRaised,
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.calendar_month, size: 16, color: colors.onSurfaceVariant),
+                    const SizedBox(width: AppSpacing.sm),
+                    Expanded(
+                      child: Text(
+                        isLatest ? 'Son kayıt gösteriliyor' : '${_formatDate(state.selectedDate!)} gösteriliyor',
+                        style: typography.bodyMedium.copyWith(color: colors.onSurfaceVariant, fontSize: 13),
+                      ),
+                    ),
+                    Text('Tarih değiştir', style: typography.headingSmall.copyWith(color: colors.primary, fontSize: 13)),
+                  ],
+                ),
+              ),
+            ),
+          ),
         Center(
           child: MeasurementAvatar(
             points: state.points,

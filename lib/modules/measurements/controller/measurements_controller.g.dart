@@ -171,8 +171,8 @@ final measurementsViewedUidProvider =
     );
 
 typedef _$MeasurementsViewedUid = AutoDisposeNotifier<String?>;
-String _$measurementsControllerHash() =>
-    r'ed9d5266de121157b13ed18e2e202c02c3a97cb3';
+String _$measurementsSelectedDateHash() =>
+    r'6cad12b8168922575626494d99830d0fef577749';
 
 /// F4-1 — görüntülenen kişinin (kendisi ya da admin/antrenörün açtığı bir
 /// üye) ölçümleri gerçek zamanlı `measurements/{uid}/entries` alt
@@ -180,7 +180,24 @@ String _$measurementsControllerHash() =>
 /// — boş bir avatar/grafik göstermek yerine örnek bir başlangıç durumu
 /// sunar.
 ///
-/// Copied from [MeasurementsController].
+/// Copied from [_MeasurementsSelectedDate].
+@ProviderFor(_MeasurementsSelectedDate)
+final _measurementsSelectedDateProvider =
+    AutoDisposeNotifierProvider<_MeasurementsSelectedDate, DateTime?>.internal(
+      _MeasurementsSelectedDate.new,
+      name: r'_measurementsSelectedDateProvider',
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$measurementsSelectedDateHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
+
+typedef _$MeasurementsSelectedDate = AutoDisposeNotifier<DateTime?>;
+String _$measurementsControllerHash() =>
+    r'9c2339047dc6cd9b5186a43a591d8c27a85fe354';
+
+/// See also [MeasurementsController].
 @ProviderFor(MeasurementsController)
 final measurementsControllerProvider =
     AutoDisposeNotifierProvider<

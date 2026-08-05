@@ -48,9 +48,28 @@ Stream<List<_Entry>> _measurementEntries(_MeasurementEntriesRef ref, String uid)
           }).toList());
 }
 
-MeasurementsState _toState(List<_Entry> entries) {
+bool _isSameDay(DateTime a, DateTime b) => a.year == b.year && a.month == b.month && a.day == b.day;
+
+/// `entries` tarihe göre artan sırada — `target` gün veya ondan önceki en
+/// yakın kaydı döner (o metrik için o günde/o günden önce bir kayıt yoksa
+/// null).
+_Entry? _entryAtOrBefore(List<_Entry> entries, DateTime target) {
+  _Entry? result;
+  for (final entry in entries) {
+    if (entry.$1.isAfter(target) && !_isSameDay(entry.$1, target)) break;
+    result = entry;
+  }
+  return result;
+}
+
+/// F4-1 — `selectedDate` verilirse avatar ekranı o güne (veya o günden
+/// önceki en yakın kayda) ait değerleri gösterir; verilmezse her metriğin
+/// en son kaydı kullanılır. Grafik/trend her zaman tüm geçmişi gösterir,
+/// tarih seçiminden etkilenmez.
+MeasurementsState _toState(List<_Entry> entries, {DateTime? selectedDate}) {
   final series = <MeasurementMetric, MeasurementSeries>{};
   final points = <MeasurementMetric, MeasurementPoint>{};
+  final recordedDates = entries.map((e) => e.$1).toSet().toList()..sort((a, b) => b.compareTo(a));
 
   for (final metric in MeasurementMetric.values) {
     final withMetric = entries.where((e) => e.$2.containsKey(metric)).toList();
@@ -68,22 +87,25 @@ MeasurementsState _toState(List<_Entry> entries) {
 
     final layout = _avatarLayout[metric];
     if (layout == null) continue;
-    final latest = values.last;
-    final previous = values.length > 1 ? values[values.length - 2] : latest;
-    final diff = latest - previous;
+
+    final target = selectedDate == null ? withMetric.last : (_entryAtOrBefore(withMetric, selectedDate) ?? withMetric.last);
+    final targetIndex = withMetric.indexOf(target);
+    final targetValue = target.$2[metric]!;
+    final previousValue = targetIndex > 0 ? withMetric[targetIndex - 1].$2[metric]! : targetValue;
+    final diff = targetValue - previousValue;
     points[metric] = MeasurementPoint(
       metric: metric,
-      value: latest.toStringAsFixed(1).replaceAll('.', ','),
+      value: targetValue.toStringAsFixed(1).replaceAll('.', ','),
       delta: _formatDelta(diff, zeroLabel: 'değişim yok'),
       isImprovement: diff <= 0,
-      since: 'Son ölçüm ${withMetric.last.$1.day} ${_monthAbbrev[withMetric.last.$1.month]}',
+      since: '${target.$1.day} ${_monthAbbrev[target.$1.month]} ${target.$1.year}',
       fx: layout.fx,
       fy: layout.fy,
       side: layout.side,
     );
   }
 
-  return MeasurementsState(points: points, series: series);
+  return MeasurementsState(points: points, series: series, recordedDates: recordedDates);
 }
 
 String _formatDelta(double diff, {required String zeroLabel}) {
@@ -110,9 +132,18 @@ class MeasurementsViewedUid extends _$MeasurementsViewedUid {
 /// — boş bir avatar/grafik göstermek yerine örnek bir başlangıç durumu
 /// sunar.
 @riverpod
+class _MeasurementsSelectedDate extends _$MeasurementsSelectedDate {
+  @override
+  DateTime? build() => null;
+
+  void select(DateTime? date) => state = date;
+}
+
+@riverpod
 class MeasurementsController extends _$MeasurementsController {
   @override
   MeasurementsState build() {
+    final selectedDate = ref.watch(_measurementsSelectedDateProvider);
     final uid = ref.watch(measurementsViewedUidProvider) ?? ref.watch(authStateProvider).valueOrNull?.uid;
     final mock = ref.watch(measurementsRepositoryProvider).loadInitial();
     if (uid == null) return mock;
@@ -120,8 +151,13 @@ class MeasurementsController extends _$MeasurementsController {
     final entries = ref.watch(_measurementEntriesProvider(uid)).valueOrNull;
     if (entries == null || entries.isEmpty) return mock;
 
-    final real = _toState(entries);
-    return mock.copyWith(points: real.points, series: real.series);
+    final real = _toState(entries, selectedDate: selectedDate);
+    return mock.copyWith(
+      points: real.points,
+      series: real.series,
+      recordedDates: real.recordedDates,
+      selectedDate: selectedDate,
+    );
   }
 
   void selectPoint(MeasurementMetric metric) {
@@ -132,9 +168,15 @@ class MeasurementsController extends _$MeasurementsController {
     state = state.copyWith(viewMode: mode);
   }
 
+  /// Geçmiş bir tarihi seçip avatar ekranında o güne ait değerleri
+  /// gösterir; `null` en son kayda döner.
+  void selectDate(DateTime? date) => ref.read(_measurementsSelectedDateProvider.notifier).select(date);
+
   /// Yeni ölçüm ekle formundan gelen değerleri gerçek Firestore'a yazar —
   /// boş bırakılan alanlar atlanır. Admin/antrenör bir üyeyi görüntülüyorsa
   /// (`measurementsViewedUidProvider` set edilmiş) o üyenin verisine yazar.
+  /// Aynı gün için ikinci bir kayıt, o günün verisinin tamamen üzerine
+  /// yazar (bkz. `MeasurementsWriteService`).
   Future<void> addMeasurement(Map<MeasurementMetric, double> newValues) async {
     final uid = ref.read(measurementsViewedUidProvider) ?? ref.read(authStateProvider).valueOrNull?.uid;
     if (uid == null || newValues.isEmpty) return;
