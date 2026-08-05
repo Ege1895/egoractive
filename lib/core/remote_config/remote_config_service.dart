@@ -29,6 +29,15 @@ abstract final class RemoteConfigKeys {
   /// client-side gösterim/erken uyarı için kullanılır, ikisi değiştirilirse
   /// birlikte güncellenmeli.
   static const cancellationDeadlineHours = 'cfg_cancellation_deadline_hours';
+  /// F3-6 — Yetki Ayarları'nın global varsayılanları. Bir salon
+  /// `gyms/{gymId}.permissions` altında override yazmadıysa buradan okunur.
+  static const defaultTrainerReminderDelayMinutes =
+      'cfg_default_trainer_reminder_delay_minutes';
+  static const defaultOnlineBookingEnabled = 'cfg_default_online_booking_enabled';
+  static const defaultAllowSessionsAfterPackageExpiry =
+      'cfg_default_allow_sessions_after_package_expiry';
+  static const defaultMemberCanCancelSession =
+      'cfg_default_member_can_cancel_session';
 
   static const commonVazgec = 'lbl_common_vazgec';
   static const commonKaydet = 'lbl_common_kaydet';
@@ -452,6 +461,10 @@ class RemoteConfigService {
     RemoteConfigKeys.sessionReminderMinutesBefore: 60,
     RemoteConfigKeys.defaultGroupSessionCapacity: 6,
     RemoteConfigKeys.cancellationDeadlineHours: 24,
+    RemoteConfigKeys.defaultTrainerReminderDelayMinutes: 30,
+    RemoteConfigKeys.defaultOnlineBookingEnabled: true,
+    RemoteConfigKeys.defaultAllowSessionsAfterPackageExpiry: false,
+    RemoteConfigKeys.defaultMemberCanCancelSession: true,
     RemoteConfigKeys.feedbackReminderDayOfMonth: -1,
     RemoteConfigKeys.freeVersionAdsEnabled: true,
     RemoteConfigKeys.featureFlags: '{}',
@@ -1074,6 +1087,19 @@ class RemoteConfigService {
   /// Üye/antrenör seansı en fazla kaç saat öncesine kadar iptal edebilir.
   int get cancellationDeadlineHours =>
       getInt(RemoteConfigKeys.cancellationDeadlineHours);
+
+  /// F3-6 — bir salon override yazmadıysa Yetki Ayarları'nın varsayılanları.
+  int get defaultTrainerReminderDelayMinutes =>
+      getInt(RemoteConfigKeys.defaultTrainerReminderDelayMinutes);
+
+  bool get defaultOnlineBookingEnabled =>
+      getBool(RemoteConfigKeys.defaultOnlineBookingEnabled);
+
+  bool get defaultAllowSessionsAfterPackageExpiry =>
+      getBool(RemoteConfigKeys.defaultAllowSessionsAfterPackageExpiry);
+
+  bool get defaultMemberCanCancelSession =>
+      getBool(RemoteConfigKeys.defaultMemberCanCancelSession);
 
   /// Aylık geri bildirim hatırlatmasının gönderileceği gün. -1 = ayın son günü.
   int get feedbackReminderDayOfMonth =>
