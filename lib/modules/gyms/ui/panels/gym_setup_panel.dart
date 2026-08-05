@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -8,6 +10,7 @@ import '../../../../core/panels/shell/admin_shell_panel.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_text_field.dart';
+import '../../controller/create_gym_controller.dart';
 import '../../controller/gym_profile_controller.dart';
 import '../../controller/gym_theme_controller.dart';
 import '../../domain/gym_theme.dart';
@@ -43,6 +46,8 @@ class _GymSetupPanelState extends BasePanelState<GymSetupPanel> {
     final profileController = ref.read(gymProfileControllerProvider.notifier);
     final themeState = ref.watch(gymThemeControllerProvider);
     final themeController = ref.read(gymThemeControllerProvider.notifier);
+    final createGymState = ref.watch(createGymControllerProvider);
+    final createGymController = ref.read(createGymControllerProvider.notifier);
 
     return Scaffold(
       body: SafeArea(
@@ -132,17 +137,32 @@ class _GymSetupPanelState extends BasePanelState<GymSetupPanel> {
                           style: typography.bodyMedium.copyWith(color: colors.onSurfaceMuted, fontSize: 13),
                         ),
                         const SizedBox(height: AppSpacing.md),
+                        if (createGymState.logoFile != null) ...[
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+                            child: Image.file(
+                              File(createGymState.logoFile!.path),
+                              width: 72,
+                              height: 72,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                          const SizedBox(height: AppSpacing.md),
+                        ],
                         Material(
                           color: colors.surfaceRaised,
                           borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
                           child: InkWell(
-                            onTap: () {},
+                            onTap: createGymController.pickLogo,
                             borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
                             child: Container(
                               padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
                               constraints: const BoxConstraints(minHeight: 44),
                               alignment: Alignment.centerLeft,
-                              child: Text('Logo seç', style: typography.headingSmall.copyWith(fontSize: 14, color: colors.onSurfaceVariant)),
+                              child: Text(
+                                createGymState.logoFile == null ? 'Logo seç' : 'Logoyu değiştir',
+                                style: typography.headingSmall.copyWith(fontSize: 14, color: colors.onSurfaceVariant),
+                              ),
                             ),
                           ),
                         ),
@@ -188,9 +208,28 @@ class _GymSetupPanelState extends BasePanelState<GymSetupPanel> {
             ),
             Padding(
               padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.md, AppSpacing.screenEdge, AppSpacing.lg),
-              child: AppButton(
-                label: 'Salonu oluştur ve girişi tamamla',
-                onPressed: () => ref.read(panelStackControllerProvider.notifier).replaceRoot(const AdminShellPanel()),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (createGymState.errorMessage != null) ...[
+                    Text(
+                      createGymState.errorMessage!,
+                      style: typography.bodyMedium.copyWith(color: colors.error, fontSize: 13),
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                  ],
+                  AppButton(
+                    label: createGymState.isSubmitting ? 'Oluşturuluyor…' : 'Salonu oluştur ve girişi tamamla',
+                    onPressed: createGymState.isSubmitting
+                        ? null
+                        : () async {
+                            final gymId = await createGymController.submit();
+                            if (gymId != null && mounted) {
+                              ref.read(panelStackControllerProvider.notifier).replaceRoot(const AdminShellPanel());
+                            }
+                          },
+                  ),
+                ],
               ),
             ),
           ],
