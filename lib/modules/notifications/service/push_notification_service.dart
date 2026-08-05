@@ -67,7 +67,7 @@ class PushNotificationService {
   Future<void> _saveToken(String token) async {
     final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid == null) return;
-    final locale = PlatformDispatcher.instance.locale.languageCode == 'en' ? 'en' : 'tr';
+    final locale = PlatformDispatcher.instance.locale.languageCode == 'tr' ? 'tr' : 'en';
     await FirebaseFirestore.instance.collection('users').doc(uid).set(
       {
         'fcmTokens': FieldValue.arrayUnion([token]),

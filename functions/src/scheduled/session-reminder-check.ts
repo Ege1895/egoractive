@@ -30,7 +30,7 @@ function readReminderMinutesBefore(template: RemoteConfigTemplate): number {
  * RC'de karşılığı yoksa kod içindeki varsayılana düşer.
  */
 function readNotificationText(template: RemoteConfigTemplate, baseKey: string, locale: string): string {
-  const lang = locale === "en" ? "en" : "tr";
+  const lang = locale === "tr" ? "tr" : "en";
   return readParam(template, `${baseKey}_${lang}`) ?? DEFAULT_TEXT[baseKey][lang];
 }
 
@@ -81,7 +81,7 @@ export const sessionReminderCheck = onSchedule("every 15 minutes", async () => {
       continue;
     }
 
-    const locale = (memberDoc.data()?.locale as string | undefined) ?? "tr";
+    const locale = (memberDoc.data()?.locale as string | undefined) ?? "en";
     await getMessaging().sendEachForMulticast({
       tokens: fcmTokens,
       notification: {

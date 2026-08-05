@@ -1083,12 +1083,11 @@ class RemoteConfigService {
         'Egoractive · Egora Games · Version 1.0',
   };
 
-  /// Şu anki dil — cihazın dilinden okunur. RC'de sadece `_tr`/`_en`
-  /// çiftleri olduğu için desteklenmeyen her dilde 'tr'ye düşülür
-  /// (uygulamanın hedef kitlesi Türkiye). Uygulama içi ayrı bir dil
-  /// seçici henüz yok.
+  /// Şu anki dil — cihazın dilinden okunur. Cihaz dili Türkçe ise 'tr',
+  /// diğer tüm diller (İngilizce dahil) için 'en'. Uygulama içi ayrı bir
+  /// dil seçici henüz yok.
   String get currentLocale =>
-      PlatformDispatcher.instance.locale.languageCode == 'en' ? 'en' : 'tr';
+      PlatformDispatcher.instance.locale.languageCode == 'tr' ? 'tr' : 'en';
 
   /// Ders/seans onay bildiriminin kaç dakika önce gönderileceği.
   int get sessionReminderMinutesBefore =>
