@@ -3,13 +3,29 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:egoractive/main.dart';
+import 'package:egoractive/modules/auth/repository/auth_repository.dart';
+
+/// Gerçek Firebase çağrısı (F1-10) yapmayan sahte repository — bu dosya
+/// panel geçişlerini test eder, Firebase entegrasyonunu değil.
+class _FakeAuthRepository implements AuthRepository {
+  @override
+  Future<void> login(String phoneDigits) => Future<void>.delayed(const Duration(seconds: 2));
+
+  @override
+  Future<void> deleteAccount() => Future<void>.delayed(const Duration(seconds: 2));
+}
 
 void main() {
   testWidgets(
     'Splash auto-transitions to phone login, native keyboard input fills the '
-    'number, login pushes the waiting screen, and cancel returns',
+    'number, login pushes the waiting screen, and cancel returns while still loading',
     (tester) async {
-      await tester.pumpWidget(const ProviderScope(child: EgoractiveApp()));
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [authRepositoryProvider.overrideWith((ref) => _FakeAuthRepository())],
+          child: const EgoractiveApp(),
+        ),
+      );
       await tester.pump();
       expect(find.text('Egoractive'), findsOneWidget);
 
@@ -34,15 +50,40 @@ void main() {
       expect(find.text('Seni tanıyoruz…'), findsOneWidget);
       expect(find.text('+90 532 418 76 05 numarası stüdyoda aranıyor.'), findsOneWidget);
 
-      // Mock login isteğinin (2sn) tamamlanmasını bekle, aksi halde test
-      // "pending timer" hatasıyla bitiyor.
-      await tester.pump(const Duration(seconds: 2));
-
+      // Fake login isteği (2sn) hâlâ sürerken iptal edilebiliyor.
       await tester.tap(find.text('İptal'));
       await tester.pumpAndSettle();
       expect(find.text('Telefonunla giriş yap'), findsOneWidget);
+
+      // Fake isteğin zamanlayıcısı hâlâ ayakta — testin "pending timer"
+      // hatasıyla bitmemesi için tamamlanmasını bekle.
+      await tester.pump(const Duration(seconds: 2));
     },
   );
+
+  testWidgets('Successful login navigates from the waiting screen to the role picker', (tester) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [authRepositoryProvider.overrideWith((ref) => _FakeAuthRepository())],
+        child: const EgoractiveApp(),
+      ),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 1700));
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.byType(TextField), '5324187605');
+    await tester.pump();
+    await tester.tap(find.text('Giriş yap'));
+    await tester.pump();
+    expect(find.text('Seni tanıyoruz…'), findsOneWidget);
+
+    // Fake login isteğinin (2sn) tamamlanmasını bekle — başarı sonrası
+    // ref.listen otomatik olarak rol seçici ekranına geçiş yapıyor.
+    await tester.pump(const Duration(seconds: 2));
+    await tester.pumpAndSettle();
+    expect(find.text('Rol seç (demo)'), findsOneWidget);
+  });
 
   testWidgets('Splash cannot be reached again via back after replaceRoot', (tester) async {
     await tester.pumpWidget(const ProviderScope(child: EgoractiveApp()));

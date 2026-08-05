@@ -1,5 +1,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../core/remote_config/remote_config_service.dart';
+import '../domain/auth_login_exception.dart';
 import '../domain/auth_state.dart';
 import '../repository/auth_repository.dart';
 
@@ -18,9 +20,13 @@ class AuthController extends _$AuthController {
 
   Future<void> requestLogin() async {
     if (!state.isPhoneComplete || state.isRequestingLogin) return;
-    state = state.copyWith(isRequestingLogin: true);
-    await ref.read(authRepositoryProvider).login(state.phoneDigits);
-    state = state.copyWith(isRequestingLogin: false);
+    state = state.copyWith(isRequestingLogin: true, loginErrorMessage: null);
+    try {
+      await ref.read(authRepositoryProvider).login(state.phoneDigits);
+      state = state.copyWith(isRequestingLogin: false);
+    } on AuthLoginException catch (e) {
+      state = state.copyWith(isRequestingLogin: false, loginErrorMessage: _messageFor(e.reason));
+    }
   }
 
   void toggleDeleteAcknowledged() {
@@ -42,8 +48,18 @@ class AuthController extends _$AuthController {
     state = state.copyWith(sessionReminderEnabled: !state.sessionReminderEnabled);
   }
 
-  /// Oturumu kapatır — F1-10'da gerçek `FirebaseAuth.signOut()` çağıracak.
+  /// Oturumu kapatır — F1-11'de gerçek `FirebaseAuth.signOut()` çağıracak.
   void logout() {
     state = const AuthState();
+  }
+
+  String _messageFor(AuthLoginErrorReason reason) {
+    final rc = ref.read(remoteConfigServiceProvider);
+    final key = switch (reason) {
+      AuthLoginErrorReason.notFound => RemoteConfigKeys.authLoginErrorNotFound,
+      AuthLoginErrorReason.rateLimited => RemoteConfigKeys.authLoginErrorRateLimited,
+      AuthLoginErrorReason.generic => RemoteConfigKeys.authLoginErrorGeneric,
+    };
+    return rc.getText(key);
   }
 }

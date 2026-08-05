@@ -635,6 +635,54 @@
       },
       "valueType": "STRING"
     },
+    "lbl_auth_login_error_not_found_tr": {
+      "defaultValue": {
+        "value": "Bu numarayla kayıtlı bir hesap bulunamadı. Stüdyo yönetimi seni eklemeli."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_login_error_not_found_en": {
+      "defaultValue": {
+        "value": "No account found with this number. The gym staff needs to add you first."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_login_error_rate_limited_tr": {
+      "defaultValue": {
+        "value": "Çok fazla deneme yapıldı. Bir dakika sonra tekrar dene."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_login_error_rate_limited_en": {
+      "defaultValue": {
+        "value": "Too many attempts. Try again in a minute."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_login_error_generic_tr": {
+      "defaultValue": {
+        "value": "Giriş yapılamadı. Bağlantını kontrol edip tekrar dene."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_login_error_generic_en": {
+      "defaultValue": {
+        "value": "Could not log in. Check your connection and try again."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_retry_button_tr": {
+      "defaultValue": {
+        "value": "Tekrar dene"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_retry_button_en": {
+      "defaultValue": {
+        "value": "Try again"
+      },
+      "valueType": "STRING"
+    },
     "lbl_badges_title_tr": {
       "defaultValue": {
         "value": "Rozetlerim"
