@@ -70,6 +70,31 @@
       "description": "Feature flag'lerin tutulduğu JSON obje (esnek, sabit alanı yok).",
       "valueType": "JSON"
     },
+    "lbl_notif_session_reminder_title_tr": {
+      "defaultValue": {
+        "value": "Dersin yaklaşıyor"
+      },
+      "description": "F3-4 — sessionReminderCheck push başlığı (Admin SDK'dan da okunur).",
+      "valueType": "STRING"
+    },
+    "lbl_notif_session_reminder_title_en": {
+      "defaultValue": {
+        "value": "Your session is coming up"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notif_session_reminder_body_tr": {
+      "defaultValue": {
+        "value": "Yaklaşan dersin için gelip gelmeyeceğini bildir."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notif_session_reminder_body_en": {
+      "defaultValue": {
+        "value": "Let us know if you can make your upcoming session."
+      },
+      "valueType": "STRING"
+    },
     "lbl_common_vazgec_tr": {
       "defaultValue": {
         "value": "Vazgeç"
