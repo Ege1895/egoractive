@@ -72,26 +72,27 @@
     },
     "lbl_notif_session_reminder_title_tr": {
       "defaultValue": {
-        "value": "Dersin yaklaşıyor"
+        "value": "⏰ Bugün {time}'de dersin var!"
       },
-      "description": "F3-4 — sessionReminderCheck push başlığı (Admin SDK'dan da okunur).",
+      "description": "F3-4 — sessionReminderCheck push başlığı (Admin SDK'dan da okunur). {time} yer tutucusu fonksiyon tarafında değiştirilir.",
       "valueType": "STRING"
     },
     "lbl_notif_session_reminder_title_en": {
       "defaultValue": {
-        "value": "Your session is coming up"
+        "value": "⏰ Your session is at {time} today!"
       },
       "valueType": "STRING"
     },
     "lbl_notif_session_reminder_body_tr": {
       "defaultValue": {
-        "value": "Yaklaşan dersin için gelip gelmeyeceğini bildir."
+        "value": "{trainerName} seni bekliyor. Gelip gelmeyeceğini onaylamak için dokun 👇"
       },
+      "description": "{trainerName} yer tutucusu fonksiyon tarafında değiştirilir.",
       "valueType": "STRING"
     },
     "lbl_notif_session_reminder_body_en": {
       "defaultValue": {
-        "value": "Let us know if you can make your upcoming session."
+        "value": "{trainerName} is waiting for you. Tap to confirm you're coming 👇"
       },
       "valueType": "STRING"
     },
