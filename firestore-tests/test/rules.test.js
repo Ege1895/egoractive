@@ -2,7 +2,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const test = require("node:test");
 const assert = require("node:assert/strict");
-const { setDoc, getDoc, doc } = require("firebase/firestore");
+const { setDoc, updateDoc, getDoc, doc, Timestamp } = require("firebase/firestore");
 const {
   initializeTestEnvironment,
   assertSucceeds,
@@ -172,4 +172,78 @@ test("trainer cannot read a memberPackages doc (negative)", async () => {
   });
   const db = contextFor("trainer-a", { role: "trainer", gymId: "gym-a" }).firestore();
   await assertFails(getDoc(doc(db, "memberPackages/pkg-1")));
+});
+
+// --- sessions/{sessionId} (F3-3) ---
+
+function hoursFromNow(hours) {
+  return Timestamp.fromMillis(Date.now() + hours * 60 * 60 * 1000);
+}
+
+async function seedSession(id, { trainerId, memberId, startTime }) {
+  await testEnv.withSecurityRulesDisabled(async (context) => {
+    await setDoc(context.firestore().doc(`sessions/${id}`), {
+      gymId: "gym-a",
+      trainerId,
+      memberId,
+      startTime,
+      status: "planned",
+    });
+  });
+}
+
+test("admin can create a session for their own gym (positive)", async () => {
+  const db = contextFor("admin-a", { role: "admin", gymId: "gym-a" }).firestore();
+  await assertSucceeds(
+    setDoc(doc(db, "sessions/s1"), {
+      gymId: "gym-a",
+      trainerId: "trainer-a",
+      memberId: "member-a1",
+      startTime: hoursFromNow(48),
+      status: "planned",
+    }),
+  );
+});
+
+test("trainer cannot create a session (negative — only admin screens create)", async () => {
+  const db = contextFor("trainer-a", { role: "trainer", gymId: "gym-a" }).firestore();
+  await assertFails(
+    setDoc(doc(db, "sessions/s1"), {
+      gymId: "gym-a",
+      trainerId: "trainer-a",
+      memberId: "member-a1",
+      startTime: hoursFromNow(48),
+      status: "planned",
+    }),
+  );
+});
+
+test("admin can cancel a session starting in 1 hour (positive — no deadline for admin)", async () => {
+  await seedSession("s1", { trainerId: "trainer-a", memberId: "member-a1", startTime: hoursFromNow(1) });
+  const db = contextFor("admin-a", { role: "admin", gymId: "gym-a" }).firestore();
+  await assertSucceeds(updateDoc(doc(db, "sessions/s1"), { status: "cancelled" }));
+});
+
+test("trainer cannot cancel their own session starting in 1 hour (negative — inside 24h window)", async () => {
+  await seedSession("s1", { trainerId: "trainer-a", memberId: "member-a1", startTime: hoursFromNow(1) });
+  const db = contextFor("trainer-a", { role: "trainer", gymId: "gym-a" }).firestore();
+  await assertFails(updateDoc(doc(db, "sessions/s1"), { status: "cancelled" }));
+});
+
+test("trainer can cancel their own session starting in 48 hours (positive — outside 24h window)", async () => {
+  await seedSession("s1", { trainerId: "trainer-a", memberId: "member-a1", startTime: hoursFromNow(48) });
+  const db = contextFor("trainer-a", { role: "trainer", gymId: "gym-a" }).firestore();
+  await assertSucceeds(updateDoc(doc(db, "sessions/s1"), { status: "cancelled" }));
+});
+
+test("member cannot cancel another member's session (negative)", async () => {
+  await seedSession("s1", { trainerId: "trainer-a", memberId: "member-a2", startTime: hoursFromNow(48) });
+  const db = contextFor("member-a1", { role: "member", gymId: "gym-a" }).firestore();
+  await assertFails(updateDoc(doc(db, "sessions/s1"), { status: "cancelled" }));
+});
+
+test("member can read a session in their own gym (positive)", async () => {
+  await seedSession("s1", { trainerId: "trainer-a", memberId: "member-a1", startTime: hoursFromNow(48) });
+  const db = contextFor("member-a1", { role: "member", gymId: "gym-a" }).firestore();
+  await assertSucceeds(getDoc(doc(db, "sessions/s1")));
 });

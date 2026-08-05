@@ -6,6 +6,7 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../controller/admin_calendar_controller.dart';
 import '../../domain/admin_calendar_state.dart';
+import '../widgets/create_session_sheet.dart';
 
 const _monthNames = {
   1: 'Ocak', 2: 'Şubat', 3: 'Mart', 4: 'Nisan', 5: 'Mayıs', 6: 'Haziran',
@@ -42,12 +43,19 @@ class AdminCalendarPanel extends ConsumerWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text('Takvim', style: typography.headingLarge.copyWith(color: colors.onSurface)),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-                    constraints: const BoxConstraints(minHeight: 40),
-                    decoration: BoxDecoration(color: colors.primary, borderRadius: BorderRadius.circular(AppSpacing.radiusInner)),
-                    alignment: Alignment.center,
-                    child: Text('+ Seans', style: typography.headingSmall.copyWith(fontSize: 14, color: colors.onPrimary)),
+                  Material(
+                    color: colors.primary,
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+                      onTap: () => showCreateSessionSheet(context, ref, state.selectedDate),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+                        constraints: const BoxConstraints(minHeight: 40),
+                        alignment: Alignment.center,
+                        child: Text('+ Seans', style: typography.headingSmall.copyWith(fontSize: 14, color: colors.onPrimary)),
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -155,7 +163,7 @@ class AdminCalendarPanel extends ConsumerWidget {
                             _AgendaRow(
                               slot: selectedSlots[i],
                               showDivider: i < selectedSlots.length - 1,
-                              onTap: () => _showSlotPopup(context, selectedSlots[i], state.selectedDate),
+                              onTap: () => _showSlotPopup(context, ref, selectedSlots[i], state.selectedDate),
                             ),
                         ],
                       ),
@@ -169,7 +177,7 @@ class AdminCalendarPanel extends ConsumerWidget {
     );
   }
 
-  void _showSlotPopup(BuildContext context, AdminSessionSlot slot, DateTime date) {
+  void _showSlotPopup(BuildContext context, WidgetRef ref, AdminSessionSlot slot, DateTime date) {
     final colors = context.appColors;
     final typography = context.appTypography;
     final (chipLabel, chipBg, chipFg) = switch (slot.state) {
@@ -235,7 +243,15 @@ class AdminCalendarPanel extends ConsumerWidget {
               Row(
                 children: [
                   Expanded(
-                    child: AppButton(label: 'Seansı ertele', onPressed: () => Navigator.of(sheetContext).pop()),
+                    child: AppButton(
+                      label: 'Seansı ertele',
+                      onPressed: () async {
+                        Navigator.of(sheetContext).pop();
+                        final parts = slot.time.split(':');
+                        final currentStart = DateTime(date.year, date.month, date.day, int.parse(parts[0]), int.parse(parts[1]));
+                        await showRescheduleSessionSheet(context, ref, sessionId: slot.id, currentStart: currentStart);
+                      },
+                    ),
                   ),
                   const SizedBox(width: AppSpacing.sm),
                   Expanded(

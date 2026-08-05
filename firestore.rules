@@ -68,5 +68,29 @@ service cloud.firestore {
       allow read, update, delete: if isSignedIn() && myRole() == 'admin' && resource.data.gymId == myGymId();
       allow create: if isSignedIn() && myRole() == 'admin' && request.resource.data.gymId == myGymId();
     }
+
+    // sessions/{sessionId} — F3-3. Oluşturma sadece admin ekranlarından
+    // (client'ta başka bir yol yok). İptal/erteleme admin için her zaman
+    // izinli; antrenör/üye kendi seansı içinse ve başlangıca 24 saatten
+    // fazla varsa izinli. Remote Config'teki cancellationDeadlineHours
+    // (varsayılan 24) buradaki 24 saatlik sabitle senkron tutulmalı —
+    // Security Rules harici bir servise (Remote Config) erişemediği için
+    // buraya sabit olarak yazılıyor.
+    function isOwnSession() {
+      return (myRole() == 'trainer' && resource.data.trainerId == request.auth.uid) ||
+             (myRole() == 'member' && resource.data.memberId == request.auth.uid);
+    }
+
+    function withinCancellationWindow() {
+      return resource.data.startTime - request.time > duration.value(24, 'h');
+    }
+
+    match /sessions/{sessionId} {
+      allow read: if isSignedIn() && resource.data.gymId == myGymId();
+      allow create: if isSignedIn() && myRole() == 'admin' && request.resource.data.gymId == myGymId();
+      allow update, delete: if isSignedIn() && resource.data.gymId == myGymId() && (
+        myRole() == 'admin' || (isOwnSession() && withinCancellationWindow())
+      );
+    }
   }
 }
