@@ -1,0 +1,44 @@
+{
+  "conditions": [],
+  "parameters": {
+    "sessionReminderMinutesBefore": {
+      "defaultValue": {
+        "value": "60"
+      },
+      "description": "Ders/seans onay bildiriminin kaç dakika önce gönderileceği.",
+      "valueType": "NUMBER"
+    },
+    "defaultGroupSessionCapacity": {
+      "defaultValue": {
+        "value": "6"
+      },
+      "description": "Grup dersi oluştururken varsayılan kontenjan.",
+      "valueType": "NUMBER"
+    },
+    "feedbackReminderDayOfMonth": {
+      "defaultValue": {
+        "value": "-1"
+      },
+      "description": "Aylık geri bildirim hatırlatmasının gönderileceği gün. -1 = ayın son günü.",
+      "valueType": "NUMBER"
+    },
+    "freeVersionAdsEnabled": {
+      "defaultValue": {
+        "value": "true"
+      },
+      "description": "Ücretsiz sürümde reklam gösterilsin mi.",
+      "valueType": "BOOLEAN"
+    },
+    "featureFlags": {
+      "defaultValue": {
+        "value": "{}"
+      },
+      "description": "Feature flag'lerin tutulduğu JSON obje.",
+      "valueType": "JSON"
+    }
+  },
+  "parameterGroups": {},
+  "version": {
+    "versionNumber": "1"
+  }
+}
