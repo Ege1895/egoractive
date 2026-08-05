@@ -7,10 +7,16 @@ import '../../../../core/panels/panel_stack_controller.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_back_button.dart';
 import '../../../../shared/widgets/app_button.dart';
+import '../../service/session_completion_service.dart';
 
 enum _CompletionAnswer { pending, done, absent }
 
 /// Antrenör 6 · Ders Tamamlama Onayı — tek dokunuşla "tamamlandı mı?" akışı.
+///
+/// F3-5 — `sessionId`/`memberId` verilirse "Tamamlandı"/"Üye gelmedi"
+/// gerçek Firestore'a yazar (kalan seans sayısı transaction içinde
+/// düşülür). Verilmezse (henüz gerçek veriye bağlanmamış eski çağrı
+/// noktaları için) sadece yerel önizleme gösterir, hiçbir yere yazmaz.
 class SessionCompletionPanel extends BasePanel {
   const SessionCompletionPanel({
     required this.time,
@@ -18,6 +24,8 @@ class SessionCompletionPanel extends BasePanel {
     required this.memberName,
     required this.meta,
     required this.remainingBefore,
+    this.sessionId,
+    this.memberId,
     super.key,
   });
 
@@ -26,6 +34,8 @@ class SessionCompletionPanel extends BasePanel {
   final String memberName;
   final String meta;
   final int remainingBefore;
+  final String? sessionId;
+  final String? memberId;
 
   @override
   ConsumerState<SessionCompletionPanel> createState() => _SessionCompletionPanelState();
@@ -121,12 +131,30 @@ class _SessionCompletionPanelState extends BasePanelState<SessionCompletionPanel
                     ),
                     const SizedBox(height: AppSpacing.lg),
                     if (_answer == _CompletionAnswer.pending) ...[
-                      AppButton(label: 'Tamamlandı', onPressed: () => setState(() => _answer = _CompletionAnswer.done)),
+                      AppButton(
+                        label: 'Tamamlandı',
+                        onPressed: () async {
+                          final sessionId = widget.sessionId;
+                          final memberId = widget.memberId;
+                          if (sessionId != null && memberId != null) {
+                            await ref
+                                .read(sessionCompletionServiceProvider)
+                                .markCompleted(sessionId: sessionId, memberId: memberId);
+                          }
+                          if (mounted) setState(() => _answer = _CompletionAnswer.done);
+                        },
+                      ),
                       const SizedBox(height: AppSpacing.sm),
                       AppButton(
                         label: 'Üye gelmedi',
                         variant: AppButtonVariant.secondary,
-                        onPressed: () => setState(() => _answer = _CompletionAnswer.absent),
+                        onPressed: () async {
+                          final sessionId = widget.sessionId;
+                          if (sessionId != null) {
+                            await ref.read(sessionCompletionServiceProvider).markAbsent(sessionId);
+                          }
+                          if (mounted) setState(() => _answer = _CompletionAnswer.absent);
+                        },
                       ),
                       const SizedBox(height: AppSpacing.sm),
                       Text(

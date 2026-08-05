@@ -180,14 +180,15 @@ function hoursFromNow(hours) {
   return Timestamp.fromMillis(Date.now() + hours * 60 * 60 * 1000);
 }
 
-async function seedSession(id, { trainerId, memberId, startTime }) {
+async function seedSession(id, { trainerId, memberId, startTime, endTime, status = "planned" }) {
   await testEnv.withSecurityRulesDisabled(async (context) => {
     await setDoc(context.firestore().doc(`sessions/${id}`), {
       gymId: "gym-a",
       trainerId,
       memberId,
       startTime,
-      status: "planned",
+      endTime: endTime ?? startTime,
+      status,
     });
   });
 }
@@ -266,4 +267,61 @@ test("member cannot change status while setting memberConfirmation (negative —
   await seedSession("s1", { trainerId: "trainer-a", memberId: "member-a1", startTime: hoursFromNow(1) });
   const db = contextFor("member-a1", { role: "member", gymId: "gym-a" }).firestore();
   await assertFails(updateDoc(doc(db, "sessions/s1"), { memberConfirmation: "coming", status: "cancelled" }));
+});
+
+// --- ders tamamlama onayı (F3-5) ---
+
+test("trainer can mark their own past session as completed (positive — 24h kuralına tabi değil, ders zaten bitmiş)", async () => {
+  await seedSession("s1", { trainerId: "trainer-a", memberId: "member-a1", startTime: hoursFromNow(-2), endTime: hoursFromNow(-1) });
+  const db = contextFor("trainer-a", { role: "trainer", gymId: "gym-a" }).firestore();
+  await assertSucceeds(updateDoc(doc(db, "sessions/s1"), { status: "completed", attended: true }));
+});
+
+test("trainer can mark their own past session as no-show (positive)", async () => {
+  await seedSession("s1", { trainerId: "trainer-a", memberId: "member-a1", startTime: hoursFromNow(-2), endTime: hoursFromNow(-1) });
+  const db = contextFor("trainer-a", { role: "trainer", gymId: "gym-a" }).firestore();
+  await assertSucceeds(updateDoc(doc(db, "sessions/s1"), { status: "completed", attended: false }));
+});
+
+test("trainer cannot mark another trainer's session as completed (negative)", async () => {
+  await seedSession("s1", { trainerId: "trainer-x", memberId: "member-a1", startTime: hoursFromNow(-2), endTime: hoursFromNow(-1) });
+  const db = contextFor("trainer-a", { role: "trainer", gymId: "gym-a" }).firestore();
+  await assertFails(updateDoc(doc(db, "sessions/s1"), { status: "completed", attended: true }));
+});
+
+test("trainer cannot change other fields while marking a session completed (negative — sadece status+attended)", async () => {
+  await seedSession("s1", { trainerId: "trainer-a", memberId: "member-a1", startTime: hoursFromNow(-2), endTime: hoursFromNow(-1) });
+  const db = contextFor("trainer-a", { role: "trainer", gymId: "gym-a" }).firestore();
+  await assertFails(updateDoc(doc(db, "sessions/s1"), { status: "completed", attended: true, memberId: "member-a2" }));
+});
+
+test("trainer can decrement remainingSessions on their own assigned member (positive — tamamlama transaction'ının parçası)", async () => {
+  await testEnv.withSecurityRulesDisabled(async (context) => {
+    await setDoc(context.firestore().doc("users/member-a1"), {
+      role: "member",
+      gymId: "gym-a",
+      trainerId: "trainer-a",
+      remainingSessions: 5,
+    });
+  });
+  const db = contextFor("trainer-a", { role: "trainer", gymId: "gym-a" }).firestore();
+  await assertSucceeds(updateDoc(doc(db, "users/member-a1"), { remainingSessions: 4 }));
+});
+
+test("trainer cannot decrement remainingSessions on a member not assigned to them (negative)", async () => {
+  const db = contextFor("trainer-a", { role: "trainer", gymId: "gym-a" }).firestore();
+  await assertFails(updateDoc(doc(db, "users/member-a2"), { remainingSessions: 4 }));
+});
+
+test("trainer cannot change other fields while updating remainingSessions (negative — sadece o alan)", async () => {
+  await testEnv.withSecurityRulesDisabled(async (context) => {
+    await setDoc(context.firestore().doc("users/member-a1"), {
+      role: "member",
+      gymId: "gym-a",
+      trainerId: "trainer-a",
+      remainingSessions: 5,
+    });
+  });
+  const db = contextFor("trainer-a", { role: "trainer", gymId: "gym-a" }).firestore();
+  await assertFails(updateDoc(doc(db, "users/member-a1"), { remainingSessions: 4, name: "Hacked" }));
 });

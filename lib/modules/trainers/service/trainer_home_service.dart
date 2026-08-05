@@ -18,6 +18,7 @@ class TrainerHomeService {
       pendingConfirmations: [
         PendingConfirmation(
           id: 'pending-1',
+          memberId: 'mock-cem-demir',
           memberInitials: 'CD',
           memberName: 'Cem Demir',
           meta: 'Birebir · dün tamamlandı mı?',
@@ -26,6 +27,7 @@ class TrainerHomeService {
         ),
         PendingConfirmation(
           id: 'pending-2',
+          memberId: 'mock-zeynep-kaya',
           memberInitials: 'ZK',
           memberName: 'Zeynep Kaya',
           meta: 'Birebir · dün tamamlandı mı?',

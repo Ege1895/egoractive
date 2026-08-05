@@ -3,6 +3,11 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'sessions_write_service.g.dart';
 
+/// F3-5 — seans süresi henüz stüdyo bazlı yapılandırılabilir değil, sabit
+/// 60 dakika kabul ediliyor. `endTime` bu süre üzerinden hesaplanıp
+/// kaydediliyor — F3-5'teki tamamlama hatırlatma fonksiyonu bunu kullanır.
+const sessionDefaultDurationMinutes = 60;
+
 /// F3-3 — `sessions/{sessionId}` üzerinde oluşturma/iptal/erteleme.
 /// Antrenör/üye için 24 saatlik iptal penceresi `firestore.rules`'ta
 /// zorlanır (bu servis sadece admin ekranlarından çağrılıyor, admin için
@@ -18,6 +23,7 @@ class SessionsWriteService {
     required String memberName,
     required DateTime startTime,
   }) async {
+    final endTime = startTime.add(const Duration(minutes: sessionDefaultDurationMinutes));
     await FirebaseFirestore.instance.collection('sessions').add({
       'gymId': gymId,
       'trainerId': trainerId,
@@ -25,17 +31,22 @@ class SessionsWriteService {
       'memberId': memberId,
       'memberName': memberName,
       'startTime': Timestamp.fromDate(startTime),
+      'endTime': Timestamp.fromDate(endTime),
       'status': 'planned',
       'confirmationRequested': false,
+      'completionPushSent': false,
       'createdAt': FieldValue.serverTimestamp(),
     });
   }
 
   Future<void> rescheduleSession(String sessionId, DateTime newStartTime) async {
-    await FirebaseFirestore.instance
-        .collection('sessions')
-        .doc(sessionId)
-        .update({'startTime': Timestamp.fromDate(newStartTime)});
+    final newEndTime = newStartTime.add(const Duration(minutes: sessionDefaultDurationMinutes));
+    await FirebaseFirestore.instance.collection('sessions').doc(sessionId).update({
+      'startTime': Timestamp.fromDate(newStartTime),
+      'endTime': Timestamp.fromDate(newEndTime),
+      'confirmationRequested': false,
+      'completionPushSent': false,
+    });
   }
 
   Future<void> cancelSession(String sessionId) async {

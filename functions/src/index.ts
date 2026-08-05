@@ -7,3 +7,4 @@ export { requestCustomToken } from "./callable/request-custom-token";
 export { deleteAccount } from "./callable/delete-account";
 export { onUserRoleAssigned } from "./triggers/on-user-role-assigned";
 export { sessionReminderCheck } from "./scheduled/session-reminder-check";
+export { sessionCompletionCheck } from "./scheduled/session-completion-check";

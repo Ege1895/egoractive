@@ -116,6 +116,8 @@ class TrainerHomePanel extends ConsumerWidget {
                       memberName: pending.memberName,
                       meta: pending.meta,
                       remainingBefore: pending.remainingBefore,
+                      sessionId: pending.id,
+                      memberId: pending.memberId,
                     ),
                   ),
                   onDone: () => controller.markCompleted(pending.id),

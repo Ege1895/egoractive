@@ -18,6 +18,7 @@ final _privateConstructorUsedError = UnsupportedError(
 /// @nodoc
 mixin _$PendingConfirmation {
   String get id => throw _privateConstructorUsedError;
+  String get memberId => throw _privateConstructorUsedError;
   String get memberInitials => throw _privateConstructorUsedError;
   String get memberName => throw _privateConstructorUsedError;
   String get meta => throw _privateConstructorUsedError;
@@ -40,6 +41,7 @@ abstract class $PendingConfirmationCopyWith<$Res> {
   @useResult
   $Res call({
     String id,
+    String memberId,
     String memberInitials,
     String memberName,
     String meta,
@@ -64,6 +66,7 @@ class _$PendingConfirmationCopyWithImpl<$Res, $Val extends PendingConfirmation>
   @override
   $Res call({
     Object? id = null,
+    Object? memberId = null,
     Object? memberInitials = null,
     Object? memberName = null,
     Object? meta = null,
@@ -75,6 +78,10 @@ class _$PendingConfirmationCopyWithImpl<$Res, $Val extends PendingConfirmation>
             id: null == id
                 ? _value.id
                 : id // ignore: cast_nullable_to_non_nullable
+                      as String,
+            memberId: null == memberId
+                ? _value.memberId
+                : memberId // ignore: cast_nullable_to_non_nullable
                       as String,
             memberInitials: null == memberInitials
                 ? _value.memberInitials
@@ -113,6 +120,7 @@ abstract class _$$PendingConfirmationImplCopyWith<$Res>
   @useResult
   $Res call({
     String id,
+    String memberId,
     String memberInitials,
     String memberName,
     String meta,
@@ -136,6 +144,7 @@ class __$$PendingConfirmationImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? id = null,
+    Object? memberId = null,
     Object? memberInitials = null,
     Object? memberName = null,
     Object? meta = null,
@@ -147,6 +156,10 @@ class __$$PendingConfirmationImplCopyWithImpl<$Res>
         id: null == id
             ? _value.id
             : id // ignore: cast_nullable_to_non_nullable
+                  as String,
+        memberId: null == memberId
+            ? _value.memberId
+            : memberId // ignore: cast_nullable_to_non_nullable
                   as String,
         memberInitials: null == memberInitials
             ? _value.memberInitials
@@ -178,6 +191,7 @@ class __$$PendingConfirmationImplCopyWithImpl<$Res>
 class _$PendingConfirmationImpl implements _PendingConfirmation {
   const _$PendingConfirmationImpl({
     required this.id,
+    required this.memberId,
     required this.memberInitials,
     required this.memberName,
     required this.meta,
@@ -187,6 +201,8 @@ class _$PendingConfirmationImpl implements _PendingConfirmation {
 
   @override
   final String id;
+  @override
+  final String memberId;
   @override
   final String memberInitials;
   @override
@@ -200,7 +216,7 @@ class _$PendingConfirmationImpl implements _PendingConfirmation {
 
   @override
   String toString() {
-    return 'PendingConfirmation(id: $id, memberInitials: $memberInitials, memberName: $memberName, meta: $meta, time: $time, remainingBefore: $remainingBefore)';
+    return 'PendingConfirmation(id: $id, memberId: $memberId, memberInitials: $memberInitials, memberName: $memberName, meta: $meta, time: $time, remainingBefore: $remainingBefore)';
   }
 
   @override
@@ -209,6 +225,8 @@ class _$PendingConfirmationImpl implements _PendingConfirmation {
         (other.runtimeType == runtimeType &&
             other is _$PendingConfirmationImpl &&
             (identical(other.id, id) || other.id == id) &&
+            (identical(other.memberId, memberId) ||
+                other.memberId == memberId) &&
             (identical(other.memberInitials, memberInitials) ||
                 other.memberInitials == memberInitials) &&
             (identical(other.memberName, memberName) ||
@@ -223,6 +241,7 @@ class _$PendingConfirmationImpl implements _PendingConfirmation {
   int get hashCode => Object.hash(
     runtimeType,
     id,
+    memberId,
     memberInitials,
     memberName,
     meta,
@@ -245,6 +264,7 @@ class _$PendingConfirmationImpl implements _PendingConfirmation {
 abstract class _PendingConfirmation implements PendingConfirmation {
   const factory _PendingConfirmation({
     required final String id,
+    required final String memberId,
     required final String memberInitials,
     required final String memberName,
     required final String meta,
@@ -254,6 +274,8 @@ abstract class _PendingConfirmation implements PendingConfirmation {
 
   @override
   String get id;
+  @override
+  String get memberId;
   @override
   String get memberInitials;
   @override

@@ -47,6 +47,10 @@ abstract final class RemoteConfigKeys {
   /// değerlerle değiştiriliyor (kişiselleştirilmiş bildirim metni).
   static const notifSessionReminderTitle = 'lbl_notif_session_reminder_title';
   static const notifSessionReminderBody = 'lbl_notif_session_reminder_body';
+  /// F3-5 — sessionCompletionCheck Cloud Function'ının antrenöre gönderdiği
+  /// push metni. `{memberName}` yer tutucusu fonksiyon tarafında değişir.
+  static const notifSessionCompletionTitle = 'lbl_notif_session_completion_title';
+  static const notifSessionCompletionBody = 'lbl_notif_session_completion_body';
 
   static const commonVazgec = 'lbl_common_vazgec';
   static const commonKaydet = 'lbl_common_kaydet';
@@ -479,6 +483,8 @@ class RemoteConfigService {
     RemoteConfigKeys.featureFlags: '{}',
     'lbl_notif_session_reminder_title_tr': '⏰ Bugün {time}\'de dersin var!',
     'lbl_notif_session_reminder_body_tr': '{trainerName} seni bekliyor. Gelip gelmeyeceğini onaylamak için dokun 👇',
+    'lbl_notif_session_completion_title_tr': '✅ Dersini onaylar mısın?',
+    'lbl_notif_session_completion_body_tr': '{memberName} ile dersin bitti. Tamamlandı mı, yoksa üye gelmedi mi?',
     'lbl_common_vazgec_tr': 'Vazgeç',
     'lbl_common_kaydet_tr': 'Kaydet',
     'lbl_common_duzenle_tr': 'Düzenle',
@@ -782,6 +788,8 @@ class RemoteConfigService {
         'Egoractive · Egora Games · Sürüm 1.0',
     'lbl_notif_session_reminder_title_en': '⏰ Your session is at {time} today!',
     'lbl_notif_session_reminder_body_en': '{trainerName} is waiting for you. Tap to confirm you\'re coming 👇',
+    'lbl_notif_session_completion_title_en': '✅ Can you confirm your session?',
+    'lbl_notif_session_completion_body_en': 'Your session with {memberName} has ended. Was it completed, or did they not show up?',
     'lbl_common_vazgec_en': 'Cancel',
     'lbl_common_kaydet_en': 'Save',
     'lbl_common_duzenle_en': 'Edit',

@@ -53,7 +53,12 @@ service cloud.firestore {
         request.auth.uid == uid ||
         (myRole() == 'admin' &&
           resource.data.gymId == myGymId() &&
-          request.resource.data.gymId == myGymId())
+          request.resource.data.gymId == myGymId()) ||
+        // F3-5 — antrenör, kendine atanmış üyenin SADECE remainingSessions
+        // alanını, ders tamamlama transaction'ının parçası olarak düşürür.
+        (myRole() == 'trainer' &&
+          resource.data.trainerId == request.auth.uid &&
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['remainingSessions']))
       );
 
       allow delete: if isSignedIn() && myRole() == 'admin' && resource.data.gymId == myGymId();
@@ -96,13 +101,26 @@ service cloud.firestore {
       return request.resource.data.diff(resource.data).affectedKeys().hasOnly(['memberConfirmation']);
     }
 
+    // F3-5 — antrenör kendi seansını "tamamlandı"/"üye gelmedi" olarak
+    // işaretlerken sadece status+attended alanlarını değiştiriyor; bu,
+    // ders zaten bittiği (dolayısıyla 24 saatlik pencerenin çoktan geçmiş
+    // olacağı) için 24 saat kuralından bağımsız tutuluyor.
+    function isCompletingOwnSession() {
+      return myRole() == 'trainer' &&
+        resource.data.trainerId == request.auth.uid &&
+        resource.data.status == 'planned' &&
+        request.resource.data.status == 'completed' &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'attended']);
+    }
+
     match /sessions/{sessionId} {
       allow read: if isSignedIn() && resource.data.gymId == myGymId();
       allow create: if isSignedIn() && myRole() == 'admin' && request.resource.data.gymId == myGymId();
       allow update, delete: if isSignedIn() && resource.data.gymId == myGymId() && (
         myRole() == 'admin' ||
         (isOwnSession() && withinCancellationWindow()) ||
-        (isOwnMemberSession() && onlyChangesConfirmation())
+        (isOwnMemberSession() && onlyChangesConfirmation()) ||
+        isCompletingOwnSession()
       );
     }
   }
