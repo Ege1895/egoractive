@@ -175,8 +175,9 @@ class _EditStudioPackagePanelState extends BasePanelState<EditStudioPackagePanel
                         ),
                         if (!widget.isNew)
                           InkWell(
-                            onTap: () {
-                              controller.deletePackage(widget.existing!.id);
+                            onTap: () async {
+                              await controller.deletePackage(widget.existing!.id);
+                              if (!mounted) return;
                               ref.read(panelStackControllerProvider.notifier).pop();
                             },
                             child: Container(
@@ -200,10 +201,10 @@ class _EditStudioPackagePanelState extends BasePanelState<EditStudioPackagePanel
               padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.md, AppSpacing.screenEdge, AppSpacing.lg),
               child: AppButton(
                 label: 'Kaydet',
-                onPressed: () {
+                onPressed: () async {
                   final name = _nameController.text.trim();
                   if (name.isEmpty) return;
-                  controller.addOrUpdate(
+                  await controller.addOrUpdate(
                     StudioPackage(
                       id: widget.existing?.id ?? name.toLowerCase().replaceAll(' ', '-'),
                       name: name,
@@ -214,6 +215,7 @@ class _EditStudioPackagePanelState extends BasePanelState<EditStudioPackagePanel
                       activeForSale: _activeForSale,
                     ),
                   );
+                  if (!mounted) return;
                   ref.read(panelStackControllerProvider.notifier).pop();
                 },
               ),
