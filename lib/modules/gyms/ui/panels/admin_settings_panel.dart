@@ -6,9 +6,16 @@ import '../../../../core/panels/panel_stack_controller.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../auth/controller/auth_controller.dart';
 import '../../../auth/ui/panels/phone_login_panel.dart';
+import '../../../events/ui/panels/admin_events_panel.dart';
+import '../../../feedback/ui/panels/admin_feedback_list_panel.dart';
+import '../../../group_sessions/ui/panels/admin_group_sessions_panel.dart';
+import '../../../notifications/ui/panels/send_notification_panel.dart';
 import '../../../packages/ui/panels/studio_packages_panel.dart';
+import '../../../sessions/ui/panels/admin_session_management_panel.dart';
 import '../../../trainers/ui/panels/admin_trainer_management_panel.dart';
+import 'admin_permissions_panel.dart';
 import 'gym_info_panel.dart';
+import 'studio_rules_panel.dart';
 
 /// Admin · Ayarlar (Ayarlar sekmesi kökü) — kurulum ekranlarına giriş
 /// noktası: Salon Bilgileri, Antrenör Yönetimi, Stüdyo Paketleri.
@@ -40,6 +47,39 @@ class AdminSettingsPanel extends ConsumerWidget {
                   _NavRow(label: 'Salon bilgileri', onTap: () => panelStack.push(const GymInfoPanel())),
                   _NavRow(label: 'Antrenör yönetimi', onTap: () => panelStack.push(const AdminTrainerManagementPanel())),
                   _NavRow(label: 'Stüdyo paketleri', isLast: true, onTap: () => panelStack.push(const StudioPackagesPanel())),
+                ],
+              ),
+            ),
+            const SizedBox(height: AppSpacing.lg),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+              decoration: BoxDecoration(
+                color: colors.surface,
+                borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
+                border: Border.all(color: colors.outline),
+              ),
+              child: Column(
+                children: [
+                  _NavRow(label: 'Ders / seans yönetimi', onTap: () => panelStack.push(const AdminSessionManagementPanel())),
+                  _NavRow(label: 'Grup dersleri', onTap: () => panelStack.push(const AdminGroupSessionsPanel())),
+                  _NavRow(label: 'Etkinlikler', isLast: true, onTap: () => panelStack.push(const AdminEventsPanel())),
+                ],
+              ),
+            ),
+            const SizedBox(height: AppSpacing.lg),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+              decoration: BoxDecoration(
+                color: colors.surface,
+                borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
+                border: Border.all(color: colors.outline),
+              ),
+              child: Column(
+                children: [
+                  _NavRow(label: 'Stüdyo kuralları', onTap: () => panelStack.push(const StudioRulesPanel())),
+                  _NavRow(label: 'Yetki ayarları', onTap: () => panelStack.push(const AdminPermissionsPanel())),
+                  _NavRow(label: 'Geri bildirimler', onTap: () => panelStack.push(const AdminFeedbackListPanel())),
+                  _NavRow(label: 'Bildirim gönder', isLast: true, onTap: () => panelStack.push(const SendNotificationPanel())),
                 ],
               ),
             ),
@@ -89,9 +129,8 @@ class _NavRow extends StatelessWidget {
         constraints: const BoxConstraints(minHeight: 56),
         decoration: BoxDecoration(border: isLast ? null : Border(bottom: BorderSide(color: colors.outline))),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(label, style: typography.bodyLarge.copyWith(color: colors.onSurface, fontSize: 15)),
+            Expanded(child: Text(label, style: typography.bodyLarge.copyWith(color: colors.onSurface, fontSize: 15))),
             Icon(Icons.chevron_right, color: colors.onSurfaceMuted, size: 18),
           ],
         ),
