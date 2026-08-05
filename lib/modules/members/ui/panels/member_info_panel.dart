@@ -10,6 +10,7 @@ import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_text_field.dart';
 import '../../../trainers/controller/admin_trainers_controller.dart';
 import '../../../trainers/domain/admin_trainer_summary.dart';
+import '../../controller/member_registration_controller.dart';
 import '../../controller/new_member_controller.dart';
 import '../../domain/admin_member_summary.dart';
 import '../../domain/new_member_form.dart';
@@ -58,6 +59,8 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
     final typography = context.appTypography;
     final controller = ref.read(newMemberControllerProvider.notifier);
     final form = ref.watch(newMemberControllerProvider);
+    final registrationState = ref.watch(memberRegistrationControllerProvider);
+    final registrationController = ref.read(memberRegistrationControllerProvider.notifier);
 
     return Scaffold(
       body: SafeArea(
@@ -241,15 +244,34 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
             ),
             Padding(
               padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.md, AppSpacing.screenEdge, AppSpacing.lg),
-              child: AppButton(
-                label: widget.isNew ? 'Paket seçimine geç' : 'Kaydet',
-                onPressed: () {
-                  if (widget.isNew) {
-                    ref.read(panelStackControllerProvider.notifier).push(const NewMembershipPackagePanel());
-                  } else {
-                    ref.read(panelStackControllerProvider.notifier).pop();
-                  }
-                },
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (widget.isNew && registrationState.errorMessage != null) ...[
+                    Text(
+                      registrationState.errorMessage!,
+                      style: typography.bodyMedium.copyWith(color: colors.error, fontSize: 13),
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                  ],
+                  AppButton(
+                    label: widget.isNew
+                        ? (registrationState.isSubmitting ? 'Kaydediliyor…' : 'Paket seçimine geç')
+                        : 'Kaydet',
+                    onPressed: widget.isNew && registrationState.isSubmitting
+                        ? null
+                        : () async {
+                            if (!widget.isNew) {
+                              ref.read(panelStackControllerProvider.notifier).pop();
+                              return;
+                            }
+                            final success = await registrationController.submit();
+                            if (success && mounted) {
+                              ref.read(panelStackControllerProvider.notifier).push(const NewMembershipPackagePanel());
+                            }
+                          },
+                  ),
+                ],
               ),
             ),
           ],
