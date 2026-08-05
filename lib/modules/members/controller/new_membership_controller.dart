@@ -1,5 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../core/theme/theme_controller.dart';
 import '../../packages/domain/studio_package.dart';
 import '../domain/new_membership_state.dart';
 
@@ -11,7 +13,7 @@ part 'new_membership_controller.g.dart';
 class NewMembershipController extends _$NewMembershipController {
   @override
   NewMembershipState build() {
-    final now = DateTime(2026, 8, 3);
+    final now = DateTime.now();
     return NewMembershipState(startDate: now, endDate: now, makeupSessions: 0, paidAmount: 0);
   }
 
@@ -36,4 +38,39 @@ class NewMembershipController extends _$NewMembershipController {
   void setPaidAmount(int amount) => state = state.copyWith(paidAmount: amount.clamp(0, state.totalAmount));
 
   void reset() => state = build();
+
+  /// F3-2 — seçilen paket + ödeme bilgisiyle `memberPackages` dokümanını
+  /// oluşturur ve üyenin liste görünümünde okunan `remainingSessions`/
+  /// `packageEndDate` alanlarını `users/{memberId}` üzerinde günceller
+  /// (admin üye listesi ek bir sorgu yapmasın diye denormalize edilir).
+  /// Başarılıysa `true` döner.
+  Future<bool> save(String memberId) async {
+    final package = state.selectedPackage;
+    final gymId = await ref.read(activeGymIdProvider.future);
+    if (package == null || gymId == null) return false;
+
+    final firestore = FirebaseFirestore.instance;
+    await firestore.collection('memberPackages').add({
+      'memberId': memberId,
+      'gymId': gymId,
+      'packageId': package.id,
+      'packageName': package.name,
+      'sessionType': package.sessionType.name,
+      'totalSessions': package.sessionCount,
+      'remainingSessions': package.sessionCount,
+      'makeupSessions': state.makeupSessions,
+      'startDate': state.startDate.toIso8601String(),
+      'endDate': state.endDate.toIso8601String(),
+      'totalAmount': state.totalAmount,
+      'paidAmount': state.paidAmount,
+      'dueAmount': state.dueAmount,
+    });
+
+    await firestore.collection('users').doc(memberId).update({
+      'remainingSessions': package.sessionCount,
+      'packageEndDate': state.endDate.toIso8601String(),
+    });
+
+    return true;
+  }
 }

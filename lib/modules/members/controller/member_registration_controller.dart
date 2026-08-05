@@ -7,15 +7,25 @@ import 'new_member_controller.dart';
 part 'member_registration_controller.g.dart';
 
 class MemberRegistrationState {
-  const MemberRegistrationState({this.isSubmitting = false, this.errorMessage});
+  const MemberRegistrationState({this.isSubmitting = false, this.errorMessage, this.createdMemberId});
 
   final bool isSubmitting;
   final String? errorMessage;
 
-  MemberRegistrationState copyWith({bool? isSubmitting, String? errorMessage, bool clearError = false}) {
+  /// F3-2 — paket satış akışı `memberPackages` dokümanını bu üyeye
+  /// bağlamak için kullanır.
+  final String? createdMemberId;
+
+  MemberRegistrationState copyWith({
+    bool? isSubmitting,
+    String? errorMessage,
+    String? createdMemberId,
+    bool clearError = false,
+  }) {
     return MemberRegistrationState(
       isSubmitting: isSubmitting ?? this.isSubmitting,
       errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
+      createdMemberId: createdMemberId ?? this.createdMemberId,
     );
   }
 }
@@ -55,8 +65,14 @@ class MemberRegistrationController extends _$MemberRegistrationController {
         state = state.copyWith(isSubmitting: false, errorMessage: 'Bu telefon numarası zaten kayıtlı.');
         return false;
       }
-      await service.registerMember(name: name, phoneNumber: phoneNumber, gymId: gymId);
-      state = state.copyWith(isSubmitting: false);
+      final memberId = await service.registerMember(
+        name: name,
+        phoneNumber: phoneNumber,
+        gymId: gymId,
+        trainerId: form.trainerId,
+        trainerName: form.trainerName,
+      );
+      state = state.copyWith(isSubmitting: false, createdMemberId: memberId);
       return true;
     } catch (_) {
       state = state.copyWith(isSubmitting: false, errorMessage: 'Üye eklenemedi. Bağlantını kontrol edip tekrar dene.');
