@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'core/panels/panel_stack_controller.dart';
 import 'core/panels/panel_stack_view.dart';
+import 'core/remote_config/remote_config_service.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/app_typography.dart';
 import 'core/theme/theme_controller.dart';
@@ -13,6 +14,7 @@ import 'modules/auth/ui/panels/splash_panel.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await const RemoteConfigService().init();
   runApp(const ProviderScope(child: EgoractiveApp()));
 }
 
