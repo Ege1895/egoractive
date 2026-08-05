@@ -6,6 +6,7 @@ part 'pending_confirmation.freezed.dart';
 class PendingConfirmation with _$PendingConfirmation {
   const factory PendingConfirmation({
     required String id,
+    required String memberId,
     required String memberInitials,
     required String memberName,
     required String meta,

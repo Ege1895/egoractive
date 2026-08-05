@@ -157,11 +157,180 @@ class _TodayScheduleForTrainerProviderElement
       (origin as _TodayScheduleForTrainerProvider).trainerId;
 }
 
-String _$trainerHomeControllerHash() =>
-    r'99f76785bf7d266676232ac19ab0f03c912fb3a7';
+String _$pendingConfirmationsForTrainerHash() =>
+    r'8425335c7bd4b595ca0e1737a6056ae29cfb5792';
 
-/// F3-3 — antrenörün "Bugünkü program"ı gerçek zamanlı `sessions`
-/// koleksiyonundan (trainerId == kendi uid'si, bugünün tarih aralığı)
+/// F3-5 — antrenörün onayını bekleyen, bitiş saati geçmiş ama hâlâ
+/// `planned` kalan seanslar. Her biri için üyenin güncel
+/// `remainingSessions`'ı ayrıca okunur (onay ekranındaki "X'ten Y'ye
+/// düşer" önizlemesi için) — pending sayısı genelde küçük olduğundan bu
+/// ek okuma kabul edilebilir.
+///
+/// Copied from [_pendingConfirmationsForTrainer].
+@ProviderFor(_pendingConfirmationsForTrainer)
+const _pendingConfirmationsForTrainerProvider =
+    _PendingConfirmationsForTrainerFamily();
+
+/// F3-5 — antrenörün onayını bekleyen, bitiş saati geçmiş ama hâlâ
+/// `planned` kalan seanslar. Her biri için üyenin güncel
+/// `remainingSessions`'ı ayrıca okunur (onay ekranındaki "X'ten Y'ye
+/// düşer" önizlemesi için) — pending sayısı genelde küçük olduğundan bu
+/// ek okuma kabul edilebilir.
+///
+/// Copied from [_pendingConfirmationsForTrainer].
+class _PendingConfirmationsForTrainerFamily
+    extends Family<AsyncValue<List<PendingConfirmation>>> {
+  /// F3-5 — antrenörün onayını bekleyen, bitiş saati geçmiş ama hâlâ
+  /// `planned` kalan seanslar. Her biri için üyenin güncel
+  /// `remainingSessions`'ı ayrıca okunur (onay ekranındaki "X'ten Y'ye
+  /// düşer" önizlemesi için) — pending sayısı genelde küçük olduğundan bu
+  /// ek okuma kabul edilebilir.
+  ///
+  /// Copied from [_pendingConfirmationsForTrainer].
+  const _PendingConfirmationsForTrainerFamily();
+
+  /// F3-5 — antrenörün onayını bekleyen, bitiş saati geçmiş ama hâlâ
+  /// `planned` kalan seanslar. Her biri için üyenin güncel
+  /// `remainingSessions`'ı ayrıca okunur (onay ekranındaki "X'ten Y'ye
+  /// düşer" önizlemesi için) — pending sayısı genelde küçük olduğundan bu
+  /// ek okuma kabul edilebilir.
+  ///
+  /// Copied from [_pendingConfirmationsForTrainer].
+  _PendingConfirmationsForTrainerProvider call(String trainerId) {
+    return _PendingConfirmationsForTrainerProvider(trainerId);
+  }
+
+  @override
+  _PendingConfirmationsForTrainerProvider getProviderOverride(
+    covariant _PendingConfirmationsForTrainerProvider provider,
+  ) {
+    return call(provider.trainerId);
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'_pendingConfirmationsForTrainerProvider';
+}
+
+/// F3-5 — antrenörün onayını bekleyen, bitiş saati geçmiş ama hâlâ
+/// `planned` kalan seanslar. Her biri için üyenin güncel
+/// `remainingSessions`'ı ayrıca okunur (onay ekranındaki "X'ten Y'ye
+/// düşer" önizlemesi için) — pending sayısı genelde küçük olduğundan bu
+/// ek okuma kabul edilebilir.
+///
+/// Copied from [_pendingConfirmationsForTrainer].
+class _PendingConfirmationsForTrainerProvider
+    extends AutoDisposeStreamProvider<List<PendingConfirmation>> {
+  /// F3-5 — antrenörün onayını bekleyen, bitiş saati geçmiş ama hâlâ
+  /// `planned` kalan seanslar. Her biri için üyenin güncel
+  /// `remainingSessions`'ı ayrıca okunur (onay ekranındaki "X'ten Y'ye
+  /// düşer" önizlemesi için) — pending sayısı genelde küçük olduğundan bu
+  /// ek okuma kabul edilebilir.
+  ///
+  /// Copied from [_pendingConfirmationsForTrainer].
+  _PendingConfirmationsForTrainerProvider(String trainerId)
+    : this._internal(
+        (ref) => _pendingConfirmationsForTrainer(
+          ref as _PendingConfirmationsForTrainerRef,
+          trainerId,
+        ),
+        from: _pendingConfirmationsForTrainerProvider,
+        name: r'_pendingConfirmationsForTrainerProvider',
+        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+            ? null
+            : _$pendingConfirmationsForTrainerHash,
+        dependencies: _PendingConfirmationsForTrainerFamily._dependencies,
+        allTransitiveDependencies:
+            _PendingConfirmationsForTrainerFamily._allTransitiveDependencies,
+        trainerId: trainerId,
+      );
+
+  _PendingConfirmationsForTrainerProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.trainerId,
+  }) : super.internal();
+
+  final String trainerId;
+
+  @override
+  Override overrideWith(
+    Stream<List<PendingConfirmation>> Function(
+      _PendingConfirmationsForTrainerRef provider,
+    )
+    create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: _PendingConfirmationsForTrainerProvider._internal(
+        (ref) => create(ref as _PendingConfirmationsForTrainerRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        trainerId: trainerId,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeStreamProviderElement<List<PendingConfirmation>> createElement() {
+    return _PendingConfirmationsForTrainerProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is _PendingConfirmationsForTrainerProvider &&
+        other.trainerId == trainerId;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, trainerId.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin _PendingConfirmationsForTrainerRef
+    on AutoDisposeStreamProviderRef<List<PendingConfirmation>> {
+  /// The parameter `trainerId` of this provider.
+  String get trainerId;
+}
+
+class _PendingConfirmationsForTrainerProviderElement
+    extends AutoDisposeStreamProviderElement<List<PendingConfirmation>>
+    with _PendingConfirmationsForTrainerRef {
+  _PendingConfirmationsForTrainerProviderElement(super.provider);
+
+  @override
+  String get trainerId =>
+      (origin as _PendingConfirmationsForTrainerProvider).trainerId;
+}
+
+String _$trainerHomeControllerHash() =>
+    r'5826ddf0c8eca3009724742dbc238e7aebb16039';
+
+/// F3-3/F3-5 — antrenörün "Bugünkü program"ı ve onay bekleyen seansları
+/// gerçek zamanlı `sessions` koleksiyonundan (trainerId == kendi uid'si)
 /// okunur. `freeSlotCount` boş bırakılıyor — stüdyo çalışma saatleri/
 /// kapasite kavramı henüz tanımlı değil, bu yüzden 0 dönüyor (mock'taki
 /// keyfi sayı yerine).

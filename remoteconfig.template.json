@@ -96,6 +96,32 @@
       },
       "valueType": "STRING"
     },
+    "lbl_notif_session_completion_title_tr": {
+      "defaultValue": {
+        "value": "✅ Dersini onaylar mısın?"
+      },
+      "description": "F3-5 — sessionCompletionCheck push başlığı (antrenöre gider, Admin SDK'dan da okunur).",
+      "valueType": "STRING"
+    },
+    "lbl_notif_session_completion_title_en": {
+      "defaultValue": {
+        "value": "✅ Can you confirm your session?"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notif_session_completion_body_tr": {
+      "defaultValue": {
+        "value": "{memberName} ile dersin bitti. Tamamlandı mı, yoksa üye gelmedi mi?"
+      },
+      "description": "{memberName} yer tutucusu fonksiyon tarafında değiştirilir.",
+      "valueType": "STRING"
+    },
+    "lbl_notif_session_completion_body_en": {
+      "defaultValue": {
+        "value": "Your session with {memberName} has ended. Was it completed, or did they not show up?"
+      },
+      "valueType": "STRING"
+    },
     "lbl_common_vazgec_tr": {
       "defaultValue": {
         "value": "Vazgeç"
