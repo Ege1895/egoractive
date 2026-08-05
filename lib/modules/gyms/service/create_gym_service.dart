@@ -1,11 +1,14 @@
+import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:image/image.dart' as img;
 import 'package:image_picker/image_picker.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../core/constants/gym_logo_constants.dart';
 import '../domain/gym_profile.dart';
 
 part 'create_gym_service.g.dart';
@@ -28,10 +31,10 @@ class CreateGymService {
     }
 
     final gymRef = FirebaseFirestore.instance.collection('gyms').doc();
-    final logoRef = FirebaseStorage.instance.ref('gym_logos/${gymRef.id}.jpg');
+    final logoRef = FirebaseStorage.instance.ref('gym_logos/${gymRef.id}.png');
     await logoRef.putData(
-      await logoFile.readAsBytes(),
-      SettableMetadata(contentType: 'image/jpeg'),
+      _toLogoPng(await logoFile.readAsBytes()),
+      SettableMetadata(contentType: 'image/png'),
     );
     final logoUrl = await logoRef.getDownloadURL();
 
@@ -53,6 +56,29 @@ class CreateGymService {
   }
 
   String _toHex(Color color) => '#${color.toARGB32().toRadixString(16).substring(2).toUpperCase()}';
+
+  /// Storage'ı ücretsiz kotada tutmak için logo her zaman en fazla
+  /// [gymLogoMaxDimension]x[gymLogoMaxDimension] boyutuna küçültülüp PNG
+  /// olarak encode edilir — `storage.rules`'daki boyut sınırı bunun
+  /// yalnızca güvenlik tabanıdır, gerçek garanti burada verilir.
+  Uint8List _toLogoPng(Uint8List original) {
+    final decoded = img.decodeImage(original);
+    if (decoded == null) {
+      throw const FormatException('Seçilen dosya geçerli bir görsel değil.');
+    }
+    final resized = decoded.width > gymLogoMaxDimension || decoded.height > gymLogoMaxDimension
+        ? img.copyResize(
+            decoded,
+            width: decoded.width >= decoded.height ? gymLogoMaxDimension : null,
+            height: decoded.height > decoded.width ? gymLogoMaxDimension : null,
+          )
+        : decoded;
+    final encoded = Uint8List.fromList(img.encodePng(resized));
+    if (encoded.length > gymLogoMaxBytes) {
+      throw const FormatException('Logo dosyası çok büyük, daha küçük bir görsel seç.');
+    }
+    return encoded;
+  }
 }
 
 @riverpod
