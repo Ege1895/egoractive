@@ -149,13 +149,36 @@ class _MeasurementEntriesProviderElement
   String get uid => (origin as _MeasurementEntriesProvider).uid;
 }
 
-String _$measurementsControllerHash() =>
-    r'a6602840fb9b2ef035984c405e569335e919d77f';
+String _$measurementsViewedUidHash() =>
+    r'35665840f2af82804a3945ba3ef6ac4fe69e152d';
 
-/// F4-1 — üyenin kendi ölçümleri gerçek zamanlı `measurements/{uid}/entries`
-/// alt koleksiyonundan okunur. Hiç ölçüm yoksa (yeni üye) mock veriye
-/// düşülür — boş bir avatar/grafik göstermek yerine örnek bir başlangıç
-/// durumu sunar.
+/// F4-1 — admin/antrenör bir üyenin ölçüm ekranını açtığında bu sağlanır;
+/// `MeasurementsController` bunu kendi uid'sinin önüne alır. Panel
+/// kapanınca (onPanelHide) tekrar null'a dönüp üyenin kendi görünümünü
+/// bozmadan bırakır.
+///
+/// Copied from [MeasurementsViewedUid].
+@ProviderFor(MeasurementsViewedUid)
+final measurementsViewedUidProvider =
+    AutoDisposeNotifierProvider<MeasurementsViewedUid, String?>.internal(
+      MeasurementsViewedUid.new,
+      name: r'measurementsViewedUidProvider',
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$measurementsViewedUidHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
+
+typedef _$MeasurementsViewedUid = AutoDisposeNotifier<String?>;
+String _$measurementsControllerHash() =>
+    r'ed9d5266de121157b13ed18e2e202c02c3a97cb3';
+
+/// F4-1 — görüntülenen kişinin (kendisi ya da admin/antrenörün açtığı bir
+/// üye) ölçümleri gerçek zamanlı `measurements/{uid}/entries` alt
+/// koleksiyonundan okunur. Hiç ölçüm yoksa (yeni üye) mock veriye düşülür
+/// — boş bir avatar/grafik göstermek yerine örnek bir başlangıç durumu
+/// sunar.
 ///
 /// Copied from [MeasurementsController].
 @ProviderFor(MeasurementsController)

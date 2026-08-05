@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/app_spacing.dart';
+import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../shared/widgets/app_back_button.dart';
 import '../../../../shared/widgets/trend_bar_chart.dart';
 import '../../controller/measurements_controller.dart';
 import '../../domain/measurement_metric.dart';
@@ -11,17 +13,47 @@ import '../../domain/measurements_state.dart';
 import '../widgets/measurement_avatar.dart';
 import 'add_measurement_panel.dart';
 
-/// Üye · Ölçümlerim (Ölçümlerim sekmesi kökü) — avatar / grafik geçişi.
-class MeasurementsPanel extends ConsumerWidget {
-  const MeasurementsPanel({super.key});
+/// Üye · Ölçümlerim (Ölçümlerim sekmesi kökü, kendi verisi için sekme
+/// içine gömülü kullanılır) — avatar / grafik geçişi.
+///
+/// F4-1 — `memberId`/`memberName` verilirse (admin/antrenörün bir üyenin
+/// detayından buraya girmesi) geri butonu gösterilir ve panel açık olduğu
+/// sürece `measurementsViewedUidProvider` o üyenin uid'sine ayarlanır —
+/// tüm alt widget'lar (avatar, grafik, "Yeni ölçüm ekle") otomatik olarak
+/// o üyenin verisini gösterir/düzenler, ekstra bir değişiklik gerekmez.
+class MeasurementsPanel extends BasePanel {
+  const MeasurementsPanel({this.memberId, this.memberName, super.key});
+
+  final String? memberId;
+  final String? memberName;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<MeasurementsPanel> createState() => _MeasurementsPanelState();
+}
+
+class _MeasurementsPanelState extends BasePanelState<MeasurementsPanel> {
+  @override
+  void onPanelShow() {
+    if (widget.memberId != null) {
+      ref.read(measurementsViewedUidProvider.notifier).set(widget.memberId);
+    }
+  }
+
+  @override
+  void onPanelHide() {
+    if (widget.memberId != null) {
+      ref.read(measurementsViewedUidProvider.notifier).set(null);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final colors = context.appColors;
     final typography = context.appTypography;
     final state = ref.watch(measurementsControllerProvider);
     final controller = ref.read(measurementsControllerProvider.notifier);
     final isAvatar = state.viewMode == MeasurementsViewMode.avatar;
+    final title = widget.memberName != null ? '${widget.memberName} · Ölçümleri' : 'Ölçümlerim';
 
     return Scaffold(
       body: SafeArea(
@@ -32,15 +64,17 @@ class MeasurementsPanel extends ConsumerWidget {
               padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.lg, AppSpacing.screenEdge, 0),
               child: Row(
                 children: [
+                  if (widget.memberId != null) ...[
+                    AppBackButton(onTap: () => ref.read(panelStackControllerProvider.notifier).pop()),
+                    const SizedBox(width: AppSpacing.md),
+                  ],
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Ölçümlerim', style: typography.headingLarge.copyWith(color: colors.onSurface)),
+                        Text(title, style: typography.headingLarge.copyWith(color: colors.onSurface, fontSize: widget.memberId != null ? 20 : null)),
                         Text(
-                          isAvatar
-                              ? 'Son ölçüm 12 Temmuz · noktalara dokunarak değerleri gör'
-                              : 'metrik çiplerine dokun',
+                          isAvatar ? 'Noktalara dokunarak değerleri gör' : 'metrik çiplerine dokun',
                           style: typography.caption.copyWith(color: colors.onSurfaceMuted),
                         ),
                       ],
@@ -132,15 +166,17 @@ class _AvatarView extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Seçili nokta', style: typography.caption.copyWith(color: colors.onSurfaceMuted)),
-                      Text(
-                        state.selectedMetric.label,
-                        style: typography.headingMedium.copyWith(color: colors.onSurface, fontSize: 19),
-                      ),
-                    ],
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Seçili nokta', style: typography.caption.copyWith(color: colors.onSurfaceMuted)),
+                        Text(
+                          state.selectedMetric.label,
+                          style: typography.headingMedium.copyWith(color: colors.onSurface, fontSize: 19),
+                        ),
+                      ],
+                    ),
                   ),
                   Text.rich(
                     TextSpan(
@@ -171,7 +207,13 @@ class _AvatarView extends ConsumerWidget {
                     ),
                   ),
                   const SizedBox(width: AppSpacing.sm),
-                  Text(selectedPoint.since, style: typography.caption.copyWith(color: colors.onSurfaceMuted)),
+                  Expanded(
+                    child: Text(
+                      selectedPoint.since,
+                      style: typography.caption.copyWith(color: colors.onSurfaceMuted),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
                 ],
               ),
               const SizedBox(height: AppSpacing.md),

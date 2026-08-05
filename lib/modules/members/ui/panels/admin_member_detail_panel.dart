@@ -8,6 +8,7 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_back_button.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/trend_bar_chart.dart';
+import '../../../measurements/ui/panels/measurements_panel.dart';
 import '../../../trainers/domain/trainer_member_detail.dart';
 import '../../../trainers/domain/trainer_metric.dart';
 import '../../controller/admin_member_detail_controller.dart';
@@ -147,6 +148,14 @@ class _AdminMemberDetailPanelState extends BasePanelState<AdminMemberDetailPanel
                         ),
                       ],
                     ),
+                  ),
+                  const SizedBox(height: AppSpacing.lg),
+                  AppButton(
+                    label: 'Ölçüm ekranını gör',
+                    variant: AppButtonVariant.secondary,
+                    onPressed: () => ref.read(panelStackControllerProvider.notifier).push(
+                          MeasurementsPanel(memberId: widget.memberId, memberName: detail.name),
+                        ),
                   ),
                   const SizedBox(height: AppSpacing.lg),
                   InkWell(

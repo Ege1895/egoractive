@@ -92,15 +92,28 @@ String _formatDelta(double diff, {required String zeroLabel}) {
   return '${diff < 0 ? '−' : '+'}$formatted cm';
 }
 
-/// F4-1 — üyenin kendi ölçümleri gerçek zamanlı `measurements/{uid}/entries`
-/// alt koleksiyonundan okunur. Hiç ölçüm yoksa (yeni üye) mock veriye
-/// düşülür — boş bir avatar/grafik göstermek yerine örnek bir başlangıç
-/// durumu sunar.
+/// F4-1 — admin/antrenör bir üyenin ölçüm ekranını açtığında bu sağlanır;
+/// `MeasurementsController` bunu kendi uid'sinin önüne alır. Panel
+/// kapanınca (onPanelHide) tekrar null'a dönüp üyenin kendi görünümünü
+/// bozmadan bırakır.
+@riverpod
+class MeasurementsViewedUid extends _$MeasurementsViewedUid {
+  @override
+  String? build() => null;
+
+  void set(String? uid) => state = uid;
+}
+
+/// F4-1 — görüntülenen kişinin (kendisi ya da admin/antrenörün açtığı bir
+/// üye) ölçümleri gerçek zamanlı `measurements/{uid}/entries` alt
+/// koleksiyonundan okunur. Hiç ölçüm yoksa (yeni üye) mock veriye düşülür
+/// — boş bir avatar/grafik göstermek yerine örnek bir başlangıç durumu
+/// sunar.
 @riverpod
 class MeasurementsController extends _$MeasurementsController {
   @override
   MeasurementsState build() {
-    final uid = ref.watch(authStateProvider).valueOrNull?.uid;
+    final uid = ref.watch(measurementsViewedUidProvider) ?? ref.watch(authStateProvider).valueOrNull?.uid;
     final mock = ref.watch(measurementsRepositoryProvider).loadInitial();
     if (uid == null) return mock;
 
@@ -120,9 +133,10 @@ class MeasurementsController extends _$MeasurementsController {
   }
 
   /// Yeni ölçüm ekle formundan gelen değerleri gerçek Firestore'a yazar —
-  /// boş bırakılan alanlar atlanır.
+  /// boş bırakılan alanlar atlanır. Admin/antrenör bir üyeyi görüntülüyorsa
+  /// (`measurementsViewedUidProvider` set edilmiş) o üyenin verisine yazar.
   Future<void> addMeasurement(Map<MeasurementMetric, double> newValues) async {
-    final uid = ref.read(authStateProvider).valueOrNull?.uid;
+    final uid = ref.read(measurementsViewedUidProvider) ?? ref.read(authStateProvider).valueOrNull?.uid;
     if (uid == null || newValues.isEmpty) return;
     await ref.read(measurementsWriteServiceProvider).addEntry(uid: uid, date: DateTime.now(), values: newValues);
   }
