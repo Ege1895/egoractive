@@ -4,17 +4,17 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
-import '../../../../core/panels/shell/role_picker_panel.dart';
 import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/utils/phone_number_formatter.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_loading_indicator.dart';
 import '../../controller/auth_controller.dart';
-import '../../domain/auth_state.dart';
 
 /// Ortak 3 · Giriş Bekleniyor — `requestCustomToken` çağrısı sürerken
-/// gösterilir; sonucu [authControllerProvider]'ı dinleyerek yakalar.
+/// gösterilir. Başarılı girişte yönlendirme main.dart'taki global rol
+/// dinleyicisi (F1-11) tarafından yapılır — bu panel sadece hata durumunu
+/// (callable `not-found`/`resource-exhausted` vb. dönerse) kendi gösterir.
 class LoginWaitingPanel extends BasePanel {
   const LoginWaitingPanel({super.key});
 
@@ -28,13 +28,6 @@ class _LoginWaitingPanelState extends BasePanelState<LoginWaitingPanel> {
     final colors = context.appColors;
     final typography = context.appTypography;
     final authState = ref.watch(authControllerProvider);
-
-    ref.listen<AuthState>(authControllerProvider, (previous, next) {
-      final wasRequesting = previous?.isRequestingLogin ?? true;
-      if (wasRequesting && !next.isRequestingLogin && next.loginErrorMessage == null) {
-        ref.read(panelStackControllerProvider.notifier).replaceRoot(const RolePickerPanel());
-      }
-    });
 
     if (authState.loginErrorMessage != null) {
       return _LoginErrorView(message: authState.loginErrorMessage!);

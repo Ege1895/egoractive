@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/base_panel.dart';
-import '../../../../core/panels/dev/dev_menu_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/utils/phone_number_formatter.dart';
@@ -123,17 +122,6 @@ class _PhoneLoginPanelState extends BasePanelState<PhoneLoginPanel> {
                         ref.read(panelStackControllerProvider.notifier).push(const LoginWaitingPanel());
                       }
                     : null,
-              ),
-              const SizedBox(height: AppSpacing.lg),
-              Align(
-                alignment: Alignment.center,
-                child: AppButton(
-                  label: 'Geliştirici menüsü',
-                  variant: AppButtonVariant.text,
-                  expand: false,
-                  onPressed: () =>
-                      ref.read(panelStackControllerProvider.notifier).push(const DevMenuPanel()),
-                ),
               ),
             ],
           ),

@@ -61,29 +61,35 @@ void main() {
     },
   );
 
-  testWidgets('Successful login navigates from the waiting screen to the role picker', (tester) async {
-    await tester.pumpWidget(
-      ProviderScope(
-        overrides: [authRepositoryProvider.overrideWith((ref) => _FakeAuthRepository())],
-        child: const EgoractiveApp(),
-      ),
-    );
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 1700));
-    await tester.pumpAndSettle();
+  testWidgets(
+    'Successful mock login shows no error and leaves waiting-for-role state to the '
+    'global router (F1-11, only exercised against real Firebase — see app_router_test.dart)',
+    (tester) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [authRepositoryProvider.overrideWith((ref) => _FakeAuthRepository())],
+          child: const EgoractiveApp(),
+        ),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 1700));
+      await tester.pumpAndSettle();
 
-    await tester.enterText(find.byType(TextField), '5324187605');
-    await tester.pump();
-    await tester.tap(find.text('Giriş yap'));
-    await tester.pump();
-    expect(find.text('Seni tanıyoruz…'), findsOneWidget);
+      await tester.enterText(find.byType(TextField), '5324187605');
+      await tester.pump();
+      await tester.tap(find.text('Giriş yap'));
+      await tester.pump();
+      expect(find.text('Seni tanıyoruz…'), findsOneWidget);
 
-    // Fake login isteğinin (2sn) tamamlanmasını bekle — başarı sonrası
-    // ref.listen otomatik olarak rol seçici ekranına geçiş yapıyor.
-    await tester.pump(const Duration(seconds: 2));
-    await tester.pumpAndSettle();
-    expect(find.text('Rol seç (demo)'), findsOneWidget);
-  });
+      // Fake repository başarıyla "giriş yapar" ama gerçek bir Firebase Auth
+      // oturumu açmaz — bu yüzden main.dart'taki rol dinleyicisi tetiklenmez
+      // ve panel hata göstermeden bekleme ekranında kalır (F1-11'in asıl
+      // yönlendirme mantığı app_router_test.dart'ta Firebase'siz test ediliyor).
+      await tester.pump(const Duration(seconds: 2));
+      await tester.pump();
+      expect(find.text('Seni tanıyoruz…'), findsOneWidget);
+    },
+  );
 
   testWidgets('Splash cannot be reached again via back after replaceRoot', (tester) async {
     await tester.pumpWidget(const ProviderScope(child: EgoractiveApp()));

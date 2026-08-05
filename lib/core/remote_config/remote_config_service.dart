@@ -73,7 +73,6 @@ abstract final class RemoteConfigKeys {
   static const authProfileTitle = 'lbl_auth_profile_title';
   static const authPhoneNumberLabel = 'lbl_auth_phone_number_label';
   static const authLoginButton = 'lbl_auth_login_button';
-  static const authDevMenuButton = 'lbl_auth_dev_menu_button';
   static const authSelectAvatarLabel = 'lbl_auth_select_avatar_label';
   static const authBadgesNavLabel = 'lbl_auth_badges_nav_label';
   static const authGiveFeedbackNavLabel = 'lbl_auth_give_feedback_nav_label';
@@ -492,7 +491,6 @@ class RemoteConfigService {
     'lbl_auth_profile_title_tr': 'Profilim',
     'lbl_auth_phone_number_label_tr': 'Telefon numarası',
     'lbl_auth_login_button_tr': 'Giriş yap',
-    'lbl_auth_dev_menu_button_tr': 'Geliştirici menüsü',
     'lbl_auth_select_avatar_label_tr': 'Avatarını seç',
     'lbl_auth_badges_nav_label_tr': 'Rozetlerim',
     'lbl_auth_give_feedback_nav_label_tr': 'Geri bildirim ver',
@@ -792,7 +790,6 @@ class RemoteConfigService {
     'lbl_auth_profile_title_en': 'My Profile',
     'lbl_auth_phone_number_label_en': 'Phone number',
     'lbl_auth_login_button_en': 'Log in',
-    'lbl_auth_dev_menu_button_en': 'Developer menu',
     'lbl_auth_select_avatar_label_en': 'Choose your avatar',
     'lbl_auth_badges_nav_label_en': 'My Badges',
     'lbl_auth_give_feedback_nav_label_en': 'Give feedback',
