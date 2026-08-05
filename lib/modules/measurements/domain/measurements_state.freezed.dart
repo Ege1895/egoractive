@@ -24,6 +24,13 @@ mixin _$MeasurementsState {
   MeasurementsViewMode get viewMode => throw _privateConstructorUsedError;
   MeasurementMetric get selectedMetric => throw _privateConstructorUsedError;
 
+  /// Avatar ekranında görüntülenen kayıt tarihi. `null` = en son kayıt.
+  DateTime? get selectedDate => throw _privateConstructorUsedError;
+
+  /// Geçmişe dönük tarih seçmek için — en yeniden en eskiye sıralı,
+  /// gerçek veri yoksa boş.
+  List<DateTime> get recordedDates => throw _privateConstructorUsedError;
+
   /// Create a copy of MeasurementsState
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -43,6 +50,8 @@ abstract class $MeasurementsStateCopyWith<$Res> {
     Map<MeasurementMetric, MeasurementSeries> series,
     MeasurementsViewMode viewMode,
     MeasurementMetric selectedMetric,
+    DateTime? selectedDate,
+    List<DateTime> recordedDates,
   });
 }
 
@@ -65,6 +74,8 @@ class _$MeasurementsStateCopyWithImpl<$Res, $Val extends MeasurementsState>
     Object? series = null,
     Object? viewMode = null,
     Object? selectedMetric = null,
+    Object? selectedDate = freezed,
+    Object? recordedDates = null,
   }) {
     return _then(
       _value.copyWith(
@@ -84,6 +95,14 @@ class _$MeasurementsStateCopyWithImpl<$Res, $Val extends MeasurementsState>
                 ? _value.selectedMetric
                 : selectedMetric // ignore: cast_nullable_to_non_nullable
                       as MeasurementMetric,
+            selectedDate: freezed == selectedDate
+                ? _value.selectedDate
+                : selectedDate // ignore: cast_nullable_to_non_nullable
+                      as DateTime?,
+            recordedDates: null == recordedDates
+                ? _value.recordedDates
+                : recordedDates // ignore: cast_nullable_to_non_nullable
+                      as List<DateTime>,
           )
           as $Val,
     );
@@ -104,6 +123,8 @@ abstract class _$$MeasurementsStateImplCopyWith<$Res>
     Map<MeasurementMetric, MeasurementSeries> series,
     MeasurementsViewMode viewMode,
     MeasurementMetric selectedMetric,
+    DateTime? selectedDate,
+    List<DateTime> recordedDates,
   });
 }
 
@@ -125,6 +146,8 @@ class __$$MeasurementsStateImplCopyWithImpl<$Res>
     Object? series = null,
     Object? viewMode = null,
     Object? selectedMetric = null,
+    Object? selectedDate = freezed,
+    Object? recordedDates = null,
   }) {
     return _then(
       _$MeasurementsStateImpl(
@@ -144,6 +167,14 @@ class __$$MeasurementsStateImplCopyWithImpl<$Res>
             ? _value.selectedMetric
             : selectedMetric // ignore: cast_nullable_to_non_nullable
                   as MeasurementMetric,
+        selectedDate: freezed == selectedDate
+            ? _value.selectedDate
+            : selectedDate // ignore: cast_nullable_to_non_nullable
+                  as DateTime?,
+        recordedDates: null == recordedDates
+            ? _value._recordedDates
+            : recordedDates // ignore: cast_nullable_to_non_nullable
+                  as List<DateTime>,
       ),
     );
   }
@@ -157,8 +188,11 @@ class _$MeasurementsStateImpl implements _MeasurementsState {
     required final Map<MeasurementMetric, MeasurementSeries> series,
     this.viewMode = MeasurementsViewMode.avatar,
     this.selectedMetric = MeasurementMetric.bel,
+    this.selectedDate,
+    final List<DateTime> recordedDates = const <DateTime>[],
   }) : _points = points,
-       _series = series;
+       _series = series,
+       _recordedDates = recordedDates;
 
   final Map<MeasurementMetric, MeasurementPoint> _points;
   @override
@@ -183,9 +217,27 @@ class _$MeasurementsStateImpl implements _MeasurementsState {
   @JsonKey()
   final MeasurementMetric selectedMetric;
 
+  /// Avatar ekranında görüntülenen kayıt tarihi. `null` = en son kayıt.
+  @override
+  final DateTime? selectedDate;
+
+  /// Geçmişe dönük tarih seçmek için — en yeniden en eskiye sıralı,
+  /// gerçek veri yoksa boş.
+  final List<DateTime> _recordedDates;
+
+  /// Geçmişe dönük tarih seçmek için — en yeniden en eskiye sıralı,
+  /// gerçek veri yoksa boş.
+  @override
+  @JsonKey()
+  List<DateTime> get recordedDates {
+    if (_recordedDates is EqualUnmodifiableListView) return _recordedDates;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_recordedDates);
+  }
+
   @override
   String toString() {
-    return 'MeasurementsState(points: $points, series: $series, viewMode: $viewMode, selectedMetric: $selectedMetric)';
+    return 'MeasurementsState(points: $points, series: $series, viewMode: $viewMode, selectedMetric: $selectedMetric, selectedDate: $selectedDate, recordedDates: $recordedDates)';
   }
 
   @override
@@ -198,7 +250,13 @@ class _$MeasurementsStateImpl implements _MeasurementsState {
             (identical(other.viewMode, viewMode) ||
                 other.viewMode == viewMode) &&
             (identical(other.selectedMetric, selectedMetric) ||
-                other.selectedMetric == selectedMetric));
+                other.selectedMetric == selectedMetric) &&
+            (identical(other.selectedDate, selectedDate) ||
+                other.selectedDate == selectedDate) &&
+            const DeepCollectionEquality().equals(
+              other._recordedDates,
+              _recordedDates,
+            ));
   }
 
   @override
@@ -208,6 +266,8 @@ class _$MeasurementsStateImpl implements _MeasurementsState {
     const DeepCollectionEquality().hash(_series),
     viewMode,
     selectedMetric,
+    selectedDate,
+    const DeepCollectionEquality().hash(_recordedDates),
   );
 
   /// Create a copy of MeasurementsState
@@ -228,6 +288,8 @@ abstract class _MeasurementsState implements MeasurementsState {
     required final Map<MeasurementMetric, MeasurementSeries> series,
     final MeasurementsViewMode viewMode,
     final MeasurementMetric selectedMetric,
+    final DateTime? selectedDate,
+    final List<DateTime> recordedDates,
   }) = _$MeasurementsStateImpl;
 
   @override
@@ -238,6 +300,15 @@ abstract class _MeasurementsState implements MeasurementsState {
   MeasurementsViewMode get viewMode;
   @override
   MeasurementMetric get selectedMetric;
+
+  /// Avatar ekranında görüntülenen kayıt tarihi. `null` = en son kayıt.
+  @override
+  DateTime? get selectedDate;
+
+  /// Geçmişe dönük tarih seçmek için — en yeniden en eskiye sıralı,
+  /// gerçek veri yoksa boş.
+  @override
+  List<DateTime> get recordedDates;
 
   /// Create a copy of MeasurementsState
   /// with the given fields replaced by the non-null parameter values.

@@ -325,3 +325,61 @@ test("trainer cannot change other fields while updating remainingSessions (negat
   const db = contextFor("trainer-a", { role: "trainer", gymId: "gym-a" }).firestore();
   await assertFails(updateDoc(doc(db, "users/member-a1"), { remainingSessions: 4, name: "Hacked" }));
 });
+
+// --- measurements/{uid}/entries/{entryId} (F4-1) ---
+
+test("member can write their own measurement entry (positive)", async () => {
+  const db = contextFor("member-a1", { role: "member", gymId: "gym-a" }).firestore();
+  await assertSucceeds(setDoc(doc(db, "measurements/member-a1/entries/e1"), { bel: 74.5 }));
+});
+
+test("member can read their own measurement entry (positive)", async () => {
+  await testEnv.withSecurityRulesDisabled(async (context) => {
+    await setDoc(context.firestore().doc("measurements/member-a1/entries/e1"), { bel: 74.5 });
+  });
+  const db = contextFor("member-a1", { role: "member", gymId: "gym-a" }).firestore();
+  await assertSucceeds(getDoc(doc(db, "measurements/member-a1/entries/e1")));
+});
+
+test("member cannot read another member's measurement entry (negative)", async () => {
+  await testEnv.withSecurityRulesDisabled(async (context) => {
+    await setDoc(context.firestore().doc("measurements/member-a2/entries/e1"), { bel: 74.5 });
+  });
+  const db = contextFor("member-a1", { role: "member", gymId: "gym-a" }).firestore();
+  await assertFails(getDoc(doc(db, "measurements/member-a2/entries/e1")));
+});
+
+test("trainer can read+write their assigned member's measurement entry (positive — üye detayından ölçüm ekranı)", async () => {
+  await testEnv.withSecurityRulesDisabled(async (context) => {
+    await setDoc(context.firestore().doc("measurements/member-a1/entries/e1"), { bel: 74.5 });
+  });
+  const db = contextFor("trainer-a", { role: "trainer", gymId: "gym-a" }).firestore();
+  await assertSucceeds(getDoc(doc(db, "measurements/member-a1/entries/e1")));
+  await assertSucceeds(setDoc(doc(db, "measurements/member-a1/entries/e2"), { bel: 73.0 }));
+});
+
+test("trainer not assigned to the member cannot read their measurement entry (negative)", async () => {
+  await testEnv.withSecurityRulesDisabled(async (context) => {
+    // member-a2'nin trainerId'si trainer-x, trainer-a değil.
+    await setDoc(context.firestore().doc("measurements/member-a2/entries/e1"), { bel: 74.5 });
+  });
+  const db = contextFor("trainer-a", { role: "trainer", gymId: "gym-a" }).firestore();
+  await assertFails(getDoc(doc(db, "measurements/member-a2/entries/e1")));
+});
+
+test("admin can read+write a member's measurement entry in their own gym (positive — üye detayından ölçüm ekranı)", async () => {
+  await testEnv.withSecurityRulesDisabled(async (context) => {
+    await setDoc(context.firestore().doc("measurements/member-a1/entries/e1"), { bel: 74.5 });
+  });
+  const db = contextFor("admin-a", { role: "admin", gymId: "gym-a" }).firestore();
+  await assertSucceeds(getDoc(doc(db, "measurements/member-a1/entries/e1")));
+  await assertSucceeds(setDoc(doc(db, "measurements/member-a1/entries/e2"), { bel: 73.0 }));
+});
+
+test("admin of a different gym cannot read a member's measurement entry (negative)", async () => {
+  await testEnv.withSecurityRulesDisabled(async (context) => {
+    await setDoc(context.firestore().doc("measurements/member-a1/entries/e1"), { bel: 74.5 });
+  });
+  const db = contextFor("admin-b", { role: "admin", gymId: "gym-b" }).firestore();
+  await assertFails(getDoc(doc(db, "measurements/member-a1/entries/e1")));
+});

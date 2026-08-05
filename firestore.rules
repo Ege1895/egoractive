@@ -123,5 +123,25 @@ service cloud.firestore {
         isCompletingOwnSession()
       );
     }
+
+    // measurements/{uid}/entries/{entryId} — F4-1. Vücut ölçümü kişisel/
+    // hassas sağlık verisi (F0-4 gizlilik politikası kapsamında) ama admin
+    // ve kendi antrenörü, üyenin ölçüm ekranını üye detayından açıp
+    // görüntüleyip düzenleyebiliyor (stüdyo içi kullanım) — üçüncü bir
+    // salonun admin/antrenörüne asla açılmıyor. `targetUser()` bir ekstra
+    // doküman okuması gerektiriyor (users/{uid}) — üyenin gymId/trainerId
+    // bilgisi custom claim'lerde değil, hedef kullanıcının kendi
+    // dokümanında olduğu için.
+    function targetUser(uid) {
+      return get(/databases/$(database)/documents/users/$(uid)).data;
+    }
+
+    match /measurements/{uid}/entries/{entryId} {
+      allow read, write: if isSignedIn() && (
+        request.auth.uid == uid ||
+        (myRole() == 'admin' && targetUser(uid).gymId == myGymId()) ||
+        (myRole() == 'trainer' && targetUser(uid).trainerId == request.auth.uid)
+      );
+    }
   }
 }

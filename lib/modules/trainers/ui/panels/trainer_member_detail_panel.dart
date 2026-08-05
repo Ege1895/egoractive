@@ -7,6 +7,7 @@ import '../../../../core/panels/panel_stack_controller.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_back_button.dart';
 import '../../../../shared/widgets/trend_bar_chart.dart';
+import '../../../measurements/ui/panels/measurements_panel.dart';
 import '../../controller/trainer_member_detail_controller.dart';
 import '../../domain/trainer_member_detail.dart';
 import '../../domain/trainer_metric.dart';
@@ -123,7 +124,9 @@ class _TrainerMemberDetailPanelState extends BasePanelState<TrainerMemberDetailP
                                 color: colors.surfaceRaised,
                                 borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
                                 child: InkWell(
-                                  onTap: () {},
+                                  onTap: () => ref.read(panelStackControllerProvider.notifier).push(
+                                        MeasurementsPanel(memberId: widget.memberId, memberName: detail.name),
+                                      ),
                                   borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
                                   child: Container(
                                     constraints: const BoxConstraints(minHeight: 44),
