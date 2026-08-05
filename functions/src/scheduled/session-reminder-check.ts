@@ -7,12 +7,17 @@ import * as logger from "firebase-functions/logger";
 const DEFAULT_REMINDER_MINUTES = 60;
 
 const DEFAULT_TEXT: Record<string, { tr: string; en: string }> = {
-  lbl_notif_session_reminder_title: { tr: "Dersin yaklaşıyor", en: "Your session is coming up" },
+  lbl_notif_session_reminder_title: {
+    tr: "⏰ Bugün {time}'de dersin var!",
+    en: "⏰ Your session is at {time} today!",
+  },
   lbl_notif_session_reminder_body: {
-    tr: "Yaklaşan dersin için gelip gelmeyeceğini bildir.",
-    en: "Let us know if you can make your upcoming session.",
+    tr: "{trainerName} seni bekliyor. Gelip gelmeyeceğini onaylamak için dokun 👇",
+    en: "{trainerName} is waiting for you. Tap to confirm you're coming 👇",
   },
 };
+
+const FALLBACK_TRAINER_NAME: Record<string, string> = { tr: "Antrenörün", en: "Your trainer" };
 
 function readParam(template: RemoteConfigTemplate, key: string): string | undefined {
   const param = template.parameters[key];
@@ -26,12 +31,25 @@ function readReminderMinutesBefore(template: RemoteConfigTemplate): number {
 
 /**
  * F3-4 — bildirim metnini kullanıcının `users/{uid}.locale` alanına göre
- * seçer (client bunu FCM token kaydederken cihaz dilinden yazıyor).
- * RC'de karşılığı yoksa kod içindeki varsayılana düşer.
+ * seçer (client bunu FCM token kaydederken cihaz dilinden yazıyor), RC'de
+ * karşılığı yoksa kod içindeki varsayılana düşer. `{time}`/`{trainerName}`
+ * yer tutucularını gerçek değerlerle değiştirip kişiselleştirilmiş bir
+ * metin döner — jenerik "dersin yaklaşıyor" yerine somut, harekete
+ * geçirici bir bildirim (UX kalitesi için bilerek tasarlandı).
  */
-function readNotificationText(template: RemoteConfigTemplate, baseKey: string, locale: string): string {
+function readNotificationText(
+  template: RemoteConfigTemplate,
+  baseKey: string,
+  locale: string,
+  vars: Record<string, string>,
+): string {
   const lang = locale === "tr" ? "tr" : "en";
-  return readParam(template, `${baseKey}_${lang}`) ?? DEFAULT_TEXT[baseKey][lang];
+  const raw = readParam(template, `${baseKey}_${lang}`) ?? DEFAULT_TEXT[baseKey][lang];
+  return Object.entries(vars).reduce((text, [key, value]) => text.replaceAll(`{${key}}`, value), raw);
+}
+
+function formatTime(date: Date): string {
+  return `${date.getHours().toString().padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
 }
 
 /**
@@ -70,7 +88,8 @@ export const sessionReminderCheck = onSchedule("every 15 minutes", async () => {
   }
 
   for (const sessionDoc of dueSessions.docs) {
-    const { memberId } = sessionDoc.data() as { memberId?: string };
+    const sessionData = sessionDoc.data() as { memberId?: string; trainerName?: string; startTime?: Timestamp };
+    const { memberId } = sessionData;
     if (!memberId) continue;
 
     const memberDoc = await db.collection("users").doc(memberId).get();
@@ -82,11 +101,17 @@ export const sessionReminderCheck = onSchedule("every 15 minutes", async () => {
     }
 
     const locale = (memberDoc.data()?.locale as string | undefined) ?? "en";
+    const lang = locale === "tr" ? "tr" : "en";
+    const vars = {
+      time: sessionData.startTime ? formatTime(sessionData.startTime.toDate()) : "--:--",
+      trainerName: sessionData.trainerName?.trim() || FALLBACK_TRAINER_NAME[lang],
+    };
+
     await getMessaging().sendEachForMulticast({
       tokens: fcmTokens,
       notification: {
-        title: readNotificationText(template, "lbl_notif_session_reminder_title", locale),
-        body: readNotificationText(template, "lbl_notif_session_reminder_body", locale),
+        title: readNotificationText(template, "lbl_notif_session_reminder_title", locale, vars),
+        body: readNotificationText(template, "lbl_notif_session_reminder_body", locale, vars),
       },
       data: { type: "session_reminder", sessionId: sessionDoc.id },
     });

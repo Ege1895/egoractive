@@ -43,6 +43,8 @@ abstract final class RemoteConfigKeys {
   /// F3-4 — sessionReminderCheck Cloud Function'ının gönderdiği push metni.
   /// Admin SDK'dan (Cloud Functions) da okunabildiği için diğer `lbl_*`
   /// metinlerinden farklı olarak isimlendirmede `notif` öneki kullanılıyor.
+  /// `{time}` ve `{trainerName}` yer tutucuları fonksiyon tarafında gerçek
+  /// değerlerle değiştiriliyor (kişiselleştirilmiş bildirim metni).
   static const notifSessionReminderTitle = 'lbl_notif_session_reminder_title';
   static const notifSessionReminderBody = 'lbl_notif_session_reminder_body';
 
@@ -475,8 +477,8 @@ class RemoteConfigService {
     RemoteConfigKeys.feedbackReminderDayOfMonth: -1,
     RemoteConfigKeys.freeVersionAdsEnabled: true,
     RemoteConfigKeys.featureFlags: '{}',
-    'lbl_notif_session_reminder_title_tr': 'Dersin yaklaşıyor',
-    'lbl_notif_session_reminder_body_tr': 'Yaklaşan dersin için gelip gelmeyeceğini bildir.',
+    'lbl_notif_session_reminder_title_tr': '⏰ Bugün {time}\'de dersin var!',
+    'lbl_notif_session_reminder_body_tr': '{trainerName} seni bekliyor. Gelip gelmeyeceğini onaylamak için dokun 👇',
     'lbl_common_vazgec_tr': 'Vazgeç',
     'lbl_common_kaydet_tr': 'Kaydet',
     'lbl_common_duzenle_tr': 'Düzenle',
@@ -778,8 +780,8 @@ class RemoteConfigService {
     'lbl_trainers_report_group_toggle_tr': 'Grup',
     'lbl_trainers_profile_footer_text_tr':
         'Egoractive · Egora Games · Sürüm 1.0',
-    'lbl_notif_session_reminder_title_en': 'Your session is coming up',
-    'lbl_notif_session_reminder_body_en': 'Let us know if you can make your upcoming session.',
+    'lbl_notif_session_reminder_title_en': '⏰ Your session is at {time} today!',
+    'lbl_notif_session_reminder_body_en': '{trainerName} is waiting for you. Tap to confirm you\'re coming 👇',
     'lbl_common_vazgec_en': 'Cancel',
     'lbl_common_kaydet_en': 'Save',
     'lbl_common_duzenle_en': 'Edit',
