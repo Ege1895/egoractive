@@ -35,6 +35,111 @@
       },
       "description": "Feature flag'lerin tutulduğu JSON obje.",
       "valueType": "JSON"
+    },
+    "screenTextsCommon": {
+      "defaultValue": {
+        "value": "{\"vazgec\":\"Vazgeç\",\"kaydet\":\"Kaydet\",\"duzenle\":\"Düzenle\",\"kapat\":\"Kapat\",\"degistir\":\"Değiştir\",\"cikisYap\":\"Çıkış yap\",\"hesabimiSil\":\"Hesabımı sil\",\"studyoKurallariNav\":\"Stüdyo kuralları\",\"seansiErtele\":\"Seansı ertele\",\"gelicem\":\"Gelicem\",\"gelmeyecegim\":\"Gelmeyeceğim\",\"anaSayfaTab\":\"Ana Sayfa\",\"profilTab\":\"Profil\",\"telefonLabel\":\"Telefon\",\"tumuFilter\":\"Tümü\",\"tamamlandi\":\"Tamamlandı\",\"iptalLabel\":\"İptal\",\"kalanDersLabel\":\"Kalan ders\",\"paketiYokFilter\":\"Paketi yok\",\"seansSayisiLabel\":\"Seans sayısı\",\"addSeansButton\":\"+ Seans\",\"olcum6AySectionHeader\":\"ÖLÇÜM · 6 AY\",\"dersGecmisiSectionHeader\":\"DERS GEÇMİŞİ\",\"uyeDetayiTitle\":\"Üye detayı\",\"buGundeSeansYok\":\"Bu günde seans yok.\",\"bitisLabel\":\"Bitiş\"}"
+      },
+      "description": "Birden fazla panelde tekrar eden ortak static metinler (buton/label/section).",
+      "valueType": "JSON"
+    },
+    "screenTextsShell": {
+      "defaultValue": {
+        "value": "{\"memberTabDerslerim\":\"Derslerim\",\"memberTabOlcumlerim\":\"Ölçümlerim\",\"memberTabKesfet\":\"Keşfet\",\"trainerTabTakvimim\":\"Takvimim\",\"trainerTabUyelerim\":\"Üyelerim\",\"trainerTabRaporum\":\"Raporum\",\"adminTabUyeler\":\"Üyeler\",\"adminTabSeanslar\":\"Seanslar\",\"adminTabFinans\":\"Finans\",\"adminTabAyarlar\":\"Ayarlar\",\"rolePickerMemberButton\":\"Üye\",\"rolePickerTrainerButton\":\"Antrenör\",\"rolePickerAdminButton\":\"Admin\",\"rolePickerGymSetupButton\":\"Admin · Salon Kurulumu (ilk kurulum)\"}"
+      },
+      "description": "Rol bazlı tab bar ve rol seçici ekranındaki static metinler.",
+      "valueType": "JSON"
+    },
+    "screenTextsAuth": {
+      "defaultValue": {
+        "value": "{\"profileTitle\":\"Profilim\",\"phoneNumberLabel\":\"Telefon numarası\",\"loginButton\":\"Giriş yap\",\"devMenuButton\":\"Geliştirici menüsü\",\"selectAvatarLabel\":\"Avatarını seç\",\"badgesNavLabel\":\"Rozetlerim\",\"giveFeedbackNavLabel\":\"Geri bildirim ver\",\"sessionRemindersToggleTitle\":\"Ders hatırlatmaları\",\"sessionRemindersToggleDescription\":\"Dersinden 2 saat önce bildirim\",\"deleteAccountConfirmTitle\":\"Profilim\"}"
+      },
+      "description": "auth modülü (Splash, Telefon Girişi, Profil, Hesap Silme) static metinleri.",
+      "valueType": "JSON"
+    },
+    "screenTextsBadges": {
+      "defaultValue": {
+        "value": "{\"title\":\"Rozetlerim\"}"
+      },
+      "description": "badges modülü static metinleri.",
+      "valueType": "JSON"
+    },
+    "screenTextsEvents": {
+      "defaultValue": {
+        "value": "{\"adminListTitle\":\"Etkinlikler\",\"addEventButton\":\"+ Etkinlik\",\"attendingLabel\":\"Katılan\",\"capacityLabel\":\"Kontenjan\",\"createTitle\":\"Etkinlik oluştur\",\"capacityEmptyMeansUnlimitedHelper\":\"Boş bırakırsanız sınırsız olur\",\"nameFieldLabel\":\"Etkinlik adı\",\"locationFieldLabel\":\"Lokasyon\",\"dateFieldLabel\":\"Tarih\",\"timeFieldLabel\":\"Saat\",\"descriptionFieldLabel\":\"Açıklama\",\"createSubmitButton\":\"Etkinliği oluştur\"}"
+      },
+      "description": "events modülü static metinleri.",
+      "valueType": "JSON"
+    },
+    "screenTextsExpenses": {
+      "defaultValue": {
+        "value": "{\"listTitle\":\"Giderler\",\"addExpenseButton\":\"+ Gider\",\"categoriesSectionHeader\":\"KATEGORİLER\",\"recentEntriesSectionHeader\":\"SON KAYITLAR\",\"addTitle\":\"Gider ekle\",\"categoryFieldLabel\":\"Kategori\",\"recurringToggleLabel\":\"Her ay tekrar et\",\"recurringToggleDescription\":\"Kira ve fatura gibi sabit giderler için\",\"amountFieldLabel\":\"Tutar (₺)\",\"descriptionFieldLabel\":\"Açıklama\",\"dateFieldLabel\":\"Tarih\",\"submitButton\":\"Gideri kaydet\"}"
+      },
+      "description": "expenses modülü static metinleri.",
+      "valueType": "JSON"
+    },
+    "screenTextsFeedback": {
+      "defaultValue": {
+        "value": "{\"adminListTitle\":\"Geri bildirimler\",\"memberFormTitle\":\"Geri bildirim\",\"commentSectionHeader\":\"YORUMUN (İSTEĞE BAĞLI)\"}"
+      },
+      "description": "feedback modülü static metinleri.",
+      "valueType": "JSON"
+    },
+    "screenTextsGroupSessions": {
+      "defaultValue": {
+        "value": "{\"adminListTitle\":\"Grup dersleri\",\"addGroupSessionButton\":\"+ Grup dersi\",\"capacitySuffixLabel\":\"kontenjan\",\"viewParticipantsLink\":\"Katılımcıları gör\",\"discoverTitle\":\"Keşfet\",\"discoverTabGroupSessions\":\"Grup dersleri\",\"discoverTabEvents\":\"Etkinlikler\",\"createTitle\":\"Grup dersi oluştur\",\"daysFieldLabel\":\"Günler\",\"capacityFieldLabel\":\"Kontenjan\",\"onlineBookingToggleLabel\":\"Online rezervasyona açık\",\"onlineBookingToggleDescription\":\"Üyeler Keşfet'ten katılabilir\",\"defaultLocationLabel\":\"Stüdyo\",\"nameFieldLabel\":\"Ders adı\",\"startTimeFieldLabel\":\"Başlangıç saati\",\"durationFieldLabel\":\"Süre\",\"createSubmitButton\":\"Grup dersini oluştur\"}"
+      },
+      "description": "group_sessions modülü static metinleri.",
+      "valueType": "JSON"
+    },
+    "screenTextsGyms": {
+      "defaultValue": {
+        "value": "{\"adminHomeCompletedWord\":\"tamamlanan\",\"adminHomeTrainerPerformanceSection\":\"ANTRENÖR PERFORMANSI\",\"adminHomeUpcomingPaymentsSection\":\"ÖDEME VAKTİ YAKLAŞAN\",\"adminHomePendingFeedbackLabel\":\"Bekleyen geri bildirim\",\"adminHomeTotalSessionsLabel\":\"Toplam seans\",\"adminHomeCompletedLabel\":\"Tamamlanan\",\"adminHomeEstimatedRevenueLabel\":\"Tahmini ciro\",\"adminHomeExpenseLabel\":\"Gider\",\"permissionsTitle\":\"Yetki ayarları\",\"permissionsReminderDropdownLabel\":\"Seans bitimi eğitmene ne zaman hatırlatılsın?\",\"permissionsReminderDescription\":\"Bildirim seans bitiminden sonra gider\",\"settingsTitle\":\"Ayarlar\",\"settingsNavGymInfo\":\"Salon bilgileri\",\"settingsNavTrainerManagement\":\"Antrenör yönetimi\",\"settingsNavStudioPackages\":\"Stüdyo paketleri\",\"settingsNavSessionManagement\":\"Ders / seans yönetimi\",\"settingsNavGroupSessions\":\"Grup dersleri\",\"settingsNavEvents\":\"Etkinlikler\",\"settingsNavPermissions\":\"Yetki ayarları\",\"settingsNavFeedback\":\"Geri bildirimler\",\"settingsNavSendNotification\":\"Bildirim gönder\",\"gymInfoTitle\":\"Salon bilgileri\",\"gymInfoLogoSection\":\"LOGO\",\"gymInfoLogoHelper\":\"Kare, en az 512×512 px PNG yükleyin.\",\"gymInfoChangeLogoButton\":\"Logoyu değiştir\",\"gymInfoThemeColorSection\":\"TEMA RENGİ\",\"gymInfoPreviewLabel\":\"Önizleme\",\"gymInfoPrimaryButtonLabel\":\"Birincil buton\",\"gymInfoSeeAllThemesLink\":\"Tüm temaları gör ›\",\"gymInfoNameFieldLabel\":\"Salon adı\",\"gymInfoAddressFieldLabel\":\"Adres\",\"gymSetupStepHeader\":\"KURULUM 1 / 1\",\"gymSetupTitle\":\"Salonunu tanımla\",\"gymSetupLogoLabel\":\"Salon logosu\",\"gymSetupChooseLogoButton\":\"Logo seç\",\"gymSetupThemeColorLabel\":\"Tema rengi\",\"gymSetupCityFieldLabel\":\"Şehir\",\"gymSetupSubmitButton\":\"Salonu oluştur ve girişi tamamla\",\"themesTitle\":\"Temalar\",\"themesMemberPreviewSection\":\"ÜYE EKRANI ÖNİZLEMESİ\",\"themesShowLogoSilhouetteToggleLabel\":\"Logo silüetini arka planda göster\",\"themesShowLogoSilhouetteToggleDescription\":\"Üye ve antrenör ekranlarında %25 opaklıkla\",\"themesApplyToAllButton\":\"Temayı tüm üyelere uygula\",\"addThemeTitle\":\"Tema ekle\",\"addThemePaletteLabel\":\"Palet\",\"addThemeColorCodeLabel\":\"Renk kodu\",\"addThemeColorHelper\":\"Paletten seçin ya da kendi HEX kodunuzu yazın.\",\"addThemeUseLogoQuestion\":\"Salon logosu kullanılsın mı?\",\"addThemePreviewSection\":\"ÖNİZLEME\",\"addThemeUseLogoOption\":\"Evet, logoyu kullan\",\"addThemeFlatBackgroundOption\":\"Hayır, düz zemin\",\"addThemeSubmitButton\":\"Temayı kaydet ve uygula\",\"addThemeNameFieldLabel\":\"Tema adı\",\"studioRulesTitle\":\"Stüdyo kuralları\",\"editStudioRulesTitle\":\"Kuralları düzenle\"}"
+      },
+      "description": "gyms modülü (Admin Ana Sayfa, Ayarlar, Salon Bilgileri/Kurulum/Temalar, Yetki Ayarları, Stüdyo Kuralları) static metinleri.",
+      "valueType": "JSON"
+    },
+    "screenTextsMeasurements": {
+      "defaultValue": {
+        "value": "{\"addTitle\":\"Yeni ölçüm\",\"measurementDateLabel\":\"Ölçüm tarihi\",\"measurementsSection\":\"ÖLÇÜLER\",\"unitCm\":\"cm\",\"title\":\"Ölçümlerim\",\"selectedPointLabel\":\"Seçili nokta\",\"historySection\":\"ÖLÇÜM GEÇMİŞİ\"}"
+      },
+      "description": "measurements modülü static metinleri.",
+      "valueType": "JSON"
+    },
+    "screenTextsMembers": {
+      "defaultValue": {
+        "value": "{\"detailPaymentStatusLabel\":\"Ödeme durumu\",\"detailRemainingSessionsLabel\":\"Kalan ders\",\"detailMakeupLabel\":\"Telafi\",\"detailTotalLabel\":\"Toplam\",\"detailPaidLabel\":\"Ödendi\",\"detailRemainingAmountLabel\":\"Kalan\",\"listTitle\":\"Üyeler\",\"addMemberButton\":\"+ Üye ekle\",\"listEmptyState\":\"Bu filtreye uyan üye yok.\",\"filterActive\":\"Aktif\",\"filterExpiring\":\"Bitiyor\",\"infoStepIndicator1\":\"1 / 3\",\"infoLoginHelper\":\"Üye bu numarayla giriş yapar, şifre yok.\",\"genderFieldLabel\":\"Cinsiyet\",\"trainerFieldLabel\":\"Antrenör\",\"registrationDateFieldLabel\":\"Kayıt tarihi\",\"selectTrainerButton\":\"Antrenör seç\",\"firstNameFieldLabel\":\"Ad\",\"lastNameFieldLabel\":\"Soyad\",\"birthYearFieldLabel\":\"Doğum yılı\",\"heightFieldLabel\":\"Boy\",\"noteFieldLabel\":\"Not (isteğe bağlı)\",\"paymentTitle\":\"Ödeme bilgisi\",\"paymentStepIndicator3\":\"3 / 3\",\"paymentTotalLabel\":\"Toplam tutar\",\"paymentPaidLabel\":\"Ödendi\",\"paymentRemainingLabel\":\"Kalan ödeme\",\"paymentAutoCalculatedHelper\":\"Otomatik hesaplanır\",\"paymentDueDateFieldLabel\":\"Son ödeme tarihi\",\"paymentEnterAmountHelper\":\"Ödenen tutarı gir\",\"paymentFullOption\":\"Tam ödendi\",\"paymentHalfOption\":\"Yarısı\",\"paymentOtherOption\":\"Diğer\",\"newMembershipTitle\":\"Yeni üyelik\",\"newMembershipStepIndicator2\":\"2 / 3\",\"packageSelectSection\":\"PAKET SEÇ\",\"makeupSessionCountLabel\":\"Telafi seans sayısı\",\"makeupSessionHelper\":\"Paket bitince kullanılabilir\",\"startDateFieldLabel\":\"Başlangıç tarihi\",\"endDateFieldLabel\":\"Bitiş tarihi\",\"goToPaymentButton\":\"Ödeme bilgisine geç\"}"
+      },
+      "description": "members modülü (Üye Listesi/Bilgileri/Detayı, Yeni Üyelik) static metinleri.",
+      "valueType": "JSON"
+    },
+    "screenTextsNotifications": {
+      "defaultValue": {
+        "value": "{\"title\":\"Bildirim gönder\",\"targetQuestionLabel\":\"Kime gidecek?\",\"targetSingleMemberOption\":\"Tek üye\",\"targetWholeGymOption\":\"Tüm salon\",\"previewLabel\":\"Önizleme\",\"selectMemberButton\":\"Üye seç\",\"titleFieldLabel\":\"Başlık\",\"messageFieldLabel\":\"Mesaj\"}"
+      },
+      "description": "notifications modülü static metinleri.",
+      "valueType": "JSON"
+    },
+    "screenTextsPackages": {
+      "defaultValue": {
+        "value": "{\"listTitle\":\"Paketler\",\"addPackageButton\":\"+ Paket ekle\",\"editSessionTypeFieldLabel\":\"Ders tipi\",\"editOnSaleToggleLabel\":\"Satışta\",\"editOnSaleToggleDescription\":\"Kapalıysa yeni üyeliklerde görünmez\",\"deletePackageButton\":\"Paketi sil\",\"editNameFieldLabel\":\"Paket adı\",\"editValidityDaysFieldLabel\":\"Geçerlilik (gün)\",\"editPriceFieldLabel\":\"Fiyat (₺)\",\"memberPackageTitle\":\"Paketim\",\"remainingWord\":\"kalan\",\"trainerOwnerLabel\":\"Antrenörün\",\"startLabel\":\"Başlangıç\"}"
+      },
+      "description": "packages modülü static metinleri.",
+      "valueType": "JSON"
+    },
+    "screenTextsSessions": {
+      "defaultValue": {
+        "value": "{\"calendarTitle\":\"Takvim\",\"calendarSlotTimeLabel\":\"Saat\",\"calendarSlotStatusLabel\":\"Durum\",\"attendanceAnswerLabel\":\"Cevabı\",\"attendanceAnswerTimeLabel\":\"Cevap saati\",\"attendanceMemberNoteLabel\":\"Üyenin notu\",\"attendanceBackToCalendarButton\":\"Takvime dön\",\"managementTitle\":\"Seanslar\",\"managementEmptyState\":\"Bu güne uyan seans yok.\",\"filterScheduled\":\"Planlandı\",\"changeTrainerAction\":\"Antrenörü değiştir\",\"cancelSessionAction\":\"Seansı iptal et\",\"confirmTitle\":\"Ders onayı\",\"confirmAttendingAnswerText\":\"Geleceğini bildirdin\",\"confirmNotAttendingAnswerText\":\"Gelmeyeceğini bildirdin\",\"confirmChangeAnswerButton\":\"Cevabımı değiştir\",\"memberHomeThisWeekSection\":\"BU HAFTA\",\"memberHomeSeePackageButton\":\"Paketimi gör\",\"trainerNotificationsTitle\":\"Bildirimler\",\"completionTitle\":\"Seans onayı\",\"completionMemberNoShowOption\":\"Üye gelmedi\",\"completionUndoButton\":\"Geri al\",\"listTitle\":\"Derslerim\",\"listViewToggle\":\"Liste\",\"calendarViewToggle\":\"Takvim\",\"upcomingSection\":\"YAKLAŞAN\",\"pastSection\":\"GEÇMİŞ\"}"
+      },
+      "description": "sessions modülü (Takvim, Ders Yönetimi, Ders Onayı, Derslerim) static metinleri.",
+      "valueType": "JSON"
+    },
+    "screenTextsTrainers": {
+      "defaultValue": {
+        "value": "{\"managementTitle\":\"Antrenörler\",\"addTrainerButton\":\"+ Antrenör ekle\",\"specialtyFieldLabel\":\"Uzmanlık\",\"addTrainerFormTitle\":\"Antrenör ekle\",\"fullNameFieldLabel\":\"Ad soyad\",\"addTrainerSubmitButton\":\"Antrenörü ekle\",\"homeAwaitingApprovalSection\":\"ONAYINIZI BEKLİYOR\",\"homeTodayScheduleSection\":\"BUGÜNKÜ PROGRAMINIZ\",\"homeNoShowLabel\":\"Gelmedi\",\"homeTodaySessionsLabel\":\"Bugünkü seans\",\"homeCompletedLabel\":\"Tamamlanan\",\"homeFreeSlotLabel\":\"Boş saat\",\"memberDetailCreateSessionButton\":\"Seans oluştur\",\"memberDetailAddMeasurementButton\":\"Ölçüm ekle\",\"memberDetailRemainingSessionsLabel\":\"Kalan ders\",\"memberDetailPackageEndLabel\":\"Paket bitişi\",\"calendarTitle\":\"Takvimim\",\"calendarWeekToggle\":\"Hafta\",\"calendarMonthToggle\":\"Ay\",\"calendarMarkCompletedAction\":\"Tamamlandı işaretle\",\"membersListTitle\":\"Üyelerim\",\"membersFilterExpiring\":\"Paketi bitiyor\",\"membersRemainingSessionsSuffix\":\"kalan ders\",\"reportTitle\":\"Seans raporum\",\"reportEarnedCommissionLabel\":\"Kazanılan prim\",\"reportDetailLink\":\"Detay\",\"reportStartDateFieldLabel\":\"Başlangıç t.\",\"reportEndDateFieldLabel\":\"Bitiş t.\",\"reportOneOnOneToggle\":\"Birebir\",\"reportGroupToggle\":\"Grup\",\"profileFooterText\":\"Egoractive · Egora Games · Sürüm 1.0\"}"
+      },
+      "description": "trainers modülü (Ana Sayfa, Üye Detayı, Takvimim, Üyelerim, Raporum, Profil) static metinleri.",
+      "valueType": "JSON"
     }
   },
   "parameterGroups": {},
