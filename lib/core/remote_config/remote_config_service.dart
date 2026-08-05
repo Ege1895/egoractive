@@ -86,6 +86,7 @@ abstract final class RemoteConfigKeys {
   static const authLoginErrorRateLimited = 'lbl_auth_login_error_rate_limited';
   static const authLoginErrorGeneric = 'lbl_auth_login_error_generic';
   static const authRetryButton = 'lbl_auth_retry_button';
+  static const authDeleteAccountErrorGeneric = 'lbl_auth_delete_account_error_generic';
   static const badgesTitle = 'lbl_badges_title';
   static const eventsAdminListTitle = 'lbl_events_admin_list_title';
   static const eventsAddEventButton = 'lbl_events_add_event_button';
@@ -505,6 +506,8 @@ class RemoteConfigService {
     'lbl_auth_login_error_generic_tr':
         'Giriş yapılamadı. Bağlantını kontrol edip tekrar dene.',
     'lbl_auth_retry_button_tr': 'Tekrar dene',
+    'lbl_auth_delete_account_error_generic_tr':
+        'Hesap silinemedi. Bağlantını kontrol edip tekrar dene.',
     'lbl_badges_title_tr': 'Rozetlerim',
     'lbl_events_admin_list_title_tr': 'Etkinlikler',
     'lbl_events_add_event_button_tr': '+ Etkinlik',
@@ -802,6 +805,8 @@ class RemoteConfigService {
     'lbl_auth_login_error_rate_limited_en': 'Too many attempts. Try again in a minute.',
     'lbl_auth_login_error_generic_en': 'Could not log in. Check your connection and try again.',
     'lbl_auth_retry_button_en': 'Try again',
+    'lbl_auth_delete_account_error_generic_en':
+        'Could not delete account. Check your connection and try again.',
     'lbl_badges_title_en': 'My Badges',
     'lbl_events_admin_list_title_en': 'Events',
     'lbl_events_add_event_button_en': '+ Event',

@@ -7,7 +7,8 @@ import '../domain/auth_login_exception.dart';
 part 'auth_service.g.dart';
 
 /// F1-10 — `requestCustomToken` callable'ını çağırıp dönen token'la
-/// `signInWithCustomToken` yapar. Hesap silme F2-8'de gerçek akışa bağlanacak.
+/// `signInWithCustomToken` yapar. F2-8 — `deleteAccount` callable'ını çağırıp
+/// (Auth kaydı + users/{uid} silinir) yerel oturumu da kapatır.
 class AuthService {
   const AuthService();
 
@@ -27,8 +28,9 @@ class AuthService {
     }
   }
 
-  Future<void> deleteAccount() {
-    return Future<void>.delayed(const Duration(seconds: 2));
+  Future<void> deleteAccount() async {
+    await FirebaseFunctions.instance.httpsCallable('deleteAccount').call<void>();
+    await FirebaseAuth.instance.signOut();
   }
 
   AuthLoginErrorReason _reasonForCode(String code) {

@@ -7,6 +7,7 @@ import '../../../../core/panels/panel_stack_controller.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../controller/auth_controller.dart';
+import 'phone_login_panel.dart';
 
 const _deleteItems = [
   'Kalan 6 dersin ve telafi hakkın',
@@ -145,14 +146,23 @@ class _DeleteAccountConfirmPanelState extends BasePanelState<DeleteAccountConfir
                     checked: authState.deleteAccountAcknowledged,
                     onTap: authController.toggleDeleteAcknowledged,
                   ),
+                  if (authState.deleteAccountErrorMessage != null) ...[
+                    const SizedBox(height: AppSpacing.sm),
+                    Text(
+                      authState.deleteAccountErrorMessage!,
+                      style: typography.bodyMedium.copyWith(color: colors.error, fontSize: 13),
+                    ),
+                  ],
                   const SizedBox(height: AppSpacing.lg),
                   _DangerButton(
-                    label: 'Hesabımı sil',
+                    label: authState.isDeletingAccount ? 'Siliniyor…' : 'Hesabımı sil',
                     enabled: authState.deleteAccountAcknowledged && !authState.isDeletingAccount,
                     onPressed: () async {
-                      await authController.deleteAccount();
-                      if (!context.mounted) return;
-                      ref.read(panelStackControllerProvider.notifier).pop();
+                      final success = await authController.deleteAccount();
+                      if (!mounted) return;
+                      if (success) {
+                        ref.read(panelStackControllerProvider.notifier).replaceRoot(const PhoneLoginPanel());
+                      }
                     },
                   ),
                   const SizedBox(height: AppSpacing.sm),
