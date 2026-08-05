@@ -7,6 +7,7 @@ import '../../../../core/theme/app_theme.dart';
 import '../../controller/admin_members_controller.dart';
 import '../../controller/new_member_controller.dart';
 import '../../domain/admin_member_summary.dart';
+import 'admin_member_detail_panel.dart';
 import 'member_info_panel.dart';
 
 enum _MemberFilter { all, active, endingSoon, none }
@@ -200,7 +201,7 @@ class _MemberCard extends ConsumerWidget {
 
     return InkWell(
       borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
-      onTap: () => ref.read(panelStackControllerProvider.notifier).push(MemberInfoPanel(existing: member)),
+      onTap: () => ref.read(panelStackControllerProvider.notifier).push(AdminMemberDetailPanel(memberId: member.id)),
       child: Container(
         margin: const EdgeInsets.only(bottom: AppSpacing.md),
         padding: const EdgeInsets.all(AppSpacing.md),
