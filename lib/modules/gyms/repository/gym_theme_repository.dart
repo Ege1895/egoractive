@@ -6,7 +6,10 @@ import '../service/gym_theme_service.dart';
 part 'gym_theme_repository.g.dart';
 
 abstract interface class GymThemeRepository {
-  GymThemeState loadInitial();
+  Stream<GymThemeState> watchState(String gymId);
+  Future<void> selectTheme(String gymId, GymTheme theme, {required bool watermarkEnabled});
+  Future<void> savePresets(String gymId, List<GymTheme> presets);
+  Future<void> setWatermarkEnabled(String gymId, bool enabled);
 }
 
 class GymThemeRepositoryImpl implements GymThemeRepository {
@@ -15,7 +18,17 @@ class GymThemeRepositoryImpl implements GymThemeRepository {
   final GymThemeService _service;
 
   @override
-  GymThemeState loadInitial() => _service.loadInitial();
+  Stream<GymThemeState> watchState(String gymId) => _service.watchState(gymId);
+
+  @override
+  Future<void> selectTheme(String gymId, GymTheme theme, {required bool watermarkEnabled}) =>
+      _service.selectTheme(gymId, theme, watermarkEnabled: watermarkEnabled);
+
+  @override
+  Future<void> savePresets(String gymId, List<GymTheme> presets) => _service.savePresets(gymId, presets);
+
+  @override
+  Future<void> setWatermarkEnabled(String gymId, bool enabled) => _service.setWatermarkEnabled(gymId, enabled);
 }
 
 @riverpod

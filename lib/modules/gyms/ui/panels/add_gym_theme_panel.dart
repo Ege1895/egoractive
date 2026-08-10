@@ -213,9 +213,9 @@ class _AddGymThemePanelState extends BasePanelState<AddGymThemePanel> {
               padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.md, AppSpacing.screenEdge, AppSpacing.lg),
               child: AppButton(
                 label: 'Temayı kaydet ve uygula',
-                onPressed: () {
+                onPressed: () async {
                   final name = _nameController.text.trim().isEmpty ? 'Yeni Tema' : _nameController.text.trim();
-                  controller.addTheme(
+                  await controller.addTheme(
                     GymTheme(
                       id: '${name.toLowerCase().replaceAll(' ', '-')}-${DateTime.now().millisecondsSinceEpoch}',
                       name: name,
@@ -224,6 +224,7 @@ class _AddGymThemePanelState extends BasePanelState<AddGymThemePanel> {
                       note: _useGymLogo ? 'Salon logosu açık' : 'Düz zemin',
                     ),
                   );
+                  if (!mounted) return;
                   ref.read(panelStackControllerProvider.notifier).pop();
                 },
               ),
