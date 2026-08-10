@@ -197,5 +197,13 @@ service cloud.firestore {
       );
       allow delete: if isSignedIn() && resource.data.gymId == myGymId() && (myRole() == 'admin' || myRole() == 'trainer');
     }
+
+    // expenses/{id} — F5-1 dashboard'ının gider toplamı okuduğu koleksiyon
+    // (giriş ekranı F5-3'te gelecek). memberPackages ile aynı hassasiyet:
+    // sadece kendi salonunun admin'i erişir.
+    match /expenses/{expenseId} {
+      allow read, update, delete: if isSignedIn() && myRole() == 'admin' && resource.data.gymId == myGymId();
+      allow create: if isSignedIn() && myRole() == 'admin' && request.resource.data.gymId == myGymId();
+    }
   }
 }

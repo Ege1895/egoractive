@@ -177,6 +177,38 @@ test("trainer cannot read a memberPackages doc (negative)", async () => {
   await assertFails(getDoc(doc(db, "memberPackages/pkg-1")));
 });
 
+// --- expenses/{id} (F5-1 — dashboard'ın okuduğu, F5-3'te giriş ekranı gelecek) ---
+
+test("admin can create an expenses doc for their own gym (positive)", async () => {
+  const db = contextFor("admin-a", { role: "admin", gymId: "gym-a" }).firestore();
+  await assertSucceeds(
+    setDoc(doc(db, "expenses/exp-1"), { gymId: "gym-a", category: "Kira", amountTl: 65000 }),
+  );
+});
+
+test("admin cannot create an expenses doc for a different gym (negative)", async () => {
+  const db = contextFor("admin-a", { role: "admin", gymId: "gym-a" }).firestore();
+  await assertFails(
+    setDoc(doc(db, "expenses/exp-1"), { gymId: "gym-b", category: "Kira", amountTl: 65000 }),
+  );
+});
+
+test("member cannot read an expenses doc (negative)", async () => {
+  await testEnv.withSecurityRulesDisabled(async (context) => {
+    await setDoc(context.firestore().doc("expenses/exp-1"), { gymId: "gym-a", category: "Kira", amountTl: 65000 });
+  });
+  const db = contextFor("member-a1", { role: "member", gymId: "gym-a" }).firestore();
+  await assertFails(getDoc(doc(db, "expenses/exp-1")));
+});
+
+test("trainer cannot read an expenses doc (negative)", async () => {
+  await testEnv.withSecurityRulesDisabled(async (context) => {
+    await setDoc(context.firestore().doc("expenses/exp-1"), { gymId: "gym-a", category: "Kira", amountTl: 65000 });
+  });
+  const db = contextFor("trainer-a", { role: "trainer", gymId: "gym-a" }).firestore();
+  await assertFails(getDoc(doc(db, "expenses/exp-1")));
+});
+
 // --- sessions/{sessionId} (F3-3) ---
 
 function hoursFromNow(hours) {

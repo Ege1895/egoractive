@@ -13,6 +13,7 @@ import '../../../notifications/ui/panels/send_notification_panel.dart';
 import '../../../packages/ui/panels/studio_packages_panel.dart';
 import '../../../sessions/ui/panels/admin_session_management_panel.dart';
 import '../../../trainers/ui/panels/admin_trainer_management_panel.dart';
+import '../../../reports/ui/panels/admin_dashboard_panel.dart';
 import 'admin_permissions_panel.dart';
 import 'gym_info_panel.dart';
 import 'gym_rules_view_panel.dart';
@@ -46,7 +47,8 @@ class AdminSettingsPanel extends ConsumerWidget {
                 children: [
                   _NavRow(label: 'Salon bilgileri', onTap: () => panelStack.push(const GymInfoPanel())),
                   _NavRow(label: 'Antrenör yönetimi', onTap: () => panelStack.push(const AdminTrainerManagementPanel())),
-                  _NavRow(label: 'Stüdyo paketleri', isLast: true, onTap: () => panelStack.push(const StudioPackagesPanel())),
+                  _NavRow(label: 'Stüdyo paketleri', onTap: () => panelStack.push(const StudioPackagesPanel())),
+                  _NavRow(label: 'Raporlar', isLast: true, onTap: () => panelStack.push(const AdminDashboardPanel())),
                 ],
               ),
             ),
