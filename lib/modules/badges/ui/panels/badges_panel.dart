@@ -24,7 +24,9 @@ class _BadgesPanelState extends BasePanelState<BadgesPanel> {
     final typography = context.appTypography;
     final badges = ref.watch(badgesControllerProvider);
     final earnedCount = badges.where((b) => b.earned).length;
-    final nextLocked = badges.firstWhere((b) => !b.earned, orElse: () => badges.last);
+    final nextLocked = badges.isEmpty
+        ? null
+        : badges.firstWhere((b) => !b.earned, orElse: () => badges.last);
 
     return Scaffold(
       body: SafeArea(
@@ -63,7 +65,8 @@ class _BadgesPanelState extends BasePanelState<BadgesPanel> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text('$earnedCount rozet kazandın', style: typography.headingSmall.copyWith(color: colors.onSurface, fontSize: 18)),
-                                  Text('Sıradaki: ${nextLocked.note}', style: typography.bodyMedium.copyWith(color: colors.onSurfaceVariant, fontSize: 14)),
+                                  if (nextLocked != null)
+                                    Text('Sıradaki: ${nextLocked.note}', style: typography.bodyMedium.copyWith(color: colors.onSurfaceVariant, fontSize: 14)),
                                 ],
                               ),
                             ),
@@ -86,7 +89,7 @@ class _BadgesPanelState extends BasePanelState<BadgesPanel> {
                         ClipRRect(
                           borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
                           child: LinearProgressIndicator(
-                            value: earnedCount / badges.length,
+                            value: badges.isEmpty ? 0 : earnedCount / badges.length,
                             minHeight: 8,
                             backgroundColor: colors.surfaceRaised,
                             valueColor: AlwaysStoppedAnimation(colors.primary),

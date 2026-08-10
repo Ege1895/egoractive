@@ -17,6 +17,7 @@ final _privateConstructorUsedError = UnsupportedError(
 
 /// @nodoc
 mixin _$BadgeItem {
+  String get id => throw _privateConstructorUsedError;
   String get title => throw _privateConstructorUsedError;
   String get note => throw _privateConstructorUsedError;
   bool get earned => throw _privateConstructorUsedError;
@@ -33,7 +34,7 @@ abstract class $BadgeItemCopyWith<$Res> {
   factory $BadgeItemCopyWith(BadgeItem value, $Res Function(BadgeItem) then) =
       _$BadgeItemCopyWithImpl<$Res, BadgeItem>;
   @useResult
-  $Res call({String title, String note, bool earned});
+  $Res call({String id, String title, String note, bool earned});
 }
 
 /// @nodoc
@@ -51,12 +52,17 @@ class _$BadgeItemCopyWithImpl<$Res, $Val extends BadgeItem>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? id = null,
     Object? title = null,
     Object? note = null,
     Object? earned = null,
   }) {
     return _then(
       _value.copyWith(
+            id: null == id
+                ? _value.id
+                : id // ignore: cast_nullable_to_non_nullable
+                      as String,
             title: null == title
                 ? _value.title
                 : title // ignore: cast_nullable_to_non_nullable
@@ -84,7 +90,7 @@ abstract class _$$BadgeItemImplCopyWith<$Res>
   ) = __$$BadgeItemImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String title, String note, bool earned});
+  $Res call({String id, String title, String note, bool earned});
 }
 
 /// @nodoc
@@ -101,12 +107,17 @@ class __$$BadgeItemImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? id = null,
     Object? title = null,
     Object? note = null,
     Object? earned = null,
   }) {
     return _then(
       _$BadgeItemImpl(
+        id: null == id
+            ? _value.id
+            : id // ignore: cast_nullable_to_non_nullable
+                  as String,
         title: null == title
             ? _value.title
             : title // ignore: cast_nullable_to_non_nullable
@@ -128,11 +139,14 @@ class __$$BadgeItemImplCopyWithImpl<$Res>
 
 class _$BadgeItemImpl implements _BadgeItem {
   const _$BadgeItemImpl({
+    required this.id,
     required this.title,
     required this.note,
     required this.earned,
   });
 
+  @override
+  final String id;
   @override
   final String title;
   @override
@@ -142,7 +156,7 @@ class _$BadgeItemImpl implements _BadgeItem {
 
   @override
   String toString() {
-    return 'BadgeItem(title: $title, note: $note, earned: $earned)';
+    return 'BadgeItem(id: $id, title: $title, note: $note, earned: $earned)';
   }
 
   @override
@@ -150,13 +164,14 @@ class _$BadgeItemImpl implements _BadgeItem {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$BadgeItemImpl &&
+            (identical(other.id, id) || other.id == id) &&
             (identical(other.title, title) || other.title == title) &&
             (identical(other.note, note) || other.note == note) &&
             (identical(other.earned, earned) || other.earned == earned));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, title, note, earned);
+  int get hashCode => Object.hash(runtimeType, id, title, note, earned);
 
   /// Create a copy of BadgeItem
   /// with the given fields replaced by the non-null parameter values.
@@ -169,11 +184,14 @@ class _$BadgeItemImpl implements _BadgeItem {
 
 abstract class _BadgeItem implements BadgeItem {
   const factory _BadgeItem({
+    required final String id,
     required final String title,
     required final String note,
     required final bool earned,
   }) = _$BadgeItemImpl;
 
+  @override
+  String get id;
   @override
   String get title;
   @override

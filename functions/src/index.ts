@@ -8,3 +8,4 @@ export { deleteAccount } from "./callable/delete-account";
 export { onUserRoleAssigned } from "./triggers/on-user-role-assigned";
 export { sessionReminderCheck } from "./scheduled/session-reminder-check";
 export { sessionCompletionCheck } from "./scheduled/session-completion-check";
+export { badgeCheck } from "./scheduled/badge-check";

@@ -27,6 +27,12 @@ abstract final class RemoteConfigKeys {
       'cfg_feedback_reminder_day_of_month';
   static const freeVersionAdsEnabled = 'cfg_free_version_ads_enabled';
   static const featureFlags = 'cfg_feature_flags';
+  /// F4-4 — rozet kriterleri: `[{id, title, note, type, threshold}]`.
+  /// `type`: sessionsCompleted | groupSessionJoins | eventJoins |
+  /// membershipMonths. Yeni bir rozet eklemek/eşiği değiştirmek için store
+  /// güncellemesi gerekmiyor — `badgeCheck` scheduled function'ı da aynı
+  /// şablonu okuyor.
+  static const badgeCriteria = 'cfg_badge_criteria';
   /// F3-3 — üye/antrenör için seans iptali son kaç saate kadar açık.
   /// Gerçek zorlama `firestore.rules`'ta (Security Rules Remote Config'e
   /// erişemediği için orada sabit 24 olarak tutuluyor) — bu değer sadece
@@ -473,6 +479,17 @@ abstract final class RemoteConfigKeys {
 class RemoteConfigService {
   const RemoteConfigService();
 
+  static const _defaultBadgeCriteriaJson = '''
+[
+  {"id": "first_session", "title": "İlk dersin", "note": "İlk dersini tamamla", "type": "sessionsCompleted", "threshold": 1},
+  {"id": "sessions_5", "title": "5 ders tamam", "note": "5 ders tamamla", "type": "sessionsCompleted", "threshold": 5},
+  {"id": "sessions_20", "title": "20 ders tamam", "note": "20 ders tamamla", "type": "sessionsCompleted", "threshold": 20},
+  {"id": "group_session_join", "title": "Grup dersi", "note": "Bir grup dersine katıl", "type": "groupSessionJoins", "threshold": 1},
+  {"id": "event_join", "title": "Etkinlik", "note": "Bir etkinliğe katıl", "type": "eventJoins", "threshold": 1},
+  {"id": "membership_6_months", "title": "6 ay üyelik", "note": "6 ay üyeliğini sürdür", "type": "membershipMonths", "threshold": 6}
+]
+''';
+
   static const Map<String, Object> _defaults = {
     RemoteConfigKeys.sessionReminderMinutesBefore: 60,
     RemoteConfigKeys.defaultGroupSessionCapacity: 6,
@@ -485,6 +502,7 @@ class RemoteConfigService {
     RemoteConfigKeys.feedbackReminderDayOfMonth: -1,
     RemoteConfigKeys.freeVersionAdsEnabled: true,
     RemoteConfigKeys.featureFlags: '{}',
+    RemoteConfigKeys.badgeCriteria: _defaultBadgeCriteriaJson,
     'lbl_notif_session_reminder_title_tr': '⏰ Bugün {time}\'de dersin var!',
     'lbl_notif_session_reminder_body_tr': '{trainerName} seni bekliyor. Gelip gelmeyeceğini onaylamak için dokun 👇',
     'lbl_notif_session_completion_title_tr': '✅ Dersini onaylar mısın?',
@@ -1144,6 +1162,10 @@ class RemoteConfigService {
   Map<String, dynamic> get featureFlags =>
       _getJsonMap(RemoteConfigKeys.featureFlags);
 
+  /// F4-4 — rozet kriterleri listesi (kodda değil RC'de tanımlı).
+  List<Map<String, dynamic>> get badgeCriteria =>
+      _getJsonList(RemoteConfigKeys.badgeCriteria);
+
   /// `lbl*` metinlerini okur: `<key>_<currentLocale>` parametresini getirir.
   /// Kod içinde `_tr`/`_en` asla elle yazılmaz, bu metod ekler.
   String getText(String baseKey) => getString('${baseKey}_$currentLocale');
@@ -1183,6 +1205,17 @@ class RemoteConfigService {
       return decoded is Map<String, dynamic> ? decoded : const {};
     } on FormatException {
       return const {};
+    }
+  }
+
+  List<Map<String, dynamic>> _getJsonList(String key) {
+    final raw = getString(key);
+    if (raw.isEmpty) return const [];
+    try {
+      final decoded = jsonDecode(raw);
+      return decoded is List ? decoded.whereType<Map<String, dynamic>>().toList() : const [];
+    } on FormatException {
+      return const [];
     }
   }
 }
