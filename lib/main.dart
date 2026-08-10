@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -44,6 +45,7 @@ class EgoractiveApp extends ConsumerWidget {
         colors: colors,
         typography: AppTypography.standard(),
       ),
+      localizationsDelegates: const [FlutterQuillLocalizations.delegate],
       home: const _AppRoot(),
     );
   }
