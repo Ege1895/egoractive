@@ -63,6 +63,20 @@
       "description": "Aylık geri bildirim hatırlatmasının gönderileceği gün. -1 = ayın son günü.",
       "valueType": "NUMBER"
     },
+    "cfg_weekly_report_day_of_week": {
+      "defaultValue": {
+        "value": "1"
+      },
+      "description": "F5-2 — haftalık salon/muhasebe/antrenör raporlarının gönderileceği gün. ISO hafta günü: 1=Pazartesi ... 7=Pazar. Yalnızca Cloud Functions tarafından okunur.",
+      "valueType": "NUMBER"
+    },
+    "cfg_weekly_report_hour": {
+      "defaultValue": {
+        "value": "6"
+      },
+      "description": "F5-2 — haftalık raporların gönderileceği saat (İstanbul yerel saati, 0-23). Yalnızca Cloud Functions tarafından okunur.",
+      "valueType": "NUMBER"
+    },
     "cfg_free_version_ads_enabled": {
       "defaultValue": {
         "value": "true"

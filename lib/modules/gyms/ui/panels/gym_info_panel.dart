@@ -8,6 +8,8 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_back_button.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_text_field.dart';
+import '../../../reports/controller/report_recipients_controller.dart';
+import '../../../reports/domain/report_recipients.dart';
 import '../../controller/gym_profile_controller.dart';
 import '../../controller/gym_theme_controller.dart';
 import '../../domain/gym_theme.dart';
@@ -25,6 +27,8 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
   late final TextEditingController _nameController;
   late final TextEditingController _addressController;
   late final TextEditingController _phoneController;
+  late final TextEditingController _gymReportEmailController;
+  late final TextEditingController _accountingReportEmailController;
 
   @override
   void initState() {
@@ -33,6 +37,10 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
     _nameController = TextEditingController(text: profile.name);
     _addressController = TextEditingController(text: '${profile.address}, ${profile.city}');
     _phoneController = TextEditingController(text: profile.phone);
+
+    final recipients = ref.read(reportRecipientsControllerProvider);
+    _gymReportEmailController = TextEditingController(text: recipients.gymReportEmail);
+    _accountingReportEmailController = TextEditingController(text: recipients.accountingReportEmail);
   }
 
   @override
@@ -209,6 +217,59 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
                       ],
                     ),
                   ),
+                  const SizedBox(height: AppSpacing.lg),
+                  Text('RAPOR E-POSTALARI', style: typography.caption.copyWith(color: colors.onSurfaceMuted, letterSpacing: 1.2)),
+                  const SizedBox(height: AppSpacing.sm),
+                  Container(
+                    padding: const EdgeInsets.all(AppSpacing.lg),
+                    decoration: BoxDecoration(
+                      color: colors.surface,
+                      borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
+                      border: Border.all(color: colors.outline),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Haftalık salon ve muhasebe özeti bu adreslere e-posta ile gönderilir.',
+                          style: typography.caption.copyWith(color: colors.onSurfaceMuted, height: 1.4),
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+                        AppTextField(
+                          label: 'Salon raporu e-postası',
+                          hint: 'admin@stüdyo.com',
+                          keyboardType: TextInputType.emailAddress,
+                          controller: _gymReportEmailController,
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+                        AppTextField(
+                          label: 'Muhasebe raporu e-postası',
+                          hint: 'muhasebe@stüdyo.com',
+                          keyboardType: TextInputType.emailAddress,
+                          controller: _accountingReportEmailController,
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+                        Material(
+                          color: Colors.transparent,
+                          borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+                            onTap: () => ref.read(reportRecipientsControllerProvider.notifier).save(
+                                  ReportRecipients(
+                                    gymReportEmail: _gymReportEmailController.text.trim(),
+                                    accountingReportEmail: _accountingReportEmailController.text.trim(),
+                                  ),
+                                ),
+                            child: Container(
+                              constraints: const BoxConstraints(minHeight: 44),
+                              alignment: Alignment.centerLeft,
+                              child: Text('Rapor e-postalarını kaydet', style: typography.headingSmall.copyWith(fontSize: 14, color: colors.onPrimaryContainer)),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -227,6 +288,8 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
     _nameController.dispose();
     _addressController.dispose();
     _phoneController.dispose();
+    _gymReportEmailController.dispose();
+    _accountingReportEmailController.dispose();
     super.dispose();
   }
 }
