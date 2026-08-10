@@ -6,7 +6,8 @@ import '../service/badges_service.dart';
 part 'badges_repository.g.dart';
 
 abstract interface class BadgesRepository {
-  List<BadgeItem> loadBadges();
+  List<BadgeItem> buildBadges(List<String> earnedIds);
+  Stream<List<String>> earnedBadgeIds(String uid);
 }
 
 class BadgesRepositoryImpl implements BadgesRepository {
@@ -15,7 +16,10 @@ class BadgesRepositoryImpl implements BadgesRepository {
   final BadgesService _service;
 
   @override
-  List<BadgeItem> loadBadges() => _service.loadBadges();
+  List<BadgeItem> buildBadges(List<String> earnedIds) => _service.buildBadges(earnedIds);
+
+  @override
+  Stream<List<String>> earnedBadgeIds(String uid) => _service.earnedBadgeIds(uid);
 }
 
 @riverpod

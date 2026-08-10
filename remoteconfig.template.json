@@ -77,6 +77,13 @@
       "description": "Feature flag'lerin tutulduğu JSON obje (esnek, sabit alanı yok).",
       "valueType": "JSON"
     },
+    "cfg_badge_criteria": {
+      "defaultValue": {
+        "value": "[{\"id\": \"first_session\", \"title\": \"İlk dersin\", \"note\": \"İlk dersini tamamla\", \"type\": \"sessionsCompleted\", \"threshold\": 1}, {\"id\": \"sessions_5\", \"title\": \"5 ders tamam\", \"note\": \"5 ders tamamla\", \"type\": \"sessionsCompleted\", \"threshold\": 5}, {\"id\": \"sessions_20\", \"title\": \"20 ders tamam\", \"note\": \"20 ders tamamla\", \"type\": \"sessionsCompleted\", \"threshold\": 20}, {\"id\": \"group_session_join\", \"title\": \"Grup dersi\", \"note\": \"Bir grup dersine katıl\", \"type\": \"groupSessionJoins\", \"threshold\": 1}, {\"id\": \"event_join\", \"title\": \"Etkinlik\", \"note\": \"Bir etkinliğe katıl\", \"type\": \"eventJoins\", \"threshold\": 1}, {\"id\": \"membership_6_months\", \"title\": \"6 ay üyelik\", \"note\": \"6 ay üyeliğini sürdür\", \"type\": \"membershipMonths\", \"threshold\": 6}]"
+      },
+      "description": "F4-4 — rozet kriterleri: id/title/note/type/threshold listesi. type: sessionsCompleted | groupSessionJoins | eventJoins | membershipMonths. badgeCheck scheduled function ve client aynı şablonu okur.",
+      "valueType": "JSON"
+    },
     "lbl_notif_session_reminder_title_tr": {
       "defaultValue": {
         "value": "⏰ Bugün {time}'de dersin var!"
