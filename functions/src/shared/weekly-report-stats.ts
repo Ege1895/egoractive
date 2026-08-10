@@ -1,0 +1,119 @@
+import { AggregateField, Firestore, Timestamp } from "firebase-admin/firestore";
+
+export interface GymWeeklyStats {
+  totalSessions: number;
+  completedSessions: number;
+  cancelledSessions: number;
+  revenueTl: number;
+  expensesTl: number;
+}
+
+export interface TrainerWeeklyStats {
+  totalSessions: number;
+  completedSessions: number;
+}
+
+export interface ExpenseCategoryTotal {
+  category: string;
+  amountTl: number;
+}
+
+/** F5-1'deki dashboard ile aynı yaklaşım: sayımlar `count()`/`sum()`
+ * aggregation query'leriyle, hiçbir doküman client'a (fonksiyona) çekilmeden
+ * hesaplanır. */
+export async function fetchGymWeeklyStats(
+  db: Firestore,
+  gymId: string,
+  weekStart: Date,
+  weekEnd: Date,
+): Promise<GymWeeklyStats> {
+  const start = Timestamp.fromDate(weekStart);
+  const end = Timestamp.fromDate(weekEnd);
+
+  const weekSessions = db
+    .collection("sessions")
+    .where("gymId", "==", gymId)
+    .where("startTime", ">=", start)
+    .where("startTime", "<", end);
+
+  const [totalSnap, completedSnap, cancelledSnap, revenueSnap, expensesSnap] = await Promise.all([
+    weekSessions.count().get(),
+    weekSessions.where("status", "==", "completed").count().get(),
+    weekSessions.where("status", "==", "cancelled").count().get(),
+    db
+      .collection("memberPackages")
+      .where("gymId", "==", gymId)
+      .where("purchasedAt", ">=", start)
+      .where("purchasedAt", "<", end)
+      .aggregate({ total: AggregateField.sum("paidAmount") })
+      .get(),
+    db
+      .collection("expenses")
+      .where("gymId", "==", gymId)
+      .where("date", ">=", start)
+      .where("date", "<", end)
+      .aggregate({ total: AggregateField.sum("amountTl") })
+      .get(),
+  ]);
+
+  return {
+    totalSessions: totalSnap.data().count,
+    completedSessions: completedSnap.data().count,
+    cancelledSessions: cancelledSnap.data().count,
+    revenueTl: Math.round(revenueSnap.data().total ?? 0),
+    expensesTl: Math.round(expensesSnap.data().total ?? 0),
+  };
+}
+
+export async function fetchTrainerWeeklyStats(
+  db: Firestore,
+  gymId: string,
+  trainerId: string,
+  weekStart: Date,
+  weekEnd: Date,
+): Promise<TrainerWeeklyStats> {
+  const start = Timestamp.fromDate(weekStart);
+  const end = Timestamp.fromDate(weekEnd);
+  const weekSessions = db
+    .collection("sessions")
+    .where("gymId", "==", gymId)
+    .where("trainerId", "==", trainerId)
+    .where("startTime", ">=", start)
+    .where("startTime", "<", end);
+
+  const [totalSnap, completedSnap] = await Promise.all([
+    weekSessions.count().get(),
+    weekSessions.where("status", "==", "completed").count().get(),
+  ]);
+
+  return { totalSessions: totalSnap.data().count, completedSessions: completedSnap.data().count };
+}
+
+/** Muhasebe raporu kategori kırılımı için — haftalık gider hacmi düşük
+ * olduğundan (F5-1'in 10.000+ seans endişesinin aksine) dokümanları
+ * doğrudan okumak burada güvenli. */
+export async function fetchExpenseCategoryTotals(
+  db: Firestore,
+  gymId: string,
+  weekStart: Date,
+  weekEnd: Date,
+): Promise<ExpenseCategoryTotal[]> {
+  const snapshot = await db
+    .collection("expenses")
+    .where("gymId", "==", gymId)
+    .where("date", ">=", Timestamp.fromDate(weekStart))
+    .where("date", "<", Timestamp.fromDate(weekEnd))
+    .get();
+
+  const totals = new Map<string, number>();
+  for (const doc of snapshot.docs) {
+    const data = doc.data();
+    const category = (data.category as string | undefined) ?? "Diğer";
+    const amount = (data.amountTl as number | undefined) ?? 0;
+    totals.set(category, (totals.get(category) ?? 0) + amount);
+  }
+
+  return [...totals.entries()]
+    .map(([category, amountTl]) => ({ category, amountTl }))
+    .sort((a, b) => b.amountTl - a.amountTl);
+}
