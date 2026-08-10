@@ -8,6 +8,7 @@ import '../../../../shared/mock/trainer_mock_data.dart';
 import '../../../auth/controller/auth_controller.dart';
 import '../../../auth/ui/panels/delete_account_confirm_panel.dart';
 import '../../../auth/ui/panels/phone_login_panel.dart';
+import '../../../gyms/ui/panels/gym_rules_view_panel.dart';
 
 /// Antrenör · Profil (Profil sekmesi kökü) — üye Profilim'in sade antrenör
 /// karşılığı, rozet/geri bildirim gibi üyeye özgü bölümler içermez.
@@ -70,7 +71,13 @@ class TrainerProfilePanel extends ConsumerWidget {
                 borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
                 border: Border.all(color: colors.outline),
               ),
-              child: const Column(children: [_NavRow(label: 'Stüdyo kuralları', isLast: true)]),
+              child: Column(children: [
+                _NavRow(
+                  label: 'Stüdyo kuralları',
+                  isLast: true,
+                  onTap: () => panelStack.push(const GymRulesViewPanel()),
+                ),
+              ]),
             ),
             const SizedBox(height: AppSpacing.lg),
             Container(

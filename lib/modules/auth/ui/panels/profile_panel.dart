@@ -9,6 +9,7 @@ import '../../../../shared/mock/member_mock_profile.dart';
 import '../../../../shared/utils/phone_number_formatter.dart';
 import '../../../badges/ui/panels/badges_panel.dart';
 import '../../../feedback/ui/panels/feedback_panel.dart';
+import '../../../gyms/ui/panels/gym_rules_view_panel.dart';
 import '../../controller/auth_controller.dart';
 import 'delete_account_confirm_panel.dart';
 import 'phone_login_panel.dart';
@@ -111,7 +112,10 @@ class ProfilePanel extends ConsumerWidget {
                     label: 'Geri bildirim ver',
                     onTap: () => panelStack.push(const FeedbackPanel()),
                   ),
-                  const _NavRow(label: 'Stüdyo kuralları'),
+                  _NavRow(
+                    label: 'Stüdyo kuralları',
+                    onTap: () => panelStack.push(const GymRulesViewPanel()),
+                  ),
                   Container(
                     constraints: const BoxConstraints(minHeight: 56),
                     child: Row(

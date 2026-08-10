@@ -15,7 +15,7 @@ import '../../../sessions/ui/panels/admin_session_management_panel.dart';
 import '../../../trainers/ui/panels/admin_trainer_management_panel.dart';
 import 'admin_permissions_panel.dart';
 import 'gym_info_panel.dart';
-import 'studio_rules_panel.dart';
+import 'gym_rules_view_panel.dart';
 
 /// Admin · Ayarlar (Ayarlar sekmesi kökü) — kurulum ekranlarına giriş
 /// noktası: Salon Bilgileri, Antrenör Yönetimi, Stüdyo Paketleri.
@@ -76,7 +76,7 @@ class AdminSettingsPanel extends ConsumerWidget {
               ),
               child: Column(
                 children: [
-                  _NavRow(label: 'Stüdyo kuralları', onTap: () => panelStack.push(const StudioRulesPanel())),
+                  _NavRow(label: 'Stüdyo kuralları', onTap: () => panelStack.push(const GymRulesViewPanel(showEditButton: true))),
                   _NavRow(label: 'Yetki ayarları', onTap: () => panelStack.push(const AdminPermissionsPanel())),
                   _NavRow(label: 'Geri bildirimler', onTap: () => panelStack.push(const AdminFeedbackListPanel())),
                   _NavRow(label: 'Bildirim gönder', isLast: true, onTap: () => panelStack.push(const SendNotificationPanel())),

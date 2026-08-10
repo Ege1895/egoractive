@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -12,8 +13,8 @@ import 'package:egoractive/modules/expenses/ui/panels/admin_expenses_panel.dart'
 import 'package:egoractive/modules/feedback/ui/panels/admin_feedback_list_panel.dart';
 import 'package:egoractive/modules/group_sessions/ui/panels/admin_group_sessions_panel.dart';
 import 'package:egoractive/modules/gyms/ui/panels/admin_permissions_panel.dart';
-import 'package:egoractive/modules/gyms/ui/panels/edit_studio_rules_panel.dart';
-import 'package:egoractive/modules/gyms/ui/panels/studio_rules_panel.dart';
+import 'package:egoractive/modules/gyms/ui/panels/gym_rules_editor_panel.dart';
+import 'package:egoractive/modules/gyms/ui/panels/gym_rules_view_panel.dart';
 import 'package:egoractive/modules/members/ui/panels/admin_member_detail_panel.dart';
 import 'package:egoractive/modules/notifications/ui/panels/send_notification_panel.dart';
 import 'package:egoractive/modules/sessions/ui/panels/admin_calendar_panel.dart';
@@ -23,6 +24,7 @@ Widget _wrap(Widget child) {
   return ProviderScope(
     child: MaterialApp(
       theme: AppTheme.build(colors: AppColorScheme.defaultScheme(), typography: AppTypography.standard()),
+      localizationsDelegates: const [FlutterQuillLocalizations.delegate],
       home: Scaffold(body: child),
     ),
   );
@@ -37,8 +39,8 @@ void main() {
     'CreateEventPanel': const CreateEventPanel(),
     'AdminExpensesPanel': const AdminExpensesPanel(),
     'AddExpensePanel': const AddExpensePanel(),
-    'StudioRulesPanel': const StudioRulesPanel(),
-    'EditStudioRulesPanel': const EditStudioRulesPanel(),
+    'GymRulesViewPanel': const GymRulesViewPanel(),
+    'GymRulesEditorPanel': const GymRulesEditorPanel(),
     'AdminPermissionsPanel': const AdminPermissionsPanel(),
     'AdminFeedbackListPanel': const AdminFeedbackListPanel(),
     'SendNotificationPanel': const SendNotificationPanel(),
@@ -48,7 +50,10 @@ void main() {
   for (final entry in panels.entries) {
     testWidgets('${entry.key} renders without overflow or render errors', (tester) async {
       await tester.pumpWidget(_wrap(entry.value));
-      await tester.pump();
+      // GymRulesEditorPanel'in Quill araç çubuğu ilk frame'de sıfır süreli bir
+      // Timer.run() zamanlayıcısı kuruyor (kaydırma okları için) — sahte saati
+      // ilerletmeden pump() bunu temizlemiyor.
+      await tester.pump(const Duration(milliseconds: 10));
       expect(tester.takeException(), isNull, reason: '${entry.key} threw during initial render');
     });
 
@@ -56,7 +61,7 @@ void main() {
       await tester.binding.setSurfaceSize(const Size(375, 667));
       addTearDown(() => tester.binding.setSurfaceSize(null));
       await tester.pumpWidget(_wrap(entry.value));
-      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 10));
       expect(tester.takeException(), isNull, reason: '${entry.key} threw on a small screen');
     });
   }
