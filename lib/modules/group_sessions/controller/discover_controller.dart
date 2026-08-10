@@ -4,6 +4,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/remote_config/remote_config_service.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/theme_controller.dart';
+import '../../events/service/events_write_service.dart';
 import '../domain/discover_item.dart';
 import '../repository/discover_repository.dart';
 import '../service/group_sessions_write_service.dart';
@@ -26,10 +27,10 @@ Stream<List<DiscoverItem>> _groupSessionsForGym(_GroupSessionsForGymRef ref, Str
       .where('startTime', isGreaterThanOrEqualTo: now)
       .orderBy('startTime')
       .snapshots()
-      .map((snapshot) => snapshot.docs.map((doc) => _toDiscoverItem(doc, myUid, lockHours)).toList());
+      .map((snapshot) => snapshot.docs.map((doc) => _toGroupSessionItem(doc, myUid, lockHours)).toList());
 }
 
-DiscoverItem _toDiscoverItem(QueryDocumentSnapshot<Map<String, dynamic>> doc, String myUid, int lockHours) {
+DiscoverItem _toGroupSessionItem(QueryDocumentSnapshot<Map<String, dynamic>> doc, String myUid, int lockHours) {
   final data = doc.data();
   final startTime = (data['startTime'] as Timestamp).toDate();
   final attendeeIds = List<String>.from(data['attendeeIds'] as List? ?? const []);
@@ -43,16 +44,49 @@ DiscoverItem _toDiscoverItem(QueryDocumentSnapshot<Map<String, dynamic>> doc, St
     title: (data['title'] as String?) ?? '',
     meta: '${(data['trainerName'] as String?) ?? ''} · ${_weekdayNames[startTime.weekday]} $time · $durationMinutes dk',
     taken: attendeeIds.length,
-    capacity: (data['capacity'] as num?)?.toInt() ?? 0,
+    capacity: (data['capacity'] as num?)?.toInt(),
     joined: attendeeIds.contains(myUid),
     startTime: startTime,
     lockHoursBefore: lockHours,
   );
 }
 
-/// F4-2 — üyenin salonunda ileri tarihli, gerçek zamanlı grup dersleri.
-/// Etkinlikler (F4-3) hâlâ mock — sadece grup dersleri kategorisi gerçeğe
-/// bağlandı.
+@riverpod
+Stream<List<DiscoverItem>> _eventsForGym(_EventsForGymRef ref, String gymId, String myUid) {
+  final lockHours = ref.watch(remoteConfigServiceProvider).groupSessionLockHoursBefore;
+  final now = Timestamp.now();
+  return FirebaseFirestore.instance
+      .collection('events')
+      .where('gymId', isEqualTo: gymId)
+      .where('dateTime', isGreaterThanOrEqualTo: now)
+      .orderBy('dateTime')
+      .snapshots()
+      .map((snapshot) => snapshot.docs.map((doc) => _toEventItem(doc, myUid, lockHours)).toList());
+}
+
+DiscoverItem _toEventItem(QueryDocumentSnapshot<Map<String, dynamic>> doc, String myUid, int lockHours) {
+  final data = doc.data();
+  final dateTime = (data['dateTime'] as Timestamp).toDate();
+  final attendeeIds = List<String>.from(data['attendeeIds'] as List? ?? const []);
+  final time = '${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
+  return DiscoverItem(
+    id: doc.id,
+    category: DiscoverCategory.events,
+    day: dateTime.day.toString().padLeft(2, '0'),
+    month: _monthAbbrev[dateTime.month] ?? '',
+    title: (data['name'] as String?) ?? '',
+    meta: '${(data['location'] as String?) ?? ''} · ${_weekdayNames[dateTime.weekday]} $time',
+    taken: attendeeIds.length,
+    capacity: (data['capacity'] as num?)?.toInt(),
+    joined: attendeeIds.contains(myUid),
+    startTime: dateTime,
+    lockHoursBefore: lockHours,
+  );
+}
+
+/// F4-2/F4-3 — üyenin salonunda ileri tarihli, gerçek zamanlı grup dersleri
+/// ve etkinlikler. Kontenjan katılım/ayrılma her iki kategori için de
+/// `CapacityService` üzerinden ortak mantıkla yapılır.
 @riverpod
 class DiscoverController extends _$DiscoverController {
   @override
@@ -63,35 +97,37 @@ class DiscoverController extends _$DiscoverController {
     if (gymId == null || uid == null) return mock;
 
     final groupSessions = ref.watch(_groupSessionsForGymProvider(gymId, uid)).valueOrNull;
-    if (groupSessions == null) return mock;
+    final events = ref.watch(_eventsForGymProvider(gymId, uid)).valueOrNull;
+    if (groupSessions == null || events == null) return mock;
 
-    final events = mock.where((i) => i.category == DiscoverCategory.events).toList();
     return [...groupSessions, ...events];
   }
 
   Future<void> toggleJoin(String id) async {
     final uid = ref.read(authStateProvider).valueOrNull?.uid;
-    final item = state.where((i) => i.id == id).firstOrNullFallback();
-    if (uid == null || item == null || item.isLocked) return;
+    final matches = state.where((i) => i.id == id);
+    if (uid == null || matches.isEmpty) return;
+    final item = matches.first;
+    if (item.isLocked) return;
 
-    final service = ref.read(groupSessionsWriteServiceProvider);
+    Future<void> leave() => item.category == DiscoverCategory.groupSessions
+        ? ref.read(groupSessionsWriteServiceProvider).leave(sessionId: id, uid: uid)
+        : ref.read(eventsWriteServiceProvider).leave(eventId: id, uid: uid);
+
+    Future<void> join() => item.category == DiscoverCategory.groupSessions
+        ? ref.read(groupSessionsWriteServiceProvider).join(sessionId: id, uid: uid)
+        : ref.read(eventsWriteServiceProvider).join(eventId: id, uid: uid);
+
     if (item.joined) {
-      await service.leave(sessionId: id, uid: uid);
+      await leave();
     } else {
       if (item.isFull) return;
       try {
-        await service.join(sessionId: id, uid: uid);
+        await join();
       } catch (_) {
         // Kontenjan tam o an dolduysa (yarış durumu) sessizce yok say —
         // gerçek zamanlı stream zaten güncel dolu durumunu yansıtacak.
       }
     }
-  }
-}
-
-extension _FirstOrNull<T> on Iterable<T> {
-  T? firstOrNullFallback() {
-    final it = iterator;
-    return it.moveNext() ? it.current : null;
   }
 }

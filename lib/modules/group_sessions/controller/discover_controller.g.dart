@@ -7,7 +7,7 @@ part of 'discover_controller.dart';
 // **************************************************************************
 
 String _$groupSessionsForGymHash() =>
-    r'363adacfa612f52fdbd7399e119f6a7d5ceb47ec';
+    r'3156fbbdd5e6dc62b65dba112372fe434a55b584';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -165,12 +165,145 @@ class _GroupSessionsForGymProviderElement
   String get myUid => (origin as _GroupSessionsForGymProvider).myUid;
 }
 
-String _$discoverControllerHash() =>
-    r'2d3cd470c6b0832b26d8124e0bba4ced7cbc8fd4';
+String _$eventsForGymHash() => r'4873549f21c61b0dcb82f792106fd06a71af1d39';
 
-/// F4-2 — üyenin salonunda ileri tarihli, gerçek zamanlı grup dersleri.
-/// Etkinlikler (F4-3) hâlâ mock — sadece grup dersleri kategorisi gerçeğe
-/// bağlandı.
+/// See also [_eventsForGym].
+@ProviderFor(_eventsForGym)
+const _eventsForGymProvider = _EventsForGymFamily();
+
+/// See also [_eventsForGym].
+class _EventsForGymFamily extends Family<AsyncValue<List<DiscoverItem>>> {
+  /// See also [_eventsForGym].
+  const _EventsForGymFamily();
+
+  /// See also [_eventsForGym].
+  _EventsForGymProvider call(String gymId, String myUid) {
+    return _EventsForGymProvider(gymId, myUid);
+  }
+
+  @override
+  _EventsForGymProvider getProviderOverride(
+    covariant _EventsForGymProvider provider,
+  ) {
+    return call(provider.gymId, provider.myUid);
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'_eventsForGymProvider';
+}
+
+/// See also [_eventsForGym].
+class _EventsForGymProvider
+    extends AutoDisposeStreamProvider<List<DiscoverItem>> {
+  /// See also [_eventsForGym].
+  _EventsForGymProvider(String gymId, String myUid)
+    : this._internal(
+        (ref) => _eventsForGym(ref as _EventsForGymRef, gymId, myUid),
+        from: _eventsForGymProvider,
+        name: r'_eventsForGymProvider',
+        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+            ? null
+            : _$eventsForGymHash,
+        dependencies: _EventsForGymFamily._dependencies,
+        allTransitiveDependencies:
+            _EventsForGymFamily._allTransitiveDependencies,
+        gymId: gymId,
+        myUid: myUid,
+      );
+
+  _EventsForGymProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.gymId,
+    required this.myUid,
+  }) : super.internal();
+
+  final String gymId;
+  final String myUid;
+
+  @override
+  Override overrideWith(
+    Stream<List<DiscoverItem>> Function(_EventsForGymRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: _EventsForGymProvider._internal(
+        (ref) => create(ref as _EventsForGymRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        gymId: gymId,
+        myUid: myUid,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeStreamProviderElement<List<DiscoverItem>> createElement() {
+    return _EventsForGymProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is _EventsForGymProvider &&
+        other.gymId == gymId &&
+        other.myUid == myUid;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, gymId.hashCode);
+    hash = _SystemHash.combine(hash, myUid.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin _EventsForGymRef on AutoDisposeStreamProviderRef<List<DiscoverItem>> {
+  /// The parameter `gymId` of this provider.
+  String get gymId;
+
+  /// The parameter `myUid` of this provider.
+  String get myUid;
+}
+
+class _EventsForGymProviderElement
+    extends AutoDisposeStreamProviderElement<List<DiscoverItem>>
+    with _EventsForGymRef {
+  _EventsForGymProviderElement(super.provider);
+
+  @override
+  String get gymId => (origin as _EventsForGymProvider).gymId;
+  @override
+  String get myUid => (origin as _EventsForGymProvider).myUid;
+}
+
+String _$discoverControllerHash() =>
+    r'd44f072d26d301b8d90a5c0bea1f4e3aa118db16';
+
+/// F4-2/F4-3 — üyenin salonunda ileri tarihli, gerçek zamanlı grup dersleri
+/// ve etkinlikler. Kontenjan katılım/ayrılma her iki kategori için de
+/// `CapacityService` üzerinden ortak mantıkla yapılır.
 ///
 /// Copied from [DiscoverController].
 @ProviderFor(DiscoverController)

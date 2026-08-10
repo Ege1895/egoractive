@@ -491,3 +491,70 @@ test("YÜK TESTİ: 10 eşzamanlı katılım isteğinde kontenjan (capacity=5) hi
     assert.equal(new Set(finalAttendees).size, 5, "attendeeIds içinde tekrar olmamalı");
   });
 });
+
+// --- events/{id} (F4-3) — groupSessions ile aynı kontenjan kuralları ---
+
+async function seedEvent(id, { capacity, attendeeIds = [] }) {
+  await testEnv.withSecurityRulesDisabled(async (context) => {
+    await setDoc(context.firestore().doc(`events/${id}`), {
+      gymId: "gym-a",
+      name: "Yaz Şenliği",
+      location: "Bahçe",
+      capacity,
+      attendeeIds,
+    });
+  });
+}
+
+test("admin can create an event for their own gym (positive)", async () => {
+  const db = contextFor("admin-a", { role: "admin", gymId: "gym-a" }).firestore();
+  await assertSucceeds(
+    setDoc(doc(db, "events/ev1"), { gymId: "gym-a", name: "Yaz Şenliği", capacity: 20, attendeeIds: [] }),
+  );
+});
+
+test("trainer can create an event for their own gym (positive)", async () => {
+  const db = contextFor("trainer-a", { role: "trainer", gymId: "gym-a" }).firestore();
+  await assertSucceeds(
+    setDoc(doc(db, "events/ev1"), { gymId: "gym-a", name: "Yaz Şenliği", capacity: 20, attendeeIds: [] }),
+  );
+});
+
+test("member cannot create an event (negative)", async () => {
+  const db = contextFor("member-a1", { role: "member", gymId: "gym-a" }).firestore();
+  await assertFails(
+    setDoc(doc(db, "events/ev1"), { gymId: "gym-a", name: "Yaz Şenliği", capacity: 20, attendeeIds: [] }),
+  );
+});
+
+test("member can join an event with room left (positive)", async () => {
+  await seedEvent("ev1", { capacity: 2, attendeeIds: [] });
+  const db = contextFor("member-a1", { role: "member", gymId: "gym-a" }).firestore();
+  await assertSucceeds(updateDoc(doc(db, "events/ev1"), { attendeeIds: arrayUnion("member-a1") }));
+});
+
+test("member cannot join a full event (negative — kontenjan dolu)", async () => {
+  await seedEvent("ev1", { capacity: 1, attendeeIds: ["member-a2"] });
+  const db = contextFor("member-a1", { role: "member", gymId: "gym-a" }).firestore();
+  await assertFails(updateDoc(doc(db, "events/ev1"), { attendeeIds: arrayUnion("member-a1") }));
+});
+
+test("member can join an unlimited-capacity event (positive — capacity null)", async () => {
+  await seedEvent("ev1", { capacity: null, attendeeIds: [] });
+  const db = contextFor("member-a1", { role: "member", gymId: "gym-a" }).firestore();
+  await assertSucceeds(updateDoc(doc(db, "events/ev1"), { attendeeIds: arrayUnion("member-a1") }));
+});
+
+test("member can leave an event they joined (positive)", async () => {
+  await seedEvent("ev1", { capacity: 8, attendeeIds: ["member-a1"] });
+  const db = contextFor("member-a1", { role: "member", gymId: "gym-a" }).firestore();
+  await assertSucceeds(updateDoc(doc(db, "events/ev1"), { attendeeIds: [] }));
+});
+
+test("member cannot change other fields while joining an event (negative — sadece attendeeIds)", async () => {
+  await seedEvent("ev1", { capacity: 8, attendeeIds: [] });
+  const db = contextFor("member-a1", { role: "member", gymId: "gym-a" }).firestore();
+  await assertFails(
+    updateDoc(doc(db, "events/ev1"), { attendeeIds: arrayUnion("member-a1"), capacity: 100 }),
+  );
+});

@@ -5,10 +5,15 @@ import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/theme/theme_controller.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_text_field.dart';
-import '../../controller/gym_events_controller.dart';
-import '../../domain/gym_event.dart';
+import '../../service/events_write_service.dart';
+
+const _monthAbbrevToNumber = {
+  'Oca': 1, 'Şub': 2, 'Mar': 3, 'Nis': 4, 'May': 5, 'Haz': 6,
+  'Tem': 7, 'Ağu': 8, 'Eyl': 9, 'Eki': 10, 'Kas': 11, 'Ara': 12,
+};
 
 /// Admin 13 · Etkinlik Oluştur — lokasyon, tarih/saat, kontenjan.
 class CreateEventPanel extends BasePanel {
@@ -105,22 +110,23 @@ class _CreateEventPanelState extends BasePanelState<CreateEventPanel> {
               padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.md, AppSpacing.screenEdge, AppSpacing.lg),
               child: AppButton(
                 label: 'Etkinliği oluştur',
-                onPressed: () {
+                onPressed: () async {
                   final name = _nameController.text.trim();
-                  if (name.isEmpty) return;
-                  final dateParts = _dateController.text.trim().split(' ');
-                  ref.read(gymEventsControllerProvider.notifier).addEvent(
-                        GymEvent(
-                          id: name.toLowerCase().replaceAll(' ', '-'),
-                          name: name,
-                          location: _locationController.text.trim(),
-                          day: dateParts.isNotEmpty ? dateParts.first : '1',
-                          month: dateParts.length > 1 ? dateParts[1] : '',
-                          meta: _descriptionController.text.trim(),
-                          joined: 0,
-                          capacity: _capacity,
-                        ),
+                  final dateTime = _parseDateTime(_dateController.text, _timeController.text);
+                  if (name.isEmpty || dateTime == null) return;
+
+                  final gymId = await ref.read(activeGymIdProvider.future);
+                  if (gymId == null) return;
+
+                  await ref.read(eventsWriteServiceProvider).createEvent(
+                        gymId: gymId,
+                        name: name,
+                        location: _locationController.text.trim(),
+                        dateTime: dateTime,
+                        description: _descriptionController.text.trim(),
+                        capacity: _capacity,
                       );
+                  if (!mounted) return;
                   ref.read(panelStackControllerProvider.notifier).pop();
                 },
               ),
@@ -129,6 +135,22 @@ class _CreateEventPanelState extends BasePanelState<CreateEventPanel> {
         ),
       ),
     );
+  }
+
+  /// "16 Ağu 2026" + "08:00" formatlarını ayrıştırır — geçersizse null.
+  DateTime? _parseDateTime(String dateText, String timeText) {
+    final dateParts = dateText.trim().split(RegExp(r'\s+'));
+    if (dateParts.length != 3) return null;
+    final day = int.tryParse(dateParts[0]);
+    final month = _monthAbbrevToNumber[dateParts[1]];
+    final year = int.tryParse(dateParts[2]);
+    if (day == null || month == null || year == null) return null;
+
+    final timeParts = timeText.trim().split(':');
+    final hour = timeParts.isNotEmpty ? int.tryParse(timeParts[0]) ?? 0 : 0;
+    final minute = timeParts.length > 1 ? int.tryParse(timeParts[1]) ?? 0 : 0;
+
+    return DateTime(year, month, day, hour, minute);
   }
 
   @override
