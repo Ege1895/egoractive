@@ -17,6 +17,7 @@ import 'package:egoractive/modules/gyms/ui/panels/gym_rules_editor_panel.dart';
 import 'package:egoractive/modules/gyms/ui/panels/gym_rules_view_panel.dart';
 import 'package:egoractive/modules/members/ui/panels/admin_member_detail_panel.dart';
 import 'package:egoractive/modules/notifications/ui/panels/send_notification_panel.dart';
+import 'package:egoractive/modules/reports/ui/panels/admin_dashboard_panel.dart';
 import 'package:egoractive/modules/sessions/ui/panels/admin_calendar_panel.dart';
 import 'package:egoractive/modules/sessions/ui/panels/admin_session_management_panel.dart';
 
@@ -45,6 +46,7 @@ void main() {
     'AdminFeedbackListPanel': const AdminFeedbackListPanel(),
     'SendNotificationPanel': const SendNotificationPanel(),
     'AdminMemberDetailPanel': const AdminMemberDetailPanel(memberId: 'ayse-yilmaz'),
+    'AdminDashboardPanel': const AdminDashboardPanel(),
   };
 
   for (final entry in panels.entries) {
