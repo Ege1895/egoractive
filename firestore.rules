@@ -144,20 +144,27 @@ service cloud.firestore {
       );
     }
 
-    // groupSessions/{id} — F4-2. Oluşturma admin/antrenöre ait; üye
-    // sadece kendi katılım durumunu (attendeeIds'e kendi uid'sini ekleme/
-    // çıkarma) değiştirebilir. Kontenjan aşımı burada da (client'taki
-    // transaction'a ek bir güvenlik katmanı olarak) engellenir:
-    // request.resource.data.attendeeIds.size() <= capacity.
-    function isJoiningGroupSession() {
+    // Kontenjanlı katılım listeleri (groupSessions F4-2, events F4-3) —
+    // ortak kural mantığı. Oluşturma admin/antrenöre ait; üye sadece kendi
+    // katılım durumunu (attendeeIds'e kendi uid'sini ekleme/çıkarma)
+    // değiştirebilir. Kontenjan aşımı burada da (client'taki
+    // CapacityService transaction'ına ek bir güvenlik katmanı olarak)
+    // engellenir. `capacity == null` sınırsız demektir, hiç kontrol
+    // yapılmaz (bazı etkinliklerde olduğu gibi).
+    function withinCapacity() {
+      return resource.data.capacity == null ||
+        request.resource.data.attendeeIds.size() <= resource.data.capacity;
+    }
+
+    function isJoiningCapacityList() {
       return request.resource.data.attendeeIds.size() == resource.data.attendeeIds.size() + 1 &&
         !resource.data.attendeeIds.hasAny([request.auth.uid]) &&
         request.resource.data.attendeeIds.hasAll(resource.data.attendeeIds) &&
         request.resource.data.attendeeIds.hasAny([request.auth.uid]) &&
-        request.resource.data.attendeeIds.size() <= resource.data.capacity;
+        withinCapacity();
     }
 
-    function isLeavingGroupSession() {
+    function isLeavingCapacityList() {
       return request.resource.data.attendeeIds.size() == resource.data.attendeeIds.size() - 1 &&
         resource.data.attendeeIds.hasAny([request.auth.uid]) &&
         !request.resource.data.attendeeIds.hasAny([request.auth.uid]) &&
@@ -167,10 +174,21 @@ service cloud.firestore {
     function isOwnAttendeeChange() {
       return myRole() == 'member' &&
         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['attendeeIds']) &&
-        (isJoiningGroupSession() || isLeavingGroupSession());
+        (isJoiningCapacityList() || isLeavingCapacityList());
     }
 
     match /groupSessions/{sessionId} {
+      allow read: if isSignedIn() && resource.data.gymId == myGymId();
+      allow create: if isSignedIn() && (myRole() == 'admin' || myRole() == 'trainer') &&
+        request.resource.data.gymId == myGymId();
+      allow update: if isSignedIn() && resource.data.gymId == myGymId() && (
+        myRole() == 'admin' || myRole() == 'trainer' || isOwnAttendeeChange()
+      );
+      allow delete: if isSignedIn() && resource.data.gymId == myGymId() && (myRole() == 'admin' || myRole() == 'trainer');
+    }
+
+    // events/{id} — F4-3. groupSessions ile aynı kontenjan kuralları.
+    match /events/{eventId} {
       allow read: if isSignedIn() && resource.data.gymId == myGymId();
       allow create: if isSignedIn() && (myRole() == 'admin' || myRole() == 'trainer') &&
         request.resource.data.gymId == myGymId();

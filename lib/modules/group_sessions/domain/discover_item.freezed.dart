@@ -24,11 +24,12 @@ mixin _$DiscoverItem {
   String get title => throw _privateConstructorUsedError;
   String get meta => throw _privateConstructorUsedError;
   int get taken => throw _privateConstructorUsedError;
-  int get capacity => throw _privateConstructorUsedError;
+
+  /// `null` = sınırsız kontenjan (bazı etkinliklerde olduğu gibi).
+  int? get capacity => throw _privateConstructorUsedError;
   bool get joined => throw _privateConstructorUsedError;
 
-  /// Grup dersi ise gerçek başlangıç zamanı — kilit kontrolü için.
-  /// Etkinlikler (F4-3, henüz mock) için null.
+  /// Gerçek başlangıç zamanı — kilit kontrolü için.
   DateTime? get startTime => throw _privateConstructorUsedError;
   int get lockHoursBefore => throw _privateConstructorUsedError;
 
@@ -54,7 +55,7 @@ abstract class $DiscoverItemCopyWith<$Res> {
     String title,
     String meta,
     int taken,
-    int capacity,
+    int? capacity,
     bool joined,
     DateTime? startTime,
     int lockHoursBefore,
@@ -83,7 +84,7 @@ class _$DiscoverItemCopyWithImpl<$Res, $Val extends DiscoverItem>
     Object? title = null,
     Object? meta = null,
     Object? taken = null,
-    Object? capacity = null,
+    Object? capacity = freezed,
     Object? joined = null,
     Object? startTime = freezed,
     Object? lockHoursBefore = null,
@@ -118,10 +119,10 @@ class _$DiscoverItemCopyWithImpl<$Res, $Val extends DiscoverItem>
                 ? _value.taken
                 : taken // ignore: cast_nullable_to_non_nullable
                       as int,
-            capacity: null == capacity
+            capacity: freezed == capacity
                 ? _value.capacity
                 : capacity // ignore: cast_nullable_to_non_nullable
-                      as int,
+                      as int?,
             joined: null == joined
                 ? _value.joined
                 : joined // ignore: cast_nullable_to_non_nullable
@@ -157,7 +158,7 @@ abstract class _$$DiscoverItemImplCopyWith<$Res>
     String title,
     String meta,
     int taken,
-    int capacity,
+    int? capacity,
     bool joined,
     DateTime? startTime,
     int lockHoursBefore,
@@ -185,7 +186,7 @@ class __$$DiscoverItemImplCopyWithImpl<$Res>
     Object? title = null,
     Object? meta = null,
     Object? taken = null,
-    Object? capacity = null,
+    Object? capacity = freezed,
     Object? joined = null,
     Object? startTime = freezed,
     Object? lockHoursBefore = null,
@@ -220,10 +221,10 @@ class __$$DiscoverItemImplCopyWithImpl<$Res>
             ? _value.taken
             : taken // ignore: cast_nullable_to_non_nullable
                   as int,
-        capacity: null == capacity
+        capacity: freezed == capacity
             ? _value.capacity
             : capacity // ignore: cast_nullable_to_non_nullable
-                  as int,
+                  as int?,
         joined: null == joined
             ? _value.joined
             : joined // ignore: cast_nullable_to_non_nullable
@@ -252,7 +253,7 @@ class _$DiscoverItemImpl extends _DiscoverItem {
     required this.title,
     required this.meta,
     required this.taken,
-    required this.capacity,
+    this.capacity,
     this.joined = false,
     this.startTime,
     this.lockHoursBefore = 24,
@@ -272,14 +273,15 @@ class _$DiscoverItemImpl extends _DiscoverItem {
   final String meta;
   @override
   final int taken;
+
+  /// `null` = sınırsız kontenjan (bazı etkinliklerde olduğu gibi).
   @override
-  final int capacity;
+  final int? capacity;
   @override
   @JsonKey()
   final bool joined;
 
-  /// Grup dersi ise gerçek başlangıç zamanı — kilit kontrolü için.
-  /// Etkinlikler (F4-3, henüz mock) için null.
+  /// Gerçek başlangıç zamanı — kilit kontrolü için.
   @override
   final DateTime? startTime;
   @override
@@ -347,7 +349,7 @@ abstract class _DiscoverItem extends DiscoverItem {
     required final String title,
     required final String meta,
     required final int taken,
-    required final int capacity,
+    final int? capacity,
     final bool joined,
     final DateTime? startTime,
     final int lockHoursBefore,
@@ -368,13 +370,14 @@ abstract class _DiscoverItem extends DiscoverItem {
   String get meta;
   @override
   int get taken;
+
+  /// `null` = sınırsız kontenjan (bazı etkinliklerde olduğu gibi).
   @override
-  int get capacity;
+  int? get capacity;
   @override
   bool get joined;
 
-  /// Grup dersi ise gerçek başlangıç zamanı — kilit kontrolü için.
-  /// Etkinlikler (F4-3, henüz mock) için null.
+  /// Gerçek başlangıç zamanı — kilit kontrolü için.
   @override
   DateTime? get startTime;
   @override

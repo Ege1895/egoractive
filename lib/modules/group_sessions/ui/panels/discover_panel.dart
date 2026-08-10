@@ -130,7 +130,8 @@ class _DiscoverCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.appColors;
     final typography = context.appTypography;
-    final remaining = item.capacity - item.taken;
+    final capacity = item.capacity;
+    final remaining = capacity == null ? null : capacity - item.taken;
 
     final Color capFg;
     final Color barColor;
@@ -139,7 +140,7 @@ class _DiscoverCard extends StatelessWidget {
       capFg = colors.error;
       barColor = colors.error;
       capNote = 'Kontenjan doldu';
-    } else if (remaining <= 2) {
+    } else if (remaining != null && remaining <= 2) {
       capFg = colors.onWarningContainer;
       barColor = colors.warning;
       capNote = 'Son $remaining yer';
@@ -215,7 +216,7 @@ class _DiscoverCard extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  '${item.taken} / ${item.capacity} kişi',
+                  capacity == null ? '${item.taken} kişi katılıyor' : '${item.taken} / $capacity kişi',
                   style: typography.bodyMedium.copyWith(color: colors.onSurfaceVariant, fontSize: 13),
                 ),
               ),
@@ -227,7 +228,7 @@ class _DiscoverCard extends StatelessWidget {
           ClipRRect(
             borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
             child: LinearProgressIndicator(
-              value: (item.taken / item.capacity).clamp(0, 1),
+              value: capacity == null ? 0 : (item.taken / capacity).clamp(0, 1),
               minHeight: 6,
               backgroundColor: colors.surfaceRaised,
               valueColor: AlwaysStoppedAnimation(barColor),

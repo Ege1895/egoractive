@@ -1,30 +1,29 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'group_sessions_write_service.dart';
+part of 'events_write_service.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$groupSessionsWriteServiceHash() =>
-    r'888346c6972707973480812f4781c65fad66df5d';
+String _$eventsWriteServiceHash() =>
+    r'6aac96caa0527e032cf79eaae45517369b58c089';
 
-/// See also [groupSessionsWriteService].
-@ProviderFor(groupSessionsWriteService)
-final groupSessionsWriteServiceProvider =
-    AutoDisposeProvider<GroupSessionsWriteService>.internal(
-      groupSessionsWriteService,
-      name: r'groupSessionsWriteServiceProvider',
+/// See also [eventsWriteService].
+@ProviderFor(eventsWriteService)
+final eventsWriteServiceProvider =
+    AutoDisposeProvider<EventsWriteService>.internal(
+      eventsWriteService,
+      name: r'eventsWriteServiceProvider',
       debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
           ? null
-          : _$groupSessionsWriteServiceHash,
+          : _$eventsWriteServiceHash,
       dependencies: null,
       allTransitiveDependencies: null,
     );
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-typedef GroupSessionsWriteServiceRef =
-    AutoDisposeProviderRef<GroupSessionsWriteService>;
+typedef EventsWriteServiceRef = AutoDisposeProviderRef<EventsWriteService>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
