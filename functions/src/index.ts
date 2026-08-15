@@ -5,6 +5,7 @@ initializeApp();
 export { helloWorld } from "./callable/hello-world";
 export { requestCustomToken } from "./callable/request-custom-token";
 export { deleteAccount } from "./callable/delete-account";
+export { verifySubscriptionPurchase } from "./callable/verify-subscription-purchase";
 export { onUserRoleAssigned } from "./triggers/on-user-role-assigned";
 export { sessionReminderCheck } from "./scheduled/session-reminder-check";
 export { sessionCompletionCheck } from "./scheduled/session-completion-check";
