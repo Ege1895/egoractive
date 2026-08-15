@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../ads/ad_banner_widget.dart';
 import '../base_panel.dart';
 import 'app_tab_shell.dart';
 import '../../../modules/auth/ui/panels/profile_panel.dart';
@@ -22,6 +23,7 @@ class _MemberShellPanelState extends BasePanelState<MemberShellPanel> {
   @override
   Widget build(BuildContext context) {
     return AppTabShell(
+      bottomAdSlot: const AdBannerWidget(),
       items: [
         AppTabItem(
           icon: Icons.home_rounded,
