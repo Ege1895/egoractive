@@ -1,25 +1,75 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../domain/admin_feedback_entry.dart';
 
 part 'admin_feedback_service.g.dart';
 
-/// Mock servis — F2'de gerçek `feedback` koleksiyonuna bağlanacak.
+const _monthNamesLong = {
+  1: 'Ocak', 2: 'Şubat', 3: 'Mart', 4: 'Nisan', 5: 'Mayıs', 6: 'Haziran',
+  7: 'Temmuz', 8: 'Ağustos', 9: 'Eylül', 10: 'Ekim', 11: 'Kasım', 12: 'Aralık',
+};
+
+/// F5-4 — `feedback` koleksiyonu (gymId, memberId, memberName, trainerId,
+/// trainerName, stars, comment, createdAt). Sadece stüdyo yönetimi
+/// (admin) görür; antrenöre hiç açılmıyor (F5-4 gizlilik notu).
 class AdminFeedbackService {
   const AdminFeedbackService();
 
-  AdminFeedbackSummary loadSummary() {
-    return const AdminFeedbackSummary(
-      average: 4.6,
-      totalCount: 38,
-      starCounts: {5: 24, 4: 9, 3: 3, 2: 1, 1: 1},
-      entries: [
-        AdminFeedbackEntry(id: 'fb-1', initials: 'AY', memberName: 'Ayşe Yılmaz', meta: '3 Ağustos · Berk Aydın', stars: 5, comment: 'Berk çok ilgili, programım tam bana göre ilerliyor.'),
-        AdminFeedbackEntry(id: 'fb-2', initials: 'CD', memberName: 'Cem Demir', meta: '1 Ağustos · Berk Aydın', stars: 4, comment: 'Stüdyo temiz ve düzenli, sadece duş kısmı biraz dar.'),
-        AdminFeedbackEntry(id: 'fb-3', initials: 'ZK', memberName: 'Zeynep Kaya', meta: '29 Temmuz · Berk Aydın', stars: 5, comment: 'Reformer grup dersi harika, Selin hoca çok enerjik.'),
-        AdminFeedbackEntry(id: 'fb-4', initials: 'MA', memberName: 'Mert Arslan', meta: '25 Temmuz · Berk Aydın', stars: 3, comment: 'Bazı saatlerde stüdyo çok kalabalık oluyor.'),
-      ],
+  Stream<AdminFeedbackSummary> watchSummary(String gymId) {
+    return FirebaseFirestore.instance
+        .collection('feedback')
+        .where('gymId', isEqualTo: gymId)
+        .snapshots()
+        .map((snapshot) {
+      final docs = snapshot.docs.toList()
+        ..sort((a, b) {
+          final aTime = a.data()['createdAt'] as Timestamp?;
+          final bTime = b.data()['createdAt'] as Timestamp?;
+          if (aTime == null || bTime == null) return 0;
+          return bTime.compareTo(aTime);
+        });
+
+      final starCounts = <int, int>{1: 0, 2: 0, 3: 0, 4: 0, 5: 0};
+      var totalStars = 0;
+      for (final doc in docs) {
+        final stars = (doc.data()['stars'] as num?)?.toInt() ?? 0;
+        if (stars < 1 || stars > 5) continue;
+        starCounts[stars] = (starCounts[stars] ?? 0) + 1;
+        totalStars += stars;
+      }
+
+      return AdminFeedbackSummary(
+        average: docs.isEmpty ? 0 : totalStars / docs.length,
+        totalCount: docs.length,
+        starCounts: starCounts,
+        entries: docs.map(_toEntry).toList(),
+      );
+    });
+  }
+
+  AdminFeedbackEntry _toEntry(QueryDocumentSnapshot<Map<String, dynamic>> doc) {
+    final data = doc.data();
+    final memberName = (data['memberName'] as String?) ?? '';
+    final trainerName = (data['trainerName'] as String?) ?? '';
+    final createdAt = (data['createdAt'] as Timestamp?)?.toDate();
+    final dateLabel = createdAt == null ? '' : '${createdAt.day} ${_monthNamesLong[createdAt.month]}';
+
+    return AdminFeedbackEntry(
+      id: doc.id,
+      initials: _initials(memberName),
+      memberName: memberName,
+      meta: trainerName.isEmpty ? dateLabel : '$dateLabel · $trainerName',
+      stars: (data['stars'] as num?)?.toInt() ?? 0,
+      comment: (data['comment'] as String?) ?? '',
     );
+  }
+
+  String _initials(String name) {
+    final parts = name.trim().split(RegExp(r'\s+')).where((p) => p.isNotEmpty).toList();
+    if (parts.isEmpty) return '?';
+    if (parts.length == 1) return parts.first.substring(0, 1).toUpperCase();
+    return (parts.first.substring(0, 1) + parts.last.substring(0, 1)).toUpperCase();
   }
 }
 

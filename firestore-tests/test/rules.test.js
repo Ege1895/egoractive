@@ -590,3 +590,76 @@ test("member cannot change other fields while joining an event (negative — sad
     updateDoc(doc(db, "events/ev1"), { attendeeIds: arrayUnion("member-a1"), capacity: 100 }),
   );
 });
+
+// --- feedback/{id} (F5-4) ---
+
+test("member can create their own feedback for their own gym (positive)", async () => {
+  const db = contextFor("member-a1", { role: "member", gymId: "gym-a" }).firestore();
+  await assertSucceeds(
+    setDoc(doc(db, "feedback/fb1"), {
+      gymId: "gym-a",
+      memberId: "member-a1",
+      memberName: "Member A1",
+      trainerId: "trainer-a",
+      trainerName: "Trainer A",
+      stars: 5,
+      comment: "Harikaydı",
+    }),
+  );
+});
+
+test("member cannot create feedback on behalf of another member (negative)", async () => {
+  const db = contextFor("member-a1", { role: "member", gymId: "gym-a" }).firestore();
+  await assertFails(
+    setDoc(doc(db, "feedback/fb1"), {
+      gymId: "gym-a",
+      memberId: "member-a2",
+      stars: 5,
+      comment: "Harikaydı",
+    }),
+  );
+});
+
+test("member cannot create feedback for a different gym (negative)", async () => {
+  const db = contextFor("member-a1", { role: "member", gymId: "gym-a" }).firestore();
+  await assertFails(
+    setDoc(doc(db, "feedback/fb1"), {
+      gymId: "gym-b",
+      memberId: "member-a1",
+      stars: 5,
+      comment: "Harikaydı",
+    }),
+  );
+});
+
+test("admin can read feedback for their own gym (positive)", async () => {
+  await testEnv.withSecurityRulesDisabled(async (context) => {
+    await setDoc(context.firestore().doc("feedback/fb1"), { gymId: "gym-a", memberId: "member-a1", stars: 5 });
+  });
+  const db = contextFor("admin-a", { role: "admin", gymId: "gym-a" }).firestore();
+  await assertSucceeds(getDoc(doc(db, "feedback/fb1")));
+});
+
+test("admin from a different gym cannot read feedback (negative)", async () => {
+  await testEnv.withSecurityRulesDisabled(async (context) => {
+    await setDoc(context.firestore().doc("feedback/fb1"), { gymId: "gym-a", memberId: "member-a1", stars: 5 });
+  });
+  const db = contextFor("admin-b", { role: "admin", gymId: "gym-b" }).firestore();
+  await assertFails(getDoc(doc(db, "feedback/fb1")));
+});
+
+test("trainer cannot read feedback (negative — antrenöre hiç açılmıyor)", async () => {
+  await testEnv.withSecurityRulesDisabled(async (context) => {
+    await setDoc(context.firestore().doc("feedback/fb1"), { gymId: "gym-a", memberId: "member-a1", stars: 5 });
+  });
+  const db = contextFor("trainer-a", { role: "trainer", gymId: "gym-a" }).firestore();
+  await assertFails(getDoc(doc(db, "feedback/fb1")));
+});
+
+test("member cannot read another member's feedback (negative)", async () => {
+  await testEnv.withSecurityRulesDisabled(async (context) => {
+    await setDoc(context.firestore().doc("feedback/fb1"), { gymId: "gym-a", memberId: "member-a1", stars: 5 });
+  });
+  const db = contextFor("member-a2", { role: "member", gymId: "gym-a" }).firestore();
+  await assertFails(getDoc(doc(db, "feedback/fb1")));
+});

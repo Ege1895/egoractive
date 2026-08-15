@@ -12,3 +12,5 @@ export { badgeCheck } from "./scheduled/badge-check";
 export { weeklyGymReport } from "./scheduled/weekly-gym-report";
 export { weeklyAccountingReport } from "./scheduled/weekly-accounting-report";
 export { weeklyTrainerReport } from "./scheduled/weekly-trainer-report";
+export { feedbackReminderCheck } from "./scheduled/feedback-reminder-check";
+export { monthlyFeedbackSummary } from "./scheduled/monthly-feedback-summary";

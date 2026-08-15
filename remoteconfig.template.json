@@ -157,6 +157,31 @@
       },
       "valueType": "STRING"
     },
+    "lbl_notif_feedback_reminder_title_tr": {
+      "defaultValue": {
+        "value": "💬 Bu ay nasıl geçti?"
+      },
+      "description": "F5-4 — feedbackReminderCheck push başlığı (Admin SDK'dan da okunur).",
+      "valueType": "STRING"
+    },
+    "lbl_notif_feedback_reminder_title_en": {
+      "defaultValue": {
+        "value": "💬 How was your month?"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notif_feedback_reminder_body_tr": {
+      "defaultValue": {
+        "value": "Deneyimini bizimle paylaşır mısın? 1 dakikanı alır."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notif_feedback_reminder_body_en": {
+      "defaultValue": {
+        "value": "Would you share your experience with us? It only takes a minute."
+      },
+      "valueType": "STRING"
+    },
     "lbl_common_vazgec_tr": {
       "defaultValue": {
         "value": "Vazgeç"
