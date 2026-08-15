@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
+import '../../../../core/subscription/subscription_write_gate.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_text_field.dart';
@@ -211,6 +212,7 @@ class _CreateGroupSessionPanelState extends BasePanelState<CreateGroupSessionPan
               child: AppButton(
                 label: 'Grup dersini oluştur',
                 onPressed: () async {
+                  if (!await ensureSubscriptionAllowsWrite(context, ref)) return;
                   final success = await controller.submit();
                   if (success) panelStack.pop();
                 },

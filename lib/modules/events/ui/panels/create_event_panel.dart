@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
+import '../../../../core/subscription/subscription_write_gate.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/theme/theme_controller.dart';
 import '../../../../shared/widgets/app_button.dart';
@@ -114,6 +115,7 @@ class _CreateEventPanelState extends BasePanelState<CreateEventPanel> {
                   final name = _nameController.text.trim();
                   final dateTime = _parseDateTime(_dateController.text, _timeController.text);
                   if (name.isEmpty || dateTime == null) return;
+                  if (!await ensureSubscriptionAllowsWrite(context, ref)) return;
 
                   final gymId = await ref.read(activeGymIdProvider.future);
                   if (gymId == null) return;
