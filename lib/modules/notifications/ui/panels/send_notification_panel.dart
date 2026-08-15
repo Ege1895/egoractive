@@ -139,6 +139,10 @@ class _SendNotificationPanelState extends BasePanelState<SendNotificationPanel> 
                       ],
                     ),
                   ),
+                  if (form.errorMessage != null) ...[
+                    const SizedBox(height: AppSpacing.md),
+                    Text(form.errorMessage!, style: typography.bodyMedium.copyWith(color: colors.error, fontSize: 13)),
+                  ],
                   const SizedBox(height: AppSpacing.lg),
                   Container(
                     padding: const EdgeInsets.all(AppSpacing.md),
@@ -165,14 +169,17 @@ class _SendNotificationPanelState extends BasePanelState<SendNotificationPanel> 
             Padding(
               padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.md, AppSpacing.screenEdge, AppSpacing.lg),
               child: AppButton(
-                label: form.sent ? 'Gönderildi' : 'Gönder',
-                onPressed: form.sent || form.title.trim().isEmpty || form.message.trim().isEmpty
+                label: form.sent ? 'Gönderildi' : (form.isSending ? 'Gönderiliyor…' : 'Gönder'),
+                onPressed: form.sent || form.isSending || form.title.trim().isEmpty || form.message.trim().isEmpty
                     ? null
-                    : () {
-                        controller.send();
-                        Future.delayed(const Duration(milliseconds: 600), () {
-                          if (mounted) ref.read(panelStackControllerProvider.notifier).pop();
-                        });
+                    : () async {
+                        await controller.send();
+                        if (!mounted) return;
+                        if (ref.read(sendNotificationControllerProvider).sent) {
+                          Future.delayed(const Duration(milliseconds: 600), () {
+                            if (mounted) ref.read(panelStackControllerProvider.notifier).pop();
+                          });
+                        }
                       },
               ),
             ),

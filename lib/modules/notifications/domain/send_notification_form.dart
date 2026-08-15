@@ -13,5 +13,7 @@ class SendNotificationForm with _$SendNotificationForm {
     @Default('') String title,
     @Default('') String message,
     @Default(false) bool sent,
+    @Default(false) bool isSending,
+    String? errorMessage,
   }) = _SendNotificationForm;
 }

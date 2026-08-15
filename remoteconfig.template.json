@@ -77,6 +77,13 @@
       "description": "F5-2 — haftalık raporların gönderileceği saat (İstanbul yerel saati, 0-23). Yalnızca Cloud Functions tarafından okunur.",
       "valueType": "NUMBER"
     },
+    "cfg_manual_notification_hourly_limit": {
+      "defaultValue": {
+        "value": "10"
+      },
+      "description": "F6-4 — bir admin'in saatte en fazla kaç manuel bildirim gönderebileceği (kötüye kullanımı önlemek için). Yalnızca Cloud Functions tarafından okunur.",
+      "valueType": "NUMBER"
+    },
     "cfg_free_version_ads_enabled": {
       "defaultValue": {
         "value": "true"

@@ -23,6 +23,8 @@ mixin _$SendNotificationForm {
   String get title => throw _privateConstructorUsedError;
   String get message => throw _privateConstructorUsedError;
   bool get sent => throw _privateConstructorUsedError;
+  bool get isSending => throw _privateConstructorUsedError;
+  String? get errorMessage => throw _privateConstructorUsedError;
 
   /// Create a copy of SendNotificationForm
   /// with the given fields replaced by the non-null parameter values.
@@ -45,6 +47,8 @@ abstract class $SendNotificationFormCopyWith<$Res> {
     String title,
     String message,
     bool sent,
+    bool isSending,
+    String? errorMessage,
   });
 }
 
@@ -72,6 +76,8 @@ class _$SendNotificationFormCopyWithImpl<
     Object? title = null,
     Object? message = null,
     Object? sent = null,
+    Object? isSending = null,
+    Object? errorMessage = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -99,6 +105,14 @@ class _$SendNotificationFormCopyWithImpl<
                 ? _value.sent
                 : sent // ignore: cast_nullable_to_non_nullable
                       as bool,
+            isSending: null == isSending
+                ? _value.isSending
+                : isSending // ignore: cast_nullable_to_non_nullable
+                      as bool,
+            errorMessage: freezed == errorMessage
+                ? _value.errorMessage
+                : errorMessage // ignore: cast_nullable_to_non_nullable
+                      as String?,
           )
           as $Val,
     );
@@ -121,6 +135,8 @@ abstract class _$$SendNotificationFormImplCopyWith<$Res>
     String title,
     String message,
     bool sent,
+    bool isSending,
+    String? errorMessage,
   });
 }
 
@@ -144,6 +160,8 @@ class __$$SendNotificationFormImplCopyWithImpl<$Res>
     Object? title = null,
     Object? message = null,
     Object? sent = null,
+    Object? isSending = null,
+    Object? errorMessage = freezed,
   }) {
     return _then(
       _$SendNotificationFormImpl(
@@ -171,6 +189,14 @@ class __$$SendNotificationFormImplCopyWithImpl<$Res>
             ? _value.sent
             : sent // ignore: cast_nullable_to_non_nullable
                   as bool,
+        isSending: null == isSending
+            ? _value.isSending
+            : isSending // ignore: cast_nullable_to_non_nullable
+                  as bool,
+        errorMessage: freezed == errorMessage
+            ? _value.errorMessage
+            : errorMessage // ignore: cast_nullable_to_non_nullable
+                  as String?,
       ),
     );
   }
@@ -186,6 +212,8 @@ class _$SendNotificationFormImpl implements _SendNotificationForm {
     this.title = '',
     this.message = '',
     this.sent = false,
+    this.isSending = false,
+    this.errorMessage,
   });
 
   @override
@@ -204,10 +232,15 @@ class _$SendNotificationFormImpl implements _SendNotificationForm {
   @override
   @JsonKey()
   final bool sent;
+  @override
+  @JsonKey()
+  final bool isSending;
+  @override
+  final String? errorMessage;
 
   @override
   String toString() {
-    return 'SendNotificationForm(targetType: $targetType, targetMemberId: $targetMemberId, targetMemberName: $targetMemberName, title: $title, message: $message, sent: $sent)';
+    return 'SendNotificationForm(targetType: $targetType, targetMemberId: $targetMemberId, targetMemberName: $targetMemberName, title: $title, message: $message, sent: $sent, isSending: $isSending, errorMessage: $errorMessage)';
   }
 
   @override
@@ -223,7 +256,11 @@ class _$SendNotificationFormImpl implements _SendNotificationForm {
                 other.targetMemberName == targetMemberName) &&
             (identical(other.title, title) || other.title == title) &&
             (identical(other.message, message) || other.message == message) &&
-            (identical(other.sent, sent) || other.sent == sent));
+            (identical(other.sent, sent) || other.sent == sent) &&
+            (identical(other.isSending, isSending) ||
+                other.isSending == isSending) &&
+            (identical(other.errorMessage, errorMessage) ||
+                other.errorMessage == errorMessage));
   }
 
   @override
@@ -235,6 +272,8 @@ class _$SendNotificationFormImpl implements _SendNotificationForm {
     title,
     message,
     sent,
+    isSending,
+    errorMessage,
   );
 
   /// Create a copy of SendNotificationForm
@@ -258,6 +297,8 @@ abstract class _SendNotificationForm implements SendNotificationForm {
     final String title,
     final String message,
     final bool sent,
+    final bool isSending,
+    final String? errorMessage,
   }) = _$SendNotificationFormImpl;
 
   @override
@@ -272,6 +313,10 @@ abstract class _SendNotificationForm implements SendNotificationForm {
   String get message;
   @override
   bool get sent;
+  @override
+  bool get isSending;
+  @override
+  String? get errorMessage;
 
   /// Create a copy of SendNotificationForm
   /// with the given fields replaced by the non-null parameter values.
