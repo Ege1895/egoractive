@@ -21,7 +21,10 @@
         "*.local",
         "src/**/*.test.ts"
       ],
-      "predeploy": ["npm --prefix \"$RESOURCE_DIR\" run lint", "npm --prefix \"$RESOURCE_DIR\" run build"]
+      "predeploy": [
+        "npm --prefix \"$RESOURCE_DIR\" run lint",
+        "npm --prefix \"$RESOURCE_DIR\" run build"
+      ]
     }
   ],
   "flutter": {
@@ -51,5 +54,8 @@
         }
       }
     }
+  },
+  "extensions": {
+    "firestore-send-email": "firebase/firestore-send-email@0.2.10"
   }
 }

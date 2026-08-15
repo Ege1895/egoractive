@@ -1,5 +1,13 @@
 {
   "projects": {
     "default": "egoractive-e92bd"
+  },
+  "targets": {},
+  "etags": {
+    "egoractive-e92bd": {
+      "extensionInstances": {
+        "firestore-send-email": "9162c7a5399bcf15931933311f93a512e1a067bad15e4cb19939deebf3dd00b3"
+      }
+    }
   }
 }
