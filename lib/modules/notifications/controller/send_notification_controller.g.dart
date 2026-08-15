@@ -7,9 +7,9 @@ part of 'send_notification_controller.dart';
 // **************************************************************************
 
 String _$sendNotificationControllerHash() =>
-    r'389dbb180786f3e11fe1c86eddbfe0bd90495013';
+    r'c5ecefc746718964ddaab6f6ada8ffb134b65d5c';
 
-/// Mock kontrolcü — F2'de gerçek FCM/Cloud Functions gönderimine bağlanacak.
+/// F6-4 — `sendManualNotification` Cloud Function'ını çağırır.
 ///
 /// Copied from [SendNotificationController].
 @ProviderFor(SendNotificationController)
