@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
+import '../../../../core/remote_config/feature_flags.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../auth/controller/auth_controller.dart';
 import '../../../auth/ui/panels/phone_login_panel.dart';
@@ -28,6 +29,7 @@ class AdminSettingsPanel extends ConsumerWidget {
     final colors = context.appColors;
     final typography = context.appTypography;
     final panelStack = ref.read(panelStackControllerProvider.notifier);
+    final groupSessionsEnabled = ref.watch(featureFlagsProvider).isGroupSessionsEnabled;
 
     return Scaffold(
       body: SafeArea(
@@ -63,7 +65,8 @@ class AdminSettingsPanel extends ConsumerWidget {
               child: Column(
                 children: [
                   _NavRow(label: 'Ders / seans yönetimi', onTap: () => panelStack.push(const AdminSessionManagementPanel())),
-                  _NavRow(label: 'Grup dersleri', onTap: () => panelStack.push(const AdminGroupSessionsPanel())),
+                  if (groupSessionsEnabled)
+                    _NavRow(label: 'Grup dersleri', onTap: () => panelStack.push(const AdminGroupSessionsPanel())),
                   _NavRow(label: 'Etkinlikler', isLast: true, onTap: () => panelStack.push(const AdminEventsPanel())),
                 ],
               ),

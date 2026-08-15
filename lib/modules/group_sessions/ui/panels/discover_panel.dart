@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/app_spacing.dart';
+import '../../../../core/remote_config/feature_flags.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../controller/discover_controller.dart';
 import '../../domain/discover_item.dart';
@@ -21,7 +22,9 @@ class _DiscoverPanelState extends ConsumerState<DiscoverPanel> {
   Widget build(BuildContext context) {
     final colors = context.appColors;
     final typography = context.appTypography;
-    final items = ref.watch(discoverControllerProvider).where((i) => i.category == _category).toList();
+    final groupSessionsEnabled = ref.watch(featureFlagsProvider).isGroupSessionsEnabled;
+    final category = groupSessionsEnabled ? _category : DiscoverCategory.events;
+    final items = ref.watch(discoverControllerProvider).where((i) => i.category == category).toList();
     final controller = ref.read(discoverControllerProvider.notifier);
 
     return Scaffold(
@@ -36,32 +39,33 @@ class _DiscoverPanelState extends ConsumerState<DiscoverPanel> {
                 children: [
                   Text('Keşfet', style: typography.headingLarge.copyWith(color: colors.onSurface)),
                   const SizedBox(height: AppSpacing.md),
-                  Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                      color: colors.surface,
-                      border: Border.all(color: colors.outline),
-                      borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
-                    ),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: _CategoryTab(
-                            label: 'Grup dersleri',
-                            selected: _category == DiscoverCategory.groupSessions,
-                            onTap: () => setState(() => _category = DiscoverCategory.groupSessions),
+                  if (groupSessionsEnabled)
+                    Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: colors.surface,
+                        border: Border.all(color: colors.outline),
+                        borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: _CategoryTab(
+                              label: 'Grup dersleri',
+                              selected: category == DiscoverCategory.groupSessions,
+                              onTap: () => setState(() => _category = DiscoverCategory.groupSessions),
+                            ),
                           ),
-                        ),
-                        Expanded(
-                          child: _CategoryTab(
-                            label: 'Etkinlikler',
-                            selected: _category == DiscoverCategory.events,
-                            onTap: () => setState(() => _category = DiscoverCategory.events),
+                          Expanded(
+                            child: _CategoryTab(
+                              label: 'Etkinlikler',
+                              selected: category == DiscoverCategory.events,
+                              onTap: () => setState(() => _category = DiscoverCategory.events),
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
                 ],
               ),
             ),
