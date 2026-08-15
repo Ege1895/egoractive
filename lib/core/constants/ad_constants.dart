@@ -23,16 +23,23 @@ const _iosTestBannerAdUnitId = 'ca-app-pub-3940256099942544/2934735716';
 const _androidBannerAdUnitId = 'ca-app-pub-7842412614783450/8018778123';
 const _iosBannerAdUnitId = 'ca-app-pub-7842412614783450/9570749122';
 
-/// F6-2 — otomatik geçiş reklamı (interstitial). AdMob konsolunda henüz
-/// "Interstitial" türünde bir reklam birimi oluşturulmadığı için gerçek ID
-/// gelene kadar release build'de de Google'ın TEST ID'si kullanılıyor —
-/// bannerAdUnitId'nin aksine burada release/debug ayrımı yok. Gerçek ID'ler
-/// oluşturulunca [_androidInterstitialAdUnitId]/[_iosInterstitialAdUnitId]
-/// doldurulup bu getter bannerAdUnitId ile aynı kDebugMode desenine geçmeli.
-String get interstitialAdUnitId => Platform.isIOS ? _iosTestInterstitialAdUnitId : _androidTestInterstitialAdUnitId;
+/// F6-2 — otomatik geçiş reklamı (interstitial). bannerAdUnitId ile aynı
+/// desen: debug build'de her zaman Google'ın TEST ID'si, sadece
+/// release/profile'da gerçek (AdMob konsolundaki) ID'ye geçer.
+String get interstitialAdUnitId {
+  if (kDebugMode) {
+    return Platform.isIOS ? _iosTestInterstitialAdUnitId : _androidTestInterstitialAdUnitId;
+  }
+  return Platform.isIOS ? _iosInterstitialAdUnitId : _androidInterstitialAdUnitId;
+}
 
 const _androidTestInterstitialAdUnitId = 'ca-app-pub-3940256099942544/1033173712';
 const _iosTestInterstitialAdUnitId = 'ca-app-pub-3940256099942544/4411468910';
+
+/// AdMob konsolunda `com.egoragames.egoractive` için oluşturulan gerçek
+/// geçiş reklamı (interstitial) birimleri.
+const _androidInterstitialAdUnitId = 'ca-app-pub-7842412614783450/4817899714';
+const _iosInterstitialAdUnitId = 'ca-app-pub-7842412614783450/7790075233';
 
 /// F6-2 — Gerçek App ID'lerle test ederken kendi cihazının reklam
 /// isteklerini AdMob'a "test isteği" olarak işaretlemek için buraya
