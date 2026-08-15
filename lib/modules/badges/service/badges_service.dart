@@ -15,12 +15,13 @@ class BadgesService {
   final RemoteConfigService _remoteConfig;
 
   List<BadgeItem> buildBadges(List<String> earnedIds) {
+    final locale = _remoteConfig.currentLocale;
     return _remoteConfig.badgeCriteria.map((criterion) {
       final id = criterion['id'] as String? ?? '';
       return BadgeItem(
         id: id,
-        title: (criterion['title'] as String?) ?? '',
-        note: (criterion['note'] as String?) ?? '',
+        title: (criterion['title_$locale'] as String?) ?? '',
+        note: (criterion['note_$locale'] as String?) ?? '',
         earned: earnedIds.contains(id),
       );
     }).toList();

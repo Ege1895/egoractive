@@ -147,16 +147,17 @@ class _ExpensesForGymProviderElement
   String get gymId => (origin as _ExpensesForGymProvider).gymId;
 }
 
-String _$expenseCategoriesHash() => r'4aaa3a44074a29f1a5e18d1ffc759657e5e5ce11';
+String _$expenseCategoriesHash() => r'4e4f003b404ff4c3c2100ecd6f9f5f5319632371';
 
 /// F5-3 — `cfg_expense_categories` okuması burada async-wrapped: Remote
 /// Config henüz hazır olmadığı (ör. Firebase başlatılmamış test ortamı)
-/// durumlarda panel çökmesin diye.
+/// durumlarda panel çökmesin diye. Cihaz diline göre `label_tr`/`label_en`
+/// çözümlenir — Firestore'a yazılan `id` dilden bağımsız kalır.
 ///
 /// Copied from [expenseCategories].
 @ProviderFor(expenseCategories)
 final expenseCategoriesProvider =
-    AutoDisposeStreamProvider<List<String>>.internal(
+    AutoDisposeStreamProvider<List<ExpenseCategoryOption>>.internal(
       expenseCategories,
       name: r'expenseCategoriesProvider',
       debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
@@ -168,7 +169,8 @@ final expenseCategoriesProvider =
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-typedef ExpenseCategoriesRef = AutoDisposeStreamProviderRef<List<String>>;
+typedef ExpenseCategoriesRef =
+    AutoDisposeStreamProviderRef<List<ExpenseCategoryOption>>;
 String _$expensesControllerHash() =>
     r'66b75ff0c9ba0b1638bb145125e9f9fc343df84d';
 
