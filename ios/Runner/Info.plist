@@ -28,11 +28,9 @@
 	<true/>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Salon logonuzu yüklemek için fotoğraflarınıza erişim gerekiyor.</string>
-	<!-- F6-2 — Google'ın herkese açık TEST App ID'si. Gerçek AdMob App ID
-	     (AdMob konsolunda bu bundle ID için oluşturulan) store'a yüklemeden
-	     önce buraya girilmeli, aksi halde reklam gösterilmez. -->
+	<!-- F6-2 — AdMob konsolunda com.egoragames.egoractive için oluşturulan gerçek App ID. -->
 	<key>GADApplicationIdentifier</key>
-	<string>ca-app-pub-3940256099942544~1458002511</string>
+	<string>ca-app-pub-7842412614783450~1836513159</string>
 	<key>SKAdNetworkItems</key>
 	<array>
 		<dict>
