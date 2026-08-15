@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
+import '../../../../core/subscription/subscription_write_gate.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_text_field.dart';
@@ -143,6 +144,7 @@ class _AddExpensePanelState extends BasePanelState<AddExpensePanel> {
                   final category = _category;
                   final date = _parseDate(_dateController.text);
                   if (amount <= 0 || title.isEmpty || category == null || date == null) return;
+                  if (!await ensureSubscriptionAllowsWrite(context, ref)) return;
 
                   await ref.read(expensesControllerProvider.notifier).addExpense(
                         category: category,

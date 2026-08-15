@@ -37,8 +37,12 @@ test.beforeEach(async () => {
   // seed eder.
   await testEnv.withSecurityRulesDisabled(async (context) => {
     const db = context.firestore();
-    await setDoc(doc(db, "gyms/gym-a"), { name: "Gym A" });
-    await setDoc(doc(db, "gyms/gym-b"), { name: "Gym B" });
+    await setDoc(doc(db, "gyms/gym-a"), { name: "Gym A", subscriptionStatus: "trial" });
+    await setDoc(doc(db, "gyms/gym-b"), { name: "Gym B", subscriptionStatus: "trial" });
+    // F6-3 — deneme süresi dolmuş/aboneliği sona ermiş bir salon.
+    await setDoc(doc(db, "gyms/gym-expired"), { name: "Gym Expired", subscriptionStatus: "expired" });
+    await setDoc(doc(db, "users/admin-expired"), { role: "admin", gymId: "gym-expired" });
+    await setDoc(doc(db, "users/trainer-expired"), { role: "trainer", gymId: "gym-expired" });
     await setDoc(doc(db, "users/admin-a"), { role: "admin", gymId: "gym-a" });
     await setDoc(doc(db, "users/trainer-a"), { role: "trainer", gymId: "gym-a" });
     await setDoc(doc(db, "users/member-a1"), {
@@ -692,4 +696,97 @@ test("member cannot read another member's feedback (negative)", async () => {
   });
   const db = contextFor("member-a2", { role: "member", gymId: "gym-a" }).firestore();
   await assertFails(getDoc(doc(db, "feedback/fb1")));
+});
+
+// --- F6-3: gymSubscriptionAllowsWrite() — expired bir salon yeni içerik oluşturamaz ---
+
+test("admin of an expired gym cannot create a new member (negative)", async () => {
+  const db = contextFor("admin-expired", { role: "admin", gymId: "gym-expired" }).firestore();
+  await assertFails(
+    setDoc(doc(db, "users/new-member"), { role: "member", gymId: "gym-expired", trainerId: "" }),
+  );
+});
+
+test("admin of an expired gym cannot create a memberPackages doc (negative)", async () => {
+  const db = contextFor("admin-expired", { role: "admin", gymId: "gym-expired" }).firestore();
+  await assertFails(
+    setDoc(doc(db, "memberPackages/pkg-1"), { memberId: "m1", gymId: "gym-expired", totalAmount: 9600 }),
+  );
+});
+
+test("admin of an expired gym cannot create a session (negative)", async () => {
+  const db = contextFor("admin-expired", { role: "admin", gymId: "gym-expired" }).firestore();
+  await assertFails(
+    setDoc(doc(db, "sessions/s1"), {
+      gymId: "gym-expired",
+      trainerId: "trainer-expired",
+      memberId: "m1",
+      startTime: hoursFromNow(48),
+      status: "planned",
+    }),
+  );
+});
+
+test("admin of an expired gym cannot create a group session (negative)", async () => {
+  const db = contextFor("admin-expired", { role: "admin", gymId: "gym-expired" }).firestore();
+  await assertFails(
+    setDoc(doc(db, "groupSessions/gs1"), { gymId: "gym-expired", title: "Mat Pilates", capacity: 8, attendeeIds: [] }),
+  );
+});
+
+test("trainer of an expired gym cannot create a group session either (negative — salon bazlı kısıt)", async () => {
+  const db = contextFor("trainer-expired", { role: "trainer", gymId: "gym-expired" }).firestore();
+  await assertFails(
+    setDoc(doc(db, "groupSessions/gs1"), { gymId: "gym-expired", title: "Mat Pilates", capacity: 8, attendeeIds: [] }),
+  );
+});
+
+test("admin of an expired gym cannot create an event (negative)", async () => {
+  const db = contextFor("admin-expired", { role: "admin", gymId: "gym-expired" }).firestore();
+  await assertFails(
+    setDoc(doc(db, "events/ev1"), { gymId: "gym-expired", name: "Yaz Şenliği", capacity: 20, attendeeIds: [] }),
+  );
+});
+
+test("admin of an expired gym cannot create an expense (negative)", async () => {
+  const db = contextFor("admin-expired", { role: "admin", gymId: "gym-expired" }).firestore();
+  await assertFails(
+    setDoc(doc(db, "expenses/exp-1"), { gymId: "gym-expired", category: "Kira", amountTl: 65000 }),
+  );
+});
+
+test("admin of an expired gym cannot create a studio package catalog entry (negative)", async () => {
+  const db = contextFor("admin-expired", { role: "admin", gymId: "gym-expired" }).firestore();
+  await assertFails(
+    setDoc(doc(db, "gyms/gym-expired/packages/pkg-1"), { name: "10 Ders", sessionCount: 10, priceTl: 9600 }),
+  );
+});
+
+test("admin of an expired gym CAN still update an existing studio package (positive — sadece yeni oluşturma engelli)", async () => {
+  await testEnv.withSecurityRulesDisabled(async (context) => {
+    await setDoc(context.firestore().doc("gyms/gym-expired/packages/pkg-1"), {
+      name: "10 Ders",
+      sessionCount: 10,
+      priceTl: 9600,
+    });
+  });
+  const db = contextFor("admin-expired", { role: "admin", gymId: "gym-expired" }).firestore();
+  await assertSucceeds(
+    setDoc(doc(db, "gyms/gym-expired/packages/pkg-1"), { name: "10 Ders (güncel)" }, { merge: true }),
+  );
+});
+
+test("admin of an expired gym CAN still update an existing session (positive — ör. tamamlama/iptal)", async () => {
+  await testEnv.withSecurityRulesDisabled(async (context) => {
+    await setDoc(context.firestore().doc("sessions/s1"), {
+      gymId: "gym-expired",
+      trainerId: "trainer-expired",
+      memberId: "m1",
+      startTime: hoursFromNow(48),
+      endTime: hoursFromNow(49),
+      status: "planned",
+    });
+  });
+  const db = contextFor("admin-expired", { role: "admin", gymId: "gym-expired" }).firestore();
+  await assertSucceeds(setDoc(doc(db, "sessions/s1"), { status: "cancelled" }, { merge: true }));
 });

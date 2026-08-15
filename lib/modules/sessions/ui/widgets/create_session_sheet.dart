@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/app_spacing.dart';
+import '../../../../core/subscription/subscription_write_gate.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/theme/theme_controller.dart';
 import '../../../../shared/widgets/app_button.dart';
@@ -131,6 +132,7 @@ class _CreateSessionSheetState extends ConsumerState<_CreateSessionSheet> {
             onPressed: _member == null || _trainer == null
                 ? null
                 : () async {
+                    if (!await ensureSubscriptionAllowsWrite(context, ref)) return;
                     final gymId = await ref.read(activeGymIdProvider.future);
                     if (gymId == null) return;
                     await ref.read(sessionsWriteServiceProvider).createSession(

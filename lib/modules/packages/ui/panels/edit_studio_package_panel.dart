@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
+import '../../../../core/subscription/subscription_write_gate.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_text_field.dart';
@@ -204,6 +205,7 @@ class _EditStudioPackagePanelState extends BasePanelState<EditStudioPackagePanel
                 onPressed: () async {
                   final name = _nameController.text.trim();
                   if (name.isEmpty) return;
+                  if (widget.existing == null && !await ensureSubscriptionAllowsWrite(context, ref)) return;
                   await controller.addOrUpdate(
                     StudioPackage(
                       id: widget.existing?.id ?? name.toLowerCase().replaceAll(' ', '-'),

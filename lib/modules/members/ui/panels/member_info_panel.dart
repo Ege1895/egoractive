@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
+import '../../../../core/subscription/subscription_write_gate.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/utils/phone_number_formatter.dart';
 import '../../../../shared/widgets/app_button.dart';
@@ -265,6 +266,7 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
                               ref.read(panelStackControllerProvider.notifier).pop();
                               return;
                             }
+                            if (!await ensureSubscriptionAllowsWrite(context, ref)) return;
                             final success = await registrationController.submit();
                             if (success && mounted) {
                               ref.read(panelStackControllerProvider.notifier).push(const NewMembershipPackagePanel());

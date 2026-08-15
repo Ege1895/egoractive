@@ -32,6 +32,18 @@ service cloud.firestore {
       return ['subscriptionStatus', 'subscriptionExpiresAt', 'subscriptionProductId', 'subscriptionPlatform', 'trialStartedAt'];
     }
 
+    // F6-3 — deneme süresi dolan (trialExpiryCheck scheduled function
+    // 'trial'ı süresi dolunca 'expired'e çevirir) ya da aboneliği sona eren
+    // bir salon yeni içerik (üye/paket satışı/seans/grup dersi/etkinlik/
+    // gider/paket kataloğu) OLUŞTURAMAZ — mevcut kayıtları görüntüleme/
+    // düzenleme/silme etkilenmez. Client tarafında `subscription_write_gate.dart`
+    // aynı durumu proaktif kontrol edip "aboneliğini yenile" uyarısı
+    // gösteriyor, ama bu kural client atlatılsa bile geçerli olan gerçek
+    // güvenlik sınırı.
+    function gymSubscriptionAllowsWrite(gymId) {
+      return get(/databases/$(database)/documents/gyms/$(gymId)).data.subscriptionStatus in ['trial', 'active'];
+    }
+
     match /gyms/{gymId} {
       allow read: if isSignedIn() && myGymId() == gymId;
       allow create: if isSignedIn() && myRole() == 'admin' && myGymId() == gymId &&
@@ -47,7 +59,8 @@ service cloud.firestore {
       // wildcard değil.
       match /packages/{packageId} {
         allow read: if isSignedIn() && myGymId() == gymId;
-        allow write: if isSignedIn() && myRole() == 'admin' && myGymId() == gymId;
+        allow create: if isSignedIn() && myRole() == 'admin' && myGymId() == gymId && gymSubscriptionAllowsWrite(gymId);
+        allow update, delete: if isSignedIn() && myRole() == 'admin' && myGymId() == gymId;
       }
     }
 
@@ -66,7 +79,7 @@ service cloud.firestore {
 
       allow create: if isSignedIn() && (
         request.auth.uid == uid ||
-        (myRole() == 'admin' && request.resource.data.gymId == myGymId())
+        (myRole() == 'admin' && request.resource.data.gymId == myGymId() && gymSubscriptionAllowsWrite(myGymId()))
       );
 
       allow update: if isSignedIn() && (
@@ -91,7 +104,8 @@ service cloud.firestore {
     // dokunmaz.
     match /memberPackages/{packageId} {
       allow read, update, delete: if isSignedIn() && myRole() == 'admin' && resource.data.gymId == myGymId();
-      allow create: if isSignedIn() && myRole() == 'admin' && request.resource.data.gymId == myGymId();
+      allow create: if isSignedIn() && myRole() == 'admin' && request.resource.data.gymId == myGymId() &&
+        gymSubscriptionAllowsWrite(myGymId());
     }
 
     // sessions/{sessionId} — F3-3. Oluşturma sadece admin ekranlarından
@@ -135,7 +149,8 @@ service cloud.firestore {
 
     match /sessions/{sessionId} {
       allow read: if isSignedIn() && resource.data.gymId == myGymId();
-      allow create: if isSignedIn() && myRole() == 'admin' && request.resource.data.gymId == myGymId();
+      allow create: if isSignedIn() && myRole() == 'admin' && request.resource.data.gymId == myGymId() &&
+        gymSubscriptionAllowsWrite(myGymId());
       allow update, delete: if isSignedIn() && resource.data.gymId == myGymId() && (
         myRole() == 'admin' ||
         (isOwnSession() && withinCancellationWindow()) ||
@@ -200,7 +215,7 @@ service cloud.firestore {
     match /groupSessions/{sessionId} {
       allow read: if isSignedIn() && resource.data.gymId == myGymId();
       allow create: if isSignedIn() && (myRole() == 'admin' || myRole() == 'trainer') &&
-        request.resource.data.gymId == myGymId();
+        request.resource.data.gymId == myGymId() && gymSubscriptionAllowsWrite(myGymId());
       allow update: if isSignedIn() && resource.data.gymId == myGymId() && (
         myRole() == 'admin' || myRole() == 'trainer' || isOwnAttendeeChange()
       );
@@ -211,7 +226,7 @@ service cloud.firestore {
     match /events/{eventId} {
       allow read: if isSignedIn() && resource.data.gymId == myGymId();
       allow create: if isSignedIn() && (myRole() == 'admin' || myRole() == 'trainer') &&
-        request.resource.data.gymId == myGymId();
+        request.resource.data.gymId == myGymId() && gymSubscriptionAllowsWrite(myGymId());
       allow update: if isSignedIn() && resource.data.gymId == myGymId() && (
         myRole() == 'admin' || myRole() == 'trainer' || isOwnAttendeeChange()
       );
@@ -223,7 +238,8 @@ service cloud.firestore {
     // sadece kendi salonunun admin'i erişir.
     match /expenses/{expenseId} {
       allow read, update, delete: if isSignedIn() && myRole() == 'admin' && resource.data.gymId == myGymId();
-      allow create: if isSignedIn() && myRole() == 'admin' && request.resource.data.gymId == myGymId();
+      allow create: if isSignedIn() && myRole() == 'admin' && request.resource.data.gymId == myGymId() &&
+        gymSubscriptionAllowsWrite(myGymId());
     }
 
     // feedback/{id} — F5-4. Üye kendi geri bildirimini yazar (değiştiremez/
