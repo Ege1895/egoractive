@@ -205,5 +205,16 @@ service cloud.firestore {
       allow read, update, delete: if isSignedIn() && myRole() == 'admin' && resource.data.gymId == myGymId();
       allow create: if isSignedIn() && myRole() == 'admin' && request.resource.data.gymId == myGymId();
     }
+
+    // feedback/{id} — F5-4. Üye kendi geri bildirimini yazar (değiştiremez/
+    // silemez, gönderim tek seferlik); sadece stüdyo yönetimi (admin) okur —
+    // antrenöre hiç açılmıyor (F5-4 gizlilik notu: "antrenörüne isimsiz
+    // iletilir" — bu app'te antrenör tarafında hiç gösterilmiyor).
+    match /feedback/{feedbackId} {
+      allow read: if isSignedIn() && myRole() == 'admin' && resource.data.gymId == myGymId();
+      allow create: if isSignedIn() && myRole() == 'member' &&
+        request.resource.data.gymId == myGymId() &&
+        request.resource.data.memberId == request.auth.uid;
+    }
   }
 }

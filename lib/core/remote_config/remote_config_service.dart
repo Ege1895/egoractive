@@ -65,6 +65,10 @@ abstract final class RemoteConfigKeys {
   /// push metni. `{memberName}` yer tutucusu fonksiyon tarafında değişir.
   static const notifSessionCompletionTitle = 'lbl_notif_session_completion_title';
   static const notifSessionCompletionBody = 'lbl_notif_session_completion_body';
+  /// F5-4 — feedbackReminderCheck Cloud Function'ının üyelere gönderdiği
+  /// push metni.
+  static const notifFeedbackReminderTitle = 'lbl_notif_feedback_reminder_title';
+  static const notifFeedbackReminderBody = 'lbl_notif_feedback_reminder_body';
 
   static const commonVazgec = 'lbl_common_vazgec';
   static const commonKaydet = 'lbl_common_kaydet';
@@ -524,6 +528,8 @@ class RemoteConfigService {
     'lbl_notif_session_reminder_body_tr': '{trainerName} seni bekliyor. Gelip gelmeyeceğini onaylamak için dokun 👇',
     'lbl_notif_session_completion_title_tr': '✅ Dersini onaylar mısın?',
     'lbl_notif_session_completion_body_tr': '{memberName} ile dersin bitti. Tamamlandı mı, yoksa üye gelmedi mi?',
+    'lbl_notif_feedback_reminder_title_tr': '💬 Bu ay nasıl geçti?',
+    'lbl_notif_feedback_reminder_body_tr': 'Deneyimini bizimle paylaşır mısın? 1 dakikanı alır.',
     'lbl_common_vazgec_tr': 'Vazgeç',
     'lbl_common_kaydet_tr': 'Kaydet',
     'lbl_common_duzenle_tr': 'Düzenle',
@@ -829,6 +835,8 @@ class RemoteConfigService {
     'lbl_notif_session_reminder_body_en': '{trainerName} is waiting for you. Tap to confirm you\'re coming 👇',
     'lbl_notif_session_completion_title_en': '✅ Can you confirm your session?',
     'lbl_notif_session_completion_body_en': 'Your session with {memberName} has ended. Was it completed, or did they not show up?',
+    'lbl_notif_feedback_reminder_title_en': '💬 How was your month?',
+    'lbl_notif_feedback_reminder_body_en': 'Would you share your experience with us? It only takes a minute.',
     'lbl_common_vazgec_en': 'Cancel',
     'lbl_common_kaydet_en': 'Save',
     'lbl_common_duzenle_en': 'Edit',
