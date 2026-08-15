@@ -33,6 +33,9 @@ abstract final class RemoteConfigKeys {
   /// güncellemesi gerekmiyor — `badgeCheck` scheduled function'ı da aynı
   /// şablonu okuyor.
   static const badgeCriteria = 'cfg_badge_criteria';
+  /// F5-3 — gider kategorileri listesi. Yeni bir kategori eklemek için
+  /// kod değişikliği/store güncellemesi gerekmiyor.
+  static const expenseCategories = 'cfg_expense_categories';
   /// F3-3 — üye/antrenör için seans iptali son kaç saate kadar açık.
   /// Gerçek zorlama `firestore.rules`'ta (Security Rules Remote Config'e
   /// erişemediği için orada sabit 24 olarak tutuluyor) — bu değer sadece
@@ -503,6 +506,7 @@ class RemoteConfigService {
     RemoteConfigKeys.freeVersionAdsEnabled: true,
     RemoteConfigKeys.featureFlags: '{}',
     RemoteConfigKeys.badgeCriteria: _defaultBadgeCriteriaJson,
+    RemoteConfigKeys.expenseCategories: '["Kira", "Fatura", "Ekipman", "Prim", "Pazarlama", "Diğer"]',
     'lbl_notif_session_reminder_title_tr': '⏰ Bugün {time}\'de dersin var!',
     'lbl_notif_session_reminder_body_tr': '{trainerName} seni bekliyor. Gelip gelmeyeceğini onaylamak için dokun 👇',
     'lbl_notif_session_completion_title_tr': '✅ Dersini onaylar mısın?',
@@ -1166,6 +1170,10 @@ class RemoteConfigService {
   List<Map<String, dynamic>> get badgeCriteria =>
       _getJsonList(RemoteConfigKeys.badgeCriteria);
 
+  /// F5-3 — gider kategorileri (kodda değil RC'de tanımlı).
+  List<String> get expenseCategories =>
+      _getStringList(RemoteConfigKeys.expenseCategories);
+
   /// `lbl*` metinlerini okur: `<key>_<currentLocale>` parametresini getirir.
   /// Kod içinde `_tr`/`_en` asla elle yazılmaz, bu metod ekler.
   String getText(String baseKey) => getString('${baseKey}_$currentLocale');
@@ -1214,6 +1222,17 @@ class RemoteConfigService {
     try {
       final decoded = jsonDecode(raw);
       return decoded is List ? decoded.whereType<Map<String, dynamic>>().toList() : const [];
+    } on FormatException {
+      return const [];
+    }
+  }
+
+  List<String> _getStringList(String key) {
+    final raw = getString(key);
+    if (raw.isEmpty) return const [];
+    try {
+      final decoded = jsonDecode(raw);
+      return decoded is List ? decoded.whereType<String>().toList() : const [];
     } on FormatException {
       return const [];
     }

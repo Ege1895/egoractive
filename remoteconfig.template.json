@@ -98,6 +98,13 @@
       "description": "F4-4 — rozet kriterleri: id/title/note/type/threshold listesi. type: sessionsCompleted | groupSessionJoins | eventJoins | membershipMonths. badgeCheck scheduled function ve client aynı şablonu okur.",
       "valueType": "JSON"
     },
+    "cfg_expense_categories": {
+      "defaultValue": {
+        "value": "[\"Kira\", \"Fatura\", \"Ekipman\", \"Prim\", \"Pazarlama\", \"Diğer\"]"
+      },
+      "description": "F5-3 — gider kategorileri listesi. Yeni bir kategori eklemek için kod değişikliği gerekmiyor.",
+      "valueType": "JSON"
+    },
     "lbl_notif_session_reminder_title_tr": {
       "defaultValue": {
         "value": "⏰ Bugün {time}'de dersin var!"
