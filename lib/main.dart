@@ -9,6 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
+import 'core/constants/ad_constants.dart';
 import 'core/panels/panel_stack_controller.dart';
 import 'core/panels/panel_stack_view.dart';
 import 'core/remote_config/remote_config_service.dart';
@@ -32,6 +33,9 @@ void main() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await const RemoteConfigService().init();
   unawaited(MobileAds.instance.initialize());
+  if (debugTestDeviceIds.isNotEmpty) {
+    MobileAds.instance.updateRequestConfiguration(RequestConfiguration(testDeviceIds: debugTestDeviceIds));
+  }
   FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
   await PushNotificationService().init(_providerContainer);
   runApp(UncontrolledProviderScope(container: _providerContainer, child: const EgoractiveApp()));

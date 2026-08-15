@@ -6,7 +6,7 @@ part of 'ad_gate.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$shouldShowAdsHash() => r'fee8bacc6b722d42f6f5b911121f0ddf1fcac974';
+String _$shouldShowAdsHash() => r'c8f9e99c3dcfa8923d673e9157af4f90b5522223';
 
 /// F6-2 — bir üyeye banner reklam gösterilip gösterilmeyeceğine karar
 /// verir: salonun aboneliği `active` DEĞİLSE VE `cfg_free_version_ads_enabled`

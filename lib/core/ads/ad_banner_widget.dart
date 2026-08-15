@@ -3,12 +3,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import '../constants/ad_constants.dart';
+import 'ad_consent_service.dart';
 import 'ad_gate.dart';
 
 /// F6-2 — `AppTabShell`'in alt tab bar'ının hemen üstüne yerleştirilen
 /// banner reklam. Görünürlüğü tamamen [shouldShowAdsProvider]'a bağlı:
 /// abone olan bir salonun üyesinde ya da `cfg_free_version_ads_enabled`
-/// kapalıyken hiç yer kaplamaz (SizedBox.shrink).
+/// kapalıyken hiç yer kaplamaz (SizedBox.shrink). Reklam isteğinden önce
+/// [AdConsentService] ile GDPR/UK rıza akışı tamamlanır — AB/İngiltere
+/// dışındaki kullanıcılarda bu adım anında geçer, UI göstermez.
 class AdBannerWidget extends ConsumerStatefulWidget {
   const AdBannerWidget({super.key});
 
@@ -24,7 +27,7 @@ class _AdBannerWidgetState extends ConsumerState<AdBannerWidget> {
   void initState() {
     super.initState();
     if (ref.read(shouldShowAdsProvider)) {
-      _loadAd();
+      _maybeLoadAd();
     }
   }
 
@@ -32,7 +35,7 @@ class _AdBannerWidgetState extends ConsumerState<AdBannerWidget> {
   Widget build(BuildContext context) {
     ref.listen(shouldShowAdsProvider, (previous, shouldShow) {
       if (shouldShow && _bannerAd == null) {
-        _loadAd();
+        _maybeLoadAd();
       } else if (!shouldShow) {
         _disposeAd();
       }
@@ -44,6 +47,12 @@ class _AdBannerWidgetState extends ConsumerState<AdBannerWidget> {
       height: _bannerAd!.size.height.toDouble(),
       child: AdWidget(ad: _bannerAd!),
     );
+  }
+
+  Future<void> _maybeLoadAd() async {
+    final canRequestAds = await ref.read(adConsentServiceProvider).ensureConsent();
+    if (!mounted || !canRequestAds || !ref.read(shouldShowAdsProvider)) return;
+    _loadAd();
   }
 
   void _loadAd() {
