@@ -28,6 +28,16 @@
 	<true/>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Salon logonuzu yüklemek için fotoğraflarınıza erişim gerekiyor.</string>
+	<!-- F6-2 — AdMob konsolunda com.egoragames.egoractive için oluşturulan gerçek App ID. -->
+	<key>GADApplicationIdentifier</key>
+	<string>ca-app-pub-7842412614783450~1836513159</string>
+	<key>SKAdNetworkItems</key>
+	<array>
+		<dict>
+			<key>SKAdNetworkIdentifier</key>
+			<string>cstr6suwn9.skadnetwork</string>
+		</dict>
+	</array>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

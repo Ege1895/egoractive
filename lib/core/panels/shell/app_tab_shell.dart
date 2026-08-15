@@ -20,9 +20,19 @@ class AppTabItem {
 /// Flutter karşılığı: aktif sekme [AppColorScheme.onPrimaryContainer],
 /// pasif sekme [AppColorScheme.onSurfaceMuted] rengini alır.
 class AppTabShell extends StatefulWidget {
-  const AppTabShell({required this.items, super.key});
+  const AppTabShell({required this.items, this.bottomAdSlot, this.onTabSelected, super.key});
 
   final List<AppTabItem> items;
+
+  /// F6-2 — tab bar'ın hemen üstüne yerleştirilen opsiyonel reklam alanı.
+  /// Sadece `MemberShellPanel` bunu doldurur; admin/antrenör shell'lerinde
+  /// `null` kalır.
+  final Widget? bottomAdSlot;
+
+  /// F6-2 — kullanıcı bir sekmeye dokunduğunda (yeni index ne olursa olsun)
+  /// tetiklenir. `MemberShellPanel` bunu, "Ana Sayfa"ya dönüşü interstitial
+  /// reklam için doğal bir geçiş anı olarak işaretlemek amacıyla kullanır.
+  final ValueChanged<int>? onTabSelected;
 
   @override
   State<AppTabShell> createState() => _AppTabShellState();
@@ -52,20 +62,29 @@ class _AppTabShellState extends State<AppTabShell> {
         ),
         child: SafeArea(
           top: false,
-          child: SizedBox(
-            height: 64,
-            child: Row(
-              children: [
-                for (var i = 0; i < widget.items.length; i++)
-                  Expanded(
-                    child: _TabButton(
-                      item: widget.items[i],
-                      selected: i == _index,
-                      onTap: () => setState(() => _index = i),
-                    ),
-                  ),
-              ],
-            ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (widget.bottomAdSlot != null) widget.bottomAdSlot!,
+              SizedBox(
+                height: 64,
+                child: Row(
+                  children: [
+                    for (var i = 0; i < widget.items.length; i++)
+                      Expanded(
+                        child: _TabButton(
+                          item: widget.items[i],
+                          selected: i == _index,
+                          onTap: () {
+                            setState(() => _index = i);
+                            widget.onTabSelected?.call(i);
+                          },
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ),
       ),
