@@ -6,7 +6,15 @@ import '../service/expenses_service.dart';
 part 'expenses_repository.g.dart';
 
 abstract interface class ExpensesRepository {
-  ExpensesState loadInitial();
+  Stream<ExpensesState> watchMonth(String gymId);
+  Future<void> addExpense({
+    required String gymId,
+    required String category,
+    required String title,
+    required DateTime date,
+    required int amountTl,
+    required bool recurring,
+  });
 }
 
 class ExpensesRepositoryImpl implements ExpensesRepository {
@@ -15,7 +23,26 @@ class ExpensesRepositoryImpl implements ExpensesRepository {
   final ExpensesService _service;
 
   @override
-  ExpensesState loadInitial() => _service.loadInitial();
+  Stream<ExpensesState> watchMonth(String gymId) => _service.watchMonth(gymId);
+
+  @override
+  Future<void> addExpense({
+    required String gymId,
+    required String category,
+    required String title,
+    required DateTime date,
+    required int amountTl,
+    required bool recurring,
+  }) {
+    return _service.addExpense(
+      gymId: gymId,
+      category: category,
+      title: title,
+      date: date,
+      amountTl: amountTl,
+      recurring: recurring,
+    );
+  }
 }
 
 @riverpod

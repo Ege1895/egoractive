@@ -8,10 +8,15 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_text_field.dart';
 import '../../controller/expenses_controller.dart';
-import '../../domain/expense_category.dart';
-import '../../domain/expense_state.dart';
 
-/// Admin 15 · Gider Ekle — kategori, tutar, tarih, tekrar.
+const _monthAbbrevToNumber = {
+  'Oca': 1, 'Şub': 2, 'Mar': 3, 'Nis': 4, 'May': 5, 'Haz': 6,
+  'Tem': 7, 'Ağu': 8, 'Eyl': 9, 'Eki': 10, 'Kas': 11, 'Ara': 12,
+};
+
+/// Admin 15 · Gider Ekle — kategori, tutar, tarih, tekrar. Kategori listesi
+/// Remote Config'ten (`cfg_expense_categories`) okunur — yeni bir kategori
+/// eklemek kod değişikliği gerektirmiyor (F5-3 kabul kriteri).
 class AddExpensePanel extends BasePanel {
   const AddExpensePanel({super.key});
 
@@ -23,13 +28,15 @@ class _AddExpensePanelState extends BasePanelState<AddExpensePanel> {
   final _amountController = TextEditingController();
   final _titleController = TextEditingController();
   final _dateController = TextEditingController(text: '18 Tem 2026');
-  String _category = expenseCategoryOptions.first;
+  String? _category;
   bool _recurring = false;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
     final typography = context.appTypography;
+    final categories = ref.watch(expenseCategoriesProvider).valueOrNull ?? const [];
+    _category ??= categories.isEmpty ? null : categories.first;
 
     return Scaffold(
       body: SafeArea(
@@ -64,7 +71,7 @@ class _AddExpensePanelState extends BasePanelState<AddExpensePanel> {
                     spacing: AppSpacing.sm,
                     runSpacing: AppSpacing.sm,
                     children: [
-                      for (final category in expenseCategoryOptions)
+                      for (final category in categories)
                         _CategoryChip(label: category, selected: _category == category, onTap: () => setState(() => _category = category)),
                     ],
                   ),
@@ -126,20 +133,21 @@ class _AddExpensePanelState extends BasePanelState<AddExpensePanel> {
               padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.md, AppSpacing.screenEdge, AppSpacing.lg),
               child: AppButton(
                 label: 'Gideri kaydet',
-                onPressed: () {
+                onPressed: () async {
                   final amount = int.tryParse(_amountController.text) ?? 0;
                   final title = _titleController.text.trim();
-                  if (amount <= 0 || title.isEmpty) return;
-                  ref.read(expensesControllerProvider.notifier).addExpense(
-                        ExpenseEntry(
-                          id: '${title.toLowerCase().replaceAll(' ', '-')}-${DateTime.now().millisecondsSinceEpoch}',
-                          category: _category,
-                          title: title,
-                          date: _dateController.text.trim(),
-                          amountTl: amount,
-                          recurring: _recurring,
-                        ),
+                  final category = _category;
+                  final date = _parseDate(_dateController.text);
+                  if (amount <= 0 || title.isEmpty || category == null || date == null) return;
+
+                  await ref.read(expensesControllerProvider.notifier).addExpense(
+                        category: category,
+                        title: title,
+                        date: date,
+                        amountTl: amount,
+                        recurring: _recurring,
                       );
+                  if (!mounted) return;
                   ref.read(panelStackControllerProvider.notifier).pop();
                 },
               ),
@@ -148,6 +156,17 @@ class _AddExpensePanelState extends BasePanelState<AddExpensePanel> {
         ),
       ),
     );
+  }
+
+  /// "18 Tem 2026" formatını ayrıştırır — geçersizse null.
+  DateTime? _parseDate(String text) {
+    final parts = text.trim().split(RegExp(r'\s+'));
+    if (parts.length != 3) return null;
+    final day = int.tryParse(parts[0]);
+    final month = _monthAbbrevToNumber[parts[1]];
+    final year = int.tryParse(parts[2]);
+    if (day == null || month == null || year == null) return null;
+    return DateTime(year, month, day);
   }
 
   @override
