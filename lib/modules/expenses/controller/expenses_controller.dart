@@ -2,6 +2,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/remote_config/remote_config_service.dart';
 import '../../../core/theme/theme_controller.dart';
+import '../domain/expense_category.dart';
 import '../domain/expense_state.dart';
 import '../repository/expenses_repository.dart';
 
@@ -16,10 +17,16 @@ Stream<ExpensesState> _expensesForGym(_ExpensesForGymRef ref, String gymId) {
 
 /// F5-3 — `cfg_expense_categories` okuması burada async-wrapped: Remote
 /// Config henüz hazır olmadığı (ör. Firebase başlatılmamış test ortamı)
-/// durumlarda panel çökmesin diye.
+/// durumlarda panel çökmesin diye. Cihaz diline göre `label_tr`/`label_en`
+/// çözümlenir — Firestore'a yazılan `id` dilden bağımsız kalır.
 @riverpod
-Stream<List<String>> expenseCategories(ExpenseCategoriesRef ref) async* {
-  yield ref.watch(remoteConfigServiceProvider).expenseCategories;
+Stream<List<ExpenseCategoryOption>> expenseCategories(ExpenseCategoriesRef ref) async* {
+  final rc = ref.watch(remoteConfigServiceProvider);
+  final locale = rc.currentLocale;
+  yield rc.expenseCategories.map((raw) {
+    final id = raw['id'] as String? ?? '';
+    return ExpenseCategoryOption(id: id, label: (raw['label_$locale'] as String?) ?? id);
+  }).toList();
 }
 
 @riverpod

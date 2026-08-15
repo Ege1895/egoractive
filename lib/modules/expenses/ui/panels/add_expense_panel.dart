@@ -36,7 +36,7 @@ class _AddExpensePanelState extends BasePanelState<AddExpensePanel> {
     final colors = context.appColors;
     final typography = context.appTypography;
     final categories = ref.watch(expenseCategoriesProvider).valueOrNull ?? const [];
-    _category ??= categories.isEmpty ? null : categories.first;
+    _category ??= categories.isEmpty ? null : categories.first.id;
 
     return Scaffold(
       body: SafeArea(
@@ -72,7 +72,11 @@ class _AddExpensePanelState extends BasePanelState<AddExpensePanel> {
                     runSpacing: AppSpacing.sm,
                     children: [
                       for (final category in categories)
-                        _CategoryChip(label: category, selected: _category == category, onTap: () => setState(() => _category = category)),
+                        _CategoryChip(
+                          label: category.label,
+                          selected: _category == category.id,
+                          onTap: () => setState(() => _category = category.id),
+                        ),
                     ],
                   ),
                   const SizedBox(height: AppSpacing.lg),

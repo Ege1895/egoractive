@@ -18,6 +18,9 @@ class AdminExpensesPanel extends ConsumerWidget {
     final typography = context.appTypography;
     final state = ref.watch(expensesControllerProvider);
     final maxCategory = state.categoryTotals.isEmpty ? 1 : state.categoryTotals.first.amountTl;
+    final categories = ref.watch(expenseCategoriesProvider).valueOrNull ?? const [];
+    final categoryLabels = {for (final c in categories) c.id: c.label};
+    String labelFor(String id) => categoryLabels[id] ?? id;
 
     return Scaffold(
       body: SafeArea(
@@ -73,7 +76,11 @@ class AdminExpensesPanel extends ConsumerWidget {
                     child: Column(
                       children: [
                         for (var i = 0; i < state.categoryTotals.length; i++) ...[
-                          _CategoryRow(total: state.categoryTotals[i], ratio: state.categoryTotals[i].amountTl / maxCategory),
+                          _CategoryRow(
+                            total: state.categoryTotals[i],
+                            label: labelFor(state.categoryTotals[i].category),
+                            ratio: state.categoryTotals[i].amountTl / maxCategory,
+                          ),
                           if (i < state.categoryTotals.length - 1) const SizedBox(height: AppSpacing.md),
                         ],
                       ],
@@ -87,7 +94,12 @@ class AdminExpensesPanel extends ConsumerWidget {
                     decoration: BoxDecoration(color: colors.surface, borderRadius: BorderRadius.circular(AppSpacing.radiusCard), border: Border.all(color: colors.outline)),
                     child: Column(
                       children: [
-                        for (var i = 0; i < state.entries.length; i++) _ExpenseRow(entry: state.entries[i], showDivider: i < state.entries.length - 1),
+                        for (var i = 0; i < state.entries.length; i++)
+                          _ExpenseRow(
+                            entry: state.entries[i],
+                            categoryLabel: labelFor(state.entries[i].category),
+                            showDivider: i < state.entries.length - 1,
+                          ),
                       ],
                     ),
                   ),
@@ -102,9 +114,10 @@ class AdminExpensesPanel extends ConsumerWidget {
 }
 
 class _CategoryRow extends StatelessWidget {
-  const _CategoryRow({required this.total, required this.ratio});
+  const _CategoryRow({required this.total, required this.label, required this.ratio});
 
   final ExpenseCategoryTotal total;
+  final String label;
   final double ratio;
 
   @override
@@ -116,7 +129,7 @@ class _CategoryRow extends StatelessWidget {
       children: [
         Row(
           children: [
-            Expanded(child: Text(total.category, style: typography.bodyLarge.copyWith(color: colors.onSurface, fontSize: 15))),
+            Expanded(child: Text(label, style: typography.bodyLarge.copyWith(color: colors.onSurface, fontSize: 15))),
             Text('₺${total.amountTl}', style: typography.headingSmall.copyWith(color: colors.onSurfaceVariant, fontSize: 15)),
           ],
         ),
@@ -131,9 +144,10 @@ class _CategoryRow extends StatelessWidget {
 }
 
 class _ExpenseRow extends StatelessWidget {
-  const _ExpenseRow({required this.entry, required this.showDivider});
+  const _ExpenseRow({required this.entry, required this.categoryLabel, required this.showDivider});
 
   final ExpenseEntry entry;
+  final String categoryLabel;
   final bool showDivider;
 
   @override
@@ -150,7 +164,7 @@ class _ExpenseRow extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(entry.title, style: typography.bodyLarge.copyWith(color: colors.onSurface, fontSize: 15)),
-                Text('${entry.category} · ${entry.date}', style: typography.caption.copyWith(color: colors.onSurfaceMuted)),
+                Text('$categoryLabel · ${entry.date}', style: typography.caption.copyWith(color: colors.onSurfaceMuted)),
               ],
             ),
           ),

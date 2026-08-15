@@ -33,8 +33,10 @@ abstract final class RemoteConfigKeys {
   /// güncellemesi gerekmiyor — `badgeCheck` scheduled function'ı da aynı
   /// şablonu okuyor.
   static const badgeCriteria = 'cfg_badge_criteria';
-  /// F5-3 — gider kategorileri listesi. Yeni bir kategori eklemek için
-  /// kod değişikliği/store güncellemesi gerekmiyor.
+  /// F5-3 — gider kategorileri: `[{id, label_tr, label_en}]`. Firestore'a
+  /// `id` yazılır, ekranda cihaz diline göre `label_tr`/`label_en` gösterilir
+  /// — Firestore'da dilden bağımsız, ekranda doğru dilde. Yeni bir kategori
+  /// eklemek için kod değişikliği/store güncellemesi gerekmiyor.
   static const expenseCategories = 'cfg_expense_categories';
   /// F3-3 — üye/antrenör için seans iptali son kaç saate kadar açık.
   /// Gerçek zorlama `firestore.rules`'ta (Security Rules Remote Config'e
@@ -484,12 +486,23 @@ class RemoteConfigService {
 
   static const _defaultBadgeCriteriaJson = '''
 [
-  {"id": "first_session", "title": "İlk dersin", "note": "İlk dersini tamamla", "type": "sessionsCompleted", "threshold": 1},
-  {"id": "sessions_5", "title": "5 ders tamam", "note": "5 ders tamamla", "type": "sessionsCompleted", "threshold": 5},
-  {"id": "sessions_20", "title": "20 ders tamam", "note": "20 ders tamamla", "type": "sessionsCompleted", "threshold": 20},
-  {"id": "group_session_join", "title": "Grup dersi", "note": "Bir grup dersine katıl", "type": "groupSessionJoins", "threshold": 1},
-  {"id": "event_join", "title": "Etkinlik", "note": "Bir etkinliğe katıl", "type": "eventJoins", "threshold": 1},
-  {"id": "membership_6_months", "title": "6 ay üyelik", "note": "6 ay üyeliğini sürdür", "type": "membershipMonths", "threshold": 6}
+  {"id": "first_session", "title_tr": "İlk dersin", "title_en": "Your first session", "note_tr": "İlk dersini tamamla", "note_en": "Complete your first session", "type": "sessionsCompleted", "threshold": 1},
+  {"id": "sessions_5", "title_tr": "5 ders tamam", "title_en": "5 sessions done", "note_tr": "5 ders tamamla", "note_en": "Complete 5 sessions", "type": "sessionsCompleted", "threshold": 5},
+  {"id": "sessions_20", "title_tr": "20 ders tamam", "title_en": "20 sessions done", "note_tr": "20 ders tamamla", "note_en": "Complete 20 sessions", "type": "sessionsCompleted", "threshold": 20},
+  {"id": "group_session_join", "title_tr": "Grup dersi", "title_en": "Group class", "note_tr": "Bir grup dersine katıl", "note_en": "Join a group class", "type": "groupSessionJoins", "threshold": 1},
+  {"id": "event_join", "title_tr": "Etkinlik", "title_en": "Event", "note_tr": "Bir etkinliğe katıl", "note_en": "Join an event", "type": "eventJoins", "threshold": 1},
+  {"id": "membership_6_months", "title_tr": "6 ay üyelik", "title_en": "6-month membership", "note_tr": "6 ay üyeliğini sürdür", "note_en": "Keep your membership for 6 months", "type": "membershipMonths", "threshold": 6}
+]
+''';
+
+  static const _defaultExpenseCategoriesJson = '''
+[
+  {"id": "rent", "label_tr": "Kira", "label_en": "Rent"},
+  {"id": "utility", "label_tr": "Fatura", "label_en": "Utility"},
+  {"id": "equipment", "label_tr": "Ekipman", "label_en": "Equipment"},
+  {"id": "commission", "label_tr": "Prim", "label_en": "Commission"},
+  {"id": "marketing", "label_tr": "Pazarlama", "label_en": "Marketing"},
+  {"id": "other", "label_tr": "Diğer", "label_en": "Other"}
 ]
 ''';
 
@@ -506,7 +519,7 @@ class RemoteConfigService {
     RemoteConfigKeys.freeVersionAdsEnabled: true,
     RemoteConfigKeys.featureFlags: '{}',
     RemoteConfigKeys.badgeCriteria: _defaultBadgeCriteriaJson,
-    RemoteConfigKeys.expenseCategories: '["Kira", "Fatura", "Ekipman", "Prim", "Pazarlama", "Diğer"]',
+    RemoteConfigKeys.expenseCategories: _defaultExpenseCategoriesJson,
     'lbl_notif_session_reminder_title_tr': '⏰ Bugün {time}\'de dersin var!',
     'lbl_notif_session_reminder_body_tr': '{trainerName} seni bekliyor. Gelip gelmeyeceğini onaylamak için dokun 👇',
     'lbl_notif_session_completion_title_tr': '✅ Dersini onaylar mısın?',
@@ -1170,9 +1183,11 @@ class RemoteConfigService {
   List<Map<String, dynamic>> get badgeCriteria =>
       _getJsonList(RemoteConfigKeys.badgeCriteria);
 
-  /// F5-3 — gider kategorileri (kodda değil RC'de tanımlı).
-  List<String> get expenseCategories =>
-      _getStringList(RemoteConfigKeys.expenseCategories);
+  /// F5-3 — gider kategorileri, ham liste (kodda değil RC'de tanımlı).
+  /// Her öğe `{id, label_tr, label_en}` — dile göre çözümleme çağıran
+  /// tarafta (`currentLocale` ile) yapılır.
+  List<Map<String, dynamic>> get expenseCategories =>
+      _getJsonList(RemoteConfigKeys.expenseCategories);
 
   /// `lbl*` metinlerini okur: `<key>_<currentLocale>` parametresini getirir.
   /// Kod içinde `_tr`/`_en` asla elle yazılmaz, bu metod ekler.
@@ -1222,17 +1237,6 @@ class RemoteConfigService {
     try {
       final decoded = jsonDecode(raw);
       return decoded is List ? decoded.whereType<Map<String, dynamic>>().toList() : const [];
-    } on FormatException {
-      return const [];
-    }
-  }
-
-  List<String> _getStringList(String key) {
-    final raw = getString(key);
-    if (raw.isEmpty) return const [];
-    try {
-      final decoded = jsonDecode(raw);
-      return decoded is List ? decoded.whereType<String>().toList() : const [];
     } on FormatException {
       return const [];
     }
