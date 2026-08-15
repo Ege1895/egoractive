@@ -84,6 +84,13 @@
       "description": "Ücretsiz sürümde reklam gösterilsin mi.",
       "valueType": "BOOLEAN"
     },
+    "cfg_trial_duration_days": {
+      "defaultValue": {
+        "value": "14"
+      },
+      "description": "F6-3 — yeni bir salona trialStartedAt'ten itibaren tanınan ücretsiz deneme süresi (gün).",
+      "valueType": "NUMBER"
+    },
     "cfg_feature_flags": {
       "defaultValue": {
         "value": "{\"group_sessions_enabled\": true}"

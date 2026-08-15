@@ -91,6 +91,36 @@ test("admin of a different gym cannot write to this gym (negative)", async () =>
   await assertFails(setDoc(doc(db, "gyms/gym-a"), { name: "Hacked" }, { merge: true }));
 });
 
+// --- gyms/{gymId} subscription fields (F6-1) ---
+
+test("admin can create a gym doc with subscriptionStatus 'trial' (positive)", async () => {
+  const db = contextFor("admin-a", { role: "admin", gymId: "gym-new" }).firestore();
+  await assertSucceeds(
+    setDoc(doc(db, "gyms/gym-new"), { name: "New Gym", subscriptionStatus: "trial" }),
+  );
+});
+
+test("admin cannot create a gym doc directly as 'active' (negative — bedava premium'a geçemez)", async () => {
+  const db = contextFor("admin-a", { role: "admin", gymId: "gym-new" }).firestore();
+  await assertFails(
+    setDoc(doc(db, "gyms/gym-new"), { name: "New Gym", subscriptionStatus: "active" }),
+  );
+});
+
+test("admin cannot upgrade their own gym's subscriptionStatus by writing to it directly (negative)", async () => {
+  const db = contextFor("admin-a", { role: "admin", gymId: "gym-a" }).firestore();
+  await assertFails(
+    setDoc(doc(db, "gyms/gym-a"), { subscriptionStatus: "active" }, { merge: true }),
+  );
+});
+
+test("admin can still update non-subscription fields on their own gym (positive)", async () => {
+  const db = contextFor("admin-a", { role: "admin", gymId: "gym-a" }).firestore();
+  await assertSucceeds(
+    setDoc(doc(db, "gyms/gym-a"), { name: "Gym A Renamed" }, { merge: true }),
+  );
+});
+
 // --- users/{uid} ---
 
 test("a user can read their own users/{uid} document (positive)", async () => {

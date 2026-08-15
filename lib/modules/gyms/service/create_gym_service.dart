@@ -45,6 +45,12 @@ class CreateGymService {
       'address': profile.address,
       'logoUrl': logoUrl,
       'themeColors': {'primary': _toHex(themeColor)},
+      // F6-1/F6-3 — her salon 'trial' olarak başlar; 'active'e geçiş sadece
+      // verifySubscriptionPurchase Cloud Function'ı üzerinden (Admin SDK,
+      // kurallara tabi değil) olur — firestore.rules bu alanları admin'in
+      // doğrudan değiştirmesini engelliyor.
+      'subscriptionStatus': 'trial',
+      'trialStartedAt': FieldValue.serverTimestamp(),
     });
 
     await FirebaseFirestore.instance.collection('users').doc(uid).set({

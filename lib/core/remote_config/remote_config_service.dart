@@ -27,6 +27,9 @@ abstract final class RemoteConfigKeys {
       'cfg_feedback_reminder_day_of_month';
   static const freeVersionAdsEnabled = 'cfg_free_version_ads_enabled';
   static const featureFlags = 'cfg_feature_flags';
+  /// F6-3 — yeni bir salon oluşturulduğunda `trialStartedAt`'ten itibaren
+  /// kaç gün ücretsiz deneme süresi tanınır.
+  static const trialDurationDays = 'cfg_trial_duration_days';
   /// F4-4 — rozet kriterleri: `[{id, title, note, type, threshold}]`.
   /// `type`: sessionsCompleted | groupSessionJoins | eventJoins |
   /// membershipMonths. Yeni bir rozet eklemek/eşiği değiştirmek için store
@@ -521,6 +524,7 @@ class RemoteConfigService {
     RemoteConfigKeys.defaultMemberCanCancelSession: true,
     RemoteConfigKeys.feedbackReminderDayOfMonth: -1,
     RemoteConfigKeys.freeVersionAdsEnabled: true,
+    RemoteConfigKeys.trialDurationDays: 14,
     RemoteConfigKeys.featureFlags: '{"group_sessions_enabled": true}',
     RemoteConfigKeys.badgeCriteria: _defaultBadgeCriteriaJson,
     RemoteConfigKeys.expenseCategories: _defaultExpenseCategoriesJson,
@@ -1182,6 +1186,9 @@ class RemoteConfigService {
   /// Ücretsiz sürümde reklam gösterilsin mi.
   bool get freeVersionAdsEnabled =>
       getBool(RemoteConfigKeys.freeVersionAdsEnabled);
+
+  /// F6-3 — yeni salonlara tanınan ücretsiz deneme süresi (gün).
+  int get trialDurationDays => getInt(RemoteConfigKeys.trialDurationDays);
 
   /// Feature flag'lerin tutulduğu JSON obje (esnek, sabit alanı yok).
   Map<String, dynamic> get featureFlags =>
