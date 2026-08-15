@@ -20,7 +20,7 @@ class AppTabItem {
 /// Flutter karşılığı: aktif sekme [AppColorScheme.onPrimaryContainer],
 /// pasif sekme [AppColorScheme.onSurfaceMuted] rengini alır.
 class AppTabShell extends StatefulWidget {
-  const AppTabShell({required this.items, this.bottomAdSlot, this.onTabSelected, super.key});
+  const AppTabShell({required this.items, this.bottomAdSlot, this.topBanner, this.onTabSelected, super.key});
 
   final List<AppTabItem> items;
 
@@ -28,6 +28,11 @@ class AppTabShell extends StatefulWidget {
   /// Sadece `MemberShellPanel` bunu doldurur; admin/antrenör shell'lerinde
   /// `null` kalır.
   final Widget? bottomAdSlot;
+
+  /// F6-3 — ekranın en üstüne, hangi sekmede olunursa olsun sabit kalan
+  /// opsiyonel uyarı şeridi. Sadece `AdminShellPanel` bunu dolduruyor
+  /// (abonelik durumu uyarısı) — antrenör/üye shell'lerinde `null` kalır.
+  final Widget? topBanner;
 
   /// F6-2 — kullanıcı bir sekmeye dokunduğunda (yeni index ne olursa olsun)
   /// tetiklenir. `MemberShellPanel` bunu, "Ana Sayfa"ya dönüşü interstitial
@@ -48,10 +53,17 @@ class _AppTabShellState extends State<AppTabShell> {
     return Scaffold(
       body: SafeArea(
         bottom: false,
-        child: IndexedStack(
-          index: _index,
+        child: Column(
           children: [
-            for (final item in widget.items) Builder(builder: item.builder),
+            if (widget.topBanner != null) widget.topBanner!,
+            Expanded(
+              child: IndexedStack(
+                index: _index,
+                children: [
+                  for (final item in widget.items) Builder(builder: item.builder),
+                ],
+              ),
+            ),
           ],
         ),
       ),

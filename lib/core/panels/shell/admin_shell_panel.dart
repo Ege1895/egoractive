@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../subscription/subscription_status_banner.dart';
 import '../base_panel.dart';
 import 'app_tab_shell.dart';
 import '../../../modules/expenses/ui/panels/admin_expenses_panel.dart';
@@ -22,6 +23,7 @@ class _AdminShellPanelState extends BasePanelState<AdminShellPanel> {
   @override
   Widget build(BuildContext context) {
     return AppTabShell(
+      topBanner: const SubscriptionStatusBanner(),
       items: [
         AppTabItem(
           icon: Icons.home_rounded,
