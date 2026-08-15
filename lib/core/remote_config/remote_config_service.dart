@@ -521,7 +521,7 @@ class RemoteConfigService {
     RemoteConfigKeys.defaultMemberCanCancelSession: true,
     RemoteConfigKeys.feedbackReminderDayOfMonth: -1,
     RemoteConfigKeys.freeVersionAdsEnabled: true,
-    RemoteConfigKeys.featureFlags: '{}',
+    RemoteConfigKeys.featureFlags: '{"group_sessions_enabled": true}',
     RemoteConfigKeys.badgeCriteria: _defaultBadgeCriteriaJson,
     RemoteConfigKeys.expenseCategories: _defaultExpenseCategoriesJson,
     'lbl_notif_session_reminder_title_tr': '⏰ Bugün {time}\'de dersin var!',

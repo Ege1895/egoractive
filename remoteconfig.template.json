@@ -86,9 +86,9 @@
     },
     "cfg_feature_flags": {
       "defaultValue": {
-        "value": "{}"
+        "value": "{\"group_sessions_enabled\": true}"
       },
-      "description": "Feature flag'lerin tutulduğu JSON obje (esnek, sabit alanı yok).",
+      "description": "F5-5 — feature flag'lerin tutulduğu JSON obje. Anahtarlar lib/core/remote_config/feature_flags.dart'taki FeatureFlags getter'larıyla eşleşir.",
       "valueType": "JSON"
     },
     "cfg_badge_criteria": {
