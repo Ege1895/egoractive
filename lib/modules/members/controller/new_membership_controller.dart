@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../core/analytics/analytics_service.dart';
 import '../../../core/theme/theme_controller.dart';
 import '../../packages/domain/studio_package.dart';
 import '../domain/new_membership_state.dart';
@@ -64,12 +65,24 @@ class NewMembershipController extends _$NewMembershipController {
       'totalAmount': state.totalAmount,
       'paidAmount': state.paidAmount,
       'dueAmount': state.dueAmount,
+      // F5-1/F5-2/F5-3'teki ciro aggregation'ları (memberPackages.paidAmount
+      // sum()) bu alana göre ay/hafta aralığı filtreliyor.
+      'purchasedAt': FieldValue.serverTimestamp(),
     });
 
     await firestore.collection('users').doc(memberId).update({
       'remainingSessions': package.sessionCount,
       'packageEndDate': state.endDate.toIso8601String(),
     });
+
+    await ref.read(analyticsServiceProvider).logEvent(
+      AnalyticsEvent.packagePurchased,
+      parameters: {
+        'package_id': package.id,
+        'gym_id': gymId,
+        'paid_amount': state.paidAmount,
+      },
+    );
 
     return true;
   }

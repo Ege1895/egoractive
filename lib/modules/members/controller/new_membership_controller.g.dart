@@ -7,7 +7,7 @@ part of 'new_membership_controller.dart';
 // **************************************************************************
 
 String _$newMembershipControllerHash() =>
-    r'078c85f7e30cb165a4d8d614aa265660a17d9bac';
+    r'e0581591fd5f697c6c652f29dcd6e77f29273f9f';
 
 /// Yeni üyelik akışının (P4-6 → P4-7) paket + ödeme state'i — geri tuşuyla
 /// paket adımına dönüldüğünde ödeme girişleri kaybolmasın diye tek state.

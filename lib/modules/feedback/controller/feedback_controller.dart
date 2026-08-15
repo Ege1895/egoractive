@@ -1,5 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../core/analytics/analytics_service.dart';
 import '../domain/feedback_state.dart';
 import '../repository/feedback_repository.dart';
 
@@ -22,6 +23,10 @@ class FeedbackController extends _$FeedbackController {
     if (state.rating == 0 || state.isSubmitting) return;
     state = state.copyWith(isSubmitting: true);
     await ref.read(feedbackRepositoryProvider).submit(rating: state.rating, comment: state.comment);
+    await ref.read(analyticsServiceProvider).logEvent(
+      AnalyticsEvent.feedbackSubmitted,
+      parameters: {'rating': state.rating},
+    );
     state = state.copyWith(isSubmitting: false, isSubmitted: true);
   }
 }

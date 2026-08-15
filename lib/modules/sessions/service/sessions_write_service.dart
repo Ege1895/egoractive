@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../core/analytics/analytics_service.dart';
+
 part 'sessions_write_service.g.dart';
 
 /// F3-5 — seans süresi henüz stüdyo bazlı yapılandırılabilir değil, sabit
@@ -13,7 +15,9 @@ const sessionDefaultDurationMinutes = 60;
 /// zorlanır (bu servis sadece admin ekranlarından çağrılıyor, admin için
 /// deadline yok).
 class SessionsWriteService {
-  const SessionsWriteService();
+  const SessionsWriteService(this._analytics);
+
+  final AnalyticsService _analytics;
 
   Future<void> createSession({
     required String gymId,
@@ -51,8 +55,11 @@ class SessionsWriteService {
 
   Future<void> cancelSession(String sessionId) async {
     await FirebaseFirestore.instance.collection('sessions').doc(sessionId).update({'status': 'cancelled'});
+    await _analytics.logEvent(AnalyticsEvent.sessionCancelled, parameters: {'session_id': sessionId});
   }
 }
 
 @riverpod
-SessionsWriteService sessionsWriteService(SessionsWriteServiceRef ref) => const SessionsWriteService();
+SessionsWriteService sessionsWriteService(SessionsWriteServiceRef ref) {
+  return SessionsWriteService(ref.watch(analyticsServiceProvider));
+}

@@ -7,7 +7,7 @@ part of 'member_registration_service.dart';
 // **************************************************************************
 
 String _$memberRegistrationServiceHash() =>
-    r'49d34687ecdafe2afd7b87544ef7b023d0aba61a';
+    r'13886614e90b39caf7288a428e2fa1c470254205';
 
 /// See also [memberRegistrationService].
 @ProviderFor(memberRegistrationService)

@@ -1,11 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../core/analytics/analytics_service.dart';
+
 part 'member_registration_service.g.dart';
 
 /// F2-2 — üye ekleme: `users` koleksiyonuna `role: member` dokümanı yazar.
 class MemberRegistrationService {
-  const MemberRegistrationService();
+  const MemberRegistrationService(this._analytics);
+
+  final AnalyticsService _analytics;
 
   Future<bool> phoneNumberIsTaken(String phoneNumber) async {
     final snapshot = await FirebaseFirestore.instance
@@ -34,11 +38,15 @@ class MemberRegistrationService {
       'trainerId': trainerId,
       'trainerName': trainerName,
     });
+    await _analytics.logEvent(
+      AnalyticsEvent.membershipCreated,
+      parameters: {'gym_id': gymId, 'trainer_id': trainerId},
+    );
     return doc.id;
   }
 }
 
 @riverpod
 MemberRegistrationService memberRegistrationService(MemberRegistrationServiceRef ref) {
-  return const MemberRegistrationService();
+  return MemberRegistrationService(ref.watch(analyticsServiceProvider));
 }

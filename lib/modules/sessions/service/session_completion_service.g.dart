@@ -7,7 +7,7 @@ part of 'session_completion_service.dart';
 // **************************************************************************
 
 String _$sessionCompletionServiceHash() =>
-    r'cf68cac8722f056b03fd85efa470296caf14f89f';
+    r'78aadaa0b27d89591fe50cc8ab1e72089b587efb';
 
 /// See also [sessionCompletionService].
 @ProviderFor(sessionCompletionService)

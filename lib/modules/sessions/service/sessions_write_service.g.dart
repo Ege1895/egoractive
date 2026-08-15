@@ -7,7 +7,7 @@ part of 'sessions_write_service.dart';
 // **************************************************************************
 
 String _$sessionsWriteServiceHash() =>
-    r'f111d5920a974710640bd82040591a1e7ad70f15';
+    r'18db4c65fe4ac250d5b74bf22e591a5174b69e9b';
 
 /// See also [sessionsWriteService].
 @ProviderFor(sessionsWriteService)
