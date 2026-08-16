@@ -6,7 +6,7 @@ part of 'admin_members_controller.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$membersForGymHash() => r'ea8d770b791f38465bbdbe9f2abc91ddf34cedac';
+String _$membersForGymHash() => r'5e968bdde1adcdb5e7f23e3ee8449756cff26e2a';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -32,6 +32,12 @@ class _SystemHash {
 /// `gyms/{gymId}` bilinmediği (henüz gerçek bir salon yoksa) çağrılmaz —
 /// bu durumda [AdminMembersController] mock listeye düşer.
 ///
+/// F7-2 — bilerek SINIRSIZ: üye detayı/seans-antrenör seçici/bildirim
+/// hedefi gibi tüketiciler tüm üye kümesi üzerinde arama/seçim yapabilmeli.
+/// Ana liste ekranı (F2-2, `AdminMemberListPanel`) büyük salon ölçeğinde
+/// bunun yerine sayfalı [AdminMemberListController]'ı kullanıyor — bu
+/// provider sadece o üç tüketici için hâlâ geçerli.
+///
 /// Copied from [_membersForGym].
 @ProviderFor(_membersForGym)
 const _membersForGymProvider = _MembersForGymFamily();
@@ -39,17 +45,35 @@ const _membersForGymProvider = _MembersForGymFamily();
 /// `gyms/{gymId}` bilinmediği (henüz gerçek bir salon yoksa) çağrılmaz —
 /// bu durumda [AdminMembersController] mock listeye düşer.
 ///
+/// F7-2 — bilerek SINIRSIZ: üye detayı/seans-antrenör seçici/bildirim
+/// hedefi gibi tüketiciler tüm üye kümesi üzerinde arama/seçim yapabilmeli.
+/// Ana liste ekranı (F2-2, `AdminMemberListPanel`) büyük salon ölçeğinde
+/// bunun yerine sayfalı [AdminMemberListController]'ı kullanıyor — bu
+/// provider sadece o üç tüketici için hâlâ geçerli.
+///
 /// Copied from [_membersForGym].
 class _MembersForGymFamily
     extends Family<AsyncValue<List<AdminMemberSummary>>> {
   /// `gyms/{gymId}` bilinmediği (henüz gerçek bir salon yoksa) çağrılmaz —
   /// bu durumda [AdminMembersController] mock listeye düşer.
   ///
+  /// F7-2 — bilerek SINIRSIZ: üye detayı/seans-antrenör seçici/bildirim
+  /// hedefi gibi tüketiciler tüm üye kümesi üzerinde arama/seçim yapabilmeli.
+  /// Ana liste ekranı (F2-2, `AdminMemberListPanel`) büyük salon ölçeğinde
+  /// bunun yerine sayfalı [AdminMemberListController]'ı kullanıyor — bu
+  /// provider sadece o üç tüketici için hâlâ geçerli.
+  ///
   /// Copied from [_membersForGym].
   const _MembersForGymFamily();
 
   /// `gyms/{gymId}` bilinmediği (henüz gerçek bir salon yoksa) çağrılmaz —
   /// bu durumda [AdminMembersController] mock listeye düşer.
+  ///
+  /// F7-2 — bilerek SINIRSIZ: üye detayı/seans-antrenör seçici/bildirim
+  /// hedefi gibi tüketiciler tüm üye kümesi üzerinde arama/seçim yapabilmeli.
+  /// Ana liste ekranı (F2-2, `AdminMemberListPanel`) büyük salon ölçeğinde
+  /// bunun yerine sayfalı [AdminMemberListController]'ı kullanıyor — bu
+  /// provider sadece o üç tüketici için hâlâ geçerli.
   ///
   /// Copied from [_membersForGym].
   _MembersForGymProvider call(String gymId) {
@@ -81,11 +105,23 @@ class _MembersForGymFamily
 /// `gyms/{gymId}` bilinmediği (henüz gerçek bir salon yoksa) çağrılmaz —
 /// bu durumda [AdminMembersController] mock listeye düşer.
 ///
+/// F7-2 — bilerek SINIRSIZ: üye detayı/seans-antrenör seçici/bildirim
+/// hedefi gibi tüketiciler tüm üye kümesi üzerinde arama/seçim yapabilmeli.
+/// Ana liste ekranı (F2-2, `AdminMemberListPanel`) büyük salon ölçeğinde
+/// bunun yerine sayfalı [AdminMemberListController]'ı kullanıyor — bu
+/// provider sadece o üç tüketici için hâlâ geçerli.
+///
 /// Copied from [_membersForGym].
 class _MembersForGymProvider
     extends AutoDisposeStreamProvider<List<AdminMemberSummary>> {
   /// `gyms/{gymId}` bilinmediği (henüz gerçek bir salon yoksa) çağrılmaz —
   /// bu durumda [AdminMembersController] mock listeye düşer.
+  ///
+  /// F7-2 — bilerek SINIRSIZ: üye detayı/seans-antrenör seçici/bildirim
+  /// hedefi gibi tüketiciler tüm üye kümesi üzerinde arama/seçim yapabilmeli.
+  /// Ana liste ekranı (F2-2, `AdminMemberListPanel`) büyük salon ölçeğinde
+  /// bunun yerine sayfalı [AdminMemberListController]'ı kullanıyor — bu
+  /// provider sadece o üç tüketici için hâlâ geçerli.
   ///
   /// Copied from [_membersForGym].
   _MembersForGymProvider(String gymId)
@@ -172,10 +208,10 @@ class _MembersForGymProviderElement
 String _$adminMembersControllerHash() =>
     r'3885845e36aa49fc9723f25295cc7d5718a19d24';
 
-/// F2-2 — aktif salonun üyelerini gerçek zamanlı listeler. Dış arayüz
-/// bilerek senkron (`List<AdminMemberSummary>`) tutuldu — panel/servis
-/// tüketicileri (liste, detay, bildirim gönderme) `AsyncValue` bilmek
-/// zorunda değil; Firestore akışı burada sarmalanıyor.
+/// Üye detayı/seans oluşturma/bildirim gönderme ekranlarının kullandığı,
+/// aktif salonun üyelerini gerçek zamanlı listeleyen kontrolcü. Dış arayüz
+/// bilerek senkron (`List<AdminMemberSummary>`) tutuldu — tüketiciler
+/// `AsyncValue` bilmek zorunda değil; Firestore akışı burada sarmalanıyor.
 ///
 /// Copied from [AdminMembersController].
 @ProviderFor(AdminMembersController)

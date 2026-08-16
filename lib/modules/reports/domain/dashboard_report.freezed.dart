@@ -233,6 +233,268 @@ abstract class _TrainerPerformance extends TrainerPerformance {
 }
 
 /// @nodoc
+mixin _$DashboardSummary {
+  String get monthLabel => throw _privateConstructorUsedError;
+  int get totalSessions => throw _privateConstructorUsedError;
+  int get completedSessions => throw _privateConstructorUsedError;
+  int get cancelledSessions => throw _privateConstructorUsedError;
+  int get estimatedRevenueTl => throw _privateConstructorUsedError;
+  int get totalExpensesTl => throw _privateConstructorUsedError;
+
+  /// Create a copy of DashboardSummary
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $DashboardSummaryCopyWith<DashboardSummary> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $DashboardSummaryCopyWith<$Res> {
+  factory $DashboardSummaryCopyWith(
+    DashboardSummary value,
+    $Res Function(DashboardSummary) then,
+  ) = _$DashboardSummaryCopyWithImpl<$Res, DashboardSummary>;
+  @useResult
+  $Res call({
+    String monthLabel,
+    int totalSessions,
+    int completedSessions,
+    int cancelledSessions,
+    int estimatedRevenueTl,
+    int totalExpensesTl,
+  });
+}
+
+/// @nodoc
+class _$DashboardSummaryCopyWithImpl<$Res, $Val extends DashboardSummary>
+    implements $DashboardSummaryCopyWith<$Res> {
+  _$DashboardSummaryCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of DashboardSummary
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? monthLabel = null,
+    Object? totalSessions = null,
+    Object? completedSessions = null,
+    Object? cancelledSessions = null,
+    Object? estimatedRevenueTl = null,
+    Object? totalExpensesTl = null,
+  }) {
+    return _then(
+      _value.copyWith(
+            monthLabel: null == monthLabel
+                ? _value.monthLabel
+                : monthLabel // ignore: cast_nullable_to_non_nullable
+                      as String,
+            totalSessions: null == totalSessions
+                ? _value.totalSessions
+                : totalSessions // ignore: cast_nullable_to_non_nullable
+                      as int,
+            completedSessions: null == completedSessions
+                ? _value.completedSessions
+                : completedSessions // ignore: cast_nullable_to_non_nullable
+                      as int,
+            cancelledSessions: null == cancelledSessions
+                ? _value.cancelledSessions
+                : cancelledSessions // ignore: cast_nullable_to_non_nullable
+                      as int,
+            estimatedRevenueTl: null == estimatedRevenueTl
+                ? _value.estimatedRevenueTl
+                : estimatedRevenueTl // ignore: cast_nullable_to_non_nullable
+                      as int,
+            totalExpensesTl: null == totalExpensesTl
+                ? _value.totalExpensesTl
+                : totalExpensesTl // ignore: cast_nullable_to_non_nullable
+                      as int,
+          )
+          as $Val,
+    );
+  }
+}
+
+/// @nodoc
+abstract class _$$DashboardSummaryImplCopyWith<$Res>
+    implements $DashboardSummaryCopyWith<$Res> {
+  factory _$$DashboardSummaryImplCopyWith(
+    _$DashboardSummaryImpl value,
+    $Res Function(_$DashboardSummaryImpl) then,
+  ) = __$$DashboardSummaryImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({
+    String monthLabel,
+    int totalSessions,
+    int completedSessions,
+    int cancelledSessions,
+    int estimatedRevenueTl,
+    int totalExpensesTl,
+  });
+}
+
+/// @nodoc
+class __$$DashboardSummaryImplCopyWithImpl<$Res>
+    extends _$DashboardSummaryCopyWithImpl<$Res, _$DashboardSummaryImpl>
+    implements _$$DashboardSummaryImplCopyWith<$Res> {
+  __$$DashboardSummaryImplCopyWithImpl(
+    _$DashboardSummaryImpl _value,
+    $Res Function(_$DashboardSummaryImpl) _then,
+  ) : super(_value, _then);
+
+  /// Create a copy of DashboardSummary
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? monthLabel = null,
+    Object? totalSessions = null,
+    Object? completedSessions = null,
+    Object? cancelledSessions = null,
+    Object? estimatedRevenueTl = null,
+    Object? totalExpensesTl = null,
+  }) {
+    return _then(
+      _$DashboardSummaryImpl(
+        monthLabel: null == monthLabel
+            ? _value.monthLabel
+            : monthLabel // ignore: cast_nullable_to_non_nullable
+                  as String,
+        totalSessions: null == totalSessions
+            ? _value.totalSessions
+            : totalSessions // ignore: cast_nullable_to_non_nullable
+                  as int,
+        completedSessions: null == completedSessions
+            ? _value.completedSessions
+            : completedSessions // ignore: cast_nullable_to_non_nullable
+                  as int,
+        cancelledSessions: null == cancelledSessions
+            ? _value.cancelledSessions
+            : cancelledSessions // ignore: cast_nullable_to_non_nullable
+                  as int,
+        estimatedRevenueTl: null == estimatedRevenueTl
+            ? _value.estimatedRevenueTl
+            : estimatedRevenueTl // ignore: cast_nullable_to_non_nullable
+                  as int,
+        totalExpensesTl: null == totalExpensesTl
+            ? _value.totalExpensesTl
+            : totalExpensesTl // ignore: cast_nullable_to_non_nullable
+                  as int,
+      ),
+    );
+  }
+}
+
+/// @nodoc
+
+class _$DashboardSummaryImpl extends _DashboardSummary {
+  const _$DashboardSummaryImpl({
+    required this.monthLabel,
+    required this.totalSessions,
+    required this.completedSessions,
+    required this.cancelledSessions,
+    required this.estimatedRevenueTl,
+    required this.totalExpensesTl,
+  }) : super._();
+
+  @override
+  final String monthLabel;
+  @override
+  final int totalSessions;
+  @override
+  final int completedSessions;
+  @override
+  final int cancelledSessions;
+  @override
+  final int estimatedRevenueTl;
+  @override
+  final int totalExpensesTl;
+
+  @override
+  String toString() {
+    return 'DashboardSummary(monthLabel: $monthLabel, totalSessions: $totalSessions, completedSessions: $completedSessions, cancelledSessions: $cancelledSessions, estimatedRevenueTl: $estimatedRevenueTl, totalExpensesTl: $totalExpensesTl)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$DashboardSummaryImpl &&
+            (identical(other.monthLabel, monthLabel) ||
+                other.monthLabel == monthLabel) &&
+            (identical(other.totalSessions, totalSessions) ||
+                other.totalSessions == totalSessions) &&
+            (identical(other.completedSessions, completedSessions) ||
+                other.completedSessions == completedSessions) &&
+            (identical(other.cancelledSessions, cancelledSessions) ||
+                other.cancelledSessions == cancelledSessions) &&
+            (identical(other.estimatedRevenueTl, estimatedRevenueTl) ||
+                other.estimatedRevenueTl == estimatedRevenueTl) &&
+            (identical(other.totalExpensesTl, totalExpensesTl) ||
+                other.totalExpensesTl == totalExpensesTl));
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    runtimeType,
+    monthLabel,
+    totalSessions,
+    completedSessions,
+    cancelledSessions,
+    estimatedRevenueTl,
+    totalExpensesTl,
+  );
+
+  /// Create a copy of DashboardSummary
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$DashboardSummaryImplCopyWith<_$DashboardSummaryImpl> get copyWith =>
+      __$$DashboardSummaryImplCopyWithImpl<_$DashboardSummaryImpl>(
+        this,
+        _$identity,
+      );
+}
+
+abstract class _DashboardSummary extends DashboardSummary {
+  const factory _DashboardSummary({
+    required final String monthLabel,
+    required final int totalSessions,
+    required final int completedSessions,
+    required final int cancelledSessions,
+    required final int estimatedRevenueTl,
+    required final int totalExpensesTl,
+  }) = _$DashboardSummaryImpl;
+  const _DashboardSummary._() : super._();
+
+  @override
+  String get monthLabel;
+  @override
+  int get totalSessions;
+  @override
+  int get completedSessions;
+  @override
+  int get cancelledSessions;
+  @override
+  int get estimatedRevenueTl;
+  @override
+  int get totalExpensesTl;
+
+  /// Create a copy of DashboardSummary
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$DashboardSummaryImplCopyWith<_$DashboardSummaryImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
 mixin _$DashboardReport {
   String get monthLabel => throw _privateConstructorUsedError;
   int get totalSessions => throw _privateConstructorUsedError;

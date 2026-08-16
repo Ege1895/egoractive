@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -9,6 +11,7 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_back_button.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_text_field.dart';
+import '../../controller/admin_member_list_controller.dart';
 import '../../controller/member_registration_controller.dart';
 import '../../controller/new_member_controller.dart';
 import '../../controller/new_membership_controller.dart';
@@ -214,6 +217,9 @@ class _NewMembershipPaymentPanelState extends BasePanelState<NewMembershipPaymen
                         if (!success || !mounted) return;
                         ref.read(newMemberControllerProvider.notifier).reset();
                         ref.read(newMembershipControllerProvider.notifier).reset();
+                        // F7-2 — AdminMemberListController artık canlı dinlemiyor
+                        // (sayfalı), yeni üyenin listede görünmesi için elle yenile.
+                        unawaited(ref.read(adminMemberListControllerProvider.notifier).refresh());
                         ref.read(panelStackControllerProvider.notifier).popToRoot();
                       },
               ),
