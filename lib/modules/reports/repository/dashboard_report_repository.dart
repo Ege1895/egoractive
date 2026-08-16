@@ -6,7 +6,8 @@ import '../service/dashboard_report_service.dart';
 part 'dashboard_report_repository.g.dart';
 
 abstract interface class DashboardReportRepository {
-  Future<DashboardReport> loadReport(String gymId);
+  Future<DashboardSummary> loadSummary(String gymId);
+  Future<List<TrainerPerformance>> loadTrainerPerformance(String gymId);
 }
 
 class DashboardReportRepositoryImpl implements DashboardReportRepository {
@@ -15,7 +16,10 @@ class DashboardReportRepositoryImpl implements DashboardReportRepository {
   final DashboardReportService _service;
 
   @override
-  Future<DashboardReport> loadReport(String gymId) => _service.loadReport(gymId);
+  Future<DashboardSummary> loadSummary(String gymId) => _service.loadSummary(gymId);
+
+  @override
+  Future<List<TrainerPerformance>> loadTrainerPerformance(String gymId) => _service.loadTrainerPerformance(gymId);
 }
 
 @riverpod

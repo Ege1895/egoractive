@@ -1,10 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../controller/admin_members_controller.dart';
+import '../../controller/admin_member_list_controller.dart';
 import '../../controller/new_member_controller.dart';
 import '../../domain/admin_member_summary.dart';
 import 'admin_member_detail_panel.dart';
@@ -12,7 +14,17 @@ import 'member_info_panel.dart';
 
 enum _MemberFilter { all, active, endingSoon, none }
 
+const _searchDebounce = Duration(milliseconds: 300);
+const _loadMoreThreshold = 400.0;
+
 /// Admin 4 · Üye Listesi — arama + filtre çipleri, + Üye ekle.
+///
+/// F7-2 — büyük salonlarda (10.000+ üye) ilk render'ı 3 saniyenin altında
+/// tutmak için `AdminMemberListController`'ın sayfalı verisini kullanır
+/// (bkz. `scripts/seed_load_test_data.ts`). Filtre çipleri o an yüklü
+/// sayfalar üzerinde çalışır; arama sunucu tarafında isim başlangıcına
+/// göre ayrı bir sorgu yapar (telefon/isim-ortası araması artık desteklenmiyor
+/// — pagination'a geçişin bilinen kısıtı).
 class AdminMemberListPanel extends ConsumerStatefulWidget {
   const AdminMemberListPanel({super.key});
 
@@ -22,14 +34,17 @@ class AdminMemberListPanel extends ConsumerStatefulWidget {
 
 class _AdminMemberListPanelState extends ConsumerState<AdminMemberListPanel> {
   _MemberFilter _filter = _MemberFilter.all;
-  String _query = '';
+  Timer? _searchDebounceTimer;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
     final typography = context.appTypography;
-    final members = ref.watch(adminMembersControllerProvider);
-    final filtered = members.where(_matchesFilter).where(_matchesQuery).toList();
+    final state = ref.watch(adminMemberListControllerProvider);
+    final controller = ref.read(adminMemberListControllerProvider.notifier);
+    final isSearchActive = state.searchResults != null;
+    final source = state.searchResults ?? state.items;
+    final filtered = source.where(_matchesFilter).toList();
 
     return Scaffold(
       body: SafeArea(
@@ -79,10 +94,10 @@ class _AdminMemberListPanelState extends ConsumerState<AdminMemberListPanel> {
                         const SizedBox(width: AppSpacing.sm),
                         Expanded(
                           child: TextField(
-                            onChanged: (value) => setState(() => _query = value),
+                            onChanged: _onSearchChanged,
                             style: typography.bodyLarge.copyWith(color: colors.onSurface, fontSize: 15),
                             decoration: InputDecoration(
-                              hintText: 'İsim veya telefon ara',
+                              hintText: 'İsim ara',
                               hintStyle: typography.bodyLarge.copyWith(color: colors.onSurfaceMuted, fontSize: 15),
                               border: InputBorder.none,
                               isDense: true,
@@ -116,19 +131,47 @@ class _AdminMemberListPanelState extends ConsumerState<AdminMemberListPanel> {
               ),
             ),
             Expanded(
-              child: filtered.isEmpty
-                  ? Center(child: Text('Bu filtreye uyan üye yok.', style: typography.bodyMedium.copyWith(color: colors.onSurfaceMuted)))
-                  : ListView(
-                      padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.md, AppSpacing.screenEdge, AppSpacing.lg),
-                      children: [
-                        for (final member in filtered) _MemberCard(member: member),
-                      ],
-                    ),
+              child: state.isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : filtered.isEmpty
+                      ? Center(child: Text('Bu filtreye uyan üye yok.', style: typography.bodyMedium.copyWith(color: colors.onSurfaceMuted)))
+                      : RefreshIndicator(
+                          onRefresh: controller.refresh,
+                          child: NotificationListener<ScrollNotification>(
+                            onNotification: (notification) {
+                              if (!isSearchActive &&
+                                  notification.metrics.maxScrollExtent - notification.metrics.pixels < _loadMoreThreshold) {
+                                controller.loadMore();
+                              }
+                              return false;
+                            },
+                            child: ListView.builder(
+                              padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.md, AppSpacing.screenEdge, AppSpacing.lg),
+                              itemCount: filtered.length + (!isSearchActive && state.isLoadingMore ? 1 : 0),
+                              itemBuilder: (context, index) {
+                                if (index >= filtered.length) {
+                                  return const Padding(
+                                    padding: EdgeInsets.symmetric(vertical: AppSpacing.md),
+                                    child: Center(child: CircularProgressIndicator()),
+                                  );
+                                }
+                                return _MemberCard(member: filtered[index]);
+                              },
+                            ),
+                          ),
+                        ),
             ),
           ],
         ),
       ),
     );
+  }
+
+  void _onSearchChanged(String value) {
+    _searchDebounceTimer?.cancel();
+    _searchDebounceTimer = Timer(_searchDebounce, () {
+      ref.read(adminMemberListControllerProvider.notifier).search(value);
+    });
   }
 
   bool _matchesFilter(AdminMemberSummary member) {
@@ -140,10 +183,10 @@ class _AdminMemberListPanelState extends ConsumerState<AdminMemberListPanel> {
     };
   }
 
-  bool _matchesQuery(AdminMemberSummary member) {
-    if (_query.isEmpty) return true;
-    final query = _query.toLowerCase();
-    return member.name.toLowerCase().contains(query) || member.phone.contains(query);
+  @override
+  void dispose() {
+    _searchDebounceTimer?.cancel();
+    super.dispose();
   }
 }
 

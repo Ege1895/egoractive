@@ -13,7 +13,10 @@ import '../../domain/dashboard_report.dart';
 /// Admin · Raporlar — aylık seans/ciro/gider özeti + antrenör performansı
 /// (F5-1). Sayımlar Firestore `count()`/`sum()` aggregation query'leriyle
 /// hesaplanır, hiçbir yerde tüm seans dokümanları client'a çekilmez —
-/// 10.000+ kayıtlı bir salonda da hızlı yüklenir.
+/// 10.000+ kayıtlı bir salonda da hızlı yüklenir. F7-2 — antrenör dökümü
+/// (çok antrenörlü salonlarda asıl maliyeti taşıyan kısım) özetten ayrı
+/// yüklenir; özet metrikler antrenör dökümünü beklemeden görünür, antrenör
+/// bölümü kendi yükleniyor göstergesini ayrı gösterir.
 class AdminDashboardPanel extends BasePanel {
   const AdminDashboardPanel({super.key});
 
@@ -27,7 +30,9 @@ class _AdminDashboardPanelState extends BasePanelState<AdminDashboardPanel> {
     final colors = context.appColors;
     final typography = context.appTypography;
     final report = ref.watch(dashboardReportControllerProvider);
-    final isLoading = ref.watch(dashboardReportControllerProvider.notifier).isLoading;
+    final controller = ref.watch(dashboardReportControllerProvider.notifier);
+    final isSummaryLoading = controller.isSummaryLoading;
+    final isTrainerPerformanceLoading = controller.isTrainerPerformanceLoading;
 
     return Scaffold(
       body: SafeArea(
@@ -45,7 +50,7 @@ class _AdminDashboardPanelState extends BasePanelState<AdminDashboardPanel> {
               ),
             ),
             Expanded(
-              child: isLoading && report.trainerPerformance.isEmpty
+              child: isSummaryLoading
                   ? Center(child: CircularProgressIndicator(color: colors.primary))
                   : ListView(
                       padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.md, AppSpacing.screenEdge, AppSpacing.lg),
@@ -106,15 +111,20 @@ class _AdminDashboardPanelState extends BasePanelState<AdminDashboardPanel> {
                         Container(
                           padding: const EdgeInsets.fromLTRB(AppSpacing.sm, AppSpacing.lg, AppSpacing.lg, AppSpacing.md),
                           decoration: BoxDecoration(color: colors.surface, borderRadius: BorderRadius.circular(AppSpacing.radiusCard), border: Border.all(color: colors.outline)),
-                          child: report.trainerPerformance.isEmpty
-                              ? Padding(
-                                  padding: const EdgeInsets.symmetric(vertical: AppSpacing.lg),
-                                  child: Text(
-                                    'Bu ay için antrenör verisi yok.',
-                                    style: typography.bodyMedium.copyWith(color: colors.onSurfaceMuted),
-                                  ),
+                          child: isTrainerPerformanceLoading && report.trainerPerformance.isEmpty
+                              ? const Padding(
+                                  padding: EdgeInsets.symmetric(vertical: AppSpacing.lg),
+                                  child: Center(child: CircularProgressIndicator()),
                                 )
-                              : _TrainerPerformanceChart(trainerPerformance: report.trainerPerformance),
+                              : report.trainerPerformance.isEmpty
+                                  ? Padding(
+                                      padding: const EdgeInsets.symmetric(vertical: AppSpacing.lg),
+                                      child: Text(
+                                        'Bu ay için antrenör verisi yok.',
+                                        style: typography.bodyMedium.copyWith(color: colors.onSurfaceMuted),
+                                      ),
+                                    )
+                                  : _TrainerPerformanceChart(trainerPerformance: report.trainerPerformance),
                         ),
                       ],
                     ),
