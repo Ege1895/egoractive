@@ -4,6 +4,7 @@ import { onSchedule } from "firebase-functions/v2/scheduler";
 import * as logger from "firebase-functions/logger";
 
 import { formatDateTr, formatWeekRangeTr } from "../shared/format";
+import { withFailureAlerting } from "../shared/function-health";
 import { queueEmail } from "../shared/mail";
 import { isWeeklyReportDue, previousWeekRange } from "../shared/weekly-schedule";
 
@@ -59,7 +60,7 @@ function buildHtml(weekLabel: string, rows: GymSubscriptionRow[]): string {
  * salonların abonelik durumunu özetleyip Egora Games'in kendi mailine
  * (sabit adres, salon bazlı değil) gönderir.
  */
-export const weeklySubscriberSummary = onSchedule("every 60 minutes", async () => {
+export const weeklySubscriberSummary = onSchedule("every 60 minutes", withFailureAlerting("weeklySubscriberSummary", async () => {
   const now = new Date();
 
   let template: RemoteConfigTemplate;
@@ -99,4 +100,4 @@ export const weeklySubscriberSummary = onSchedule("every 60 minutes", async () =
   });
 
   logger.info(`Haftalık abone özeti gönderildi: ${rows.length} salon.`);
-});
+}));

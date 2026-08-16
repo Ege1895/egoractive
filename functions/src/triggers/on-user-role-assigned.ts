@@ -3,6 +3,7 @@ import { getAuth } from "firebase-admin/auth";
 import { onDocumentWritten } from "firebase-functions/v2/firestore";
 
 import { usersCollection } from "../shared/firestore-paths";
+import { withFailureAlerting } from "../shared/function-health";
 
 export interface ClaimsUpdate {
   role: string;
@@ -43,14 +44,17 @@ export function resolveClaimsUpdate(
  * anlaması için) — bu yazım kendi role/gymId'sini değiştirmediğinden trigger'ı
  * tekrar anlamlı bir işe sürüklemez.
  */
-export const onUserRoleAssigned = onDocumentWritten(`${usersCollection()}/{uid}`, async (event) => {
-  const before = event.data?.before;
-  const after = event.data?.after;
-  if (!after?.exists) return;
+export const onUserRoleAssigned = onDocumentWritten(
+  `${usersCollection()}/{uid}`,
+  withFailureAlerting("onUserRoleAssigned", async (event) => {
+    const before = event.data?.before;
+    const after = event.data?.after;
+    if (!after?.exists) return;
 
-  const update = resolveClaimsUpdate(before?.exists ? before.data() : undefined, after.data());
-  if (!update) return;
+    const update = resolveClaimsUpdate(before?.exists ? before.data() : undefined, after.data());
+    if (!update) return;
 
-  await getAuth().setCustomUserClaims(event.params.uid, update);
-  await after.ref.update({ claimsSyncedAt: FieldValue.serverTimestamp() });
-});
+    await getAuth().setCustomUserClaims(event.params.uid, update);
+    await after.ref.update({ claimsSyncedAt: FieldValue.serverTimestamp() });
+  }),
+);

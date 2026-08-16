@@ -4,6 +4,7 @@ import { onSchedule } from "firebase-functions/v2/scheduler";
 import * as logger from "firebase-functions/logger";
 
 import { formatWeekRangeTr, formatTl } from "../shared/format";
+import { withFailureAlerting } from "../shared/function-health";
 import { queueEmail } from "../shared/mail";
 import { fetchGymWeeklyStats } from "../shared/weekly-report-stats";
 import { isWeeklyReportDue, previousWeekRange } from "../shared/weekly-schedule";
@@ -31,7 +32,7 @@ function buildHtml(gymName: string, weekLabel: string, stats: Awaited<ReturnType
  * gönderir. Saatte bir çalışıp RC'yi kontrol etmesi, RC değeri
  * değiştiğinde yeniden deploy gerektirmemesi içindir.
  */
-export const weeklyGymReport = onSchedule("every 60 minutes", async () => {
+export const weeklyGymReport = onSchedule("every 60 minutes", withFailureAlerting("weeklyGymReport", async () => {
   const db = getFirestore();
   const now = new Date();
 
@@ -64,4 +65,4 @@ export const weeklyGymReport = onSchedule("every 60 minutes", async () => {
       html: buildHtml((data.name as string | undefined) ?? "Salonunuz", weekLabel, stats),
     });
   }
-});
+}));

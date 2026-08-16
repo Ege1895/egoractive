@@ -3,6 +3,8 @@ import { getRemoteConfig, RemoteConfigTemplate } from "firebase-admin/remote-con
 import { onSchedule } from "firebase-functions/v2/scheduler";
 import * as logger from "firebase-functions/logger";
 
+import { withFailureAlerting } from "../shared/function-health";
+
 function readIntParam(template: RemoteConfigTemplate, key: string, fallback: number): number {
   const param = template.parameters[key];
   const raw = param?.defaultValue && "value" in param.defaultValue ? param.defaultValue.value : undefined;
@@ -18,7 +20,7 @@ function readIntParam(template: RemoteConfigTemplate, key: string, fallback: num
  * `subscription_write_gate.dart` aynı durumu proaktif olarak kontrol edip
  * "aboneliğini yenile" uyarısını gösterir.
  */
-export const trialExpiryCheck = onSchedule("every 60 minutes", async () => {
+export const trialExpiryCheck = onSchedule("every 60 minutes", withFailureAlerting("trialExpiryCheck", async () => {
   let trialDurationDays = 14;
   try {
     const template = await getRemoteConfig().getTemplate();
@@ -50,4 +52,4 @@ export const trialExpiryCheck = onSchedule("every 60 minutes", async () => {
     await batch.commit();
     logger.info(`${expiredCount} salonun deneme süresi doldu, 'expired' durumuna geçirildi.`);
   }
-});
+}));
