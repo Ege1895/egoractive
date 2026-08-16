@@ -4,6 +4,7 @@ import { onSchedule } from "firebase-functions/v2/scheduler";
 import * as logger from "firebase-functions/logger";
 
 import { formatWeekRangeTr, formatTl } from "../shared/format";
+import { withFailureAlerting } from "../shared/function-health";
 import { queueEmail } from "../shared/mail";
 import { fetchExpenseCategoryTotals, fetchGymWeeklyStats } from "../shared/weekly-report-stats";
 import { isWeeklyReportDue, previousWeekRange } from "../shared/weekly-schedule";
@@ -36,7 +37,7 @@ function buildHtml(
  * kırılımı gönderir. Zamanlama mantığı `weeklyGymReport` ile aynı (RC
  * kontrolü, saatte bir çalışır).
  */
-export const weeklyAccountingReport = onSchedule("every 60 minutes", async () => {
+export const weeklyAccountingReport = onSchedule("every 60 minutes", withFailureAlerting("weeklyAccountingReport", async () => {
   const db = getFirestore();
   const now = new Date();
 
@@ -73,4 +74,4 @@ export const weeklyAccountingReport = onSchedule("every 60 minutes", async () =>
       html: buildHtml((data.name as string | undefined) ?? "Salonunuz", weekLabel, stats, categoryTotals),
     });
   }
-});
+}));

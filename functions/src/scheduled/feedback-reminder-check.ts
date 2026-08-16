@@ -4,6 +4,7 @@ import { getRemoteConfig, RemoteConfigTemplate } from "firebase-admin/remote-con
 import { onSchedule } from "firebase-functions/v2/scheduler";
 import * as logger from "firebase-functions/logger";
 
+import { withFailureAlerting } from "../shared/function-health";
 import { isFeedbackReminderDue } from "../shared/monthly-schedule";
 
 const DEFAULT_TEXT: Record<string, { tr: string; en: string }> = {
@@ -36,7 +37,7 @@ function readNotificationText(template: RemoteConfigTemplate, baseKey: string, l
  */
 export const feedbackReminderCheck = onSchedule(
   { schedule: "every day 10:00", timeZone: "Europe/Istanbul" },
-  async () => {
+  withFailureAlerting("feedbackReminderCheck", async () => {
     const db = getFirestore();
     const now = new Date();
 
@@ -70,5 +71,5 @@ export const feedbackReminderCheck = onSchedule(
     }
 
     logger.info(`Geri bildirim hatırlatması ${membersSnapshot.size} üyeye gönderildi.`);
-  },
+  }),
 );

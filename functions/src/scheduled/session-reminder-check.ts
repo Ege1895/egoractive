@@ -4,6 +4,8 @@ import { getRemoteConfig, RemoteConfigTemplate } from "firebase-admin/remote-con
 import { onSchedule } from "firebase-functions/v2/scheduler";
 import * as logger from "firebase-functions/logger";
 
+import { withFailureAlerting } from "../shared/function-health";
+
 const DEFAULT_REMINDER_MINUTES = 60;
 
 const DEFAULT_TEXT: Record<string, { tr: string; en: string }> = {
@@ -59,7 +61,7 @@ function formatTime(date: Date): string {
  * FCM token'larına push gönderir ve `confirmationRequested: true` yapar —
  * bu alan aynı seans için ikinci kez bildirim gitmesini engeller.
  */
-export const sessionReminderCheck = onSchedule("every 15 minutes", async () => {
+export const sessionReminderCheck = onSchedule("every 15 minutes", withFailureAlerting("sessionReminderCheck", async () => {
   const db = getFirestore();
 
   let template: RemoteConfigTemplate;
@@ -118,4 +120,4 @@ export const sessionReminderCheck = onSchedule("every 15 minutes", async () => {
 
     await sessionDoc.ref.update({ confirmationRequested: true });
   }
-});
+}));

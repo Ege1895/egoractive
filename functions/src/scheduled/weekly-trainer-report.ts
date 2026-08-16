@@ -4,6 +4,7 @@ import { onSchedule } from "firebase-functions/v2/scheduler";
 import * as logger from "firebase-functions/logger";
 
 import { formatWeekRangeTr } from "../shared/format";
+import { withFailureAlerting } from "../shared/function-health";
 import { queueEmail } from "../shared/mail";
 import { fetchTrainerWeeklyStats } from "../shared/weekly-report-stats";
 import { isWeeklyReportDue, previousWeekRange } from "../shared/weekly-schedule";
@@ -25,7 +26,7 @@ function buildHtml(trainerName: string, weekLabel: string, stats: Awaited<Return
  * çekilmiyor). Antrenörün e-postası `users/{uid}.email` alanından okunur;
  * ayarlanmamışsa o antrenör atlanır.
  */
-export const weeklyTrainerReport = onSchedule("every 60 minutes", async () => {
+export const weeklyTrainerReport = onSchedule("every 60 minutes", withFailureAlerting("weeklyTrainerReport", async () => {
   const db = getFirestore();
   const now = new Date();
 
@@ -59,4 +60,4 @@ export const weeklyTrainerReport = onSchedule("every 60 minutes", async () => {
       html: buildHtml((data.name as string | undefined) ?? "Antrenör", weekLabel, stats),
     });
   }
-});
+}));

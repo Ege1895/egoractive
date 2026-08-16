@@ -3,6 +3,7 @@ import { onSchedule } from "firebase-functions/v2/scheduler";
 import * as logger from "firebase-functions/logger";
 
 import { formatMonthLabelTr } from "../shared/format";
+import { withFailureAlerting } from "../shared/function-health";
 import { queueEmail } from "../shared/mail";
 import { currentMonthRange, isLastDayOfMonth } from "../shared/monthly-schedule";
 
@@ -26,7 +27,7 @@ function buildHtml(gymName: string, monthLabel: string, average: number, totalCo
  */
 export const monthlyFeedbackSummary = onSchedule(
   { schedule: "every day 10:00", timeZone: "Europe/Istanbul" },
-  async () => {
+  withFailureAlerting("monthlyFeedbackSummary", async () => {
     const now = new Date();
     if (!isLastDayOfMonth(now)) return;
 
@@ -60,5 +61,5 @@ export const monthlyFeedbackSummary = onSchedule(
         html: buildHtml((data.name as string | undefined) ?? "Salonunuz", monthLabel, average, totalCount),
       });
     }
-  },
+  }),
 );

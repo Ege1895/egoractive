@@ -3,6 +3,8 @@ import { getRemoteConfig, RemoteConfigTemplate } from "firebase-admin/remote-con
 import { onSchedule } from "firebase-functions/v2/scheduler";
 import * as logger from "firebase-functions/logger";
 
+import { withFailureAlerting } from "../shared/function-health";
+
 export interface BadgeCriterion {
   id: string;
   type: "sessionsCompleted" | "groupSessionJoins" | "eventJoins" | "membershipMonths";
@@ -62,7 +64,7 @@ function membershipMonthsSince(createdAt: FirebaseFirestore.Timestamp | undefine
  * sayılarını ve üyelik süresini hesaplar, `cfg_badge_criteria`deki eşikleri
  * geçen ama henüz `users/{uid}.badges` içinde olmayan rozetleri ekler.
  */
-export const badgeCheck = onSchedule("every day 03:00", async () => {
+export const badgeCheck = onSchedule("every day 03:00", withFailureAlerting("badgeCheck", async () => {
   const db = getFirestore();
 
   let template: RemoteConfigTemplate;
@@ -106,4 +108,4 @@ export const badgeCheck = onSchedule("every day 03:00", async () => {
     await memberDoc.ref.update({ badges: [...existingBadgeIds, ...newlyEarned] });
     logger.info(`Üye ${uid} yeni rozet kazandı: ${newlyEarned.join(", ")}`);
   }
-});
+}));

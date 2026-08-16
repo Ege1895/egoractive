@@ -4,6 +4,8 @@ import { getRemoteConfig, RemoteConfigTemplate } from "firebase-admin/remote-con
 import { onSchedule } from "firebase-functions/v2/scheduler";
 import * as logger from "firebase-functions/logger";
 
+import { withFailureAlerting } from "../shared/function-health";
+
 const DEFAULT_TEXT: Record<string, { tr: string; en: string }> = {
   lbl_notif_session_completion_title: {
     tr: "✅ Dersini onaylar mısın?",
@@ -39,7 +41,7 @@ function readNotificationText(
  * "tamamlandı" işaretlemesi ve `remainingSessions` düşürme işlemi
  * client'ta (`SessionCompletionPanel`) bir transaction ile yapılır.
  */
-export const sessionCompletionCheck = onSchedule("every 15 minutes", async () => {
+export const sessionCompletionCheck = onSchedule("every 15 minutes", withFailureAlerting("sessionCompletionCheck", async () => {
   const db = getFirestore();
 
   let template: RemoteConfigTemplate;
@@ -90,4 +92,4 @@ export const sessionCompletionCheck = onSchedule("every 15 minutes", async () =>
 
     await sessionDoc.ref.update({ completionPushSent: true });
   }
-});
+}));
