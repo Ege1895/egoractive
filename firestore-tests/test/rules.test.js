@@ -2,7 +2,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const test = require("node:test");
 const assert = require("node:assert/strict");
-const { setDoc, updateDoc, getDoc, doc, Timestamp, runTransaction, arrayUnion } = require("firebase/firestore");
+const { setDoc, updateDoc, deleteDoc, getDoc, doc, Timestamp, runTransaction, arrayUnion } = require("firebase/firestore");
 const {
   initializeTestEnvironment,
   assertSucceeds,
@@ -95,6 +95,79 @@ test("admin of a different gym cannot write to this gym (negative)", async () =>
   await assertFails(setDoc(doc(db, "gyms/gym-a"), { name: "Hacked" }, { merge: true }));
 });
 
+test("a user from a different gym cannot read this gym (negative)", async () => {
+  const db = contextFor("admin-b", { role: "admin", gymId: "gym-b" }).firestore();
+  await assertFails(getDoc(doc(db, "gyms/gym-a")));
+});
+
+test("trainer cannot create a gym doc (negative — sadece admin onboarding'i)", async () => {
+  const db = contextFor("trainer-a", { role: "trainer", gymId: "gym-new" }).firestore();
+  await assertFails(setDoc(doc(db, "gyms/gym-new"), { name: "New Gym", subscriptionStatus: "trial" }));
+});
+
+test("admin can delete their own gym (positive)", async () => {
+  const db = contextFor("admin-a", { role: "admin", gymId: "gym-a" }).firestore();
+  await assertSucceeds(deleteDoc(doc(db, "gyms/gym-a")));
+});
+
+test("non-admin cannot delete a gym (negative)", async () => {
+  const db = contextFor("trainer-a", { role: "trainer", gymId: "gym-a" }).firestore();
+  await assertFails(deleteDoc(doc(db, "gyms/gym-a")));
+});
+
+test("admin of a different gym cannot delete this gym (negative)", async () => {
+  const db = contextFor("admin-b", { role: "admin", gymId: "gym-b" }).firestore();
+  await assertFails(deleteDoc(doc(db, "gyms/gym-a")));
+});
+
+// --- gyms/{gymId}/packages/{packageId} — paket kataloğu (F4-9) ---
+
+test("member can read their own gym's package catalog (positive)", async () => {
+  await testEnv.withSecurityRulesDisabled(async (context) => {
+    await setDoc(context.firestore().doc("gyms/gym-a/packages/pkg-1"), { name: "10 Ders", sessionCount: 10, priceTl: 9600 });
+  });
+  const db = contextFor("member-a1", { role: "member", gymId: "gym-a" }).firestore();
+  await assertSucceeds(getDoc(doc(db, "gyms/gym-a/packages/pkg-1")));
+});
+
+test("a user from a different gym cannot read this gym's package catalog (negative)", async () => {
+  await testEnv.withSecurityRulesDisabled(async (context) => {
+    await setDoc(context.firestore().doc("gyms/gym-a/packages/pkg-1"), { name: "10 Ders", sessionCount: 10, priceTl: 9600 });
+  });
+  const db = contextFor("admin-b", { role: "admin", gymId: "gym-b" }).firestore();
+  await assertFails(getDoc(doc(db, "gyms/gym-a/packages/pkg-1")));
+});
+
+test("admin can create a package catalog entry for their own (non-expired) gym (positive)", async () => {
+  const db = contextFor("admin-a", { role: "admin", gymId: "gym-a" }).firestore();
+  await assertSucceeds(
+    setDoc(doc(db, "gyms/gym-a/packages/pkg-1"), { name: "10 Ders", sessionCount: 10, priceTl: 9600 }),
+  );
+});
+
+test("trainer cannot create a package catalog entry (negative)", async () => {
+  const db = contextFor("trainer-a", { role: "trainer", gymId: "gym-a" }).firestore();
+  await assertFails(
+    setDoc(doc(db, "gyms/gym-a/packages/pkg-1"), { name: "10 Ders", sessionCount: 10, priceTl: 9600 }),
+  );
+});
+
+test("admin can delete a package catalog entry (positive)", async () => {
+  await testEnv.withSecurityRulesDisabled(async (context) => {
+    await setDoc(context.firestore().doc("gyms/gym-a/packages/pkg-1"), { name: "10 Ders", sessionCount: 10, priceTl: 9600 });
+  });
+  const db = contextFor("admin-a", { role: "admin", gymId: "gym-a" }).firestore();
+  await assertSucceeds(deleteDoc(doc(db, "gyms/gym-a/packages/pkg-1")));
+});
+
+test("trainer cannot delete a package catalog entry (negative)", async () => {
+  await testEnv.withSecurityRulesDisabled(async (context) => {
+    await setDoc(context.firestore().doc("gyms/gym-a/packages/pkg-1"), { name: "10 Ders", sessionCount: 10, priceTl: 9600 });
+  });
+  const db = contextFor("trainer-a", { role: "trainer", gymId: "gym-a" }).firestore();
+  await assertFails(deleteDoc(doc(db, "gyms/gym-a/packages/pkg-1")));
+});
+
 // --- gyms/{gymId} subscription fields (F6-1) ---
 
 test("admin can create a gym doc with subscriptionStatus 'trial' (positive)", async () => {
@@ -171,6 +244,35 @@ test("admin cannot create a user document for a different gym (negative)", async
   );
 });
 
+test("trainer cannot create a user document for someone else (negative)", async () => {
+  const db = contextFor("trainer-a", { role: "trainer", gymId: "gym-a" }).firestore();
+  await assertFails(
+    setDoc(doc(db, "users/new-member"), { role: "member", gymId: "gym-a", trainerId: "trainer-a" }),
+  );
+});
+
+test("member cannot create a user document for someone else (negative)", async () => {
+  const db = contextFor("member-a1", { role: "member", gymId: "gym-a" }).firestore();
+  await assertFails(
+    setDoc(doc(db, "users/new-member"), { role: "member", gymId: "gym-a", trainerId: "" }),
+  );
+});
+
+test("admin can delete a member in their own gym (positive)", async () => {
+  const db = contextFor("admin-a", { role: "admin", gymId: "gym-a" }).firestore();
+  await assertSucceeds(deleteDoc(doc(db, "users/member-a1")));
+});
+
+test("admin of a different gym cannot delete a member (negative)", async () => {
+  const db = contextFor("admin-b", { role: "admin", gymId: "gym-b" }).firestore();
+  await assertFails(deleteDoc(doc(db, "users/member-a1")));
+});
+
+test("trainer cannot delete a member (negative)", async () => {
+  const db = contextFor("trainer-a", { role: "trainer", gymId: "gym-a" }).firestore();
+  await assertFails(deleteDoc(doc(db, "users/member-a1")));
+});
+
 // --- memberPackages/{id} (F3-2) ---
 
 test("admin can create a memberPackages doc for their own gym (positive)", async () => {
@@ -211,6 +313,46 @@ test("trainer cannot read a memberPackages doc (negative)", async () => {
   await assertFails(getDoc(doc(db, "memberPackages/pkg-1")));
 });
 
+test("trainer cannot create a memberPackages doc (negative)", async () => {
+  const db = contextFor("trainer-a", { role: "trainer", gymId: "gym-a" }).firestore();
+  await assertFails(
+    setDoc(doc(db, "memberPackages/pkg-1"), { memberId: "member-a1", gymId: "gym-a", totalAmount: 9600 }),
+  );
+});
+
+test("member cannot create a memberPackages doc (negative)", async () => {
+  const db = contextFor("member-a1", { role: "member", gymId: "gym-a" }).firestore();
+  await assertFails(
+    setDoc(doc(db, "memberPackages/pkg-1"), { memberId: "member-a1", gymId: "gym-a", totalAmount: 9600 }),
+  );
+});
+
+test("admin can read a memberPackages doc in their own gym (positive)", async () => {
+  await testEnv.withSecurityRulesDisabled(async (context) => {
+    await setDoc(context.firestore().doc("memberPackages/pkg-1"), { memberId: "member-a1", gymId: "gym-a", totalAmount: 9600 });
+  });
+  const db = contextFor("admin-a", { role: "admin", gymId: "gym-a" }).firestore();
+  await assertSucceeds(getDoc(doc(db, "memberPackages/pkg-1")));
+});
+
+test("admin can update/delete a memberPackages doc in their own gym (positive)", async () => {
+  await testEnv.withSecurityRulesDisabled(async (context) => {
+    await setDoc(context.firestore().doc("memberPackages/pkg-1"), { memberId: "member-a1", gymId: "gym-a", totalAmount: 9600 });
+  });
+  const db = contextFor("admin-a", { role: "admin", gymId: "gym-a" }).firestore();
+  await assertSucceeds(setDoc(doc(db, "memberPackages/pkg-1"), { paidAmount: 4800 }, { merge: true }));
+  await assertSucceeds(deleteDoc(doc(db, "memberPackages/pkg-1")));
+});
+
+test("admin of a different gym cannot update/delete a memberPackages doc (negative)", async () => {
+  await testEnv.withSecurityRulesDisabled(async (context) => {
+    await setDoc(context.firestore().doc("memberPackages/pkg-1"), { memberId: "member-a1", gymId: "gym-a", totalAmount: 9600 });
+  });
+  const db = contextFor("admin-b", { role: "admin", gymId: "gym-b" }).firestore();
+  await assertFails(setDoc(doc(db, "memberPackages/pkg-1"), { paidAmount: 4800 }, { merge: true }));
+  await assertFails(deleteDoc(doc(db, "memberPackages/pkg-1")));
+});
+
 // --- expenses/{id} (F5-1 — dashboard'ın okuduğu, F5-3'te giriş ekranı gelecek) ---
 
 test("admin can create an expenses doc for their own gym (positive)", async () => {
@@ -241,6 +383,42 @@ test("trainer cannot read an expenses doc (negative)", async () => {
   });
   const db = contextFor("trainer-a", { role: "trainer", gymId: "gym-a" }).firestore();
   await assertFails(getDoc(doc(db, "expenses/exp-1")));
+});
+
+test("trainer cannot create an expenses doc (negative)", async () => {
+  const db = contextFor("trainer-a", { role: "trainer", gymId: "gym-a" }).firestore();
+  await assertFails(setDoc(doc(db, "expenses/exp-1"), { gymId: "gym-a", category: "Kira", amountTl: 65000 }));
+});
+
+test("member cannot create an expenses doc (negative)", async () => {
+  const db = contextFor("member-a1", { role: "member", gymId: "gym-a" }).firestore();
+  await assertFails(setDoc(doc(db, "expenses/exp-1"), { gymId: "gym-a", category: "Kira", amountTl: 65000 }));
+});
+
+test("admin can read an expenses doc in their own gym (positive)", async () => {
+  await testEnv.withSecurityRulesDisabled(async (context) => {
+    await setDoc(context.firestore().doc("expenses/exp-1"), { gymId: "gym-a", category: "Kira", amountTl: 65000 });
+  });
+  const db = contextFor("admin-a", { role: "admin", gymId: "gym-a" }).firestore();
+  await assertSucceeds(getDoc(doc(db, "expenses/exp-1")));
+});
+
+test("admin can update/delete an expenses doc in their own gym (positive)", async () => {
+  await testEnv.withSecurityRulesDisabled(async (context) => {
+    await setDoc(context.firestore().doc("expenses/exp-1"), { gymId: "gym-a", category: "Kira", amountTl: 65000 });
+  });
+  const db = contextFor("admin-a", { role: "admin", gymId: "gym-a" }).firestore();
+  await assertSucceeds(setDoc(doc(db, "expenses/exp-1"), { amountTl: 70000 }, { merge: true }));
+  await assertSucceeds(deleteDoc(doc(db, "expenses/exp-1")));
+});
+
+test("admin of a different gym cannot update/delete an expenses doc (negative)", async () => {
+  await testEnv.withSecurityRulesDisabled(async (context) => {
+    await setDoc(context.firestore().doc("expenses/exp-1"), { gymId: "gym-a", category: "Kira", amountTl: 65000 });
+  });
+  const db = contextFor("admin-b", { role: "admin", gymId: "gym-b" }).firestore();
+  await assertFails(setDoc(doc(db, "expenses/exp-1"), { amountTl: 70000 }, { merge: true }));
+  await assertFails(deleteDoc(doc(db, "expenses/exp-1")));
 });
 
 // --- sessions/{sessionId} (F3-3) ---
@@ -286,6 +464,26 @@ test("trainer cannot create a session (negative — only admin screens create)",
       status: "planned",
     }),
   );
+});
+
+test("member cannot create a session (negative)", async () => {
+  const db = contextFor("member-a1", { role: "member", gymId: "gym-a" }).firestore();
+  await assertFails(
+    setDoc(doc(db, "sessions/s1"), {
+      gymId: "gym-a",
+      trainerId: "trainer-a",
+      memberId: "member-a1",
+      startTime: hoursFromNow(48),
+      status: "planned",
+    }),
+  );
+});
+
+test("admin of a different gym cannot read/update a session (negative)", async () => {
+  await seedSession("s1", { trainerId: "trainer-a", memberId: "member-a1", startTime: hoursFromNow(48) });
+  const db = contextFor("admin-b", { role: "admin", gymId: "gym-b" }).firestore();
+  await assertFails(getDoc(doc(db, "sessions/s1")));
+  await assertFails(updateDoc(doc(db, "sessions/s1"), { status: "cancelled" }));
 });
 
 test("admin can cancel a session starting in 1 hour (positive — no deadline for admin)", async () => {
@@ -488,6 +686,31 @@ test("member cannot create a group session (negative)", async () => {
   );
 });
 
+test("admin of a different gym cannot create a group session for another gym (negative)", async () => {
+  const db = contextFor("admin-b", { role: "admin", gymId: "gym-b" }).firestore();
+  await assertFails(
+    setDoc(doc(db, "groupSessions/gs1"), { gymId: "gym-a", title: "Mat Pilates", capacity: 8, attendeeIds: [] }),
+  );
+});
+
+test("admin can update any field of a group session (positive)", async () => {
+  await seedGroupSession("gs1", { capacity: 8, attendeeIds: [] });
+  const db = contextFor("admin-a", { role: "admin", gymId: "gym-a" }).firestore();
+  await assertSucceeds(updateDoc(doc(db, "groupSessions/gs1"), { title: "Reformer Grup (güncel)", capacity: 10 }));
+});
+
+test("admin can delete a group session (positive)", async () => {
+  await seedGroupSession("gs1", { capacity: 8, attendeeIds: [] });
+  const db = contextFor("admin-a", { role: "admin", gymId: "gym-a" }).firestore();
+  await assertSucceeds(deleteDoc(doc(db, "groupSessions/gs1")));
+});
+
+test("member cannot delete a group session (negative)", async () => {
+  await seedGroupSession("gs1", { capacity: 8, attendeeIds: [] });
+  const db = contextFor("member-a1", { role: "member", gymId: "gym-a" }).firestore();
+  await assertFails(deleteDoc(doc(db, "groupSessions/gs1")));
+});
+
 test("member can join a group session with room left (positive)", async () => {
   await seedGroupSession("gs1", { capacity: 2, attendeeIds: [] });
   const db = contextFor("member-a1", { role: "member", gymId: "gym-a" }).firestore();
@@ -593,6 +816,31 @@ test("member cannot create an event (negative)", async () => {
   );
 });
 
+test("admin of a different gym cannot create an event for another gym (negative)", async () => {
+  const db = contextFor("admin-b", { role: "admin", gymId: "gym-b" }).firestore();
+  await assertFails(
+    setDoc(doc(db, "events/ev1"), { gymId: "gym-a", name: "Yaz Şenliği", capacity: 20, attendeeIds: [] }),
+  );
+});
+
+test("admin can update any field of an event (positive)", async () => {
+  await seedEvent("ev1", { capacity: 20, attendeeIds: [] });
+  const db = contextFor("admin-a", { role: "admin", gymId: "gym-a" }).firestore();
+  await assertSucceeds(updateDoc(doc(db, "events/ev1"), { name: "Yaz Şenliği (güncel)", capacity: 25 }));
+});
+
+test("admin can delete an event (positive)", async () => {
+  await seedEvent("ev1", { capacity: 20, attendeeIds: [] });
+  const db = contextFor("admin-a", { role: "admin", gymId: "gym-a" }).firestore();
+  await assertSucceeds(deleteDoc(doc(db, "events/ev1")));
+});
+
+test("member cannot delete an event (negative)", async () => {
+  await seedEvent("ev1", { capacity: 20, attendeeIds: [] });
+  const db = contextFor("member-a1", { role: "member", gymId: "gym-a" }).firestore();
+  await assertFails(deleteDoc(doc(db, "events/ev1")));
+});
+
 test("member can join an event with room left (positive)", async () => {
   await seedEvent("ev1", { capacity: 2, attendeeIds: [] });
   const db = contextFor("member-a1", { role: "member", gymId: "gym-a" }).firestore();
@@ -666,6 +914,20 @@ test("member cannot create feedback for a different gym (negative)", async () =>
   );
 });
 
+test("admin cannot create feedback (negative — sadece üye gönderir)", async () => {
+  const db = contextFor("admin-a", { role: "admin", gymId: "gym-a" }).firestore();
+  await assertFails(
+    setDoc(doc(db, "feedback/fb1"), { gymId: "gym-a", memberId: "member-a1", stars: 5, comment: "Harikaydı" }),
+  );
+});
+
+test("trainer cannot create feedback (negative — sadece üye gönderir)", async () => {
+  const db = contextFor("trainer-a", { role: "trainer", gymId: "gym-a" }).firestore();
+  await assertFails(
+    setDoc(doc(db, "feedback/fb1"), { gymId: "gym-a", memberId: "member-a1", stars: 5, comment: "Harikaydı" }),
+  );
+});
+
 test("admin can read feedback for their own gym (positive)", async () => {
   await testEnv.withSecurityRulesDisabled(async (context) => {
     await setDoc(context.firestore().doc("feedback/fb1"), { gymId: "gym-a", memberId: "member-a1", stars: 5 });
@@ -696,6 +958,30 @@ test("member cannot read another member's feedback (negative)", async () => {
   });
   const db = contextFor("member-a2", { role: "member", gymId: "gym-a" }).firestore();
   await assertFails(getDoc(doc(db, "feedback/fb1")));
+});
+
+test("member cannot read their own feedback either (negative — gönderim tek yönlü, admin dışında kimse okuyamaz)", async () => {
+  await testEnv.withSecurityRulesDisabled(async (context) => {
+    await setDoc(context.firestore().doc("feedback/fb1"), { gymId: "gym-a", memberId: "member-a1", stars: 5 });
+  });
+  const db = contextFor("member-a1", { role: "member", gymId: "gym-a" }).firestore();
+  await assertFails(getDoc(doc(db, "feedback/fb1")));
+});
+
+test("nobody can update feedback after it's submitted, not even admin (negative)", async () => {
+  await testEnv.withSecurityRulesDisabled(async (context) => {
+    await setDoc(context.firestore().doc("feedback/fb1"), { gymId: "gym-a", memberId: "member-a1", stars: 5 });
+  });
+  const db = contextFor("admin-a", { role: "admin", gymId: "gym-a" }).firestore();
+  await assertFails(updateDoc(doc(db, "feedback/fb1"), { stars: 1 }));
+});
+
+test("nobody can delete feedback, not even the member who wrote it (negative)", async () => {
+  await testEnv.withSecurityRulesDisabled(async (context) => {
+    await setDoc(context.firestore().doc("feedback/fb1"), { gymId: "gym-a", memberId: "member-a1", stars: 5 });
+  });
+  const db = contextFor("member-a1", { role: "member", gymId: "gym-a" }).firestore();
+  await assertFails(deleteDoc(doc(db, "feedback/fb1")));
 });
 
 // --- F6-3: gymSubscriptionAllowsWrite() — expired bir salon yeni içerik oluşturamaz ---
@@ -789,4 +1075,14 @@ test("admin of an expired gym CAN still update an existing session (positive —
   });
   const db = contextFor("admin-expired", { role: "admin", gymId: "gym-expired" }).firestore();
   await assertSucceeds(setDoc(doc(db, "sessions/s1"), { status: "cancelled" }, { merge: true }));
+});
+
+test("admin of a gym with subscriptionStatus 'active' CAN create a new member (positive — sadece 'trial' değil, 'active' de yazmaya izin veriyor)", async () => {
+  await testEnv.withSecurityRulesDisabled(async (context) => {
+    await setDoc(context.firestore().doc("gyms/gym-active"), { name: "Gym Active", subscriptionStatus: "active" });
+  });
+  const db = contextFor("admin-active", { role: "admin", gymId: "gym-active" }).firestore();
+  await assertSucceeds(
+    setDoc(doc(db, "users/new-member"), { role: "member", gymId: "gym-active", trainerId: "" }),
+  );
 });
