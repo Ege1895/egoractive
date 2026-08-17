@@ -13,6 +13,12 @@ function requireNonEmptyString(value: unknown, field: string): string {
   return value.trim();
 }
 
+/** Logo opsiyonel — boş/eksikse `undefined` döner, girildiyse trim'lenir. */
+function optionalNonEmptyString(value: unknown): string | undefined {
+  if (typeof value !== "string" || value.trim().length === 0) return undefined;
+  return value.trim();
+}
+
 /**
  * F2-9 — yeni bir antrenör, henüz hiçbir Firebase Auth oturumu olmadan
  * "kendi salonumu oluşturuyorum" akışında bu fonksiyonu çağırır (client
@@ -32,11 +38,14 @@ export const signupGymAdmin = onCall(async (request) => {
   const phoneNumber = requireNonEmptyString(data.phoneNumber, "Telefon numarası");
   const address = requireNonEmptyString(data.address, "Adres");
   const themeColorHex = requireNonEmptyString(data.themeColorHex, "Tema rengi");
-  const logoBase64 = requireNonEmptyString(data.logoBase64, "Salon logosu");
+  const logoBase64 = optionalNonEmptyString(data.logoBase64);
 
-  const logoBuffer = Buffer.from(logoBase64, "base64");
-  if (logoBuffer.length === 0 || logoBuffer.length > MAX_LOGO_BYTES) {
-    throw new HttpsError("invalid-argument", "Logo dosyası geçersiz veya çok büyük.");
+  let logoBuffer: Buffer | undefined;
+  if (logoBase64 !== undefined) {
+    logoBuffer = Buffer.from(logoBase64, "base64");
+    if (logoBuffer.length === 0 || logoBuffer.length > MAX_LOGO_BYTES) {
+      throw new HttpsError("invalid-argument", "Logo dosyası geçersiz veya çok büyük.");
+    }
   }
 
   const firestore = getFirestore();
@@ -50,18 +59,22 @@ export const signupGymAdmin = onCall(async (request) => {
   }
 
   const gymRef = firestore.collection(gymsCollection()).doc();
-  const logoPath = `gym_logos/${gymRef.id}.png`;
-  const file = getStorage().bucket().file(logoPath);
-  await file.save(logoBuffer, { contentType: "image/png" });
-  await file.makePublic();
-  const logoUrl = `https://storage.googleapis.com/${file.bucket.name}/${logoPath}`;
+
+  let logoUrl: string | undefined;
+  if (logoBuffer !== undefined) {
+    const logoPath = `gym_logos/${gymRef.id}.png`;
+    const file = getStorage().bucket().file(logoPath);
+    await file.save(logoBuffer, { contentType: "image/png" });
+    await file.makePublic();
+    logoUrl = `https://storage.googleapis.com/${file.bucket.name}/${logoPath}`;
+  }
 
   await gymRef.set({
     name,
     city,
     phone: phoneNumber,
     address,
-    logoUrl,
+    ...(logoUrl !== undefined ? { logoUrl } : {}),
     themeColors: { primary: themeColorHex },
     subscriptionStatus: "trial",
     trialStartedAt: FieldValue.serverTimestamp(),

@@ -47,13 +47,13 @@ class CreateGymController extends _$CreateGymController {
     }
   }
 
-  /// Boş alan / logo eksikse `false` döner ve [errorMessage]'ı doldurur;
-  /// başarılıysa oluşturulan `gymId`'yi döner.
+  /// Zorunlu alan eksikse `null` döner ve [errorMessage]'ı doldurur;
+  /// başarılıysa oluşturulan `gymId`'yi döner. Logo opsiyoneldir.
   Future<String?> submit() async {
     if (state.isSubmitting) return null;
 
     final profile = ref.read(gymProfileControllerProvider);
-    final validationError = _validate(profile, state.logoFile);
+    final validationError = _validate(profile);
     if (validationError != null) {
       state = state.copyWith(errorMessage: validationError);
       return null;
@@ -65,7 +65,7 @@ class CreateGymController extends _$CreateGymController {
       final gymId = await ref.read(createGymServiceProvider).createGym(
             profile: profile,
             themeColor: themeColor,
-            logoFile: state.logoFile!,
+            logoFile: state.logoFile,
           );
       state = state.copyWith(isSubmitting: false);
       return gymId;
@@ -78,15 +78,12 @@ class CreateGymController extends _$CreateGymController {
     }
   }
 
-  String? _validate(GymProfile profile, XFile? logoFile) {
+  String? _validate(GymProfile profile) {
     if (profile.name.trim().isEmpty ||
         profile.city.trim().isEmpty ||
         profile.phone.trim().isEmpty ||
         profile.address.trim().isEmpty) {
       return 'Lütfen tüm alanları doldur.';
-    }
-    if (logoFile == null) {
-      return 'Lütfen bir salon logosu seç.';
     }
     return null;
   }
