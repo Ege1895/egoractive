@@ -7,6 +7,7 @@ import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/utils/phone_number_formatter.dart';
+import '../../../../shared/widgets/app_back_button.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../controller/auth_controller.dart';
 import 'login_waiting_panel.dart';
@@ -17,6 +18,13 @@ import 'login_waiting_panel.dart';
 /// akışının son adımında kullanılır: salon kaydı tamamlanınca kullanıcı bu
 /// ekrana, az önce girdiği numara önceden dolu ve bir başarı mesajıyla
 /// yönlendirilir.
+///
+/// Geri butonu sadece bu panel `push` ile açıldıysa (ör. F2-9 onboarding
+/// akışından gelindiyse) gösterilir — panel `replaceRoot` ile (çıkış yapma,
+/// hesap silme, oturum süresi dolma) açıldığında stack'te tek panel kalır ve
+/// geri dönülecek bir ekran olmaz. Bu durumu merkezi `PanelStackController`
+/// stack uzunluğundan okuyoruz — CLAUDE.md §2.3'teki "tek navigasyon
+/// sistemi" kuralına uygun olarak.
 class PhoneLoginPanel extends BasePanel {
   const PhoneLoginPanel({super.key, this.prefillPhoneDigits, this.successBanner});
 
@@ -48,6 +56,7 @@ class _PhoneLoginPanelState extends BasePanelState<PhoneLoginPanel> {
     final typography = context.appTypography;
     final authState = ref.watch(authControllerProvider);
     final authController = ref.read(authControllerProvider.notifier);
+    final canPop = ref.watch(panelStackControllerProvider).length > 1;
 
     final formatted = formatTrPhoneDigits(authState.phoneDigits);
     if (_phoneController.text != formatted) {
@@ -69,6 +78,10 @@ class _PhoneLoginPanelState extends BasePanelState<PhoneLoginPanel> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              if (canPop) ...[
+                AppBackButton(onTap: () => ref.read(panelStackControllerProvider.notifier).pop()),
+                const SizedBox(height: AppSpacing.lg),
+              ],
               if (widget.successBanner != null) ...[
                 Container(
                   width: double.infinity,
