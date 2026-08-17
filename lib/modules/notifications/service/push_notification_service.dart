@@ -51,8 +51,18 @@ class PushNotificationService {
       onDidReceiveNotificationResponse: (_) => _navigateToReminderPanel(container),
     );
 
-    final token = await FirebaseMessaging.instance.getToken();
-    if (token != null) await _saveToken(token);
+    // APNS token'ın cihaza/simülatöre ulaşması gecikebilir (ya da kullanıcı
+    // bildirim iznini reddettiyse hiç gelmeyebilir) — getToken() bu durumda
+    // fırlatıyor. init() burada çağrıldığı yerde (main.dart) await edildiği
+    // için bu hata yakalanmazsa runApp() hiç çalışmaz, uygulama boş ekranda
+    // takılı kalır. Token alınamazsa sessizce vazgeçilir, onTokenRefresh
+    // ileride token gelince zaten _saveToken'ı tetikleyecek.
+    try {
+      final token = await FirebaseMessaging.instance.getToken();
+      if (token != null) await _saveToken(token);
+    } on Exception {
+      // Kasıtlı: bildirim token'ı olmadan da uygulama normal çalışmaya devam etmeli.
+    }
     FirebaseMessaging.instance.onTokenRefresh.listen(_saveToken);
 
     FirebaseMessaging.onMessage.listen(_showForegroundNotification);

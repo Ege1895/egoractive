@@ -12,8 +12,16 @@ import '../../controller/auth_controller.dart';
 import 'login_waiting_panel.dart';
 
 /// Ortak 2 · Telefon Numarası Girişi.
+///
+/// [prefillPhoneDigits] ve [successBanner], F2-9'daki "yeni salon oluştur"
+/// akışının son adımında kullanılır: salon kaydı tamamlanınca kullanıcı bu
+/// ekrana, az önce girdiği numara önceden dolu ve bir başarı mesajıyla
+/// yönlendirilir.
 class PhoneLoginPanel extends BasePanel {
-  const PhoneLoginPanel({super.key});
+  const PhoneLoginPanel({super.key, this.prefillPhoneDigits, this.successBanner});
+
+  final String? prefillPhoneDigits;
+  final String? successBanner;
 
   @override
   ConsumerState<PhoneLoginPanel> createState() => _PhoneLoginPanelState();
@@ -26,6 +34,12 @@ class _PhoneLoginPanelState extends BasePanelState<PhoneLoginPanel> {
   void initState() {
     super.initState();
     _phoneController = TextEditingController();
+    final prefill = widget.prefillPhoneDigits;
+    if (prefill != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) ref.read(authControllerProvider.notifier).setPhoneDigits(prefill);
+      });
+    }
   }
 
   @override
@@ -55,6 +69,22 @@ class _PhoneLoginPanelState extends BasePanelState<PhoneLoginPanel> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              if (widget.successBanner != null) ...[
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(AppSpacing.md),
+                  decoration: BoxDecoration(
+                    color: colors.primaryContainer,
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+                    border: Border.all(color: colors.primary.withValues(alpha: 0.3)),
+                  ),
+                  child: Text(
+                    widget.successBanner!,
+                    style: typography.bodyMedium.copyWith(color: colors.onPrimaryContainer, fontSize: 14),
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.lg),
+              ],
               Text(
                 'Telefonunla giriş yap',
                 style: typography.headingLarge.copyWith(color: colors.onSurface, fontSize: 30),

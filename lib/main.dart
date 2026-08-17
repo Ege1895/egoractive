@@ -37,7 +37,14 @@ void main() async {
     MobileAds.instance.updateRequestConfiguration(RequestConfiguration(testDeviceIds: debugTestDeviceIds));
   }
   FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
-  await PushNotificationService().init(_providerContainer);
+  // Push bildirim kurulumu opsiyonel bir iyileştirme — burada oluşacak
+  // herhangi bir hata (izin reddi, APNS gecikmesi vb.) runApp() çağrısını
+  // asla engellememeli, yoksa uygulama açılışta beyaz ekranda takılı kalır.
+  try {
+    await PushNotificationService().init(_providerContainer);
+  } on Exception catch (error) {
+    debugPrint('Push bildirim kurulumu başarısız oldu, uygulama yine de açılıyor: $error');
+  }
   runApp(UncontrolledProviderScope(container: _providerContainer, child: const EgoractiveApp()));
 }
 
