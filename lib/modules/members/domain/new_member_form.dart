@@ -19,7 +19,7 @@ class NewMemberForm with _$NewMemberForm {
     required String phoneDigits,
     required int birthYear,
     required int heightCm,
-    required MemberGender gender,
+    MemberGender? gender,
     required String trainerId,
     required String trainerName,
     required String note,

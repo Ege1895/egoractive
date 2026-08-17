@@ -30,7 +30,7 @@ class MemberRegistrationService {
     required String gymId,
     required String trainerId,
     required String trainerName,
-    required MemberGender gender,
+    MemberGender? gender,
   }) async {
     final doc = await FirebaseFirestore.instance.collection('users').add({
       'name': name,
@@ -39,7 +39,7 @@ class MemberRegistrationService {
       'gymId': gymId,
       'trainerId': trainerId,
       'trainerName': trainerName,
-      'gender': gender.name,
+      if (gender != null) 'gender': gender.name,
     });
     await _analytics.logEvent(
       AnalyticsEvent.membershipCreated,
