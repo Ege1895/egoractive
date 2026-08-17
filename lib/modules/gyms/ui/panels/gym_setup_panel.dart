@@ -130,10 +130,10 @@ class _GymSetupPanelState extends BasePanelState<GymSetupPanel> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Salon logosu', style: typography.headingSmall.copyWith(color: colors.onSurface, fontSize: 16)),
+                        Text('Salon logosu (opsiyonel)', style: typography.headingSmall.copyWith(color: colors.onSurface, fontSize: 16)),
                         const SizedBox(height: AppSpacing.xs),
                         Text(
-                          'Kare PNG, en az 512×512. Bu logo üyelerin ve antrenörlerin her ekranında arka planda %25 opaklıkla silüet olarak görünür.',
+                          'Kare PNG, en az 512×512. Eklersen üyelerin ve antrenörlerin her ekranında arka planda %25 opaklıkla silüet olarak görünür — sonradan Salon Bilgileri panelinden de ekleyebilirsin.',
                           style: typography.bodyMedium.copyWith(color: colors.onSurfaceMuted, fontSize: 13),
                         ),
                         const SizedBox(height: AppSpacing.md),

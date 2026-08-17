@@ -6,17 +6,20 @@ import 'package:egoractive/modules/gyms/controller/gym_profile_controller.dart';
 
 void main() {
   group('CreateGymController validation', () {
-    test('fails with a missing-logo message when no logo has been picked', () async {
+    test('does not require a logo — validation passes through to the (network) submit step', () async {
       final container = ProviderContainer();
       addTearDown(container.dispose);
       final notifier = container.read(createGymControllerProvider.notifier);
 
-      // Mock profil varsayılan olarak tüm alanları dolu getirir — bu yüzden
-      // Firebase'e hiç dokunmadan sadece "logo eksik" validasyonu tetiklenir.
+      // Mock profil varsayılan olarak tüm alanları dolu getirir ve logo hiç
+      // seçilmedi — validasyon artık logo'yu zorunlu tutmadığı için istek
+      // Firebase'e kadar ilerliyor ve orada (test ortamında Firebase
+      // başlatılmadığı için) genel bağlantı hatasıyla başarısız oluyor —
+      // "logo eksik" validasyon hatası artık hiç tetiklenmiyor.
       final gymId = await notifier.submit();
 
       expect(gymId, isNull);
-      expect(container.read(createGymControllerProvider).errorMessage, contains('logo'));
+      expect(container.read(createGymControllerProvider).errorMessage, isNot(contains('logo')));
       expect(container.read(createGymControllerProvider).isSubmitting, isFalse);
     });
 

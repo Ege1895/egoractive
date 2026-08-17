@@ -26,7 +26,7 @@ class CreateGymService {
   Future<String> createGym({
     required GymProfile profile,
     required Color themeColor,
-    required XFile logoFile,
+    XFile? logoFile,
   }) async {
     final result = await FirebaseFunctions.instance.httpsCallable('signupGymAdmin').call<Map<String, dynamic>>({
       'name': profile.name,
@@ -34,7 +34,7 @@ class CreateGymService {
       'phoneNumber': profile.phone,
       'address': profile.address,
       'themeColorHex': _toHex(themeColor),
-      'logoBase64': base64Encode(_toLogoPng(await logoFile.readAsBytes())),
+      if (logoFile != null) 'logoBase64': base64Encode(_toLogoPng(await logoFile.readAsBytes())),
     });
     return result.data['gymId'] as String;
   }
