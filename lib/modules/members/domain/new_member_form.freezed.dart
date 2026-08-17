@@ -22,7 +22,7 @@ mixin _$NewMemberForm {
   String get phoneDigits => throw _privateConstructorUsedError;
   int get birthYear => throw _privateConstructorUsedError;
   int get heightCm => throw _privateConstructorUsedError;
-  MemberGender get gender => throw _privateConstructorUsedError;
+  MemberGender? get gender => throw _privateConstructorUsedError;
   String get trainerId => throw _privateConstructorUsedError;
   String get trainerName => throw _privateConstructorUsedError;
   String get note => throw _privateConstructorUsedError;
@@ -47,7 +47,7 @@ abstract class $NewMemberFormCopyWith<$Res> {
     String phoneDigits,
     int birthYear,
     int heightCm,
-    MemberGender gender,
+    MemberGender? gender,
     String trainerId,
     String trainerName,
     String note,
@@ -74,7 +74,7 @@ class _$NewMemberFormCopyWithImpl<$Res, $Val extends NewMemberForm>
     Object? phoneDigits = null,
     Object? birthYear = null,
     Object? heightCm = null,
-    Object? gender = null,
+    Object? gender = freezed,
     Object? trainerId = null,
     Object? trainerName = null,
     Object? note = null,
@@ -101,10 +101,10 @@ class _$NewMemberFormCopyWithImpl<$Res, $Val extends NewMemberForm>
                 ? _value.heightCm
                 : heightCm // ignore: cast_nullable_to_non_nullable
                       as int,
-            gender: null == gender
+            gender: freezed == gender
                 ? _value.gender
                 : gender // ignore: cast_nullable_to_non_nullable
-                      as MemberGender,
+                      as MemberGender?,
             trainerId: null == trainerId
                 ? _value.trainerId
                 : trainerId // ignore: cast_nullable_to_non_nullable
@@ -138,7 +138,7 @@ abstract class _$$NewMemberFormImplCopyWith<$Res>
     String phoneDigits,
     int birthYear,
     int heightCm,
-    MemberGender gender,
+    MemberGender? gender,
     String trainerId,
     String trainerName,
     String note,
@@ -164,7 +164,7 @@ class __$$NewMemberFormImplCopyWithImpl<$Res>
     Object? phoneDigits = null,
     Object? birthYear = null,
     Object? heightCm = null,
-    Object? gender = null,
+    Object? gender = freezed,
     Object? trainerId = null,
     Object? trainerName = null,
     Object? note = null,
@@ -191,10 +191,10 @@ class __$$NewMemberFormImplCopyWithImpl<$Res>
             ? _value.heightCm
             : heightCm // ignore: cast_nullable_to_non_nullable
                   as int,
-        gender: null == gender
+        gender: freezed == gender
             ? _value.gender
             : gender // ignore: cast_nullable_to_non_nullable
-                  as MemberGender,
+                  as MemberGender?,
         trainerId: null == trainerId
             ? _value.trainerId
             : trainerId // ignore: cast_nullable_to_non_nullable
@@ -221,7 +221,7 @@ class _$NewMemberFormImpl extends _NewMemberForm {
     required this.phoneDigits,
     required this.birthYear,
     required this.heightCm,
-    required this.gender,
+    this.gender,
     required this.trainerId,
     required this.trainerName,
     required this.note,
@@ -238,7 +238,7 @@ class _$NewMemberFormImpl extends _NewMemberForm {
   @override
   final int heightCm;
   @override
-  final MemberGender gender;
+  final MemberGender? gender;
   @override
   final String trainerId;
   @override
@@ -304,7 +304,7 @@ abstract class _NewMemberForm extends NewMemberForm {
     required final String phoneDigits,
     required final int birthYear,
     required final int heightCm,
-    required final MemberGender gender,
+    final MemberGender? gender,
     required final String trainerId,
     required final String trainerName,
     required final String note,
@@ -322,7 +322,7 @@ abstract class _NewMemberForm extends NewMemberForm {
   @override
   int get heightCm;
   @override
-  MemberGender get gender;
+  MemberGender? get gender;
   @override
   String get trainerId;
   @override

@@ -16,7 +16,6 @@ class NewMemberController extends _$NewMemberController {
       phoneDigits: '',
       birthYear: 1995,
       heightCm: 170,
-      gender: MemberGender.kadin,
       trainerId: 'berk-aydin',
       trainerName: 'Berk Aydın',
       note: '',
@@ -33,7 +32,11 @@ class NewMemberController extends _$NewMemberController {
 
   void updateHeightCm(int value) => state = state.copyWith(heightCm: value);
 
-  void updateGender(MemberGender value) => state = state.copyWith(gender: value);
+  /// Zaten seçili olan cinsiyete tekrar dokunulursa seçim kaldırılır —
+  /// cinsiyet opsiyonel bir alan, admin hiç seçmeden de devam edebilir.
+  void toggleGender(MemberGender value) {
+    state = state.copyWith(gender: state.gender == value ? null : value);
+  }
 
   void selectTrainer(String id, String name) => state = state.copyWith(trainerId: id, trainerName: name);
 

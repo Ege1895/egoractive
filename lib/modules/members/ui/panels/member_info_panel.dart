@@ -155,7 +155,7 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
                           ],
                         ),
                         const SizedBox(height: AppSpacing.md),
-                        Text('Cinsiyet', style: typography.bodyMedium.copyWith(color: colors.onSurfaceMuted, fontSize: 13)),
+                        Text('Cinsiyet (opsiyonel)', style: typography.bodyMedium.copyWith(color: colors.onSurfaceMuted, fontSize: 13)),
                         const SizedBox(height: AppSpacing.sm),
                         Row(
                           children: [
@@ -166,7 +166,7 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
                                   child: _GenderChip(
                                     label: gender.label,
                                     selected: form.gender == gender,
-                                    onTap: () => controller.updateGender(gender),
+                                    onTap: () => controller.toggleGender(gender),
                                   ),
                                 ),
                               ),
