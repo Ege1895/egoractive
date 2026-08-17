@@ -1,7 +1,6 @@
 import 'package:image_picker/image_picker.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../../core/router/app_router.dart';
 import '../domain/gym_profile.dart';
 import '../service/create_gym_service.dart';
 import 'gym_profile_controller.dart';
@@ -68,9 +67,6 @@ class CreateGymController extends _$CreateGymController {
             themeColor: themeColor,
             logoFile: state.logoFile!,
           );
-      // Custom claim, F2-5'teki Firestore trigger'ı üzerinden asenkron
-      // atanıyor — token'ı yenilemeyi dene ki claim varsa hemen yansısın.
-      await ref.read(authStateProvider.future);
       state = state.copyWith(isSubmitting: false);
       return gymId;
     } catch (_) {

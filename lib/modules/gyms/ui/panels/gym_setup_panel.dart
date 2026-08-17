@@ -6,10 +6,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
-import '../../../../core/panels/shell/admin_shell_panel.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_text_field.dart';
+import '../../../auth/ui/panels/phone_login_panel.dart';
 import '../../controller/create_gym_controller.dart';
 import '../../controller/gym_profile_controller.dart';
 import '../../controller/gym_theme_controller.dart';
@@ -225,7 +225,15 @@ class _GymSetupPanelState extends BasePanelState<GymSetupPanel> {
                         : () async {
                             final gymId = await createGymController.submit();
                             if (gymId != null && mounted) {
-                              ref.read(panelStackControllerProvider.notifier).replaceRoot(const AdminShellPanel());
+                              final phoneDigits =
+                                  ref.read(gymProfileControllerProvider).phone.replaceAll(RegExp(r'[^0-9]'), '');
+                              ref.read(panelStackControllerProvider.notifier).replaceRoot(
+                                    PhoneLoginPanel(
+                                      prefillPhoneDigits: phoneDigits,
+                                      successBanner:
+                                          'Salonun oluşturuldu! Şimdi az önce girdiğin numarayla giriş yap.',
+                                    ),
+                                  );
                             }
                           },
                   ),

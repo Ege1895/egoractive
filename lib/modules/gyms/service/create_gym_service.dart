@@ -1,9 +1,8 @@
+import 'dart:convert';
 import 'dart:typed_data';
 import 'dart:ui';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:image/image.dart' as img;
 import 'package:image_picker/image_picker.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -13,10 +12,14 @@ import '../domain/gym_profile.dart';
 
 part 'create_gym_service.g.dart';
 
-/// F2-1 — salon oluşturma: logoyu Cloud Storage'a yükler, `gyms/{gymId}`
-/// dokümanını yazar, oluşturan kullanıcının `users/{uid}` dokümanına
-/// `role: admin` + `gymId` yazar (F2-5'teki trigger bunu custom claim'e
-/// çevirir).
+/// F2-9 — salon oluşturma: bu ekrana henüz hiçbir Firebase Auth oturumu
+/// olmayan yeni bir antrenör "kendi salonumu açıyorum" akışından ulaşır, bu
+/// yüzden yazma işlemi client'ta doğrudan Firestore/Storage'a değil,
+/// `signupGymAdmin` callable'ına (Admin SDK, kurallara tabi değil) yapılır.
+/// O fonksiyon `gyms` dokümanını, logoyu ve `users/{uid}` (`role: admin`)
+/// dokümanını oluşturur — F2-5'teki trigger bunu custom claim'e çevirir,
+/// kullanıcı da girdiği telefon numarasıyla `requestCustomToken` üzerinden
+/// (F1-10) ilk girişini yapınca gerçek Auth hesabı lazy olarak oluşur.
 class CreateGymService {
   const CreateGymService();
 
@@ -25,48 +28,23 @@ class CreateGymService {
     required Color themeColor,
     required XFile logoFile,
   }) async {
-    final uid = FirebaseAuth.instance.currentUser?.uid;
-    if (uid == null) {
-      throw StateError('Salon oluşturmak için oturum açmış bir kullanıcı gerekiyor.');
-    }
-
-    final gymRef = FirebaseFirestore.instance.collection('gyms').doc();
-    final logoRef = FirebaseStorage.instance.ref('gym_logos/${gymRef.id}.png');
-    await logoRef.putData(
-      _toLogoPng(await logoFile.readAsBytes()),
-      SettableMetadata(contentType: 'image/png'),
-    );
-    final logoUrl = await logoRef.getDownloadURL();
-
-    await gymRef.set({
+    final result = await FirebaseFunctions.instance.httpsCallable('signupGymAdmin').call<Map<String, dynamic>>({
       'name': profile.name,
       'city': profile.city,
-      'phone': profile.phone,
+      'phoneNumber': profile.phone,
       'address': profile.address,
-      'logoUrl': logoUrl,
-      'themeColors': {'primary': _toHex(themeColor)},
-      // F6-1/F6-3 — her salon 'trial' olarak başlar; 'active'e geçiş sadece
-      // verifySubscriptionPurchase Cloud Function'ı üzerinden (Admin SDK,
-      // kurallara tabi değil) olur — firestore.rules bu alanları admin'in
-      // doğrudan değiştirmesini engelliyor.
-      'subscriptionStatus': 'trial',
-      'trialStartedAt': FieldValue.serverTimestamp(),
+      'themeColorHex': _toHex(themeColor),
+      'logoBase64': base64Encode(_toLogoPng(await logoFile.readAsBytes())),
     });
-
-    await FirebaseFirestore.instance.collection('users').doc(uid).set({
-      'role': 'admin',
-      'gymId': gymRef.id,
-    }, SetOptions(merge: true));
-
-    return gymRef.id;
+    return result.data['gymId'] as String;
   }
 
   String _toHex(Color color) => '#${color.toARGB32().toRadixString(16).substring(2).toUpperCase()}';
 
   /// Storage'ı ücretsiz kotada tutmak için logo her zaman en fazla
   /// [gymLogoMaxDimension]x[gymLogoMaxDimension] boyutuna küçültülüp PNG
-  /// olarak encode edilir — `storage.rules`'daki boyut sınırı bunun
-  /// yalnızca güvenlik tabanıdır, gerçek garanti burada verilir.
+  /// olarak encode edilir — `signupGymAdmin` fonksiyonundaki boyut sınırı
+  /// bunun yalnızca güvenlik tabanıdır, gerçek garanti burada verilir.
   Uint8List _toLogoPng(Uint8List original) {
     final decoded = img.decodeImage(original);
     if (decoded == null) {
