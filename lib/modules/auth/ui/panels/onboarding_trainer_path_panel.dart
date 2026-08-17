@@ -39,7 +39,10 @@ class _OnboardingTrainerPathPanelState extends BasePanelState<OnboardingTrainerP
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              AppBackButton(onTap: () => ref.read(panelStackControllerProvider.notifier).pop()),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: AppBackButton(onTap: () => ref.read(panelStackControllerProvider.notifier).pop()),
+              ),
               const SizedBox(height: AppSpacing.lg),
               Text('Bir salona bağlı mısın?', style: typography.headingLarge.copyWith(color: colors.onSurface, fontSize: 28)),
               const SizedBox(height: AppSpacing.xs),
