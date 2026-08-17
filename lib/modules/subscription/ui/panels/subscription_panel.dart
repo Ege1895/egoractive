@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/constants/subscription_constants.dart';
@@ -350,10 +351,7 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
         _SecondaryCta(
           label: rc.getText(RemoteConfigKeys.subscriptionManageCta),
           caption: _fill(rc.getText(RemoteConfigKeys.subscriptionManageCaption), {'store': _storeName}),
-          onTap: () {
-            // Mağaza abonelik yönetimi ekranı — iOS/Android'in kendi
-            // sistem ayarlarına açılır, uygulama içinde bir işlem yok.
-          },
+          onTap: _openStoreSubscriptionManagement,
         ),
       ],
     );
@@ -535,6 +533,17 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
   }
 
   Map<String, String> get _storePlaceholders => {'store': _storeName, 'storeAccount': _storeAccountName};
+
+  /// "Aboneliği yönet" — cihazın kendi abonelik yönetim sayfasını açar.
+  /// Uygulama içinde plan değişikliği/iptal işlemi yok, hepsi mağazada.
+  Future<void> _openStoreSubscriptionManagement() async {
+    final uri = Platform.isIOS
+        ? Uri.parse('https://apps.apple.com/account/subscriptions')
+        : Uri.parse('https://play.google.com/store/account/subscriptions?package=$androidPackageName');
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
+  }
 }
 
 // ---------------------------------------------------------------------------
