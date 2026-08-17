@@ -7,13 +7,15 @@ import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
 import '../../../../core/theme/app_theme.dart';
-import 'phone_login_panel.dart';
+import 'onboarding_role_panel.dart';
 
 /// Ortak 1 · Splash — logo + oturum kontrolü simülasyonu.
 ///
-/// F1-10'da gerçek oturum kontrolüne (mevcut Firebase Auth oturumu var mı?)
-/// bağlanınca burada rol bazlı shell'e ya da giriş ekranına yönlenecek;
-/// şimdilik doğrudan [PhoneLoginPanel]'e geçiyor.
+/// Burada aktif bir Firebase Auth oturumu varsa `main.dart`'taki
+/// `currentRoleProvider` dinleyicisi zaten devreye girip ilgili role
+/// shell'ine yönlendirir (bu ekranın timer'ı geçersiz kılınır). Oturum
+/// yoksa (yeni kullanıcı ya da çıkış yapılmış) bu timer [OnboardingRolePanel]'e
+/// geçer — "antrenör müsün, üye misin?" sorusuyla başlayan ilk açılış akışı.
 class SplashPanel extends BasePanel {
   const SplashPanel({super.key});
 
@@ -94,7 +96,7 @@ class _SplashPanelState extends BasePanelState<SplashPanel> {
   void onPanelShow() {
     _sessionCheckTimer = Timer(const Duration(milliseconds: 1600), () {
       if (!mounted) return;
-      ref.read(panelStackControllerProvider.notifier).replaceRoot(const PhoneLoginPanel());
+      ref.read(panelStackControllerProvider.notifier).replaceRoot(const OnboardingRolePanel());
     });
   }
 

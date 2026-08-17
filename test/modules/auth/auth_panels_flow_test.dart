@@ -15,10 +15,28 @@ class _FakeAuthRepository implements AuthRepository {
   Future<void> deleteAccount() => Future<void>.delayed(const Duration(seconds: 2));
 }
 
+/// Splash'ın mock oturum kontrolü süresi geçip [OnboardingRolePanel]'e
+/// düşmesini bekler, "Üyeyim"i seçip Telefonla Giriş ekranına geçer.
+Future<void> _navigateToPhoneLogin(WidgetTester tester) async {
+  await tester.pump();
+  expect(find.text('Egoractive'), findsOneWidget);
+
+  await tester.pump(const Duration(milliseconds: 1700));
+  await tester.pumpAndSettle();
+  expect(find.text('Hoş geldin'), findsOneWidget);
+
+  await tester.tap(find.text('Üyeyim'));
+  await tester.pumpAndSettle();
+  await tester.tap(find.text('Girişe geç'));
+  await tester.pumpAndSettle();
+  expect(find.text('Telefonunla giriş yap'), findsOneWidget);
+}
+
 void main() {
   testWidgets(
-    'Splash auto-transitions to phone login, native keyboard input fills the '
-    'number, login pushes the waiting screen, and cancel returns while still loading',
+    'Splash auto-transitions to onboarding role picker, "Üyeyim" leads to phone '
+    'login, native keyboard input fills the number, login pushes the waiting '
+    'screen, and cancel returns while still loading',
     (tester) async {
       await tester.pumpWidget(
         ProviderScope(
@@ -26,13 +44,7 @@ void main() {
           child: const EgoractiveApp(),
         ),
       );
-      await tester.pump();
-      expect(find.text('Egoractive'), findsOneWidget);
-
-      // Splash'ın mock oturum kontrolü süresi geçsin.
-      await tester.pump(const Duration(milliseconds: 1700));
-      await tester.pumpAndSettle();
-      expect(find.text('Telefonunla giriş yap'), findsOneWidget);
+      await _navigateToPhoneLogin(tester);
 
       // Giriş yap butonu numara tamamlanmadan disabled.
       final loginButtonFinder = find.text('Giriş yap');
@@ -71,9 +83,7 @@ void main() {
           child: const EgoractiveApp(),
         ),
       );
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 1700));
-      await tester.pumpAndSettle();
+      await _navigateToPhoneLogin(tester);
 
       await tester.enterText(find.byType(TextField), '5324187605');
       await tester.pump();
@@ -93,14 +103,14 @@ void main() {
 
   testWidgets('Splash cannot be reached again via back after replaceRoot', (tester) async {
     await tester.pumpWidget(const ProviderScope(child: EgoractiveApp()));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 1700));
-    await tester.pumpAndSettle();
-    expect(find.text('Telefonunla giriş yap'), findsOneWidget);
+    await _navigateToPhoneLogin(tester);
 
+    // Sistem geri tuşu, PhoneLoginPanel'i pop edip bir önceki panele
+    // (OnboardingRolePanel) döner — replaceRoot ile değiştirilen Splash'a
+    // asla geri dönülemez.
     await tester.binding.handlePopRoute();
     await tester.pumpAndSettle();
-    expect(find.text('Telefonunla giriş yap'), findsOneWidget);
+    expect(find.text('Hoş geldin'), findsOneWidget);
     expect(find.text('Egoractive'), findsNothing);
   });
 }
