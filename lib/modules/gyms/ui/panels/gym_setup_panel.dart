@@ -7,6 +7,7 @@ import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../shared/utils/phone_number_formatter.dart';
 import '../../../../shared/widgets/app_back_button.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_text_field.dart';
@@ -36,7 +37,7 @@ class _GymSetupPanelState extends BasePanelState<GymSetupPanel> {
     final profile = ref.read(gymProfileControllerProvider);
     _nameController = TextEditingController(text: profile.name);
     _cityController = TextEditingController(text: profile.city);
-    _phoneController = TextEditingController(text: profile.phone);
+    _phoneController = TextEditingController(text: formatTrPhoneDigits(profile.phone));
     _addressController = TextEditingController(text: profile.address);
   }
 
@@ -49,6 +50,15 @@ class _GymSetupPanelState extends BasePanelState<GymSetupPanel> {
     final themeController = ref.read(gymThemeControllerProvider.notifier);
     final createGymState = ref.watch(createGymControllerProvider);
     final createGymController = ref.read(createGymControllerProvider.notifier);
+    final profile = ref.watch(gymProfileControllerProvider);
+
+    final formattedPhone = formatTrPhoneDigits(profile.phone);
+    if (_phoneController.text != formattedPhone) {
+      _phoneController.value = TextEditingValue(
+        text: formattedPhone,
+        selection: TextSelection.collapsed(offset: formattedPhone.length),
+      );
+    }
 
     return Scaffold(
       body: SafeArea(
@@ -95,25 +105,25 @@ class _GymSetupPanelState extends BasePanelState<GymSetupPanel> {
                           onChanged: profileController.updateName,
                         ),
                         const SizedBox(height: AppSpacing.md),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: AppTextField(
-                                label: 'Şehir',
-                                controller: _cityController,
-                                onChanged: profileController.updateCity,
-                              ),
-                            ),
-                            const SizedBox(width: AppSpacing.sm),
-                            Expanded(
-                              child: AppTextField(
-                                label: 'Telefon',
-                                keyboardType: TextInputType.phone,
-                                controller: _phoneController,
-                                onChanged: profileController.updatePhone,
-                              ),
-                            ),
-                          ],
+                        AppTextField(
+                          label: 'Şehir',
+                          controller: _cityController,
+                          onChanged: profileController.updateCity,
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+                        AppTextField(
+                          label: 'Telefon numaran (giriş için)',
+                          hint: '5XX XXX XX XX',
+                          prefixText: '+90 ',
+                          keyboardType: TextInputType.number,
+                          controller: _phoneController,
+                          inputFormatters: [TrPhoneNumberInputFormatter()],
+                          onChanged: profileController.updatePhone,
+                        ),
+                        const SizedBox(height: AppSpacing.xs),
+                        Text(
+                          'Salon kaydı tamamlanınca bu numarayla admin olarak giriş yapacaksın.',
+                          style: typography.caption.copyWith(color: colors.onSurfaceMuted, fontSize: 12),
                         ),
                         const SizedBox(height: AppSpacing.md),
                         AppTextField(
@@ -230,11 +240,9 @@ class _GymSetupPanelState extends BasePanelState<GymSetupPanel> {
                         : () async {
                             final gymId = await createGymController.submit();
                             if (gymId != null && mounted) {
-                              final phoneDigits =
-                                  ref.read(gymProfileControllerProvider).phone.replaceAll(RegExp(r'[^0-9]'), '');
                               ref.read(panelStackControllerProvider.notifier).replaceRoot(
                                     PhoneLoginPanel(
-                                      prefillPhoneDigits: phoneDigits,
+                                      prefillPhoneDigits: ref.read(gymProfileControllerProvider).phone,
                                       successBanner:
                                           'Salonun oluşturuldu! Şimdi az önce girdiğin numarayla giriş yap.',
                                     ),

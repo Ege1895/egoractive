@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/app_spacing.dart';
@@ -136,7 +135,7 @@ class _PhoneLoginPanelState extends BasePanelState<PhoneLoginPanel> {
                         controller: _phoneController,
                         keyboardType: TextInputType.number,
                         textInputAction: TextInputAction.done,
-                        inputFormatters: [_PhoneNumberInputFormatter()],
+                        inputFormatters: [TrPhoneNumberInputFormatter()],
                         onChanged: authController.setPhoneDigits,
                         style: typography.dataMedium.copyWith(fontSize: 20, color: colors.onSurface),
                         decoration: InputDecoration(
@@ -177,19 +176,5 @@ class _PhoneLoginPanelState extends BasePanelState<PhoneLoginPanel> {
   void dispose() {
     _phoneController.dispose();
     super.dispose();
-  }
-}
-
-/// Kullanıcı yazdıkça haneleri "5XX XXX XX XX" olarak gruplar.
-class _PhoneNumberInputFormatter extends TextInputFormatter {
-  @override
-  TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
-    final digits = newValue.text.replaceAll(RegExp(r'[^0-9]'), '');
-    final limited = digits.length > 10 ? digits.substring(0, 10) : digits;
-    final formatted = formatTrPhoneDigits(limited);
-    return TextEditingValue(
-      text: formatted,
-      selection: TextSelection.collapsed(offset: formatted.length),
-    );
   }
 }

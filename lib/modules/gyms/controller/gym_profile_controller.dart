@@ -14,7 +14,13 @@ class GymProfileController extends _$GymProfileController {
 
   void updateCity(String city) => state = state.copyWith(city: city);
 
-  void updatePhone(String phone) => state = state.copyWith(phone: phone);
+  /// Salonu oluşturan kişi bu numarayla giriş yapacağı için (F2-9), sadece
+  /// rakamlar (en fazla 10 hane) tutulur — [AuthController.setPhoneDigits]
+  /// ile aynı temsil, `+90` öneki gönderim anında eklenir.
+  void updatePhone(String rawInput) {
+    final digits = rawInput.replaceAll(RegExp(r'[^0-9]'), '');
+    state = state.copyWith(phone: digits.length > 10 ? digits.substring(0, 10) : digits);
+  }
 
   void updateAddress(String address) => state = state.copyWith(address: address);
 }

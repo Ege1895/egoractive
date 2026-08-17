@@ -79,11 +79,15 @@ class CreateGymController extends _$CreateGymController {
   }
 
   String? _validate(GymProfile profile) {
-    if (profile.name.trim().isEmpty ||
-        profile.city.trim().isEmpty ||
-        profile.phone.trim().isEmpty ||
-        profile.address.trim().isEmpty) {
+    if (profile.name.trim().isEmpty || profile.city.trim().isEmpty || profile.address.trim().isEmpty) {
       return 'Lütfen tüm alanları doldur.';
+    }
+    // profile.phone GymProfileController.updatePhone'da zaten sadece rakam
+    // tutuluyor — bu numarayla admin girişi yapılacağı için 10 haneli
+    // geçerli bir TR cep telefonu olmalı (AuthState.isPhoneComplete ile
+    // aynı kural).
+    if (profile.phone.length != 10) {
+      return 'Lütfen geçerli bir cep telefonu numarası gir.';
     }
     return null;
   }

@@ -31,7 +31,10 @@ class CreateGymService {
     final result = await FirebaseFunctions.instance.httpsCallable('signupGymAdmin').call<Map<String, dynamic>>({
       'name': profile.name,
       'city': profile.city,
-      'phoneNumber': profile.phone,
+      // profile.phone sadece 10 haneli rakam (GymProfileController) — F1-10
+      // login akışıyla (AuthService) aynı '+90' + rakam formatına burada
+      // çevriliyor, yoksa requestCustomToken bu numarayı bulamaz.
+      'phoneNumber': '+90${profile.phone}',
       'address': profile.address,
       'themeColorHex': _toHex(themeColor),
       if (logoFile != null) 'logoBase64': base64Encode(_toLogoPng(await logoFile.readAsBytes())),
