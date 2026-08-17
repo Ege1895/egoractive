@@ -9,10 +9,15 @@ enum SubscriptionStatus { trial, active, expired, none }
 class SubscriptionState with _$SubscriptionState {
   const factory SubscriptionState({
     @Default(SubscriptionStatus.none) SubscriptionStatus status,
+    DateTime? trialStartedAt,
     DateTime? trialEndsAt,
+    DateTime? startedAt,
     DateTime? expiresAt,
     String? productId,
     @Default(false) bool isPurchasing,
+    /// Satın alma akışı başlatılan ürün — mağaza penceresi açıkken hangi
+    /// plan kartının "bekleniyor" durumunda gösterileceğini belirler.
+    String? pendingProductId,
   }) = _SubscriptionState;
 }
 

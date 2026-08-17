@@ -18,10 +18,16 @@ final _privateConstructorUsedError = UnsupportedError(
 /// @nodoc
 mixin _$SubscriptionState {
   SubscriptionStatus get status => throw _privateConstructorUsedError;
+  DateTime? get trialStartedAt => throw _privateConstructorUsedError;
   DateTime? get trialEndsAt => throw _privateConstructorUsedError;
+  DateTime? get startedAt => throw _privateConstructorUsedError;
   DateTime? get expiresAt => throw _privateConstructorUsedError;
   String? get productId => throw _privateConstructorUsedError;
   bool get isPurchasing => throw _privateConstructorUsedError;
+
+  /// Satın alma akışı başlatılan ürün — mağaza penceresi açıkken hangi
+  /// plan kartının "bekleniyor" durumunda gösterileceğini belirler.
+  String? get pendingProductId => throw _privateConstructorUsedError;
 
   /// Create a copy of SubscriptionState
   /// with the given fields replaced by the non-null parameter values.
@@ -39,10 +45,13 @@ abstract class $SubscriptionStateCopyWith<$Res> {
   @useResult
   $Res call({
     SubscriptionStatus status,
+    DateTime? trialStartedAt,
     DateTime? trialEndsAt,
+    DateTime? startedAt,
     DateTime? expiresAt,
     String? productId,
     bool isPurchasing,
+    String? pendingProductId,
   });
 }
 
@@ -62,10 +71,13 @@ class _$SubscriptionStateCopyWithImpl<$Res, $Val extends SubscriptionState>
   @override
   $Res call({
     Object? status = null,
+    Object? trialStartedAt = freezed,
     Object? trialEndsAt = freezed,
+    Object? startedAt = freezed,
     Object? expiresAt = freezed,
     Object? productId = freezed,
     Object? isPurchasing = null,
+    Object? pendingProductId = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -73,9 +85,17 @@ class _$SubscriptionStateCopyWithImpl<$Res, $Val extends SubscriptionState>
                 ? _value.status
                 : status // ignore: cast_nullable_to_non_nullable
                       as SubscriptionStatus,
+            trialStartedAt: freezed == trialStartedAt
+                ? _value.trialStartedAt
+                : trialStartedAt // ignore: cast_nullable_to_non_nullable
+                      as DateTime?,
             trialEndsAt: freezed == trialEndsAt
                 ? _value.trialEndsAt
                 : trialEndsAt // ignore: cast_nullable_to_non_nullable
+                      as DateTime?,
+            startedAt: freezed == startedAt
+                ? _value.startedAt
+                : startedAt // ignore: cast_nullable_to_non_nullable
                       as DateTime?,
             expiresAt: freezed == expiresAt
                 ? _value.expiresAt
@@ -89,6 +109,10 @@ class _$SubscriptionStateCopyWithImpl<$Res, $Val extends SubscriptionState>
                 ? _value.isPurchasing
                 : isPurchasing // ignore: cast_nullable_to_non_nullable
                       as bool,
+            pendingProductId: freezed == pendingProductId
+                ? _value.pendingProductId
+                : pendingProductId // ignore: cast_nullable_to_non_nullable
+                      as String?,
           )
           as $Val,
     );
@@ -106,10 +130,13 @@ abstract class _$$SubscriptionStateImplCopyWith<$Res>
   @useResult
   $Res call({
     SubscriptionStatus status,
+    DateTime? trialStartedAt,
     DateTime? trialEndsAt,
+    DateTime? startedAt,
     DateTime? expiresAt,
     String? productId,
     bool isPurchasing,
+    String? pendingProductId,
   });
 }
 
@@ -128,10 +155,13 @@ class __$$SubscriptionStateImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? status = null,
+    Object? trialStartedAt = freezed,
     Object? trialEndsAt = freezed,
+    Object? startedAt = freezed,
     Object? expiresAt = freezed,
     Object? productId = freezed,
     Object? isPurchasing = null,
+    Object? pendingProductId = freezed,
   }) {
     return _then(
       _$SubscriptionStateImpl(
@@ -139,9 +169,17 @@ class __$$SubscriptionStateImplCopyWithImpl<$Res>
             ? _value.status
             : status // ignore: cast_nullable_to_non_nullable
                   as SubscriptionStatus,
+        trialStartedAt: freezed == trialStartedAt
+            ? _value.trialStartedAt
+            : trialStartedAt // ignore: cast_nullable_to_non_nullable
+                  as DateTime?,
         trialEndsAt: freezed == trialEndsAt
             ? _value.trialEndsAt
             : trialEndsAt // ignore: cast_nullable_to_non_nullable
+                  as DateTime?,
+        startedAt: freezed == startedAt
+            ? _value.startedAt
+            : startedAt // ignore: cast_nullable_to_non_nullable
                   as DateTime?,
         expiresAt: freezed == expiresAt
             ? _value.expiresAt
@@ -155,6 +193,10 @@ class __$$SubscriptionStateImplCopyWithImpl<$Res>
             ? _value.isPurchasing
             : isPurchasing // ignore: cast_nullable_to_non_nullable
                   as bool,
+        pendingProductId: freezed == pendingProductId
+            ? _value.pendingProductId
+            : pendingProductId // ignore: cast_nullable_to_non_nullable
+                  as String?,
       ),
     );
   }
@@ -165,17 +207,24 @@ class __$$SubscriptionStateImplCopyWithImpl<$Res>
 class _$SubscriptionStateImpl implements _SubscriptionState {
   const _$SubscriptionStateImpl({
     this.status = SubscriptionStatus.none,
+    this.trialStartedAt,
     this.trialEndsAt,
+    this.startedAt,
     this.expiresAt,
     this.productId,
     this.isPurchasing = false,
+    this.pendingProductId,
   });
 
   @override
   @JsonKey()
   final SubscriptionStatus status;
   @override
+  final DateTime? trialStartedAt;
+  @override
   final DateTime? trialEndsAt;
+  @override
+  final DateTime? startedAt;
   @override
   final DateTime? expiresAt;
   @override
@@ -184,9 +233,14 @@ class _$SubscriptionStateImpl implements _SubscriptionState {
   @JsonKey()
   final bool isPurchasing;
 
+  /// Satın alma akışı başlatılan ürün — mağaza penceresi açıkken hangi
+  /// plan kartının "bekleniyor" durumunda gösterileceğini belirler.
+  @override
+  final String? pendingProductId;
+
   @override
   String toString() {
-    return 'SubscriptionState(status: $status, trialEndsAt: $trialEndsAt, expiresAt: $expiresAt, productId: $productId, isPurchasing: $isPurchasing)';
+    return 'SubscriptionState(status: $status, trialStartedAt: $trialStartedAt, trialEndsAt: $trialEndsAt, startedAt: $startedAt, expiresAt: $expiresAt, productId: $productId, isPurchasing: $isPurchasing, pendingProductId: $pendingProductId)';
   }
 
   @override
@@ -195,24 +249,33 @@ class _$SubscriptionStateImpl implements _SubscriptionState {
         (other.runtimeType == runtimeType &&
             other is _$SubscriptionStateImpl &&
             (identical(other.status, status) || other.status == status) &&
+            (identical(other.trialStartedAt, trialStartedAt) ||
+                other.trialStartedAt == trialStartedAt) &&
             (identical(other.trialEndsAt, trialEndsAt) ||
                 other.trialEndsAt == trialEndsAt) &&
+            (identical(other.startedAt, startedAt) ||
+                other.startedAt == startedAt) &&
             (identical(other.expiresAt, expiresAt) ||
                 other.expiresAt == expiresAt) &&
             (identical(other.productId, productId) ||
                 other.productId == productId) &&
             (identical(other.isPurchasing, isPurchasing) ||
-                other.isPurchasing == isPurchasing));
+                other.isPurchasing == isPurchasing) &&
+            (identical(other.pendingProductId, pendingProductId) ||
+                other.pendingProductId == pendingProductId));
   }
 
   @override
   int get hashCode => Object.hash(
     runtimeType,
     status,
+    trialStartedAt,
     trialEndsAt,
+    startedAt,
     expiresAt,
     productId,
     isPurchasing,
+    pendingProductId,
   );
 
   /// Create a copy of SubscriptionState
@@ -230,22 +293,34 @@ class _$SubscriptionStateImpl implements _SubscriptionState {
 abstract class _SubscriptionState implements SubscriptionState {
   const factory _SubscriptionState({
     final SubscriptionStatus status,
+    final DateTime? trialStartedAt,
     final DateTime? trialEndsAt,
+    final DateTime? startedAt,
     final DateTime? expiresAt,
     final String? productId,
     final bool isPurchasing,
+    final String? pendingProductId,
   }) = _$SubscriptionStateImpl;
 
   @override
   SubscriptionStatus get status;
   @override
+  DateTime? get trialStartedAt;
+  @override
   DateTime? get trialEndsAt;
+  @override
+  DateTime? get startedAt;
   @override
   DateTime? get expiresAt;
   @override
   String? get productId;
   @override
   bool get isPurchasing;
+
+  /// Satın alma akışı başlatılan ürün — mağaza penceresi açıkken hangi
+  /// plan kartının "bekleniyor" durumunda gösterileceğini belirler.
+  @override
+  String? get pendingProductId;
 
   /// Create a copy of SubscriptionState
   /// with the given fields replaced by the non-null parameter values.

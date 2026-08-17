@@ -3567,6 +3567,392 @@
         "value": "Egoractive · Egora Games · Version 1.0"
       },
       "valueType": "STRING"
+    },
+    "lbl_subscription_trial_banner_title_tr": {
+      "defaultValue": {
+        "value": "Deneme süreniz {days} gün sonra doluyor"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_trial_banner_body_tr": {
+      "defaultValue": {
+        "value": "{date} tarihine kadar tüm özellikler açık. Bir plan seçerseniz stüdyonuz kesintisiz çalışmaya devam eder."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_trial_progress_tr": {
+      "defaultValue": {
+        "value": "{total} günlük denemenin {current}. günündesiniz"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_expired_banner_title_tr": {
+      "defaultValue": {
+        "value": "Aboneliğiniz {date} tarihinde sona erdi"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_expired_banner_title_en": {
+      "defaultValue": {
+        "value": "Your subscription ended on {date}"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_expired_banner_body_tr": {
+      "defaultValue": {
+        "value": "Verileriniz güvende ve eksiksiz duruyor. Bir plan seçtiğiniz anda her şey kaldığı yerden devam eder."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_expired_banner_body_en": {
+      "defaultValue": {
+        "value": "Your data is safe and complete. As soon as you choose a plan, everything continues where it left off."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_restricted_title_tr": {
+      "defaultValue": {
+        "value": "Şu an kısıtlı"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_restricted_title_en": {
+      "defaultValue": {
+        "value": "Currently restricted"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_restricted_note_tr": {
+      "defaultValue": {
+        "value": "Takvim, üye listesi ve raporları görüntülemeye devam edebilirsiniz."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_restricted_note_en": {
+      "defaultValue": {
+        "value": "You can still view the calendar, member list and reports."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_active_plan_label_tr": {
+      "defaultValue": {
+        "value": "Mevcut planınız"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_active_plan_label_en": {
+      "defaultValue": {
+        "value": "Your current plan"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_active_badge_tr": {
+      "defaultValue": {
+        "value": "Aktif"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_active_badge_en": {
+      "defaultValue": {
+        "value": "Active"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_renewal_label_tr": {
+      "defaultValue": {
+        "value": "Yenilenme"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_renewal_label_en": {
+      "defaultValue": {
+        "value": "Renews"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_started_label_tr": {
+      "defaultValue": {
+        "value": "Başlangıç"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_started_label_en": {
+      "defaultValue": {
+        "value": "Started"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_active_note_tr": {
+      "defaultValue": {
+        "value": "Aboneliğiniz {period} kendini yeniler. Plan değişikliği, duraklatma ve iptal uygulama içinde değil, {store} abonelik ayarlarında yapılır."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_active_note_en": {
+      "defaultValue": {
+        "value": "Your subscription renews {period}. Plan changes, pausing and cancellation are done in {store} subscription settings, not in the app."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_store_row_title_tr": {
+      "defaultValue": {
+        "value": "{store} üzerinden"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_store_row_title_en": {
+      "defaultValue": {
+        "value": "Via {store}"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_store_row_subtitle_tr": {
+      "defaultValue": {
+        "value": "Ödeme ve faturalar {storeAccount} hesabınızda"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_store_row_subtitle_en": {
+      "defaultValue": {
+        "value": "Payments and invoices are on your {storeAccount} account"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_manage_cta_tr": {
+      "defaultValue": {
+        "value": "Aboneliği yönet"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_manage_cta_en": {
+      "defaultValue": {
+        "value": "Manage subscription"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_manage_caption_tr": {
+      "defaultValue": {
+        "value": "{store} abonelik ayarları açılır"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_manage_caption_en": {
+      "defaultValue": {
+        "value": "{store} subscription settings will open"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_store_note_tr": {
+      "defaultValue": {
+        "value": "Satın alma uygulama içinde yapılmaz. Devam ettiğinizde {store} açılır; ödeme, iptal ve faturalar {storeAccount} hesabınız üzerinden yürür. Dönem bitiminden 24 saat önce iptal edilmezse abonelik kendini yeniler."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_store_note_en": {
+      "defaultValue": {
+        "value": "Purchases are not made in the app. When you continue, {store} opens; payment, cancellation and invoices are handled through your {storeAccount} account. Unless cancelled 24 hours before the period ends, the subscription renews automatically."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_store_note_expired_tr": {
+      "defaultValue": {
+        "value": "Satın alma uygulama içinde yapılmaz. Devam ettiğinizde {store} açılır; ödeme, iptal ve faturalar {storeAccount} hesabınız üzerinden yürür."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_store_note_expired_en": {
+      "defaultValue": {
+        "value": "Purchases are not made in the app. When you continue, {store} opens; payment, cancellation and invoices are handled through your {storeAccount} account."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_purchase_cta_tr": {
+      "defaultValue": {
+        "value": "{plan} planla {store}'a git"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_purchase_cta_en": {
+      "defaultValue": {
+        "value": "Go to {store} with the {plan} plan"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_purchase_cta_expired_tr": {
+      "defaultValue": {
+        "value": "{plan} planı {store}'da başlat"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_purchase_cta_expired_en": {
+      "defaultValue": {
+        "value": "Start the {plan} plan on {store}"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_purchase_caption_tr": {
+      "defaultValue": {
+        "value": "{store}'da açılır · Satın almayı geri yükle"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_purchase_caption_en": {
+      "defaultValue": {
+        "value": "Opens in {store} · Restore purchase"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_pending_banner_title_tr": {
+      "defaultValue": {
+        "value": "{store}'a yönlendirildiniz"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_pending_banner_title_en": {
+      "defaultValue": {
+        "value": "You've been redirected to {store}"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_pending_banner_body_tr": {
+      "defaultValue": {
+        "value": "Satın almayı mağaza penceresinde tamamlayın; sonucu bu ekrana biz yansıtacağız."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_pending_banner_body_en": {
+      "defaultValue": {
+        "value": "Complete the purchase in the store window; we will reflect the result on this screen."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_pending_pill_tr": {
+      "defaultValue": {
+        "value": "{store}'da açıldı"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_pending_pill_en": {
+      "defaultValue": {
+        "value": "Opened in {store}"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_pending_cta_tr": {
+      "defaultValue": {
+        "value": "{store} bekleniyor…"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_pending_cta_en": {
+      "defaultValue": {
+        "value": "Waiting for {store}…"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_pending_caption_tr": {
+      "defaultValue": {
+        "value": "Mağaza penceresi kapanınca güncellenir"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_pending_caption_en": {
+      "defaultValue": {
+        "value": "Updates once the store window closes"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_pending_note_tr": {
+      "defaultValue": {
+        "value": "Mağaza penceresini kapatır ya da iptal ederseniz bu ekrana geri dönersiniz; plan seçiminiz korunur."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_pending_note_en": {
+      "defaultValue": {
+        "value": "If you close the store window or cancel, you will return to this screen; your plan selection is kept."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_yearly_badge_tr": {
+      "defaultValue": {
+        "value": "En avantajlı"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_yearly_badge_en": {
+      "defaultValue": {
+        "value": "Best value"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_yearly_sub_tr": {
+      "defaultValue": {
+        "value": "2 ay bedava"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_yearly_sub_en": {
+      "defaultValue": {
+        "value": "2 months free"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_monthly_sub_tr": {
+      "defaultValue": {
+        "value": "aylık"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_monthly_sub_en": {
+      "defaultValue": {
+        "value": "monthly"
+      },
+      "valueType": "STRING"
+    },
+    "cfg_subscription_included_features": {
+      "defaultValue": {
+        "value": "[{\"label_tr\": \"Sınırsız üye ve antrenör hesabı\", \"label_en\": \"Unlimited member and trainer accounts\"}, {\"label_tr\": \"Seans takvimi, onay ve telafi takibi\", \"label_en\": \"Session calendar, confirmation and makeup tracking\"}, {\"label_tr\": \"Ölçüm takibi ve üye raporları\", \"label_en\": \"Measurement tracking and member reports\"}, {\"label_tr\": \"Salon teması, kurallar ve bildirimler\", \"label_en\": \"Gym theme, rules and notifications\"}]"
+      },
+      "description": "F6-1 — abonelikte dahil olan özellikler listesi.",
+      "valueType": "STRING"
+    },
+    "cfg_subscription_restricted_operations": {
+      "defaultValue": {
+        "value": "[{\"label_tr\": \"Yeni üye ve üyelik ekleme\", \"label_en\": \"Adding new members and memberships\"}, {\"label_tr\": \"Seans ve grup dersi oluşturma\", \"label_en\": \"Creating sessions and group classes\"}, {\"label_tr\": \"Üyelere bildirim gönderme\", \"label_en\": \"Sending notifications to members\"}]"
+      },
+      "description": "F6-1 — abonelik süresi dolduğunda kısıtlanan işlemler listesi.",
+      "valueType": "STRING"
+    },
+    "lbl_subscription_trial_banner_title_en": {
+      "defaultValue": {
+        "value": "Your trial ends in {days} days"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_trial_banner_body_en": {
+      "defaultValue": {
+        "value": "All features are open until {date}. If you choose a plan, your studio keeps running without interruption."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_trial_progress_en": {
+      "defaultValue": {
+        "value": "You're on day {current} of your {total}-day trial"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_no_products_tr": {
+      "defaultValue": {
+        "value": "Şu an satın alınabilir bir abonelik ürünü bulunamadı."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_no_products_en": {
+      "defaultValue": {
+        "value": "No purchasable subscription product is available right now."
+      },
+      "valueType": "STRING"
     }
   }
 }

@@ -484,6 +484,47 @@ abstract final class RemoteConfigKeys {
       'lbl_trainers_report_one_on_one_toggle';
   static const trainersReportGroupToggle = 'lbl_trainers_report_group_toggle';
   static const trainersProfileFooterText = 'lbl_trainers_profile_footer_text';
+
+  // F6-1 abonelik ekranı yeniden tasarımı — 4 durum (deneme/aktif/süresi
+  // dolmuş/mağazaya yönlendirildi). `{days}`/`{date}`/`{total}`/`{current}`/
+  // `{period}`/`{plan}` yer tutucuları panel tarafında dolduruluyor;
+  // `{store}`/`{storeAccount}` ("App Store"/"Apple" ya da "Google Play"/
+  // "Google") platforma göre kod içinde sabit — marka adı, iş kuralı değil.
+  static const subscriptionTrialBannerTitle = 'lbl_subscription_trial_banner_title';
+  static const subscriptionTrialBannerBody = 'lbl_subscription_trial_banner_body';
+  static const subscriptionTrialProgress = 'lbl_subscription_trial_progress';
+  static const subscriptionExpiredBannerTitle = 'lbl_subscription_expired_banner_title';
+  static const subscriptionExpiredBannerBody = 'lbl_subscription_expired_banner_body';
+  static const subscriptionRestrictedTitle = 'lbl_subscription_restricted_title';
+  static const subscriptionRestrictedNote = 'lbl_subscription_restricted_note';
+  static const subscriptionActivePlanLabel = 'lbl_subscription_active_plan_label';
+  static const subscriptionActiveBadge = 'lbl_subscription_active_badge';
+  static const subscriptionRenewalLabel = 'lbl_subscription_renewal_label';
+  static const subscriptionStartedLabel = 'lbl_subscription_started_label';
+  static const subscriptionActiveNote = 'lbl_subscription_active_note';
+  static const subscriptionStoreRowTitle = 'lbl_subscription_store_row_title';
+  static const subscriptionStoreRowSubtitle = 'lbl_subscription_store_row_subtitle';
+  static const subscriptionManageCta = 'lbl_subscription_manage_cta';
+  static const subscriptionManageCaption = 'lbl_subscription_manage_caption';
+  static const subscriptionStoreNote = 'lbl_subscription_store_note';
+  static const subscriptionStoreNoteExpired = 'lbl_subscription_store_note_expired';
+  static const subscriptionPurchaseCta = 'lbl_subscription_purchase_cta';
+  static const subscriptionPurchaseCtaExpired = 'lbl_subscription_purchase_cta_expired';
+  static const subscriptionPurchaseCaption = 'lbl_subscription_purchase_caption';
+  static const subscriptionPendingBannerTitle = 'lbl_subscription_pending_banner_title';
+  static const subscriptionPendingBannerBody = 'lbl_subscription_pending_banner_body';
+  static const subscriptionPendingPill = 'lbl_subscription_pending_pill';
+  static const subscriptionPendingCta = 'lbl_subscription_pending_cta';
+  static const subscriptionPendingCaption = 'lbl_subscription_pending_caption';
+  static const subscriptionPendingNote = 'lbl_subscription_pending_note';
+  static const subscriptionYearlyBadge = 'lbl_subscription_yearly_badge';
+  static const subscriptionYearlySub = 'lbl_subscription_yearly_sub';
+  static const subscriptionMonthlySub = 'lbl_subscription_monthly_sub';
+  static const subscriptionNoProducts = 'lbl_subscription_no_products';
+  /// `[{label_tr, label_en}]` — abonelikte dahil olan özellik listesi.
+  static const subscriptionIncludedFeatures = 'cfg_subscription_included_features';
+  /// `[{label_tr, label_en}]` — süresi dolduğunda kısıtlanan işlemler.
+  static const subscriptionRestrictedOperations = 'cfg_subscription_restricted_operations';
 }
 
 /// Firebase Remote Config'e tip güvenli erişim katmanı. `FirebaseRemoteConfig.instance`
@@ -510,6 +551,23 @@ class RemoteConfigService {
   {"id": "commission", "label_tr": "Prim", "label_en": "Commission"},
   {"id": "marketing", "label_tr": "Pazarlama", "label_en": "Marketing"},
   {"id": "other", "label_tr": "Diğer", "label_en": "Other"}
+]
+''';
+
+  static const _defaultSubscriptionIncludedFeaturesJson = '''
+[
+  {"label_tr": "Sınırsız üye ve antrenör hesabı", "label_en": "Unlimited member and trainer accounts"},
+  {"label_tr": "Seans takvimi, onay ve telafi takibi", "label_en": "Session calendar, confirmation and makeup tracking"},
+  {"label_tr": "Ölçüm takibi ve üye raporları", "label_en": "Measurement tracking and member reports"},
+  {"label_tr": "Salon teması, kurallar ve bildirimler", "label_en": "Gym theme, rules and notifications"}
+]
+''';
+
+  static const _defaultSubscriptionRestrictedOperationsJson = '''
+[
+  {"label_tr": "Yeni üye ve üyelik ekleme", "label_en": "Adding new members and memberships"},
+  {"label_tr": "Seans ve grup dersi oluşturma", "label_en": "Creating sessions and group classes"},
+  {"label_tr": "Üyelere bildirim gönderme", "label_en": "Sending notifications to members"}
 ]
 ''';
 
@@ -1142,6 +1200,87 @@ class RemoteConfigService {
     'lbl_trainers_report_group_toggle_en': 'Group',
     'lbl_trainers_profile_footer_text_en':
         'Egoractive · Egora Games · Version 1.0',
+
+    RemoteConfigKeys.subscriptionIncludedFeatures: _defaultSubscriptionIncludedFeaturesJson,
+    RemoteConfigKeys.subscriptionRestrictedOperations: _defaultSubscriptionRestrictedOperationsJson,
+    'lbl_subscription_trial_banner_title_tr': 'Deneme süreniz {days} gün sonra doluyor',
+    'lbl_subscription_trial_banner_title_en': 'Your trial ends in {days} days',
+    'lbl_subscription_trial_banner_body_tr':
+        '{date} tarihine kadar tüm özellikler açık. Bir plan seçerseniz stüdyonuz kesintisiz çalışmaya devam eder.',
+    'lbl_subscription_trial_banner_body_en':
+        'All features are open until {date}. If you choose a plan, your studio keeps running without interruption.',
+    'lbl_subscription_trial_progress_tr': '{total} günlük denemenin {current}. günündesiniz',
+    'lbl_subscription_trial_progress_en': "You're on day {current} of your {total}-day trial",
+    'lbl_subscription_expired_banner_title_tr': 'Aboneliğiniz {date} tarihinde sona erdi',
+    'lbl_subscription_expired_banner_title_en': 'Your subscription ended on {date}',
+    'lbl_subscription_expired_banner_body_tr':
+        'Verileriniz güvende ve eksiksiz duruyor. Bir plan seçtiğiniz anda her şey kaldığı yerden devam eder.',
+    'lbl_subscription_expired_banner_body_en':
+        'Your data is safe and complete. As soon as you choose a plan, everything continues where it left off.',
+    'lbl_subscription_restricted_title_tr': 'Şu an kısıtlı',
+    'lbl_subscription_restricted_title_en': 'Currently restricted',
+    'lbl_subscription_restricted_note_tr':
+        'Takvim, üye listesi ve raporları görüntülemeye devam edebilirsiniz.',
+    'lbl_subscription_restricted_note_en':
+        'You can still view the calendar, member list and reports.',
+    'lbl_subscription_active_plan_label_tr': 'Mevcut planınız',
+    'lbl_subscription_active_plan_label_en': 'Your current plan',
+    'lbl_subscription_active_badge_tr': 'Aktif',
+    'lbl_subscription_active_badge_en': 'Active',
+    'lbl_subscription_renewal_label_tr': 'Yenilenme',
+    'lbl_subscription_renewal_label_en': 'Renews',
+    'lbl_subscription_started_label_tr': 'Başlangıç',
+    'lbl_subscription_started_label_en': 'Started',
+    'lbl_subscription_active_note_tr':
+        'Aboneliğiniz {period} kendini yeniler. Plan değişikliği, duraklatma ve iptal uygulama içinde değil, {store} abonelik ayarlarında yapılır.',
+    'lbl_subscription_active_note_en':
+        'Your subscription renews {period}. Plan changes, pausing and cancellation are done in {store} subscription settings, not in the app.',
+    'lbl_subscription_store_row_title_tr': '{store} üzerinden',
+    'lbl_subscription_store_row_title_en': 'Via {store}',
+    'lbl_subscription_store_row_subtitle_tr': 'Ödeme ve faturalar {storeAccount} hesabınızda',
+    'lbl_subscription_store_row_subtitle_en': 'Payments and invoices are on your {storeAccount} account',
+    'lbl_subscription_manage_cta_tr': 'Aboneliği yönet',
+    'lbl_subscription_manage_cta_en': 'Manage subscription',
+    'lbl_subscription_manage_caption_tr': '{store} abonelik ayarları açılır',
+    'lbl_subscription_manage_caption_en': '{store} subscription settings will open',
+    'lbl_subscription_store_note_tr':
+        "Satın alma uygulama içinde yapılmaz. Devam ettiğinizde {store} açılır; ödeme, iptal ve faturalar {storeAccount} hesabınız üzerinden yürür. Dönem bitiminden 24 saat önce iptal edilmezse abonelik kendini yeniler.",
+    'lbl_subscription_store_note_en':
+        'Purchases are not made in the app. When you continue, {store} opens; payment, cancellation and invoices are handled through your {storeAccount} account. Unless cancelled 24 hours before the period ends, the subscription renews automatically.',
+    'lbl_subscription_store_note_expired_tr':
+        'Satın alma uygulama içinde yapılmaz. Devam ettiğinizde {store} açılır; ödeme, iptal ve faturalar {storeAccount} hesabınız üzerinden yürür.',
+    'lbl_subscription_store_note_expired_en':
+        'Purchases are not made in the app. When you continue, {store} opens; payment, cancellation and invoices are handled through your {storeAccount} account.',
+    'lbl_subscription_purchase_cta_tr': "{plan} planla {store}'a git",
+    'lbl_subscription_purchase_cta_en': 'Go to {store} with the {plan} plan',
+    'lbl_subscription_purchase_cta_expired_tr': "{plan} planı {store}'da başlat",
+    'lbl_subscription_purchase_cta_expired_en': 'Start the {plan} plan on {store}',
+    'lbl_subscription_purchase_caption_tr': "{store}'da açılır · Satın almayı geri yükle",
+    'lbl_subscription_purchase_caption_en': 'Opens in {store} · Restore purchase',
+    'lbl_subscription_pending_banner_title_tr': "{store}'a yönlendirildiniz",
+    'lbl_subscription_pending_banner_title_en': "You've been redirected to {store}",
+    'lbl_subscription_pending_banner_body_tr':
+        'Satın almayı mağaza penceresinde tamamlayın; sonucu bu ekrana biz yansıtacağız.',
+    'lbl_subscription_pending_banner_body_en':
+        'Complete the purchase in the store window; we will reflect the result on this screen.',
+    'lbl_subscription_pending_pill_tr': "{store}'da açıldı",
+    'lbl_subscription_pending_pill_en': 'Opened in {store}',
+    'lbl_subscription_pending_cta_tr': '{store} bekleniyor…',
+    'lbl_subscription_pending_cta_en': 'Waiting for {store}…',
+    'lbl_subscription_pending_caption_tr': 'Mağaza penceresi kapanınca güncellenir',
+    'lbl_subscription_pending_caption_en': 'Updates once the store window closes',
+    'lbl_subscription_pending_note_tr':
+        'Mağaza penceresini kapatır ya da iptal ederseniz bu ekrana geri dönersiniz; plan seçiminiz korunur.',
+    'lbl_subscription_pending_note_en':
+        'If you close the store window or cancel, you will return to this screen; your plan selection is kept.',
+    'lbl_subscription_yearly_badge_tr': 'En avantajlı',
+    'lbl_subscription_yearly_badge_en': 'Best value',
+    'lbl_subscription_yearly_sub_tr': '2 ay bedava',
+    'lbl_subscription_yearly_sub_en': '2 months free',
+    'lbl_subscription_monthly_sub_tr': 'aylık',
+    'lbl_subscription_monthly_sub_en': 'monthly',
+    'lbl_subscription_no_products_tr': 'Şu an satın alınabilir bir abonelik ürünü bulunamadı.',
+    'lbl_subscription_no_products_en': 'No purchasable subscription product is available right now.',
   };
 
   /// Şu anki dil — cihazın dilinden okunur. Cihaz dili Türkçe ise 'tr',
@@ -1203,6 +1342,14 @@ class RemoteConfigService {
   /// tarafta (`currentLocale` ile) yapılır.
   List<Map<String, dynamic>> get expenseCategories =>
       _getJsonList(RemoteConfigKeys.expenseCategories);
+
+  /// F6-1 — abonelikte dahil olan özellikler, ham liste (`{label_tr, label_en}`).
+  List<Map<String, dynamic>> get subscriptionIncludedFeatures =>
+      _getJsonList(RemoteConfigKeys.subscriptionIncludedFeatures);
+
+  /// F6-1 — süresi dolduğunda kısıtlanan işlemler, ham liste.
+  List<Map<String, dynamic>> get subscriptionRestrictedOperations =>
+      _getJsonList(RemoteConfigKeys.subscriptionRestrictedOperations);
 
   /// `lbl*` metinlerini okur: `<key>_<currentLocale>` parametresini getirir.
   /// Kod içinde `_tr`/`_en` asla elle yazılmaz, bu metod ekler.

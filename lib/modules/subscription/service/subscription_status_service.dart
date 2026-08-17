@@ -28,7 +28,9 @@ class SubscriptionStatusService {
 
       return SubscriptionState(
         status: status,
+        trialStartedAt: trialStartedAt,
         trialEndsAt: trialEndsAt,
+        startedAt: (data?['subscriptionStartedAt'] as Timestamp?)?.toDate(),
         expiresAt: (data?['subscriptionExpiresAt'] as Timestamp?)?.toDate(),
         productId: data?['subscriptionProductId'] as String?,
       );

@@ -77,6 +77,7 @@ export const verifySubscriptionPurchase = onCall(
       .update({
         subscriptionStatus: verified.isActive ? "active" : "expired",
         subscriptionExpiresAt: Timestamp.fromMillis(verified.expiresAtMs),
+        subscriptionStartedAt: Timestamp.fromMillis(verified.startAtMs),
         subscriptionProductId: productId,
         subscriptionPlatform: platform,
       });
