@@ -153,7 +153,7 @@ class _GroupSessionsForGymProviderElement
 }
 
 String _$adminGroupSessionsControllerHash() =>
-    r'4d7a18a4345ec51ef6c0909f86bf8f604e51770a';
+    r'4c85be2459376a1862371ab06d5d9727d9232311';
 
 /// F4-2 — salonun ileri tarihli, gerçek zamanlı grup dersleri.
 ///

@@ -24,6 +24,17 @@ class TrendBarChart extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.appColors;
     final typography = context.appTypography;
+    if (values.isEmpty) {
+      return SizedBox(
+        height: height,
+        child: Center(
+          child: Text(
+            'Henüz veri yok',
+            style: typography.bodyMedium.copyWith(color: colors.onSurfaceMuted),
+          ),
+        ),
+      );
+    }
     final minVal = values.reduce((a, b) => a < b ? a : b);
     final maxVal = values.reduce((a, b) => a > b ? a : b);
     final range = (maxVal - minVal) == 0 ? 1 : (maxVal - minVal);
@@ -45,17 +56,22 @@ class TrendBarChart extends StatelessWidget {
                       textAlign: TextAlign.center,
                       style: typography.dataSmall.copyWith(
                         fontSize: 12,
-                        color: i == values.length - 1 ? colors.onPrimaryContainer : colors.onSurfaceMuted,
+                        color: i == values.length - 1
+                            ? colors.onPrimaryContainer
+                            : colors.onSurfaceMuted,
                       ),
                     ),
                     const SizedBox(height: AppSpacing.xs),
                     Expanded(
                       child: FractionallySizedBox(
                         alignment: Alignment.bottomCenter,
-                        heightFactor: 0.22 + ((values[i] - minVal) / range) * 0.68,
+                        heightFactor:
+                            0.22 + ((values[i] - minVal) / range) * 0.68,
                         child: Container(
                           decoration: BoxDecoration(
-                            color: i == values.length - 1 ? colors.primary : colors.primary.withValues(alpha: 0.28),
+                            color: i == values.length - 1
+                                ? colors.primary
+                                : colors.primary.withValues(alpha: 0.28),
                             borderRadius: BorderRadius.circular(8),
                           ),
                         ),
@@ -65,7 +81,10 @@ class TrendBarChart extends StatelessWidget {
                     Text(
                       labels[i],
                       textAlign: TextAlign.center,
-                      style: typography.caption.copyWith(color: colors.onSurfaceMuted, fontSize: 11),
+                      style: typography.caption.copyWith(
+                        color: colors.onSurfaceMuted,
+                        fontSize: 11,
+                      ),
                     ),
                   ],
                 ),

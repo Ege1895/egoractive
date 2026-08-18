@@ -205,7 +205,7 @@ final _selectedCalendarDateProvider =
 
 typedef _$SelectedCalendarDate = AutoDisposeNotifier<DateTime>;
 String _$adminCalendarControllerHash() =>
-    r'6006de8c3732a7853e126eb8a02d1b2b5270996d';
+    r'53f6fced34cc4546c1f41cb378e44d5044ac3734';
 
 /// F3-3 — aktif salonun bulunduğu aya ait seansları gerçek zamanlı
 /// dinler. Salon bilinmiyorsa (test ortamı vb.) mock repository'e düşer.

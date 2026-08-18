@@ -167,7 +167,7 @@ class _PackagesForGymProviderElement
 }
 
 String _$studioPackagesControllerHash() =>
-    r'73fa73f0256604c25149d15e098a4c38a5be2efd';
+    r'f87b9210425bc4af3552cdeaad6d770e5da2729d';
 
 /// F3-1 — stüdyo paket kataloğu artık gerçek zamanlı `gyms/{gymId}/packages`
 /// koleksiyonundan okunur/yazılır. Dış arayüz bilerce senkron
