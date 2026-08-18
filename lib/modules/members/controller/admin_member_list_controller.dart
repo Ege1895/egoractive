@@ -32,8 +32,9 @@ class AdminMemberListController extends _$AdminMemberListController {
     if (gymId == null ||
         !state.hasMore ||
         state.isLoadingMore ||
-        state.searchResults != null)
+        state.searchResults != null) {
       return;
+    }
 
     state = state.copyWith(isLoadingMore: true, errorMessage: null);
     try {
