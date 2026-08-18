@@ -149,7 +149,7 @@ class _ReportForTrainerProviderElement
 }
 
 String _$trainerReportControllerHash() =>
-    r'd2f84d27082263aae199c3411415836df393cae5';
+    r'f9c56cb22b4b33f2b6e8b3e71d363b6160010e88';
 
 /// Antrenörün kendi (`trainerId == uid`) bu ayki seans özeti gerçek zamanlı
 /// hesaplanır. Oturum yoksa (test ortamı vb.) mock repository'e düşer.

@@ -29,11 +29,14 @@ class _AddMeasurementPanelState extends BasePanelState<AddMeasurementPanel> {
   @override
   void initState() {
     super.initState();
-    final points = ref.read(measurementsControllerProvider).points;
+    final measurementsState = ref.read(measurementsControllerProvider);
+    final points = measurementsState.points;
     _controllers = {
       for (final metric in MeasurementMetric.values)
         metric: TextEditingController(
-          text: metric == MeasurementMetric.bacak
+          text:
+              metric == MeasurementMetric.bacak ||
+                  !measurementsState.hasRealData
               ? ''
               : points[metric]?.value ?? '',
         ),
@@ -44,7 +47,9 @@ class _AddMeasurementPanelState extends BasePanelState<AddMeasurementPanel> {
   Widget build(BuildContext context) {
     final colors = context.appColors;
     final typography = context.appTypography;
-    final points = ref.watch(measurementsControllerProvider).points;
+    final measurementsState = ref.watch(measurementsControllerProvider);
+    final points = measurementsState.points;
+    final hasRealData = measurementsState.hasRealData;
 
     return Scaffold(
       body: SafeArea(
@@ -152,8 +157,9 @@ class _AddMeasurementPanelState extends BasePanelState<AddMeasurementPanel> {
                           )
                             _MeasurementField(
                               metric: MeasurementMetric.values[i],
-                              lastValueLabel:
-                                  points[MeasurementMetric.values[i]]?.value,
+                              lastValueLabel: hasRealData
+                                  ? points[MeasurementMetric.values[i]]?.value
+                                  : null,
                               controller:
                                   _controllers[MeasurementMetric.values[i]]!,
                               showDivider:

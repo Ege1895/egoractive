@@ -31,6 +31,12 @@ mixin _$MeasurementsState {
   /// gerçek veri yoksa boş.
   List<DateTime> get recordedDates => throw _privateConstructorUsedError;
 
+  /// `points`/`series` gerçek bir kayda mı dayanıyor, yoksa (henüz hiç
+  /// ölçümü olmayan bir üye için) örnek/mock veriye mi düşüldü —
+  /// [AddMeasurementPanel] formu sadece gerçek veriyle önceden
+  /// doldurmalı, mock değerleri gerçek ölçüm gibi göstermemeli.
+  bool get hasRealData => throw _privateConstructorUsedError;
+
   /// Create a copy of MeasurementsState
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -52,6 +58,7 @@ abstract class $MeasurementsStateCopyWith<$Res> {
     MeasurementMetric selectedMetric,
     DateTime? selectedDate,
     List<DateTime> recordedDates,
+    bool hasRealData,
   });
 }
 
@@ -76,6 +83,7 @@ class _$MeasurementsStateCopyWithImpl<$Res, $Val extends MeasurementsState>
     Object? selectedMetric = null,
     Object? selectedDate = freezed,
     Object? recordedDates = null,
+    Object? hasRealData = null,
   }) {
     return _then(
       _value.copyWith(
@@ -103,6 +111,10 @@ class _$MeasurementsStateCopyWithImpl<$Res, $Val extends MeasurementsState>
                 ? _value.recordedDates
                 : recordedDates // ignore: cast_nullable_to_non_nullable
                       as List<DateTime>,
+            hasRealData: null == hasRealData
+                ? _value.hasRealData
+                : hasRealData // ignore: cast_nullable_to_non_nullable
+                      as bool,
           )
           as $Val,
     );
@@ -125,6 +137,7 @@ abstract class _$$MeasurementsStateImplCopyWith<$Res>
     MeasurementMetric selectedMetric,
     DateTime? selectedDate,
     List<DateTime> recordedDates,
+    bool hasRealData,
   });
 }
 
@@ -148,6 +161,7 @@ class __$$MeasurementsStateImplCopyWithImpl<$Res>
     Object? selectedMetric = null,
     Object? selectedDate = freezed,
     Object? recordedDates = null,
+    Object? hasRealData = null,
   }) {
     return _then(
       _$MeasurementsStateImpl(
@@ -175,6 +189,10 @@ class __$$MeasurementsStateImplCopyWithImpl<$Res>
             ? _value._recordedDates
             : recordedDates // ignore: cast_nullable_to_non_nullable
                   as List<DateTime>,
+        hasRealData: null == hasRealData
+            ? _value.hasRealData
+            : hasRealData // ignore: cast_nullable_to_non_nullable
+                  as bool,
       ),
     );
   }
@@ -190,6 +208,7 @@ class _$MeasurementsStateImpl implements _MeasurementsState {
     this.selectedMetric = MeasurementMetric.bel,
     this.selectedDate,
     final List<DateTime> recordedDates = const <DateTime>[],
+    this.hasRealData = false,
   }) : _points = points,
        _series = series,
        _recordedDates = recordedDates;
@@ -235,9 +254,17 @@ class _$MeasurementsStateImpl implements _MeasurementsState {
     return EqualUnmodifiableListView(_recordedDates);
   }
 
+  /// `points`/`series` gerçek bir kayda mı dayanıyor, yoksa (henüz hiç
+  /// ölçümü olmayan bir üye için) örnek/mock veriye mi düşüldü —
+  /// [AddMeasurementPanel] formu sadece gerçek veriyle önceden
+  /// doldurmalı, mock değerleri gerçek ölçüm gibi göstermemeli.
+  @override
+  @JsonKey()
+  final bool hasRealData;
+
   @override
   String toString() {
-    return 'MeasurementsState(points: $points, series: $series, viewMode: $viewMode, selectedMetric: $selectedMetric, selectedDate: $selectedDate, recordedDates: $recordedDates)';
+    return 'MeasurementsState(points: $points, series: $series, viewMode: $viewMode, selectedMetric: $selectedMetric, selectedDate: $selectedDate, recordedDates: $recordedDates, hasRealData: $hasRealData)';
   }
 
   @override
@@ -256,7 +283,9 @@ class _$MeasurementsStateImpl implements _MeasurementsState {
             const DeepCollectionEquality().equals(
               other._recordedDates,
               _recordedDates,
-            ));
+            ) &&
+            (identical(other.hasRealData, hasRealData) ||
+                other.hasRealData == hasRealData));
   }
 
   @override
@@ -268,6 +297,7 @@ class _$MeasurementsStateImpl implements _MeasurementsState {
     selectedMetric,
     selectedDate,
     const DeepCollectionEquality().hash(_recordedDates),
+    hasRealData,
   );
 
   /// Create a copy of MeasurementsState
@@ -290,6 +320,7 @@ abstract class _MeasurementsState implements MeasurementsState {
     final MeasurementMetric selectedMetric,
     final DateTime? selectedDate,
     final List<DateTime> recordedDates,
+    final bool hasRealData,
   }) = _$MeasurementsStateImpl;
 
   @override
@@ -309,6 +340,13 @@ abstract class _MeasurementsState implements MeasurementsState {
   /// gerçek veri yoksa boş.
   @override
   List<DateTime> get recordedDates;
+
+  /// `points`/`series` gerçek bir kayda mı dayanıyor, yoksa (henüz hiç
+  /// ölçümü olmayan bir üye için) örnek/mock veriye mi düşüldü —
+  /// [AddMeasurementPanel] formu sadece gerçek veriyle önceden
+  /// doldurmalı, mock değerleri gerçek ölçüm gibi göstermemeli.
+  @override
+  bool get hasRealData;
 
   /// Create a copy of MeasurementsState
   /// with the given fields replaced by the non-null parameter values.

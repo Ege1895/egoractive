@@ -160,7 +160,7 @@ class _ConfirmationsForTrainerProviderElement
 }
 
 String _$trainerNotificationsControllerHash() =>
-    r'4916be5c631431caf61032862e34228d6f8282f3';
+    r'9479d38e3b1a0a872420c01d2a128bffdc3f56c4';
 
 /// Antrenörün kendi (`trainerId == uid`) seanslarına üyelerin verdiği
 /// gelecek/gelmeyecek yanıtları gerçek zamanlı dinlenir. Oturum yoksa (test

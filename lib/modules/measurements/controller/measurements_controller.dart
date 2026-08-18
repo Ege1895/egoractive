@@ -12,8 +12,18 @@ import '../service/measurements_write_service.dart';
 part 'measurements_controller.g.dart';
 
 const _monthAbbrev = {
-  1: 'Oca', 2: 'Şub', 3: 'Mar', 4: 'Nis', 5: 'May', 6: 'Haz',
-  7: 'Tem', 8: 'Ağu', 9: 'Eyl', 10: 'Eki', 11: 'Kas', 12: 'Ara',
+  1: 'Oca',
+  2: 'Şub',
+  3: 'Mar',
+  4: 'Nis',
+  5: 'May',
+  6: 'Haz',
+  7: 'Tem',
+  8: 'Ağu',
+  9: 'Eyl',
+  10: 'Eki',
+  11: 'Kas',
+  12: 'Ara',
 };
 
 /// Silüet üzerindeki tıklanabilir nokta konumları — gerçek ölçüm verisiyle
@@ -29,26 +39,32 @@ const _avatarLayout = {
 typedef _Entry = (DateTime date, Map<MeasurementMetric, double> values);
 
 @riverpod
-Stream<List<_Entry>> _measurementEntries(_MeasurementEntriesRef ref, String uid) {
+Stream<List<_Entry>> _measurementEntries(
+  _MeasurementEntriesRef ref,
+  String uid,
+) {
   return FirebaseFirestore.instance
       .collection('measurements')
       .doc(uid)
       .collection('entries')
       .orderBy('date')
       .snapshots()
-      .map((snapshot) => snapshot.docs.map((doc) {
-            final data = doc.data();
-            final date = (data['date'] as Timestamp).toDate();
-            final values = <MeasurementMetric, double>{};
-            for (final metric in MeasurementMetric.values) {
-              final raw = data[metric.name];
-              if (raw is num) values[metric] = raw.toDouble();
-            }
-            return (date, values);
-          }).toList());
+      .map(
+        (snapshot) => snapshot.docs.map((doc) {
+          final data = doc.data();
+          final date = (data['date'] as Timestamp).toDate();
+          final values = <MeasurementMetric, double>{};
+          for (final metric in MeasurementMetric.values) {
+            final raw = data[metric.name];
+            if (raw is num) values[metric] = raw.toDouble();
+          }
+          return (date, values);
+        }).toList(),
+      );
 }
 
-bool _isSameDay(DateTime a, DateTime b) => a.year == b.year && a.month == b.month && a.day == b.day;
+bool _isSameDay(DateTime a, DateTime b) =>
+    a.year == b.year && a.month == b.month && a.day == b.day;
 
 /// `entries` tarihe göre artan sırada — `target` gün veya ondan önceki en
 /// yakın kaydı döner (o metrik için o günde/o günden önce bir kayıt yoksa
@@ -69,13 +85,16 @@ _Entry? _entryAtOrBefore(List<_Entry> entries, DateTime target) {
 MeasurementsState _toState(List<_Entry> entries, {DateTime? selectedDate}) {
   final series = <MeasurementMetric, MeasurementSeries>{};
   final points = <MeasurementMetric, MeasurementPoint>{};
-  final recordedDates = entries.map((e) => e.$1).toSet().toList()..sort((a, b) => b.compareTo(a));
+  final recordedDates = entries.map((e) => e.$1).toSet().toList()
+    ..sort((a, b) => b.compareTo(a));
 
   for (final metric in MeasurementMetric.values) {
     final withMetric = entries.where((e) => e.$2.containsKey(metric)).toList();
     if (withMetric.isEmpty) continue;
 
-    final months = withMetric.map((e) => _monthAbbrev[e.$1.month] ?? '').toList();
+    final months = withMetric
+        .map((e) => _monthAbbrev[e.$1.month] ?? '')
+        .toList();
     final values = withMetric.map((e) => e.$2[metric]!).toList();
     final totalDelta = values.last - values.first;
     series[metric] = MeasurementSeries(
@@ -88,24 +107,33 @@ MeasurementsState _toState(List<_Entry> entries, {DateTime? selectedDate}) {
     final layout = _avatarLayout[metric];
     if (layout == null) continue;
 
-    final target = selectedDate == null ? withMetric.last : (_entryAtOrBefore(withMetric, selectedDate) ?? withMetric.last);
+    final target = selectedDate == null
+        ? withMetric.last
+        : (_entryAtOrBefore(withMetric, selectedDate) ?? withMetric.last);
     final targetIndex = withMetric.indexOf(target);
     final targetValue = target.$2[metric]!;
-    final previousValue = targetIndex > 0 ? withMetric[targetIndex - 1].$2[metric]! : targetValue;
+    final previousValue = targetIndex > 0
+        ? withMetric[targetIndex - 1].$2[metric]!
+        : targetValue;
     final diff = targetValue - previousValue;
     points[metric] = MeasurementPoint(
       metric: metric,
       value: targetValue.toStringAsFixed(1).replaceAll('.', ','),
       delta: _formatDelta(diff, zeroLabel: 'değişim yok'),
       isImprovement: diff <= 0,
-      since: '${target.$1.day} ${_monthAbbrev[target.$1.month]} ${target.$1.year}',
+      since:
+          '${target.$1.day} ${_monthAbbrev[target.$1.month]} ${target.$1.year}',
       fx: layout.fx,
       fy: layout.fy,
       side: layout.side,
     );
   }
 
-  return MeasurementsState(points: points, series: series, recordedDates: recordedDates);
+  return MeasurementsState(
+    points: points,
+    series: series,
+    recordedDates: recordedDates,
+  );
 }
 
 String _formatDelta(double diff, {required String zeroLabel}) {
@@ -144,7 +172,9 @@ class MeasurementsController extends _$MeasurementsController {
   @override
   MeasurementsState build() {
     final selectedDate = ref.watch(_measurementsSelectedDateProvider);
-    final uid = ref.watch(measurementsViewedUidProvider) ?? ref.watch(authStateProvider).valueOrNull?.uid;
+    final uid =
+        ref.watch(measurementsViewedUidProvider) ??
+        ref.watch(authStateProvider).valueOrNull?.uid;
     final mock = ref.watch(measurementsRepositoryProvider).loadInitial();
     if (uid == null) return mock;
 
@@ -157,6 +187,7 @@ class MeasurementsController extends _$MeasurementsController {
       series: real.series,
       recordedDates: real.recordedDates,
       selectedDate: selectedDate,
+      hasRealData: true,
     );
   }
 
@@ -170,7 +201,8 @@ class MeasurementsController extends _$MeasurementsController {
 
   /// Geçmiş bir tarihi seçip avatar ekranında o güne ait değerleri
   /// gösterir; `null` en son kayda döner.
-  void selectDate(DateTime? date) => ref.read(_measurementsSelectedDateProvider.notifier).select(date);
+  void selectDate(DateTime? date) =>
+      ref.read(_measurementsSelectedDateProvider.notifier).select(date);
 
   /// Yeni ölçüm ekle formundan gelen değerleri gerçek Firestore'a yazar —
   /// boş bırakılan alanlar atlanır. Admin/antrenör bir üyeyi görüntülüyorsa
@@ -178,8 +210,12 @@ class MeasurementsController extends _$MeasurementsController {
   /// Aynı gün için ikinci bir kayıt, o günün verisinin tamamen üzerine
   /// yazar (bkz. `MeasurementsWriteService`).
   Future<void> addMeasurement(Map<MeasurementMetric, double> newValues) async {
-    final uid = ref.read(measurementsViewedUidProvider) ?? ref.read(authStateProvider).valueOrNull?.uid;
+    final uid =
+        ref.read(measurementsViewedUidProvider) ??
+        ref.read(authStateProvider).valueOrNull?.uid;
     if (uid == null || newValues.isEmpty) return;
-    await ref.read(measurementsWriteServiceProvider).addEntry(uid: uid, date: DateTime.now(), values: newValues);
+    await ref
+        .read(measurementsWriteServiceProvider)
+        .addEntry(uid: uid, date: DateTime.now(), values: newValues);
   }
 }

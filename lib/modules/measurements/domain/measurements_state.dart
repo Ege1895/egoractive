@@ -15,10 +15,18 @@ class MeasurementsState with _$MeasurementsState {
     required Map<MeasurementMetric, MeasurementSeries> series,
     @Default(MeasurementsViewMode.avatar) MeasurementsViewMode viewMode,
     @Default(MeasurementMetric.bel) MeasurementMetric selectedMetric,
+
     /// Avatar ekranında görüntülenen kayıt tarihi. `null` = en son kayıt.
     DateTime? selectedDate,
+
     /// Geçmişe dönük tarih seçmek için — en yeniden en eskiye sıralı,
     /// gerçek veri yoksa boş.
     @Default(<DateTime>[]) List<DateTime> recordedDates,
+
+    /// `points`/`series` gerçek bir kayda mı dayanıyor, yoksa (henüz hiç
+    /// ölçümü olmayan bir üye için) örnek/mock veriye mi düşüldü —
+    /// [AddMeasurementPanel] formu sadece gerçek veriyle önceden
+    /// doldurmalı, mock değerleri gerçek ölçüm gibi göstermemeli.
+    @Default(false) bool hasRealData,
   }) = _MeasurementsState;
 }
