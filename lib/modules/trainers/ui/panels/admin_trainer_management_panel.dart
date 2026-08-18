@@ -4,7 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
+import '../../../../core/subscription/subscription_write_gate.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../shared/utils/phone_number_formatter.dart';
 import '../../../../shared/widgets/app_back_button.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_text_field.dart';
@@ -16,10 +18,12 @@ class AdminTrainerManagementPanel extends BasePanel {
   const AdminTrainerManagementPanel({super.key});
 
   @override
-  ConsumerState<AdminTrainerManagementPanel> createState() => _AdminTrainerManagementPanelState();
+  ConsumerState<AdminTrainerManagementPanel> createState() =>
+      _AdminTrainerManagementPanelState();
 }
 
-class _AdminTrainerManagementPanelState extends BasePanelState<AdminTrainerManagementPanel> {
+class _AdminTrainerManagementPanelState
+    extends BasePanelState<AdminTrainerManagementPanel> {
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
@@ -32,26 +36,58 @@ class _AdminTrainerManagementPanelState extends BasePanelState<AdminTrainerManag
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.md, AppSpacing.screenEdge, 0),
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.screenEdge,
+                AppSpacing.md,
+                AppSpacing.screenEdge,
+                0,
+              ),
               child: Row(
                 children: [
-                  AppBackButton(onTap: () => ref.read(panelStackControllerProvider.notifier).pop()),
+                  AppBackButton(
+                    onTap: () =>
+                        ref.read(panelStackControllerProvider.notifier).pop(),
+                  ),
                   const SizedBox(width: AppSpacing.md),
-                  Expanded(child: Text('Antrenörler', style: typography.headingSmall.copyWith(color: colors.onSurface, fontSize: 18))),
-                  Text('${trainers.length} kişi', style: typography.headingSmall.copyWith(color: colors.onSurfaceMuted, fontSize: 15)),
+                  Expanded(
+                    child: Text(
+                      'Antrenörler',
+                      style: typography.headingSmall.copyWith(
+                        color: colors.onSurface,
+                        fontSize: 18,
+                      ),
+                    ),
+                  ),
+                  Text(
+                    '${trainers.length} kişi',
+                    style: typography.headingSmall.copyWith(
+                      color: colors.onSurfaceMuted,
+                      fontSize: 15,
+                    ),
+                  ),
                 ],
               ),
             ),
             Expanded(
               child: ListView(
-                padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.md, AppSpacing.screenEdge, AppSpacing.lg),
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.screenEdge,
+                  AppSpacing.md,
+                  AppSpacing.screenEdge,
+                  AppSpacing.lg,
+                ),
                 children: [
                   for (final trainer in trainers) _TrainerRow(trainer: trainer),
                 ],
               ),
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, 0, AppSpacing.screenEdge, AppSpacing.lg),
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.screenEdge,
+                0,
+                AppSpacing.screenEdge,
+                AppSpacing.lg,
+              ),
               child: AppButton(
                 label: '+ Antrenör ekle',
                 variant: AppButtonVariant.secondary,
@@ -70,7 +106,9 @@ class _AdminTrainerManagementPanelState extends BasePanelState<AdminTrainerManag
       context: context,
       isScrollControlled: true,
       backgroundColor: colors.surface,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
       builder: (sheetContext) => const _AddTrainerSheet(),
     );
   }
@@ -99,19 +137,37 @@ class _TrainerRow extends StatelessWidget {
           Container(
             width: 44,
             height: 44,
-            decoration: BoxDecoration(color: colors.primaryContainer, shape: BoxShape.circle),
+            decoration: BoxDecoration(
+              color: colors.primaryContainer,
+              shape: BoxShape.circle,
+            ),
             alignment: Alignment.center,
-            child: Text(trainer.initials, style: typography.headingSmall.copyWith(color: colors.onPrimaryContainer, fontSize: 15)),
+            child: Text(
+              trainer.initials,
+              style: typography.headingSmall.copyWith(
+                color: colors.onPrimaryContainer,
+                fontSize: 15,
+              ),
+            ),
           ),
           const SizedBox(width: AppSpacing.md),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(trainer.name, style: typography.headingSmall.copyWith(color: colors.onSurface, fontSize: 16)),
+                Text(
+                  trainer.name,
+                  style: typography.headingSmall.copyWith(
+                    color: colors.onSurface,
+                    fontSize: 16,
+                  ),
+                ),
                 Text(
                   '${trainer.specialties.join(", ")} · ${trainer.memberCount} üye',
-                  style: typography.bodyMedium.copyWith(color: colors.onSurfaceMuted, fontSize: 13),
+                  style: typography.bodyMedium.copyWith(
+                    color: colors.onSurfaceMuted,
+                    fontSize: 13,
+                  ),
                 ),
               ],
             ),
@@ -134,6 +190,42 @@ class _AddTrainerSheetState extends ConsumerState<_AddTrainerSheet> {
   final _nameController = TextEditingController();
   final _phoneController = TextEditingController();
   final Set<String> _selectedSpecialties = {};
+  bool _isSaving = false;
+  String? _nameError;
+  String? _errorMessage;
+
+  Future<void> _submit() async {
+    final name = _nameController.text.trim();
+    setState(() => _nameError = name.isEmpty ? 'Ad soyad boş olamaz.' : null);
+    if (_nameError != null) return;
+    if (!await ensureSubscriptionAllowsWrite(context, ref)) return;
+
+    setState(() {
+      _isSaving = true;
+      _errorMessage = null;
+    });
+    final phoneDigits = _phoneController.text.replaceAll(RegExp(r'[^0-9]'), '');
+    try {
+      await ref
+          .read(adminTrainersControllerProvider.notifier)
+          .addTrainer(
+            name: name,
+            phoneNumber: phoneDigits.isEmpty ? '' : '+90$phoneDigits',
+            specialties: _selectedSpecialties.isEmpty
+                ? ['Fonksiyonel']
+                : _selectedSpecialties.toList(),
+          );
+    } catch (_) {
+      if (mounted) {
+        setState(() {
+          _isSaving = false;
+          _errorMessage = 'Antrenör eklenemedi, tekrar dene.';
+        });
+      }
+      return;
+    }
+    if (mounted) Navigator.of(context).pop();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -152,16 +244,46 @@ class _AddTrainerSheetState extends ConsumerState<_AddTrainerSheet> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Center(
-            child: Container(width: 44, height: 5, decoration: BoxDecoration(color: colors.outlineStrong, borderRadius: BorderRadius.circular(AppSpacing.radiusPill))),
+            child: Container(
+              width: 44,
+              height: 5,
+              decoration: BoxDecoration(
+                color: colors.outlineStrong,
+                borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
+              ),
+            ),
           ),
           const SizedBox(height: AppSpacing.lg),
-          Text('Antrenör ekle', style: typography.headingLarge.copyWith(color: colors.onSurface, fontSize: 22)),
+          Text(
+            'Antrenör ekle',
+            style: typography.headingLarge.copyWith(
+              color: colors.onSurface,
+              fontSize: 22,
+            ),
+          ),
           const SizedBox(height: AppSpacing.lg),
-          AppTextField(label: 'Ad soyad', controller: _nameController, hint: 'Emre Kaya'),
+          AppTextField(
+            label: 'Ad soyad',
+            controller: _nameController,
+            errorText: _nameError,
+            hint: 'Emre Kaya',
+          ),
           const SizedBox(height: AppSpacing.md),
-          AppTextField(label: 'Telefon', controller: _phoneController, keyboardType: TextInputType.phone, hint: '0542 907 33 18'),
+          AppTextField(
+            label: 'Telefon',
+            controller: _phoneController,
+            keyboardType: TextInputType.phone,
+            inputFormatters: [TrPhoneNumberInputFormatter()],
+            hint: '5XX XXX XX XX',
+          ),
           const SizedBox(height: AppSpacing.md),
-          Text('Uzmanlık', style: typography.bodyMedium.copyWith(color: colors.onSurfaceMuted, fontSize: 13)),
+          Text(
+            'Uzmanlık',
+            style: typography.bodyMedium.copyWith(
+              color: colors.onSurfaceMuted,
+              fontSize: 13,
+            ),
+          ),
           const SizedBox(height: AppSpacing.sm),
           Wrap(
             spacing: AppSpacing.sm,
@@ -172,31 +294,27 @@ class _AddTrainerSheetState extends ConsumerState<_AddTrainerSheet> {
                   label: specialty,
                   selected: _selectedSpecialties.contains(specialty),
                   onTap: () => setState(() {
-                    _selectedSpecialties.contains(specialty) ? _selectedSpecialties.remove(specialty) : _selectedSpecialties.add(specialty);
+                    _selectedSpecialties.contains(specialty)
+                        ? _selectedSpecialties.remove(specialty)
+                        : _selectedSpecialties.add(specialty);
                   }),
                 ),
             ],
           ),
           const SizedBox(height: AppSpacing.lg),
+          if (_errorMessage != null) ...[
+            Text(
+              _errorMessage!,
+              style: typography.bodyMedium.copyWith(
+                color: colors.error,
+                fontSize: 13,
+              ),
+            ),
+            const SizedBox(height: AppSpacing.sm),
+          ],
           AppButton(
-            label: 'Antrenörü ekle',
-            onPressed: () {
-              final name = _nameController.text.trim();
-              if (name.isEmpty) return;
-              final words = name.split(RegExp(r'\s+')).where((w) => w.isNotEmpty).toList();
-              final initials = words.take(2).map((w) => w[0]).join().toUpperCase();
-              ref.read(adminTrainersControllerProvider.notifier).addTrainer(
-                    AdminTrainerSummary(
-                      id: name.toLowerCase().replaceAll(' ', '-'),
-                      initials: initials,
-                      name: name,
-                      phone: _phoneController.text.trim(),
-                      specialties: _selectedSpecialties.isEmpty ? ['Fonksiyonel'] : _selectedSpecialties.toList(),
-                      memberCount: 0,
-                    ),
-                  );
-              Navigator.of(context).pop();
-            },
+            label: _isSaving ? 'Ekleniyor…' : 'Antrenörü ekle',
+            onPressed: _isSaving ? null : _submit,
           ),
         ],
       ),
@@ -212,7 +330,11 @@ class _AddTrainerSheetState extends ConsumerState<_AddTrainerSheet> {
 }
 
 class _SpecialtyChip extends StatelessWidget {
-  const _SpecialtyChip({required this.label, required this.selected, required this.onTap});
+  const _SpecialtyChip({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
 
   final String label;
   final bool selected;
@@ -233,11 +355,16 @@ class _SpecialtyChip extends StatelessWidget {
           alignment: Alignment.center,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
-            border: Border.all(color: selected ? colors.primary : colors.outlineStrong),
+            border: Border.all(
+              color: selected ? colors.primary : colors.outlineStrong,
+            ),
           ),
           child: Text(
             label,
-            style: context.appTypography.headingSmall.copyWith(fontSize: 14, color: selected ? colors.onPrimary : colors.onSurfaceVariant),
+            style: context.appTypography.headingSmall.copyWith(
+              fontSize: 14,
+              color: selected ? colors.onPrimary : colors.onSurfaceVariant,
+            ),
           ),
         ),
       ),
