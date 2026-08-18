@@ -30,6 +30,7 @@ class _GymSetupPanelState extends BasePanelState<GymSetupPanel> {
   late final TextEditingController _cityController;
   late final TextEditingController _phoneController;
   late final TextEditingController _addressController;
+  final _phoneFieldKey = GlobalKey();
 
   @override
   void initState() {
@@ -69,6 +70,25 @@ class _GymSetupPanelState extends BasePanelState<GymSetupPanel> {
         selection: TextSelection.collapsed(offset: formattedPhone.length),
       );
     }
+
+    // "Bu numarayla kayıtlı bir hesap zaten var" gibi telefon hatası
+    // ListView'de scroll'un altında kalabiliyordu — kullanıcı hatayı hiç
+    // görmeden "Oluşturuluyor…" sonrası hiçbir şey olmamış gibi düşünüyordu.
+    // Hata oluştuğunda alan otomatik olarak ekranın ortasına kaydırılır.
+    ref.listen(createGymControllerProvider, (previous, next) {
+      if (next.phoneError != null && previous?.phoneError != next.phoneError) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          final context = _phoneFieldKey.currentContext;
+          if (context == null) return;
+          Scrollable.ensureVisible(
+            context,
+            alignment: 0.5,
+            duration: const Duration(milliseconds: 250),
+            curve: Curves.easeInOut,
+          );
+        });
+      }
+    });
 
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
@@ -161,6 +181,7 @@ class _GymSetupPanelState extends BasePanelState<GymSetupPanel> {
                           ),
                           const SizedBox(height: AppSpacing.md),
                           AppTextField(
+                            key: _phoneFieldKey,
                             label: 'Telefon numaran (giriş için)',
                             hint: '5XX XXX XX XX',
                             prefixText: '+90 ',
