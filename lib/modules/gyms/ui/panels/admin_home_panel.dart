@@ -2,8 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/app_spacing.dart';
+import '../../../../core/panels/panel_stack_controller.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/progress_ring.dart';
+import '../../../notifications/ui/panels/send_notification_panel.dart';
+import '../../../trainers/ui/panels/admin_trainer_management_panel.dart';
 import '../../controller/admin_home_controller.dart';
 import '../../controller/gym_profile_controller.dart';
 import '../../domain/admin_home_state.dart';
@@ -18,6 +22,7 @@ class AdminHomePanel extends ConsumerWidget {
     final typography = context.appTypography;
     final state = ref.watch(adminHomeControllerProvider);
     final profile = ref.watch(gymProfileControllerProvider);
+    final panelStack = ref.read(panelStackControllerProvider.notifier);
 
     return Scaffold(
       body: SafeArea(
@@ -66,39 +71,23 @@ class AdminHomePanel extends ConsumerWidget {
                     ],
                   ),
                 ),
-                Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(
-                    color: colors.surface,
-                    shape: BoxShape.circle,
-                    border: Border.all(color: colors.outlineStrong),
-                  ),
-                  child: Stack(
+                InkWell(
+                  borderRadius: BorderRadius.circular(999),
+                  onTap: () => panelStack.push(const SendNotificationPanel()),
+                  child: Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: colors.surface,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: colors.outlineStrong),
+                    ),
                     alignment: Alignment.center,
-                    children: [
-                      Icon(
-                        Icons.notifications_outlined,
-                        size: 18,
-                        color: colors.onSurfaceVariant,
-                      ),
-                      Positioned(
-                        top: 10,
-                        right: 11,
-                        child: Container(
-                          width: 8,
-                          height: 8,
-                          decoration: BoxDecoration(
-                            color: colors.warning,
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: colors.background,
-                              width: 2,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
+                    child: Icon(
+                      Icons.notifications_outlined,
+                      size: 18,
+                      color: colors.onSurfaceVariant,
+                    ),
                   ),
                 ),
               ],
@@ -201,17 +190,40 @@ class AdminHomePanel extends ConsumerWidget {
                 borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
                 border: Border.all(color: colors.outline),
               ),
-              child: Column(
-                children: [
-                  for (var i = 0; i < state.trainerPerformance.length; i++) ...[
-                    _TrainerPerformanceRow(
-                      performance: state.trainerPerformance[i],
+              child: state.trainerPerformance.isEmpty
+                  ? Column(
+                      children: [
+                        Text(
+                          'Henüz antrenör yok.',
+                          style: typography.bodyMedium.copyWith(
+                            color: colors.onSurfaceMuted,
+                          ),
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+                        AppButton(
+                          label: '+ Antrenör ekle',
+                          variant: AppButtonVariant.secondary,
+                          onPressed: () => panelStack.push(
+                            const AdminTrainerManagementPanel(),
+                          ),
+                        ),
+                      ],
+                    )
+                  : Column(
+                      children: [
+                        for (
+                          var i = 0;
+                          i < state.trainerPerformance.length;
+                          i++
+                        ) ...[
+                          _TrainerPerformanceRow(
+                            performance: state.trainerPerformance[i],
+                          ),
+                          if (i < state.trainerPerformance.length - 1)
+                            const SizedBox(height: AppSpacing.md),
+                        ],
+                      ],
                     ),
-                    if (i < state.trainerPerformance.length - 1)
-                      const SizedBox(height: AppSpacing.md),
-                  ],
-                ],
-              ),
             ),
             const SizedBox(height: AppSpacing.xl),
             Text(
