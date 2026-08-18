@@ -23,7 +23,7 @@ final _badgesProvider = AutoDisposeStreamProvider<List<BadgeItem>>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef _BadgesRef = AutoDisposeStreamProviderRef<List<BadgeItem>>;
-String _$badgesControllerHash() => r'c30b957e6ad95205a54928e4434208dd5c5aa251';
+String _$badgesControllerHash() => r'8266fc71e3bca37ffb7f5c80dc9a2fa2e45c434f';
 
 /// See also [BadgesController].
 @ProviderFor(BadgesController)

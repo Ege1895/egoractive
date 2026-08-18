@@ -21,4 +21,8 @@ Stream<List<BadgeItem>> _badges(_BadgesRef ref) async* {
 class BadgesController extends _$BadgesController {
   @override
   List<BadgeItem> build() => ref.watch(_badgesProvider).valueOrNull ?? const [];
+
+  /// Stream hatası (network/izin) valueOrNull ile sessizce boş listeye
+  /// düşüyordu — "hiç rozet kazanmadın" ile "yüklenemedi" ayırt edilemiyordu.
+  bool get hasError => ref.watch(_badgesProvider).hasError;
 }

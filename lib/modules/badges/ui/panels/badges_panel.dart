@@ -23,6 +23,7 @@ class _BadgesPanelState extends BasePanelState<BadgesPanel> {
     final colors = context.appColors;
     final typography = context.appTypography;
     final badges = ref.watch(badgesControllerProvider);
+    final hasError = ref.watch(badgesControllerProvider.notifier).hasError;
     final earnedCount = badges.where((b) => b.earned).length;
     final nextLocked = badges.isEmpty
         ? null
@@ -34,24 +35,55 @@ class _BadgesPanelState extends BasePanelState<BadgesPanel> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.md, AppSpacing.screenEdge, 0),
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.screenEdge,
+                AppSpacing.md,
+                AppSpacing.screenEdge,
+                0,
+              ),
               child: Row(
                 children: [
-                  AppBackButton(onTap: () => ref.read(panelStackControllerProvider.notifier).pop()),
+                  AppBackButton(
+                    onTap: () =>
+                        ref.read(panelStackControllerProvider.notifier).pop(),
+                  ),
                   const SizedBox(width: AppSpacing.md),
-                  Text('Rozetlerim', style: typography.headingSmall.copyWith(color: colors.onSurface, fontSize: 18)),
+                  Text(
+                    'Rozetlerim',
+                    style: typography.headingSmall.copyWith(
+                      color: colors.onSurface,
+                      fontSize: 18,
+                    ),
+                  ),
                 ],
               ),
             ),
             Expanded(
               child: ListView(
-                padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.md, AppSpacing.screenEdge, AppSpacing.lg),
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.screenEdge,
+                  AppSpacing.md,
+                  AppSpacing.screenEdge,
+                  AppSpacing.lg,
+                ),
                 children: [
+                  if (hasError) ...[
+                    Text(
+                      'Rozetler yüklenemedi.',
+                      style: typography.bodyMedium.copyWith(
+                        color: colors.error,
+                        fontSize: 13,
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                  ],
                   Container(
                     padding: const EdgeInsets.all(AppSpacing.lg),
                     decoration: BoxDecoration(
                       color: colors.surface,
-                      borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusCard,
+                      ),
                       border: Border.all(color: colors.outline),
                     ),
                     child: Column(
@@ -64,9 +96,21 @@ class _BadgesPanelState extends BasePanelState<BadgesPanel> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text('$earnedCount rozet kazandın', style: typography.headingSmall.copyWith(color: colors.onSurface, fontSize: 18)),
+                                  Text(
+                                    '$earnedCount rozet kazandın',
+                                    style: typography.headingSmall.copyWith(
+                                      color: colors.onSurface,
+                                      fontSize: 18,
+                                    ),
+                                  ),
                                   if (nextLocked != null)
-                                    Text('Sıradaki: ${nextLocked.note}', style: typography.bodyMedium.copyWith(color: colors.onSurfaceVariant, fontSize: 14)),
+                                    Text(
+                                      'Sıradaki: ${nextLocked.note}',
+                                      style: typography.bodyMedium.copyWith(
+                                        color: colors.onSurfaceVariant,
+                                        fontSize: 14,
+                                      ),
+                                    ),
                                 ],
                               ),
                             ),
@@ -74,11 +118,17 @@ class _BadgesPanelState extends BasePanelState<BadgesPanel> {
                             Text.rich(
                               TextSpan(
                                 text: '$earnedCount',
-                                style: typography.dataLarge.copyWith(color: colors.onPrimaryContainer, fontSize: 28),
+                                style: typography.dataLarge.copyWith(
+                                  color: colors.onPrimaryContainer,
+                                  fontSize: 28,
+                                ),
                                 children: [
                                   TextSpan(
                                     text: '/${badges.length}',
-                                    style: typography.bodyMedium.copyWith(color: colors.onSurfaceMuted, fontSize: 15),
+                                    style: typography.bodyMedium.copyWith(
+                                      color: colors.onSurfaceMuted,
+                                      fontSize: 15,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -87,9 +137,13 @@ class _BadgesPanelState extends BasePanelState<BadgesPanel> {
                         ),
                         const SizedBox(height: AppSpacing.md),
                         ClipRRect(
-                          borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
+                          borderRadius: BorderRadius.circular(
+                            AppSpacing.radiusPill,
+                          ),
                           child: LinearProgressIndicator(
-                            value: badges.isEmpty ? 0 : earnedCount / badges.length,
+                            value: badges.isEmpty
+                                ? 0
+                                : earnedCount / badges.length,
                             minHeight: 8,
                             backgroundColor: colors.surfaceRaised,
                             valueColor: AlwaysStoppedAnimation(colors.primary),
@@ -103,13 +157,15 @@ class _BadgesPanelState extends BasePanelState<BadgesPanel> {
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     itemCount: badges.length,
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3,
-                      mainAxisSpacing: AppSpacing.md,
-                      crossAxisSpacing: AppSpacing.md,
-                      mainAxisExtent: 118,
-                    ),
-                    itemBuilder: (context, index) => _BadgeTile(badge: badges[index]),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 3,
+                          mainAxisSpacing: AppSpacing.md,
+                          crossAxisSpacing: AppSpacing.md,
+                          mainAxisExtent: 118,
+                        ),
+                    itemBuilder: (context, index) =>
+                        _BadgeTile(badge: badges[index]),
                   ),
                 ],
               ),
@@ -132,11 +188,18 @@ class _BadgeTile extends StatelessWidget {
     final typography = context.appTypography;
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs, vertical: AppSpacing.sm),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.xs,
+        vertical: AppSpacing.sm,
+      ),
       decoration: BoxDecoration(
         color: badge.earned ? colors.primaryContainer : colors.surface,
         borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
-        border: Border.all(color: badge.earned ? colors.primary.withValues(alpha: 0.32) : colors.outline),
+        border: Border.all(
+          color: badge.earned
+              ? colors.primary.withValues(alpha: 0.32)
+              : colors.outline,
+        ),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -146,9 +209,14 @@ class _BadgeTile extends StatelessWidget {
             width: 44,
             height: 44,
             decoration: BoxDecoration(
-              color: badge.earned ? colors.primaryContainer : colors.surfaceRaised,
+              color: badge.earned
+                  ? colors.primaryContainer
+                  : colors.surfaceRaised,
               shape: BoxShape.circle,
-              border: Border.all(color: badge.earned ? colors.primary : colors.outlineStrong, width: 2),
+              border: Border.all(
+                color: badge.earned ? colors.primary : colors.outlineStrong,
+                width: 2,
+              ),
             ),
             alignment: Alignment.center,
             child: Icon(
@@ -174,7 +242,10 @@ class _BadgeTile extends StatelessWidget {
             textAlign: TextAlign.center,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
-            style: typography.caption.copyWith(color: colors.onSurfaceMuted, fontSize: 10),
+            style: typography.caption.copyWith(
+              color: colors.onSurfaceMuted,
+              fontSize: 10,
+            ),
           ),
         ],
       ),
