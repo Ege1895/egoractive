@@ -39,16 +39,27 @@ class AdminHomePanel extends ConsumerWidget {
                 Container(
                   width: 44,
                   height: 44,
+                  clipBehavior: Clip.antiAlias,
                   decoration: BoxDecoration(
                     color: colors.primaryContainer,
                     borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
                   ),
                   alignment: Alignment.center,
-                  child: Icon(
-                    Icons.fitness_center_rounded,
-                    color: colors.onPrimaryContainer,
-                    size: 20,
-                  ),
+                  child: profile.logoUrl.isEmpty
+                      ? Icon(
+                          Icons.fitness_center_rounded,
+                          color: colors.onPrimaryContainer,
+                          size: 20,
+                        )
+                      : Image.network(
+                          profile.logoUrl,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) => Icon(
+                            Icons.fitness_center_rounded,
+                            color: colors.onPrimaryContainer,
+                            size: 20,
+                          ),
+                        ),
                 ),
                 const SizedBox(width: AppSpacing.md),
                 Expanded(

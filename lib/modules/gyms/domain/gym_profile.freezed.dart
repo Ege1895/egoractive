@@ -21,6 +21,7 @@ mixin _$GymProfile {
   String get city => throw _privateConstructorUsedError;
   String get phone => throw _privateConstructorUsedError;
   String get address => throw _privateConstructorUsedError;
+  String get logoUrl => throw _privateConstructorUsedError;
 
   /// Create a copy of GymProfile
   /// with the given fields replaced by the non-null parameter values.
@@ -36,7 +37,13 @@ abstract class $GymProfileCopyWith<$Res> {
     $Res Function(GymProfile) then,
   ) = _$GymProfileCopyWithImpl<$Res, GymProfile>;
   @useResult
-  $Res call({String name, String city, String phone, String address});
+  $Res call({
+    String name,
+    String city,
+    String phone,
+    String address,
+    String logoUrl,
+  });
 }
 
 /// @nodoc
@@ -58,6 +65,7 @@ class _$GymProfileCopyWithImpl<$Res, $Val extends GymProfile>
     Object? city = null,
     Object? phone = null,
     Object? address = null,
+    Object? logoUrl = null,
   }) {
     return _then(
       _value.copyWith(
@@ -77,6 +85,10 @@ class _$GymProfileCopyWithImpl<$Res, $Val extends GymProfile>
                 ? _value.address
                 : address // ignore: cast_nullable_to_non_nullable
                       as String,
+            logoUrl: null == logoUrl
+                ? _value.logoUrl
+                : logoUrl // ignore: cast_nullable_to_non_nullable
+                      as String,
           )
           as $Val,
     );
@@ -92,7 +104,13 @@ abstract class _$$GymProfileImplCopyWith<$Res>
   ) = __$$GymProfileImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String name, String city, String phone, String address});
+  $Res call({
+    String name,
+    String city,
+    String phone,
+    String address,
+    String logoUrl,
+  });
 }
 
 /// @nodoc
@@ -113,6 +131,7 @@ class __$$GymProfileImplCopyWithImpl<$Res>
     Object? city = null,
     Object? phone = null,
     Object? address = null,
+    Object? logoUrl = null,
   }) {
     return _then(
       _$GymProfileImpl(
@@ -132,6 +151,10 @@ class __$$GymProfileImplCopyWithImpl<$Res>
             ? _value.address
             : address // ignore: cast_nullable_to_non_nullable
                   as String,
+        logoUrl: null == logoUrl
+            ? _value.logoUrl
+            : logoUrl // ignore: cast_nullable_to_non_nullable
+                  as String,
       ),
     );
   }
@@ -145,6 +168,7 @@ class _$GymProfileImpl implements _GymProfile {
     required this.city,
     required this.phone,
     required this.address,
+    this.logoUrl = '',
   });
 
   @override
@@ -155,10 +179,13 @@ class _$GymProfileImpl implements _GymProfile {
   final String phone;
   @override
   final String address;
+  @override
+  @JsonKey()
+  final String logoUrl;
 
   @override
   String toString() {
-    return 'GymProfile(name: $name, city: $city, phone: $phone, address: $address)';
+    return 'GymProfile(name: $name, city: $city, phone: $phone, address: $address, logoUrl: $logoUrl)';
   }
 
   @override
@@ -169,11 +196,13 @@ class _$GymProfileImpl implements _GymProfile {
             (identical(other.name, name) || other.name == name) &&
             (identical(other.city, city) || other.city == city) &&
             (identical(other.phone, phone) || other.phone == phone) &&
-            (identical(other.address, address) || other.address == address));
+            (identical(other.address, address) || other.address == address) &&
+            (identical(other.logoUrl, logoUrl) || other.logoUrl == logoUrl));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, name, city, phone, address);
+  int get hashCode =>
+      Object.hash(runtimeType, name, city, phone, address, logoUrl);
 
   /// Create a copy of GymProfile
   /// with the given fields replaced by the non-null parameter values.
@@ -190,6 +219,7 @@ abstract class _GymProfile implements GymProfile {
     required final String city,
     required final String phone,
     required final String address,
+    final String logoUrl,
   }) = _$GymProfileImpl;
 
   @override
@@ -200,6 +230,8 @@ abstract class _GymProfile implements GymProfile {
   String get phone;
   @override
   String get address;
+  @override
+  String get logoUrl;
 
   /// Create a copy of GymProfile
   /// with the given fields replaced by the non-null parameter values.

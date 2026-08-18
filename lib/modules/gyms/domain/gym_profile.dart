@@ -9,5 +9,6 @@ class GymProfile with _$GymProfile {
     required String city,
     required String phone,
     required String address,
+    @Default('') String logoUrl,
   }) = _GymProfile;
 }

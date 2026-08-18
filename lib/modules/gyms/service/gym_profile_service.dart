@@ -27,6 +27,7 @@ class GymProfileService {
             // en fazla 10 hane) korumak için önek burada soyuluyor.
             phone: _stripToDigits((data?['phone'] as String?) ?? ''),
             address: (data?['address'] as String?) ?? '',
+            logoUrl: (data?['logoUrl'] as String?) ?? '',
           );
         });
   }
