@@ -149,12 +149,14 @@ class _GymSetupPanelState extends BasePanelState<GymSetupPanel> {
                           AppTextField(
                             label: 'Salon adı',
                             controller: _nameController,
+                            errorText: createGymState.nameError,
                             onChanged: profileController.updateName,
                           ),
                           const SizedBox(height: AppSpacing.md),
                           AppTextField(
                             label: 'Şehir',
                             controller: _cityController,
+                            errorText: createGymState.cityError,
                             onChanged: profileController.updateCity,
                           ),
                           const SizedBox(height: AppSpacing.md),
@@ -165,6 +167,7 @@ class _GymSetupPanelState extends BasePanelState<GymSetupPanel> {
                             keyboardType: TextInputType.number,
                             controller: _phoneController,
                             inputFormatters: [TrPhoneNumberInputFormatter()],
+                            errorText: createGymState.phoneError,
                             onChanged: profileController.updatePhone,
                           ),
                           const SizedBox(height: AppSpacing.xs),
@@ -179,6 +182,7 @@ class _GymSetupPanelState extends BasePanelState<GymSetupPanel> {
                           AppTextField(
                             label: 'Adres',
                             controller: _addressController,
+                            errorText: createGymState.addressError,
                             onChanged: profileController.updateAddress,
                           ),
                         ],

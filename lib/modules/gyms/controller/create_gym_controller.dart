@@ -20,6 +20,10 @@ class CreateGymState {
     this.logoFile,
     this.isSubmitting = false,
     this.errorMessage,
+    this.nameError,
+    this.cityError,
+    this.addressError,
+    this.phoneError,
     this.isExtractingPalette = false,
     this.logoPalette = const [],
     this.selectedPaletteColor,
@@ -27,7 +31,14 @@ class CreateGymState {
 
   final XFile? logoFile;
   final bool isSubmitting;
+
+  /// Alana bağlanamayan hatalar (network, sunucu) için — field-seviyeli
+  /// hatalar aşağıdaki ayrı alanlarda tutulur.
   final String? errorMessage;
+  final String? nameError;
+  final String? cityError;
+  final String? addressError;
+  final String? phoneError;
 
   /// Logo seçildikten sonra `palette_generator` ile renk çıkarımı sürüyor mu.
   final bool isExtractingPalette;
@@ -45,6 +56,11 @@ class CreateGymState {
     bool? isSubmitting,
     String? errorMessage,
     bool clearError = false,
+    String? nameError,
+    String? cityError,
+    String? addressError,
+    String? phoneError,
+    bool clearFieldErrors = false,
     bool? isExtractingPalette,
     List<Color>? logoPalette,
     Color? selectedPaletteColor,
@@ -54,6 +70,12 @@ class CreateGymState {
       logoFile: logoFile ?? this.logoFile,
       isSubmitting: isSubmitting ?? this.isSubmitting,
       errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
+      nameError: clearFieldErrors ? null : (nameError ?? this.nameError),
+      cityError: clearFieldErrors ? null : (cityError ?? this.cityError),
+      addressError: clearFieldErrors
+          ? null
+          : (addressError ?? this.addressError),
+      phoneError: clearFieldErrors ? null : (phoneError ?? this.phoneError),
       isExtractingPalette: isExtractingPalette ?? this.isExtractingPalette,
       logoPalette: logoPalette ?? this.logoPalette,
       selectedPaletteColor: clearSelectedPaletteColor
@@ -158,19 +180,22 @@ class CreateGymController extends _$CreateGymController {
     return result;
   }
 
-  /// Zorunlu alan eksikse `null` döner ve [errorMessage]'ı doldurur;
-  /// başarılıysa oluşturulan `gymId`'yi döner. Logo opsiyoneldir.
+  /// Zorunlu alan eksikse ilgili alanın hatasını doldurup `null` döner —
+  /// önceki sürüm tüm hataları ("zaten kayıtlı" dahil) tek bir genel
+  /// banner'da gösteriyordu, kullanıcı hangi alanın sorunlu olduğunu
+  /// görmeden alanlara tek tek bakmak zorunda kalıyordu. Başarılıysa
+  /// oluşturulan `gymId`'yi döner. Logo opsiyoneldir.
   Future<String?> submit() async {
     if (state.isSubmitting) return null;
 
     final profile = ref.read(gymProfileControllerProvider);
-    final validationError = _validate(profile);
-    if (validationError != null) {
-      state = state.copyWith(errorMessage: validationError);
-      return null;
-    }
+    if (!_validate(profile)) return null;
 
-    state = state.copyWith(isSubmitting: true, clearError: true);
+    state = state.copyWith(
+      isSubmitting: true,
+      clearError: true,
+      clearFieldErrors: true,
+    );
     try {
       final themeColor =
           state.selectedPaletteColor ??
@@ -187,8 +212,11 @@ class CreateGymController extends _$CreateGymController {
     } on FirebaseFunctionsException catch (e) {
       state = state.copyWith(
         isSubmitting: false,
+        phoneError: e.code == 'already-exists'
+            ? 'Bu numarayla kayıtlı bir hesap zaten var. Giriş yapmayı dene.'
+            : null,
         errorMessage: e.code == 'already-exists'
-            ? 'Bu telefon numarasıyla kayıtlı bir hesap zaten var. Salon oluşturmak yerine giriş yapmayı dene.'
+            ? null
             : 'Salon oluşturulamadı. Bağlantını kontrol edip tekrar dene.',
       );
       return null;
@@ -202,19 +230,41 @@ class CreateGymController extends _$CreateGymController {
     }
   }
 
-  String? _validate(GymProfile profile) {
-    if (profile.name.trim().isEmpty ||
-        profile.city.trim().isEmpty ||
-        profile.address.trim().isEmpty) {
-      return 'Lütfen tüm alanları doldur.';
-    }
+  /// Her boş/geçersiz alan için ayrı bir hata mesajı yazar, geçerliyse
+  /// `true` döner.
+  bool _validate(GymProfile profile) {
+    final nameError = profile.name.trim().isEmpty ? 'Salon adı gerekli.' : null;
+    final cityError = profile.city.trim().isEmpty ? 'Şehir gerekli.' : null;
+    final addressError = profile.address.trim().isEmpty
+        ? 'Adres gerekli.'
+        : null;
     // profile.phone GymProfileController.updatePhone'da zaten sadece rakam
     // tutuluyor — bu numarayla admin girişi yapılacağı için 10 haneli
     // geçerli bir TR cep telefonu olmalı (AuthState.isPhoneComplete ile
     // aynı kural).
-    if (profile.phone.length != 10) {
-      return 'Lütfen geçerli bir cep telefonu numarası gir.';
+    final phoneError = profile.phone.length != 10
+        ? 'Geçerli bir cep telefonu numarası gir.'
+        : null;
+
+    if (nameError == null &&
+        cityError == null &&
+        addressError == null &&
+        phoneError == null) {
+      return true;
     }
-    return null;
+    // copyWith'in `x ?? this.x` deseni "null geç" ile "hiç geçme"yi ayırt
+    // edemediği için (biri geçersizken diğeri artık geçerli olan alanın
+    // eski hatası temizlenemez), burada state doğrudan kuruluyor.
+    state = CreateGymState(
+      logoFile: state.logoFile,
+      isExtractingPalette: state.isExtractingPalette,
+      logoPalette: state.logoPalette,
+      selectedPaletteColor: state.selectedPaletteColor,
+      nameError: nameError,
+      cityError: cityError,
+      addressError: addressError,
+      phoneError: phoneError,
+    );
+    return false;
   }
 }
