@@ -15,9 +15,15 @@ void main() {
       final success = await notifier.submit();
 
       expect(success, isFalse);
+      // Genel bir banner yerine hangi alanın eksik olduğu ayrı ayrı
+      // gösteriliyor (bkz. task #90).
       expect(
-        container.read(memberRegistrationControllerProvider).errorMessage,
-        contains('ad, soyad'),
+        container.read(memberRegistrationControllerProvider).nameError,
+        contains('Ad ve soyad'),
+      );
+      expect(
+        container.read(memberRegistrationControllerProvider).phoneError,
+        isNotNull,
       );
       expect(container.read(memberRegistrationControllerProvider).isSubmitting, isFalse);
     });
@@ -34,9 +40,10 @@ void main() {
 
       expect(success, isFalse);
       expect(
-        container.read(memberRegistrationControllerProvider).errorMessage,
-        contains('ad, soyad'),
+        container.read(memberRegistrationControllerProvider).phoneError,
+        contains('Geçerli bir telefon'),
       );
+      expect(container.read(memberRegistrationControllerProvider).nameError, isNull);
     });
   });
 }

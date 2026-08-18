@@ -191,6 +191,9 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
                               child: AppTextField(
                                 label: 'Ad',
                                 controller: _firstNameController,
+                                errorText: widget.isNew
+                                    ? registrationState.nameError
+                                    : null,
                                 onChanged: controller.updateFirstName,
                               ),
                             ),
@@ -209,6 +212,9 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
                           label: 'Telefon',
                           keyboardType: TextInputType.phone,
                           controller: _phoneController,
+                          errorText: widget.isNew
+                              ? registrationState.phoneError
+                              : null,
                           onChanged: (value) => controller.updatePhoneDigits(
                             value.replaceAll(RegExp(r'[^0-9]'), ''),
                           ),
@@ -311,7 +317,13 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
                             constraints: const BoxConstraints(minHeight: 60),
                             decoration: BoxDecoration(
                               border: Border(
-                                bottom: BorderSide(color: colors.outline),
+                                bottom: BorderSide(
+                                  color:
+                                      widget.isNew &&
+                                          registrationState.trainerError != null
+                                      ? colors.error
+                                      : colors.outline,
+                                ),
                               ),
                             ),
                             child: Row(
@@ -355,6 +367,18 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
                             ),
                           ),
                         ),
+                        if (widget.isNew &&
+                            registrationState.trainerError != null)
+                          Padding(
+                            padding: const EdgeInsets.only(top: AppSpacing.xs),
+                            child: Text(
+                              registrationState.trainerError!,
+                              style: typography.bodyMedium.copyWith(
+                                color: colors.error,
+                                fontSize: 13,
+                              ),
+                            ),
+                          ),
                         Container(
                           constraints: const BoxConstraints(minHeight: 60),
                           child: Row(
@@ -433,8 +457,9 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
                             if (!await ensureSubscriptionAllowsWrite(
                               context,
                               ref,
-                            ))
+                            )) {
                               return;
+                            }
                             final success = await registrationController
                                 .submit();
                             if (success && mounted) {
