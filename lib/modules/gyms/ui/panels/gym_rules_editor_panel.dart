@@ -23,6 +23,7 @@ class GymRulesEditorPanel extends BasePanel {
 
 class _GymRulesEditorPanelState extends BasePanelState<GymRulesEditorPanel> {
   late final QuillController _controller;
+  final _editorFocusNode = FocusNode();
   bool _isSaving = false;
   String? _errorMessage;
 
@@ -157,21 +158,67 @@ class _GymRulesEditorPanelState extends BasePanelState<GymRulesEditorPanel> {
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(AppSpacing.screenEdge),
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(AppSpacing.lg),
-                  decoration: BoxDecoration(
-                    color: colors.surface,
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
-                    border: Border.all(
-                      color: colors.primary.withValues(alpha: 0.4),
+                child: GestureDetector(
+                  behavior: HitTestBehavior.translucent,
+                  onTapDown: (_) => _editorFocusNode.requestFocus(),
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(AppSpacing.lg),
+                    decoration: BoxDecoration(
+                      color: colors.surface,
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusCard,
+                      ),
+                      border: Border.all(
+                        color: colors.primary.withValues(alpha: 0.4),
+                      ),
                     ),
-                  ),
-                  child: QuillEditor.basic(
-                    controller: _controller,
-                    config: const QuillEditorConfig(
-                      expands: true,
-                      padding: EdgeInsets.zero,
+                    child: QuillEditor.basic(
+                      controller: _controller,
+                      focusNode: _editorFocusNode,
+                      config: QuillEditorConfig(
+                        expands: true,
+                        padding: EdgeInsets.zero,
+                        // Panel'in üstündeki global "dışarı tıklayınca
+                        // klavyeyi kapat" GestureDetector'ı (bkz.
+                        // panel_stack_view.dart) tap-up anında unfocus()
+                        // çağırıyor; Quill kendi odağını daha geç istediği
+                        // için buna yenik düşüyordu — odak burada tap-down
+                        // anında elle isteniyor (standart TextField'ın aynı
+                        // yarışı kazandığı yöntemle aynı).
+                        contextMenuBuilder: (context, rawEditorState) {
+                          final selection =
+                              rawEditorState.textEditingValue.selection;
+                          final buttonItems =
+                              EditableText.getEditableButtonItems(
+                                clipboardStatus: ClipboardStatus.pasteable,
+                                onCopy: () => rawEditorState.copySelection(
+                                  SelectionChangedCause.toolbar,
+                                ),
+                                onCut: selection.isCollapsed
+                                    ? null
+                                    : () => rawEditorState.cutSelection(
+                                        SelectionChangedCause.toolbar,
+                                      ),
+                                onPaste: () => rawEditorState.pasteText(
+                                  SelectionChangedCause.toolbar,
+                                ),
+                                onSelectAll: () => rawEditorState.selectAll(
+                                  SelectionChangedCause.toolbar,
+                                ),
+                                onLookUp: null,
+                                onSearchWeb: null,
+                                onShare: null,
+                                onLiveTextInput: null,
+                              );
+                          return TextFieldTapRegion(
+                            child: AdaptiveTextSelectionToolbar.buttonItems(
+                              anchors: rawEditorState.contextMenuAnchors,
+                              buttonItems: buttonItems,
+                            ),
+                          );
+                        },
+                      ),
                     ),
                   ),
                 ),
@@ -213,6 +260,7 @@ class _GymRulesEditorPanelState extends BasePanelState<GymRulesEditorPanel> {
   @override
   void dispose() {
     _controller.dispose();
+    _editorFocusNode.dispose();
     super.dispose();
   }
 }
