@@ -5,3 +5,8 @@ const gymMonthlySubscriptionProductId = 'egoractive_gym_monthly';
 const gymYearlySubscriptionProductId = 'egoractive_gym_yearly';
 
 const gymSubscriptionProductIds = {gymMonthlySubscriptionProductId, gymYearlySubscriptionProductId};
+
+/// `functions/src/shared/subscription-constants.ts`'teki `ANDROID_PACKAGE_NAME`
+/// ile birebir eşleşmeli — Play Store abonelik yönetimi derin bağlantısı
+/// (`SubscriptionPanel`'deki "Aboneliği yönet") için gerekiyor.
+const androidPackageName = 'com.egoragames.egoractive';

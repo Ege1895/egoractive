@@ -5,6 +5,8 @@ import { ANDROID_PACKAGE_NAME } from "./subscription-constants";
 export interface VerifiedSubscription {
   expiresAtMs: number;
   isActive: boolean;
+  /** Aboneliğin mağazadaki orijinal başlangıç tarihi — yenilemelerde değişmez. */
+  startAtMs: number;
 }
 
 const APPLE_PRODUCTION_VERIFY_URL = "https://buy.itunes.apple.com/verifyReceipt";
@@ -40,6 +42,7 @@ export async function verifyAppleReceipt(params: {
   const latestReceipts = (response.latest_receipt_info ?? []) as Array<{
     product_id: string;
     expires_date_ms: string;
+    original_purchase_date_ms: string;
   }>;
   const matching = latestReceipts
     .filter((entry) => entry.product_id === params.productId)
@@ -50,7 +53,8 @@ export async function verifyAppleReceipt(params: {
   }
 
   const expiresAtMs = Number(matching.expires_date_ms);
-  return { expiresAtMs, isActive: expiresAtMs > Date.now() };
+  const startAtMs = Number(matching.original_purchase_date_ms);
+  return { expiresAtMs, isActive: expiresAtMs > Date.now(), startAtMs };
 }
 
 async function fetchAppleVerify(url: string, body: string): Promise<{ status: number; latest_receipt_info?: unknown }> {
@@ -84,7 +88,8 @@ export async function verifyGooglePurchase(params: {
     throw new Error(`Google Play doğrulaması başarısız (HTTP ${res.status}).`);
   }
 
-  const data = (await res.json()) as { expiryTimeMillis: string };
+  const data = (await res.json()) as { expiryTimeMillis: string; startTimeMillis: string };
   const expiresAtMs = Number(data.expiryTimeMillis);
-  return { expiresAtMs, isActive: expiresAtMs > Date.now() };
+  const startAtMs = Number(data.startTimeMillis);
+  return { expiresAtMs, isActive: expiresAtMs > Date.now(), startAtMs };
 }

@@ -23,25 +23,44 @@ Stream<SubscriptionState> _subscriptionStateForGym(_SubscriptionStateForGymRef r
 class SubscriptionController extends _$SubscriptionController {
   StreamSubscription<List<PurchaseDetails>>? _purchaseSub;
 
+  // Firestore'dan gelen her yeni doküman anlık görüntüsü build()'i tekrar
+  // çalıştırıp SubscriptionState'i sıfırdan üretiyor — isPurchasing/
+  // pendingProductId bu akışın parçası değil (gyms/{gymId} dokümanında
+  // yok), bu yüzden ayrı örnek alanlarında tutulup her build()'de geri
+  // bindiriliyor; yoksa satın alma sürerken gelen alakasız bir Firestore
+  // güncellemesi "mağaza bekleniyor" ekranını sıfırlardı.
+  bool _isPurchasing = false;
+  String? _pendingProductId;
+
   @override
   SubscriptionState build() {
     ref.onDispose(() => _purchaseSub?.cancel());
     _purchaseSub ??= ref.watch(subscriptionRepositoryProvider).purchaseUpdates.listen(_onPurchaseUpdate);
 
     final gymId = ref.watch(activeGymIdProvider).valueOrNull;
-    if (gymId == null) return const SubscriptionState();
-    return ref.watch(_subscriptionStateForGymProvider(gymId)).valueOrNull ?? const SubscriptionState();
+    final base = gymId == null
+        ? const SubscriptionState()
+        : ref.watch(_subscriptionStateForGymProvider(gymId)).valueOrNull ?? const SubscriptionState();
+    return base.copyWith(isPurchasing: _isPurchasing, pendingProductId: _pendingProductId);
   }
 
   Future<List<SubscriptionProduct>> fetchProducts() => ref.read(subscriptionRepositoryProvider).fetchProducts();
 
+  /// `isPurchasing`, satın alma sadece başlatılırken değil — mağaza
+  /// penceresi açıkken sonuç [_onPurchaseUpdate] üzerinden gelene kadar
+  /// (satın alındı/geri yüklendi/hata/iptal) `true` kalır, ekran "mağaza
+  /// bekleniyor" durumunu bu süre boyunca göstersin diye.
   Future<void> purchase(String productId) async {
-    if (state.isPurchasing) return;
-    state = state.copyWith(isPurchasing: true);
+    if (_isPurchasing) return;
+    _isPurchasing = true;
+    _pendingProductId = productId;
+    state = state.copyWith(isPurchasing: true, pendingProductId: productId);
     try {
       await ref.read(subscriptionRepositoryProvider).buySubscription(productId);
-    } finally {
-      state = state.copyWith(isPurchasing: false);
+    } catch (_) {
+      _isPurchasing = false;
+      _pendingProductId = null;
+      state = state.copyWith(isPurchasing: false, pendingProductId: null);
     }
   }
 
@@ -55,8 +74,14 @@ class SubscriptionController extends _$SubscriptionController {
           await repo.verifyPurchase(gymId: gymId, purchase: purchase);
         }
         await repo.completePurchase(purchase);
+        _isPurchasing = false;
+        _pendingProductId = null;
+        state = state.copyWith(isPurchasing: false, pendingProductId: null);
       } else if (purchase.status == PurchaseStatus.error || purchase.status == PurchaseStatus.canceled) {
         await repo.completePurchase(purchase);
+        _isPurchasing = false;
+        _pendingProductId = null;
+        state = state.copyWith(isPurchasing: false, pendingProductId: null);
       }
     }
   }
