@@ -14,12 +14,18 @@ import '../../service/sessions_write_service.dart';
 
 /// F3-3 — "+ Seans": üye + antrenör + tarih/saat seçip `sessions`
 /// koleksiyonuna gerçek bir doküman yazar.
-Future<void> showCreateSessionSheet(BuildContext context, WidgetRef ref, DateTime initialDate) {
+Future<void> showCreateSessionSheet(
+  BuildContext context,
+  WidgetRef ref,
+  DateTime initialDate,
+) {
   return showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
     backgroundColor: context.appColors.surface,
-    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+    ),
     builder: (sheetContext) => _CreateSessionSheet(initialDate: initialDate),
   );
 }
@@ -38,12 +44,34 @@ Future<void> showRescheduleSessionSheet(
     lastDate: DateTime.now().add(const Duration(days: 365)),
   );
   if (date == null || !context.mounted) return;
-  final time = await showTimePicker(context: context, initialTime: TimeOfDay.fromDateTime(currentStart));
-  if (time == null) return;
-  await ref.read(sessionsWriteServiceProvider).rescheduleSession(
-        sessionId,
-        DateTime(date.year, date.month, date.day, time.hour, time.minute),
+  final time = await showTimePicker(
+    context: context,
+    initialTime: TimeOfDay.fromDateTime(currentStart),
+  );
+  if (time == null || !context.mounted) return;
+
+  showDialog<void>(
+    context: context,
+    barrierDismissible: false,
+    builder: (_) => const Center(child: CircularProgressIndicator()),
+  );
+  try {
+    await ref
+        .read(sessionsWriteServiceProvider)
+        .rescheduleSession(
+          sessionId,
+          DateTime(date.year, date.month, date.day, time.hour, time.minute),
+        );
+  } catch (_) {
+    if (context.mounted) {
+      Navigator.of(context, rootNavigator: true).pop();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Seans ertelenemedi, tekrar dene.')),
       );
+    }
+    return;
+  }
+  if (context.mounted) Navigator.of(context, rootNavigator: true).pop();
 }
 
 class _CreateSessionSheet extends ConsumerStatefulWidget {
@@ -52,7 +80,8 @@ class _CreateSessionSheet extends ConsumerStatefulWidget {
   final DateTime initialDate;
 
   @override
-  ConsumerState<_CreateSessionSheet> createState() => _CreateSessionSheetState();
+  ConsumerState<_CreateSessionSheet> createState() =>
+      _CreateSessionSheetState();
 }
 
 class _CreateSessionSheetState extends ConsumerState<_CreateSessionSheet> {
@@ -60,11 +89,52 @@ class _CreateSessionSheetState extends ConsumerState<_CreateSessionSheet> {
   TimeOfDay _time = const TimeOfDay(hour: 18, minute: 0);
   AdminMemberSummary? _member;
   AdminTrainerSummary? _trainer;
+  bool _isCreating = false;
+  String? _errorMessage;
 
   @override
   void initState() {
     super.initState();
     _date = widget.initialDate;
+  }
+
+  Future<void> _create() async {
+    if (!await ensureSubscriptionAllowsWrite(context, ref)) return;
+    setState(() {
+      _isCreating = true;
+      _errorMessage = null;
+    });
+    try {
+      final gymId = await ref.read(activeGymIdProvider.future);
+      if (gymId == null) {
+        throw StateError('Aktif salon bulunamadı.');
+      }
+      await ref
+          .read(sessionsWriteServiceProvider)
+          .createSession(
+            gymId: gymId,
+            trainerId: _trainer!.id,
+            trainerName: _trainer!.name,
+            memberId: _member!.id,
+            memberName: _member!.name,
+            startTime: DateTime(
+              _date.year,
+              _date.month,
+              _date.day,
+              _time.hour,
+              _time.minute,
+            ),
+          );
+    } catch (_) {
+      if (mounted) {
+        setState(() {
+          _isCreating = false;
+          _errorMessage = 'Seans oluşturulamadı, tekrar dene.';
+        });
+      }
+      return;
+    }
+    if (mounted) Navigator.of(context).pop();
   }
 
   @override
@@ -75,12 +145,23 @@ class _CreateSessionSheetState extends ConsumerState<_CreateSessionSheet> {
     final trainers = ref.watch(adminTrainersControllerProvider);
 
     return Padding(
-      padding: EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.lg, AppSpacing.lg, AppSpacing.lg + MediaQuery.of(context).viewInsets.bottom),
+      padding: EdgeInsets.fromLTRB(
+        AppSpacing.lg,
+        AppSpacing.lg,
+        AppSpacing.lg,
+        AppSpacing.lg + MediaQuery.of(context).viewInsets.bottom,
+      ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Yeni seans', style: typography.headingMedium.copyWith(color: colors.onSurface, fontSize: 20)),
+          Text(
+            'Yeni seans',
+            style: typography.headingMedium.copyWith(
+              color: colors.onSurface,
+              fontSize: 20,
+            ),
+          ),
           const SizedBox(height: AppSpacing.lg),
           _PickerRow(
             label: 'Üye',
@@ -122,29 +203,29 @@ class _CreateSessionSheetState extends ConsumerState<_CreateSessionSheet> {
             label: 'Saat',
             value: _time.format(context),
             onTap: () async {
-              final picked = await showTimePicker(context: context, initialTime: _time);
+              final picked = await showTimePicker(
+                context: context,
+                initialTime: _time,
+              );
               if (picked != null) setState(() => _time = picked);
             },
           ),
           const SizedBox(height: AppSpacing.lg),
+          if (_errorMessage != null) ...[
+            Text(
+              _errorMessage!,
+              style: typography.bodyMedium.copyWith(
+                color: colors.error,
+                fontSize: 13,
+              ),
+            ),
+            const SizedBox(height: AppSpacing.sm),
+          ],
           AppButton(
-            label: 'Oluştur',
-            onPressed: _member == null || _trainer == null
+            label: _isCreating ? 'Oluşturuluyor…' : 'Oluştur',
+            onPressed: _member == null || _trainer == null || _isCreating
                 ? null
-                : () async {
-                    if (!await ensureSubscriptionAllowsWrite(context, ref)) return;
-                    final gymId = await ref.read(activeGymIdProvider.future);
-                    if (gymId == null) return;
-                    await ref.read(sessionsWriteServiceProvider).createSession(
-                          gymId: gymId,
-                          trainerId: _trainer!.id,
-                          trainerName: _trainer!.name,
-                          memberId: _member!.id,
-                          memberName: _member!.name,
-                          startTime: DateTime(_date.year, _date.month, _date.day, _time.hour, _time.minute),
-                        );
-                    if (context.mounted) Navigator.of(context).pop();
-                  },
+                : _create,
           ),
         ],
       ),
@@ -161,7 +242,9 @@ class _CreateSessionSheetState extends ConsumerState<_CreateSessionSheet> {
     showModalBottomSheet<void>(
       context: context,
       backgroundColor: colors.surface,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
       builder: (sheetContext) => SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.lg),
@@ -169,7 +252,13 @@ class _CreateSessionSheetState extends ConsumerState<_CreateSessionSheet> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(title, style: context.appTypography.headingMedium.copyWith(color: colors.onSurface, fontSize: 20)),
+              Text(
+                title,
+                style: context.appTypography.headingMedium.copyWith(
+                  color: colors.onSurface,
+                  fontSize: 20,
+                ),
+              ),
               const SizedBox(height: AppSpacing.md),
               for (final item in items)
                 InkWell(
@@ -180,7 +269,13 @@ class _CreateSessionSheetState extends ConsumerState<_CreateSessionSheet> {
                   child: Container(
                     constraints: const BoxConstraints(minHeight: 52),
                     alignment: Alignment.centerLeft,
-                    child: Text(labelOf(item), style: context.appTypography.bodyLarge.copyWith(color: colors.onSurface, fontSize: 15)),
+                    child: Text(
+                      labelOf(item),
+                      style: context.appTypography.bodyLarge.copyWith(
+                        color: colors.onSurface,
+                        fontSize: 15,
+                      ),
+                    ),
                   ),
                 ),
             ],
@@ -192,7 +287,11 @@ class _CreateSessionSheetState extends ConsumerState<_CreateSessionSheet> {
 }
 
 class _PickerRow extends StatelessWidget {
-  const _PickerRow({required this.label, required this.value, required this.onTap});
+  const _PickerRow({
+    required this.label,
+    required this.value,
+    required this.onTap,
+  });
 
   final String label;
   final String value;
@@ -208,11 +307,28 @@ class _PickerRow extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
         constraints: const BoxConstraints(minHeight: 52),
-        decoration: BoxDecoration(color: colors.surfaceRaised, borderRadius: BorderRadius.circular(AppSpacing.radiusInner)),
+        decoration: BoxDecoration(
+          color: colors.surfaceRaised,
+          borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+        ),
         child: Row(
           children: [
-            Expanded(child: Text(label, style: typography.bodyLarge.copyWith(color: colors.onSurfaceVariant, fontSize: 15))),
-            Text(value, style: typography.headingSmall.copyWith(color: colors.onSurface, fontSize: 15)),
+            Expanded(
+              child: Text(
+                label,
+                style: typography.bodyLarge.copyWith(
+                  color: colors.onSurfaceVariant,
+                  fontSize: 15,
+                ),
+              ),
+            ),
+            Text(
+              value,
+              style: typography.headingSmall.copyWith(
+                color: colors.onSurface,
+                fontSize: 15,
+              ),
+            ),
             const SizedBox(width: AppSpacing.xs),
             Icon(Icons.chevron_right, color: colors.onSurfaceMuted, size: 18),
           ],
