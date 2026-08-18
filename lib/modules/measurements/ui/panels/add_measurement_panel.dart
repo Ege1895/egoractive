@@ -16,11 +16,14 @@ class AddMeasurementPanel extends BasePanel {
   const AddMeasurementPanel({super.key});
 
   @override
-  ConsumerState<AddMeasurementPanel> createState() => _AddMeasurementPanelState();
+  ConsumerState<AddMeasurementPanel> createState() =>
+      _AddMeasurementPanelState();
 }
 
 class _AddMeasurementPanelState extends BasePanelState<AddMeasurementPanel> {
   late final Map<MeasurementMetric, TextEditingController> _controllers;
+  bool _isSaving = false;
+  String? _errorMessage;
 
   @override
   void initState() {
@@ -28,7 +31,11 @@ class _AddMeasurementPanelState extends BasePanelState<AddMeasurementPanel> {
     final points = ref.read(measurementsControllerProvider).points;
     _controllers = {
       for (final metric in MeasurementMetric.values)
-        metric: TextEditingController(text: metric == MeasurementMetric.bacak ? '' : points[metric]?.value ?? ''),
+        metric: TextEditingController(
+          text: metric == MeasurementMetric.bacak
+              ? ''
+              : points[metric]?.value ?? '',
+        ),
     };
   }
 
@@ -43,21 +50,43 @@ class _AddMeasurementPanelState extends BasePanelState<AddMeasurementPanel> {
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.md, AppSpacing.screenEdge, 0),
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.screenEdge,
+                AppSpacing.md,
+                AppSpacing.screenEdge,
+                0,
+              ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('Yeni ölçüm', style: typography.headingSmall.copyWith(color: colors.onSurface, fontSize: 18)),
+                  Text(
+                    'Yeni ölçüm',
+                    style: typography.headingSmall.copyWith(
+                      color: colors.onSurface,
+                      fontSize: 18,
+                    ),
+                  ),
                   GestureDetector(
-                    onTap: () => ref.read(panelStackControllerProvider.notifier).pop(),
-                    child: Text('Vazgeç', style: typography.bodyMedium.copyWith(color: colors.onSurfaceVariant)),
+                    onTap: () =>
+                        ref.read(panelStackControllerProvider.notifier).pop(),
+                    child: Text(
+                      'Vazgeç',
+                      style: typography.bodyMedium.copyWith(
+                        color: colors.onSurfaceVariant,
+                      ),
+                    ),
                   ),
                 ],
               ),
             ),
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.md, AppSpacing.screenEdge, AppSpacing.lg),
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.screenEdge,
+                  AppSpacing.md,
+                  AppSpacing.screenEdge,
+                  AppSpacing.lg,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -65,7 +94,9 @@ class _AddMeasurementPanelState extends BasePanelState<AddMeasurementPanel> {
                       padding: const EdgeInsets.all(AppSpacing.lg),
                       decoration: BoxDecoration(
                         color: colors.surface,
-                        borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
+                        borderRadius: BorderRadius.circular(
+                          AppSpacing.radiusCard,
+                        ),
                         border: Border.all(color: colors.outline),
                       ),
                       child: Row(
@@ -74,43 +105,81 @@ class _AddMeasurementPanelState extends BasePanelState<AddMeasurementPanel> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('Ölçüm tarihi', style: typography.caption.copyWith(color: colors.onSurfaceMuted)),
-                                Text('3 Ağustos 2026', style: typography.headingSmall.copyWith(color: colors.onSurface, fontSize: 17)),
+                                Text(
+                                  'Ölçüm tarihi',
+                                  style: typography.caption.copyWith(
+                                    color: colors.onSurfaceMuted,
+                                  ),
+                                ),
+                                Text(
+                                  '3 Ağustos 2026',
+                                  style: typography.headingSmall.copyWith(
+                                    color: colors.onSurface,
+                                    fontSize: 17,
+                                  ),
+                                ),
                               ],
                             ),
                           ),
                           const SizedBox(width: AppSpacing.sm),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: AppSpacing.md,
+                            ),
                             constraints: const BoxConstraints(minHeight: 44),
                             alignment: Alignment.center,
                             decoration: BoxDecoration(
                               color: colors.surfaceRaised,
-                              borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+                              borderRadius: BorderRadius.circular(
+                                AppSpacing.radiusInner,
+                              ),
                             ),
-                            child: Text('Değiştir', style: typography.headingSmall.copyWith(color: colors.onSurfaceVariant, fontSize: 14)),
+                            child: Text(
+                              'Değiştir',
+                              style: typography.headingSmall.copyWith(
+                                color: colors.onSurfaceVariant,
+                                fontSize: 14,
+                              ),
+                            ),
                           ),
                         ],
                       ),
                     ),
                     const SizedBox(height: AppSpacing.lg),
-                    Text('ÖLÇÜLER', style: typography.caption.copyWith(color: colors.onSurfaceMuted, letterSpacing: 1.2)),
+                    Text(
+                      'ÖLÇÜLER',
+                      style: typography.caption.copyWith(
+                        color: colors.onSurfaceMuted,
+                        letterSpacing: 1.2,
+                      ),
+                    ),
                     const SizedBox(height: AppSpacing.sm),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.lg,
+                      ),
                       decoration: BoxDecoration(
                         color: colors.surface,
-                        borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
+                        borderRadius: BorderRadius.circular(
+                          AppSpacing.radiusCard,
+                        ),
                         border: Border.all(color: colors.outline),
                       ),
                       child: Column(
                         children: [
-                          for (var i = 0; i < MeasurementMetric.values.length; i++)
+                          for (
+                            var i = 0;
+                            i < MeasurementMetric.values.length;
+                            i++
+                          )
                             _MeasurementField(
                               metric: MeasurementMetric.values[i],
-                              lastValueLabel: points[MeasurementMetric.values[i]]?.value,
-                              controller: _controllers[MeasurementMetric.values[i]]!,
-                              showDivider: i < MeasurementMetric.values.length - 1,
+                              lastValueLabel:
+                                  points[MeasurementMetric.values[i]]?.value,
+                              controller:
+                                  _controllers[MeasurementMetric.values[i]]!,
+                              showDivider:
+                                  i < MeasurementMetric.values.length - 1,
                             ),
                         ],
                       ),
@@ -120,12 +189,19 @@ class _AddMeasurementPanelState extends BasePanelState<AddMeasurementPanel> {
                       padding: const EdgeInsets.all(AppSpacing.md),
                       decoration: BoxDecoration(
                         color: colors.primaryContainer,
-                        borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
-                        border: Border.all(color: colors.primary.withValues(alpha: 0.22)),
+                        borderRadius: BorderRadius.circular(
+                          AppSpacing.radiusInner,
+                        ),
+                        border: Border.all(
+                          color: colors.primary.withValues(alpha: 0.22),
+                        ),
                       ),
                       child: Text(
                         'Ölçüyü boş bırakırsan o nokta bu kayıtta atlanır, grafiğinde kırılma olmaz.',
-                        style: typography.bodyMedium.copyWith(color: colors.onSurfaceVariant, fontSize: 14),
+                        style: typography.bodyMedium.copyWith(
+                          color: colors.onSurfaceVariant,
+                          fontSize: 14,
+                        ),
                       ),
                     ),
                   ],
@@ -133,9 +209,35 @@ class _AddMeasurementPanelState extends BasePanelState<AddMeasurementPanel> {
               ),
             ),
             Container(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.md, AppSpacing.screenEdge, AppSpacing.xl),
-              decoration: BoxDecoration(color: colors.background, border: Border(top: BorderSide(color: colors.outline))),
-              child: AppButton(label: 'Kaydet', onPressed: _save),
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.screenEdge,
+                AppSpacing.md,
+                AppSpacing.screenEdge,
+                AppSpacing.xl,
+              ),
+              decoration: BoxDecoration(
+                color: colors.background,
+                border: Border(top: BorderSide(color: colors.outline)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (_errorMessage != null) ...[
+                    Text(
+                      _errorMessage!,
+                      style: typography.bodyMedium.copyWith(
+                        color: colors.error,
+                        fontSize: 13,
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                  ],
+                  AppButton(
+                    label: _isSaving ? 'Kaydediliyor…' : 'Kaydet',
+                    onPressed: _isSaving ? null : _save,
+                  ),
+                ],
+              ),
             ),
           ],
         ),
@@ -150,9 +252,23 @@ class _AddMeasurementPanelState extends BasePanelState<AddMeasurementPanel> {
       final parsed = double.tryParse(raw);
       if (parsed != null) values[entry.key] = parsed;
     }
-    await ref.read(measurementsControllerProvider.notifier).addMeasurement(values);
-    if (!mounted) return;
-    ref.read(panelStackControllerProvider.notifier).pop();
+    setState(() {
+      _isSaving = true;
+      _errorMessage = null;
+    });
+    try {
+      await ref
+          .read(measurementsControllerProvider.notifier)
+          .addMeasurement(values);
+      if (mounted) ref.read(panelStackControllerProvider.notifier).pop();
+    } catch (_) {
+      if (mounted) {
+        setState(() {
+          _isSaving = false;
+          _errorMessage = 'Ölçüm kaydedilemedi, tekrar dene.';
+        });
+      }
+    }
   }
 
   @override
@@ -185,7 +301,9 @@ class _MeasurementField extends StatelessWidget {
     return Container(
       constraints: const BoxConstraints(minHeight: 60),
       decoration: BoxDecoration(
-        border: showDivider ? Border(bottom: BorderSide(color: colors.outline)) : null,
+        border: showDivider
+            ? Border(bottom: BorderSide(color: colors.outline))
+            : null,
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -194,10 +312,21 @@ class _MeasurementField extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(metric.label, style: typography.bodyLarge.copyWith(color: colors.onSurface, fontSize: 15)),
                 Text(
-                  lastValueLabel == null ? 'İlk ölçüm' : 'Son: $lastValueLabel cm',
-                  style: typography.caption.copyWith(color: colors.onSurfaceMuted, fontSize: 12),
+                  metric.label,
+                  style: typography.bodyLarge.copyWith(
+                    color: colors.onSurface,
+                    fontSize: 15,
+                  ),
+                ),
+                Text(
+                  lastValueLabel == null
+                      ? 'İlk ölçüm'
+                      : 'Son: $lastValueLabel cm',
+                  style: typography.caption.copyWith(
+                    color: colors.onSurfaceMuted,
+                    fontSize: 12,
+                  ),
                 ),
               ],
             ),
@@ -211,7 +340,9 @@ class _MeasurementField extends StatelessWidget {
               color: colors.surfaceRaised,
               borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
               border: Border.all(
-                color: controller.text.isEmpty ? colors.outline : colors.primary.withValues(alpha: 0.5),
+                color: controller.text.isEmpty
+                    ? colors.outline
+                    : colors.primary.withValues(alpha: 0.5),
               ),
             ),
             child: Row(
@@ -220,9 +351,16 @@ class _MeasurementField extends StatelessWidget {
                   child: TextField(
                     controller: controller,
                     textAlign: TextAlign.right,
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                    inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9,.]'))],
-                    style: typography.dataSmall.copyWith(fontSize: 17, color: colors.onSurface),
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
+                    inputFormatters: [
+                      FilteringTextInputFormatter.allow(RegExp(r'[0-9,.]')),
+                    ],
+                    style: typography.dataSmall.copyWith(
+                      fontSize: 17,
+                      color: colors.onSurface,
+                    ),
                     decoration: const InputDecoration(
                       isDense: true,
                       border: InputBorder.none,
@@ -231,7 +369,12 @@ class _MeasurementField extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 4),
-                Text('cm', style: typography.caption.copyWith(color: colors.onSurfaceMuted)),
+                Text(
+                  'cm',
+                  style: typography.caption.copyWith(
+                    color: colors.onSurfaceMuted,
+                  ),
+                ),
               ],
             ),
           ),

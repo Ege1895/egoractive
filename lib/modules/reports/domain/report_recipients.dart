@@ -9,5 +9,7 @@ class ReportRecipients with _$ReportRecipients {
   const factory ReportRecipients({
     @Default('') String gymReportEmail,
     @Default('') String accountingReportEmail,
+    @Default(false) bool isSaving,
+    String? errorMessage,
   }) = _ReportRecipients;
 }

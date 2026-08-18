@@ -21,12 +21,23 @@ class FeedbackController extends _$FeedbackController {
 
   Future<void> submit() async {
     if (state.rating == 0 || state.isSubmitting) return;
-    state = state.copyWith(isSubmitting: true);
-    await ref.read(feedbackRepositoryProvider).submit(rating: state.rating, comment: state.comment);
-    await ref.read(analyticsServiceProvider).logEvent(
-      AnalyticsEvent.feedbackSubmitted,
-      parameters: {'rating': state.rating},
-    );
-    state = state.copyWith(isSubmitting: false, isSubmitted: true);
+    state = state.copyWith(isSubmitting: true, errorMessage: null);
+    try {
+      await ref
+          .read(feedbackRepositoryProvider)
+          .submit(rating: state.rating, comment: state.comment);
+      await ref
+          .read(analyticsServiceProvider)
+          .logEvent(
+            AnalyticsEvent.feedbackSubmitted,
+            parameters: {'rating': state.rating},
+          );
+      state = state.copyWith(isSubmitting: false, isSubmitted: true);
+    } catch (_) {
+      state = state.copyWith(
+        isSubmitting: false,
+        errorMessage: 'Gönderilemedi, tekrar dener misin?',
+      );
+    }
   }
 }

@@ -21,6 +21,7 @@ mixin _$FeedbackState {
   String get comment => throw _privateConstructorUsedError;
   bool get isSubmitting => throw _privateConstructorUsedError;
   bool get isSubmitted => throw _privateConstructorUsedError;
+  String? get errorMessage => throw _privateConstructorUsedError;
 
   /// Create a copy of FeedbackState
   /// with the given fields replaced by the non-null parameter values.
@@ -36,7 +37,13 @@ abstract class $FeedbackStateCopyWith<$Res> {
     $Res Function(FeedbackState) then,
   ) = _$FeedbackStateCopyWithImpl<$Res, FeedbackState>;
   @useResult
-  $Res call({int rating, String comment, bool isSubmitting, bool isSubmitted});
+  $Res call({
+    int rating,
+    String comment,
+    bool isSubmitting,
+    bool isSubmitted,
+    String? errorMessage,
+  });
 }
 
 /// @nodoc
@@ -58,6 +65,7 @@ class _$FeedbackStateCopyWithImpl<$Res, $Val extends FeedbackState>
     Object? comment = null,
     Object? isSubmitting = null,
     Object? isSubmitted = null,
+    Object? errorMessage = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -77,6 +85,10 @@ class _$FeedbackStateCopyWithImpl<$Res, $Val extends FeedbackState>
                 ? _value.isSubmitted
                 : isSubmitted // ignore: cast_nullable_to_non_nullable
                       as bool,
+            errorMessage: freezed == errorMessage
+                ? _value.errorMessage
+                : errorMessage // ignore: cast_nullable_to_non_nullable
+                      as String?,
           )
           as $Val,
     );
@@ -92,7 +104,13 @@ abstract class _$$FeedbackStateImplCopyWith<$Res>
   ) = __$$FeedbackStateImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({int rating, String comment, bool isSubmitting, bool isSubmitted});
+  $Res call({
+    int rating,
+    String comment,
+    bool isSubmitting,
+    bool isSubmitted,
+    String? errorMessage,
+  });
 }
 
 /// @nodoc
@@ -113,6 +131,7 @@ class __$$FeedbackStateImplCopyWithImpl<$Res>
     Object? comment = null,
     Object? isSubmitting = null,
     Object? isSubmitted = null,
+    Object? errorMessage = freezed,
   }) {
     return _then(
       _$FeedbackStateImpl(
@@ -132,6 +151,10 @@ class __$$FeedbackStateImplCopyWithImpl<$Res>
             ? _value.isSubmitted
             : isSubmitted // ignore: cast_nullable_to_non_nullable
                   as bool,
+        errorMessage: freezed == errorMessage
+            ? _value.errorMessage
+            : errorMessage // ignore: cast_nullable_to_non_nullable
+                  as String?,
       ),
     );
   }
@@ -145,6 +168,7 @@ class _$FeedbackStateImpl implements _FeedbackState {
     this.comment = '',
     this.isSubmitting = false,
     this.isSubmitted = false,
+    this.errorMessage,
   });
 
   @override
@@ -159,10 +183,12 @@ class _$FeedbackStateImpl implements _FeedbackState {
   @override
   @JsonKey()
   final bool isSubmitted;
+  @override
+  final String? errorMessage;
 
   @override
   String toString() {
-    return 'FeedbackState(rating: $rating, comment: $comment, isSubmitting: $isSubmitting, isSubmitted: $isSubmitted)';
+    return 'FeedbackState(rating: $rating, comment: $comment, isSubmitting: $isSubmitting, isSubmitted: $isSubmitted, errorMessage: $errorMessage)';
   }
 
   @override
@@ -175,12 +201,20 @@ class _$FeedbackStateImpl implements _FeedbackState {
             (identical(other.isSubmitting, isSubmitting) ||
                 other.isSubmitting == isSubmitting) &&
             (identical(other.isSubmitted, isSubmitted) ||
-                other.isSubmitted == isSubmitted));
+                other.isSubmitted == isSubmitted) &&
+            (identical(other.errorMessage, errorMessage) ||
+                other.errorMessage == errorMessage));
   }
 
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, rating, comment, isSubmitting, isSubmitted);
+  int get hashCode => Object.hash(
+    runtimeType,
+    rating,
+    comment,
+    isSubmitting,
+    isSubmitted,
+    errorMessage,
+  );
 
   /// Create a copy of FeedbackState
   /// with the given fields replaced by the non-null parameter values.
@@ -197,6 +231,7 @@ abstract class _FeedbackState implements FeedbackState {
     final String comment,
     final bool isSubmitting,
     final bool isSubmitted,
+    final String? errorMessage,
   }) = _$FeedbackStateImpl;
 
   @override
@@ -207,6 +242,8 @@ abstract class _FeedbackState implements FeedbackState {
   bool get isSubmitting;
   @override
   bool get isSubmitted;
+  @override
+  String? get errorMessage;
 
   /// Create a copy of FeedbackState
   /// with the given fields replaced by the non-null parameter values.

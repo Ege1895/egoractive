@@ -35,12 +35,18 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
     super.initState();
     final profile = ref.read(gymProfileControllerProvider);
     _nameController = TextEditingController(text: profile.name);
-    _addressController = TextEditingController(text: '${profile.address}, ${profile.city}');
+    _addressController = TextEditingController(
+      text: '${profile.address}, ${profile.city}',
+    );
     _phoneController = TextEditingController(text: profile.phone);
 
     final recipients = ref.read(reportRecipientsControllerProvider);
-    _gymReportEmailController = TextEditingController(text: recipients.gymReportEmail);
-    _accountingReportEmailController = TextEditingController(text: recipients.accountingReportEmail);
+    _gymReportEmailController = TextEditingController(
+      text: recipients.gymReportEmail,
+    );
+    _accountingReportEmailController = TextEditingController(
+      text: recipients.accountingReportEmail,
+    );
   }
 
   @override
@@ -48,6 +54,7 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
     final colors = context.appColors;
     final typography = context.appTypography;
     final profileController = ref.read(gymProfileControllerProvider.notifier);
+    final recipientsState = ref.watch(reportRecipientsControllerProvider);
     final themeState = ref.watch(gymThemeControllerProvider);
     final themeController = ref.read(gymThemeControllerProvider.notifier);
     final active = themeController.activeTheme;
@@ -58,32 +65,61 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.md, AppSpacing.screenEdge, 0),
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.screenEdge,
+                AppSpacing.md,
+                AppSpacing.screenEdge,
+                0,
+              ),
               child: Row(
                 children: [
-                  AppBackButton(onTap: () => ref.read(panelStackControllerProvider.notifier).pop()),
+                  AppBackButton(
+                    onTap: () =>
+                        ref.read(panelStackControllerProvider.notifier).pop(),
+                  ),
                   const SizedBox(width: AppSpacing.md),
-                  Text('Salon bilgileri', style: typography.headingSmall.copyWith(color: colors.onSurface, fontSize: 18)),
+                  Text(
+                    'Salon bilgileri',
+                    style: typography.headingSmall.copyWith(
+                      color: colors.onSurface,
+                      fontSize: 18,
+                    ),
+                  ),
                 ],
               ),
             ),
             Expanded(
               child: ListView(
-                padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.md, AppSpacing.screenEdge, AppSpacing.lg),
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.screenEdge,
+                  AppSpacing.md,
+                  AppSpacing.screenEdge,
+                  AppSpacing.lg,
+                ),
                 children: [
                   Container(
                     padding: const EdgeInsets.all(AppSpacing.lg),
                     decoration: BoxDecoration(
                       color: colors.surface,
-                      borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusCard,
+                      ),
                       border: Border.all(color: colors.outline),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        AppTextField(label: 'Salon adı', controller: _nameController, onChanged: profileController.updateName),
+                        AppTextField(
+                          label: 'Salon adı',
+                          controller: _nameController,
+                          onChanged: profileController.updateName,
+                        ),
                         const SizedBox(height: AppSpacing.md),
-                        AppTextField(label: 'Adres', controller: _addressController, onChanged: profileController.updateAddress),
+                        AppTextField(
+                          label: 'Adres',
+                          controller: _addressController,
+                          onChanged: profileController.updateAddress,
+                        ),
                         const SizedBox(height: AppSpacing.md),
                         AppTextField(
                           label: 'Telefon',
@@ -95,13 +131,21 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
                     ),
                   ),
                   const SizedBox(height: AppSpacing.lg),
-                  Text('LOGO', style: typography.caption.copyWith(color: colors.onSurfaceMuted, letterSpacing: 1.2)),
+                  Text(
+                    'LOGO',
+                    style: typography.caption.copyWith(
+                      color: colors.onSurfaceMuted,
+                      letterSpacing: 1.2,
+                    ),
+                  ),
                   const SizedBox(height: AppSpacing.sm),
                   Container(
                     padding: const EdgeInsets.all(AppSpacing.lg),
                     decoration: BoxDecoration(
                       color: colors.surface,
-                      borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusCard,
+                      ),
                       border: Border.all(color: colors.outline),
                     ),
                     child: Row(
@@ -111,30 +155,54 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
                           height: 72,
                           decoration: BoxDecoration(
                             color: colors.surfaceRaised,
-                            borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+                            borderRadius: BorderRadius.circular(
+                              AppSpacing.radiusInner,
+                            ),
                             border: Border.all(color: colors.outlineStrong),
                           ),
                           alignment: Alignment.center,
-                          child: Icon(Icons.image_outlined, color: colors.onSurfaceMuted),
+                          child: Icon(
+                            Icons.image_outlined,
+                            color: colors.onSurfaceMuted,
+                          ),
                         ),
                         const SizedBox(width: AppSpacing.md),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('Kare, en az 512×512 px PNG yükleyin.', style: typography.bodyMedium.copyWith(color: colors.onSurfaceVariant)),
+                              Text(
+                                'Kare, en az 512×512 px PNG yükleyin.',
+                                style: typography.bodyMedium.copyWith(
+                                  color: colors.onSurfaceVariant,
+                                ),
+                              ),
                               const SizedBox(height: AppSpacing.sm),
                               Material(
                                 color: colors.surfaceRaised,
-                                borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+                                borderRadius: BorderRadius.circular(
+                                  AppSpacing.radiusInner,
+                                ),
                                 child: InkWell(
                                   onTap: () {},
-                                  borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+                                  borderRadius: BorderRadius.circular(
+                                    AppSpacing.radiusInner,
+                                  ),
                                   child: Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-                                    constraints: const BoxConstraints(minHeight: 40),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: AppSpacing.md,
+                                    ),
+                                    constraints: const BoxConstraints(
+                                      minHeight: 40,
+                                    ),
                                     alignment: Alignment.centerLeft,
-                                    child: Text('Logoyu değiştir', style: typography.headingSmall.copyWith(fontSize: 14, color: colors.onSurfaceVariant)),
+                                    child: Text(
+                                      'Logoyu değiştir',
+                                      style: typography.headingSmall.copyWith(
+                                        fontSize: 14,
+                                        color: colors.onSurfaceVariant,
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ),
@@ -145,13 +213,21 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
                     ),
                   ),
                   const SizedBox(height: AppSpacing.lg),
-                  Text('TEMA RENGİ', style: typography.caption.copyWith(color: colors.onSurfaceMuted, letterSpacing: 1.2)),
+                  Text(
+                    'TEMA RENGİ',
+                    style: typography.caption.copyWith(
+                      color: colors.onSurfaceMuted,
+                      letterSpacing: 1.2,
+                    ),
+                  ),
                   const SizedBox(height: AppSpacing.sm),
                   Container(
                     padding: const EdgeInsets.all(AppSpacing.lg),
                     decoration: BoxDecoration(
                       color: colors.surface,
-                      borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusCard,
+                      ),
                       border: Border.all(color: colors.outline),
                     ),
                     child: Column(
@@ -161,11 +237,15 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
                           children: [
                             for (final theme in themeState.themes)
                               Padding(
-                                padding: const EdgeInsets.only(right: AppSpacing.md),
+                                padding: const EdgeInsets.only(
+                                  right: AppSpacing.md,
+                                ),
                                 child: _ThemeDot(
                                   theme: theme,
-                                  selected: theme.id == themeState.activeThemeId,
-                                  onTap: () => themeController.selectTheme(theme.id),
+                                  selected:
+                                      theme.id == themeState.activeThemeId,
+                                  onTap: () =>
+                                      themeController.selectTheme(theme.id),
                                 ),
                               ),
                           ],
@@ -173,24 +253,55 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
                         const SizedBox(height: AppSpacing.md),
                         Container(
                           padding: const EdgeInsets.all(AppSpacing.md),
-                          decoration: BoxDecoration(color: colors.surfaceRaised, borderRadius: BorderRadius.circular(AppSpacing.radiusInner)),
+                          decoration: BoxDecoration(
+                            color: colors.surfaceRaised,
+                            borderRadius: BorderRadius.circular(
+                              AppSpacing.radiusInner,
+                            ),
+                          ),
                           child: Row(
                             children: [
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text('Önizleme', style: typography.caption.copyWith(color: colors.onSurfaceMuted)),
-                                    Text('Birincil buton', style: typography.headingSmall.copyWith(color: colors.onSurface, fontSize: 15)),
+                                    Text(
+                                      'Önizleme',
+                                      style: typography.caption.copyWith(
+                                        color: colors.onSurfaceMuted,
+                                      ),
+                                    ),
+                                    Text(
+                                      'Birincil buton',
+                                      style: typography.headingSmall.copyWith(
+                                        color: colors.onSurface,
+                                        fontSize: 15,
+                                      ),
+                                    ),
                                   ],
                                 ),
                               ),
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-                                constraints: const BoxConstraints(minHeight: 44),
-                                decoration: BoxDecoration(color: active.primary, borderRadius: BorderRadius.circular(AppSpacing.radiusInner)),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: AppSpacing.lg,
+                                ),
+                                constraints: const BoxConstraints(
+                                  minHeight: 44,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: active.primary,
+                                  borderRadius: BorderRadius.circular(
+                                    AppSpacing.radiusInner,
+                                  ),
+                                ),
                                 alignment: Alignment.center,
-                                child: Text('Kaydet', style: typography.headingSmall.copyWith(fontSize: 15, color: colors.onPrimary)),
+                                child: Text(
+                                  'Kaydet',
+                                  style: typography.headingSmall.copyWith(
+                                    fontSize: 15,
+                                    color: colors.onPrimary,
+                                  ),
+                                ),
                               ),
                             ],
                           ),
@@ -198,19 +309,34 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
                         const SizedBox(height: AppSpacing.sm),
                         Text(
                           'Seçtiğiniz renk üyelerin uygulamasında da birincil renk olur; koyu zemin ve durum renkleri değişmez.',
-                          style: typography.bodyMedium.copyWith(color: colors.onSurfaceMuted, fontSize: 13),
+                          style: typography.bodyMedium.copyWith(
+                            color: colors.onSurfaceMuted,
+                            fontSize: 13,
+                          ),
                         ),
                         const SizedBox(height: AppSpacing.md),
                         Material(
                           color: Colors.transparent,
-                          borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+                          borderRadius: BorderRadius.circular(
+                            AppSpacing.radiusInner,
+                          ),
                           child: InkWell(
-                            borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
-                            onTap: () => ref.read(panelStackControllerProvider.notifier).push(const GymThemesPanel()),
+                            borderRadius: BorderRadius.circular(
+                              AppSpacing.radiusInner,
+                            ),
+                            onTap: () => ref
+                                .read(panelStackControllerProvider.notifier)
+                                .push(const GymThemesPanel()),
                             child: Container(
                               constraints: const BoxConstraints(minHeight: 44),
                               alignment: Alignment.centerLeft,
-                              child: Text('Tüm temaları gör ›', style: typography.headingSmall.copyWith(fontSize: 14, color: colors.onPrimaryContainer)),
+                              child: Text(
+                                'Tüm temaları gör ›',
+                                style: typography.headingSmall.copyWith(
+                                  fontSize: 14,
+                                  color: colors.onPrimaryContainer,
+                                ),
+                              ),
                             ),
                           ),
                         ),
@@ -218,13 +344,21 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
                     ),
                   ),
                   const SizedBox(height: AppSpacing.lg),
-                  Text('RAPOR E-POSTALARI', style: typography.caption.copyWith(color: colors.onSurfaceMuted, letterSpacing: 1.2)),
+                  Text(
+                    'RAPOR E-POSTALARI',
+                    style: typography.caption.copyWith(
+                      color: colors.onSurfaceMuted,
+                      letterSpacing: 1.2,
+                    ),
+                  ),
                   const SizedBox(height: AppSpacing.sm),
                   Container(
                     padding: const EdgeInsets.all(AppSpacing.lg),
                     decoration: BoxDecoration(
                       color: colors.surface,
-                      borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusCard,
+                      ),
                       border: Border.all(color: colors.outline),
                     ),
                     child: Column(
@@ -232,7 +366,10 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
                       children: [
                         Text(
                           'Haftalık salon ve muhasebe özeti bu adreslere e-posta ile gönderilir.',
-                          style: typography.caption.copyWith(color: colors.onSurfaceMuted, height: 1.4),
+                          style: typography.caption.copyWith(
+                            color: colors.onSurfaceMuted,
+                            height: 1.4,
+                          ),
                         ),
                         const SizedBox(height: AppSpacing.md),
                         AppTextField(
@@ -249,21 +386,55 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
                           controller: _accountingReportEmailController,
                         ),
                         const SizedBox(height: AppSpacing.md),
+                        if (recipientsState.errorMessage != null) ...[
+                          Text(
+                            recipientsState.errorMessage!,
+                            style: typography.bodyMedium.copyWith(
+                              color: colors.error,
+                              fontSize: 13,
+                            ),
+                          ),
+                          const SizedBox(height: AppSpacing.sm),
+                        ],
                         Material(
                           color: Colors.transparent,
-                          borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+                          borderRadius: BorderRadius.circular(
+                            AppSpacing.radiusInner,
+                          ),
                           child: InkWell(
-                            borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
-                            onTap: () => ref.read(reportRecipientsControllerProvider.notifier).save(
-                                  ReportRecipients(
-                                    gymReportEmail: _gymReportEmailController.text.trim(),
-                                    accountingReportEmail: _accountingReportEmailController.text.trim(),
-                                  ),
-                                ),
+                            borderRadius: BorderRadius.circular(
+                              AppSpacing.radiusInner,
+                            ),
+                            onTap: recipientsState.isSaving
+                                ? null
+                                : () => ref
+                                      .read(
+                                        reportRecipientsControllerProvider
+                                            .notifier,
+                                      )
+                                      .save(
+                                        ReportRecipients(
+                                          gymReportEmail:
+                                              _gymReportEmailController.text
+                                                  .trim(),
+                                          accountingReportEmail:
+                                              _accountingReportEmailController
+                                                  .text
+                                                  .trim(),
+                                        ),
+                                      ),
                             child: Container(
                               constraints: const BoxConstraints(minHeight: 44),
                               alignment: Alignment.centerLeft,
-                              child: Text('Rapor e-postalarını kaydet', style: typography.headingSmall.copyWith(fontSize: 14, color: colors.onPrimaryContainer)),
+                              child: Text(
+                                recipientsState.isSaving
+                                    ? 'Kaydediliyor…'
+                                    : 'Rapor e-postalarını kaydet',
+                                style: typography.headingSmall.copyWith(
+                                  fontSize: 14,
+                                  color: colors.onPrimaryContainer,
+                                ),
+                              ),
                             ),
                           ),
                         ),
@@ -274,8 +445,17 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.md, AppSpacing.screenEdge, AppSpacing.lg),
-              child: AppButton(label: 'Kaydet', onPressed: () => ref.read(panelStackControllerProvider.notifier).pop()),
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.screenEdge,
+                AppSpacing.md,
+                AppSpacing.screenEdge,
+                AppSpacing.lg,
+              ),
+              child: AppButton(
+                label: 'Kaydet',
+                onPressed: () =>
+                    ref.read(panelStackControllerProvider.notifier).pop(),
+              ),
             ),
           ],
         ),
@@ -295,7 +475,11 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
 }
 
 class _ThemeDot extends StatelessWidget {
-  const _ThemeDot({required this.theme, required this.selected, required this.onTap});
+  const _ThemeDot({
+    required this.theme,
+    required this.selected,
+    required this.onTap,
+  });
 
   final GymTheme theme;
   final bool selected;
@@ -312,10 +496,20 @@ class _ThemeDot extends StatelessWidget {
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           color: theme.primary.withValues(alpha: 0.16),
-          border: Border.all(color: selected ? theme.primary : colors.outlineStrong, width: 2),
+          border: Border.all(
+            color: selected ? theme.primary : colors.outlineStrong,
+            width: 2,
+          ),
         ),
         alignment: Alignment.center,
-        child: Container(width: 24, height: 24, decoration: BoxDecoration(shape: BoxShape.circle, color: theme.primary)),
+        child: Container(
+          width: 24,
+          height: 24,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: theme.primary,
+          ),
+        ),
       ),
     );
   }
