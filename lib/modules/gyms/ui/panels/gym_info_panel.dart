@@ -276,6 +276,16 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
                               ),
                           ],
                         ),
+                        if (themeState.errorMessage != null) ...[
+                          const SizedBox(height: AppSpacing.sm),
+                          Text(
+                            themeState.errorMessage!,
+                            style: typography.bodyMedium.copyWith(
+                              color: colors.error,
+                              fontSize: 13,
+                            ),
+                          ),
+                        ],
                         const SizedBox(height: AppSpacing.md),
                         Container(
                           padding: const EdgeInsets.all(AppSpacing.md),
