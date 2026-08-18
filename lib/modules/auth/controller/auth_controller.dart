@@ -75,16 +75,6 @@ class AuthController extends _$AuthController {
     }
   }
 
-  void selectAvatar(int index) {
-    state = state.copyWith(selectedAvatarIndex: index);
-  }
-
-  void toggleSessionReminder() {
-    state = state.copyWith(
-      sessionReminderEnabled: !state.sessionReminderEnabled,
-    );
-  }
-
   /// Oturumu kapatır. UI hemen giriş ekranına döndüğü için local state
   /// senkron sıfırlanıyor; gerçek `FirebaseAuth.signOut()` arkada
   /// tamamlanıyor — aksi halde (önceki sürümde olduğu gibi) Auth oturumu

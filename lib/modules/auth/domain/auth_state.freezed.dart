@@ -29,8 +29,6 @@ mixin _$AuthState {
   bool get deleteAccountAcknowledged => throw _privateConstructorUsedError;
   bool get isDeletingAccount => throw _privateConstructorUsedError;
   String? get deleteAccountErrorMessage => throw _privateConstructorUsedError;
-  int get selectedAvatarIndex => throw _privateConstructorUsedError;
-  bool get sessionReminderEnabled => throw _privateConstructorUsedError;
 
   /// Create a copy of AuthState
   /// with the given fields replaced by the non-null parameter values.
@@ -52,8 +50,6 @@ abstract class $AuthStateCopyWith<$Res> {
     bool deleteAccountAcknowledged,
     bool isDeletingAccount,
     String? deleteAccountErrorMessage,
-    int selectedAvatarIndex,
-    bool sessionReminderEnabled,
   });
 }
 
@@ -79,8 +75,6 @@ class _$AuthStateCopyWithImpl<$Res, $Val extends AuthState>
     Object? deleteAccountAcknowledged = null,
     Object? isDeletingAccount = null,
     Object? deleteAccountErrorMessage = freezed,
-    Object? selectedAvatarIndex = null,
-    Object? sessionReminderEnabled = null,
   }) {
     return _then(
       _value.copyWith(
@@ -112,14 +106,6 @@ class _$AuthStateCopyWithImpl<$Res, $Val extends AuthState>
                 ? _value.deleteAccountErrorMessage
                 : deleteAccountErrorMessage // ignore: cast_nullable_to_non_nullable
                       as String?,
-            selectedAvatarIndex: null == selectedAvatarIndex
-                ? _value.selectedAvatarIndex
-                : selectedAvatarIndex // ignore: cast_nullable_to_non_nullable
-                      as int,
-            sessionReminderEnabled: null == sessionReminderEnabled
-                ? _value.sessionReminderEnabled
-                : sessionReminderEnabled // ignore: cast_nullable_to_non_nullable
-                      as bool,
           )
           as $Val,
     );
@@ -143,8 +129,6 @@ abstract class _$$AuthStateImplCopyWith<$Res>
     bool deleteAccountAcknowledged,
     bool isDeletingAccount,
     String? deleteAccountErrorMessage,
-    int selectedAvatarIndex,
-    bool sessionReminderEnabled,
   });
 }
 
@@ -169,8 +153,6 @@ class __$$AuthStateImplCopyWithImpl<$Res>
     Object? deleteAccountAcknowledged = null,
     Object? isDeletingAccount = null,
     Object? deleteAccountErrorMessage = freezed,
-    Object? selectedAvatarIndex = null,
-    Object? sessionReminderEnabled = null,
   }) {
     return _then(
       _$AuthStateImpl(
@@ -202,14 +184,6 @@ class __$$AuthStateImplCopyWithImpl<$Res>
             ? _value.deleteAccountErrorMessage
             : deleteAccountErrorMessage // ignore: cast_nullable_to_non_nullable
                   as String?,
-        selectedAvatarIndex: null == selectedAvatarIndex
-            ? _value.selectedAvatarIndex
-            : selectedAvatarIndex // ignore: cast_nullable_to_non_nullable
-                  as int,
-        sessionReminderEnabled: null == sessionReminderEnabled
-            ? _value.sessionReminderEnabled
-            : sessionReminderEnabled // ignore: cast_nullable_to_non_nullable
-                  as bool,
       ),
     );
   }
@@ -226,8 +200,6 @@ class _$AuthStateImpl extends _AuthState {
     this.deleteAccountAcknowledged = false,
     this.isDeletingAccount = false,
     this.deleteAccountErrorMessage,
-    this.selectedAvatarIndex = 0,
-    this.sessionReminderEnabled = true,
   }) : super._();
 
   @override
@@ -252,16 +224,10 @@ class _$AuthStateImpl extends _AuthState {
   final bool isDeletingAccount;
   @override
   final String? deleteAccountErrorMessage;
-  @override
-  @JsonKey()
-  final int selectedAvatarIndex;
-  @override
-  @JsonKey()
-  final bool sessionReminderEnabled;
 
   @override
   String toString() {
-    return 'AuthState(phoneDigits: $phoneDigits, isRequestingLogin: $isRequestingLogin, loginErrorMessage: $loginErrorMessage, loginErrorReason: $loginErrorReason, deleteAccountAcknowledged: $deleteAccountAcknowledged, isDeletingAccount: $isDeletingAccount, deleteAccountErrorMessage: $deleteAccountErrorMessage, selectedAvatarIndex: $selectedAvatarIndex, sessionReminderEnabled: $sessionReminderEnabled)';
+    return 'AuthState(phoneDigits: $phoneDigits, isRequestingLogin: $isRequestingLogin, loginErrorMessage: $loginErrorMessage, loginErrorReason: $loginErrorReason, deleteAccountAcknowledged: $deleteAccountAcknowledged, isDeletingAccount: $isDeletingAccount, deleteAccountErrorMessage: $deleteAccountErrorMessage)';
   }
 
   @override
@@ -288,11 +254,7 @@ class _$AuthStateImpl extends _AuthState {
                   other.deleteAccountErrorMessage,
                   deleteAccountErrorMessage,
                 ) ||
-                other.deleteAccountErrorMessage == deleteAccountErrorMessage) &&
-            (identical(other.selectedAvatarIndex, selectedAvatarIndex) ||
-                other.selectedAvatarIndex == selectedAvatarIndex) &&
-            (identical(other.sessionReminderEnabled, sessionReminderEnabled) ||
-                other.sessionReminderEnabled == sessionReminderEnabled));
+                other.deleteAccountErrorMessage == deleteAccountErrorMessage));
   }
 
   @override
@@ -305,8 +267,6 @@ class _$AuthStateImpl extends _AuthState {
     deleteAccountAcknowledged,
     isDeletingAccount,
     deleteAccountErrorMessage,
-    selectedAvatarIndex,
-    sessionReminderEnabled,
   );
 
   /// Create a copy of AuthState
@@ -327,8 +287,6 @@ abstract class _AuthState extends AuthState {
     final bool deleteAccountAcknowledged,
     final bool isDeletingAccount,
     final String? deleteAccountErrorMessage,
-    final int selectedAvatarIndex,
-    final bool sessionReminderEnabled,
   }) = _$AuthStateImpl;
   const _AuthState._() : super._();
 
@@ -350,10 +308,6 @@ abstract class _AuthState extends AuthState {
   bool get isDeletingAccount;
   @override
   String? get deleteAccountErrorMessage;
-  @override
-  int get selectedAvatarIndex;
-  @override
-  bool get sessionReminderEnabled;
 
   /// Create a copy of AuthState
   /// with the given fields replaced by the non-null parameter values.

@@ -23,11 +23,13 @@ class ProfilePanel extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.appColors;
     final typography = context.appTypography;
-    final state = ref.watch(authControllerProvider);
     final controller = ref.read(authControllerProvider.notifier);
     final panelStack = ref.read(panelStackControllerProvider.notifier);
-    final avatarColor = AppAvatarPalette.colors[state.selectedAvatarIndex];
     final profile = ref.watch(memberProfileControllerProvider);
+    final profileController = ref.read(
+      memberProfileControllerProvider.notifier,
+    );
+    final avatarColor = AppAvatarPalette.colors[profile.selectedAvatarIndex];
     final earnedBadgeCount = ref
         .watch(badgesControllerProvider)
         .where((b) => b.earned)
@@ -103,11 +105,11 @@ class ProfilePanel extends ConsumerWidget {
                     children: [
                       for (var i = 0; i < AppAvatarPalette.colors.length; i++)
                         GestureDetector(
-                          onTap: () => controller.selectAvatar(i),
+                          onTap: () => profileController.selectAvatar(i),
                           child: _AvatarCircle(
                             color: AppAvatarPalette.colors[i],
                             size: 52,
-                            selected: i == state.selectedAvatarIndex,
+                            selected: i == profile.selectedAvatarIndex,
                           ),
                         ),
                     ],
@@ -180,21 +182,21 @@ class ProfilePanel extends ConsumerWidget {
                           ),
                         ),
                         GestureDetector(
-                          onTap: controller.toggleSessionReminder,
+                          onTap: profileController.toggleSessionReminder,
                           child: AnimatedContainer(
                             duration: const Duration(milliseconds: 150),
                             width: 52,
                             height: 32,
                             padding: const EdgeInsets.all(3),
                             decoration: BoxDecoration(
-                              color: state.sessionReminderEnabled
+                              color: profile.sessionReminderEnabled
                                   ? colors.primary
                                   : colors.surfaceRaised,
                               borderRadius: BorderRadius.circular(
                                 AppSpacing.radiusPill,
                               ),
                             ),
-                            alignment: state.sessionReminderEnabled
+                            alignment: profile.sessionReminderEnabled
                                 ? Alignment.centerRight
                                 : Alignment.centerLeft,
                             child: Container(

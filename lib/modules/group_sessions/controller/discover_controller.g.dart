@@ -7,7 +7,7 @@ part of 'discover_controller.dart';
 // **************************************************************************
 
 String _$groupSessionsForGymHash() =>
-    r'3156fbbdd5e6dc62b65dba112372fe434a55b584';
+    r'89bdf7835cab673a131efe83591669ed388e823a';
 
 /// Copied from Dart SDK
 class _SystemHash {
