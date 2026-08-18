@@ -36,5 +36,7 @@ class TrainerMemberDetail with _$TrainerMemberDetail {
     required List<SessionHistoryEntry> history,
     required Map<TrainerMetric, TrainerMetricSeries> seriesByMetric,
     @Default(TrainerMetric.kilo) TrainerMetric selectedMetric,
+    @Default(false) bool isLoading,
+    @Default(false) bool notFound,
   }) = _TrainerMemberDetail;
 }

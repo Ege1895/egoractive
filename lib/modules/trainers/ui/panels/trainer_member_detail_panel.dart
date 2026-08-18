@@ -38,6 +38,37 @@ class _TrainerMemberDetailPanelState
     final controller = ref.read(
       trainerMemberDetailControllerProvider(widget.memberId).notifier,
     );
+
+    if (detail.isLoading) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+    if (detail.notFound) {
+      return Scaffold(
+        body: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.screenEdge),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                AppBackButton(
+                  onTap: () =>
+                      ref.read(panelStackControllerProvider.notifier).pop(),
+                ),
+                const SizedBox(height: AppSpacing.xl),
+                Text(
+                  'Üye bulunamadı.',
+                  style: typography.headingSmall.copyWith(
+                    color: colors.onSurface,
+                    fontSize: 17,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
     final series = detail.seriesByMetric[detail.selectedMetric]!;
 
     return Scaffold(

@@ -424,6 +424,8 @@ mixin _$TrainerMemberDetail {
   Map<TrainerMetric, TrainerMetricSeries> get seriesByMetric =>
       throw _privateConstructorUsedError;
   TrainerMetric get selectedMetric => throw _privateConstructorUsedError;
+  bool get isLoading => throw _privateConstructorUsedError;
+  bool get notFound => throw _privateConstructorUsedError;
 
   /// Create a copy of TrainerMemberDetail
   /// with the given fields replaced by the non-null parameter values.
@@ -450,6 +452,8 @@ abstract class $TrainerMemberDetailCopyWith<$Res> {
     List<SessionHistoryEntry> history,
     Map<TrainerMetric, TrainerMetricSeries> seriesByMetric,
     TrainerMetric selectedMetric,
+    bool isLoading,
+    bool notFound,
   });
 }
 
@@ -478,6 +482,8 @@ class _$TrainerMemberDetailCopyWithImpl<$Res, $Val extends TrainerMemberDetail>
     Object? history = null,
     Object? seriesByMetric = null,
     Object? selectedMetric = null,
+    Object? isLoading = null,
+    Object? notFound = null,
   }) {
     return _then(
       _value.copyWith(
@@ -521,6 +527,14 @@ class _$TrainerMemberDetailCopyWithImpl<$Res, $Val extends TrainerMemberDetail>
                 ? _value.selectedMetric
                 : selectedMetric // ignore: cast_nullable_to_non_nullable
                       as TrainerMetric,
+            isLoading: null == isLoading
+                ? _value.isLoading
+                : isLoading // ignore: cast_nullable_to_non_nullable
+                      as bool,
+            notFound: null == notFound
+                ? _value.notFound
+                : notFound // ignore: cast_nullable_to_non_nullable
+                      as bool,
           )
           as $Val,
     );
@@ -547,6 +561,8 @@ abstract class _$$TrainerMemberDetailImplCopyWith<$Res>
     List<SessionHistoryEntry> history,
     Map<TrainerMetric, TrainerMetricSeries> seriesByMetric,
     TrainerMetric selectedMetric,
+    bool isLoading,
+    bool notFound,
   });
 }
 
@@ -574,6 +590,8 @@ class __$$TrainerMemberDetailImplCopyWithImpl<$Res>
     Object? history = null,
     Object? seriesByMetric = null,
     Object? selectedMetric = null,
+    Object? isLoading = null,
+    Object? notFound = null,
   }) {
     return _then(
       _$TrainerMemberDetailImpl(
@@ -617,6 +635,14 @@ class __$$TrainerMemberDetailImplCopyWithImpl<$Res>
             ? _value.selectedMetric
             : selectedMetric // ignore: cast_nullable_to_non_nullable
                   as TrainerMetric,
+        isLoading: null == isLoading
+            ? _value.isLoading
+            : isLoading // ignore: cast_nullable_to_non_nullable
+                  as bool,
+        notFound: null == notFound
+            ? _value.notFound
+            : notFound // ignore: cast_nullable_to_non_nullable
+                  as bool,
       ),
     );
   }
@@ -636,6 +662,8 @@ class _$TrainerMemberDetailImpl implements _TrainerMemberDetail {
     required final List<SessionHistoryEntry> history,
     required final Map<TrainerMetric, TrainerMetricSeries> seriesByMetric,
     this.selectedMetric = TrainerMetric.kilo,
+    this.isLoading = false,
+    this.notFound = false,
   }) : _history = history,
        _seriesByMetric = seriesByMetric;
 
@@ -672,10 +700,16 @@ class _$TrainerMemberDetailImpl implements _TrainerMemberDetail {
   @override
   @JsonKey()
   final TrainerMetric selectedMetric;
+  @override
+  @JsonKey()
+  final bool isLoading;
+  @override
+  @JsonKey()
+  final bool notFound;
 
   @override
   String toString() {
-    return 'TrainerMemberDetail(id: $id, initials: $initials, name: $name, phone: $phone, memberSince: $memberSince, remainingSessions: $remainingSessions, packageEndDate: $packageEndDate, history: $history, seriesByMetric: $seriesByMetric, selectedMetric: $selectedMetric)';
+    return 'TrainerMemberDetail(id: $id, initials: $initials, name: $name, phone: $phone, memberSince: $memberSince, remainingSessions: $remainingSessions, packageEndDate: $packageEndDate, history: $history, seriesByMetric: $seriesByMetric, selectedMetric: $selectedMetric, isLoading: $isLoading, notFound: $notFound)';
   }
 
   @override
@@ -700,7 +734,11 @@ class _$TrainerMemberDetailImpl implements _TrainerMemberDetail {
               _seriesByMetric,
             ) &&
             (identical(other.selectedMetric, selectedMetric) ||
-                other.selectedMetric == selectedMetric));
+                other.selectedMetric == selectedMetric) &&
+            (identical(other.isLoading, isLoading) ||
+                other.isLoading == isLoading) &&
+            (identical(other.notFound, notFound) ||
+                other.notFound == notFound));
   }
 
   @override
@@ -716,6 +754,8 @@ class _$TrainerMemberDetailImpl implements _TrainerMemberDetail {
     const DeepCollectionEquality().hash(_history),
     const DeepCollectionEquality().hash(_seriesByMetric),
     selectedMetric,
+    isLoading,
+    notFound,
   );
 
   /// Create a copy of TrainerMemberDetail
@@ -742,6 +782,8 @@ abstract class _TrainerMemberDetail implements TrainerMemberDetail {
     required final List<SessionHistoryEntry> history,
     required final Map<TrainerMetric, TrainerMetricSeries> seriesByMetric,
     final TrainerMetric selectedMetric,
+    final bool isLoading,
+    final bool notFound,
   }) = _$TrainerMemberDetailImpl;
 
   @override
@@ -764,6 +806,10 @@ abstract class _TrainerMemberDetail implements TrainerMemberDetail {
   Map<TrainerMetric, TrainerMetricSeries> get seriesByMetric;
   @override
   TrainerMetric get selectedMetric;
+  @override
+  bool get isLoading;
+  @override
+  bool get notFound;
 
   /// Create a copy of TrainerMemberDetail
   /// with the given fields replaced by the non-null parameter values.
