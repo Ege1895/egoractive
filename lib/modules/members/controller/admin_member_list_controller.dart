@@ -29,12 +29,29 @@ class AdminMemberListController extends _$AdminMemberListController {
 
   Future<void> loadMore() async {
     final gymId = _gymId;
-    if (gymId == null || !state.hasMore || state.isLoadingMore || state.searchResults != null) return;
+    if (gymId == null ||
+        !state.hasMore ||
+        state.isLoadingMore ||
+        state.searchResults != null)
+      return;
 
-    state = state.copyWith(isLoadingMore: true);
-    final page = await ref.read(adminMemberListPageServiceProvider).loadPage(gymId, startAfter: _lastDocument);
-    _lastDocument = page.lastDocument;
-    state = state.copyWith(items: [...state.items, ...page.items], isLoadingMore: false, hasMore: page.hasMore);
+    state = state.copyWith(isLoadingMore: true, errorMessage: null);
+    try {
+      final page = await ref
+          .read(adminMemberListPageServiceProvider)
+          .loadPage(gymId, startAfter: _lastDocument);
+      _lastDocument = page.lastDocument;
+      state = state.copyWith(
+        items: [...state.items, ...page.items],
+        isLoadingMore: false,
+        hasMore: page.hasMore,
+      );
+    } catch (_) {
+      state = state.copyWith(
+        isLoadingMore: false,
+        errorMessage: 'Daha fazla üye yüklenemedi, tekrar dene.',
+      );
+    }
   }
 
   Future<void> search(String query) async {
@@ -42,13 +59,22 @@ class AdminMemberListController extends _$AdminMemberListController {
     final trimmed = query.trim();
     if (gymId == null) return;
     if (trimmed.isEmpty) {
-      state = state.copyWith(searchResults: null);
+      state = state.copyWith(searchResults: null, errorMessage: null);
       return;
     }
 
-    state = state.copyWith(isSearching: true);
-    final results = await ref.read(adminMemberListPageServiceProvider).searchByNamePrefix(gymId, trimmed);
-    state = state.copyWith(searchResults: results, isSearching: false);
+    state = state.copyWith(isSearching: true, errorMessage: null);
+    try {
+      final results = await ref
+          .read(adminMemberListPageServiceProvider)
+          .searchByNamePrefix(gymId, trimmed);
+      state = state.copyWith(searchResults: results, isSearching: false);
+    } catch (_) {
+      state = state.copyWith(
+        isSearching: false,
+        errorMessage: 'Arama yapılamadı, tekrar dene.',
+      );
+    }
   }
 
   /// Başka bir ekrandan yeni üye eklendiğinde (bkz. `MemberInfoPanel`) canlı
@@ -57,13 +83,27 @@ class AdminMemberListController extends _$AdminMemberListController {
     final gymId = _gymId;
     if (gymId == null) return;
     _lastDocument = null;
-    state = state.copyWith(isLoading: true);
+    state = state.copyWith(isLoading: true, errorMessage: null);
     await _loadFirstPage(gymId);
   }
 
   Future<void> _loadFirstPage(String gymId) async {
-    final page = await ref.read(adminMemberListPageServiceProvider).loadPage(gymId);
-    _lastDocument = page.lastDocument;
-    state = state.copyWith(items: page.items, isLoading: false, hasMore: page.hasMore);
+    try {
+      final page = await ref
+          .read(adminMemberListPageServiceProvider)
+          .loadPage(gymId);
+      _lastDocument = page.lastDocument;
+      state = state.copyWith(
+        items: page.items,
+        isLoading: false,
+        hasMore: page.hasMore,
+        errorMessage: null,
+      );
+    } catch (_) {
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: 'Üye listesi yüklenemedi, tekrar dene.',
+      );
+    }
   }
 }
