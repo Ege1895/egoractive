@@ -23,6 +23,7 @@ class CreateGroupSessionPanel extends BasePanel {
 class _CreateGroupSessionPanelState
     extends BasePanelState<CreateGroupSessionPanel> {
   late final TextEditingController _titleController;
+  late final TextEditingController _studioNameController;
 
   @override
   void initState() {
@@ -32,6 +33,9 @@ class _CreateGroupSessionPanelState
     // senkron değildi (ör. panel yeniden build olunca alan sıfırlanabilirdi).
     _titleController = TextEditingController(
       text: ref.read(createGroupSessionControllerProvider).title,
+    );
+    _studioNameController = TextEditingController(
+      text: ref.read(createGroupSessionControllerProvider).studioName,
     );
   }
 
@@ -198,7 +202,9 @@ class _CreateGroupSessionPanelState
                                     ),
                                   ),
                                   Text(
-                                    '${form.studioName} için üst sınır ${form.capacityMax} kişi',
+                                    form.studioName.trim().isEmpty
+                                        ? 'Üst sınır ${form.capacityMax} kişi'
+                                        : '${form.studioName} için üst sınır ${form.capacityMax} kişi',
                                     style: typography.bodyMedium.copyWith(
                                       color: colors.onSurfaceMuted,
                                       fontSize: 13,
@@ -322,34 +328,10 @@ class _CreateGroupSessionPanelState
                             ],
                           ),
                         ),
-                        Container(
-                          constraints: const BoxConstraints(minHeight: 60),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  'Stüdyo',
-                                  style: typography.bodyLarge.copyWith(
-                                    color: colors.onSurface,
-                                    fontSize: 15,
-                                  ),
-                                ),
-                              ),
-                              Text(
-                                form.studioName,
-                                style: typography.headingSmall.copyWith(
-                                  color: colors.onSurfaceVariant,
-                                  fontSize: 15,
-                                ),
-                              ),
-                              const SizedBox(width: AppSpacing.xs),
-                              Icon(
-                                Icons.chevron_right,
-                                color: colors.onSurfaceMuted,
-                                size: 18,
-                              ),
-                            ],
-                          ),
+                        AppTextField(
+                          label: 'Stüdyo',
+                          controller: _studioNameController,
+                          onChanged: controller.setStudioName,
                         ),
                       ],
                     ),
@@ -406,6 +388,7 @@ class _CreateGroupSessionPanelState
   @override
   void dispose() {
     _titleController.dispose();
+    _studioNameController.dispose();
     super.dispose();
   }
 }

@@ -18,6 +18,9 @@ class CreateGroupSessionController extends _$CreateGroupSessionController {
   void setTitle(String title) =>
       state = state.copyWith(title: title, titleError: null);
 
+  void setStudioName(String studioName) =>
+      state = state.copyWith(studioName: studioName);
+
   void toggleDay(int day) {
     final days = {...state.selectedDays};
     days.contains(day) ? days.remove(day) : days.add(day);
