@@ -173,7 +173,7 @@ void main() {
   ) async {
     await tester.pumpWidget(_wrap(const SendNotificationPanel()));
     await tester.pump();
-    await tester.tap(find.text('Tek üye'));
+    await tester.tap(find.text('Seçili üyeler'));
     await tester.pump();
     expect(tester.takeException(), isNull);
   });

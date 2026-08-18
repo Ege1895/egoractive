@@ -19,8 +19,17 @@ class SendNotificationController extends _$SendNotificationController {
   void setTargetType(NotificationTargetType type) =>
       state = state.copyWith(targetType: type);
 
-  void selectMember(String id, String name) =>
-      state = state.copyWith(targetMemberId: id, targetMemberName: name);
+  /// Zaten seçili bir üyeye tekrar dokunulursa seçim kaldırılır — bir ya da
+  /// birden fazla üye seçip aynı bildirimi hepsine gönderebilmek için.
+  void toggleMember(String id, String name) {
+    final updated = Map<String, String>.from(state.targetMembers);
+    if (updated.containsKey(id)) {
+      updated.remove(id);
+    } else {
+      updated[id] = name;
+    }
+    state = state.copyWith(targetMembers: updated);
+  }
 
   void updateTitle(String value) => state = state.copyWith(title: value);
 
@@ -32,9 +41,9 @@ class SendNotificationController extends _$SendNotificationController {
         state.isSending) {
       return;
     }
-    if (state.targetType == NotificationTargetType.singleMember &&
-        state.targetMemberId == null) {
-      state = state.copyWith(errorMessage: 'Önce bir üye seç.');
+    if (state.targetType == NotificationTargetType.selectedMembers &&
+        state.targetMembers.isEmpty) {
+      state = state.copyWith(errorMessage: 'Önce en az bir üye seç.');
       return;
     }
 
@@ -44,7 +53,7 @@ class SendNotificationController extends _$SendNotificationController {
           .read(sendNotificationServiceProvider)
           .send(
             targetType: state.targetType,
-            targetMemberId: state.targetMemberId,
+            targetMemberIds: state.targetMembers.keys.toList(),
             title: state.title.trim(),
             message: state.message.trim(),
           );
