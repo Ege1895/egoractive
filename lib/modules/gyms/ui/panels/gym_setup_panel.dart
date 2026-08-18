@@ -151,6 +151,11 @@ class _GymSetupPanelState extends BasePanelState<GymSetupPanel> {
                           'Kare PNG, en az 512×512. Eklersen üyelerin ve antrenörlerin her ekranında arka planda %25 opaklıkla silüet olarak görünür — sonradan Salon Bilgileri panelinden de ekleyebilirsin.',
                           style: typography.bodyMedium.copyWith(color: colors.onSurfaceMuted, fontSize: 13),
                         ),
+                        const SizedBox(height: AppSpacing.xs),
+                        Text(
+                          'Logo eklersen aşağıdaki tema rengi seçeneklerini logona göre öneririz.',
+                          style: typography.caption.copyWith(color: colors.onSurfaceMuted, fontSize: 12),
+                        ),
                         const SizedBox(height: AppSpacing.md),
                         if (createGymState.logoFile != null) ...[
                           ClipRRect(
@@ -195,21 +200,54 @@ class _GymSetupPanelState extends BasePanelState<GymSetupPanel> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Tema rengi', style: typography.headingSmall.copyWith(color: colors.onSurface, fontSize: 16)),
-                        const SizedBox(height: AppSpacing.md),
-                        Row(
-                          children: [
-                            for (final swatch in themeState.themes)
-                              Padding(
-                                padding: const EdgeInsets.only(right: AppSpacing.md),
-                                child: _ThemeSwatch(
-                                  theme: swatch,
-                                  selected: swatch.id == themeState.activeThemeId,
-                                  onTap: () => themeController.selectTheme(swatch.id),
-                                ),
-                              ),
-                          ],
+                        Text(
+                          createGymState.logoPalette.isNotEmpty ? 'Logona göre önerilen renkler' : 'Tema rengi',
+                          style: typography.headingSmall.copyWith(color: colors.onSurface, fontSize: 16),
                         ),
+                        const SizedBox(height: AppSpacing.md),
+                        if (createGymState.isExtractingPalette)
+                          Row(
+                            children: [
+                              SizedBox(
+                                width: 18,
+                                height: 18,
+                                child: CircularProgressIndicator(strokeWidth: 2, color: colors.primary),
+                              ),
+                              const SizedBox(width: AppSpacing.sm),
+                              Text(
+                                'Logodan renkler çıkarılıyor…',
+                                style: typography.bodyMedium.copyWith(color: colors.onSurfaceMuted, fontSize: 13),
+                              ),
+                            ],
+                          )
+                        else if (createGymState.logoPalette.isNotEmpty)
+                          Row(
+                            children: [
+                              for (final color in createGymState.logoPalette)
+                                Padding(
+                                  padding: const EdgeInsets.only(right: AppSpacing.md),
+                                  child: _ColorSwatch(
+                                    color: color,
+                                    selected: color.toARGB32() == createGymState.selectedPaletteColor?.toARGB32(),
+                                    onTap: () => createGymController.selectPaletteColor(color),
+                                  ),
+                                ),
+                            ],
+                          )
+                        else
+                          Row(
+                            children: [
+                              for (final swatch in themeState.themes)
+                                Padding(
+                                  padding: const EdgeInsets.only(right: AppSpacing.md),
+                                  child: _ThemeSwatch(
+                                    theme: swatch,
+                                    selected: swatch.id == themeState.activeThemeId,
+                                    onTap: () => themeController.selectTheme(swatch.id),
+                                  ),
+                                ),
+                            ],
+                          ),
                         const SizedBox(height: AppSpacing.sm),
                         Text(
                           'Sonradan Temalar panelinden değiştirebilirsiniz.',
@@ -294,6 +332,39 @@ class _ThemeSwatch extends StatelessWidget {
           width: 24,
           height: 24,
           decoration: BoxDecoration(shape: BoxShape.circle, color: theme.primary),
+        ),
+      ),
+    );
+  }
+}
+
+/// [_ThemeSwatch] ile aynı görünüm, ama hazır bir [GymTheme] presetine değil
+/// logodan çıkarılan ham bir [Color]'a bağlı (palette_generator önerisi).
+class _ColorSwatch extends StatelessWidget {
+  const _ColorSwatch({required this.color, required this.selected, required this.onTap});
+
+  final Color color;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 52,
+        height: 52,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: color.withValues(alpha: 0.16),
+          border: Border.all(color: selected ? color : colors.outlineStrong, width: 2),
+        ),
+        alignment: Alignment.center,
+        child: Container(
+          width: 24,
+          height: 24,
+          decoration: BoxDecoration(shape: BoxShape.circle, color: color),
         ),
       ),
     );
