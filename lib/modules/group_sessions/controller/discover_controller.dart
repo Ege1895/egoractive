@@ -150,11 +150,16 @@ class DiscoverController extends _$DiscoverController {
     final mock = ref.watch(discoverRepositoryProvider).loadItems();
     if (gymId == null || uid == null) return mock;
 
-    final groupSessions = ref
-        .watch(_groupSessionsForGymProvider(gymId, uid))
-        .valueOrNull;
-    final events = ref.watch(_eventsForGymProvider(gymId, uid)).valueOrNull;
-    if (groupSessions == null || events == null) return mock;
+    // Oturum gerçekse (gymId/uid dolu) ama Firestore stream'i henüz ilk
+    // snapshot'ını vermemişse — önceden bu pencerede mock'a düşülüyordu,
+    // kullanıcı o an sahte bir öğeye (ör. mock event id'si) dokunursa
+    // gerçek olmayan bir ID ile Firestore'a yazma denemesi hataya
+    // düşüyordu. Artık sadece oturum yoksa mock, yükleniyorsa boş liste.
+    final groupSessions =
+        ref.watch(_groupSessionsForGymProvider(gymId, uid)).valueOrNull ??
+        const [];
+    final events =
+        ref.watch(_eventsForGymProvider(gymId, uid)).valueOrNull ?? const [];
 
     return [...groupSessions, ...events];
   }

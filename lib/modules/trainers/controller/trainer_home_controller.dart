@@ -11,7 +11,10 @@ import '../repository/trainer_home_repository.dart';
 part 'trainer_home_controller.g.dart';
 
 @riverpod
-Stream<List<ScheduleSlot>> _todayScheduleForTrainer(_TodayScheduleForTrainerRef ref, String trainerId) {
+Stream<List<ScheduleSlot>> _todayScheduleForTrainer(
+  _TodayScheduleForTrainerRef ref,
+  String trainerId,
+) {
   final now = DateTime.now();
   final start = DateTime(now.year, now.month, now.day);
   final end = start.add(const Duration(days: 1));
@@ -33,13 +36,16 @@ ScheduleSlot _toScheduleSlot(QueryDocumentSnapshot<Map<String, dynamic>> doc) {
   final state = switch (statusStr) {
     'cancelled' => ScheduleSlotState.cancelled,
     'completed' => ScheduleSlotState.completed,
-    _ => now.isAfter(startTime) && now.isBefore(startTime.add(const Duration(hours: 1)))
-        ? ScheduleSlotState.current
-        : ScheduleSlotState.planned,
+    _ =>
+      now.isAfter(startTime) &&
+              now.isBefore(startTime.add(const Duration(hours: 1)))
+          ? ScheduleSlotState.current
+          : ScheduleSlotState.planned,
   };
   return ScheduleSlot(
     id: doc.id,
-    time: '${startTime.hour.toString().padLeft(2, '0')}:${startTime.minute.toString().padLeft(2, '0')}',
+    time:
+        '${startTime.hour.toString().padLeft(2, '0')}:${startTime.minute.toString().padLeft(2, '0')}',
     name: (data['memberName'] as String?) ?? '',
     meta: 'Birebir',
     state: state,
@@ -73,18 +79,25 @@ Stream<List<PendingConfirmation>> _pendingConfirmationsForTrainer(
           final memberId = data['memberId'] as String? ?? '';
           final memberName = (data['memberName'] as String?) ?? '';
           final startTime = (data['startTime'] as Timestamp).toDate();
-          final memberDoc = await FirebaseFirestore.instance.collection('users').doc(memberId).get();
-          final remaining = (memberDoc.data()?['remainingSessions'] as num?)?.toInt() ?? 0;
+          final memberDoc = await FirebaseFirestore.instance
+              .collection('users')
+              .doc(memberId)
+              .get();
+          final remaining =
+              (memberDoc.data()?['remainingSessions'] as num?)?.toInt() ?? 0;
 
-          items.add(PendingConfirmation(
-            id: doc.id,
-            memberId: memberId,
-            memberInitials: _initialsFor(memberName),
-            memberName: memberName,
-            meta: 'Birebir · tamamlandı mı?',
-            time: '${startTime.hour.toString().padLeft(2, '0')}:${startTime.minute.toString().padLeft(2, '0')}',
-            remainingBefore: remaining,
-          ));
+          items.add(
+            PendingConfirmation(
+              id: doc.id,
+              memberId: memberId,
+              memberInitials: _initialsFor(memberName),
+              memberName: memberName,
+              meta: 'Birebir · tamamlandı mı?',
+              time:
+                  '${startTime.hour.toString().padLeft(2, '0')}:${startTime.minute.toString().padLeft(2, '0')}',
+              remainingBefore: remaining,
+            ),
+          );
         }
         return items;
       });
@@ -111,24 +124,37 @@ class TrainerHomeController extends _$TrainerHomeController {
     final mock = ref.watch(trainerHomeRepositoryProvider).loadInitial();
     if (uid == null) return mock;
 
-    final schedule = ref.watch(_todayScheduleForTrainerProvider(uid)).valueOrNull;
-    final pending = ref.watch(_pendingConfirmationsForTrainerProvider(uid)).valueOrNull;
-    if (schedule == null) return mock;
+    // Oturum gerçekse (uid dolu) ama Firestore stream'i henüz ilk
+    // snapshot'ını vermemişse — önceden bu pencerede mock'a düşülüyordu;
+    // antrenör o an sahte bir "onay bekliyor" kartına (ör. 'pending-1',
+    // 'mock-cem-demir') dokunursa gerçek olmayan bir sessionId/memberId
+    // ile Firestore'a yazma denemesi hataya düşüyordu. Artık sadece
+    // oturum yoksa mock, yükleniyorsa boş liste.
+    final schedule =
+        ref.watch(_todayScheduleForTrainerProvider(uid)).valueOrNull ??
+        const <ScheduleSlot>[];
+    final pending =
+        ref.watch(_pendingConfirmationsForTrainerProvider(uid)).valueOrNull ??
+        const [];
 
-    final completedCount = schedule.where((s) => s.state == ScheduleSlotState.completed).length;
+    final completedCount = schedule
+        .where((s) => s.state == ScheduleSlotState.completed)
+        .length;
     return mock.copyWith(
       todaySessionCount: schedule.length,
       completedCount: completedCount,
       freeSlotCount: 0,
       todaySchedule: schedule,
-      pendingConfirmations: pending ?? const [],
+      pendingConfirmations: pending,
     );
   }
 
   Future<void> markCompleted(String pendingId) async {
     final matches = state.pendingConfirmations.where((p) => p.id == pendingId);
     if (matches.isEmpty) return;
-    await ref.read(sessionCompletionServiceProvider).markCompleted(sessionId: pendingId, memberId: matches.first.memberId);
+    await ref
+        .read(sessionCompletionServiceProvider)
+        .markCompleted(sessionId: pendingId, memberId: matches.first.memberId);
   }
 
   Future<void> markAbsent(String pendingId) async {
