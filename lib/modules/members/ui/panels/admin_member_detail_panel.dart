@@ -22,18 +22,24 @@ class AdminMemberDetailPanel extends BasePanel {
   final String memberId;
 
   @override
-  ConsumerState<AdminMemberDetailPanel> createState() => _AdminMemberDetailPanelState();
+  ConsumerState<AdminMemberDetailPanel> createState() =>
+      _AdminMemberDetailPanelState();
 }
 
-class _AdminMemberDetailPanelState extends BasePanelState<AdminMemberDetailPanel> {
+class _AdminMemberDetailPanelState
+    extends BasePanelState<AdminMemberDetailPanel> {
   bool _metricPickerOpen = false;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
     final typography = context.appTypography;
-    final detail = ref.watch(adminMemberDetailControllerProvider(widget.memberId));
-    final controller = ref.read(adminMemberDetailControllerProvider(widget.memberId).notifier);
+    final detail = ref.watch(
+      adminMemberDetailControllerProvider(widget.memberId),
+    );
+    final controller = ref.read(
+      adminMemberDetailControllerProvider(widget.memberId).notifier,
+    );
     final series = detail.seriesByMetric[detail.selectedMetric]!;
     final isPaidFull = detail.paymentDueTl == 0;
 
@@ -43,26 +49,56 @@ class _AdminMemberDetailPanelState extends BasePanelState<AdminMemberDetailPanel
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.md, AppSpacing.screenEdge, 0),
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.screenEdge,
+                AppSpacing.md,
+                AppSpacing.screenEdge,
+                0,
+              ),
               child: Row(
                 children: [
-                  AppBackButton(onTap: () => ref.read(panelStackControllerProvider.notifier).pop()),
+                  AppBackButton(
+                    onTap: () =>
+                        ref.read(panelStackControllerProvider.notifier).pop(),
+                  ),
                   const SizedBox(width: AppSpacing.md),
-                  Expanded(child: Text('Üye detayı', style: typography.headingSmall.copyWith(color: colors.onSurface, fontSize: 18))),
+                  Expanded(
+                    child: Text(
+                      'Üye detayı',
+                      style: typography.headingSmall.copyWith(
+                        color: colors.onSurface,
+                        fontSize: 18,
+                      ),
+                    ),
+                  ),
                   Material(
                     color: colors.surfaceRaised,
                     borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
                     child: InkWell(
-                      borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusInner,
+                      ),
                       onTap: () {
-                        final summary = ref.read(adminMembersControllerProvider).firstWhere((m) => m.id == widget.memberId);
-                        ref.read(panelStackControllerProvider.notifier).push(MemberInfoPanel(existing: summary));
+                        final summary = ref
+                            .read(adminMembersControllerProvider)
+                            .firstWhere((m) => m.id == widget.memberId);
+                        ref
+                            .read(panelStackControllerProvider.notifier)
+                            .push(MemberInfoPanel(existing: summary));
                       },
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.md,
+                        ),
                         constraints: const BoxConstraints(minHeight: 40),
                         alignment: Alignment.center,
-                        child: Text('Düzenle', style: typography.headingSmall.copyWith(fontSize: 14, color: colors.onSurfaceVariant)),
+                        child: Text(
+                          'Düzenle',
+                          style: typography.headingSmall.copyWith(
+                            fontSize: 14,
+                            color: colors.onSurfaceVariant,
+                          ),
+                        ),
                       ),
                     ),
                   ),
@@ -71,11 +107,22 @@ class _AdminMemberDetailPanelState extends BasePanelState<AdminMemberDetailPanel
             ),
             Expanded(
               child: ListView(
-                padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.md, AppSpacing.screenEdge, AppSpacing.lg),
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.screenEdge,
+                  AppSpacing.md,
+                  AppSpacing.screenEdge,
+                  AppSpacing.lg,
+                ),
                 children: [
                   Container(
                     padding: const EdgeInsets.all(AppSpacing.xl),
-                    decoration: BoxDecoration(color: colors.surface, borderRadius: BorderRadius.circular(AppSpacing.radiusCard), border: Border.all(color: colors.outline)),
+                    decoration: BoxDecoration(
+                      color: colors.surface,
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusCard,
+                      ),
+                      border: Border.all(color: colors.outline),
+                    ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -84,17 +131,38 @@ class _AdminMemberDetailPanelState extends BasePanelState<AdminMemberDetailPanel
                             Container(
                               width: 56,
                               height: 56,
-                              decoration: BoxDecoration(color: colors.primaryContainer, shape: BoxShape.circle),
+                              decoration: BoxDecoration(
+                                color: colors.primaryContainer,
+                                shape: BoxShape.circle,
+                              ),
                               alignment: Alignment.center,
-                              child: Text(detail.initials, style: typography.headingSmall.copyWith(color: colors.onPrimaryContainer, fontSize: 18)),
+                              child: Text(
+                                detail.initials,
+                                style: typography.headingSmall.copyWith(
+                                  color: colors.onPrimaryContainer,
+                                  fontSize: 18,
+                                ),
+                              ),
                             ),
                             const SizedBox(width: AppSpacing.md),
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(detail.name, style: typography.headingMedium.copyWith(color: colors.onSurface, fontSize: 19)),
-                                  Text('${detail.phone} · Antrenör: ${detail.trainerName}', style: typography.bodyMedium.copyWith(color: colors.onSurfaceMuted, fontSize: 14)),
+                                  Text(
+                                    detail.name,
+                                    style: typography.headingMedium.copyWith(
+                                      color: colors.onSurface,
+                                      fontSize: 19,
+                                    ),
+                                  ),
+                                  Text(
+                                    '${detail.phone} · Antrenör: ${detail.trainerName}',
+                                    style: typography.bodyMedium.copyWith(
+                                      color: colors.onSurfaceMuted,
+                                      fontSize: 14,
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),
@@ -103,11 +171,30 @@ class _AdminMemberDetailPanelState extends BasePanelState<AdminMemberDetailPanel
                         const SizedBox(height: AppSpacing.lg),
                         Row(
                           children: [
-                            Expanded(child: _StatTile(label: 'Kalan ders', value: '${detail.remainingSessions}', valueColor: colors.onPrimaryContainer)),
+                            Expanded(
+                              child: _StatTile(
+                                label: 'Kalan ders',
+                                value: '${detail.remainingSessions}',
+                                valueColor: colors.onPrimaryContainer,
+                              ),
+                            ),
                             const SizedBox(width: AppSpacing.sm),
-                            Expanded(child: _StatTile(label: 'Telafi', value: '${detail.makeupSessions}', valueColor: colors.onSurface)),
+                            Expanded(
+                              child: _StatTile(
+                                label: 'Telafi',
+                                value: '${detail.makeupSessions}',
+                                valueColor: colors.onSurface,
+                              ),
+                            ),
                             const SizedBox(width: AppSpacing.sm),
-                            Expanded(child: _StatTile(label: 'Bitiş', value: detail.packageEndDate, valueColor: colors.onSurface, small: true)),
+                            Expanded(
+                              child: _StatTile(
+                                label: 'Bitiş',
+                                value: detail.packageEndDate,
+                                valueColor: colors.onSurface,
+                                small: true,
+                              ),
+                            ),
                           ],
                         ),
                       ],
@@ -118,34 +205,84 @@ class _AdminMemberDetailPanelState extends BasePanelState<AdminMemberDetailPanel
                     padding: const EdgeInsets.all(AppSpacing.lg),
                     decoration: BoxDecoration(
                       color: colors.warningContainer,
-                      borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
-                      border: Border.all(color: colors.warning.withValues(alpha: 0.32)),
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusCard,
+                      ),
+                      border: Border.all(
+                        color: colors.warning.withValues(alpha: 0.32),
+                      ),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(
                           children: [
-                            Expanded(child: Text('Ödeme durumu', style: typography.headingSmall.copyWith(color: colors.onWarningContainer, fontSize: 16))),
-                            Text('Son ödeme ${detail.lastPaymentDate}', style: typography.bodyMedium.copyWith(color: colors.onSurfaceVariant, fontSize: 13)),
+                            Expanded(
+                              child: Text(
+                                'Ödeme durumu',
+                                style: typography.headingSmall.copyWith(
+                                  color: colors.onWarningContainer,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ),
+                            Text(
+                              'Son ödeme ${detail.lastPaymentDate}',
+                              style: typography.bodyMedium.copyWith(
+                                color: colors.onSurfaceVariant,
+                                fontSize: 13,
+                              ),
+                            ),
                           ],
                         ),
                         const SizedBox(height: AppSpacing.md),
                         Row(
                           children: [
-                            Expanded(child: _PaymentTile(label: 'Toplam', value: '₺${detail.paymentTotalTl}', valueColor: colors.onSurface)),
+                            Expanded(
+                              child: _PaymentTile(
+                                label: 'Toplam',
+                                value: '₺${detail.paymentTotalTl}',
+                                valueColor: colors.onSurface,
+                              ),
+                            ),
                             const SizedBox(width: AppSpacing.sm),
-                            Expanded(child: _PaymentTile(label: 'Ödendi', value: '₺${detail.paymentPaidTl}', valueColor: colors.success)),
+                            Expanded(
+                              child: _PaymentTile(
+                                label: 'Ödendi',
+                                value: '₺${detail.paymentPaidTl}',
+                                valueColor: colors.success,
+                              ),
+                            ),
                             const SizedBox(width: AppSpacing.sm),
-                            Expanded(child: _PaymentTile(label: 'Kalan', value: '₺${detail.paymentDueTl}', valueColor: colors.onWarningContainer)),
+                            Expanded(
+                              child: _PaymentTile(
+                                label: 'Kalan',
+                                value: '₺${detail.paymentDueTl}',
+                                valueColor: colors.onWarningContainer,
+                              ),
+                            ),
                           ],
                         ),
-                        const SizedBox(height: AppSpacing.md),
-                        AppButton(
-                          label: isPaidFull ? 'Ödeme tamamlandı' : 'Ödeme kaydet',
-                          variant: AppButtonVariant.secondary,
-                          onPressed: isPaidFull ? null : () {},
-                        ),
+                        if (isPaidFull) ...[
+                          const SizedBox(height: AppSpacing.md),
+                          AppButton(
+                            label: 'Ödeme tamamlandı',
+                            variant: AppButtonVariant.secondary,
+                            onPressed: null,
+                          ),
+                        ] else ...[
+                          const SizedBox(height: AppSpacing.sm),
+                          // "Ödeme kaydet" butonu henüz gerçek bir ödeme
+                          // yazma akışına bağlı değil (üye ödeme verisi hâlâ
+                          // mock) — işlevsiz bir buton göstermek yerine bunu
+                          // açıkça belirtiyoruz.
+                          Text(
+                            'Ödeme kaydı bu ekrandan henüz alınamıyor.',
+                            style: typography.caption.copyWith(
+                              color: colors.onSurfaceMuted,
+                            ),
+                          ),
+                        ],
                       ],
                     ),
                   ),
@@ -153,29 +290,60 @@ class _AdminMemberDetailPanelState extends BasePanelState<AdminMemberDetailPanel
                   AppButton(
                     label: 'Ölçüm ekranını gör',
                     variant: AppButtonVariant.secondary,
-                    onPressed: () => ref.read(panelStackControllerProvider.notifier).push(
-                          MeasurementsPanel(memberId: widget.memberId, memberName: detail.name),
+                    onPressed: () => ref
+                        .read(panelStackControllerProvider.notifier)
+                        .push(
+                          MeasurementsPanel(
+                            memberId: widget.memberId,
+                            memberName: detail.name,
+                          ),
                         ),
                   ),
                   const SizedBox(height: AppSpacing.lg),
                   InkWell(
                     borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
-                    onTap: () => setState(() => _metricPickerOpen = !_metricPickerOpen),
+                    onTap: () =>
+                        setState(() => _metricPickerOpen = !_metricPickerOpen),
                     child: Container(
                       constraints: const BoxConstraints(minHeight: 44),
-                      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-                      decoration: BoxDecoration(color: colors.surface, borderRadius: BorderRadius.circular(AppSpacing.radiusInner), border: Border.all(color: colors.outline)),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.md,
+                      ),
+                      decoration: BoxDecoration(
+                        color: colors.surface,
+                        borderRadius: BorderRadius.circular(
+                          AppSpacing.radiusInner,
+                        ),
+                        border: Border.all(color: colors.outline),
+                      ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('ÖLÇÜM · 6 AY', style: typography.caption.copyWith(color: colors.onSurfaceMuted, fontSize: 11)),
-                              Text(detail.selectedMetric.label, style: typography.headingSmall.copyWith(color: colors.onSurface, fontSize: 15)),
+                              Text(
+                                'ÖLÇÜM · 6 AY',
+                                style: typography.caption.copyWith(
+                                  color: colors.onSurfaceMuted,
+                                  fontSize: 11,
+                                ),
+                              ),
+                              Text(
+                                detail.selectedMetric.label,
+                                style: typography.headingSmall.copyWith(
+                                  color: colors.onSurface,
+                                  fontSize: 15,
+                                ),
+                              ),
                             ],
                           ),
-                          Icon(_metricPickerOpen ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down, color: colors.onPrimaryContainer),
+                          Icon(
+                            _metricPickerOpen
+                                ? Icons.keyboard_arrow_up
+                                : Icons.keyboard_arrow_down,
+                            color: colors.onPrimaryContainer,
+                          ),
                         ],
                       ),
                     ),
@@ -187,25 +355,59 @@ class _AdminMemberDetailPanelState extends BasePanelState<AdminMemberDetailPanel
                       runSpacing: AppSpacing.sm,
                       children: [
                         for (final metric in TrainerMetric.values)
-                          _MetricChip(label: metric.label, selected: metric == detail.selectedMetric, onTap: () => controller.selectMetric(metric)),
+                          _MetricChip(
+                            label: metric.label,
+                            selected: metric == detail.selectedMetric,
+                            onTap: () => controller.selectMetric(metric),
+                          ),
                       ],
                     ),
                   ],
                   const SizedBox(height: AppSpacing.sm),
                   Container(
                     padding: const EdgeInsets.all(AppSpacing.lg),
-                    decoration: BoxDecoration(color: colors.surface, borderRadius: BorderRadius.circular(AppSpacing.radiusCard), border: Border.all(color: colors.outline)),
-                    child: TrendBarChart(values: series.values, labels: series.months, height: 132, valueFormatter: (v) => v.toStringAsFixed(1).replaceAll('.', ',')),
+                    decoration: BoxDecoration(
+                      color: colors.surface,
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusCard,
+                      ),
+                      border: Border.all(color: colors.outline),
+                    ),
+                    child: TrendBarChart(
+                      values: series.values,
+                      labels: series.months,
+                      height: 132,
+                      valueFormatter: (v) =>
+                          v.toStringAsFixed(1).replaceAll('.', ','),
+                    ),
                   ),
                   const SizedBox(height: AppSpacing.lg),
-                  Text('DERS GEÇMİŞİ', style: typography.caption.copyWith(color: colors.onSurfaceMuted, letterSpacing: 1.2)),
+                  Text(
+                    'DERS GEÇMİŞİ',
+                    style: typography.caption.copyWith(
+                      color: colors.onSurfaceMuted,
+                      letterSpacing: 1.2,
+                    ),
+                  ),
                   const SizedBox(height: AppSpacing.sm),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-                    decoration: BoxDecoration(color: colors.surface, borderRadius: BorderRadius.circular(AppSpacing.radiusCard), border: Border.all(color: colors.outline)),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.lg,
+                    ),
+                    decoration: BoxDecoration(
+                      color: colors.surface,
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusCard,
+                      ),
+                      border: Border.all(color: colors.outline),
+                    ),
                     child: Column(
                       children: [
-                        for (var i = 0; i < detail.history.length; i++) _HistoryRow(entry: detail.history[i], showDivider: i < detail.history.length - 1),
+                        for (var i = 0; i < detail.history.length; i++)
+                          _HistoryRow(
+                            entry: detail.history[i],
+                            showDivider: i < detail.history.length - 1,
+                          ),
                       ],
                     ),
                   ),
@@ -220,7 +422,12 @@ class _AdminMemberDetailPanelState extends BasePanelState<AdminMemberDetailPanel
 }
 
 class _StatTile extends StatelessWidget {
-  const _StatTile({required this.label, required this.value, required this.valueColor, this.small = false});
+  const _StatTile({
+    required this.label,
+    required this.value,
+    required this.valueColor,
+    this.small = false,
+  });
 
   final String label;
   final String value;
@@ -233,12 +440,32 @@ class _StatTile extends StatelessWidget {
     final typography = context.appTypography;
     return Container(
       padding: const EdgeInsets.all(AppSpacing.md),
-      decoration: BoxDecoration(color: colors.surfaceRaised, borderRadius: BorderRadius.circular(AppSpacing.radiusInner)),
+      decoration: BoxDecoration(
+        color: colors.surfaceRaised,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: typography.caption.copyWith(color: colors.onSurfaceMuted, fontSize: 12)),
-          Text(value, style: small ? typography.headingSmall.copyWith(color: valueColor, fontSize: 15) : typography.headingMedium.copyWith(color: valueColor, fontSize: 22)),
+          Text(
+            label,
+            style: typography.caption.copyWith(
+              color: colors.onSurfaceMuted,
+              fontSize: 12,
+            ),
+          ),
+          Text(
+            value,
+            style: small
+                ? typography.headingSmall.copyWith(
+                    color: valueColor,
+                    fontSize: 15,
+                  )
+                : typography.headingMedium.copyWith(
+                    color: valueColor,
+                    fontSize: 22,
+                  ),
+          ),
         ],
       ),
     );
@@ -246,7 +473,11 @@ class _StatTile extends StatelessWidget {
 }
 
 class _PaymentTile extends StatelessWidget {
-  const _PaymentTile({required this.label, required this.value, required this.valueColor});
+  const _PaymentTile({
+    required this.label,
+    required this.value,
+    required this.valueColor,
+  });
 
   final String label;
   final String value;
@@ -258,12 +489,27 @@ class _PaymentTile extends StatelessWidget {
     final typography = context.appTypography;
     return Container(
       padding: const EdgeInsets.all(AppSpacing.md),
-      decoration: BoxDecoration(color: colors.background.withValues(alpha: 0.3), borderRadius: BorderRadius.circular(AppSpacing.radiusInner)),
+      decoration: BoxDecoration(
+        color: colors.background.withValues(alpha: 0.3),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: typography.caption.copyWith(color: colors.onSurfaceMuted, fontSize: 12)),
-          Text(value, style: typography.headingSmall.copyWith(color: valueColor, fontSize: 16)),
+          Text(
+            label,
+            style: typography.caption.copyWith(
+              color: colors.onSurfaceMuted,
+              fontSize: 12,
+            ),
+          ),
+          Text(
+            value,
+            style: typography.headingSmall.copyWith(
+              color: valueColor,
+              fontSize: 16,
+            ),
+          ),
         ],
       ),
     );
@@ -271,7 +517,11 @@ class _PaymentTile extends StatelessWidget {
 }
 
 class _MetricChip extends StatelessWidget {
-  const _MetricChip({required this.label, required this.selected, required this.onTap});
+  const _MetricChip({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
 
   final String label;
   final bool selected;
@@ -290,8 +540,19 @@ class _MetricChip extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 13),
           constraints: const BoxConstraints(minHeight: 34),
           alignment: Alignment.center,
-          decoration: BoxDecoration(borderRadius: BorderRadius.circular(AppSpacing.radiusPill), border: Border.all(color: selected ? colors.primary : colors.outlineStrong)),
-          child: Text(label, style: context.appTypography.headingSmall.copyWith(fontSize: 14, color: selected ? colors.onPrimary : colors.onSurfaceVariant)),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
+            border: Border.all(
+              color: selected ? colors.primary : colors.outlineStrong,
+            ),
+          ),
+          child: Text(
+            label,
+            style: context.appTypography.headingSmall.copyWith(
+              fontSize: 14,
+              color: selected ? colors.onPrimary : colors.onSurfaceVariant,
+            ),
+          ),
         ),
       ),
     );
@@ -310,19 +571,40 @@ class _HistoryRow extends StatelessWidget {
     final typography = context.appTypography;
     return Container(
       constraints: const BoxConstraints(minHeight: 56),
-      decoration: BoxDecoration(border: showDivider ? Border(bottom: BorderSide(color: colors.outline)) : null),
+      decoration: BoxDecoration(
+        border: showDivider
+            ? Border(bottom: BorderSide(color: colors.outline))
+            : null,
+      ),
       child: Row(
         children: [
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(entry.date, style: typography.bodyLarge.copyWith(color: colors.onSurface, fontSize: 15)),
-                Text(entry.type, style: typography.caption.copyWith(color: colors.onSurfaceMuted)),
+                Text(
+                  entry.date,
+                  style: typography.bodyLarge.copyWith(
+                    color: colors.onSurface,
+                    fontSize: 15,
+                  ),
+                ),
+                Text(
+                  entry.type,
+                  style: typography.caption.copyWith(
+                    color: colors.onSurfaceMuted,
+                  ),
+                ),
               ],
             ),
           ),
-          Text(entry.stateLabel, style: typography.caption.copyWith(color: entry.isPositive ? colors.success : colors.error, fontWeight: FontWeight.w600)),
+          Text(
+            entry.stateLabel,
+            style: typography.caption.copyWith(
+              color: entry.isPositive ? colors.success : colors.error,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
         ],
       ),
     );

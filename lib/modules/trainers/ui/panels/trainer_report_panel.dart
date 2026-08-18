@@ -20,15 +20,30 @@ class TrainerReportPanel extends ConsumerWidget {
     return Scaffold(
       body: SafeArea(
         child: ListView(
-          padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.lg, AppSpacing.screenEdge, AppSpacing.lg),
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.screenEdge,
+            AppSpacing.lg,
+            AppSpacing.screenEdge,
+            AppSpacing.lg,
+          ),
           children: [
-            Text('Seans raporum', style: typography.headingLarge.copyWith(color: colors.onSurface)),
+            Text(
+              'Seans raporum',
+              style: typography.headingLarge.copyWith(color: colors.onSurface),
+            ),
             const SizedBox(height: AppSpacing.lg),
             Row(
               children: [
-                Expanded(child: _DateTile(label: 'Başlangıç t.', value: report.startDate)),
+                Expanded(
+                  child: _DateTile(
+                    label: 'Başlangıç t.',
+                    value: report.startDate,
+                  ),
+                ),
                 const SizedBox(width: AppSpacing.sm),
-                Expanded(child: _DateTile(label: 'Bitiş t.', value: report.endDate)),
+                Expanded(
+                  child: _DateTile(label: 'Bitiş t.', value: report.endDate),
+                ),
               ],
             ),
             const SizedBox(height: AppSpacing.lg),
@@ -37,53 +52,78 @@ class TrainerReportPanel extends ConsumerWidget {
               decoration: BoxDecoration(
                 color: colors.primaryContainer.withValues(alpha: 0.24),
                 borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
-                border: Border.all(color: colors.primary.withValues(alpha: 0.32)),
+                border: Border.all(
+                  color: colors.primary.withValues(alpha: 0.32),
+                ),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Kazanılan prim', style: typography.bodyMedium.copyWith(color: colors.onPrimaryContainer, fontSize: 13)),
+                  Text(
+                    'Kazanılan prim',
+                    style: typography.bodyMedium.copyWith(
+                      color: colors.onPrimaryContainer,
+                      fontSize: 13,
+                    ),
+                  ),
                   const SizedBox(height: AppSpacing.xs),
-                  Text(report.bonusAmount, style: typography.dataLarge.copyWith(color: colors.onSurface, fontSize: 40)),
+                  Text(
+                    report.bonusAmount,
+                    style: typography.dataLarge.copyWith(
+                      color: colors.onSurface,
+                      fontSize: 40,
+                    ),
+                  ),
                   const SizedBox(height: AppSpacing.xs),
                   Text(
                     '${report.completedSessionCount} tamamlanan seans · seans başı ${report.perSessionRate}',
-                    style: typography.bodyMedium.copyWith(color: colors.onSurfaceVariant, fontSize: 13),
+                    style: typography.bodyMedium.copyWith(
+                      color: colors.onSurfaceVariant,
+                      fontSize: 13,
+                    ),
                   ),
                   const SizedBox(height: AppSpacing.lg),
+                  // "Detay" ve "Prim sistemine git" için hedef bir ekran/akış
+                  // henüz yok — tıklanabilir gibi görünüp hiçbir şey
+                  // yapmamaları yerine pasif (dokunulamaz, soluk) gösteriliyor.
                   Row(
                     children: [
                       Expanded(
-                        child: Material(
-                          color: colors.primary,
-                          borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
-                          child: InkWell(
-                            onTap: () {},
-                            borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
-                            child: Container(
-                              constraints: const BoxConstraints(minHeight: 44),
-                              alignment: Alignment.center,
-                              child: Text('Detay', style: typography.headingSmall.copyWith(fontSize: 15, color: colors.onPrimary)),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: colors.surfaceRaised,
+                            borderRadius: BorderRadius.circular(
+                              AppSpacing.radiusInner,
+                            ),
+                          ),
+                          constraints: const BoxConstraints(minHeight: 44),
+                          alignment: Alignment.center,
+                          child: Text(
+                            'Detay',
+                            style: typography.headingSmall.copyWith(
+                              fontSize: 15,
+                              color: colors.onSurfaceMuted,
                             ),
                           ),
                         ),
                       ),
                       const SizedBox(width: AppSpacing.sm),
                       Expanded(
-                        child: Material(
-                          color: colors.surfaceRaised,
-                          borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
-                          child: InkWell(
-                            onTap: () {},
-                            borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
-                            child: Container(
-                              constraints: const BoxConstraints(minHeight: 44),
-                              alignment: Alignment.center,
-                              child: Text(
-                                'Prim sistemine git',
-                                textAlign: TextAlign.center,
-                                style: typography.headingSmall.copyWith(fontSize: 15, color: colors.onSurfaceVariant),
-                              ),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: colors.surfaceRaised,
+                            borderRadius: BorderRadius.circular(
+                              AppSpacing.radiusInner,
+                            ),
+                          ),
+                          constraints: const BoxConstraints(minHeight: 44),
+                          alignment: Alignment.center,
+                          child: Text(
+                            'Prim sistemine git',
+                            textAlign: TextAlign.center,
+                            style: typography.headingSmall.copyWith(
+                              fontSize: 15,
+                              color: colors.onSurfaceMuted,
                             ),
                           ),
                         ),
@@ -125,8 +165,17 @@ class _DateTile extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: typography.caption.copyWith(color: colors.onSurfaceMuted)),
-          Text(value, style: typography.headingSmall.copyWith(color: colors.onSurface, fontSize: 15)),
+          Text(
+            label,
+            style: typography.caption.copyWith(color: colors.onSurfaceMuted),
+          ),
+          Text(
+            value,
+            style: typography.headingSmall.copyWith(
+              color: colors.onSurface,
+              fontSize: 15,
+            ),
+          ),
         ],
       ),
     );
@@ -157,21 +206,34 @@ class _BreakdownCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Expanded(
-                child: Text(breakdown.title, style: typography.headingSmall.copyWith(color: colors.onSurface, fontSize: 16)),
+                child: Text(
+                  breakdown.title,
+                  style: typography.headingSmall.copyWith(
+                    color: colors.onSurface,
+                    fontSize: 16,
+                  ),
+                ),
               ),
               const SizedBox(width: AppSpacing.sm),
               Text(
                 '${breakdown.total}',
-                style: typography.dataLarge.copyWith(color: colors.onSurface, fontSize: 28),
+                style: typography.dataLarge.copyWith(
+                  color: colors.onSurface,
+                  fontSize: 28,
+                ),
               ),
             ],
           ),
           const SizedBox(height: AppSpacing.md),
           Row(
             children: [
-              Expanded(child: _MiniStat(label: 'Birebir', value: '${breakdown.solo}')),
+              Expanded(
+                child: _MiniStat(label: 'Birebir', value: '${breakdown.solo}'),
+              ),
               const SizedBox(width: AppSpacing.sm),
-              Expanded(child: _MiniStat(label: 'Grup', value: '${breakdown.group}')),
+              Expanded(
+                child: _MiniStat(label: 'Grup', value: '${breakdown.group}'),
+              ),
             ],
           ),
         ],
@@ -192,12 +254,24 @@ class _MiniStat extends StatelessWidget {
     final typography = context.appTypography;
     return Container(
       padding: const EdgeInsets.all(AppSpacing.md),
-      decoration: BoxDecoration(color: colors.surfaceRaised, borderRadius: BorderRadius.circular(AppSpacing.radiusInner)),
+      decoration: BoxDecoration(
+        color: colors.surfaceRaised,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: typography.caption.copyWith(color: colors.onSurfaceMuted)),
-          Text(value, style: typography.headingSmall.copyWith(color: colors.onSurface, fontSize: 17)),
+          Text(
+            label,
+            style: typography.caption.copyWith(color: colors.onSurfaceMuted),
+          ),
+          Text(
+            value,
+            style: typography.headingSmall.copyWith(
+              color: colors.onSurface,
+              fontSize: 17,
+            ),
+          ),
         ],
       ),
     );
