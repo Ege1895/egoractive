@@ -12,14 +12,16 @@ part 'create_group_session_controller.g.dart';
 @riverpod
 class CreateGroupSessionController extends _$CreateGroupSessionController {
   @override
-  CreateGroupSessionForm build() => ref.watch(createGroupSessionRepositoryProvider).loadInitial();
+  CreateGroupSessionForm build() =>
+      ref.watch(createGroupSessionRepositoryProvider).loadInitial();
 
-  void setTitle(String title) => state = state.copyWith(title: title);
+  void setTitle(String title) =>
+      state = state.copyWith(title: title, titleError: null);
 
   void toggleDay(int day) {
     final days = {...state.selectedDays};
     days.contains(day) ? days.remove(day) : days.add(day);
-    state = state.copyWith(selectedDays: days);
+    state = state.copyWith(selectedDays: days, daysError: null);
   }
 
   void incrementCapacity() {
@@ -32,41 +34,71 @@ class CreateGroupSessionController extends _$CreateGroupSessionController {
     state = state.copyWith(capacity: state.capacity - 1);
   }
 
-  void toggleOnlineBooking() => state = state.copyWith(onlineBookingEnabled: !state.onlineBookingEnabled);
+  void toggleOnlineBooking() =>
+      state = state.copyWith(onlineBookingEnabled: !state.onlineBookingEnabled);
 
   /// Seçili her gün için o günün en yakın gelecekteki tekrarında bir
   /// `groupSessions` dokümanı oluşturur — tam bir tekrarlı seri motoru
   /// değil (F4-2 kapsamı bunu gerektirmiyor), her seçili gün için tek bir
   /// gerçek, katılınabilir seans. Boş başlıkta veya gün seçilmemişse
-  /// `false` döner.
+  /// alanların altına spesifik hata yazıp `false` döner — önceki sürüm
+  /// sessizce hiçbir açıklama vermeden `false` dönüyordu.
   Future<bool> submit() async {
     final title = state.title.trim();
-    if (title.isEmpty || state.selectedDays.isEmpty) return false;
-
-    final gymId = await ref.read(activeGymIdProvider.future);
-    final uid = ref.read(authStateProvider).valueOrNull?.uid;
-    if (gymId == null || uid == null) return false;
-
-    final userDoc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
-    final trainerName = (userDoc.data()?['name'] as String?)?.trim();
-
-    final timeParts = state.startTime.split(':');
-    final hour = int.tryParse(timeParts.elementAt(0)) ?? 0;
-    final minute = timeParts.length > 1 ? int.tryParse(timeParts.elementAt(1)) ?? 0 : 0;
-
-    final service = ref.read(groupSessionsWriteServiceProvider);
-    for (final weekday in state.selectedDays) {
-      await service.createGroupSession(
-        gymId: gymId,
-        title: title,
-        trainerName: trainerName?.isNotEmpty == true ? trainerName! : 'Antrenör',
-        studioName: state.studioName,
-        startTime: _nextOccurrence(weekday, hour, minute),
-        durationMinutes: state.durationMinutes,
-        capacity: state.capacity,
-      );
+    final titleError = title.isEmpty ? 'Ders adı boş bırakılamaz.' : null;
+    final daysError = state.selectedDays.isEmpty ? 'En az bir gün seç.' : null;
+    if (titleError != null || daysError != null) {
+      state = state.copyWith(titleError: titleError, daysError: daysError);
+      return false;
     }
-    return true;
+
+    state = state.copyWith(isSubmitting: true, errorMessage: null);
+    try {
+      final gymId = await ref.read(activeGymIdProvider.future);
+      final uid = ref.read(authStateProvider).valueOrNull?.uid;
+      if (gymId == null || uid == null) {
+        state = state.copyWith(
+          isSubmitting: false,
+          errorMessage: 'Aktif bir salon bulunamadı.',
+        );
+        return false;
+      }
+
+      final userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(uid)
+          .get();
+      final trainerName = (userDoc.data()?['name'] as String?)?.trim();
+
+      final timeParts = state.startTime.split(':');
+      final hour = int.tryParse(timeParts.elementAt(0)) ?? 0;
+      final minute = timeParts.length > 1
+          ? int.tryParse(timeParts.elementAt(1)) ?? 0
+          : 0;
+
+      final service = ref.read(groupSessionsWriteServiceProvider);
+      for (final weekday in state.selectedDays) {
+        await service.createGroupSession(
+          gymId: gymId,
+          title: title,
+          trainerName: trainerName?.isNotEmpty == true
+              ? trainerName!
+              : 'Antrenör',
+          studioName: state.studioName,
+          startTime: _nextOccurrence(weekday, hour, minute),
+          durationMinutes: state.durationMinutes,
+          capacity: state.capacity,
+        );
+      }
+      state = state.copyWith(isSubmitting: false);
+      return true;
+    } catch (_) {
+      state = state.copyWith(
+        isSubmitting: false,
+        errorMessage: 'Grup dersi oluşturulamadı, tekrar dene.',
+      );
+      return false;
+    }
   }
 
   DateTime _nextOccurrence(int weekday, int hour, int minute) {

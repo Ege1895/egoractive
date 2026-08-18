@@ -41,6 +41,10 @@ class _CreateEventPanelState extends BasePanelState<CreateEventPanel> {
   final _timeController = TextEditingController();
   final _descriptionController = TextEditingController();
   int? _capacity;
+  bool _isSaving = false;
+  String? _nameError;
+  String? _dateError;
+  String? _errorMessage;
 
   @override
   Widget build(BuildContext context) {
@@ -108,6 +112,12 @@ class _CreateEventPanelState extends BasePanelState<CreateEventPanel> {
                         AppTextField(
                           label: 'Etkinlik adı',
                           controller: _nameController,
+                          errorText: _nameError,
+                          onChanged: (_) {
+                            if (_nameError != null) {
+                              setState(() => _nameError = null);
+                            }
+                          },
                         ),
                         const SizedBox(height: AppSpacing.md),
                         AppTextField(
@@ -116,11 +126,19 @@ class _CreateEventPanelState extends BasePanelState<CreateEventPanel> {
                         ),
                         const SizedBox(height: AppSpacing.md),
                         Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Expanded(
                               child: AppTextField(
                                 label: 'Tarih',
                                 controller: _dateController,
+                                hint: '16 Ağu 2026',
+                                errorText: _dateError,
+                                onChanged: (_) {
+                                  if (_dateError != null) {
+                                    setState(() => _dateError = null);
+                                  }
+                                },
                               ),
                             ),
                             const SizedBox(width: AppSpacing.sm),
@@ -129,6 +147,7 @@ class _CreateEventPanelState extends BasePanelState<CreateEventPanel> {
                                 label: 'Saat',
                                 controller: _timeController,
                                 keyboardType: TextInputType.datetime,
+                                hint: '08:00',
                               ),
                             ),
                           ],
@@ -212,34 +231,95 @@ class _CreateEventPanelState extends BasePanelState<CreateEventPanel> {
                 AppSpacing.screenEdge,
                 AppSpacing.lg,
               ),
-              child: AppButton(
-                label: 'Etkinliği oluştur',
-                onPressed: () async {
-                  final name = _nameController.text.trim();
-                  final dateTime = _parseDateTime(
-                    _dateController.text,
-                    _timeController.text,
-                  );
-                  if (name.isEmpty || dateTime == null) return;
-                  if (!await ensureSubscriptionAllowsWrite(context, ref))
-                    return;
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (_errorMessage != null) ...[
+                    Text(
+                      _errorMessage!,
+                      style: typography.bodyMedium.copyWith(
+                        color: colors.error,
+                        fontSize: 13,
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                  ],
+                  AppButton(
+                    label: _isSaving ? 'Oluşturuluyor…' : 'Etkinliği oluştur',
+                    onPressed: _isSaving
+                        ? null
+                        : () async {
+                            final name = _nameController.text.trim();
+                            final dateTime = _parseDateTime(
+                              _dateController.text,
+                              _timeController.text,
+                            );
+                            var hasError = false;
+                            if (name.isEmpty) {
+                              setState(
+                                () => _nameError =
+                                    'Etkinlik adı boş bırakılamaz.',
+                              );
+                              hasError = true;
+                            }
+                            if (dateTime == null) {
+                              setState(
+                                () => _dateError =
+                                    'Tarihi "gün ay yıl" formatında gir (örn. 16 Ağu 2026).',
+                              );
+                              hasError = true;
+                            }
+                            if (hasError) return;
+                            if (!await ensureSubscriptionAllowsWrite(
+                              context,
+                              ref,
+                            )) {
+                              return;
+                            }
 
-                  final gymId = await ref.read(activeGymIdProvider.future);
-                  if (gymId == null) return;
-
-                  await ref
-                      .read(eventsWriteServiceProvider)
-                      .createEvent(
-                        gymId: gymId,
-                        name: name,
-                        location: _locationController.text.trim(),
-                        dateTime: dateTime,
-                        description: _descriptionController.text.trim(),
-                        capacity: _capacity,
-                      );
-                  if (!mounted) return;
-                  ref.read(panelStackControllerProvider.notifier).pop();
-                },
+                            setState(() {
+                              _isSaving = true;
+                              _errorMessage = null;
+                            });
+                            try {
+                              final gymId = await ref.read(
+                                activeGymIdProvider.future,
+                              );
+                              if (gymId == null) {
+                                setState(() {
+                                  _isSaving = false;
+                                  _errorMessage = 'Aktif bir salon bulunamadı.';
+                                });
+                                return;
+                              }
+                              await ref
+                                  .read(eventsWriteServiceProvider)
+                                  .createEvent(
+                                    gymId: gymId,
+                                    name: name,
+                                    location: _locationController.text.trim(),
+                                    dateTime: dateTime!,
+                                    description: _descriptionController.text
+                                        .trim(),
+                                    capacity: _capacity,
+                                  );
+                              if (mounted) {
+                                ref
+                                    .read(panelStackControllerProvider.notifier)
+                                    .pop();
+                              }
+                            } catch (_) {
+                              if (mounted) {
+                                setState(() {
+                                  _isSaving = false;
+                                  _errorMessage =
+                                      'Etkinlik oluşturulamadı, tekrar dene.';
+                                });
+                              }
+                            }
+                          },
+                  ),
+                ],
               ),
             ),
           ],

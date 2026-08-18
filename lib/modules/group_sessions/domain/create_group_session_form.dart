@@ -15,5 +15,9 @@ class CreateGroupSessionForm with _$CreateGroupSessionForm {
     required int capacityMax,
     required bool onlineBookingEnabled,
     required String studioName,
+    @Default(false) bool isSubmitting,
+    String? titleError,
+    String? daysError,
+    String? errorMessage,
   }) = _CreateGroupSessionForm;
 }

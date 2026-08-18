@@ -44,6 +44,11 @@ class _AddExpensePanelState extends BasePanelState<AddExpensePanel> {
   );
   String? _category;
   bool _recurring = false;
+  bool _isSaving = false;
+  String? _amountError;
+  String? _titleError;
+  String? _dateError;
+  String? _errorMessage;
 
   @override
   Widget build(BuildContext context) {
@@ -113,6 +118,12 @@ class _AddExpensePanelState extends BasePanelState<AddExpensePanel> {
                       controller: _amountController,
                       keyboardType: TextInputType.number,
                       hint: '8400',
+                      errorText: _amountError,
+                      onChanged: (_) {
+                        if (_amountError != null) {
+                          setState(() => _amountError = null);
+                        }
+                      },
                     ),
                   ),
                   const SizedBox(height: AppSpacing.lg),
@@ -153,11 +164,23 @@ class _AddExpensePanelState extends BasePanelState<AddExpensePanel> {
                           label: 'Açıklama',
                           controller: _titleController,
                           hint: 'Reformer yay değişimi',
+                          errorText: _titleError,
+                          onChanged: (_) {
+                            if (_titleError != null) {
+                              setState(() => _titleError = null);
+                            }
+                          },
                         ),
                         const SizedBox(height: AppSpacing.md),
                         AppTextField(
                           label: 'Tarih',
                           controller: _dateController,
+                          errorText: _dateError,
+                          onChanged: (_) {
+                            if (_dateError != null) {
+                              setState(() => _dateError = null);
+                            }
+                          },
                         ),
                       ],
                     ),
@@ -248,33 +271,88 @@ class _AddExpensePanelState extends BasePanelState<AddExpensePanel> {
                 AppSpacing.screenEdge,
                 AppSpacing.lg,
               ),
-              child: AppButton(
-                label: 'Gideri kaydet',
-                onPressed: () async {
-                  final amount = int.tryParse(_amountController.text) ?? 0;
-                  final title = _titleController.text.trim();
-                  final category = _category;
-                  final date = _parseDate(_dateController.text);
-                  if (amount <= 0 ||
-                      title.isEmpty ||
-                      category == null ||
-                      date == null)
-                    return;
-                  if (!await ensureSubscriptionAllowsWrite(context, ref))
-                    return;
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (_errorMessage != null) ...[
+                    Text(
+                      _errorMessage!,
+                      style: typography.bodyMedium.copyWith(
+                        color: colors.error,
+                        fontSize: 13,
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                  ],
+                  AppButton(
+                    label: _isSaving ? 'Kaydediliyor…' : 'Gideri kaydet',
+                    onPressed: _isSaving
+                        ? null
+                        : () async {
+                            final amount =
+                                int.tryParse(_amountController.text) ?? 0;
+                            final title = _titleController.text.trim();
+                            final category = _category;
+                            final date = _parseDate(_dateController.text);
+                            var hasError = false;
+                            if (amount <= 0) {
+                              setState(
+                                () => _amountError = 'Geçerli bir tutar gir.',
+                              );
+                              hasError = true;
+                            }
+                            if (title.isEmpty) {
+                              setState(
+                                () => _titleError = 'Açıklama boş bırakılamaz.',
+                              );
+                              hasError = true;
+                            }
+                            if (date == null) {
+                              setState(
+                                () => _dateError =
+                                    'Tarihi "gün ay yıl" formatında gir (örn. 18 Tem 2026).',
+                              );
+                              hasError = true;
+                            }
+                            if (hasError) return;
+                            if (!await ensureSubscriptionAllowsWrite(
+                              context,
+                              ref,
+                            )) {
+                              return;
+                            }
 
-                  await ref
-                      .read(expensesControllerProvider.notifier)
-                      .addExpense(
-                        category: category,
-                        title: title,
-                        date: date,
-                        amountTl: amount,
-                        recurring: _recurring,
-                      );
-                  if (!mounted) return;
-                  ref.read(panelStackControllerProvider.notifier).pop();
-                },
+                            setState(() {
+                              _isSaving = true;
+                              _errorMessage = null;
+                            });
+                            try {
+                              await ref
+                                  .read(expensesControllerProvider.notifier)
+                                  .addExpense(
+                                    category: category!,
+                                    title: title,
+                                    date: date!,
+                                    amountTl: amount,
+                                    recurring: _recurring,
+                                  );
+                              if (mounted) {
+                                ref
+                                    .read(panelStackControllerProvider.notifier)
+                                    .pop();
+                              }
+                            } catch (_) {
+                              if (mounted) {
+                                setState(() {
+                                  _isSaving = false;
+                                  _errorMessage =
+                                      'Gider kaydedilemedi, tekrar dene.';
+                                });
+                              }
+                            }
+                          },
+                  ),
+                ],
               ),
             ),
           ],

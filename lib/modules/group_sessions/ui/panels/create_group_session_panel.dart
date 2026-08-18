@@ -16,10 +16,25 @@ class CreateGroupSessionPanel extends BasePanel {
   const CreateGroupSessionPanel({super.key});
 
   @override
-  ConsumerState<CreateGroupSessionPanel> createState() => _CreateGroupSessionPanelState();
+  ConsumerState<CreateGroupSessionPanel> createState() =>
+      _CreateGroupSessionPanelState();
 }
 
-class _CreateGroupSessionPanelState extends BasePanelState<CreateGroupSessionPanel> {
+class _CreateGroupSessionPanelState
+    extends BasePanelState<CreateGroupSessionPanel> {
+  late final TextEditingController _titleController;
+
+  @override
+  void initState() {
+    super.initState();
+    // Önceki sürümde bu alanın `controller` parametresi hiç verilmemişti —
+    // TextField kendi iç state'ini tutuyordu, provider'daki `form.title` ile
+    // senkron değildi (ör. panel yeniden build olunca alan sıfırlanabilirdi).
+    _titleController = TextEditingController(
+      text: ref.read(createGroupSessionControllerProvider).title,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
@@ -34,29 +49,53 @@ class _CreateGroupSessionPanelState extends BasePanelState<CreateGroupSessionPan
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.md, AppSpacing.screenEdge, 0),
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.screenEdge,
+                AppSpacing.md,
+                AppSpacing.screenEdge,
+                0,
+              ),
               child: Row(
                 children: [
                   Expanded(
-                    child: Text('Grup dersi oluştur', style: typography.headingSmall.copyWith(color: colors.onSurface, fontSize: 18)),
+                    child: Text(
+                      'Grup dersi oluştur',
+                      style: typography.headingSmall.copyWith(
+                        color: colors.onSurface,
+                        fontSize: 18,
+                      ),
+                    ),
                   ),
                   const SizedBox(width: AppSpacing.sm),
                   GestureDetector(
                     onTap: () => panelStack.pop(),
-                    child: Text('Vazgeç', style: typography.bodyLarge.copyWith(color: colors.onSurfaceMuted, fontSize: 15)),
+                    child: Text(
+                      'Vazgeç',
+                      style: typography.bodyLarge.copyWith(
+                        color: colors.onSurfaceMuted,
+                        fontSize: 15,
+                      ),
+                    ),
                   ),
                 ],
               ),
             ),
             Expanded(
               child: ListView(
-                padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.lg, AppSpacing.screenEdge, AppSpacing.lg),
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.screenEdge,
+                  AppSpacing.lg,
+                  AppSpacing.screenEdge,
+                  AppSpacing.lg,
+                ),
                 children: [
                   Container(
                     padding: const EdgeInsets.all(AppSpacing.lg),
                     decoration: BoxDecoration(
                       color: colors.surface,
-                      borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusCard,
+                      ),
                       border: Border.all(color: colors.outline),
                     ),
                     child: Column(
@@ -64,25 +103,51 @@ class _CreateGroupSessionPanelState extends BasePanelState<CreateGroupSessionPan
                       children: [
                         AppTextField(
                           label: 'Ders adı',
+                          controller: _titleController,
+                          errorText: form.titleError,
                           onChanged: controller.setTitle,
                         ),
                         const SizedBox(height: AppSpacing.md),
                         Row(
                           children: [
-                            Expanded(child: _InfoField(label: 'Başlangıç saati', value: form.startTime)),
+                            Expanded(
+                              child: _InfoField(
+                                label: 'Başlangıç saati',
+                                value: form.startTime,
+                              ),
+                            ),
                             const SizedBox(width: AppSpacing.sm),
-                            Expanded(child: _InfoField(label: 'Süre', value: '${form.durationMinutes} dk')),
+                            Expanded(
+                              child: _InfoField(
+                                label: 'Süre',
+                                value: '${form.durationMinutes} dk',
+                              ),
+                            ),
                           ],
                         ),
                         const SizedBox(height: AppSpacing.md),
-                        Text('Günler', style: typography.bodyMedium.copyWith(color: colors.onSurfaceMuted, fontSize: 13)),
+                        Text(
+                          'Günler',
+                          style: typography.bodyMedium.copyWith(
+                            color: colors.onSurfaceMuted,
+                            fontSize: 13,
+                          ),
+                        ),
                         const SizedBox(height: AppSpacing.sm),
                         Row(
                           children: [
-                            for (var i = 0; i < groupSessionDayLabels.length; i++)
+                            for (
+                              var i = 0;
+                              i < groupSessionDayLabels.length;
+                              i++
+                            )
                               Expanded(
                                 child: Padding(
-                                  padding: EdgeInsets.only(right: i == groupSessionDayLabels.length - 1 ? 0 : AppSpacing.xs),
+                                  padding: EdgeInsets.only(
+                                    right: i == groupSessionDayLabels.length - 1
+                                        ? 0
+                                        : AppSpacing.xs,
+                                  ),
                                   child: _DayChip(
                                     label: groupSessionDayLabels[i],
                                     selected: form.selectedDays.contains(i + 1),
@@ -92,6 +157,16 @@ class _CreateGroupSessionPanelState extends BasePanelState<CreateGroupSessionPan
                               ),
                           ],
                         ),
+                        if (form.daysError != null) ...[
+                          const SizedBox(height: AppSpacing.xs),
+                          Text(
+                            form.daysError!,
+                            style: typography.bodyMedium.copyWith(
+                              color: colors.error,
+                              fontSize: 13,
+                            ),
+                          ),
+                        ],
                       ],
                     ),
                   ),
@@ -100,7 +175,9 @@ class _CreateGroupSessionPanelState extends BasePanelState<CreateGroupSessionPan
                     padding: const EdgeInsets.all(AppSpacing.lg),
                     decoration: BoxDecoration(
                       color: colors.surface,
-                      borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusCard,
+                      ),
                       border: Border.all(color: colors.outline),
                     ),
                     child: Column(
@@ -113,31 +190,56 @@ class _CreateGroupSessionPanelState extends BasePanelState<CreateGroupSessionPan
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text('Kontenjan', style: typography.headingSmall.copyWith(color: colors.onSurface, fontSize: 16)),
+                                  Text(
+                                    'Kontenjan',
+                                    style: typography.headingSmall.copyWith(
+                                      color: colors.onSurface,
+                                      fontSize: 16,
+                                    ),
+                                  ),
                                   Text(
                                     '${form.studioName} için üst sınır ${form.capacityMax} kişi',
-                                    style: typography.bodyMedium.copyWith(color: colors.onSurfaceMuted, fontSize: 13),
+                                    style: typography.bodyMedium.copyWith(
+                                      color: colors.onSurfaceMuted,
+                                      fontSize: 13,
+                                    ),
                                   ),
                                 ],
                               ),
                             ),
-                            _StepperButton(icon: Icons.remove, onTap: controller.decrementCapacity, filled: false),
+                            _StepperButton(
+                              icon: Icons.remove,
+                              onTap: controller.decrementCapacity,
+                              filled: false,
+                            ),
                             SizedBox(
                               width: 40,
                               child: Text(
                                 '${form.capacity}',
                                 textAlign: TextAlign.center,
-                                style: typography.headingMedium.copyWith(color: colors.onSurface, fontSize: 24),
+                                style: typography.headingMedium.copyWith(
+                                  color: colors.onSurface,
+                                  fontSize: 24,
+                                ),
                               ),
                             ),
-                            _StepperButton(icon: Icons.add, onTap: controller.incrementCapacity, filled: true),
+                            _StepperButton(
+                              icon: Icons.add,
+                              onTap: controller.incrementCapacity,
+                              filled: true,
+                            ),
                           ],
                         ),
                         const SizedBox(height: AppSpacing.md),
                         ClipRRect(
-                          borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
+                          borderRadius: BorderRadius.circular(
+                            AppSpacing.radiusPill,
+                          ),
                           child: LinearProgressIndicator(
-                            value: (form.capacity / form.capacityMax).clamp(0, 1),
+                            value: (form.capacity / form.capacityMax).clamp(
+                              0,
+                              1,
+                            ),
                             minHeight: 6,
                             backgroundColor: colors.surfaceRaised,
                             valueColor: AlwaysStoppedAnimation(colors.primary),
@@ -148,25 +250,44 @@ class _CreateGroupSessionPanelState extends BasePanelState<CreateGroupSessionPan
                   ),
                   const SizedBox(height: AppSpacing.lg),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.lg,
+                    ),
                     decoration: BoxDecoration(
                       color: colors.surface,
-                      borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusCard,
+                      ),
                       border: Border.all(color: colors.outline),
                     ),
                     child: Column(
                       children: [
                         Container(
                           constraints: const BoxConstraints(minHeight: 60),
-                          decoration: BoxDecoration(border: Border(bottom: BorderSide(color: colors.outline))),
+                          decoration: BoxDecoration(
+                            border: Border(
+                              bottom: BorderSide(color: colors.outline),
+                            ),
+                          ),
                           child: Row(
                             children: [
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text('Online rezervasyona açık', style: typography.bodyLarge.copyWith(color: colors.onSurface, fontSize: 15)),
-                                    Text("Üyeler Keşfet'ten katılabilir", style: typography.caption.copyWith(color: colors.onSurfaceMuted)),
+                                    Text(
+                                      'Online rezervasyona açık',
+                                      style: typography.bodyLarge.copyWith(
+                                        color: colors.onSurface,
+                                        fontSize: 15,
+                                      ),
+                                    ),
+                                    Text(
+                                      "Üyeler Keşfet'ten katılabilir",
+                                      style: typography.caption.copyWith(
+                                        color: colors.onSurfaceMuted,
+                                      ),
+                                    ),
                                   ],
                                 ),
                               ),
@@ -178,11 +299,24 @@ class _CreateGroupSessionPanelState extends BasePanelState<CreateGroupSessionPan
                                   height: 32,
                                   padding: const EdgeInsets.all(3),
                                   decoration: BoxDecoration(
-                                    color: form.onlineBookingEnabled ? colors.primary : colors.surfaceRaised,
-                                    borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
+                                    color: form.onlineBookingEnabled
+                                        ? colors.primary
+                                        : colors.surfaceRaised,
+                                    borderRadius: BorderRadius.circular(
+                                      AppSpacing.radiusPill,
+                                    ),
                                   ),
-                                  alignment: form.onlineBookingEnabled ? Alignment.centerRight : Alignment.centerLeft,
-                                  child: Container(width: 26, height: 26, decoration: BoxDecoration(color: colors.onSurface, shape: BoxShape.circle)),
+                                  alignment: form.onlineBookingEnabled
+                                      ? Alignment.centerRight
+                                      : Alignment.centerLeft,
+                                  child: Container(
+                                    width: 26,
+                                    height: 26,
+                                    decoration: BoxDecoration(
+                                      color: colors.onSurface,
+                                      shape: BoxShape.circle,
+                                    ),
+                                  ),
                                 ),
                               ),
                             ],
@@ -193,11 +327,27 @@ class _CreateGroupSessionPanelState extends BasePanelState<CreateGroupSessionPan
                           child: Row(
                             children: [
                               Expanded(
-                                child: Text('Stüdyo', style: typography.bodyLarge.copyWith(color: colors.onSurface, fontSize: 15)),
+                                child: Text(
+                                  'Stüdyo',
+                                  style: typography.bodyLarge.copyWith(
+                                    color: colors.onSurface,
+                                    fontSize: 15,
+                                  ),
+                                ),
                               ),
-                              Text(form.studioName, style: typography.headingSmall.copyWith(color: colors.onSurfaceVariant, fontSize: 15)),
+                              Text(
+                                form.studioName,
+                                style: typography.headingSmall.copyWith(
+                                  color: colors.onSurfaceVariant,
+                                  fontSize: 15,
+                                ),
+                              ),
                               const SizedBox(width: AppSpacing.xs),
-                              Icon(Icons.chevron_right, color: colors.onSurfaceMuted, size: 18),
+                              Icon(
+                                Icons.chevron_right,
+                                color: colors.onSurfaceMuted,
+                                size: 18,
+                              ),
                             ],
                           ),
                         ),
@@ -208,20 +358,55 @@ class _CreateGroupSessionPanelState extends BasePanelState<CreateGroupSessionPan
               ),
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.md, AppSpacing.screenEdge, AppSpacing.lg),
-              child: AppButton(
-                label: 'Grup dersini oluştur',
-                onPressed: () async {
-                  if (!await ensureSubscriptionAllowsWrite(context, ref)) return;
-                  final success = await controller.submit();
-                  if (success) panelStack.pop();
-                },
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.screenEdge,
+                AppSpacing.md,
+                AppSpacing.screenEdge,
+                AppSpacing.lg,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (form.errorMessage != null) ...[
+                    Text(
+                      form.errorMessage!,
+                      style: typography.bodyMedium.copyWith(
+                        color: colors.error,
+                        fontSize: 13,
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                  ],
+                  AppButton(
+                    label: form.isSubmitting
+                        ? 'Oluşturuluyor…'
+                        : 'Grup dersini oluştur',
+                    onPressed: form.isSubmitting
+                        ? null
+                        : () async {
+                            if (!await ensureSubscriptionAllowsWrite(
+                              context,
+                              ref,
+                            )) {
+                              return;
+                            }
+                            final success = await controller.submit();
+                            if (success) panelStack.pop();
+                          },
+                  ),
+                ],
               ),
             ),
           ],
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    super.dispose();
   }
 }
 
@@ -237,12 +422,24 @@ class _InfoField extends StatelessWidget {
     final typography = context.appTypography;
     return Container(
       padding: const EdgeInsets.all(AppSpacing.md),
-      decoration: BoxDecoration(color: colors.surfaceRaised, borderRadius: BorderRadius.circular(AppSpacing.radiusInner)),
+      decoration: BoxDecoration(
+        color: colors.surfaceRaised,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: typography.caption.copyWith(color: colors.onSurfaceMuted)),
-          Text(value, style: typography.headingSmall.copyWith(color: colors.onSurface, fontSize: 16)),
+          Text(
+            label,
+            style: typography.caption.copyWith(color: colors.onSurfaceMuted),
+          ),
+          Text(
+            value,
+            style: typography.headingSmall.copyWith(
+              color: colors.onSurface,
+              fontSize: 16,
+            ),
+          ),
         ],
       ),
     );
@@ -250,7 +447,11 @@ class _InfoField extends StatelessWidget {
 }
 
 class _DayChip extends StatelessWidget {
-  const _DayChip({required this.label, required this.selected, required this.onTap});
+  const _DayChip({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
 
   final String label;
   final bool selected;
@@ -266,7 +467,9 @@ class _DayChip extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
         child: Container(
-          constraints: const BoxConstraints(minHeight: AppSpacing.minTouchTarget),
+          constraints: const BoxConstraints(
+            minHeight: AppSpacing.minTouchTarget,
+          ),
           alignment: Alignment.center,
           child: Text(
             label,
@@ -282,7 +485,11 @@ class _DayChip extends StatelessWidget {
 }
 
 class _StepperButton extends StatelessWidget {
-  const _StepperButton({required this.icon, required this.onTap, required this.filled});
+  const _StepperButton({
+    required this.icon,
+    required this.onTap,
+    required this.filled,
+  });
 
   final IconData icon;
   final VoidCallback onTap;
@@ -301,7 +508,11 @@ class _StepperButton extends StatelessWidget {
           width: 44,
           height: 44,
           alignment: Alignment.center,
-          child: Icon(icon, color: filled ? colors.onPrimary : colors.onSurfaceVariant, size: 20),
+          child: Icon(
+            icon,
+            color: filled ? colors.onPrimary : colors.onSurfaceVariant,
+            size: 20,
+          ),
         ),
       ),
     );
