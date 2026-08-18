@@ -136,7 +136,12 @@ class SessionsController extends _$SessionsController {
       await FirebaseFirestore.instance
           .collection('sessions')
           .doc(sessionId)
-          .update({'memberConfirmation': coming ? 'coming' : 'notComing'});
+          .update({
+            'memberConfirmation': coming ? 'coming' : 'notComing',
+            // Antrenörün bildirim listesi (bkz. TrainerNotificationsController)
+            // en son yanıtları önce göstermek için bu alanı kullanıyor.
+            'confirmationRespondedAt': FieldValue.serverTimestamp(),
+          });
     } catch (_) {
       state = state.copyWith(
         attendanceAnswer: previousAnswer,
@@ -158,7 +163,10 @@ class SessionsController extends _$SessionsController {
       await FirebaseFirestore.instance
           .collection('sessions')
           .doc(sessionId)
-          .update({'memberConfirmation': FieldValue.delete()});
+          .update({
+            'memberConfirmation': FieldValue.delete(),
+            'confirmationRespondedAt': FieldValue.delete(),
+          });
     } catch (_) {
       state = state.copyWith(
         attendanceAnswer: previousAnswer,

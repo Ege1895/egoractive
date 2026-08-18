@@ -155,7 +155,7 @@ class _SessionsForMemberProviderElement
 }
 
 String _$sessionsControllerHash() =>
-    r'b4ead8a25c8a6de2d9a3f163b410556ce57c7489';
+    r'6ecb2be567193ececea811afd7bc0bcc4b2fda7a';
 
 /// F3-3 — üyenin kendi seansları gerçek zamanlı `sessions` koleksiyonundan
 /// (memberId == kendi uid'si) okunur. `week`/`paymentWarning` bu task'ın
