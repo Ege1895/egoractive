@@ -172,7 +172,6 @@ class _TrainerRow extends StatelessWidget {
               ],
             ),
           ),
-          Icon(Icons.chevron_right, color: colors.onSurfaceMuted, size: 18),
         ],
       ),
     );
