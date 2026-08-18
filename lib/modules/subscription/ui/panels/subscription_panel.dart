@@ -797,6 +797,10 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
           );
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Abonelik yönetimi açılamadı.')),
+      );
     }
   }
 }
