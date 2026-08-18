@@ -6,6 +6,7 @@ import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../shared/utils/tr_date_formatter.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../controller/measurements_controller.dart';
 import '../../domain/measurement_metric.dart';
@@ -99,47 +100,24 @@ class _AddMeasurementPanelState extends BasePanelState<AddMeasurementPanel> {
                         ),
                         border: Border.all(color: colors.outline),
                       ),
-                      child: Row(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Ölçüm tarihi',
-                                  style: typography.caption.copyWith(
-                                    color: colors.onSurfaceMuted,
-                                  ),
-                                ),
-                                Text(
-                                  '3 Ağustos 2026',
-                                  style: typography.headingSmall.copyWith(
-                                    color: colors.onSurface,
-                                    fontSize: 17,
-                                  ),
-                                ),
-                              ],
+                          Text(
+                            'Ölçüm tarihi',
+                            style: typography.caption.copyWith(
+                              color: colors.onSurfaceMuted,
                             ),
                           ),
-                          const SizedBox(width: AppSpacing.sm),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: AppSpacing.md,
-                            ),
-                            constraints: const BoxConstraints(minHeight: 44),
-                            alignment: Alignment.center,
-                            decoration: BoxDecoration(
-                              color: colors.surfaceRaised,
-                              borderRadius: BorderRadius.circular(
-                                AppSpacing.radiusInner,
-                              ),
-                            ),
-                            child: Text(
-                              'Değiştir',
-                              style: typography.headingSmall.copyWith(
-                                color: colors.onSurfaceVariant,
-                                fontSize: 14,
-                              ),
+                          Text(
+                            // Ölçüm her zaman kaydedildiği an (DateTime.now())
+                            // için yazılıyor — geçmişe dönük tarih seçme
+                            // henüz desteklenmiyor, bu yüzden burada da
+                            // düzenlenemeyen, gerçek bugünün tarihi gösteriliyor.
+                            formatTrDate(DateTime.now()),
+                            style: typography.headingSmall.copyWith(
+                              color: colors.onSurface,
+                              fontSize: 17,
                             ),
                           ),
                         ],

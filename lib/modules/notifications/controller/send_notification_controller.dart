@@ -29,8 +29,9 @@ class SendNotificationController extends _$SendNotificationController {
   Future<void> send() async {
     if (state.title.trim().isEmpty ||
         state.message.trim().isEmpty ||
-        state.isSending)
+        state.isSending) {
       return;
+    }
     if (state.targetType == NotificationTargetType.singleMember &&
         state.targetMemberId == null) {
       state = state.copyWith(errorMessage: 'Önce bir üye seç.');
