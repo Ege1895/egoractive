@@ -53,6 +53,9 @@ Stream<List<DiscoverItem>> _groupSessionsForGym(
       .snapshots()
       .map(
         (snapshot) => snapshot.docs
+            .where(
+              (doc) => (doc.data()['onlineBookingEnabled'] as bool?) ?? true,
+            )
             .map((doc) => _toGroupSessionItem(doc, myUid, lockHours))
             .toList(),
       );

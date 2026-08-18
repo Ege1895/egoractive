@@ -21,6 +21,7 @@ class GroupSessionsWriteService {
     required DateTime startTime,
     required int durationMinutes,
     required int capacity,
+    required bool onlineBookingEnabled,
   }) async {
     await FirebaseFirestore.instance.collection('groupSessions').add({
       'gymId': gymId,
@@ -30,6 +31,7 @@ class GroupSessionsWriteService {
       'startTime': Timestamp.fromDate(startTime),
       'durationMinutes': durationMinutes,
       'capacity': capacity,
+      'onlineBookingEnabled': onlineBookingEnabled,
       'attendeeIds': <String>[],
       'createdAt': FieldValue.serverTimestamp(),
     });
@@ -37,19 +39,24 @@ class GroupSessionsWriteService {
 
   Future<void> join({required String sessionId, required String uid}) {
     return _capacityService.join(
-      ref: FirebaseFirestore.instance.collection('groupSessions').doc(sessionId),
+      ref: FirebaseFirestore.instance
+          .collection('groupSessions')
+          .doc(sessionId),
       uid: uid,
     );
   }
 
   Future<void> leave({required String sessionId, required String uid}) {
     return _capacityService.leave(
-      ref: FirebaseFirestore.instance.collection('groupSessions').doc(sessionId),
+      ref: FirebaseFirestore.instance
+          .collection('groupSessions')
+          .doc(sessionId),
       uid: uid,
     );
   }
 }
 
 @riverpod
-GroupSessionsWriteService groupSessionsWriteService(GroupSessionsWriteServiceRef ref) =>
-    GroupSessionsWriteService(ref.watch(capacityServiceProvider));
+GroupSessionsWriteService groupSessionsWriteService(
+  GroupSessionsWriteServiceRef ref,
+) => GroupSessionsWriteService(ref.watch(capacityServiceProvider));

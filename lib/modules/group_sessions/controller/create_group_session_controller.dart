@@ -88,6 +88,7 @@ class CreateGroupSessionController extends _$CreateGroupSessionController {
           startTime: _nextOccurrence(weekday, hour, minute),
           durationMinutes: state.durationMinutes,
           capacity: state.capacity,
+          onlineBookingEnabled: state.onlineBookingEnabled,
         );
       }
       state = state.copyWith(isSubmitting: false);
