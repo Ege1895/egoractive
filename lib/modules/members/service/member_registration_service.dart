@@ -30,6 +30,7 @@ class MemberRegistrationService {
     required String gymId,
     required String trainerId,
     required String trainerName,
+    required DateTime registeredAt,
     MemberGender? gender,
   }) async {
     final doc = await FirebaseFirestore.instance.collection('users').add({
@@ -39,6 +40,10 @@ class MemberRegistrationService {
       'gymId': gymId,
       'trainerId': trainerId,
       'trainerName': trainerName,
+      // Admin eskiden beri gelen bir üyeyi geçmiş bir tarihle kaydedebilir
+      // diye bugünün tarihi yerine formdan seçilen tarih yazılır (bkz.
+      // MemberInfoPanel "Kayıt tarihi" alanı).
+      'createdAt': Timestamp.fromDate(registeredAt),
       if (gender != null) 'gender': gender.name,
     });
     await _analytics.logEvent(

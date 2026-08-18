@@ -23,6 +23,7 @@ class NewMemberForm with _$NewMemberForm {
     String? trainerId,
     String? trainerName,
     required String note,
+    required DateTime registeredAt,
   }) = _NewMemberForm;
 
   const NewMemberForm._();

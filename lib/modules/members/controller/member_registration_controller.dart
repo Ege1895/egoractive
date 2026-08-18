@@ -100,6 +100,7 @@ class MemberRegistrationController extends _$MemberRegistrationController {
         gymId: gymId,
         trainerId: form.trainerId!,
         trainerName: form.trainerName!,
+        registeredAt: form.registeredAt,
         gender: form.gender,
       );
       state = state.copyWith(isSubmitting: false, createdMemberId: memberId);

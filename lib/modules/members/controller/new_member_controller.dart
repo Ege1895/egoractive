@@ -10,13 +10,14 @@ part 'new_member_controller.g.dart';
 class NewMemberController extends _$NewMemberController {
   @override
   NewMemberForm build() {
-    return const NewMemberForm(
+    return NewMemberForm(
       firstName: '',
       lastName: '',
       phoneDigits: '',
       birthYear: 1995,
       heightCm: 170,
       note: '',
+      registeredAt: DateTime.now(),
     );
   }
 
@@ -42,6 +43,9 @@ class NewMemberController extends _$NewMemberController {
       state = state.copyWith(trainerId: id, trainerName: name);
 
   void updateNote(String value) => state = state.copyWith(note: value);
+
+  void updateRegisteredAt(DateTime value) =>
+      state = state.copyWith(registeredAt: value);
 
   void reset() => state = build();
 }

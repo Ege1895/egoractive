@@ -1,3 +1,6 @@
+import 'dart:io' show Platform;
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -6,6 +9,7 @@ import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
 import '../../../../core/subscription/subscription_write_gate.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../shared/utils/phone_number_formatter.dart';
 import '../../../../shared/utils/tr_date_formatter.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_text_field.dart';
@@ -35,6 +39,7 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
   late final TextEditingController _lastNameController;
   late final TextEditingController _phoneController;
   late final TextEditingController _noteController;
+  final _noteScrollController = ScrollController();
 
   @override
   void initState() {
@@ -46,7 +51,7 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
         text: parts.skip(1).join(' '),
       );
       final phoneDigits = _digitsOnly(widget.existing!.phone);
-      _phoneController = TextEditingController(text: widget.existing!.phone);
+      _phoneController = TextEditingController();
       _noteController = TextEditingController();
       // Kaydet, NewMemberController'ın form state'ini okuyor — telefon
       // alanına hiç dokunulmasa bile geçerli bir değer olsun diye mevcut
@@ -82,6 +87,17 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
     final registrationController = ref.read(
       memberRegistrationControllerProvider.notifier,
     );
+
+    // gym_setup_panel'deki telefon alanıyla aynı deneyim: gerçek kaynak
+    // form.phoneDigits, controller sadece "5XX XXX XX XX" formatlanmış
+    // gösterimi senkron tutar.
+    final formattedPhone = formatTrPhoneDigits(form.phoneDigits);
+    if (_phoneController.text != formattedPhone) {
+      _phoneController.value = TextEditingValue(
+        text: formattedPhone,
+        selection: TextSelection.collapsed(offset: formattedPhone.length),
+      );
+    }
 
     return Scaffold(
       body: SafeArea(
@@ -219,8 +235,11 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
                         const SizedBox(height: AppSpacing.md),
                         AppTextField(
                           label: 'Telefon',
-                          keyboardType: TextInputType.phone,
+                          hint: '5XX XXX XX XX',
+                          prefixText: '+90 ',
+                          keyboardType: TextInputType.number,
                           controller: _phoneController,
+                          inputFormatters: [TrPhoneNumberInputFormatter()],
                           errorText: registrationState.phoneError,
                           onChanged: (value) => controller.updatePhoneDigits(
                             value.replaceAll(RegExp(r'[^0-9]'), ''),
@@ -247,6 +266,14 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
                                 onPlus: () => controller.updateBirthYear(
                                   form.birthYear + 1,
                                 ),
+                                onTapValue: () => _showNumberWheelPicker(
+                                  context: context,
+                                  title: 'Doğum yılı',
+                                  min: 1940,
+                                  max: 2020,
+                                  initial: form.birthYear,
+                                  onSelected: controller.updateBirthYear,
+                                ),
                               ),
                             ),
                             const SizedBox(width: AppSpacing.sm),
@@ -260,6 +287,14 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
                                 ),
                                 onPlus: () => controller.updateHeightCm(
                                   form.heightCm + 1,
+                                ),
+                                onTapValue: () => _showNumberWheelPicker(
+                                  context: context,
+                                  title: 'Boy (cm)',
+                                  min: 130,
+                                  max: 210,
+                                  initial: form.heightCm,
+                                  onSelected: controller.updateHeightCm,
                                 ),
                               ),
                             ),
@@ -386,41 +421,68 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
                               ),
                             ),
                           ),
-                        Container(
-                          constraints: const BoxConstraints(minHeight: 60),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  'Kayıt tarihi',
-                                  style: typography.bodyLarge.copyWith(
-                                    color: colors.onSurfaceVariant,
+                        InkWell(
+                          onTap: widget.isNew
+                              ? () => _showRegisteredAtPicker(
+                                  context: context,
+                                  initial: form.registeredAt,
+                                  onSelected: controller.updateRegisteredAt,
+                                )
+                              : null,
+                          child: Container(
+                            constraints: const BoxConstraints(minHeight: 60),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    'Kayıt tarihi',
+                                    style: typography.bodyLarge.copyWith(
+                                      color: colors.onSurfaceVariant,
+                                      fontSize: 15,
+                                    ),
+                                  ),
+                                ),
+                                Text(
+                                  // Mevcut üye düzenlenirken gerçek kayıt tarihi
+                                  // henüz Firestore'dan okunmuyor (ayrı kapsam).
+                                  widget.isNew
+                                      ? formatTrDate(form.registeredAt)
+                                      : '—',
+                                  style: typography.headingSmall.copyWith(
+                                    color: colors.onSurface,
                                     fontSize: 15,
                                   ),
                                 ),
-                              ),
-                              Text(
-                                // Yeni üye henüz kaydedilmedi, kayıt anı bugün olacak — mevcut üye
-                                // düzenlenirken gerçek kayıt tarihi henüz Firestore'dan okunmuyor.
-                                widget.isNew
-                                    ? formatTrDate(DateTime.now())
-                                    : '—',
-                                style: typography.headingSmall.copyWith(
-                                  color: colors.onSurface,
-                                  fontSize: 15,
-                                ),
-                              ),
-                            ],
+                                if (widget.isNew) ...[
+                                  const SizedBox(width: AppSpacing.xs),
+                                  Icon(
+                                    Icons.chevron_right,
+                                    color: colors.onSurfaceMuted,
+                                    size: 18,
+                                  ),
+                                ],
+                              ],
+                            ),
                           ),
                         ),
                       ],
                     ),
                   ),
                   const SizedBox(height: AppSpacing.lg),
-                  AppTextField(
-                    label: 'Not (isteğe bağlı)',
-                    controller: _noteController,
-                    onChanged: controller.updateNote,
+                  Scrollbar(
+                    controller: _noteScrollController,
+                    thumbVisibility: true,
+                    interactive: true,
+                    thickness: 4,
+                    radius: const Radius.circular(4),
+                    child: AppTextField(
+                      label: 'Not (isteğe bağlı)',
+                      controller: _noteController,
+                      scrollController: _noteScrollController,
+                      minLines: 1,
+                      maxLines: 5,
+                      onChanged: controller.updateNote,
+                    ),
                   ),
                 ],
               ),
@@ -534,6 +596,145 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
     );
   }
 
+  /// Boy/doğum yılı için +/- tek tek artırmanın yerine tam bir aralığı
+  /// hızlıca taramak üzere iOS'un native scroll wheel'iyle aynı bileşen
+  /// (CupertinoPicker) kullanılıyor — Flutter SDK'da Android'e özgü ayrı
+  /// bir "native" tekerlek bileşeni yok, bu yüzden iki platformda da aynı
+  /// alt sayfa gösteriliyor.
+  Future<void> _showNumberWheelPicker({
+    required BuildContext context,
+    required String title,
+    required int min,
+    required int max,
+    required int initial,
+    required ValueChanged<int> onSelected,
+  }) async {
+    final colors = context.appColors;
+    final values = [for (var v = min; v <= max; v++) v];
+    var selected = initial.clamp(min, max);
+    final initialIndex = values.indexOf(selected);
+
+    await showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: colors.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      builder: (sheetContext) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  title,
+                  style: context.appTypography.headingSmall.copyWith(
+                    color: colors.onSurface,
+                    fontSize: 16,
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.md),
+                SizedBox(
+                  height: 216,
+                  child: CupertinoPicker(
+                    scrollController: FixedExtentScrollController(
+                      initialItem: initialIndex < 0 ? 0 : initialIndex,
+                    ),
+                    itemExtent: 40,
+                    onSelectedItemChanged: (index) => selected = values[index],
+                    children: [
+                      for (final v in values)
+                        Center(
+                          child: Text(
+                            '$v',
+                            style: context.appTypography.dataMedium.copyWith(
+                              color: colors.onSurface,
+                              fontSize: 18,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.md),
+                AppButton(
+                  label: 'Seç',
+                  onPressed: () {
+                    onSelected(selected);
+                    Navigator.of(sheetContext).pop();
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  /// Kayıt tarihi için platformun kendi native tarih seçicisi: iOS'ta
+  /// gün/ay/yıl scroll wheel'i (CupertinoDatePicker), Android'de kendi
+  /// Material takvim diyaloğu (showDatePicker) — ikisi de eskiden beri
+  /// gelen bir üyeyi geçmiş bir tarihle kaydedebilmek için bugünden
+  /// öncesine izin verir.
+  Future<void> _showRegisteredAtPicker({
+    required BuildContext context,
+    required DateTime initial,
+    required ValueChanged<DateTime> onSelected,
+  }) async {
+    final now = DateTime.now();
+    final firstDate = DateTime(now.year - 50);
+    if (Platform.isIOS) {
+      final colors = context.appColors;
+      var selected = initial;
+      await showCupertinoModalPopup<void>(
+        context: context,
+        builder: (sheetContext) {
+          return Container(
+            height: 320,
+            padding: const EdgeInsets.only(top: AppSpacing.sm),
+            color: colors.surface,
+            child: SafeArea(
+              top: false,
+              child: Column(
+                children: [
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: CupertinoButton(
+                      child: const Text('Tamam'),
+                      onPressed: () {
+                        onSelected(selected);
+                        Navigator.of(sheetContext).pop();
+                      },
+                    ),
+                  ),
+                  Expanded(
+                    child: CupertinoDatePicker(
+                      mode: CupertinoDatePickerMode.date,
+                      initialDateTime: initial,
+                      minimumDate: firstDate,
+                      maximumDate: now,
+                      onDateTimeChanged: (date) => selected = date,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      );
+      return;
+    }
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: initial,
+      firstDate: firstDate,
+      lastDate: now,
+    );
+    if (picked != null) onSelected(picked);
+  }
+
   String _digitsOnly(String raw) {
     final digits = raw.replaceAll(RegExp(r'[^0-9]'), '');
     final withoutCountryCode = digits.startsWith('90') && digits.length > 10
@@ -550,6 +751,7 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
     _lastNameController.dispose();
     _phoneController.dispose();
     _noteController.dispose();
+    _noteScrollController.dispose();
     super.dispose();
   }
 }
@@ -561,6 +763,7 @@ class _StepperField extends StatelessWidget {
     required this.suffix,
     required this.onMinus,
     required this.onPlus,
+    required this.onTapValue,
   });
 
   final String label;
@@ -568,6 +771,7 @@ class _StepperField extends StatelessWidget {
   final String suffix;
   final VoidCallback onMinus;
   final VoidCallback onPlus;
+  final VoidCallback onTapValue;
 
   @override
   Widget build(BuildContext context) {
@@ -602,12 +806,16 @@ class _StepperField extends StatelessWidget {
                 ),
               ),
               Expanded(
-                child: Text(
-                  value,
-                  textAlign: TextAlign.center,
-                  style: typography.dataMedium.copyWith(
-                    color: colors.onSurface,
-                    fontSize: 16,
+                child: GestureDetector(
+                  onTap: onTapValue,
+                  behavior: HitTestBehavior.opaque,
+                  child: Text(
+                    value,
+                    textAlign: TextAlign.center,
+                    style: typography.dataMedium.copyWith(
+                      color: colors.onSurface,
+                      fontSize: 16,
+                    ),
                   ),
                 ),
               ),

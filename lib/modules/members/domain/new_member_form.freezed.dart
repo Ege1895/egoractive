@@ -26,6 +26,7 @@ mixin _$NewMemberForm {
   String? get trainerId => throw _privateConstructorUsedError;
   String? get trainerName => throw _privateConstructorUsedError;
   String get note => throw _privateConstructorUsedError;
+  DateTime get registeredAt => throw _privateConstructorUsedError;
 
   /// Create a copy of NewMemberForm
   /// with the given fields replaced by the non-null parameter values.
@@ -51,6 +52,7 @@ abstract class $NewMemberFormCopyWith<$Res> {
     String? trainerId,
     String? trainerName,
     String note,
+    DateTime registeredAt,
   });
 }
 
@@ -78,6 +80,7 @@ class _$NewMemberFormCopyWithImpl<$Res, $Val extends NewMemberForm>
     Object? trainerId = freezed,
     Object? trainerName = freezed,
     Object? note = null,
+    Object? registeredAt = null,
   }) {
     return _then(
       _value.copyWith(
@@ -117,6 +120,10 @@ class _$NewMemberFormCopyWithImpl<$Res, $Val extends NewMemberForm>
                 ? _value.note
                 : note // ignore: cast_nullable_to_non_nullable
                       as String,
+            registeredAt: null == registeredAt
+                ? _value.registeredAt
+                : registeredAt // ignore: cast_nullable_to_non_nullable
+                      as DateTime,
           )
           as $Val,
     );
@@ -142,6 +149,7 @@ abstract class _$$NewMemberFormImplCopyWith<$Res>
     String? trainerId,
     String? trainerName,
     String note,
+    DateTime registeredAt,
   });
 }
 
@@ -168,6 +176,7 @@ class __$$NewMemberFormImplCopyWithImpl<$Res>
     Object? trainerId = freezed,
     Object? trainerName = freezed,
     Object? note = null,
+    Object? registeredAt = null,
   }) {
     return _then(
       _$NewMemberFormImpl(
@@ -207,6 +216,10 @@ class __$$NewMemberFormImplCopyWithImpl<$Res>
             ? _value.note
             : note // ignore: cast_nullable_to_non_nullable
                   as String,
+        registeredAt: null == registeredAt
+            ? _value.registeredAt
+            : registeredAt // ignore: cast_nullable_to_non_nullable
+                  as DateTime,
       ),
     );
   }
@@ -225,6 +238,7 @@ class _$NewMemberFormImpl extends _NewMemberForm {
     this.trainerId,
     this.trainerName,
     required this.note,
+    required this.registeredAt,
   }) : super._();
 
   @override
@@ -245,10 +259,12 @@ class _$NewMemberFormImpl extends _NewMemberForm {
   final String? trainerName;
   @override
   final String note;
+  @override
+  final DateTime registeredAt;
 
   @override
   String toString() {
-    return 'NewMemberForm(firstName: $firstName, lastName: $lastName, phoneDigits: $phoneDigits, birthYear: $birthYear, heightCm: $heightCm, gender: $gender, trainerId: $trainerId, trainerName: $trainerName, note: $note)';
+    return 'NewMemberForm(firstName: $firstName, lastName: $lastName, phoneDigits: $phoneDigits, birthYear: $birthYear, heightCm: $heightCm, gender: $gender, trainerId: $trainerId, trainerName: $trainerName, note: $note, registeredAt: $registeredAt)';
   }
 
   @override
@@ -271,7 +287,9 @@ class _$NewMemberFormImpl extends _NewMemberForm {
                 other.trainerId == trainerId) &&
             (identical(other.trainerName, trainerName) ||
                 other.trainerName == trainerName) &&
-            (identical(other.note, note) || other.note == note));
+            (identical(other.note, note) || other.note == note) &&
+            (identical(other.registeredAt, registeredAt) ||
+                other.registeredAt == registeredAt));
   }
 
   @override
@@ -286,6 +304,7 @@ class _$NewMemberFormImpl extends _NewMemberForm {
     trainerId,
     trainerName,
     note,
+    registeredAt,
   );
 
   /// Create a copy of NewMemberForm
@@ -308,6 +327,7 @@ abstract class _NewMemberForm extends NewMemberForm {
     final String? trainerId,
     final String? trainerName,
     required final String note,
+    required final DateTime registeredAt,
   }) = _$NewMemberFormImpl;
   const _NewMemberForm._() : super._();
 
@@ -329,6 +349,8 @@ abstract class _NewMemberForm extends NewMemberForm {
   String? get trainerName;
   @override
   String get note;
+  @override
+  DateTime get registeredAt;
 
   /// Create a copy of NewMemberForm
   /// with the given fields replaced by the non-null parameter values.
