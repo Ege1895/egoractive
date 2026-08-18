@@ -12,8 +12,18 @@ import '../../../../shared/widgets/app_text_field.dart';
 import '../../service/events_write_service.dart';
 
 const _monthAbbrevToNumber = {
-  'Oca': 1, 'Şub': 2, 'Mar': 3, 'Nis': 4, 'May': 5, 'Haz': 6,
-  'Tem': 7, 'Ağu': 8, 'Eyl': 9, 'Eki': 10, 'Kas': 11, 'Ara': 12,
+  'Oca': 1,
+  'Şub': 2,
+  'Mar': 3,
+  'Nis': 4,
+  'May': 5,
+  'Haz': 6,
+  'Tem': 7,
+  'Ağu': 8,
+  'Eyl': 9,
+  'Eki': 10,
+  'Kas': 11,
+  'Ara': 12,
 };
 
 /// Admin 13 · Etkinlik Oluştur — lokasyon, tarih/saat, kontenjan.
@@ -25,12 +35,12 @@ class CreateEventPanel extends BasePanel {
 }
 
 class _CreateEventPanelState extends BasePanelState<CreateEventPanel> {
-  final _nameController = TextEditingController(text: 'Belgrad Ormanı Koşusu');
-  final _locationController = TextEditingController(text: 'Kemerburgaz, Neşetsuyu girişi');
-  final _dateController = TextEditingController(text: '16 Ağu 2026');
-  final _timeController = TextEditingController(text: '08:00');
-  final _descriptionController = TextEditingController(text: '8 km tempolu koşu, ardından esneme. Kendi suyunuzu getirin.');
-  int? _capacity = 40;
+  final _nameController = TextEditingController();
+  final _locationController = TextEditingController();
+  final _dateController = TextEditingController();
+  final _timeController = TextEditingController();
+  final _descriptionController = TextEditingController();
+  int? _capacity;
 
   @override
   Widget build(BuildContext context) {
@@ -43,64 +53,152 @@ class _CreateEventPanelState extends BasePanelState<CreateEventPanel> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.md, AppSpacing.screenEdge, 0),
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.screenEdge,
+                AppSpacing.md,
+                AppSpacing.screenEdge,
+                0,
+              ),
               child: Row(
                 children: [
-                  Expanded(child: Text('Etkinlik oluştur', style: typography.headingSmall.copyWith(color: colors.onSurface, fontSize: 18))),
+                  Expanded(
+                    child: Text(
+                      'Etkinlik oluştur',
+                      style: typography.headingSmall.copyWith(
+                        color: colors.onSurface,
+                        fontSize: 18,
+                      ),
+                    ),
+                  ),
                   GestureDetector(
-                    onTap: () => ref.read(panelStackControllerProvider.notifier).pop(),
-                    child: Text('Vazgeç', style: typography.bodyLarge.copyWith(color: colors.onSurfaceMuted, fontSize: 15)),
+                    onTap: () =>
+                        ref.read(panelStackControllerProvider.notifier).pop(),
+                    child: Text(
+                      'Vazgeç',
+                      style: typography.bodyLarge.copyWith(
+                        color: colors.onSurfaceMuted,
+                        fontSize: 15,
+                      ),
+                    ),
                   ),
                 ],
               ),
             ),
             Expanded(
               child: ListView(
-                padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.lg, AppSpacing.screenEdge, AppSpacing.lg),
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.screenEdge,
+                  AppSpacing.lg,
+                  AppSpacing.screenEdge,
+                  AppSpacing.lg,
+                ),
                 children: [
                   Container(
                     padding: const EdgeInsets.all(AppSpacing.lg),
-                    decoration: BoxDecoration(color: colors.surface, borderRadius: BorderRadius.circular(AppSpacing.radiusCard), border: Border.all(color: colors.outline)),
+                    decoration: BoxDecoration(
+                      color: colors.surface,
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusCard,
+                      ),
+                      border: Border.all(color: colors.outline),
+                    ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        AppTextField(label: 'Etkinlik adı', controller: _nameController),
+                        AppTextField(
+                          label: 'Etkinlik adı',
+                          controller: _nameController,
+                        ),
                         const SizedBox(height: AppSpacing.md),
-                        AppTextField(label: 'Lokasyon', controller: _locationController),
+                        AppTextField(
+                          label: 'Lokasyon',
+                          controller: _locationController,
+                        ),
                         const SizedBox(height: AppSpacing.md),
                         Row(
                           children: [
-                            Expanded(child: AppTextField(label: 'Tarih', controller: _dateController)),
+                            Expanded(
+                              child: AppTextField(
+                                label: 'Tarih',
+                                controller: _dateController,
+                              ),
+                            ),
                             const SizedBox(width: AppSpacing.sm),
-                            Expanded(child: AppTextField(label: 'Saat', controller: _timeController, keyboardType: TextInputType.datetime)),
+                            Expanded(
+                              child: AppTextField(
+                                label: 'Saat',
+                                controller: _timeController,
+                                keyboardType: TextInputType.datetime,
+                              ),
+                            ),
                           ],
                         ),
                         const SizedBox(height: AppSpacing.md),
-                        AppTextField(label: 'Açıklama', controller: _descriptionController),
+                        AppTextField(
+                          label: 'Açıklama',
+                          controller: _descriptionController,
+                        ),
                       ],
                     ),
                   ),
                   const SizedBox(height: AppSpacing.lg),
                   Container(
                     padding: const EdgeInsets.all(AppSpacing.lg),
-                    decoration: BoxDecoration(color: colors.surface, borderRadius: BorderRadius.circular(AppSpacing.radiusCard), border: Border.all(color: colors.outline)),
+                    decoration: BoxDecoration(
+                      color: colors.surface,
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusCard,
+                      ),
+                      border: Border.all(color: colors.outline),
+                    ),
                     child: Row(
                       children: [
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('Kontenjan', style: typography.headingSmall.copyWith(color: colors.onSurface, fontSize: 16)),
-                              Text('Boş bırakırsanız sınırsız olur', style: typography.bodyMedium.copyWith(color: colors.onSurfaceMuted, fontSize: 13)),
+                              Text(
+                                'Kontenjan',
+                                style: typography.headingSmall.copyWith(
+                                  color: colors.onSurface,
+                                  fontSize: 16,
+                                ),
+                              ),
+                              Text(
+                                'Boş bırakırsanız sınırsız olur',
+                                style: typography.bodyMedium.copyWith(
+                                  color: colors.onSurfaceMuted,
+                                  fontSize: 13,
+                                ),
+                              ),
                             ],
                           ),
                         ),
                         _StepButton(
                           icon: Icons.remove,
-                          onTap: () => setState(() => _capacity = _capacity == null ? null : (_capacity! > 1 ? _capacity! - 1 : null)),
+                          onTap: () => setState(
+                            () => _capacity = _capacity == null
+                                ? null
+                                : (_capacity! > 1 ? _capacity! - 1 : null),
+                          ),
                         ),
-                        SizedBox(width: 40, child: Text(_capacity?.toString() ?? '∞', textAlign: TextAlign.center, style: typography.dataMedium.copyWith(color: colors.onSurface, fontSize: 18))),
-                        _StepButton(icon: Icons.add, filled: true, onTap: () => setState(() => _capacity = (_capacity ?? 0) + 1)),
+                        SizedBox(
+                          width: 40,
+                          child: Text(
+                            _capacity?.toString() ?? '∞',
+                            textAlign: TextAlign.center,
+                            style: typography.dataMedium.copyWith(
+                              color: colors.onSurface,
+                              fontSize: 18,
+                            ),
+                          ),
+                        ),
+                        _StepButton(
+                          icon: Icons.add,
+                          filled: true,
+                          onTap: () =>
+                              setState(() => _capacity = (_capacity ?? 0) + 1),
+                        ),
                       ],
                     ),
                   ),
@@ -108,19 +206,30 @@ class _CreateEventPanelState extends BasePanelState<CreateEventPanel> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.md, AppSpacing.screenEdge, AppSpacing.lg),
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.screenEdge,
+                AppSpacing.md,
+                AppSpacing.screenEdge,
+                AppSpacing.lg,
+              ),
               child: AppButton(
                 label: 'Etkinliği oluştur',
                 onPressed: () async {
                   final name = _nameController.text.trim();
-                  final dateTime = _parseDateTime(_dateController.text, _timeController.text);
+                  final dateTime = _parseDateTime(
+                    _dateController.text,
+                    _timeController.text,
+                  );
                   if (name.isEmpty || dateTime == null) return;
-                  if (!await ensureSubscriptionAllowsWrite(context, ref)) return;
+                  if (!await ensureSubscriptionAllowsWrite(context, ref))
+                    return;
 
                   final gymId = await ref.read(activeGymIdProvider.future);
                   if (gymId == null) return;
 
-                  await ref.read(eventsWriteServiceProvider).createEvent(
+                  await ref
+                      .read(eventsWriteServiceProvider)
+                      .createEvent(
                         gymId: gymId,
                         name: name,
                         location: _locationController.text.trim(),
@@ -167,7 +276,11 @@ class _CreateEventPanelState extends BasePanelState<CreateEventPanel> {
 }
 
 class _StepButton extends StatelessWidget {
-  const _StepButton({required this.icon, required this.onTap, this.filled = false});
+  const _StepButton({
+    required this.icon,
+    required this.onTap,
+    this.filled = false,
+  });
 
   final IconData icon;
   final VoidCallback onTap;
@@ -182,7 +295,16 @@ class _StepButton extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
-        child: Container(width: 40, height: 40, alignment: Alignment.center, child: Icon(icon, color: filled ? colors.onPrimary : colors.onSurfaceVariant, size: 18)),
+        child: Container(
+          width: 40,
+          height: 40,
+          alignment: Alignment.center,
+          child: Icon(
+            icon,
+            color: filled ? colors.onPrimary : colors.onSurfaceVariant,
+            size: 18,
+          ),
+        ),
       ),
     );
   }

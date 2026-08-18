@@ -9,8 +9,18 @@ import '../repository/sessions_repository.dart';
 part 'sessions_controller.g.dart';
 
 const _monthAbbrev = {
-  1: 'Oca', 2: 'Şub', 3: 'Mar', 4: 'Nis', 5: 'May', 6: 'Haz',
-  7: 'Tem', 8: 'Ağu', 9: 'Eyl', 10: 'Eki', 11: 'Kas', 12: 'Ara',
+  1: 'Oca',
+  2: 'Şub',
+  3: 'Mar',
+  4: 'Nis',
+  5: 'May',
+  6: 'Haz',
+  7: 'Tem',
+  8: 'Ağu',
+  9: 'Eyl',
+  10: 'Eki',
+  11: 'Kas',
+  12: 'Ara',
 };
 
 const _emptyNextSession = Session(
@@ -23,7 +33,10 @@ const _emptyNextSession = Session(
 );
 
 @riverpod
-Stream<(List<Session>, List<Session>)> _sessionsForMember(_SessionsForMemberRef ref, String memberId) {
+Stream<(List<Session>, List<Session>)> _sessionsForMember(
+  _SessionsForMemberRef ref,
+  String memberId,
+) {
   return FirebaseFirestore.instance
       .collection('sessions')
       .where('memberId', isEqualTo: memberId)
@@ -37,7 +50,8 @@ Stream<(List<Session>, List<Session>)> _sessionsForMember(_SessionsForMemberRef 
           final data = doc.data();
           final startTime = (data['startTime'] as Timestamp).toDate();
           final session = _toSession(doc.id, data, startTime);
-          if (session.status == SessionStatus.planned && startTime.isAfter(now)) {
+          if (session.status == SessionStatus.planned &&
+              startTime.isAfter(now)) {
             upcoming.add(session);
           } else {
             past.add(session);
@@ -60,7 +74,8 @@ Session _toSession(String id, Map<String, dynamic> data, DateTime startTime) {
     'notComing' => AttendanceAnswer.notComing,
     _ => AttendanceAnswer.pending,
   };
-  final time = '${startTime.hour.toString().padLeft(2, '0')}:${startTime.minute.toString().padLeft(2, '0')}';
+  final time =
+      '${startTime.hour.toString().padLeft(2, '0')}:${startTime.minute.toString().padLeft(2, '0')}';
   return Session(
     id: id,
     day: startTime.day.toString().padLeft(2, '0'),
@@ -86,7 +101,9 @@ class SessionsController extends _$SessionsController {
     final mock = ref.watch(sessionsRepositoryProvider).loadInitial();
     if (uid == null) return mock;
 
-    final (upcoming, past) = ref.watch(_sessionsForMemberProvider(uid)).valueOrNull ?? (const <Session>[], const <Session>[]);
+    final (upcoming, past) =
+        ref.watch(_sessionsForMemberProvider(uid)).valueOrNull ??
+        (const <Session>[], const <Session>[]);
     final nextSession = upcoming.isEmpty ? _emptyNextSession : upcoming.first;
     return mock.copyWith(
       nextSession: nextSession,
@@ -100,21 +117,54 @@ class SessionsController extends _$SessionsController {
     state = state.copyWith(viewMode: mode);
   }
 
+  /// Yazma başarısız olursa (network/izin) UI'da yanlış bir "onaylandı"
+  /// görünümü kalmasın diye önceki cevaba geri dönülür — F3-4'ün ilk
+  /// sürümünde yazma denenmeden önce optimistik güncelleniyor ve hata hiç
+  /// yakalanmıyordu, bu da sessiz veri kaybına yol açabiliyordu.
   Future<void> confirmAttendance(bool coming) async {
     final sessionId = state.nextSession.id;
     if (sessionId == 'none') return;
-    final answer = coming ? AttendanceAnswer.coming : AttendanceAnswer.notComing;
-    state = state.copyWith(attendanceAnswer: answer);
-    await FirebaseFirestore.instance
-        .collection('sessions')
-        .doc(sessionId)
-        .update({'memberConfirmation': coming ? 'coming' : 'notComing'});
+    final previousAnswer = state.attendanceAnswer;
+    final answer = coming
+        ? AttendanceAnswer.coming
+        : AttendanceAnswer.notComing;
+    state = state.copyWith(
+      attendanceAnswer: answer,
+      attendanceErrorMessage: null,
+    );
+    try {
+      await FirebaseFirestore.instance
+          .collection('sessions')
+          .doc(sessionId)
+          .update({'memberConfirmation': coming ? 'coming' : 'notComing'});
+    } catch (_) {
+      state = state.copyWith(
+        attendanceAnswer: previousAnswer,
+        attendanceErrorMessage:
+            'Cevabın kaydedilemedi, bağlantını kontrol edip tekrar dene.',
+      );
+    }
   }
 
   Future<void> resetAttendance() async {
     final sessionId = state.nextSession.id;
-    state = state.copyWith(attendanceAnswer: AttendanceAnswer.pending);
+    final previousAnswer = state.attendanceAnswer;
+    state = state.copyWith(
+      attendanceAnswer: AttendanceAnswer.pending,
+      attendanceErrorMessage: null,
+    );
     if (sessionId == 'none') return;
-    await FirebaseFirestore.instance.collection('sessions').doc(sessionId).update({'memberConfirmation': FieldValue.delete()});
+    try {
+      await FirebaseFirestore.instance
+          .collection('sessions')
+          .doc(sessionId)
+          .update({'memberConfirmation': FieldValue.delete()});
+    } catch (_) {
+      state = state.copyWith(
+        attendanceAnswer: previousAnswer,
+        attendanceErrorMessage:
+            'Cevabın kaydedilemedi, bağlantını kontrol edip tekrar dene.',
+      );
+    }
   }
 }

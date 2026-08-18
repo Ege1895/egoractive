@@ -10,6 +10,12 @@ class GymProfileController extends _$GymProfileController {
   @override
   GymProfile build() => ref.watch(gymProfileRepositoryProvider).loadProfile();
 
+  /// [GymSetupPanel] (yeni salon oluşturma) her açıldığında çağırır — bu
+  /// provider [GymInfoPanel] (mevcut salonu düzenleme) ile paylaşıldığı ve
+  /// panel stack eski panelleri `maintainState` ile canlı tuttuğu için,
+  /// `build()`'ın autoDispose ile kendiliğinden sıfırlanacağı garanti değil.
+  void reset() => state = ref.read(gymProfileRepositoryProvider).loadProfile();
+
   void updateName(String name) => state = state.copyWith(name: name);
 
   void updateCity(String city) => state = state.copyWith(city: city);
@@ -19,8 +25,11 @@ class GymProfileController extends _$GymProfileController {
   /// ile aynı temsil, `+90` öneki gönderim anında eklenir.
   void updatePhone(String rawInput) {
     final digits = rawInput.replaceAll(RegExp(r'[^0-9]'), '');
-    state = state.copyWith(phone: digits.length > 10 ? digits.substring(0, 10) : digits);
+    state = state.copyWith(
+      phone: digits.length > 10 ? digits.substring(0, 10) : digits,
+    );
   }
 
-  void updateAddress(String address) => state = state.copyWith(address: address);
+  void updateAddress(String address) =>
+      state = state.copyWith(address: address);
 }

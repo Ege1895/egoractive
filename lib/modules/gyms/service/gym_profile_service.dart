@@ -9,17 +9,14 @@ class GymProfileService {
   const GymProfileService();
 
   GymProfile loadProfile() {
-    // F2-9 — bu ekran artık kimliksiz yeni kullanıcının salon oluşturma
-    // (signup) akışı; telefon alanı boş başlamalı çünkü admin bununla
-    // giriş yapacak — örnek/sahte bir numarayla yanlışlıkla kaydolmasın.
-    return const GymProfile(
-      name: 'Vira Performans Stüdyo',
-      city: 'İstanbul',
-      phone: '',
-      address: 'Bağdat Cad. No 214/3, Kadıköy',
-    );
+    // F2-9 — bu ekran kimliksiz yeni kullanıcının salon oluşturma (signup)
+    // akışı; hiçbir alan gerçek bir kayda karşılık gelmediği için tamamı
+    // boş başlamalı (telefon zaten admin bununla giriş yapacağı için boştu,
+    // aynı kural diğer alanlar için de geçerli).
+    return const GymProfile(name: '', city: '', phone: '', address: '');
   }
 }
 
 @riverpod
-GymProfileService gymProfileService(GymProfileServiceRef ref) => const GymProfileService();
+GymProfileService gymProfileService(GymProfileServiceRef ref) =>
+    const GymProfileService();

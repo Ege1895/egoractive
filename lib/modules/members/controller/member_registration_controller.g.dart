@@ -7,7 +7,7 @@ part of 'member_registration_controller.dart';
 // **************************************************************************
 
 String _$memberRegistrationControllerHash() =>
-    r'5b788929b2ee4c2fb259b92271cd907d511290c9';
+    r'f8625f34d6b5f8a95d08f94128ffba4e478766fa';
 
 /// F2-2 — [MemberInfoPanel]'in (yeni üye akışı) ilk adımdaki gerçek kayıt
 /// aksiyonu. Form alanları [NewMemberController]'da tutuluyor; bu controller

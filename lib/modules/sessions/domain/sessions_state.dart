@@ -17,7 +17,10 @@ class WeekActivityDay with _$WeekActivityDay {
 
 @freezed
 class PaymentWarning with _$PaymentWarning {
-  const factory PaymentWarning({required String amount, required String dueDate}) = _PaymentWarning;
+  const factory PaymentWarning({
+    required String amount,
+    required String dueDate,
+  }) = _PaymentWarning;
 }
 
 @freezed
@@ -30,5 +33,6 @@ class SessionsState with _$SessionsState {
     required PaymentWarning? paymentWarning,
     @Default(SessionsViewMode.list) SessionsViewMode viewMode,
     @Default(AttendanceAnswer.pending) AttendanceAnswer attendanceAnswer,
+    String? attendanceErrorMessage,
   }) = _SessionsState;
 }

@@ -17,11 +17,14 @@ class GymRulesEditorPanel extends BasePanel {
   const GymRulesEditorPanel({super.key});
 
   @override
-  ConsumerState<GymRulesEditorPanel> createState() => _GymRulesEditorPanelState();
+  ConsumerState<GymRulesEditorPanel> createState() =>
+      _GymRulesEditorPanelState();
 }
 
 class _GymRulesEditorPanelState extends BasePanelState<GymRulesEditorPanel> {
   late final QuillController _controller;
+  bool _isSaving = false;
+  String? _errorMessage;
 
   @override
   void initState() {
@@ -30,6 +33,32 @@ class _GymRulesEditorPanelState extends BasePanelState<GymRulesEditorPanel> {
       document: Document.fromJson(ref.read(gymRulesControllerProvider).delta),
       selection: const TextSelection.collapsed(offset: 0),
     );
+  }
+
+  /// Önceki sürüm yazma işlemini `await` etmeden paneli kapatıyordu — kayıt
+  /// arka planda başarısız olsa bile kullanıcı "kaydedildi" sanıyordu. Artık
+  /// yazma tamamlanana kadar bekleniyor, hata olursa panelde kalınıp
+  /// gösteriliyor.
+  Future<void> _save() async {
+    setState(() {
+      _isSaving = true;
+      _errorMessage = null;
+    });
+    try {
+      await ref
+          .read(gymRulesControllerProvider.notifier)
+          .saveRules(_controller.document.toDelta().toJson());
+      if (mounted) ref.read(panelStackControllerProvider.notifier).pop();
+    } catch (_) {
+      if (mounted) {
+        setState(
+          () => _errorMessage =
+              'Kurallar kaydedilemedi, bağlantını kontrol edip tekrar dene.',
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isSaving = false);
+    }
   }
 
   @override
@@ -43,27 +72,57 @@ class _GymRulesEditorPanelState extends BasePanelState<GymRulesEditorPanel> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.md, AppSpacing.screenEdge, 0),
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.screenEdge,
+                AppSpacing.md,
+                AppSpacing.screenEdge,
+                0,
+              ),
               child: Row(
                 children: [
-                  Expanded(child: Text('Kuralları düzenle', style: typography.headingSmall.copyWith(color: colors.onSurface, fontSize: 18))),
+                  Expanded(
+                    child: Text(
+                      'Kuralları düzenle',
+                      style: typography.headingSmall.copyWith(
+                        color: colors.onSurface,
+                        fontSize: 18,
+                      ),
+                    ),
+                  ),
                   GestureDetector(
-                    onTap: () => ref.read(panelStackControllerProvider.notifier).pop(),
-                    child: Text('Vazgeç', style: typography.bodyLarge.copyWith(color: colors.onSurfaceMuted, fontSize: 15)),
+                    onTap: () =>
+                        ref.read(panelStackControllerProvider.notifier).pop(),
+                    child: Text(
+                      'Vazgeç',
+                      style: typography.bodyLarge.copyWith(
+                        color: colors.onSurfaceMuted,
+                        fontSize: 15,
+                      ),
+                    ),
                   ),
                 ],
               ),
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.md, AppSpacing.screenEdge, 0),
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.screenEdge,
+                AppSpacing.md,
+                AppSpacing.screenEdge,
+                0,
+              ),
               child: Text(
                 'Kalın/italik gibi biçimlendirme için araç çubuğunu, emoji için klavyenizin emoji tuşunu kullanabilirsiniz.',
-                style: typography.caption.copyWith(color: colors.onSurfaceMuted, height: 1.4),
+                style: typography.caption.copyWith(
+                  color: colors.onSurfaceMuted,
+                  height: 1.4,
+                ),
               ),
             ),
             const SizedBox(height: AppSpacing.md),
             Container(
-              margin: const EdgeInsets.symmetric(horizontal: AppSpacing.screenEdge),
+              margin: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.screenEdge,
+              ),
               decoration: BoxDecoration(
                 color: colors.surfaceRaised,
                 borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
@@ -104,23 +163,45 @@ class _GymRulesEditorPanelState extends BasePanelState<GymRulesEditorPanel> {
                   decoration: BoxDecoration(
                     color: colors.surface,
                     borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
-                    border: Border.all(color: colors.primary.withValues(alpha: 0.4)),
+                    border: Border.all(
+                      color: colors.primary.withValues(alpha: 0.4),
+                    ),
                   ),
                   child: QuillEditor.basic(
                     controller: _controller,
-                    config: const QuillEditorConfig(expands: true, padding: EdgeInsets.zero),
+                    config: const QuillEditorConfig(
+                      expands: true,
+                      padding: EdgeInsets.zero,
+                    ),
                   ),
                 ),
               ),
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, 0, AppSpacing.screenEdge, AppSpacing.lg),
-              child: AppButton(
-                label: 'Kaydet',
-                onPressed: () {
-                  ref.read(gymRulesControllerProvider.notifier).saveRules(_controller.document.toDelta().toJson());
-                  ref.read(panelStackControllerProvider.notifier).pop();
-                },
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.screenEdge,
+                0,
+                AppSpacing.screenEdge,
+                AppSpacing.lg,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (_errorMessage != null) ...[
+                    Text(
+                      _errorMessage!,
+                      style: typography.bodyMedium.copyWith(
+                        color: colors.error,
+                        fontSize: 13,
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                  ],
+                  AppButton(
+                    label: _isSaving ? 'Kaydediliyor…' : 'Kaydet',
+                    onPressed: _isSaving ? null : _save,
+                  ),
+                ],
               ),
             ),
           ],

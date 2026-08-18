@@ -10,14 +10,35 @@ part 'gym_theme_controller.g.dart';
 const _fallbackState = GymThemeState(
   activeThemeId: 'egora-mavisi',
   themes: [
-    GymTheme(id: 'egora-mavisi', name: 'Egora Mavisi', primary: Color(0xFF05A6FA), soft: Color(0xFF48C2FF), note: 'Varsayılan tema'),
-    GymTheme(id: 'turuncu-enerji', name: 'Turuncu Enerji', primary: Color(0xFFFF8A3D), soft: Color(0xFFFFB27A), note: 'Sıcak, enerjik vurgu'),
-    GymTheme(id: 'yesil-doga', name: 'Yeşil Doğa', primary: Color(0xFF2ED393), soft: Color(0xFF7FE8C4), note: 'Sakin, doğal vurgu'),
+    GymTheme(
+      id: 'egora-mavisi',
+      name: 'Egora Mavisi',
+      primary: Color(0xFF05A6FA),
+      soft: Color(0xFF48C2FF),
+      note: 'Varsayılan tema',
+    ),
+    GymTheme(
+      id: 'turuncu-enerji',
+      name: 'Turuncu Enerji',
+      primary: Color(0xFFFF8A3D),
+      soft: Color(0xFFFFB27A),
+      note: 'Sıcak, enerjik vurgu',
+    ),
+    GymTheme(
+      id: 'yesil-doga',
+      name: 'Yeşil Doğa',
+      primary: Color(0xFF2ED393),
+      soft: Color(0xFF7FE8C4),
+      note: 'Sakin, doğal vurgu',
+    ),
   ],
 );
 
 @riverpod
-Stream<GymThemeState> _themeStateForGym(_ThemeStateForGymRef ref, String gymId) {
+Stream<GymThemeState> _themeStateForGym(
+  _ThemeStateForGymRef ref,
+  String gymId,
+) {
   return ref.watch(gymThemeRepositoryProvider).watchState(gymId);
 }
 
@@ -31,38 +52,76 @@ class GymThemeController extends _$GymThemeController {
   GymThemeState build() {
     final gymId = ref.watch(activeGymIdProvider).valueOrNull;
     if (gymId == null) return _fallbackState;
-    return ref.watch(_themeStateForGymProvider(gymId)).valueOrNull ?? _fallbackState;
+    return ref.watch(_themeStateForGymProvider(gymId)).valueOrNull ??
+        _fallbackState;
   }
 
+  /// Yazma başarısız olursa (network/izin) hem local state hem de anlık
+  /// önizleme için optimistik güncellenen global [ThemeController] önceki
+  /// değerine geri alınır — aksi halde tema değişmiş gibi görünür ama
+  /// diğer cihazlara hiç yansımamış olabilir.
   Future<void> selectTheme(String id) async {
+    final previousThemeId = state.activeThemeId;
+    final previousTheme = activeTheme;
     final theme = state.themes.firstWhere((t) => t.id == id);
     ref.read(themeControllerProvider.notifier).setAccentColor(theme.primary);
-    state = state.copyWith(activeThemeId: id);
+    state = state.copyWith(activeThemeId: id, errorMessage: null);
 
     final gymId = ref.read(activeGymIdProvider).valueOrNull;
     if (gymId == null) return;
-    await ref.read(gymThemeRepositoryProvider).selectTheme(gymId, theme, watermarkEnabled: state.watermarkEnabled);
+    try {
+      await ref
+          .read(gymThemeRepositoryProvider)
+          .selectTheme(gymId, theme, watermarkEnabled: state.watermarkEnabled);
+    } catch (_) {
+      state = state.copyWith(
+        activeThemeId: previousThemeId,
+        errorMessage: 'Tema kaydedilemedi, tekrar dene.',
+      );
+      ref
+          .read(themeControllerProvider.notifier)
+          .setAccentColor(previousTheme.primary);
+    }
   }
 
   Future<void> addTheme(GymTheme theme) async {
     final presets = [...state.themes, theme];
-    state = state.copyWith(themes: presets);
+    state = state.copyWith(themes: presets, errorMessage: null);
 
     final gymId = ref.read(activeGymIdProvider).valueOrNull;
     if (gymId != null) {
-      await ref.read(gymThemeRepositoryProvider).savePresets(gymId, presets);
+      try {
+        await ref.read(gymThemeRepositoryProvider).savePresets(gymId, presets);
+      } catch (_) {
+        state = state.copyWith(
+          themes: state.themes.where((t) => t.id != theme.id).toList(),
+          errorMessage: 'Tema eklenemedi, tekrar dene.',
+        );
+        return;
+      }
     }
     await selectTheme(theme.id);
   }
 
   Future<void> toggleWatermark() async {
-    final enabled = !state.watermarkEnabled;
-    state = state.copyWith(watermarkEnabled: enabled);
+    final previous = state.watermarkEnabled;
+    final enabled = !previous;
+    state = state.copyWith(watermarkEnabled: enabled, errorMessage: null);
 
     final gymId = ref.read(activeGymIdProvider).valueOrNull;
     if (gymId == null) return;
-    await ref.read(gymThemeRepositoryProvider).setWatermarkEnabled(gymId, enabled);
+    try {
+      await ref
+          .read(gymThemeRepositoryProvider)
+          .setWatermarkEnabled(gymId, enabled);
+    } catch (_) {
+      state = state.copyWith(
+        watermarkEnabled: previous,
+        errorMessage: 'Ayar kaydedilemedi, tekrar dene.',
+      );
+    }
   }
 
-  GymTheme get activeTheme => state.themes.firstWhere((t) => t.id == state.activeThemeId);
+  GymTheme get activeTheme =>
+      state.themes.firstWhere((t) => t.id == state.activeThemeId);
 }

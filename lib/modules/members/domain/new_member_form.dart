@@ -6,9 +6,9 @@ enum MemberGender { erkek, kadin }
 
 extension MemberGenderLabel on MemberGender {
   String get label => switch (this) {
-        MemberGender.erkek => 'Erkek',
-        MemberGender.kadin => 'Kadın',
-      };
+    MemberGender.erkek => 'Erkek',
+    MemberGender.kadin => 'Kadın',
+  };
 }
 
 @freezed
@@ -20,8 +20,8 @@ class NewMemberForm with _$NewMemberForm {
     required int birthYear,
     required int heightCm,
     MemberGender? gender,
-    required String trainerId,
-    required String trainerName,
+    String? trainerId,
+    String? trainerName,
     required String note,
   }) = _NewMemberForm;
 

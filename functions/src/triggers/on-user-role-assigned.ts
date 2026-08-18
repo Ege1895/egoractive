@@ -45,7 +45,13 @@ export function resolveClaimsUpdate(
  * tekrar anlamlı bir işe sürüklemez.
  */
 export const onUserRoleAssigned = onDocumentWritten(
-  `${usersCollection()}/{uid}`,
+  // F2-9 — `signupGymAdmin` bu dokümanı, henüz hiçbir Firebase Auth hesabı
+  // yokken (lazy account creation) yazıyor; bu yüzden `setCustomUserClaims`
+  // ilk denemede `auth/user-not-found` ile başarısız olabilir. `retry: true`
+  // olmadan bu hata kalıcı olur ve kullanıcı asla doğru claim'e kavuşamaz —
+  // Eventarc'ın kendi backoff'uyla, kullanıcı `requestCustomToken` ile ilk
+  // girişini yapıp hesabı oluştuktan sonra tekrar denenir.
+  { document: `${usersCollection()}/{uid}`, retry: true },
   withFailureAlerting("onUserRoleAssigned", async (event) => {
     const before = event.data?.before;
     const after = event.data?.after;

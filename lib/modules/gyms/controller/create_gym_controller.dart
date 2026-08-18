@@ -1,11 +1,13 @@
 import 'dart:io';
 import 'dart:ui' show Color;
 
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/painting.dart' show FileImage;
 import 'package:image_picker/image_picker.dart';
 import 'package:palette_generator/palette_generator.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../core/theme/theme_controller.dart';
 import '../domain/gym_profile.dart';
 import '../service/create_gym_service.dart';
 import 'gym_profile_controller.dart';
@@ -54,8 +56,9 @@ class CreateGymState {
       errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
       isExtractingPalette: isExtractingPalette ?? this.isExtractingPalette,
       logoPalette: logoPalette ?? this.logoPalette,
-      selectedPaletteColor:
-          clearSelectedPaletteColor ? null : (selectedPaletteColor ?? this.selectedPaletteColor),
+      selectedPaletteColor: clearSelectedPaletteColor
+          ? null
+          : (selectedPaletteColor ?? this.selectedPaletteColor),
     );
   }
 }
@@ -69,9 +72,22 @@ class CreateGymController extends _$CreateGymController {
   @override
   CreateGymState build() => const CreateGymState();
 
+  /// [GymSetupPanel] her açıldığında çağırır — bkz. [GymProfileController.reset].
+  /// Global tema önizlemesini de varsayılana döndürür: önceki bir denemede
+  /// palet rengi seçilip salon kaydı başarısız olduysa (ya da kullanıcı
+  /// vazgeçtiyse), bu ekrana her dönüşte yanlış/geçici bir vurgu rengi asılı
+  /// kalmasın.
+  void reset() {
+    state = const CreateGymState();
+    ref.read(themeControllerProvider.notifier).resetToDefault();
+  }
+
   Future<void> pickLogo() async {
     try {
-      final file = await ImagePicker().pickImage(source: ImageSource.gallery, imageQuality: 85);
+      final file = await ImagePicker().pickImage(
+        source: ImageSource.gallery,
+        imageQuality: 85,
+      );
       if (file == null) return;
       state = state.copyWith(
         logoFile: file,
@@ -85,7 +101,13 @@ class CreateGymController extends _$CreateGymController {
     }
   }
 
-  void selectPaletteColor(Color color) => state = state.copyWith(selectedPaletteColor: color);
+  /// Seçimi hem yerel state'e hem de global [ThemeController]'a yazar ki
+  /// buton/vurgu renkleri ekranda anında (canlı önizleme) değişsin — aynı
+  /// [GymThemeController.selectTheme] hazır tema seçiminde yaptığı gibi.
+  void selectPaletteColor(Color color) {
+    state = state.copyWith(selectedPaletteColor: color);
+    ref.read(themeControllerProvider.notifier).setAccentColor(color);
+  }
 
   /// Logodaki baskın/canlı renkleri çıkarıp öneri listesine koyar. Çıkarım
   /// başarısız olursa (bozuk dosya, format desteklenmiyor vb.) sessizce
@@ -151,25 +173,39 @@ class CreateGymController extends _$CreateGymController {
     state = state.copyWith(isSubmitting: true, clearError: true);
     try {
       final themeColor =
-          state.selectedPaletteColor ?? ref.read(gymThemeControllerProvider.notifier).activeTheme.primary;
-      final gymId = await ref.read(createGymServiceProvider).createGym(
+          state.selectedPaletteColor ??
+          ref.read(gymThemeControllerProvider.notifier).activeTheme.primary;
+      final gymId = await ref
+          .read(createGymServiceProvider)
+          .createGym(
             profile: profile,
             themeColor: themeColor,
             logoFile: state.logoFile,
           );
       state = state.copyWith(isSubmitting: false);
       return gymId;
+    } on FirebaseFunctionsException catch (e) {
+      state = state.copyWith(
+        isSubmitting: false,
+        errorMessage: e.code == 'already-exists'
+            ? 'Bu telefon numarasıyla kayıtlı bir hesap zaten var. Salon oluşturmak yerine giriş yapmayı dene.'
+            : 'Salon oluşturulamadı. Bağlantını kontrol edip tekrar dene.',
+      );
+      return null;
     } catch (_) {
       state = state.copyWith(
         isSubmitting: false,
-        errorMessage: 'Salon oluşturulamadı. Bağlantını kontrol edip tekrar dene.',
+        errorMessage:
+            'Salon oluşturulamadı. Bağlantını kontrol edip tekrar dene.',
       );
       return null;
     }
   }
 
   String? _validate(GymProfile profile) {
-    if (profile.name.trim().isEmpty || profile.city.trim().isEmpty || profile.address.trim().isEmpty) {
+    if (profile.name.trim().isEmpty ||
+        profile.city.trim().isEmpty ||
+        profile.address.trim().isEmpty) {
       return 'Lütfen tüm alanları doldur.';
     }
     // profile.phone GymProfileController.updatePhone'da zaten sadece rakam

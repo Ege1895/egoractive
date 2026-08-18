@@ -7,7 +7,7 @@ part of 'gym_profile_controller.dart';
 // **************************************************************************
 
 String _$gymProfileControllerHash() =>
-    r'acd50a1448a719d5ed4922dbc4f420d6e17e8b7a';
+    r'c8e185fd41692a0bd713cf311468bb4b393c6e75';
 
 /// See also [GymProfileController].
 @ProviderFor(GymProfileController)

@@ -6,7 +6,7 @@ import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
 import '../../../../core/subscription/subscription_write_gate.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../../../shared/utils/phone_number_formatter.dart';
+import '../../../../shared/utils/tr_date_formatter.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_text_field.dart';
 import '../../../trainers/controller/admin_trainers_controller.dart';
@@ -39,18 +39,25 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
   @override
   void initState() {
     super.initState();
-    final form = ref.read(newMemberControllerProvider);
     if (widget.existing != null) {
       final parts = widget.existing!.name.split(' ');
       _firstNameController = TextEditingController(text: parts.first);
-      _lastNameController = TextEditingController(text: parts.skip(1).join(' '));
+      _lastNameController = TextEditingController(
+        text: parts.skip(1).join(' '),
+      );
       _phoneController = TextEditingController(text: widget.existing!.phone);
       _noteController = TextEditingController();
     } else {
-      _firstNameController = TextEditingController(text: form.firstName);
-      _lastNameController = TextEditingController(text: form.lastName);
-      _phoneController = TextEditingController(text: formatTrPhoneDigits(form.phoneDigits));
-      _noteController = TextEditingController(text: form.note);
+      // Yeni üye sihirbazı: bu provider panel stack'te önceki panelleri
+      // canlı tuttuğu için önceki (iptal edilmiş) bir kayıttan kalan veri
+      // sızmasın diye alanlar her zaman boş başlar (bkz. NewMemberController.reset).
+      _firstNameController = TextEditingController();
+      _lastNameController = TextEditingController();
+      _phoneController = TextEditingController();
+      _noteController = TextEditingController();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) ref.read(newMemberControllerProvider.notifier).reset();
+      });
     }
   }
 
@@ -61,7 +68,9 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
     final controller = ref.read(newMemberControllerProvider.notifier);
     final form = ref.watch(newMemberControllerProvider);
     final registrationState = ref.watch(memberRegistrationControllerProvider);
-    final registrationController = ref.read(memberRegistrationControllerProvider.notifier);
+    final registrationController = ref.read(
+      memberRegistrationControllerProvider.notifier,
+    );
 
     return Scaffold(
       body: SafeArea(
@@ -69,17 +78,36 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.md, AppSpacing.screenEdge, 0),
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.screenEdge,
+                AppSpacing.md,
+                AppSpacing.screenEdge,
+                0,
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(widget.isNew ? 'Yeni üye' : 'Üye bilgileri', style: typography.headingSmall.copyWith(color: colors.onSurface, fontSize: 18)),
+                      Text(
+                        widget.isNew ? 'Yeni üye' : 'Üye bilgileri',
+                        style: typography.headingSmall.copyWith(
+                          color: colors.onSurface,
+                          fontSize: 18,
+                        ),
+                      ),
                       GestureDetector(
-                        onTap: () => ref.read(panelStackControllerProvider.notifier).pop(),
-                        child: Text('Vazgeç', style: typography.bodyLarge.copyWith(color: colors.onSurfaceMuted, fontSize: 15)),
+                        onTap: () => ref
+                            .read(panelStackControllerProvider.notifier)
+                            .pop(),
+                        child: Text(
+                          'Vazgeç',
+                          style: typography.bodyLarge.copyWith(
+                            color: colors.onSurfaceMuted,
+                            fontSize: 15,
+                          ),
+                        ),
                       ),
                     ],
                   ),
@@ -87,13 +115,49 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
                     const SizedBox(height: AppSpacing.md),
                     Row(
                       children: [
-                        Expanded(child: Container(height: 5, decoration: BoxDecoration(color: colors.primary, borderRadius: BorderRadius.circular(AppSpacing.radiusPill)))),
+                        Expanded(
+                          child: Container(
+                            height: 5,
+                            decoration: BoxDecoration(
+                              color: colors.primary,
+                              borderRadius: BorderRadius.circular(
+                                AppSpacing.radiusPill,
+                              ),
+                            ),
+                          ),
+                        ),
                         const SizedBox(width: AppSpacing.sm),
-                        Expanded(child: Container(height: 5, decoration: BoxDecoration(color: colors.surfaceRaised, borderRadius: BorderRadius.circular(AppSpacing.radiusPill)))),
+                        Expanded(
+                          child: Container(
+                            height: 5,
+                            decoration: BoxDecoration(
+                              color: colors.surfaceRaised,
+                              borderRadius: BorderRadius.circular(
+                                AppSpacing.radiusPill,
+                              ),
+                            ),
+                          ),
+                        ),
                         const SizedBox(width: AppSpacing.sm),
-                        Expanded(child: Container(height: 5, decoration: BoxDecoration(color: colors.surfaceRaised, borderRadius: BorderRadius.circular(AppSpacing.radiusPill)))),
+                        Expanded(
+                          child: Container(
+                            height: 5,
+                            decoration: BoxDecoration(
+                              color: colors.surfaceRaised,
+                              borderRadius: BorderRadius.circular(
+                                AppSpacing.radiusPill,
+                              ),
+                            ),
+                          ),
+                        ),
                         const SizedBox(width: AppSpacing.sm),
-                        Text('1 / 3', style: typography.headingSmall.copyWith(fontSize: 13, color: colors.onPrimaryContainer)),
+                        Text(
+                          '1 / 3',
+                          style: typography.headingSmall.copyWith(
+                            fontSize: 13,
+                            color: colors.onPrimaryContainer,
+                          ),
+                        ),
                       ],
                     ),
                   ],
@@ -102,13 +166,20 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
             ),
             Expanded(
               child: ListView(
-                padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.lg, AppSpacing.screenEdge, AppSpacing.lg),
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.screenEdge,
+                  AppSpacing.lg,
+                  AppSpacing.screenEdge,
+                  AppSpacing.lg,
+                ),
                 children: [
                   Container(
                     padding: const EdgeInsets.all(AppSpacing.lg),
                     decoration: BoxDecoration(
                       color: colors.surface,
-                      borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusCard,
+                      ),
                       border: Border.all(color: colors.outline),
                     ),
                     child: Column(
@@ -116,9 +187,21 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
                       children: [
                         Row(
                           children: [
-                            Expanded(child: AppTextField(label: 'Ad', controller: _firstNameController, onChanged: controller.updateFirstName)),
+                            Expanded(
+                              child: AppTextField(
+                                label: 'Ad',
+                                controller: _firstNameController,
+                                onChanged: controller.updateFirstName,
+                              ),
+                            ),
                             const SizedBox(width: AppSpacing.sm),
-                            Expanded(child: AppTextField(label: 'Soyad', controller: _lastNameController, onChanged: controller.updateLastName)),
+                            Expanded(
+                              child: AppTextField(
+                                label: 'Soyad',
+                                controller: _lastNameController,
+                                onChanged: controller.updateLastName,
+                              ),
+                            ),
                           ],
                         ),
                         const SizedBox(height: AppSpacing.md),
@@ -126,10 +209,17 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
                           label: 'Telefon',
                           keyboardType: TextInputType.phone,
                           controller: _phoneController,
-                          onChanged: (value) => controller.updatePhoneDigits(value.replaceAll(RegExp(r'[^0-9]'), '')),
+                          onChanged: (value) => controller.updatePhoneDigits(
+                            value.replaceAll(RegExp(r'[^0-9]'), ''),
+                          ),
                         ),
                         const SizedBox(height: AppSpacing.xs),
-                        Text('Üye bu numarayla giriş yapar, şifre yok.', style: typography.caption.copyWith(color: colors.onSurfaceMuted)),
+                        Text(
+                          'Üye bu numarayla giriş yapar, şifre yok.',
+                          style: typography.caption.copyWith(
+                            color: colors.onSurfaceMuted,
+                          ),
+                        ),
                         const SizedBox(height: AppSpacing.md),
                         Row(
                           children: [
@@ -138,8 +228,12 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
                                 label: 'Doğum yılı',
                                 value: '${form.birthYear}',
                                 suffix: '${form.age} yaş',
-                                onMinus: () => controller.updateBirthYear(form.birthYear - 1),
-                                onPlus: () => controller.updateBirthYear(form.birthYear + 1),
+                                onMinus: () => controller.updateBirthYear(
+                                  form.birthYear - 1,
+                                ),
+                                onPlus: () => controller.updateBirthYear(
+                                  form.birthYear + 1,
+                                ),
                               ),
                             ),
                             const SizedBox(width: AppSpacing.sm),
@@ -148,25 +242,40 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
                                 label: 'Boy',
                                 value: '${form.heightCm}',
                                 suffix: 'cm',
-                                onMinus: () => controller.updateHeightCm(form.heightCm - 1),
-                                onPlus: () => controller.updateHeightCm(form.heightCm + 1),
+                                onMinus: () => controller.updateHeightCm(
+                                  form.heightCm - 1,
+                                ),
+                                onPlus: () => controller.updateHeightCm(
+                                  form.heightCm + 1,
+                                ),
                               ),
                             ),
                           ],
                         ),
                         const SizedBox(height: AppSpacing.md),
-                        Text('Cinsiyet (opsiyonel)', style: typography.bodyMedium.copyWith(color: colors.onSurfaceMuted, fontSize: 13)),
+                        Text(
+                          'Cinsiyet (opsiyonel)',
+                          style: typography.bodyMedium.copyWith(
+                            color: colors.onSurfaceMuted,
+                            fontSize: 13,
+                          ),
+                        ),
                         const SizedBox(height: AppSpacing.sm),
                         Row(
                           children: [
                             for (final gender in MemberGender.values)
                               Expanded(
                                 child: Padding(
-                                  padding: EdgeInsets.only(right: gender == MemberGender.values.last ? 0 : AppSpacing.sm),
+                                  padding: EdgeInsets.only(
+                                    right: gender == MemberGender.values.last
+                                        ? 0
+                                        : AppSpacing.sm,
+                                  ),
                                   child: _GenderChip(
                                     label: gender.label,
                                     selected: form.gender == gender,
-                                    onTap: () => controller.toggleGender(gender),
+                                    onTap: () =>
+                                        controller.toggleGender(gender),
                                   ),
                                 ),
                               ),
@@ -175,17 +284,23 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
                         const SizedBox(height: AppSpacing.xs),
                         Text(
                           'Ölçüm avatarı bu bilgiye göre gösterilir; üye ekranında ayrıca seçim yapılmaz.',
-                          style: typography.caption.copyWith(color: colors.onSurfaceMuted),
+                          style: typography.caption.copyWith(
+                            color: colors.onSurfaceMuted,
+                          ),
                         ),
                       ],
                     ),
                   ),
                   const SizedBox(height: AppSpacing.lg),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.lg,
+                    ),
                     decoration: BoxDecoration(
                       color: colors.surface,
-                      borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusCard,
+                      ),
                       border: Border.all(color: colors.outline),
                     ),
                     child: Column(
@@ -194,11 +309,21 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
                           onTap: () => _showTrainerPicker(context, controller),
                           child: Container(
                             constraints: const BoxConstraints(minHeight: 60),
-                            decoration: BoxDecoration(border: Border(bottom: BorderSide(color: colors.outline))),
+                            decoration: BoxDecoration(
+                              border: Border(
+                                bottom: BorderSide(color: colors.outline),
+                              ),
+                            ),
                             child: Row(
                               children: [
                                 Expanded(
-                                  child: Text('Antrenör', style: typography.bodyLarge.copyWith(color: colors.onSurfaceVariant, fontSize: 15)),
+                                  child: Text(
+                                    'Antrenör',
+                                    style: typography.bodyLarge.copyWith(
+                                      color: colors.onSurfaceVariant,
+                                      fontSize: 15,
+                                    ),
+                                  ),
                                 ),
                                 Flexible(
                                   child: Row(
@@ -206,13 +331,23 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
                                     children: [
                                       Flexible(
                                         child: Text(
-                                          form.trainerName,
-                                          style: typography.headingSmall.copyWith(color: colors.onSurface, fontSize: 15),
+                                          form.trainerName ?? 'Antrenör seç',
+                                          style: typography.headingSmall
+                                              .copyWith(
+                                                color: form.trainerName == null
+                                                    ? colors.onSurfaceMuted
+                                                    : colors.onSurface,
+                                                fontSize: 15,
+                                              ),
                                           overflow: TextOverflow.ellipsis,
                                         ),
                                       ),
                                       const SizedBox(width: AppSpacing.xs),
-                                      Icon(Icons.chevron_right, color: colors.onSurfaceMuted, size: 18),
+                                      Icon(
+                                        Icons.chevron_right,
+                                        color: colors.onSurfaceMuted,
+                                        size: 18,
+                                      ),
                                     ],
                                   ),
                                 ),
@@ -225,9 +360,25 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
                           child: Row(
                             children: [
                               Expanded(
-                                child: Text('Kayıt tarihi', style: typography.bodyLarge.copyWith(color: colors.onSurfaceVariant, fontSize: 15)),
+                                child: Text(
+                                  'Kayıt tarihi',
+                                  style: typography.bodyLarge.copyWith(
+                                    color: colors.onSurfaceVariant,
+                                    fontSize: 15,
+                                  ),
+                                ),
                               ),
-                              Text('3 Ağu 2026', style: typography.headingSmall.copyWith(color: colors.onSurface, fontSize: 15)),
+                              Text(
+                                // Yeni üye henüz kaydedilmedi, kayıt anı bugün olacak — mevcut üye
+                                // düzenlenirken gerçek kayıt tarihi henüz Firestore'dan okunmuyor.
+                                widget.isNew
+                                    ? formatTrDate(DateTime.now())
+                                    : '—',
+                                style: typography.headingSmall.copyWith(
+                                  color: colors.onSurface,
+                                  fontSize: 15,
+                                ),
+                              ),
                             ],
                           ),
                         ),
@@ -244,32 +395,52 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.md, AppSpacing.screenEdge, AppSpacing.lg),
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.screenEdge,
+                AppSpacing.md,
+                AppSpacing.screenEdge,
+                AppSpacing.lg,
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  if (widget.isNew && registrationState.errorMessage != null) ...[
+                  if (widget.isNew &&
+                      registrationState.errorMessage != null) ...[
                     Text(
                       registrationState.errorMessage!,
-                      style: typography.bodyMedium.copyWith(color: colors.error, fontSize: 13),
+                      style: typography.bodyMedium.copyWith(
+                        color: colors.error,
+                        fontSize: 13,
+                      ),
                     ),
                     const SizedBox(height: AppSpacing.sm),
                   ],
                   AppButton(
                     label: widget.isNew
-                        ? (registrationState.isSubmitting ? 'Kaydediliyor…' : 'Paket seçimine geç')
+                        ? (registrationState.isSubmitting
+                              ? 'Kaydediliyor…'
+                              : 'Paket seçimine geç')
                         : 'Kaydet',
                     onPressed: widget.isNew && registrationState.isSubmitting
                         ? null
                         : () async {
                             if (!widget.isNew) {
-                              ref.read(panelStackControllerProvider.notifier).pop();
+                              ref
+                                  .read(panelStackControllerProvider.notifier)
+                                  .pop();
                               return;
                             }
-                            if (!await ensureSubscriptionAllowsWrite(context, ref)) return;
-                            final success = await registrationController.submit();
+                            if (!await ensureSubscriptionAllowsWrite(
+                              context,
+                              ref,
+                            ))
+                              return;
+                            final success = await registrationController
+                                .submit();
                             if (success && mounted) {
-                              ref.read(panelStackControllerProvider.notifier).push(const NewMembershipPackagePanel());
+                              ref
+                                  .read(panelStackControllerProvider.notifier)
+                                  .push(const NewMembershipPackagePanel());
                             }
                           },
                   ),
@@ -282,13 +453,18 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
     );
   }
 
-  void _showTrainerPicker(BuildContext context, NewMemberController controller) {
+  void _showTrainerPicker(
+    BuildContext context,
+    NewMemberController controller,
+  ) {
     final colors = context.appColors;
     final trainers = ref.read(adminTrainersControllerProvider);
     showModalBottomSheet<void>(
       context: context,
       backgroundColor: colors.surface,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
       builder: (sheetContext) {
         return SafeArea(
           child: Padding(
@@ -297,12 +473,22 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Antrenör seç', style: context.appTypography.headingMedium.copyWith(color: colors.onSurface, fontSize: 20)),
+                Text(
+                  'Antrenör seç',
+                  style: context.appTypography.headingMedium.copyWith(
+                    color: colors.onSurface,
+                    fontSize: 20,
+                  ),
+                ),
                 const SizedBox(height: AppSpacing.md),
-                for (final trainer in trainers) _TrainerOption(trainer: trainer, onTap: () {
-                  controller.selectTrainer(trainer.id, trainer.name);
-                  Navigator.of(sheetContext).pop();
-                }),
+                for (final trainer in trainers)
+                  _TrainerOption(
+                    trainer: trainer,
+                    onTap: () {
+                      controller.selectTrainer(trainer.id, trainer.name);
+                      Navigator.of(sheetContext).pop();
+                    },
+                  ),
               ],
             ),
           ),
@@ -322,7 +508,13 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
 }
 
 class _StepperField extends StatelessWidget {
-  const _StepperField({required this.label, required this.value, required this.suffix, required this.onMinus, required this.onPlus});
+  const _StepperField({
+    required this.label,
+    required this.value,
+    required this.suffix,
+    required this.onMinus,
+    required this.onPlus,
+  });
 
   final String label;
   final String value;
@@ -337,31 +529,68 @@ class _StepperField extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: typography.bodyMedium.copyWith(color: colors.onSurfaceMuted, fontSize: 13)),
+        Text(
+          label,
+          style: typography.bodyMedium.copyWith(
+            color: colors.onSurfaceMuted,
+            fontSize: 13,
+          ),
+        ),
         const SizedBox(height: AppSpacing.xs),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
           constraints: const BoxConstraints(minHeight: 48),
-          decoration: BoxDecoration(color: colors.surfaceRaised, borderRadius: BorderRadius.circular(AppSpacing.radiusInner)),
+          decoration: BoxDecoration(
+            color: colors.surfaceRaised,
+            borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+          ),
           child: Row(
             children: [
-              GestureDetector(onTap: onMinus, child: Icon(Icons.remove_circle_outline, color: colors.onSurfaceVariant, size: 20)),
-              Expanded(
-                child: Text(value, textAlign: TextAlign.center, style: typography.dataMedium.copyWith(color: colors.onSurface, fontSize: 16)),
+              GestureDetector(
+                onTap: onMinus,
+                child: Icon(
+                  Icons.remove_circle_outline,
+                  color: colors.onSurfaceVariant,
+                  size: 20,
+                ),
               ),
-              GestureDetector(onTap: onPlus, child: Icon(Icons.add_circle_outline, color: colors.onSurfaceVariant, size: 20)),
+              Expanded(
+                child: Text(
+                  value,
+                  textAlign: TextAlign.center,
+                  style: typography.dataMedium.copyWith(
+                    color: colors.onSurface,
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+              GestureDetector(
+                onTap: onPlus,
+                child: Icon(
+                  Icons.add_circle_outline,
+                  color: colors.onSurfaceVariant,
+                  size: 20,
+                ),
+              ),
             ],
           ),
         ),
         const SizedBox(height: AppSpacing.xs),
-        Text(suffix, style: typography.caption.copyWith(color: colors.onPrimaryContainer)),
+        Text(
+          suffix,
+          style: typography.caption.copyWith(color: colors.onPrimaryContainer),
+        ),
       ],
     );
   }
 }
 
 class _GenderChip extends StatelessWidget {
-  const _GenderChip({required this.label, required this.selected, required this.onTap});
+  const _GenderChip({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
 
   final String label;
   final bool selected;
@@ -386,12 +615,35 @@ class _GenderChip extends StatelessWidget {
               Container(
                 width: 18,
                 height: 18,
-                decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: selected ? colors.primary : colors.outlineStrong, width: 2)),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: selected ? colors.primary : colors.outlineStrong,
+                    width: 2,
+                  ),
+                ),
                 alignment: Alignment.center,
-                child: selected ? Container(width: 8, height: 8, decoration: BoxDecoration(shape: BoxShape.circle, color: colors.primary)) : null,
+                child: selected
+                    ? Container(
+                        width: 8,
+                        height: 8,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: colors.primary,
+                        ),
+                      )
+                    : null,
               ),
               const SizedBox(width: AppSpacing.sm),
-              Text(label, style: typography.headingSmall.copyWith(fontSize: 15, color: selected ? colors.onPrimaryContainer : colors.onSurface)),
+              Text(
+                label,
+                style: typography.headingSmall.copyWith(
+                  fontSize: 15,
+                  color: selected
+                      ? colors.onPrimaryContainer
+                      : colors.onSurface,
+                ),
+              ),
             ],
           ),
         ),
@@ -419,12 +671,27 @@ class _TrainerOption extends StatelessWidget {
             Container(
               width: 36,
               height: 36,
-              decoration: BoxDecoration(color: colors.primaryContainer, shape: BoxShape.circle),
+              decoration: BoxDecoration(
+                color: colors.primaryContainer,
+                shape: BoxShape.circle,
+              ),
               alignment: Alignment.center,
-              child: Text(trainer.initials, style: typography.headingSmall.copyWith(color: colors.onPrimaryContainer, fontSize: 13)),
+              child: Text(
+                trainer.initials,
+                style: typography.headingSmall.copyWith(
+                  color: colors.onPrimaryContainer,
+                  fontSize: 13,
+                ),
+              ),
             ),
             const SizedBox(width: AppSpacing.md),
-            Text(trainer.name, style: typography.bodyLarge.copyWith(color: colors.onSurface, fontSize: 15)),
+            Text(
+              trainer.name,
+              style: typography.bodyLarge.copyWith(
+                color: colors.onSurface,
+                fontSize: 15,
+              ),
+            ),
           ],
         ),
       ),

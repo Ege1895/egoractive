@@ -358,6 +358,7 @@ mixin _$SessionsState {
   PaymentWarning? get paymentWarning => throw _privateConstructorUsedError;
   SessionsViewMode get viewMode => throw _privateConstructorUsedError;
   AttendanceAnswer get attendanceAnswer => throw _privateConstructorUsedError;
+  String? get attendanceErrorMessage => throw _privateConstructorUsedError;
 
   /// Create a copy of SessionsState
   /// with the given fields replaced by the non-null parameter values.
@@ -381,6 +382,7 @@ abstract class $SessionsStateCopyWith<$Res> {
     PaymentWarning? paymentWarning,
     SessionsViewMode viewMode,
     AttendanceAnswer attendanceAnswer,
+    String? attendanceErrorMessage,
   });
 
   $SessionCopyWith<$Res> get nextSession;
@@ -409,6 +411,7 @@ class _$SessionsStateCopyWithImpl<$Res, $Val extends SessionsState>
     Object? paymentWarning = freezed,
     Object? viewMode = null,
     Object? attendanceAnswer = null,
+    Object? attendanceErrorMessage = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -440,6 +443,10 @@ class _$SessionsStateCopyWithImpl<$Res, $Val extends SessionsState>
                 ? _value.attendanceAnswer
                 : attendanceAnswer // ignore: cast_nullable_to_non_nullable
                       as AttendanceAnswer,
+            attendanceErrorMessage: freezed == attendanceErrorMessage
+                ? _value.attendanceErrorMessage
+                : attendanceErrorMessage // ignore: cast_nullable_to_non_nullable
+                      as String?,
           )
           as $Val,
     );
@@ -487,6 +494,7 @@ abstract class _$$SessionsStateImplCopyWith<$Res>
     PaymentWarning? paymentWarning,
     SessionsViewMode viewMode,
     AttendanceAnswer attendanceAnswer,
+    String? attendanceErrorMessage,
   });
 
   @override
@@ -516,6 +524,7 @@ class __$$SessionsStateImplCopyWithImpl<$Res>
     Object? paymentWarning = freezed,
     Object? viewMode = null,
     Object? attendanceAnswer = null,
+    Object? attendanceErrorMessage = freezed,
   }) {
     return _then(
       _$SessionsStateImpl(
@@ -547,6 +556,10 @@ class __$$SessionsStateImplCopyWithImpl<$Res>
             ? _value.attendanceAnswer
             : attendanceAnswer // ignore: cast_nullable_to_non_nullable
                   as AttendanceAnswer,
+        attendanceErrorMessage: freezed == attendanceErrorMessage
+            ? _value.attendanceErrorMessage
+            : attendanceErrorMessage // ignore: cast_nullable_to_non_nullable
+                  as String?,
       ),
     );
   }
@@ -563,6 +576,7 @@ class _$SessionsStateImpl implements _SessionsState {
     required this.paymentWarning,
     this.viewMode = SessionsViewMode.list,
     this.attendanceAnswer = AttendanceAnswer.pending,
+    this.attendanceErrorMessage,
   }) : _upcoming = upcoming,
        _past = past,
        _week = week;
@@ -601,10 +615,12 @@ class _$SessionsStateImpl implements _SessionsState {
   @override
   @JsonKey()
   final AttendanceAnswer attendanceAnswer;
+  @override
+  final String? attendanceErrorMessage;
 
   @override
   String toString() {
-    return 'SessionsState(nextSession: $nextSession, upcoming: $upcoming, past: $past, week: $week, paymentWarning: $paymentWarning, viewMode: $viewMode, attendanceAnswer: $attendanceAnswer)';
+    return 'SessionsState(nextSession: $nextSession, upcoming: $upcoming, past: $past, week: $week, paymentWarning: $paymentWarning, viewMode: $viewMode, attendanceAnswer: $attendanceAnswer, attendanceErrorMessage: $attendanceErrorMessage)';
   }
 
   @override
@@ -622,7 +638,9 @@ class _$SessionsStateImpl implements _SessionsState {
             (identical(other.viewMode, viewMode) ||
                 other.viewMode == viewMode) &&
             (identical(other.attendanceAnswer, attendanceAnswer) ||
-                other.attendanceAnswer == attendanceAnswer));
+                other.attendanceAnswer == attendanceAnswer) &&
+            (identical(other.attendanceErrorMessage, attendanceErrorMessage) ||
+                other.attendanceErrorMessage == attendanceErrorMessage));
   }
 
   @override
@@ -635,6 +653,7 @@ class _$SessionsStateImpl implements _SessionsState {
     paymentWarning,
     viewMode,
     attendanceAnswer,
+    attendanceErrorMessage,
   );
 
   /// Create a copy of SessionsState
@@ -655,6 +674,7 @@ abstract class _SessionsState implements SessionsState {
     required final PaymentWarning? paymentWarning,
     final SessionsViewMode viewMode,
     final AttendanceAnswer attendanceAnswer,
+    final String? attendanceErrorMessage,
   }) = _$SessionsStateImpl;
 
   @override
@@ -671,6 +691,8 @@ abstract class _SessionsState implements SessionsState {
   SessionsViewMode get viewMode;
   @override
   AttendanceAnswer get attendanceAnswer;
+  @override
+  String? get attendanceErrorMessage;
 
   /// Create a copy of SessionsState
   /// with the given fields replaced by the non-null parameter values.

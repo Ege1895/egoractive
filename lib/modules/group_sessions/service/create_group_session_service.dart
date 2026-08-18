@@ -10,19 +10,21 @@ class CreateGroupSessionService {
 
   CreateGroupSessionForm loadInitial() {
     return const CreateGroupSessionForm(
-      title: 'Fonksiyonel Grup',
-      startTime: '07:30',
-      durationMinutes: 45,
-      selectedDays: {1, 3, 5},
-      capacity: 8,
-      capacityMax: 12,
+      title: '',
+      startTime: '09:00',
+      durationMinutes: 60,
+      selectedDays: {},
+      capacity: 1,
+      capacityMax: 20,
       onlineBookingEnabled: true,
-      studioName: 'Stüdyo 1',
+      studioName: '',
     );
   }
 }
 
 @riverpod
-CreateGroupSessionService createGroupSessionService(CreateGroupSessionServiceRef ref) {
+CreateGroupSessionService createGroupSessionService(
+  CreateGroupSessionServiceRef ref,
+) {
   return const CreateGroupSessionService();
 }

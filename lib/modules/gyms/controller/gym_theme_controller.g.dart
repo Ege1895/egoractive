@@ -149,7 +149,7 @@ class _ThemeStateForGymProviderElement
 }
 
 String _$gymThemeControllerHash() =>
-    r'0b7c29a70f3b9cdaa96f1a96f1767b80bd91ff92';
+    r'd477c97f37b8595b43edac8c411f4ee7e411634e';
 
 /// F4-6 — `gyms/{gymId}.themeColors`/`themePresets`, `ThemeController`
 /// (F1-6) tarafından zaten stream olarak dinleniyor; buradaki yazmalar

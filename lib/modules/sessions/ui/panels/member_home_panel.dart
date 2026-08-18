@@ -44,7 +44,10 @@ class MemberHomePanel extends ConsumerWidget {
                   alignment: Alignment.center,
                   child: Text(
                     'AY',
-                    style: typography.headingSmall.copyWith(color: colors.onPrimaryContainer, fontSize: 16),
+                    style: typography.headingSmall.copyWith(
+                      color: colors.onPrimaryContainer,
+                      fontSize: 16,
+                    ),
                   ),
                 ),
                 const SizedBox(width: AppSpacing.md),
@@ -52,10 +55,17 @@ class MemberHomePanel extends ConsumerWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(MemberMockProfile.gymName, style: typography.caption.copyWith(color: colors.onSurfaceMuted)),
+                      Text(
+                        MemberMockProfile.gymName,
+                        style: typography.caption.copyWith(
+                          color: colors.onSurfaceMuted,
+                        ),
+                      ),
                       Text(
                         'Merhaba ${MemberMockProfile.memberFirstName}',
-                        style: typography.headingMedium.copyWith(color: colors.onSurface),
+                        style: typography.headingMedium.copyWith(
+                          color: colors.onSurface,
+                        ),
                       ),
                     ],
                   ),
@@ -71,7 +81,11 @@ class MemberHomePanel extends ConsumerWidget {
                   child: Stack(
                     alignment: Alignment.center,
                     children: [
-                      Icon(Icons.notifications_outlined, size: 18, color: colors.onSurfaceVariant),
+                      Icon(
+                        Icons.notifications_outlined,
+                        size: 18,
+                        color: colors.onSurfaceVariant,
+                      ),
                       Positioned(
                         top: 10,
                         right: 11,
@@ -81,7 +95,10 @@ class MemberHomePanel extends ConsumerWidget {
                           decoration: BoxDecoration(
                             color: colors.warning,
                             shape: BoxShape.circle,
-                            border: Border.all(color: colors.background, width: 2),
+                            border: Border.all(
+                              color: colors.background,
+                              width: 2,
+                            ),
                           ),
                         ),
                       ),
@@ -102,10 +119,14 @@ class MemberHomePanel extends ConsumerWidget {
                 children: [
                   ProgressRing(
                     size: 88,
-                    progress: MemberMockProfile.remainingSessions / MemberMockProfile.totalSessions,
+                    progress:
+                        MemberMockProfile.remainingSessions /
+                        MemberMockProfile.totalSessions,
                     child: Text(
                       '${MemberMockProfile.remainingSessions}',
-                      style: typography.dataLarge.copyWith(color: colors.onSurface),
+                      style: typography.dataLarge.copyWith(
+                        color: colors.onSurface,
+                      ),
                     ),
                   ),
                   const SizedBox(width: AppSpacing.lg),
@@ -115,12 +136,16 @@ class MemberHomePanel extends ConsumerWidget {
                       children: [
                         Text(
                           'Kalan dersin: ${MemberMockProfile.remainingSessions}',
-                          style: typography.headingSmall.copyWith(color: colors.onSurface),
+                          style: typography.headingSmall.copyWith(
+                            color: colors.onSurface,
+                          ),
                         ),
                         const SizedBox(height: AppSpacing.xs),
                         Text(
                           '${MemberMockProfile.packageName} paketi · ${MemberMockProfile.packageEnd}\'e kadar geçerli',
-                          style: typography.bodyMedium.copyWith(color: colors.onSurfaceVariant),
+                          style: typography.bodyMedium.copyWith(
+                            color: colors.onSurfaceVariant,
+                          ),
                         ),
                       ],
                     ),
@@ -135,7 +160,9 @@ class MemberHomePanel extends ConsumerWidget {
                 decoration: BoxDecoration(
                   color: colors.warningContainer,
                   borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
-                  border: Border.all(color: colors.warning.withValues(alpha: 0.32)),
+                  border: Border.all(
+                    color: colors.warning.withValues(alpha: 0.32),
+                  ),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -146,11 +173,17 @@ class MemberHomePanel extends ConsumerWidget {
                         Container(
                           width: 28,
                           height: 28,
-                          decoration: BoxDecoration(color: colors.warning, shape: BoxShape.circle),
+                          decoration: BoxDecoration(
+                            color: colors.warning,
+                            shape: BoxShape.circle,
+                          ),
                           alignment: Alignment.center,
                           child: Text(
                             '!',
-                            style: typography.headingSmall.copyWith(color: colors.warningContainer, fontSize: 15),
+                            style: typography.headingSmall.copyWith(
+                              color: colors.warningContainer,
+                              fontSize: 15,
+                            ),
                           ),
                         ),
                         const SizedBox(width: AppSpacing.md),
@@ -160,13 +193,18 @@ class MemberHomePanel extends ConsumerWidget {
                             children: [
                               Text(
                                 'Ödeme zamanı yaklaşıyor',
-                                style: typography.headingSmall.copyWith(color: colors.onWarningContainer, fontSize: 16),
+                                style: typography.headingSmall.copyWith(
+                                  color: colors.onWarningContainer,
+                                  fontSize: 16,
+                                ),
                               ),
                               const SizedBox(height: AppSpacing.xs),
                               Text(
                                 '${state.paymentWarning!.amount} kalan ödemen ${state.paymentWarning!.dueDate}\'ta son buluyor. '
                                 'Antrenörüne bugün iletebilirsin.',
-                                style: typography.bodyMedium.copyWith(color: colors.onSurfaceVariant),
+                                style: typography.bodyMedium.copyWith(
+                                  color: colors.onSurfaceVariant,
+                                ),
                               ),
                             ],
                           ),
@@ -176,7 +214,9 @@ class MemberHomePanel extends ConsumerWidget {
                     const SizedBox(height: AppSpacing.md),
                     _SecondaryActionButton(
                       label: 'Paketimi gör',
-                      onTap: () => ref.read(panelStackControllerProvider.notifier).push(const PackagePanel()),
+                      onTap: () => ref
+                          .read(panelStackControllerProvider.notifier)
+                          .push(const PackagePanel()),
                     ),
                   ],
                 ),
@@ -185,12 +225,17 @@ class MemberHomePanel extends ConsumerWidget {
             const SizedBox(height: AppSpacing.xl),
             Text(
               'SIRADAKİ DERSİN',
-              style: typography.caption.copyWith(color: colors.onSurfaceMuted, letterSpacing: 1.2),
+              style: typography.caption.copyWith(
+                color: colors.onSurfaceMuted,
+                letterSpacing: 1.2,
+              ),
             ),
             const SizedBox(height: AppSpacing.sm),
             InkWell(
               borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
-              onTap: () => ref.read(panelStackControllerProvider.notifier).push(const AttendanceConfirmPanel()),
+              onTap: () => ref
+                  .read(panelStackControllerProvider.notifier)
+                  .push(const AttendanceConfirmPanel()),
               child: Container(
                 padding: const EdgeInsets.all(AppSpacing.lg),
                 decoration: BoxDecoration(
@@ -203,20 +248,30 @@ class MemberHomePanel extends ConsumerWidget {
                     Row(
                       children: [
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: AppSpacing.md,
+                            vertical: AppSpacing.sm,
+                          ),
                           decoration: BoxDecoration(
                             color: colors.surfaceRaised,
-                            borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+                            borderRadius: BorderRadius.circular(
+                              AppSpacing.radiusInner,
+                            ),
                           ),
                           child: Column(
                             children: [
                               Text(
                                 state.nextSession.day,
-                                style: typography.dataMedium.copyWith(color: colors.onSurface),
+                                style: typography.dataMedium.copyWith(
+                                  color: colors.onSurface,
+                                ),
                               ),
                               Text(
                                 state.nextSession.month,
-                                style: typography.caption.copyWith(color: colors.onSurfaceMuted, fontSize: 12),
+                                style: typography.caption.copyWith(
+                                  color: colors.onSurfaceMuted,
+                                  fontSize: 12,
+                                ),
                               ),
                             ],
                           ),
@@ -228,11 +283,16 @@ class MemberHomePanel extends ConsumerWidget {
                             children: [
                               Text(
                                 state.nextSession.title,
-                                style: typography.headingSmall.copyWith(color: colors.onSurface),
+                                style: typography.headingSmall.copyWith(
+                                  color: colors.onSurface,
+                                ),
                               ),
                               Text(
                                 state.nextSession.meta,
-                                style: typography.bodyMedium.copyWith(color: colors.onSurfaceVariant, fontSize: 14),
+                                style: typography.bodyMedium.copyWith(
+                                  color: colors.onSurfaceVariant,
+                                  fontSize: 14,
+                                ),
                               ),
                             ],
                           ),
@@ -240,6 +300,16 @@ class MemberHomePanel extends ConsumerWidget {
                       ],
                     ),
                     const SizedBox(height: AppSpacing.md),
+                    if (state.attendanceErrorMessage != null) ...[
+                      Text(
+                        state.attendanceErrorMessage!,
+                        style: typography.bodyMedium.copyWith(
+                          color: colors.error,
+                          fontSize: 13,
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.sm),
+                    ],
                     if (state.attendanceAnswer == AttendanceAnswer.pending)
                       Row(
                         children: [
@@ -268,7 +338,9 @@ class MemberHomePanel extends ConsumerWidget {
                               ? 'Geleceğini bildirdin'
                               : 'Gelmeyeceğini bildirdin',
                           style: typography.bodyMedium.copyWith(
-                            color: state.attendanceAnswer == AttendanceAnswer.coming
+                            color:
+                                state.attendanceAnswer ==
+                                    AttendanceAnswer.coming
                                 ? colors.success
                                 : colors.onWarningContainer,
                           ),
@@ -279,7 +351,13 @@ class MemberHomePanel extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: AppSpacing.xl),
-            Text('BU HAFTA', style: typography.caption.copyWith(color: colors.onSurfaceMuted, letterSpacing: 1.2)),
+            Text(
+              'BU HAFTA',
+              style: typography.caption.copyWith(
+                color: colors.onSurfaceMuted,
+                letterSpacing: 1.2,
+              ),
+            ),
             const SizedBox(height: AppSpacing.sm),
             Container(
               height: 118,
@@ -295,7 +373,9 @@ class MemberHomePanel extends ConsumerWidget {
                   for (final day in state.week)
                     Expanded(
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.xs,
+                        ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
@@ -305,7 +385,11 @@ class MemberHomePanel extends ConsumerWidget {
                                 heightFactor: day.intensity.clamp(0.08, 1.0),
                                 child: Container(
                                   decoration: BoxDecoration(
-                                    color: day.isRestDay ? colors.surfaceRaised : colors.primary.withValues(alpha: 0.85),
+                                    color: day.isRestDay
+                                        ? colors.surfaceRaised
+                                        : colors.primary.withValues(
+                                            alpha: 0.85,
+                                          ),
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                 ),
@@ -315,7 +399,10 @@ class MemberHomePanel extends ConsumerWidget {
                             Text(
                               day.label,
                               textAlign: TextAlign.center,
-                              style: typography.caption.copyWith(color: colors.onSurfaceMuted, fontSize: 12),
+                              style: typography.caption.copyWith(
+                                color: colors.onSurfaceMuted,
+                                fontSize: 12,
+                              ),
                             ),
                           ],
                         ),
@@ -332,7 +419,11 @@ class MemberHomePanel extends ConsumerWidget {
 }
 
 class _QuickActionButton extends StatelessWidget {
-  const _QuickActionButton({required this.label, required this.filled, required this.onTap});
+  const _QuickActionButton({
+    required this.label,
+    required this.filled,
+    required this.onTap,
+  });
 
   final String label;
   final bool filled;
@@ -384,7 +475,10 @@ class _SecondaryActionButton extends StatelessWidget {
           alignment: Alignment.center,
           child: Text(
             label,
-            style: context.appTypography.headingSmall.copyWith(fontSize: 15, color: colors.onSurface),
+            style: context.appTypography.headingSmall.copyWith(
+              fontSize: 15,
+              color: colors.onSurface,
+            ),
           ),
         ),
       ),

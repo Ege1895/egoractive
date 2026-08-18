@@ -23,8 +23,8 @@ mixin _$NewMemberForm {
   int get birthYear => throw _privateConstructorUsedError;
   int get heightCm => throw _privateConstructorUsedError;
   MemberGender? get gender => throw _privateConstructorUsedError;
-  String get trainerId => throw _privateConstructorUsedError;
-  String get trainerName => throw _privateConstructorUsedError;
+  String? get trainerId => throw _privateConstructorUsedError;
+  String? get trainerName => throw _privateConstructorUsedError;
   String get note => throw _privateConstructorUsedError;
 
   /// Create a copy of NewMemberForm
@@ -48,8 +48,8 @@ abstract class $NewMemberFormCopyWith<$Res> {
     int birthYear,
     int heightCm,
     MemberGender? gender,
-    String trainerId,
-    String trainerName,
+    String? trainerId,
+    String? trainerName,
     String note,
   });
 }
@@ -75,8 +75,8 @@ class _$NewMemberFormCopyWithImpl<$Res, $Val extends NewMemberForm>
     Object? birthYear = null,
     Object? heightCm = null,
     Object? gender = freezed,
-    Object? trainerId = null,
-    Object? trainerName = null,
+    Object? trainerId = freezed,
+    Object? trainerName = freezed,
     Object? note = null,
   }) {
     return _then(
@@ -105,14 +105,14 @@ class _$NewMemberFormCopyWithImpl<$Res, $Val extends NewMemberForm>
                 ? _value.gender
                 : gender // ignore: cast_nullable_to_non_nullable
                       as MemberGender?,
-            trainerId: null == trainerId
+            trainerId: freezed == trainerId
                 ? _value.trainerId
                 : trainerId // ignore: cast_nullable_to_non_nullable
-                      as String,
-            trainerName: null == trainerName
+                      as String?,
+            trainerName: freezed == trainerName
                 ? _value.trainerName
                 : trainerName // ignore: cast_nullable_to_non_nullable
-                      as String,
+                      as String?,
             note: null == note
                 ? _value.note
                 : note // ignore: cast_nullable_to_non_nullable
@@ -139,8 +139,8 @@ abstract class _$$NewMemberFormImplCopyWith<$Res>
     int birthYear,
     int heightCm,
     MemberGender? gender,
-    String trainerId,
-    String trainerName,
+    String? trainerId,
+    String? trainerName,
     String note,
   });
 }
@@ -165,8 +165,8 @@ class __$$NewMemberFormImplCopyWithImpl<$Res>
     Object? birthYear = null,
     Object? heightCm = null,
     Object? gender = freezed,
-    Object? trainerId = null,
-    Object? trainerName = null,
+    Object? trainerId = freezed,
+    Object? trainerName = freezed,
     Object? note = null,
   }) {
     return _then(
@@ -195,14 +195,14 @@ class __$$NewMemberFormImplCopyWithImpl<$Res>
             ? _value.gender
             : gender // ignore: cast_nullable_to_non_nullable
                   as MemberGender?,
-        trainerId: null == trainerId
+        trainerId: freezed == trainerId
             ? _value.trainerId
             : trainerId // ignore: cast_nullable_to_non_nullable
-                  as String,
-        trainerName: null == trainerName
+                  as String?,
+        trainerName: freezed == trainerName
             ? _value.trainerName
             : trainerName // ignore: cast_nullable_to_non_nullable
-                  as String,
+                  as String?,
         note: null == note
             ? _value.note
             : note // ignore: cast_nullable_to_non_nullable
@@ -222,8 +222,8 @@ class _$NewMemberFormImpl extends _NewMemberForm {
     required this.birthYear,
     required this.heightCm,
     this.gender,
-    required this.trainerId,
-    required this.trainerName,
+    this.trainerId,
+    this.trainerName,
     required this.note,
   }) : super._();
 
@@ -240,9 +240,9 @@ class _$NewMemberFormImpl extends _NewMemberForm {
   @override
   final MemberGender? gender;
   @override
-  final String trainerId;
+  final String? trainerId;
   @override
-  final String trainerName;
+  final String? trainerName;
   @override
   final String note;
 
@@ -305,8 +305,8 @@ abstract class _NewMemberForm extends NewMemberForm {
     required final int birthYear,
     required final int heightCm,
     final MemberGender? gender,
-    required final String trainerId,
-    required final String trainerName,
+    final String? trainerId,
+    final String? trainerName,
     required final String note,
   }) = _$NewMemberFormImpl;
   const _NewMemberForm._() : super._();
@@ -324,9 +324,9 @@ abstract class _NewMemberForm extends NewMemberForm {
   @override
   MemberGender? get gender;
   @override
-  String get trainerId;
+  String? get trainerId;
   @override
-  String get trainerName;
+  String? get trainerName;
   @override
   String get note;
 
