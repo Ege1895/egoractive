@@ -22,14 +22,15 @@ class AddGymThemePanel extends BasePanel {
 
 class _AddGymThemePanelState extends BasePanelState<AddGymThemePanel> {
   late final TextEditingController _nameController;
+  late bool _useGymLogo;
   Color _selectedColor = AppThemePalette.colors.first;
-  bool _useGymLogo = true;
   bool _isSaving = false;
 
   @override
   void initState() {
     super.initState();
     _nameController = TextEditingController();
+    _useGymLogo = ref.read(gymThemeControllerProvider).watermarkEnabled;
   }
 
   @override
@@ -397,6 +398,20 @@ class _AddGymThemePanelState extends BasePanelState<AddGymThemePanel> {
                             if (!mounted) return;
                             // addTheme başarısız olursa gymThemeControllerProvider.errorMessage
                             // dolu kalır — bu durumda panelde kalıp göstermeliyiz.
+                            if (ref
+                                    .read(gymThemeControllerProvider)
+                                    .errorMessage !=
+                                null) {
+                              setState(() => _isSaving = false);
+                              return;
+                            }
+                            if (_useGymLogo !=
+                                ref
+                                    .read(gymThemeControllerProvider)
+                                    .watermarkEnabled) {
+                              await controller.toggleWatermark();
+                            }
+                            if (!mounted) return;
                             if (ref
                                     .read(gymThemeControllerProvider)
                                     .errorMessage !=
