@@ -5,12 +5,13 @@ import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/constants/avatar_palette.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../../../shared/mock/member_mock_profile.dart';
 import '../../../../shared/utils/phone_number_formatter.dart';
+import '../../../badges/controller/badges_controller.dart';
 import '../../../badges/ui/panels/badges_panel.dart';
 import '../../../feedback/ui/panels/feedback_panel.dart';
 import '../../../gyms/ui/panels/gym_rules_view_panel.dart';
 import '../../controller/auth_controller.dart';
+import '../../controller/member_profile_controller.dart';
 import 'delete_account_confirm_panel.dart';
 import 'phone_login_panel.dart';
 
@@ -26,13 +27,26 @@ class ProfilePanel extends ConsumerWidget {
     final controller = ref.read(authControllerProvider.notifier);
     final panelStack = ref.read(panelStackControllerProvider.notifier);
     final avatarColor = AppAvatarPalette.colors[state.selectedAvatarIndex];
+    final profile = ref.watch(memberProfileControllerProvider);
+    final earnedBadgeCount = ref
+        .watch(badgesControllerProvider)
+        .where((b) => b.earned)
+        .length;
 
     return Scaffold(
       body: SafeArea(
         child: ListView(
-          padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.lg, AppSpacing.screenEdge, AppSpacing.lg),
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.screenEdge,
+            AppSpacing.lg,
+            AppSpacing.screenEdge,
+            AppSpacing.lg,
+          ),
           children: [
-            Text('Profilim', style: typography.headingLarge.copyWith(color: colors.onSurface)),
+            Text(
+              'Profilim',
+              style: typography.headingLarge.copyWith(color: colors.onSurface),
+            ),
             const SizedBox(height: AppSpacing.lg),
             Container(
               padding: const EdgeInsets.all(AppSpacing.xl),
@@ -46,19 +60,29 @@ class ProfilePanel extends ConsumerWidget {
                 children: [
                   Row(
                     children: [
-                      _AvatarCircle(color: avatarColor, size: 64, selected: true),
+                      _AvatarCircle(
+                        color: avatarColor,
+                        size: 64,
+                        selected: true,
+                      ),
                       const SizedBox(width: AppSpacing.md),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              MemberMockProfile.memberFullName,
-                              style: typography.headingMedium.copyWith(color: colors.onSurface, fontSize: 19),
+                              profile.name.isEmpty ? '—' : profile.name,
+                              style: typography.headingMedium.copyWith(
+                                color: colors.onSurface,
+                                fontSize: 19,
+                              ),
                             ),
                             Text(
-                              '+90 ${formatTrPhoneDigits(MemberMockProfile.memberPhoneDigits)} · Üye',
-                              style: typography.bodyMedium.copyWith(color: colors.onSurfaceVariant, fontSize: 14),
+                              '+90 ${formatTrPhoneDigits(profile.phoneDigits)} · Üye',
+                              style: typography.bodyMedium.copyWith(
+                                color: colors.onSurfaceVariant,
+                                fontSize: 14,
+                              ),
                             ),
                           ],
                         ),
@@ -66,7 +90,12 @@ class ProfilePanel extends ConsumerWidget {
                     ],
                   ),
                   const SizedBox(height: AppSpacing.lg),
-                  Text('Avatarını seç', style: typography.caption.copyWith(color: colors.onSurfaceMuted)),
+                  Text(
+                    'Avatarını seç',
+                    style: typography.caption.copyWith(
+                      color: colors.onSurfaceMuted,
+                    ),
+                  ),
                   const SizedBox(height: AppSpacing.sm),
                   Wrap(
                     spacing: AppSpacing.sm,
@@ -101,9 +130,19 @@ class ProfilePanel extends ConsumerWidget {
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text('4', style: typography.headingSmall.copyWith(color: colors.onPrimaryContainer, fontSize: 15)),
+                        Text(
+                          '$earnedBadgeCount',
+                          style: typography.headingSmall.copyWith(
+                            color: colors.onPrimaryContainer,
+                            fontSize: 15,
+                          ),
+                        ),
                         const SizedBox(width: AppSpacing.xs),
-                        Icon(Icons.chevron_right, color: colors.onSurfaceMuted, size: 18),
+                        Icon(
+                          Icons.chevron_right,
+                          color: colors.onSurfaceMuted,
+                          size: 18,
+                        ),
                       ],
                     ),
                     onTap: () => panelStack.push(const BadgesPanel()),
@@ -124,8 +163,19 @@ class ProfilePanel extends ConsumerWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('Ders hatırlatmaları', style: typography.bodyLarge.copyWith(color: colors.onSurface, fontSize: 15)),
-                              Text('Dersinden 2 saat önce bildirim', style: typography.caption.copyWith(color: colors.onSurfaceMuted)),
+                              Text(
+                                'Ders hatırlatmaları',
+                                style: typography.bodyLarge.copyWith(
+                                  color: colors.onSurface,
+                                  fontSize: 15,
+                                ),
+                              ),
+                              Text(
+                                'Dersinden 2 saat önce bildirim',
+                                style: typography.caption.copyWith(
+                                  color: colors.onSurfaceMuted,
+                                ),
+                              ),
                             ],
                           ),
                         ),
@@ -137,14 +187,23 @@ class ProfilePanel extends ConsumerWidget {
                             height: 32,
                             padding: const EdgeInsets.all(3),
                             decoration: BoxDecoration(
-                              color: state.sessionReminderEnabled ? colors.primary : colors.surfaceRaised,
-                              borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
+                              color: state.sessionReminderEnabled
+                                  ? colors.primary
+                                  : colors.surfaceRaised,
+                              borderRadius: BorderRadius.circular(
+                                AppSpacing.radiusPill,
+                              ),
                             ),
-                            alignment: state.sessionReminderEnabled ? Alignment.centerRight : Alignment.centerLeft,
+                            alignment: state.sessionReminderEnabled
+                                ? Alignment.centerRight
+                                : Alignment.centerLeft,
                             child: Container(
                               width: 26,
                               height: 26,
-                              decoration: BoxDecoration(color: colors.onSurface, shape: BoxShape.circle),
+                              decoration: BoxDecoration(
+                                color: colors.onSurface,
+                                shape: BoxShape.circle,
+                              ),
                             ),
                           ),
                         ),
@@ -175,7 +234,8 @@ class ProfilePanel extends ConsumerWidget {
                     label: 'Hesabımı sil',
                     labelColor: colors.error,
                     isLast: true,
-                    onTap: () => panelStack.push(const DeleteAccountConfirmPanel()),
+                    onTap: () =>
+                        panelStack.push(const DeleteAccountConfirmPanel()),
                   ),
                 ],
               ),
@@ -184,7 +244,9 @@ class ProfilePanel extends ConsumerWidget {
             Center(
               child: Text(
                 'Egoractive · Egora Games · Sürüm 1.0',
-                style: typography.caption.copyWith(color: colors.onSurfaceMuted),
+                style: typography.caption.copyWith(
+                  color: colors.onSurfaceMuted,
+                ),
               ),
             ),
           ],
@@ -195,7 +257,11 @@ class ProfilePanel extends ConsumerWidget {
 }
 
 class _AvatarCircle extends StatelessWidget {
-  const _AvatarCircle({required this.color, required this.size, required this.selected});
+  const _AvatarCircle({
+    required this.color,
+    required this.size,
+    required this.selected,
+  });
 
   final Color color;
   final double size;
@@ -209,16 +275,30 @@ class _AvatarCircle extends StatelessWidget {
       height: size,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: Color.alphaBlend(color.withValues(alpha: 0.26), colors.background),
-        border: Border.all(color: selected ? colors.primary : colors.outline, width: 2),
+        color: Color.alphaBlend(
+          color.withValues(alpha: 0.26),
+          colors.background,
+        ),
+        border: Border.all(
+          color: selected ? colors.primary : colors.outline,
+          width: 2,
+        ),
       ),
       child: Center(
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(width: size * 0.16, height: size * 0.16, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
+            Container(
+              width: size * 0.16,
+              height: size * 0.16,
+              decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+            ),
             SizedBox(width: size * 0.08),
-            Container(width: size * 0.16, height: size * 0.16, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
+            Container(
+              width: size * 0.16,
+              height: size * 0.16,
+              decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+            ),
           ],
         ),
       ),
@@ -227,7 +307,13 @@ class _AvatarCircle extends StatelessWidget {
 }
 
 class _NavRow extends StatelessWidget {
-  const _NavRow({required this.label, this.trailing, this.onTap, this.labelColor, this.isLast = false});
+  const _NavRow({
+    required this.label,
+    this.trailing,
+    this.onTap,
+    this.labelColor,
+    this.isLast = false,
+  });
 
   final String label;
   final Widget? trailing;
@@ -245,13 +331,26 @@ class _NavRow extends StatelessWidget {
       child: Container(
         constraints: const BoxConstraints(minHeight: 56),
         decoration: BoxDecoration(
-          border: isLast ? null : Border(bottom: BorderSide(color: colors.outline)),
+          border: isLast
+              ? null
+              : Border(bottom: BorderSide(color: colors.outline)),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(label, style: typography.bodyLarge.copyWith(color: labelColor ?? colors.onSurface, fontSize: 15)),
-            trailing ?? Icon(Icons.chevron_right, color: colors.onSurfaceMuted, size: 18),
+            Text(
+              label,
+              style: typography.bodyLarge.copyWith(
+                color: labelColor ?? colors.onSurface,
+                fontSize: 15,
+              ),
+            ),
+            trailing ??
+                Icon(
+                  Icons.chevron_right,
+                  color: colors.onSurfaceMuted,
+                  size: 18,
+                ),
           ],
         ),
       ),
