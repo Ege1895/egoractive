@@ -9,6 +9,7 @@ import '../../../../shared/utils/phone_number_formatter.dart';
 import '../../../../shared/widgets/app_back_button.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../controller/auth_controller.dart';
+import '../../domain/auth_login_exception.dart';
 import 'login_waiting_panel.dart';
 
 /// Ortak 2 · Telefon Numarası Girişi.
@@ -25,7 +26,11 @@ import 'login_waiting_panel.dart';
 /// stack uzunluğundan okuyoruz — CLAUDE.md §2.3'teki "tek navigasyon
 /// sistemi" kuralına uygun olarak.
 class PhoneLoginPanel extends BasePanel {
-  const PhoneLoginPanel({super.key, this.prefillPhoneDigits, this.successBanner});
+  const PhoneLoginPanel({
+    super.key,
+    this.prefillPhoneDigits,
+    this.successBanner,
+  });
 
   final String? prefillPhoneDigits;
   final String? successBanner;
@@ -44,7 +49,9 @@ class _PhoneLoginPanelState extends BasePanelState<PhoneLoginPanel> {
     final prefill = widget.prefillPhoneDigits;
     if (prefill != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) ref.read(authControllerProvider.notifier).setPhoneDigits(prefill);
+        if (mounted) {
+          ref.read(authControllerProvider.notifier).setPhoneDigits(prefill);
+        }
       });
     }
   }
@@ -78,7 +85,10 @@ class _PhoneLoginPanelState extends BasePanelState<PhoneLoginPanel> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               if (canPop) ...[
-                AppBackButton(onTap: () => ref.read(panelStackControllerProvider.notifier).pop()),
+                AppBackButton(
+                  onTap: () =>
+                      ref.read(panelStackControllerProvider.notifier).pop(),
+                ),
                 const SizedBox(height: AppSpacing.lg),
               ],
               if (widget.successBanner != null) ...[
@@ -88,26 +98,41 @@ class _PhoneLoginPanelState extends BasePanelState<PhoneLoginPanel> {
                   decoration: BoxDecoration(
                     color: colors.primaryContainer,
                     borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
-                    border: Border.all(color: colors.primary.withValues(alpha: 0.3)),
+                    border: Border.all(
+                      color: colors.primary.withValues(alpha: 0.3),
+                    ),
                   ),
                   child: Text(
                     widget.successBanner!,
-                    style: typography.bodyMedium.copyWith(color: colors.onPrimaryContainer, fontSize: 14),
+                    style: typography.bodyMedium.copyWith(
+                      color: colors.onPrimaryContainer,
+                      fontSize: 14,
+                    ),
                   ),
                 ),
                 const SizedBox(height: AppSpacing.lg),
               ],
               Text(
                 'Telefonunla giriş yap',
-                style: typography.headingLarge.copyWith(color: colors.onSurface, fontSize: 30),
+                style: typography.headingLarge.copyWith(
+                  color: colors.onSurface,
+                  fontSize: 30,
+                ),
               ),
               const SizedBox(height: AppSpacing.sm),
               Text(
                 'Stüdyona kayıtlı numaranı gir; şifre yok, tek dokunuşla girersin.',
-                style: typography.bodyMedium.copyWith(color: colors.onSurfaceVariant),
+                style: typography.bodyMedium.copyWith(
+                  color: colors.onSurfaceVariant,
+                ),
               ),
               const SizedBox(height: AppSpacing.xl),
-              Text('Telefon numarası', style: typography.caption.copyWith(color: colors.onSurfaceMuted)),
+              Text(
+                'Telefon numarası',
+                style: typography.caption.copyWith(
+                  color: colors.onSurfaceMuted,
+                ),
+              ),
               const SizedBox(height: AppSpacing.sm),
               Container(
                 constraints: const BoxConstraints(minHeight: 60),
@@ -116,7 +141,11 @@ class _PhoneLoginPanelState extends BasePanelState<PhoneLoginPanel> {
                   color: colors.surface,
                   borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
                   border: Border.all(
-                    color: authState.isPhoneComplete
+                    color:
+                        authState.loginErrorReason ==
+                            AuthLoginErrorReason.notFound
+                        ? colors.error
+                        : authState.isPhoneComplete
                         ? colors.primary.withValues(alpha: 0.5)
                         : colors.outlineStrong,
                   ),
@@ -125,10 +154,17 @@ class _PhoneLoginPanelState extends BasePanelState<PhoneLoginPanel> {
                   children: [
                     Text(
                       '+90',
-                      style: typography.headingSmall.copyWith(color: colors.onSurfaceMuted, fontSize: 18),
+                      style: typography.headingSmall.copyWith(
+                        color: colors.onSurfaceMuted,
+                        fontSize: 18,
+                      ),
                     ),
                     const SizedBox(width: AppSpacing.md),
-                    Container(width: 1, height: 26, color: colors.outlineStrong),
+                    Container(
+                      width: 1,
+                      height: 26,
+                      color: colors.outlineStrong,
+                    ),
                     const SizedBox(width: AppSpacing.md),
                     Expanded(
                       child: TextField(
@@ -137,13 +173,19 @@ class _PhoneLoginPanelState extends BasePanelState<PhoneLoginPanel> {
                         textInputAction: TextInputAction.done,
                         inputFormatters: [TrPhoneNumberInputFormatter()],
                         onChanged: authController.setPhoneDigits,
-                        style: typography.dataMedium.copyWith(fontSize: 20, color: colors.onSurface),
+                        style: typography.dataMedium.copyWith(
+                          fontSize: 20,
+                          color: colors.onSurface,
+                        ),
                         decoration: InputDecoration(
                           isDense: true,
                           border: InputBorder.none,
                           contentPadding: EdgeInsets.zero,
                           hintText: '5XX XXX XX XX',
-                          hintStyle: typography.dataMedium.copyWith(fontSize: 20, color: colors.onSurfaceMuted),
+                          hintStyle: typography.dataMedium.copyWith(
+                            fontSize: 20,
+                            color: colors.onSurfaceMuted,
+                          ),
                         ),
                       ),
                     ),
@@ -152,8 +194,13 @@ class _PhoneLoginPanelState extends BasePanelState<PhoneLoginPanel> {
               ),
               const SizedBox(height: AppSpacing.sm),
               Text(
-                'Numaran kayıtlı değilse stüdyo yönetimi seni eklemeli.',
-                style: typography.caption.copyWith(color: colors.onSurfaceMuted),
+                authState.loginErrorMessage ??
+                    'Numaran kayıtlı değilse stüdyo yönetimi seni eklemeli.',
+                style: typography.caption.copyWith(
+                  color: authState.loginErrorMessage != null
+                      ? colors.error
+                      : colors.onSurfaceMuted,
+                ),
               ),
               const SizedBox(height: AppSpacing.xl),
               AppButton(
@@ -161,7 +208,9 @@ class _PhoneLoginPanelState extends BasePanelState<PhoneLoginPanel> {
                 onPressed: authState.isPhoneComplete
                     ? () {
                         authController.requestLogin();
-                        ref.read(panelStackControllerProvider.notifier).push(const LoginWaitingPanel());
+                        ref
+                            .read(panelStackControllerProvider.notifier)
+                            .push(const LoginWaitingPanel());
                       }
                     : null,
               ),
