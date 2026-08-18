@@ -12,5 +12,6 @@ class ScheduleSlot with _$ScheduleSlot {
     required String name,
     required String meta,
     required ScheduleSlotState state,
+    @Default('') String memberId,
   }) = _ScheduleSlot;
 }

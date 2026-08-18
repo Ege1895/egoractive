@@ -49,6 +49,7 @@ ScheduleSlot _toScheduleSlot(QueryDocumentSnapshot<Map<String, dynamic>> doc) {
     name: (data['memberName'] as String?) ?? '',
     meta: 'Birebir',
     state: state,
+    memberId: (data['memberId'] as String?) ?? '',
   );
 }
 
