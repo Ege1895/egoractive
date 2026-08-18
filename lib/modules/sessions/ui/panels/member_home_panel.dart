@@ -96,31 +96,11 @@ class MemberHomePanel extends ConsumerWidget {
                     shape: BoxShape.circle,
                     border: Border.all(color: colors.outlineStrong),
                   ),
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      Icon(
-                        Icons.notifications_outlined,
-                        size: 18,
-                        color: colors.onSurfaceVariant,
-                      ),
-                      Positioned(
-                        top: 10,
-                        right: 11,
-                        child: Container(
-                          width: 8,
-                          height: 8,
-                          decoration: BoxDecoration(
-                            color: colors.warning,
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: colors.background,
-                              width: 2,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
+                  alignment: Alignment.center,
+                  child: Icon(
+                    Icons.notifications_outlined,
+                    size: 18,
+                    color: colors.onSurfaceVariant,
                   ),
                 ),
               ],
