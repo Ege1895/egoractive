@@ -21,17 +21,21 @@ class NewMembershipPaymentPanel extends BasePanel {
   const NewMembershipPaymentPanel({super.key});
 
   @override
-  ConsumerState<NewMembershipPaymentPanel> createState() => _NewMembershipPaymentPanelState();
+  ConsumerState<NewMembershipPaymentPanel> createState() =>
+      _NewMembershipPaymentPanelState();
 }
 
-class _NewMembershipPaymentPanelState extends BasePanelState<NewMembershipPaymentPanel> {
+class _NewMembershipPaymentPanelState
+    extends BasePanelState<NewMembershipPaymentPanel> {
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
     final typography = context.appTypography;
     final memberForm = ref.watch(newMemberControllerProvider);
     final membership = ref.watch(newMembershipControllerProvider);
-    final membershipController = ref.read(newMembershipControllerProvider.notifier);
+    final membershipController = ref.read(
+      newMembershipControllerProvider.notifier,
+    );
     final package = membership.selectedPackage;
 
     return Scaffold(
@@ -40,25 +44,66 @@ class _NewMembershipPaymentPanelState extends BasePanelState<NewMembershipPaymen
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.md, AppSpacing.screenEdge, 0),
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.screenEdge,
+                AppSpacing.md,
+                AppSpacing.screenEdge,
+                0,
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
                     children: [
-                      AppBackButton(onTap: () => ref.read(panelStackControllerProvider.notifier).pop()),
+                      AppBackButton(
+                        onTap: () => ref
+                            .read(panelStackControllerProvider.notifier)
+                            .pop(),
+                      ),
                       const SizedBox(width: AppSpacing.md),
-                      Text('Ödeme bilgisi', style: typography.headingSmall.copyWith(color: colors.onSurface, fontSize: 18)),
+                      Text(
+                        'Ödeme bilgisi',
+                        style: typography.headingSmall.copyWith(
+                          color: colors.onSurface,
+                          fontSize: 18,
+                        ),
+                      ),
                     ],
                   ),
                   const SizedBox(height: AppSpacing.md),
                   Row(
                     children: [
-                      Expanded(child: Container(height: 5, decoration: BoxDecoration(color: colors.primary, borderRadius: BorderRadius.circular(AppSpacing.radiusPill)))),
+                      Expanded(
+                        child: Container(
+                          height: 5,
+                          decoration: BoxDecoration(
+                            color: colors.primary,
+                            borderRadius: BorderRadius.circular(
+                              AppSpacing.radiusPill,
+                            ),
+                          ),
+                        ),
+                      ),
                       const SizedBox(width: AppSpacing.sm),
-                      Expanded(child: Container(height: 5, decoration: BoxDecoration(color: colors.primary, borderRadius: BorderRadius.circular(AppSpacing.radiusPill)))),
+                      Expanded(
+                        child: Container(
+                          height: 5,
+                          decoration: BoxDecoration(
+                            color: colors.primary,
+                            borderRadius: BorderRadius.circular(
+                              AppSpacing.radiusPill,
+                            ),
+                          ),
+                        ),
+                      ),
                       const SizedBox(width: AppSpacing.sm),
-                      Text('3 / 3', style: typography.headingSmall.copyWith(fontSize: 13, color: colors.onPrimaryContainer)),
+                      Text(
+                        '3 / 3',
+                        style: typography.headingSmall.copyWith(
+                          fontSize: 13,
+                          color: colors.onPrimaryContainer,
+                        ),
+                      ),
                     ],
                   ),
                 ],
@@ -66,13 +111,20 @@ class _NewMembershipPaymentPanelState extends BasePanelState<NewMembershipPaymen
             ),
             Expanded(
               child: ListView(
-                padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.lg, AppSpacing.screenEdge, AppSpacing.lg),
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.screenEdge,
+                  AppSpacing.lg,
+                  AppSpacing.screenEdge,
+                  AppSpacing.lg,
+                ),
                 children: [
                   Container(
                     padding: const EdgeInsets.all(AppSpacing.md),
                     decoration: BoxDecoration(
                       color: colors.surface,
-                      borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusCard,
+                      ),
                       border: Border.all(color: colors.outline),
                     ),
                     child: Row(
@@ -80,11 +132,19 @@ class _NewMembershipPaymentPanelState extends BasePanelState<NewMembershipPaymen
                         Container(
                           width: 44,
                           height: 44,
-                          decoration: BoxDecoration(color: colors.primaryContainer, shape: BoxShape.circle),
+                          decoration: BoxDecoration(
+                            color: colors.primaryContainer,
+                            shape: BoxShape.circle,
+                          ),
                           alignment: Alignment.center,
                           child: Text(
-                            _initialsOf('${memberForm.firstName} ${memberForm.lastName}'),
-                            style: typography.headingSmall.copyWith(color: colors.onPrimaryContainer, fontSize: 15),
+                            _initialsOf(
+                              '${memberForm.firstName} ${memberForm.lastName}',
+                            ),
+                            style: typography.headingSmall.copyWith(
+                              color: colors.onPrimaryContainer,
+                              fontSize: 15,
+                            ),
                           ),
                         ),
                         const SizedBox(width: AppSpacing.md),
@@ -92,8 +152,21 @@ class _NewMembershipPaymentPanelState extends BasePanelState<NewMembershipPaymen
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('${memberForm.firstName} ${memberForm.lastName}'.trim(), style: typography.headingSmall.copyWith(color: colors.onSurface, fontSize: 16)),
-                              Text(package?.name ?? '', style: typography.bodyMedium.copyWith(color: colors.onSurfaceMuted, fontSize: 13)),
+                              Text(
+                                '${memberForm.firstName} ${memberForm.lastName}'
+                                    .trim(),
+                                style: typography.headingSmall.copyWith(
+                                  color: colors.onSurface,
+                                  fontSize: 16,
+                                ),
+                              ),
+                              Text(
+                                package?.name ?? '',
+                                style: typography.bodyMedium.copyWith(
+                                  color: colors.onSurfaceMuted,
+                                  fontSize: 13,
+                                ),
+                              ),
                             ],
                           ),
                         ),
@@ -105,7 +178,9 @@ class _NewMembershipPaymentPanelState extends BasePanelState<NewMembershipPaymen
                     padding: const EdgeInsets.all(AppSpacing.lg),
                     decoration: BoxDecoration(
                       color: colors.surface,
-                      borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusCard,
+                      ),
                       border: Border.all(color: colors.outline),
                     ),
                     child: Column(
@@ -114,15 +189,33 @@ class _NewMembershipPaymentPanelState extends BasePanelState<NewMembershipPaymen
                         Row(
                           children: [
                             Expanded(
-                              child: Text('Toplam tutar', style: typography.bodyLarge.copyWith(color: colors.onSurfaceVariant, fontSize: 15)),
+                              child: Text(
+                                'Toplam tutar',
+                                style: typography.bodyLarge.copyWith(
+                                  color: colors.onSurfaceVariant,
+                                  fontSize: 15,
+                                ),
+                              ),
                             ),
-                            Text('₺${membership.totalAmount}', style: typography.dataLarge.copyWith(color: colors.onSurface, fontSize: 22)),
+                            Text(
+                              '₺${membership.totalAmount}',
+                              style: typography.dataLarge.copyWith(
+                                color: colors.onSurface,
+                                fontSize: 22,
+                              ),
+                            ),
                           ],
                         ),
                         const SizedBox(height: AppSpacing.md),
                         Divider(color: colors.outline, height: 1),
                         const SizedBox(height: AppSpacing.md),
-                        Text('Ödendi', style: typography.bodyMedium.copyWith(color: colors.onSurfaceMuted, fontSize: 13)),
+                        Text(
+                          'Ödendi',
+                          style: typography.bodyMedium.copyWith(
+                            color: colors.onSurfaceMuted,
+                            fontSize: 13,
+                          ),
+                        ),
                         const SizedBox(height: AppSpacing.sm),
                         Row(
                           children: [
@@ -130,7 +223,9 @@ class _NewMembershipPaymentPanelState extends BasePanelState<NewMembershipPaymen
                               child: _PayChip(
                                 label: 'Tam ödendi',
                                 amount: '₺${membership.totalAmount}',
-                                selected: membership.paidAmount == membership.totalAmount,
+                                selected:
+                                    membership.paidAmount ==
+                                    membership.totalAmount,
                                 onTap: membershipController.setPaidFull,
                               ),
                             ),
@@ -138,8 +233,12 @@ class _NewMembershipPaymentPanelState extends BasePanelState<NewMembershipPaymen
                             Expanded(
                               child: _PayChip(
                                 label: 'Yarısı',
-                                amount: '₺${(membership.totalAmount / 2).round()}',
-                                selected: membership.paidAmount == (membership.totalAmount / 2).round() && membership.paidAmount != 0,
+                                amount:
+                                    '₺${(membership.totalAmount / 2).round()}',
+                                selected:
+                                    membership.paidAmount ==
+                                        (membership.totalAmount / 2).round() &&
+                                    membership.paidAmount != 0,
                                 onTap: membershipController.setPaidHalf,
                               ),
                             ),
@@ -148,8 +247,16 @@ class _NewMembershipPaymentPanelState extends BasePanelState<NewMembershipPaymen
                               child: _PayChip(
                                 label: 'Diğer',
                                 amount: '₺${membership.paidAmount}',
-                                selected: membership.paidAmount != membership.totalAmount && membership.paidAmount != (membership.totalAmount / 2).round(),
-                                onTap: () => _showOtherAmountSheet(context, membershipController, membership.totalAmount),
+                                selected:
+                                    membership.paidAmount !=
+                                        membership.totalAmount &&
+                                    membership.paidAmount !=
+                                        (membership.totalAmount / 2).round(),
+                                onTap: () => _showOtherAmountSheet(
+                                  context,
+                                  membershipController,
+                                  membership.totalAmount,
+                                ),
                               ),
                             ),
                           ],
@@ -158,9 +265,19 @@ class _NewMembershipPaymentPanelState extends BasePanelState<NewMembershipPaymen
                         Container(
                           padding: const EdgeInsets.all(AppSpacing.md),
                           decoration: BoxDecoration(
-                            color: membership.isFullyPaid ? colors.successContainer : colors.warningContainer,
-                            borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
-                            border: Border.all(color: (membership.isFullyPaid ? colors.success : colors.warning).withValues(alpha: 0.3)),
+                            color: membership.isFullyPaid
+                                ? colors.successContainer
+                                : colors.warningContainer,
+                            borderRadius: BorderRadius.circular(
+                              AppSpacing.radiusInner,
+                            ),
+                            border: Border.all(
+                              color:
+                                  (membership.isFullyPaid
+                                          ? colors.success
+                                          : colors.warning)
+                                      .withValues(alpha: 0.3),
+                            ),
                           ),
                           child: Row(
                             children: [
@@ -168,14 +285,32 @@ class _NewMembershipPaymentPanelState extends BasePanelState<NewMembershipPaymen
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text('Kalan ödeme', style: typography.caption.copyWith(color: membership.isFullyPaid ? colors.onSuccessContainer : colors.onWarningContainer)),
-                                    Text('Otomatik hesaplanır', style: typography.caption.copyWith(color: colors.onSurfaceMuted, fontSize: 11)),
+                                    Text(
+                                      'Kalan ödeme',
+                                      style: typography.caption.copyWith(
+                                        color: membership.isFullyPaid
+                                            ? colors.onSuccessContainer
+                                            : colors.onWarningContainer,
+                                      ),
+                                    ),
+                                    Text(
+                                      'Otomatik hesaplanır',
+                                      style: typography.caption.copyWith(
+                                        color: colors.onSurfaceMuted,
+                                        fontSize: 11,
+                                      ),
+                                    ),
                                   ],
                                 ),
                               ),
                               Text(
                                 '₺${membership.dueAmount}',
-                                style: typography.dataLarge.copyWith(color: membership.isFullyPaid ? colors.onSuccessContainer : colors.onWarningContainer, fontSize: 24),
+                                style: typography.dataLarge.copyWith(
+                                  color: membership.isFullyPaid
+                                      ? colors.onSuccessContainer
+                                      : colors.onWarningContainer,
+                                  fontSize: 24,
+                                ),
                               ),
                             ],
                           ),
@@ -184,11 +319,22 @@ class _NewMembershipPaymentPanelState extends BasePanelState<NewMembershipPaymen
                         Row(
                           children: [
                             Expanded(
-                              child: Text('Son ödeme tarihi', style: typography.bodyLarge.copyWith(color: colors.onSurfaceVariant, fontSize: 15)),
+                              child: Text(
+                                'Son ödeme tarihi',
+                                style: typography.bodyLarge.copyWith(
+                                  color: colors.onSurfaceVariant,
+                                  fontSize: 15,
+                                ),
+                              ),
                             ),
                             Text(
                               membership.isFullyPaid ? '—' : '10 Ağu 2026',
-                              style: typography.headingSmall.copyWith(color: membership.isFullyPaid ? colors.onSurfaceMuted : colors.onSurface, fontSize: 15),
+                              style: typography.headingSmall.copyWith(
+                                color: membership.isFullyPaid
+                                    ? colors.onSurfaceMuted
+                                    : colors.onSurface,
+                                fontSize: 15,
+                              ),
                             ),
                           ],
                         ),
@@ -198,30 +344,73 @@ class _NewMembershipPaymentPanelState extends BasePanelState<NewMembershipPaymen
                   const SizedBox(height: AppSpacing.sm),
                   Text(
                     'Üye kendi ekranında yalnızca kalan dersini ve paket bitişini görür; tutarlar üyeye gösterilmez.',
-                    style: typography.caption.copyWith(color: colors.onSurfaceMuted),
+                    style: typography.caption.copyWith(
+                      color: colors.onSurfaceMuted,
+                    ),
                   ),
                 ],
               ),
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.md, AppSpacing.screenEdge, AppSpacing.lg),
-              child: AppButton(
-                label: 'Kaydet',
-                onPressed: package == null
-                    ? null
-                    : () async {
-                        final memberId = ref.read(memberRegistrationControllerProvider).createdMemberId;
-                        if (memberId == null) return;
-                        if (!await ensureSubscriptionAllowsWrite(context, ref)) return;
-                        final success = await membershipController.save(memberId);
-                        if (!success || !mounted) return;
-                        ref.read(newMemberControllerProvider.notifier).reset();
-                        ref.read(newMembershipControllerProvider.notifier).reset();
-                        // F7-2 — AdminMemberListController artık canlı dinlemiyor
-                        // (sayfalı), yeni üyenin listede görünmesi için elle yenile.
-                        unawaited(ref.read(adminMemberListControllerProvider.notifier).refresh());
-                        ref.read(panelStackControllerProvider.notifier).popToRoot();
-                      },
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.screenEdge,
+                AppSpacing.md,
+                AppSpacing.screenEdge,
+                AppSpacing.lg,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (membership.errorMessage != null) ...[
+                    Text(
+                      membership.errorMessage!,
+                      style: typography.bodyMedium.copyWith(
+                        color: colors.error,
+                        fontSize: 13,
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                  ],
+                  AppButton(
+                    label: membership.isSaving ? 'Kaydediliyor…' : 'Kaydet',
+                    onPressed: package == null || membership.isSaving
+                        ? null
+                        : () async {
+                            final memberId = ref
+                                .read(memberRegistrationControllerProvider)
+                                .createdMemberId;
+                            if (memberId == null) return;
+                            if (!await ensureSubscriptionAllowsWrite(
+                              context,
+                              ref,
+                            )) {
+                              return;
+                            }
+                            final success = await membershipController.save(
+                              memberId,
+                            );
+                            if (!success || !mounted) return;
+                            ref
+                                .read(newMemberControllerProvider.notifier)
+                                .reset();
+                            ref
+                                .read(newMembershipControllerProvider.notifier)
+                                .reset();
+                            // F7-2 — AdminMemberListController artık canlı dinlemiyor
+                            // (sayfalı), yeni üyenin listede görünmesi için elle yenile.
+                            unawaited(
+                              ref
+                                  .read(
+                                    adminMemberListControllerProvider.notifier,
+                                  )
+                                  .refresh(),
+                            );
+                            ref
+                                .read(panelStackControllerProvider.notifier)
+                                .popToRoot();
+                          },
+                  ),
+                ],
               ),
             ),
           ],
@@ -230,7 +419,11 @@ class _NewMembershipPaymentPanelState extends BasePanelState<NewMembershipPaymen
     );
   }
 
-  void _showOtherAmountSheet(BuildContext context, NewMembershipController controller, int totalAmount) {
+  void _showOtherAmountSheet(
+    BuildContext context,
+    NewMembershipController controller,
+    int totalAmount,
+  ) {
     final colors = context.appColors;
     final typography = context.appTypography;
     final draftController = TextEditingController();
@@ -238,19 +431,41 @@ class _NewMembershipPaymentPanelState extends BasePanelState<NewMembershipPaymen
       context: context,
       isScrollControlled: true,
       backgroundColor: colors.surface,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
       builder: (sheetContext) {
         return Padding(
-          padding: EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.lg, AppSpacing.lg, AppSpacing.lg + MediaQuery.of(sheetContext).viewInsets.bottom),
+          padding: EdgeInsets.fromLTRB(
+            AppSpacing.lg,
+            AppSpacing.lg,
+            AppSpacing.lg,
+            AppSpacing.lg + MediaQuery.of(sheetContext).viewInsets.bottom,
+          ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Ödenen tutarı gir', style: typography.headingMedium.copyWith(color: colors.onSurface, fontSize: 20)),
+              Text(
+                'Ödenen tutarı gir',
+                style: typography.headingMedium.copyWith(
+                  color: colors.onSurface,
+                  fontSize: 20,
+                ),
+              ),
               const SizedBox(height: AppSpacing.xs),
-              Text('Toplam ₺$totalAmount · kalan otomatik hesaplanır', style: typography.caption.copyWith(color: colors.onSurfaceMuted)),
+              Text(
+                'Toplam ₺$totalAmount · kalan otomatik hesaplanır',
+                style: typography.caption.copyWith(
+                  color: colors.onSurfaceMuted,
+                ),
+              ),
               const SizedBox(height: AppSpacing.lg),
-              AppTextField(controller: draftController, keyboardType: TextInputType.number, hint: '0'),
+              AppTextField(
+                controller: draftController,
+                keyboardType: TextInputType.number,
+                hint: '0',
+              ),
               const SizedBox(height: AppSpacing.lg),
               Row(
                 children: [
@@ -258,14 +473,20 @@ class _NewMembershipPaymentPanelState extends BasePanelState<NewMembershipPaymen
                     child: AppButton(
                       label: 'Kaydet',
                       onPressed: () {
-                        controller.setPaidAmount(int.tryParse(draftController.text) ?? 0);
+                        controller.setPaidAmount(
+                          int.tryParse(draftController.text) ?? 0,
+                        );
                         Navigator.of(sheetContext).pop();
                       },
                     ),
                   ),
                   const SizedBox(width: AppSpacing.sm),
                   Expanded(
-                    child: AppButton(label: 'Vazgeç', variant: AppButtonVariant.secondary, onPressed: () => Navigator.of(sheetContext).pop()),
+                    child: AppButton(
+                      label: 'Vazgeç',
+                      variant: AppButtonVariant.secondary,
+                      onPressed: () => Navigator.of(sheetContext).pop(),
+                    ),
                   ),
                 ],
               ),
@@ -284,7 +505,12 @@ String _initialsOf(String name) {
 }
 
 class _PayChip extends StatelessWidget {
-  const _PayChip({required this.label, required this.amount, required this.selected, required this.onTap});
+  const _PayChip({
+    required this.label,
+    required this.amount,
+    required this.selected,
+    required this.onTap,
+  });
 
   final String label;
   final String amount;
@@ -307,8 +533,22 @@ class _PayChip extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(label, style: typography.headingSmall.copyWith(fontSize: 14, color: selected ? colors.onPrimaryContainer : colors.onSurface)),
-              Text(amount, style: typography.caption.copyWith(fontSize: 11, color: colors.onSurfaceMuted)),
+              Text(
+                label,
+                style: typography.headingSmall.copyWith(
+                  fontSize: 14,
+                  color: selected
+                      ? colors.onPrimaryContainer
+                      : colors.onSurface,
+                ),
+              ),
+              Text(
+                amount,
+                style: typography.caption.copyWith(
+                  fontSize: 11,
+                  color: colors.onSurfaceMuted,
+                ),
+              ),
             ],
           ),
         ),

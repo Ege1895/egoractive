@@ -299,7 +299,7 @@ class _EventsForGymProviderElement
 }
 
 String _$discoverControllerHash() =>
-    r'd44f072d26d301b8d90a5c0bea1f4e3aa118db16';
+    r'f3e1bbd2fc4dfc6e99f52a891c97b4852205d0f3';
 
 /// F4-2/F4-3 — üyenin salonunda ileri tarihli, gerçek zamanlı grup dersleri
 /// ve etkinlikler. Kontenjan katılım/ayrılma her iki kategori için de

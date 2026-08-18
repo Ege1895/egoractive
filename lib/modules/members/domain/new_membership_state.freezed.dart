@@ -23,6 +23,8 @@ mixin _$NewMembershipState {
   int get makeupSessions => throw _privateConstructorUsedError;
   int get paidAmount => throw _privateConstructorUsedError;
   String? get otherAmountDraft => throw _privateConstructorUsedError;
+  bool get isSaving => throw _privateConstructorUsedError;
+  String? get errorMessage => throw _privateConstructorUsedError;
 
   /// Create a copy of NewMembershipState
   /// with the given fields replaced by the non-null parameter values.
@@ -45,6 +47,8 @@ abstract class $NewMembershipStateCopyWith<$Res> {
     int makeupSessions,
     int paidAmount,
     String? otherAmountDraft,
+    bool isSaving,
+    String? errorMessage,
   });
 
   $StudioPackageCopyWith<$Res>? get selectedPackage;
@@ -71,6 +75,8 @@ class _$NewMembershipStateCopyWithImpl<$Res, $Val extends NewMembershipState>
     Object? makeupSessions = null,
     Object? paidAmount = null,
     Object? otherAmountDraft = freezed,
+    Object? isSaving = null,
+    Object? errorMessage = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -97,6 +103,14 @@ class _$NewMembershipStateCopyWithImpl<$Res, $Val extends NewMembershipState>
             otherAmountDraft: freezed == otherAmountDraft
                 ? _value.otherAmountDraft
                 : otherAmountDraft // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            isSaving: null == isSaving
+                ? _value.isSaving
+                : isSaving // ignore: cast_nullable_to_non_nullable
+                      as bool,
+            errorMessage: freezed == errorMessage
+                ? _value.errorMessage
+                : errorMessage // ignore: cast_nullable_to_non_nullable
                       as String?,
           )
           as $Val,
@@ -134,6 +148,8 @@ abstract class _$$NewMembershipStateImplCopyWith<$Res>
     int makeupSessions,
     int paidAmount,
     String? otherAmountDraft,
+    bool isSaving,
+    String? errorMessage,
   });
 
   @override
@@ -160,6 +176,8 @@ class __$$NewMembershipStateImplCopyWithImpl<$Res>
     Object? makeupSessions = null,
     Object? paidAmount = null,
     Object? otherAmountDraft = freezed,
+    Object? isSaving = null,
+    Object? errorMessage = freezed,
   }) {
     return _then(
       _$NewMembershipStateImpl(
@@ -187,6 +205,14 @@ class __$$NewMembershipStateImplCopyWithImpl<$Res>
             ? _value.otherAmountDraft
             : otherAmountDraft // ignore: cast_nullable_to_non_nullable
                   as String?,
+        isSaving: null == isSaving
+            ? _value.isSaving
+            : isSaving // ignore: cast_nullable_to_non_nullable
+                  as bool,
+        errorMessage: freezed == errorMessage
+            ? _value.errorMessage
+            : errorMessage // ignore: cast_nullable_to_non_nullable
+                  as String?,
       ),
     );
   }
@@ -202,6 +228,8 @@ class _$NewMembershipStateImpl extends _NewMembershipState {
     required this.makeupSessions,
     required this.paidAmount,
     this.otherAmountDraft,
+    this.isSaving = false,
+    this.errorMessage,
   }) : super._();
 
   @override
@@ -216,10 +244,15 @@ class _$NewMembershipStateImpl extends _NewMembershipState {
   final int paidAmount;
   @override
   final String? otherAmountDraft;
+  @override
+  @JsonKey()
+  final bool isSaving;
+  @override
+  final String? errorMessage;
 
   @override
   String toString() {
-    return 'NewMembershipState(selectedPackage: $selectedPackage, startDate: $startDate, endDate: $endDate, makeupSessions: $makeupSessions, paidAmount: $paidAmount, otherAmountDraft: $otherAmountDraft)';
+    return 'NewMembershipState(selectedPackage: $selectedPackage, startDate: $startDate, endDate: $endDate, makeupSessions: $makeupSessions, paidAmount: $paidAmount, otherAmountDraft: $otherAmountDraft, isSaving: $isSaving, errorMessage: $errorMessage)';
   }
 
   @override
@@ -237,7 +270,11 @@ class _$NewMembershipStateImpl extends _NewMembershipState {
             (identical(other.paidAmount, paidAmount) ||
                 other.paidAmount == paidAmount) &&
             (identical(other.otherAmountDraft, otherAmountDraft) ||
-                other.otherAmountDraft == otherAmountDraft));
+                other.otherAmountDraft == otherAmountDraft) &&
+            (identical(other.isSaving, isSaving) ||
+                other.isSaving == isSaving) &&
+            (identical(other.errorMessage, errorMessage) ||
+                other.errorMessage == errorMessage));
   }
 
   @override
@@ -249,6 +286,8 @@ class _$NewMembershipStateImpl extends _NewMembershipState {
     makeupSessions,
     paidAmount,
     otherAmountDraft,
+    isSaving,
+    errorMessage,
   );
 
   /// Create a copy of NewMembershipState
@@ -271,6 +310,8 @@ abstract class _NewMembershipState extends NewMembershipState {
     required final int makeupSessions,
     required final int paidAmount,
     final String? otherAmountDraft,
+    final bool isSaving,
+    final String? errorMessage,
   }) = _$NewMembershipStateImpl;
   const _NewMembershipState._() : super._();
 
@@ -286,6 +327,10 @@ abstract class _NewMembershipState extends NewMembershipState {
   int get paidAmount;
   @override
   String? get otherAmountDraft;
+  @override
+  bool get isSaving;
+  @override
+  String? get errorMessage;
 
   /// Create a copy of NewMembershipState
   /// with the given fields replaced by the non-null parameter values.

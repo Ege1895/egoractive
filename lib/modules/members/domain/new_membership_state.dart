@@ -13,6 +13,8 @@ class NewMembershipState with _$NewMembershipState {
     required int makeupSessions,
     required int paidAmount,
     String? otherAmountDraft,
+    @Default(false) bool isSaving,
+    String? errorMessage,
   }) = _NewMembershipState;
 
   const NewMembershipState._();

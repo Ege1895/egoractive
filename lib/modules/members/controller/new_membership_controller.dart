@@ -15,7 +15,12 @@ class NewMembershipController extends _$NewMembershipController {
   @override
   NewMembershipState build() {
     final now = DateTime.now();
-    return NewMembershipState(startDate: now, endDate: now, makeupSessions: 0, paidAmount: 0);
+    return NewMembershipState(
+      startDate: now,
+      endDate: now,
+      makeupSessions: 0,
+      paidAmount: 0,
+    );
   }
 
   void selectPackage(StudioPackage package) {
@@ -25,7 +30,8 @@ class NewMembershipController extends _$NewMembershipController {
     );
   }
 
-  void incrementMakeup() => state = state.copyWith(makeupSessions: state.makeupSessions + 1);
+  void incrementMakeup() =>
+      state = state.copyWith(makeupSessions: state.makeupSessions + 1);
 
   void decrementMakeup() {
     if (state.makeupSessions <= 0) return;
@@ -34,9 +40,11 @@ class NewMembershipController extends _$NewMembershipController {
 
   void setPaidFull() => state = state.copyWith(paidAmount: state.totalAmount);
 
-  void setPaidHalf() => state = state.copyWith(paidAmount: (state.totalAmount / 2).round());
+  void setPaidHalf() =>
+      state = state.copyWith(paidAmount: (state.totalAmount / 2).round());
 
-  void setPaidAmount(int amount) => state = state.copyWith(paidAmount: amount.clamp(0, state.totalAmount));
+  void setPaidAmount(int amount) =>
+      state = state.copyWith(paidAmount: amount.clamp(0, state.totalAmount));
 
   void reset() => state = build();
 
@@ -44,46 +52,69 @@ class NewMembershipController extends _$NewMembershipController {
   /// oluşturur ve üyenin liste görünümünde okunan `remainingSessions`/
   /// `packageEndDate` alanlarını `users/{memberId}` üzerinde günceller
   /// (admin üye listesi ek bir sorgu yapmasın diye denormalize edilir).
-  /// Başarılıysa `true` döner.
+  /// Başarılıysa `true` döner. Önceki sürüm hiçbir hatayı yakalamıyordu —
+  /// yazma başarısız olursa "Kaydet" butonu hiçbir şey olmamış gibi
+  /// görünüyor, üyelik de oluşmuyordu.
   Future<bool> save(String memberId) async {
     final package = state.selectedPackage;
-    final gymId = await ref.read(activeGymIdProvider.future);
-    if (package == null || gymId == null) return false;
+    if (package == null || state.isSaving) return false;
 
-    final firestore = FirebaseFirestore.instance;
-    await firestore.collection('memberPackages').add({
-      'memberId': memberId,
-      'gymId': gymId,
-      'packageId': package.id,
-      'packageName': package.name,
-      'sessionType': package.sessionType.name,
-      'totalSessions': package.sessionCount,
-      'remainingSessions': package.sessionCount,
-      'makeupSessions': state.makeupSessions,
-      'startDate': state.startDate.toIso8601String(),
-      'endDate': state.endDate.toIso8601String(),
-      'totalAmount': state.totalAmount,
-      'paidAmount': state.paidAmount,
-      'dueAmount': state.dueAmount,
-      // F5-1/F5-2/F5-3'teki ciro aggregation'ları (memberPackages.paidAmount
-      // sum()) bu alana göre ay/hafta aralığı filtreliyor.
-      'purchasedAt': FieldValue.serverTimestamp(),
-    });
+    state = state.copyWith(isSaving: true, errorMessage: null);
+    try {
+      final gymId = await ref.read(activeGymIdProvider.future);
+      if (gymId == null) {
+        state = state.copyWith(
+          isSaving: false,
+          errorMessage: 'Aktif bir salon bulunamadı.',
+        );
+        return false;
+      }
 
-    await firestore.collection('users').doc(memberId).update({
-      'remainingSessions': package.sessionCount,
-      'packageEndDate': state.endDate.toIso8601String(),
-    });
+      final firestore = FirebaseFirestore.instance;
+      await firestore.collection('memberPackages').add({
+        'memberId': memberId,
+        'gymId': gymId,
+        'packageId': package.id,
+        'packageName': package.name,
+        'sessionType': package.sessionType.name,
+        'totalSessions': package.sessionCount,
+        'remainingSessions': package.sessionCount,
+        'makeupSessions': state.makeupSessions,
+        'startDate': state.startDate.toIso8601String(),
+        'endDate': state.endDate.toIso8601String(),
+        'totalAmount': state.totalAmount,
+        'paidAmount': state.paidAmount,
+        'dueAmount': state.dueAmount,
+        // F5-1/F5-2/F5-3'teki ciro aggregation'ları (memberPackages.paidAmount
+        // sum()) bu alana göre ay/hafta aralığı filtreliyor.
+        'purchasedAt': FieldValue.serverTimestamp(),
+      });
 
-    await ref.read(analyticsServiceProvider).logEvent(
-      AnalyticsEvent.packagePurchased,
-      parameters: {
-        'package_id': package.id,
-        'gym_id': gymId,
-        'paid_amount': state.paidAmount,
-      },
-    );
+      await firestore.collection('users').doc(memberId).update({
+        'remainingSessions': package.sessionCount,
+        'packageEndDate': state.endDate.toIso8601String(),
+      });
 
-    return true;
+      await ref
+          .read(analyticsServiceProvider)
+          .logEvent(
+            AnalyticsEvent.packagePurchased,
+            parameters: {
+              'package_id': package.id,
+              'gym_id': gymId,
+              'paid_amount': state.paidAmount,
+            },
+          );
+
+      state = state.copyWith(isSaving: false);
+      return true;
+    } catch (_) {
+      state = state.copyWith(
+        isSaving: false,
+        errorMessage:
+            'Ödeme kaydedilemedi, bağlantını kontrol edip tekrar dene.',
+      );
+      return false;
+    }
   }
 }
