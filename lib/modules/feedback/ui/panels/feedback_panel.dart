@@ -7,6 +7,7 @@ import '../../../../core/panels/panel_stack_controller.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_back_button.dart';
 import '../../../../shared/widgets/app_loading_indicator.dart';
+import '../../../packages/controller/package_controller.dart';
 import '../../controller/feedback_controller.dart';
 
 const _ratingLabels = [
@@ -42,6 +43,8 @@ class _FeedbackPanelState extends BasePanelState<FeedbackPanel> {
     final typography = context.appTypography;
     final state = ref.watch(feedbackControllerProvider);
     final controller = ref.read(feedbackControllerProvider.notifier);
+    final trainerName = ref.watch(packageControllerProvider).trainerName;
+    final hasTrainer = trainerName.isNotEmpty && trainerName != '—';
 
     ref.listen(feedbackControllerProvider, (previous, next) {
       if (!previous!.isSubmitted && next.isSubmitted) {
@@ -90,7 +93,7 @@ class _FeedbackPanelState extends BasePanelState<FeedbackPanel> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '30 Temmuz dersin nasıl geçti?',
+                      'Dersin nasıl geçti?',
                       style: typography.headingMedium.copyWith(
                         color: colors.onSurface,
                         fontSize: 26,
@@ -98,7 +101,9 @@ class _FeedbackPanelState extends BasePanelState<FeedbackPanel> {
                     ),
                     const SizedBox(height: AppSpacing.sm),
                     Text(
-                      'Berk Aydın ile birebir · Yalnızca stüdyo yönetimi görür, antrenörüne isimsiz iletilir.',
+                      hasTrainer
+                          ? '$trainerName ile birebir · Yalnızca stüdyo yönetimi görür, antrenörüne isimsiz iletilir.'
+                          : 'Yalnızca stüdyo yönetimi görür, antrenörüne isimsiz iletilir.',
                       style: typography.bodyMedium.copyWith(
                         color: colors.onSurfaceVariant,
                       ),

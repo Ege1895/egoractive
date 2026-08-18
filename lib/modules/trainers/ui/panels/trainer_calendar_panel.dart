@@ -583,8 +583,9 @@ class _MonthView extends StatelessWidget {
                 ),
                 itemBuilder: (context, index) {
                   final dayNum = index - leadingBlanks + 1;
-                  if (dayNum < 1 || dayNum > daysInMonth)
+                  if (dayNum < 1 || dayNum > daysInMonth) {
                     return const SizedBox.shrink();
+                  }
                   final date = DateTime(month.year, month.month, dayNum);
                   final isSelected = date.day == state.selectedDate.day;
                   final count = state.slotsByDayOfMonth[dayNum]?.length ?? 0;
