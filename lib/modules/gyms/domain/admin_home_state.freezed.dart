@@ -196,196 +196,18 @@ abstract class _TrainerPerformance implements TrainerPerformance {
 }
 
 /// @nodoc
-mixin _$DuePayment {
-  String get memberName => throw _privateConstructorUsedError;
-  String get dueDate => throw _privateConstructorUsedError;
-  String get amount => throw _privateConstructorUsedError;
-
-  /// Create a copy of DuePayment
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $DuePaymentCopyWith<DuePayment> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $DuePaymentCopyWith<$Res> {
-  factory $DuePaymentCopyWith(
-    DuePayment value,
-    $Res Function(DuePayment) then,
-  ) = _$DuePaymentCopyWithImpl<$Res, DuePayment>;
-  @useResult
-  $Res call({String memberName, String dueDate, String amount});
-}
-
-/// @nodoc
-class _$DuePaymentCopyWithImpl<$Res, $Val extends DuePayment>
-    implements $DuePaymentCopyWith<$Res> {
-  _$DuePaymentCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of DuePayment
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? memberName = null,
-    Object? dueDate = null,
-    Object? amount = null,
-  }) {
-    return _then(
-      _value.copyWith(
-            memberName: null == memberName
-                ? _value.memberName
-                : memberName // ignore: cast_nullable_to_non_nullable
-                      as String,
-            dueDate: null == dueDate
-                ? _value.dueDate
-                : dueDate // ignore: cast_nullable_to_non_nullable
-                      as String,
-            amount: null == amount
-                ? _value.amount
-                : amount // ignore: cast_nullable_to_non_nullable
-                      as String,
-          )
-          as $Val,
-    );
-  }
-}
-
-/// @nodoc
-abstract class _$$DuePaymentImplCopyWith<$Res>
-    implements $DuePaymentCopyWith<$Res> {
-  factory _$$DuePaymentImplCopyWith(
-    _$DuePaymentImpl value,
-    $Res Function(_$DuePaymentImpl) then,
-  ) = __$$DuePaymentImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call({String memberName, String dueDate, String amount});
-}
-
-/// @nodoc
-class __$$DuePaymentImplCopyWithImpl<$Res>
-    extends _$DuePaymentCopyWithImpl<$Res, _$DuePaymentImpl>
-    implements _$$DuePaymentImplCopyWith<$Res> {
-  __$$DuePaymentImplCopyWithImpl(
-    _$DuePaymentImpl _value,
-    $Res Function(_$DuePaymentImpl) _then,
-  ) : super(_value, _then);
-
-  /// Create a copy of DuePayment
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? memberName = null,
-    Object? dueDate = null,
-    Object? amount = null,
-  }) {
-    return _then(
-      _$DuePaymentImpl(
-        memberName: null == memberName
-            ? _value.memberName
-            : memberName // ignore: cast_nullable_to_non_nullable
-                  as String,
-        dueDate: null == dueDate
-            ? _value.dueDate
-            : dueDate // ignore: cast_nullable_to_non_nullable
-                  as String,
-        amount: null == amount
-            ? _value.amount
-            : amount // ignore: cast_nullable_to_non_nullable
-                  as String,
-      ),
-    );
-  }
-}
-
-/// @nodoc
-
-class _$DuePaymentImpl implements _DuePayment {
-  const _$DuePaymentImpl({
-    required this.memberName,
-    required this.dueDate,
-    required this.amount,
-  });
-
-  @override
-  final String memberName;
-  @override
-  final String dueDate;
-  @override
-  final String amount;
-
-  @override
-  String toString() {
-    return 'DuePayment(memberName: $memberName, dueDate: $dueDate, amount: $amount)';
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$DuePaymentImpl &&
-            (identical(other.memberName, memberName) ||
-                other.memberName == memberName) &&
-            (identical(other.dueDate, dueDate) || other.dueDate == dueDate) &&
-            (identical(other.amount, amount) || other.amount == amount));
-  }
-
-  @override
-  int get hashCode => Object.hash(runtimeType, memberName, dueDate, amount);
-
-  /// Create a copy of DuePayment
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$DuePaymentImplCopyWith<_$DuePaymentImpl> get copyWith =>
-      __$$DuePaymentImplCopyWithImpl<_$DuePaymentImpl>(this, _$identity);
-}
-
-abstract class _DuePayment implements DuePayment {
-  const factory _DuePayment({
-    required final String memberName,
-    required final String dueDate,
-    required final String amount,
-  }) = _$DuePaymentImpl;
-
-  @override
-  String get memberName;
-  @override
-  String get dueDate;
-  @override
-  String get amount;
-
-  /// Create a copy of DuePayment
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$DuePaymentImplCopyWith<_$DuePaymentImpl> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
 mixin _$AdminHomeState {
   String get monthLabel => throw _privateConstructorUsedError;
   int get totalSessions => throw _privateConstructorUsedError;
   int get completedSessions => throw _privateConstructorUsedError;
   int get cancelledSessions => throw _privateConstructorUsedError;
-  String get estimatedRevenue => throw _privateConstructorUsedError;
-  String get revenueChangeLabel => throw _privateConstructorUsedError;
-  String get expenses => throw _privateConstructorUsedError;
+  int get estimatedRevenueTl => throw _privateConstructorUsedError;
+  int get expensesTl => throw _privateConstructorUsedError;
   List<TrainerPerformance> get trainerPerformance =>
       throw _privateConstructorUsedError;
-  List<DuePayment> get duePayments => throw _privateConstructorUsedError;
-  int get pendingFeedbackCount => throw _privateConstructorUsedError;
-  int get recentFeedbackDays => throw _privateConstructorUsedError;
+  int get duePaymentMemberCount => throw _privateConstructorUsedError;
+  int get duePaymentTotalTl => throw _privateConstructorUsedError;
+  int get feedbackCount => throw _privateConstructorUsedError;
 
   /// Create a copy of AdminHomeState
   /// with the given fields replaced by the non-null parameter values.
@@ -406,13 +228,12 @@ abstract class $AdminHomeStateCopyWith<$Res> {
     int totalSessions,
     int completedSessions,
     int cancelledSessions,
-    String estimatedRevenue,
-    String revenueChangeLabel,
-    String expenses,
+    int estimatedRevenueTl,
+    int expensesTl,
     List<TrainerPerformance> trainerPerformance,
-    List<DuePayment> duePayments,
-    int pendingFeedbackCount,
-    int recentFeedbackDays,
+    int duePaymentMemberCount,
+    int duePaymentTotalTl,
+    int feedbackCount,
   });
 }
 
@@ -435,13 +256,12 @@ class _$AdminHomeStateCopyWithImpl<$Res, $Val extends AdminHomeState>
     Object? totalSessions = null,
     Object? completedSessions = null,
     Object? cancelledSessions = null,
-    Object? estimatedRevenue = null,
-    Object? revenueChangeLabel = null,
-    Object? expenses = null,
+    Object? estimatedRevenueTl = null,
+    Object? expensesTl = null,
     Object? trainerPerformance = null,
-    Object? duePayments = null,
-    Object? pendingFeedbackCount = null,
-    Object? recentFeedbackDays = null,
+    Object? duePaymentMemberCount = null,
+    Object? duePaymentTotalTl = null,
+    Object? feedbackCount = null,
   }) {
     return _then(
       _value.copyWith(
@@ -461,33 +281,29 @@ class _$AdminHomeStateCopyWithImpl<$Res, $Val extends AdminHomeState>
                 ? _value.cancelledSessions
                 : cancelledSessions // ignore: cast_nullable_to_non_nullable
                       as int,
-            estimatedRevenue: null == estimatedRevenue
-                ? _value.estimatedRevenue
-                : estimatedRevenue // ignore: cast_nullable_to_non_nullable
-                      as String,
-            revenueChangeLabel: null == revenueChangeLabel
-                ? _value.revenueChangeLabel
-                : revenueChangeLabel // ignore: cast_nullable_to_non_nullable
-                      as String,
-            expenses: null == expenses
-                ? _value.expenses
-                : expenses // ignore: cast_nullable_to_non_nullable
-                      as String,
+            estimatedRevenueTl: null == estimatedRevenueTl
+                ? _value.estimatedRevenueTl
+                : estimatedRevenueTl // ignore: cast_nullable_to_non_nullable
+                      as int,
+            expensesTl: null == expensesTl
+                ? _value.expensesTl
+                : expensesTl // ignore: cast_nullable_to_non_nullable
+                      as int,
             trainerPerformance: null == trainerPerformance
                 ? _value.trainerPerformance
                 : trainerPerformance // ignore: cast_nullable_to_non_nullable
                       as List<TrainerPerformance>,
-            duePayments: null == duePayments
-                ? _value.duePayments
-                : duePayments // ignore: cast_nullable_to_non_nullable
-                      as List<DuePayment>,
-            pendingFeedbackCount: null == pendingFeedbackCount
-                ? _value.pendingFeedbackCount
-                : pendingFeedbackCount // ignore: cast_nullable_to_non_nullable
+            duePaymentMemberCount: null == duePaymentMemberCount
+                ? _value.duePaymentMemberCount
+                : duePaymentMemberCount // ignore: cast_nullable_to_non_nullable
                       as int,
-            recentFeedbackDays: null == recentFeedbackDays
-                ? _value.recentFeedbackDays
-                : recentFeedbackDays // ignore: cast_nullable_to_non_nullable
+            duePaymentTotalTl: null == duePaymentTotalTl
+                ? _value.duePaymentTotalTl
+                : duePaymentTotalTl // ignore: cast_nullable_to_non_nullable
+                      as int,
+            feedbackCount: null == feedbackCount
+                ? _value.feedbackCount
+                : feedbackCount // ignore: cast_nullable_to_non_nullable
                       as int,
           )
           as $Val,
@@ -509,13 +325,12 @@ abstract class _$$AdminHomeStateImplCopyWith<$Res>
     int totalSessions,
     int completedSessions,
     int cancelledSessions,
-    String estimatedRevenue,
-    String revenueChangeLabel,
-    String expenses,
+    int estimatedRevenueTl,
+    int expensesTl,
     List<TrainerPerformance> trainerPerformance,
-    List<DuePayment> duePayments,
-    int pendingFeedbackCount,
-    int recentFeedbackDays,
+    int duePaymentMemberCount,
+    int duePaymentTotalTl,
+    int feedbackCount,
   });
 }
 
@@ -537,13 +352,12 @@ class __$$AdminHomeStateImplCopyWithImpl<$Res>
     Object? totalSessions = null,
     Object? completedSessions = null,
     Object? cancelledSessions = null,
-    Object? estimatedRevenue = null,
-    Object? revenueChangeLabel = null,
-    Object? expenses = null,
+    Object? estimatedRevenueTl = null,
+    Object? expensesTl = null,
     Object? trainerPerformance = null,
-    Object? duePayments = null,
-    Object? pendingFeedbackCount = null,
-    Object? recentFeedbackDays = null,
+    Object? duePaymentMemberCount = null,
+    Object? duePaymentTotalTl = null,
+    Object? feedbackCount = null,
   }) {
     return _then(
       _$AdminHomeStateImpl(
@@ -563,33 +377,29 @@ class __$$AdminHomeStateImplCopyWithImpl<$Res>
             ? _value.cancelledSessions
             : cancelledSessions // ignore: cast_nullable_to_non_nullable
                   as int,
-        estimatedRevenue: null == estimatedRevenue
-            ? _value.estimatedRevenue
-            : estimatedRevenue // ignore: cast_nullable_to_non_nullable
-                  as String,
-        revenueChangeLabel: null == revenueChangeLabel
-            ? _value.revenueChangeLabel
-            : revenueChangeLabel // ignore: cast_nullable_to_non_nullable
-                  as String,
-        expenses: null == expenses
-            ? _value.expenses
-            : expenses // ignore: cast_nullable_to_non_nullable
-                  as String,
+        estimatedRevenueTl: null == estimatedRevenueTl
+            ? _value.estimatedRevenueTl
+            : estimatedRevenueTl // ignore: cast_nullable_to_non_nullable
+                  as int,
+        expensesTl: null == expensesTl
+            ? _value.expensesTl
+            : expensesTl // ignore: cast_nullable_to_non_nullable
+                  as int,
         trainerPerformance: null == trainerPerformance
             ? _value._trainerPerformance
             : trainerPerformance // ignore: cast_nullable_to_non_nullable
                   as List<TrainerPerformance>,
-        duePayments: null == duePayments
-            ? _value._duePayments
-            : duePayments // ignore: cast_nullable_to_non_nullable
-                  as List<DuePayment>,
-        pendingFeedbackCount: null == pendingFeedbackCount
-            ? _value.pendingFeedbackCount
-            : pendingFeedbackCount // ignore: cast_nullable_to_non_nullable
+        duePaymentMemberCount: null == duePaymentMemberCount
+            ? _value.duePaymentMemberCount
+            : duePaymentMemberCount // ignore: cast_nullable_to_non_nullable
                   as int,
-        recentFeedbackDays: null == recentFeedbackDays
-            ? _value.recentFeedbackDays
-            : recentFeedbackDays // ignore: cast_nullable_to_non_nullable
+        duePaymentTotalTl: null == duePaymentTotalTl
+            ? _value.duePaymentTotalTl
+            : duePaymentTotalTl // ignore: cast_nullable_to_non_nullable
+                  as int,
+        feedbackCount: null == feedbackCount
+            ? _value.feedbackCount
+            : feedbackCount // ignore: cast_nullable_to_non_nullable
                   as int,
       ),
     );
@@ -604,15 +414,13 @@ class _$AdminHomeStateImpl extends _AdminHomeState {
     required this.totalSessions,
     required this.completedSessions,
     required this.cancelledSessions,
-    required this.estimatedRevenue,
-    required this.revenueChangeLabel,
-    required this.expenses,
+    required this.estimatedRevenueTl,
+    required this.expensesTl,
     required final List<TrainerPerformance> trainerPerformance,
-    required final List<DuePayment> duePayments,
-    required this.pendingFeedbackCount,
-    required this.recentFeedbackDays,
+    required this.duePaymentMemberCount,
+    required this.duePaymentTotalTl,
+    required this.feedbackCount,
   }) : _trainerPerformance = trainerPerformance,
-       _duePayments = duePayments,
        super._();
 
   @override
@@ -624,11 +432,9 @@ class _$AdminHomeStateImpl extends _AdminHomeState {
   @override
   final int cancelledSessions;
   @override
-  final String estimatedRevenue;
+  final int estimatedRevenueTl;
   @override
-  final String revenueChangeLabel;
-  @override
-  final String expenses;
+  final int expensesTl;
   final List<TrainerPerformance> _trainerPerformance;
   @override
   List<TrainerPerformance> get trainerPerformance {
@@ -638,22 +444,16 @@ class _$AdminHomeStateImpl extends _AdminHomeState {
     return EqualUnmodifiableListView(_trainerPerformance);
   }
 
-  final List<DuePayment> _duePayments;
   @override
-  List<DuePayment> get duePayments {
-    if (_duePayments is EqualUnmodifiableListView) return _duePayments;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_duePayments);
-  }
-
+  final int duePaymentMemberCount;
   @override
-  final int pendingFeedbackCount;
+  final int duePaymentTotalTl;
   @override
-  final int recentFeedbackDays;
+  final int feedbackCount;
 
   @override
   String toString() {
-    return 'AdminHomeState(monthLabel: $monthLabel, totalSessions: $totalSessions, completedSessions: $completedSessions, cancelledSessions: $cancelledSessions, estimatedRevenue: $estimatedRevenue, revenueChangeLabel: $revenueChangeLabel, expenses: $expenses, trainerPerformance: $trainerPerformance, duePayments: $duePayments, pendingFeedbackCount: $pendingFeedbackCount, recentFeedbackDays: $recentFeedbackDays)';
+    return 'AdminHomeState(monthLabel: $monthLabel, totalSessions: $totalSessions, completedSessions: $completedSessions, cancelledSessions: $cancelledSessions, estimatedRevenueTl: $estimatedRevenueTl, expensesTl: $expensesTl, trainerPerformance: $trainerPerformance, duePaymentMemberCount: $duePaymentMemberCount, duePaymentTotalTl: $duePaymentTotalTl, feedbackCount: $feedbackCount)';
   }
 
   @override
@@ -669,24 +469,20 @@ class _$AdminHomeStateImpl extends _AdminHomeState {
                 other.completedSessions == completedSessions) &&
             (identical(other.cancelledSessions, cancelledSessions) ||
                 other.cancelledSessions == cancelledSessions) &&
-            (identical(other.estimatedRevenue, estimatedRevenue) ||
-                other.estimatedRevenue == estimatedRevenue) &&
-            (identical(other.revenueChangeLabel, revenueChangeLabel) ||
-                other.revenueChangeLabel == revenueChangeLabel) &&
-            (identical(other.expenses, expenses) ||
-                other.expenses == expenses) &&
+            (identical(other.estimatedRevenueTl, estimatedRevenueTl) ||
+                other.estimatedRevenueTl == estimatedRevenueTl) &&
+            (identical(other.expensesTl, expensesTl) ||
+                other.expensesTl == expensesTl) &&
             const DeepCollectionEquality().equals(
               other._trainerPerformance,
               _trainerPerformance,
             ) &&
-            const DeepCollectionEquality().equals(
-              other._duePayments,
-              _duePayments,
-            ) &&
-            (identical(other.pendingFeedbackCount, pendingFeedbackCount) ||
-                other.pendingFeedbackCount == pendingFeedbackCount) &&
-            (identical(other.recentFeedbackDays, recentFeedbackDays) ||
-                other.recentFeedbackDays == recentFeedbackDays));
+            (identical(other.duePaymentMemberCount, duePaymentMemberCount) ||
+                other.duePaymentMemberCount == duePaymentMemberCount) &&
+            (identical(other.duePaymentTotalTl, duePaymentTotalTl) ||
+                other.duePaymentTotalTl == duePaymentTotalTl) &&
+            (identical(other.feedbackCount, feedbackCount) ||
+                other.feedbackCount == feedbackCount));
   }
 
   @override
@@ -696,13 +492,12 @@ class _$AdminHomeStateImpl extends _AdminHomeState {
     totalSessions,
     completedSessions,
     cancelledSessions,
-    estimatedRevenue,
-    revenueChangeLabel,
-    expenses,
+    estimatedRevenueTl,
+    expensesTl,
     const DeepCollectionEquality().hash(_trainerPerformance),
-    const DeepCollectionEquality().hash(_duePayments),
-    pendingFeedbackCount,
-    recentFeedbackDays,
+    duePaymentMemberCount,
+    duePaymentTotalTl,
+    feedbackCount,
   );
 
   /// Create a copy of AdminHomeState
@@ -723,13 +518,12 @@ abstract class _AdminHomeState extends AdminHomeState {
     required final int totalSessions,
     required final int completedSessions,
     required final int cancelledSessions,
-    required final String estimatedRevenue,
-    required final String revenueChangeLabel,
-    required final String expenses,
+    required final int estimatedRevenueTl,
+    required final int expensesTl,
     required final List<TrainerPerformance> trainerPerformance,
-    required final List<DuePayment> duePayments,
-    required final int pendingFeedbackCount,
-    required final int recentFeedbackDays,
+    required final int duePaymentMemberCount,
+    required final int duePaymentTotalTl,
+    required final int feedbackCount,
   }) = _$AdminHomeStateImpl;
   const _AdminHomeState._() : super._();
 
@@ -742,19 +536,17 @@ abstract class _AdminHomeState extends AdminHomeState {
   @override
   int get cancelledSessions;
   @override
-  String get estimatedRevenue;
+  int get estimatedRevenueTl;
   @override
-  String get revenueChangeLabel;
-  @override
-  String get expenses;
+  int get expensesTl;
   @override
   List<TrainerPerformance> get trainerPerformance;
   @override
-  List<DuePayment> get duePayments;
+  int get duePaymentMemberCount;
   @override
-  int get pendingFeedbackCount;
+  int get duePaymentTotalTl;
   @override
-  int get recentFeedbackDays;
+  int get feedbackCount;
 
   /// Create a copy of AdminHomeState
   /// with the given fields replaced by the non-null parameter values.

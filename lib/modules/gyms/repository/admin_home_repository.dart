@@ -1,12 +1,11 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../domain/admin_home_state.dart';
 import '../service/admin_home_service.dart';
 
 part 'admin_home_repository.g.dart';
 
 abstract interface class AdminHomeRepository {
-  AdminHomeState loadInitial();
+  Future<DuePaymentsSummary> loadDuePaymentsSummary(String gymId);
 }
 
 class AdminHomeRepositoryImpl implements AdminHomeRepository {
@@ -15,7 +14,8 @@ class AdminHomeRepositoryImpl implements AdminHomeRepository {
   final AdminHomeService _service;
 
   @override
-  AdminHomeState loadInitial() => _service.loadInitial();
+  Future<DuePaymentsSummary> loadDuePaymentsSummary(String gymId) =>
+      _service.loadDuePaymentsSummary(gymId);
 }
 
 @riverpod

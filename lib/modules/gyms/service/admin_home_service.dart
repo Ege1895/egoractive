@@ -1,38 +1,47 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-
-import '../domain/admin_home_state.dart';
 
 part 'admin_home_service.g.dart';
 
-/// Mock servis — F3'te gerçek seans/ödeme/geri bildirim koleksiyonlarından
-/// hesaplanacak.
+class DuePaymentsSummary {
+  const DuePaymentsSummary({required this.memberCount, required this.totalTl});
+
+  final int memberCount;
+  final int totalTl;
+
+  static const empty = DuePaymentsSummary(memberCount: 0, totalTl: 0);
+}
+
+/// Aylık seans/ciro/antrenör performansı `DashboardReportService`
+/// (reports modülü) tarafından zaten gerçek zamanlı hesaplanıyor —
+/// `AdminHomeController` bunu tekrarlamak yerine doğrudan
+/// `dashboardReportControllerProvider`'ı izliyor. Burada sadece bu panele
+/// özel, o modülde karşılığı olmayan "ödemesi bekleyen üye" özeti var.
 class AdminHomeService {
   const AdminHomeService();
 
-  AdminHomeState loadInitial() {
-    return const AdminHomeState(
-      monthLabel: 'Temmuz 2026 özeti',
-      totalSessions: 248,
-      completedSessions: 214,
-      cancelledSessions: 34,
-      estimatedRevenue: '₺386.500',
-      revenueChangeLabel: 'Geçen aya göre +%8',
-      expenses: '₺142.800',
-      trainerPerformance: [
-        TrainerPerformance(name: 'Berk Aydın', sessionCount: 96, ratio: 0.9),
-        TrainerPerformance(name: 'Selin Kara', sessionCount: 74, ratio: 0.72),
-        TrainerPerformance(name: 'Ayşe Demir', sessionCount: 44, ratio: 0.5),
-      ],
-      duePayments: [
-        DuePayment(memberName: 'Ayşe Yılmaz', dueDate: '8 Ağustos', amount: '₺4.800'),
-        DuePayment(memberName: 'Cem Demir', dueDate: '10 Ağustos', amount: '₺3.200'),
-        DuePayment(memberName: 'Mert Arslan', dueDate: '12 Ağustos', amount: '₺6.000'),
-      ],
-      pendingFeedbackCount: 5,
-      recentFeedbackDays: 7,
+  /// `memberPackages` dokümanında ayrı bir "ödeme vadesi" alanı yok — bu
+  /// yüzden isim/tarih bazlı bir liste yerine, kalan borcu (`dueAmount`)
+  /// pozitif olan üye sayısı + toplam tutar gösteriliyor (aggregate query,
+  /// tüm dokümanları client'a çekmeden).
+  Future<DuePaymentsSummary> loadDuePaymentsSummary(String gymId) async {
+    final query = FirebaseFirestore.instance
+        .collection('memberPackages')
+        .where('gymId', isEqualTo: gymId)
+        .where('dueAmount', isGreaterThan: 0);
+
+    final results = await Future.wait([
+      query.count().get(),
+      query.aggregate(sum('dueAmount')).get(),
+    ]);
+
+    return DuePaymentsSummary(
+      memberCount: results[0].count ?? 0,
+      totalTl: (results[1].getSum('dueAmount') ?? 0).round(),
     );
   }
 }
 
 @riverpod
-AdminHomeService adminHomeService(AdminHomeServiceRef ref) => const AdminHomeService();
+AdminHomeService adminHomeService(AdminHomeServiceRef ref) =>
+    const AdminHomeService();
