@@ -15,10 +15,12 @@ class AdminGroupSessionsPanel extends BasePanel {
   const AdminGroupSessionsPanel({super.key});
 
   @override
-  ConsumerState<AdminGroupSessionsPanel> createState() => _AdminGroupSessionsPanelState();
+  ConsumerState<AdminGroupSessionsPanel> createState() =>
+      _AdminGroupSessionsPanelState();
 }
 
-class _AdminGroupSessionsPanelState extends BasePanelState<AdminGroupSessionsPanel> {
+class _AdminGroupSessionsPanelState
+    extends BasePanelState<AdminGroupSessionsPanel> {
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
@@ -31,23 +33,51 @@ class _AdminGroupSessionsPanelState extends BasePanelState<AdminGroupSessionsPan
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.md, AppSpacing.screenEdge, 0),
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.screenEdge,
+                AppSpacing.md,
+                AppSpacing.screenEdge,
+                0,
+              ),
               child: Row(
                 children: [
-                  AppBackButton(onTap: () => ref.read(panelStackControllerProvider.notifier).pop()),
+                  AppBackButton(
+                    onTap: () =>
+                        ref.read(panelStackControllerProvider.notifier).pop(),
+                  ),
                   const SizedBox(width: AppSpacing.md),
-                  Expanded(child: Text('Grup dersleri', style: typography.headingSmall.copyWith(color: colors.onSurface, fontSize: 18))),
+                  Expanded(
+                    child: Text(
+                      'Grup dersleri',
+                      style: typography.headingSmall.copyWith(
+                        color: colors.onSurface,
+                        fontSize: 18,
+                      ),
+                    ),
+                  ),
                   Material(
                     color: colors.primary,
                     borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
                     child: InkWell(
-                      borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
-                      onTap: () => ref.read(panelStackControllerProvider.notifier).push(const CreateGroupSessionPanel()),
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusInner,
+                      ),
+                      onTap: () => ref
+                          .read(panelStackControllerProvider.notifier)
+                          .push(const CreateGroupSessionPanel()),
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.md,
+                        ),
                         constraints: const BoxConstraints(minHeight: 40),
                         alignment: Alignment.center,
-                        child: Text('+ Grup dersi', style: typography.headingSmall.copyWith(fontSize: 14, color: colors.onPrimary)),
+                        child: Text(
+                          '+ Grup dersi',
+                          style: typography.headingSmall.copyWith(
+                            fontSize: 14,
+                            color: colors.onPrimary,
+                          ),
+                        ),
                       ),
                     ),
                   ),
@@ -56,7 +86,12 @@ class _AdminGroupSessionsPanelState extends BasePanelState<AdminGroupSessionsPan
             ),
             Expanded(
               child: ListView(
-                padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.md, AppSpacing.screenEdge, AppSpacing.lg),
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.screenEdge,
+                  AppSpacing.md,
+                  AppSpacing.screenEdge,
+                  AppSpacing.lg,
+                ),
                 children: [
                   for (final group in groups) _GroupCard(group: group),
                 ],
@@ -82,13 +117,21 @@ class _GroupCard extends StatelessWidget {
     final (capFg, barColor, note) = group.isFull
         ? (colors.error, colors.error, 'Kontenjan doldu')
         : group.remaining <= 2
-            ? (colors.onWarningContainer, colors.warning, 'Son ${group.remaining} yer')
-            : (colors.onSurfaceMuted, colors.primary, 'Yer var');
+        ? (
+            colors.onWarningContainer,
+            colors.warning,
+            'Son ${group.remaining} yer',
+          )
+        : (colors.onSurfaceMuted, colors.primary, 'Yer var');
 
     return Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.md),
       padding: const EdgeInsets.all(AppSpacing.lg),
-      decoration: BoxDecoration(color: colors.surface, borderRadius: BorderRadius.circular(AppSpacing.radiusCard), border: Border.all(color: colors.outline)),
+      decoration: BoxDecoration(
+        color: colors.surface,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
+        border: Border.all(color: colors.outline),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -99,16 +142,40 @@ class _GroupCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(group.name, style: typography.headingSmall.copyWith(color: colors.onSurface, fontSize: 17)),
-                    Text(group.meta, style: typography.bodyMedium.copyWith(color: colors.onSurfaceMuted, fontSize: 13)),
+                    Text(
+                      group.name,
+                      style: typography.headingSmall.copyWith(
+                        color: colors.onSurface,
+                        fontSize: 17,
+                      ),
+                    ),
+                    Text(
+                      group.meta,
+                      style: typography.bodyMedium.copyWith(
+                        color: colors.onSurfaceMuted,
+                        fontSize: 13,
+                      ),
+                    ),
                   ],
                 ),
               ),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  Text('${group.taken}/${group.capacity}', style: typography.dataMedium.copyWith(color: capFg, fontSize: 19)),
-                  Text('kontenjan', style: typography.caption.copyWith(color: colors.onSurfaceMuted, fontSize: 11)),
+                  Text(
+                    '${group.taken}/${group.capacity}',
+                    style: typography.dataMedium.copyWith(
+                      color: capFg,
+                      fontSize: 19,
+                    ),
+                  ),
+                  Text(
+                    'kontenjan',
+                    style: typography.caption.copyWith(
+                      color: colors.onSurfaceMuted,
+                      fontSize: 11,
+                    ),
+                  ),
                 ],
               ),
             ],
@@ -116,13 +183,25 @@ class _GroupCard extends StatelessWidget {
           const SizedBox(height: AppSpacing.md),
           ClipRRect(
             borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
-            child: LinearProgressIndicator(value: ratio.clamp(0, 1), minHeight: 8, backgroundColor: colors.surfaceRaised, valueColor: AlwaysStoppedAnimation(barColor)),
+            child: LinearProgressIndicator(
+              value: ratio.clamp(0, 1),
+              minHeight: 8,
+              backgroundColor: colors.surfaceRaised,
+              valueColor: AlwaysStoppedAnimation(barColor),
+            ),
           ),
           const SizedBox(height: AppSpacing.md),
           Row(
             children: [
-              Expanded(child: Text(note, style: typography.bodyMedium.copyWith(color: capFg, fontSize: 13))),
-              Text('Katılımcıları gör', style: typography.headingSmall.copyWith(color: colors.onPrimaryContainer, fontSize: 13)),
+              Expanded(
+                child: Text(
+                  note,
+                  style: typography.bodyMedium.copyWith(
+                    color: capFg,
+                    fontSize: 13,
+                  ),
+                ),
+              ),
             ],
           ),
         ],
