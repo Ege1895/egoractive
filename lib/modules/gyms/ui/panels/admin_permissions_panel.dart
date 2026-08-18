@@ -15,10 +15,12 @@ class AdminPermissionsPanel extends BasePanel {
   const AdminPermissionsPanel({super.key});
 
   @override
-  ConsumerState<AdminPermissionsPanel> createState() => _AdminPermissionsPanelState();
+  ConsumerState<AdminPermissionsPanel> createState() =>
+      _AdminPermissionsPanelState();
 }
 
-class _AdminPermissionsPanelState extends BasePanelState<AdminPermissionsPanel> {
+class _AdminPermissionsPanelState
+    extends BasePanelState<AdminPermissionsPanel> {
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
@@ -32,39 +34,87 @@ class _AdminPermissionsPanelState extends BasePanelState<AdminPermissionsPanel> 
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.md, AppSpacing.screenEdge, 0),
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.screenEdge,
+                AppSpacing.md,
+                AppSpacing.screenEdge,
+                0,
+              ),
               child: Row(
                 children: [
-                  AppBackButton(onTap: () => ref.read(panelStackControllerProvider.notifier).pop()),
+                  AppBackButton(
+                    onTap: () =>
+                        ref.read(panelStackControllerProvider.notifier).pop(),
+                  ),
                   const SizedBox(width: AppSpacing.md),
-                  Text('Yetki ayarları', style: typography.headingSmall.copyWith(color: colors.onSurface, fontSize: 18)),
+                  Text(
+                    'Yetki ayarları',
+                    style: typography.headingSmall.copyWith(
+                      color: colors.onSurface,
+                      fontSize: 18,
+                    ),
+                  ),
                 ],
               ),
             ),
             Expanded(
               child: ListView(
-                padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.lg, AppSpacing.screenEdge, AppSpacing.lg),
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.screenEdge,
+                  AppSpacing.lg,
+                  AppSpacing.screenEdge,
+                  AppSpacing.lg,
+                ),
                 children: [
                   Container(
                     padding: const EdgeInsets.all(AppSpacing.lg),
-                    decoration: BoxDecoration(color: colors.surface, borderRadius: BorderRadius.circular(AppSpacing.radiusCard), border: Border.all(color: colors.outline)),
+                    decoration: BoxDecoration(
+                      color: colors.surface,
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusCard,
+                      ),
+                      border: Border.all(color: colors.outline),
+                    ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Seans bitimi eğitmene ne zaman hatırlatılsın?', style: typography.headingSmall.copyWith(color: colors.onSurface, fontSize: 16)),
+                        Text(
+                          'Seans bitimi eğitmene ne zaman hatırlatılsın?',
+                          style: typography.headingSmall.copyWith(
+                            color: colors.onSurface,
+                            fontSize: 16,
+                          ),
+                        ),
                         const SizedBox(height: AppSpacing.xs),
-                        Text('Bildirim seans bitiminden sonra gider', style: typography.bodyMedium.copyWith(color: colors.onSurfaceMuted, fontSize: 13)),
+                        Text(
+                          'Bildirim seans bitiminden sonra gider',
+                          style: typography.bodyMedium.copyWith(
+                            color: colors.onSurfaceMuted,
+                            fontSize: 13,
+                          ),
+                        ),
                         const SizedBox(height: AppSpacing.md),
                         Row(
                           children: [
                             for (final delay in TrainerReminderDelay.values)
                               Expanded(
                                 child: Padding(
-                                  padding: EdgeInsets.only(right: delay == TrainerReminderDelay.values.last ? 0 : AppSpacing.sm),
+                                  padding: EdgeInsets.only(
+                                    right:
+                                        delay ==
+                                            TrainerReminderDelay.values.last
+                                        ? 0
+                                        : AppSpacing.sm,
+                                  ),
                                   child: _DelayChip(
                                     label: delay.label,
-                                    selected: permissions.trainerReminderDelay == delay,
-                                    onTap: () => controller.setReminderDelay(delay),
+                                    selected:
+                                        permissions.trainerReminderDelay ==
+                                        delay,
+                                    onTap: () => _handlePermissionAction(
+                                      context,
+                                      () => controller.setReminderDelay(delay),
+                                    ),
                                   ),
                                 ),
                               ),
@@ -75,29 +125,50 @@ class _AdminPermissionsPanelState extends BasePanelState<AdminPermissionsPanel> 
                   ),
                   const SizedBox(height: AppSpacing.lg),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-                    decoration: BoxDecoration(color: colors.surface, borderRadius: BorderRadius.circular(AppSpacing.radiusCard), border: Border.all(color: colors.outline)),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.lg,
+                    ),
+                    decoration: BoxDecoration(
+                      color: colors.surface,
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusCard,
+                      ),
+                      border: Border.all(color: colors.outline),
+                    ),
                     child: Column(
                       children: [
                         _PermissionToggle(
                           title: 'Online Rezervasyon',
-                          note: 'Üyeler Keşfet üzerinden grup derslerine katılabilir',
+                          note:
+                              'Üyeler Keşfet üzerinden grup derslerine katılabilir',
                           value: permissions.onlineBookingEnabled,
-                          onTap: controller.toggleOnlineBooking,
+                          onTap: () => _handlePermissionAction(
+                            context,
+                            controller.toggleOnlineBooking,
+                          ),
                           showDivider: true,
                         ),
                         _PermissionToggle(
-                          title: 'Paket süresi bitince seans oluşturulabilsin mi?',
-                          note: 'Kapalıysa paketi bitmiş üyeye yeni seans planlanamaz',
+                          title:
+                              'Paket süresi bitince seans oluşturulabilsin mi?',
+                          note:
+                              'Kapalıysa paketi bitmiş üyeye yeni seans planlanamaz',
                           value: permissions.allowSessionsAfterPackageExpiry,
-                          onTap: controller.toggleAllowSessionsAfterExpiry,
+                          onTap: () => _handlePermissionAction(
+                            context,
+                            controller.toggleAllowSessionsAfterExpiry,
+                          ),
                           showDivider: true,
                         ),
                         _PermissionToggle(
                           title: 'Üye seans iptal edebilir',
-                          note: 'Kapalıysa iptal yalnızca antrenör/yönetici yapabilir',
+                          note:
+                              'Kapalıysa iptal yalnızca antrenör/yönetici yapabilir',
                           value: permissions.memberCanCancelSession,
-                          onTap: controller.toggleMemberCanCancel,
+                          onTap: () => _handlePermissionAction(
+                            context,
+                            controller.toggleMemberCanCancel,
+                          ),
                           showDivider: false,
                         ),
                       ],
@@ -105,15 +176,30 @@ class _AdminPermissionsPanelState extends BasePanelState<AdminPermissionsPanel> 
                   ),
                   const SizedBox(height: AppSpacing.sm),
                   Text(
-                    'Bu ayarlar tüm antrenör ve üyeleri etkiler; kaydettiğinizde uygulama yeniden başlatılmadan geçerli olur.',
-                    style: typography.caption.copyWith(color: colors.onSurfaceMuted),
+                    'Bu ayarlar tüm antrenör ve üyeleri etkiler; her değişiklik anında kaydedilir.',
+                    style: typography.caption.copyWith(
+                      color: colors.onSurfaceMuted,
+                    ),
                   ),
                 ],
               ),
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.md, AppSpacing.screenEdge, AppSpacing.lg),
-              child: AppButton(label: 'Kaydet', onPressed: () => ref.read(panelStackControllerProvider.notifier).pop()),
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.screenEdge,
+                AppSpacing.md,
+                AppSpacing.screenEdge,
+                AppSpacing.lg,
+              ),
+              // Her toggle/süre seçimi zaten anında kaydediliyor — bu buton
+              // ayrı bir "kaydet" işlemi yapmıyor, önceki etiket ("Kaydet")
+              // kullanıcıya değişikliklerin henüz kaydedilmediğini
+              // düşündürüyordu.
+              child: AppButton(
+                label: 'Bitti',
+                onPressed: () =>
+                    ref.read(panelStackControllerProvider.notifier).pop(),
+              ),
             ),
           ],
         ),
@@ -122,8 +208,35 @@ class _AdminPermissionsPanelState extends BasePanelState<AdminPermissionsPanel> 
   }
 }
 
+/// Her toggle/süre seçimi anında Firestore'a yazıyor (fire-and-forget) —
+/// yazma başarısız olursa (network/izin) stream hiç değişmediği için switch
+/// zaten yerinde kalıyor, ama kullanıcıya NEDEN hiçbir şey olmadığını
+/// açıklayan bir mesaj yoktu. Artık hata olursa kısa bir snackbar gösteriyor.
+Future<void> _handlePermissionAction(
+  BuildContext context,
+  Future<void> Function() action,
+) async {
+  try {
+    await action();
+  } catch (_) {
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Ayar kaydedilemedi, bağlantını kontrol edip tekrar dene.',
+          ),
+        ),
+      );
+    }
+  }
+}
+
 class _DelayChip extends StatelessWidget {
-  const _DelayChip({required this.label, required this.selected, required this.onTap});
+  const _DelayChip({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
 
   final String label;
   final bool selected;
@@ -141,7 +254,13 @@ class _DelayChip extends StatelessWidget {
         child: Container(
           constraints: const BoxConstraints(minHeight: 48),
           alignment: Alignment.center,
-          child: Text(label, style: context.appTypography.headingSmall.copyWith(fontSize: 14, color: selected ? colors.onPrimary : colors.onSurfaceVariant)),
+          child: Text(
+            label,
+            style: context.appTypography.headingSmall.copyWith(
+              fontSize: 14,
+              color: selected ? colors.onPrimary : colors.onSurfaceVariant,
+            ),
+          ),
         ),
       ),
     );
@@ -149,7 +268,13 @@ class _DelayChip extends StatelessWidget {
 }
 
 class _PermissionToggle extends StatelessWidget {
-  const _PermissionToggle({required this.title, required this.note, required this.value, required this.onTap, required this.showDivider});
+  const _PermissionToggle({
+    required this.title,
+    required this.note,
+    required this.value,
+    required this.onTap,
+    required this.showDivider,
+  });
 
   final String title;
   final String note;
@@ -163,15 +288,31 @@ class _PermissionToggle extends StatelessWidget {
     final typography = context.appTypography;
     return Container(
       constraints: const BoxConstraints(minHeight: 72),
-      decoration: BoxDecoration(border: showDivider ? Border(bottom: BorderSide(color: colors.outline)) : null),
+      decoration: BoxDecoration(
+        border: showDivider
+            ? Border(bottom: BorderSide(color: colors.outline))
+            : null,
+      ),
       child: Row(
         children: [
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: typography.bodyLarge.copyWith(color: colors.onSurface, fontSize: 15)),
-                Text(note, style: typography.caption.copyWith(color: colors.onSurfaceMuted, height: 1.4)),
+                Text(
+                  title,
+                  style: typography.bodyLarge.copyWith(
+                    color: colors.onSurface,
+                    fontSize: 15,
+                  ),
+                ),
+                Text(
+                  note,
+                  style: typography.caption.copyWith(
+                    color: colors.onSurfaceMuted,
+                    height: 1.4,
+                  ),
+                ),
               ],
             ),
           ),
@@ -183,9 +324,19 @@ class _PermissionToggle extends StatelessWidget {
               width: 52,
               height: 32,
               padding: const EdgeInsets.all(3),
-              decoration: BoxDecoration(color: value ? colors.primary : colors.surfaceRaised, borderRadius: BorderRadius.circular(AppSpacing.radiusPill)),
+              decoration: BoxDecoration(
+                color: value ? colors.primary : colors.surfaceRaised,
+                borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
+              ),
               alignment: value ? Alignment.centerRight : Alignment.centerLeft,
-              child: Container(width: 26, height: 26, decoration: BoxDecoration(color: colors.onSurface, shape: BoxShape.circle)),
+              child: Container(
+                width: 26,
+                height: 26,
+                decoration: BoxDecoration(
+                  color: colors.onSurface,
+                  shape: BoxShape.circle,
+                ),
+              ),
             ),
           ),
         ],
