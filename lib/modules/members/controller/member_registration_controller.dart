@@ -112,4 +112,49 @@ class MemberRegistrationController extends _$MemberRegistrationController {
       return false;
     }
   }
+
+  /// [MemberInfoPanel]'in mevcut üye düzenleme modu — daha önce sadece
+  /// paneli kapatıp hiçbir şey yazmıyordu (false-success).
+  Future<bool> submitEdit({required String memberId}) async {
+    if (state.isSubmitting) return false;
+
+    final form = ref.read(newMemberControllerProvider);
+    final name = '${form.firstName.trim()} ${form.lastName.trim()}'.trim();
+    final phoneDigits = form.phoneDigits.trim();
+
+    final nameError = name.isEmpty ? 'Ad ve soyad gerekli.' : null;
+    final phoneError = phoneDigits.length != 10
+        ? 'Geçerli bir telefon numarası gir.'
+        : null;
+    if (nameError != null || phoneError != null) {
+      state = MemberRegistrationState(
+        nameError: nameError,
+        phoneError: phoneError,
+      );
+      return false;
+    }
+
+    state = state.copyWith(isSubmitting: true, clearError: true);
+    try {
+      await ref
+          .read(memberRegistrationServiceProvider)
+          .updateMember(
+            memberId: memberId,
+            name: name,
+            phoneNumber: '+90$phoneDigits',
+            trainerId: form.trainerId,
+            trainerName: form.trainerName,
+            gender: form.gender,
+          );
+      state = state.copyWith(isSubmitting: false);
+      return true;
+    } catch (_) {
+      state = state.copyWith(
+        isSubmitting: false,
+        errorMessage:
+            'Üye güncellenemedi. Bağlantını kontrol edip tekrar dene.',
+      );
+      return false;
+    }
+  }
 }

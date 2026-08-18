@@ -47,9 +47,32 @@ class MemberRegistrationService {
     );
     return doc.id;
   }
+
+  /// [MemberInfoPanel]'in mevcut üye düzenleme modu — `trainerId`/
+  /// `trainerName`/`gender` sadece kullanıcı bu oturumda gerçekten
+  /// değiştirdiyse (null değilse) güncellenir, aksi halde dokümandaki mevcut
+  /// değer korunur.
+  Future<void> updateMember({
+    required String memberId,
+    required String name,
+    required String phoneNumber,
+    String? trainerId,
+    String? trainerName,
+    MemberGender? gender,
+  }) {
+    return FirebaseFirestore.instance.collection('users').doc(memberId).update({
+      'name': name,
+      'phoneNumber': phoneNumber,
+      if (trainerId != null) 'trainerId': trainerId,
+      if (trainerName != null) 'trainerName': trainerName,
+      if (gender != null) 'gender': gender.name,
+    });
+  }
 }
 
 @riverpod
-MemberRegistrationService memberRegistrationService(MemberRegistrationServiceRef ref) {
+MemberRegistrationService memberRegistrationService(
+  MemberRegistrationServiceRef ref,
+) {
   return MemberRegistrationService(ref.watch(analyticsServiceProvider));
 }

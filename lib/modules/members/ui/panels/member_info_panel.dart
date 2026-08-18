@@ -45,8 +45,19 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
       _lastNameController = TextEditingController(
         text: parts.skip(1).join(' '),
       );
+      final phoneDigits = _digitsOnly(widget.existing!.phone);
       _phoneController = TextEditingController(text: widget.existing!.phone);
       _noteController = TextEditingController();
+      // Kaydet, NewMemberController'ın form state'ini okuyor — telefon
+      // alanına hiç dokunulmasa bile geçerli bir değer olsun diye mevcut
+      // üyenin numarası buraya da yazılıyor (aksi halde phoneDigits boş
+      // kalır ve validasyon "geçersiz numara" hatası verir).
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        final notifier = ref.read(newMemberControllerProvider.notifier);
+        notifier.reset();
+        notifier.updatePhoneDigits(phoneDigits);
+      });
     } else {
       // Yeni üye sihirbazı: bu provider panel stack'te önceki panelleri
       // canlı tuttuğu için önceki (iptal edilmiş) bir kayıttan kalan veri
@@ -191,9 +202,7 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
                               child: AppTextField(
                                 label: 'Ad',
                                 controller: _firstNameController,
-                                errorText: widget.isNew
-                                    ? registrationState.nameError
-                                    : null,
+                                errorText: registrationState.nameError,
                                 onChanged: controller.updateFirstName,
                               ),
                             ),
@@ -212,9 +221,7 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
                           label: 'Telefon',
                           keyboardType: TextInputType.phone,
                           controller: _phoneController,
-                          errorText: widget.isNew
-                              ? registrationState.phoneError
-                              : null,
+                          errorText: registrationState.phoneError,
                           onChanged: (value) => controller.updatePhoneDigits(
                             value.replaceAll(RegExp(r'[^0-9]'), ''),
                           ),
@@ -428,8 +435,7 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  if (widget.isNew &&
-                      registrationState.errorMessage != null) ...[
+                  if (registrationState.errorMessage != null) ...[
                     Text(
                       registrationState.errorMessage!,
                       style: typography.bodyMedium.copyWith(
@@ -444,20 +450,26 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
                         ? (registrationState.isSubmitting
                               ? 'Kaydediliyor…'
                               : 'Paket seçimine geç')
-                        : 'Kaydet',
-                    onPressed: widget.isNew && registrationState.isSubmitting
+                        : (registrationState.isSubmitting
+                              ? 'Kaydediliyor…'
+                              : 'Kaydet'),
+                    onPressed: registrationState.isSubmitting
                         ? null
                         : () async {
-                            if (!widget.isNew) {
-                              ref
-                                  .read(panelStackControllerProvider.notifier)
-                                  .pop();
-                              return;
-                            }
                             if (!await ensureSubscriptionAllowsWrite(
                               context,
                               ref,
                             )) {
+                              return;
+                            }
+                            if (!widget.isNew) {
+                              final success = await registrationController
+                                  .submitEdit(memberId: widget.existing!.id);
+                              if (success && mounted) {
+                                ref
+                                    .read(panelStackControllerProvider.notifier)
+                                    .pop();
+                              }
                               return;
                             }
                             final success = await registrationController
@@ -520,6 +532,16 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
         );
       },
     );
+  }
+
+  String _digitsOnly(String raw) {
+    final digits = raw.replaceAll(RegExp(r'[^0-9]'), '');
+    final withoutCountryCode = digits.startsWith('90') && digits.length > 10
+        ? digits.substring(2)
+        : digits;
+    return withoutCountryCode.length > 10
+        ? withoutCountryCode.substring(withoutCountryCode.length - 10)
+        : withoutCountryCode;
   }
 
   @override
