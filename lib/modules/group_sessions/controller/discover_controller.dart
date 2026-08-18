@@ -12,14 +12,38 @@ import '../service/group_sessions_write_service.dart';
 part 'discover_controller.g.dart';
 
 const _monthAbbrev = {
-  1: 'Oca', 2: 'Şub', 3: 'Mar', 4: 'Nis', 5: 'May', 6: 'Haz',
-  7: 'Tem', 8: 'Ağu', 9: 'Eyl', 10: 'Eki', 11: 'Kas', 12: 'Ara',
+  1: 'Oca',
+  2: 'Şub',
+  3: 'Mar',
+  4: 'Nis',
+  5: 'May',
+  6: 'Haz',
+  7: 'Tem',
+  8: 'Ağu',
+  9: 'Eyl',
+  10: 'Eki',
+  11: 'Kas',
+  12: 'Ara',
 };
-const _weekdayNames = {1: 'Pazartesi', 2: 'Salı', 3: 'Çarşamba', 4: 'Perşembe', 5: 'Cuma', 6: 'Cumartesi', 7: 'Pazar'};
+const _weekdayNames = {
+  1: 'Pazartesi',
+  2: 'Salı',
+  3: 'Çarşamba',
+  4: 'Perşembe',
+  5: 'Cuma',
+  6: 'Cumartesi',
+  7: 'Pazar',
+};
 
 @riverpod
-Stream<List<DiscoverItem>> _groupSessionsForGym(_GroupSessionsForGymRef ref, String gymId, String myUid) {
-  final lockHours = ref.watch(remoteConfigServiceProvider).groupSessionLockHoursBefore;
+Stream<List<DiscoverItem>> _groupSessionsForGym(
+  _GroupSessionsForGymRef ref,
+  String gymId,
+  String myUid,
+) {
+  final lockHours = ref
+      .watch(remoteConfigServiceProvider)
+      .groupSessionLockHoursBefore;
   final now = Timestamp.now();
   return FirebaseFirestore.instance
       .collection('groupSessions')
@@ -27,22 +51,34 @@ Stream<List<DiscoverItem>> _groupSessionsForGym(_GroupSessionsForGymRef ref, Str
       .where('startTime', isGreaterThanOrEqualTo: now)
       .orderBy('startTime')
       .snapshots()
-      .map((snapshot) => snapshot.docs.map((doc) => _toGroupSessionItem(doc, myUid, lockHours)).toList());
+      .map(
+        (snapshot) => snapshot.docs
+            .map((doc) => _toGroupSessionItem(doc, myUid, lockHours))
+            .toList(),
+      );
 }
 
-DiscoverItem _toGroupSessionItem(QueryDocumentSnapshot<Map<String, dynamic>> doc, String myUid, int lockHours) {
+DiscoverItem _toGroupSessionItem(
+  QueryDocumentSnapshot<Map<String, dynamic>> doc,
+  String myUid,
+  int lockHours,
+) {
   final data = doc.data();
   final startTime = (data['startTime'] as Timestamp).toDate();
-  final attendeeIds = List<String>.from(data['attendeeIds'] as List? ?? const []);
+  final attendeeIds = List<String>.from(
+    data['attendeeIds'] as List? ?? const [],
+  );
   final durationMinutes = (data['durationMinutes'] as num?)?.toInt() ?? 0;
-  final time = '${startTime.hour.toString().padLeft(2, '0')}:${startTime.minute.toString().padLeft(2, '0')}';
+  final time =
+      '${startTime.hour.toString().padLeft(2, '0')}:${startTime.minute.toString().padLeft(2, '0')}';
   return DiscoverItem(
     id: doc.id,
     category: DiscoverCategory.groupSessions,
     day: startTime.day.toString().padLeft(2, '0'),
     month: _monthAbbrev[startTime.month] ?? '',
     title: (data['title'] as String?) ?? '',
-    meta: '${(data['trainerName'] as String?) ?? ''} · ${_weekdayNames[startTime.weekday]} $time · $durationMinutes dk',
+    meta:
+        '${(data['trainerName'] as String?) ?? ''} · ${_weekdayNames[startTime.weekday]} $time · $durationMinutes dk',
     taken: attendeeIds.length,
     capacity: (data['capacity'] as num?)?.toInt(),
     joined: attendeeIds.contains(myUid),
@@ -52,8 +88,14 @@ DiscoverItem _toGroupSessionItem(QueryDocumentSnapshot<Map<String, dynamic>> doc
 }
 
 @riverpod
-Stream<List<DiscoverItem>> _eventsForGym(_EventsForGymRef ref, String gymId, String myUid) {
-  final lockHours = ref.watch(remoteConfigServiceProvider).groupSessionLockHoursBefore;
+Stream<List<DiscoverItem>> _eventsForGym(
+  _EventsForGymRef ref,
+  String gymId,
+  String myUid,
+) {
+  final lockHours = ref
+      .watch(remoteConfigServiceProvider)
+      .groupSessionLockHoursBefore;
   final now = Timestamp.now();
   return FirebaseFirestore.instance
       .collection('events')
@@ -61,21 +103,33 @@ Stream<List<DiscoverItem>> _eventsForGym(_EventsForGymRef ref, String gymId, Str
       .where('dateTime', isGreaterThanOrEqualTo: now)
       .orderBy('dateTime')
       .snapshots()
-      .map((snapshot) => snapshot.docs.map((doc) => _toEventItem(doc, myUid, lockHours)).toList());
+      .map(
+        (snapshot) => snapshot.docs
+            .map((doc) => _toEventItem(doc, myUid, lockHours))
+            .toList(),
+      );
 }
 
-DiscoverItem _toEventItem(QueryDocumentSnapshot<Map<String, dynamic>> doc, String myUid, int lockHours) {
+DiscoverItem _toEventItem(
+  QueryDocumentSnapshot<Map<String, dynamic>> doc,
+  String myUid,
+  int lockHours,
+) {
   final data = doc.data();
   final dateTime = (data['dateTime'] as Timestamp).toDate();
-  final attendeeIds = List<String>.from(data['attendeeIds'] as List? ?? const []);
-  final time = '${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
+  final attendeeIds = List<String>.from(
+    data['attendeeIds'] as List? ?? const [],
+  );
+  final time =
+      '${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
   return DiscoverItem(
     id: doc.id,
     category: DiscoverCategory.events,
     day: dateTime.day.toString().padLeft(2, '0'),
     month: _monthAbbrev[dateTime.month] ?? '',
     title: (data['name'] as String?) ?? '',
-    meta: '${(data['location'] as String?) ?? ''} · ${_weekdayNames[dateTime.weekday]} $time',
+    meta:
+        '${(data['location'] as String?) ?? ''} · ${_weekdayNames[dateTime.weekday]} $time',
     taken: attendeeIds.length,
     capacity: (data['capacity'] as num?)?.toInt(),
     joined: attendeeIds.contains(myUid),
@@ -96,7 +150,9 @@ class DiscoverController extends _$DiscoverController {
     final mock = ref.watch(discoverRepositoryProvider).loadItems();
     if (gymId == null || uid == null) return mock;
 
-    final groupSessions = ref.watch(_groupSessionsForGymProvider(gymId, uid)).valueOrNull;
+    final groupSessions = ref
+        .watch(_groupSessionsForGymProvider(gymId, uid))
+        .valueOrNull;
     final events = ref.watch(_eventsForGymProvider(gymId, uid)).valueOrNull;
     if (groupSessions == null || events == null) return mock;
 
@@ -111,23 +167,26 @@ class DiscoverController extends _$DiscoverController {
     if (item.isLocked) return;
 
     Future<void> leave() => item.category == DiscoverCategory.groupSessions
-        ? ref.read(groupSessionsWriteServiceProvider).leave(sessionId: id, uid: uid)
+        ? ref
+              .read(groupSessionsWriteServiceProvider)
+              .leave(sessionId: id, uid: uid)
         : ref.read(eventsWriteServiceProvider).leave(eventId: id, uid: uid);
 
     Future<void> join() => item.category == DiscoverCategory.groupSessions
-        ? ref.read(groupSessionsWriteServiceProvider).join(sessionId: id, uid: uid)
+        ? ref
+              .read(groupSessionsWriteServiceProvider)
+              .join(sessionId: id, uid: uid)
         : ref.read(eventsWriteServiceProvider).join(eventId: id, uid: uid);
 
+    // Önceki sürüm join() hatasını (kontenjan doldu, network vb.) sessizce
+    // yutuyordu — üye "Katılıyorum"a basıyor, hiçbir şey olmuyordu, neden
+    // olduğunu hiç öğrenemiyordu. Artık hata [DiscoverPanel]'e kadar
+    // yükseliyor, orada kısa bir mesaj olarak gösteriliyor.
     if (item.joined) {
       await leave();
     } else {
-      if (item.isFull) return;
-      try {
-        await join();
-      } catch (_) {
-        // Kontenjan tam o an dolduysa (yarış durumu) sessizce yok say —
-        // gerçek zamanlı stream zaten güncel dolu durumunu yansıtacak.
-      }
+      if (item.isFull) throw StateError('Kontenjan doldu.');
+      await join();
     }
   }
 }
