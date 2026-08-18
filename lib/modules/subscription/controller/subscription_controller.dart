@@ -96,8 +96,22 @@ class SubscriptionController extends _$SubscriptionController {
     for (final purchase in purchases) {
       if (purchase.status == PurchaseStatus.purchased ||
           purchase.status == PurchaseStatus.restored) {
+        // verifyPurchase (Cloud Functions) ağ/sunucu hatasıyla başarısız
+        // olabilir — önceden bu durumda ne completePurchase çağrılıyordu
+        // (StoreKit/Play Billing işlemi "pending" kalıp bir sonraki açılışta
+        // tekrar sunuluyordu) ne de isPurchasing false'a dönüyordu (kullanıcı
+        // "mağaza bekleniyor" ekranında sonsuza kadar kalıyordu). Ödeme
+        // mağazada zaten gerçekleşmiş olduğu için doğrulama başarısız olsa
+        // bile işlem her zaman tamamlanır (finish edilir); kullanıcıya
+        // ayrıca bir hata gösterilir.
+        String? verifyErrorMessage;
         if (gymId != null) {
-          await repo.verifyPurchase(gymId: gymId, purchase: purchase);
+          try {
+            await repo.verifyPurchase(gymId: gymId, purchase: purchase);
+          } catch (_) {
+            verifyErrorMessage =
+                'Satın alma doğrulanamadı, tekrar dene ya da destek ile iletişime geç.';
+          }
         }
         await repo.completePurchase(purchase);
         _isPurchasing = false;
@@ -105,7 +119,7 @@ class SubscriptionController extends _$SubscriptionController {
         state = state.copyWith(
           isPurchasing: false,
           pendingProductId: null,
-          purchaseErrorMessage: null,
+          purchaseErrorMessage: verifyErrorMessage,
         );
       } else if (purchase.status == PurchaseStatus.error ||
           purchase.status == PurchaseStatus.canceled) {
