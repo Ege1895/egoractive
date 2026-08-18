@@ -380,29 +380,33 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
                                   ),
                                 ),
                                 Flexible(
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Flexible(
-                                        child: Text(
-                                          form.trainerName ?? 'Antrenör seç',
-                                          style: typography.headingSmall
-                                              .copyWith(
-                                                color: form.trainerName == null
-                                                    ? colors.onSurfaceMuted
-                                                    : colors.onSurface,
-                                                fontSize: 15,
-                                              ),
-                                          overflow: TextOverflow.ellipsis,
+                                  child: Align(
+                                    alignment: Alignment.centerRight,
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Flexible(
+                                          child: Text(
+                                            form.trainerName ?? 'Antrenör seç',
+                                            style: typography.headingSmall
+                                                .copyWith(
+                                                  color:
+                                                      form.trainerName == null
+                                                      ? colors.onSurfaceMuted
+                                                      : colors.onSurface,
+                                                  fontSize: 15,
+                                                ),
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
                                         ),
-                                      ),
-                                      const SizedBox(width: AppSpacing.xs),
-                                      Icon(
-                                        Icons.chevron_right,
-                                        color: colors.onSurfaceMuted,
-                                        size: 18,
-                                      ),
-                                    ],
+                                        const SizedBox(width: AppSpacing.xs),
+                                        Icon(
+                                          Icons.chevron_right,
+                                          color: colors.onSurfaceMuted,
+                                          size: 18,
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ],

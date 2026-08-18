@@ -6,6 +6,7 @@ export { helloWorld } from "./callable/hello-world";
 export { requestCustomToken } from "./callable/request-custom-token";
 export { signupGymAdmin } from "./callable/signup-gym-admin";
 export { deleteAccount } from "./callable/delete-account";
+export { checkPhoneAvailable } from "./callable/check-phone-available";
 export { verifySubscriptionPurchase } from "./callable/verify-subscription-purchase";
 export { sendManualNotification } from "./callable/send-manual-notification";
 export { onUserRoleAssigned } from "./triggers/on-user-role-assigned";
