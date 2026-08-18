@@ -22,9 +22,12 @@ class AdminMemberDetail with _$AdminMemberDetail {
     required List<SessionHistoryEntry> history,
     required Map<TrainerMetric, TrainerMetricSeries> seriesByMetric,
     @Default(TrainerMetric.kilo) TrainerMetric selectedMetric,
+    @Default(false) bool isLoading,
+    @Default(false) bool notFound,
   }) = _AdminMemberDetail;
 
   const AdminMemberDetail._();
 
-  int get paymentDueTl => (paymentTotalTl - paymentPaidTl).clamp(0, paymentTotalTl);
+  int get paymentDueTl =>
+      (paymentTotalTl - paymentPaidTl).clamp(0, paymentTotalTl);
 }

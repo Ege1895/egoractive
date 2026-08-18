@@ -40,6 +40,37 @@ class _AdminMemberDetailPanelState
     final controller = ref.read(
       adminMemberDetailControllerProvider(widget.memberId).notifier,
     );
+
+    if (detail.isLoading) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+    if (detail.notFound) {
+      return Scaffold(
+        body: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.screenEdge),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                AppBackButton(
+                  onTap: () =>
+                      ref.read(panelStackControllerProvider.notifier).pop(),
+                ),
+                const SizedBox(height: AppSpacing.xl),
+                Text(
+                  'Üye bulunamadı.',
+                  style: typography.headingSmall.copyWith(
+                    color: colors.onSurface,
+                    fontSize: 17,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
     final series = detail.seriesByMetric[detail.selectedMetric]!;
     final isPaidFull = detail.paymentDueTl == 0;
 
@@ -79,12 +110,16 @@ class _AdminMemberDetailPanelState
                         AppSpacing.radiusInner,
                       ),
                       onTap: () {
-                        final summary = ref
-                            .read(adminMembersControllerProvider)
-                            .firstWhere((m) => m.id == widget.memberId);
+                        final summaries = ref.read(
+                          adminMembersControllerProvider,
+                        );
+                        final index = summaries.indexWhere(
+                          (m) => m.id == widget.memberId,
+                        );
+                        if (index == -1) return;
                         ref
                             .read(panelStackControllerProvider.notifier)
-                            .push(MemberInfoPanel(existing: summary));
+                            .push(MemberInfoPanel(existing: summaries[index]));
                       },
                       child: Container(
                         padding: const EdgeInsets.symmetric(

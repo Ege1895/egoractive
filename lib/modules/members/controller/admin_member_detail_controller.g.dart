@@ -6,8 +6,7 @@ part of 'admin_member_detail_controller.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$adminMemberDetailControllerHash() =>
-    r'dbea92d2f0b87da6b0fb8caf4baab937a7d846fa';
+String _$detailStreamForIdHash() => r'd457717ee6c7c614acec6247ecb7a26867450217';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -29,6 +28,128 @@ class _SystemHash {
     return 0x1fffffff & (hash + ((0x00003fff & hash) << 15));
   }
 }
+
+/// See also [_detailStreamForId].
+@ProviderFor(_detailStreamForId)
+const _detailStreamForIdProvider = _DetailStreamForIdFamily();
+
+/// See also [_detailStreamForId].
+class _DetailStreamForIdFamily extends Family<AsyncValue<AdminMemberDetail>> {
+  /// See also [_detailStreamForId].
+  const _DetailStreamForIdFamily();
+
+  /// See also [_detailStreamForId].
+  _DetailStreamForIdProvider call(String memberId) {
+    return _DetailStreamForIdProvider(memberId);
+  }
+
+  @override
+  _DetailStreamForIdProvider getProviderOverride(
+    covariant _DetailStreamForIdProvider provider,
+  ) {
+    return call(provider.memberId);
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'_detailStreamForIdProvider';
+}
+
+/// See also [_detailStreamForId].
+class _DetailStreamForIdProvider
+    extends AutoDisposeStreamProvider<AdminMemberDetail> {
+  /// See also [_detailStreamForId].
+  _DetailStreamForIdProvider(String memberId)
+    : this._internal(
+        (ref) => _detailStreamForId(ref as _DetailStreamForIdRef, memberId),
+        from: _detailStreamForIdProvider,
+        name: r'_detailStreamForIdProvider',
+        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+            ? null
+            : _$detailStreamForIdHash,
+        dependencies: _DetailStreamForIdFamily._dependencies,
+        allTransitiveDependencies:
+            _DetailStreamForIdFamily._allTransitiveDependencies,
+        memberId: memberId,
+      );
+
+  _DetailStreamForIdProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.memberId,
+  }) : super.internal();
+
+  final String memberId;
+
+  @override
+  Override overrideWith(
+    Stream<AdminMemberDetail> Function(_DetailStreamForIdRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: _DetailStreamForIdProvider._internal(
+        (ref) => create(ref as _DetailStreamForIdRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        memberId: memberId,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeStreamProviderElement<AdminMemberDetail> createElement() {
+    return _DetailStreamForIdProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is _DetailStreamForIdProvider && other.memberId == memberId;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, memberId.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin _DetailStreamForIdRef on AutoDisposeStreamProviderRef<AdminMemberDetail> {
+  /// The parameter `memberId` of this provider.
+  String get memberId;
+}
+
+class _DetailStreamForIdProviderElement
+    extends AutoDisposeStreamProviderElement<AdminMemberDetail>
+    with _DetailStreamForIdRef {
+  _DetailStreamForIdProviderElement(super.provider);
+
+  @override
+  String get memberId => (origin as _DetailStreamForIdProvider).memberId;
+}
+
+String _$adminMemberDetailControllerHash() =>
+    r'f612d4b9c9367be83a75d5fc1970c8b23ed6bfae';
 
 abstract class _$AdminMemberDetailController
     extends BuildlessAutoDisposeNotifier<AdminMemberDetail> {

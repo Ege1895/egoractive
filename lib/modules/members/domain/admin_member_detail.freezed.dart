@@ -32,6 +32,8 @@ mixin _$AdminMemberDetail {
   Map<TrainerMetric, TrainerMetricSeries> get seriesByMetric =>
       throw _privateConstructorUsedError;
   TrainerMetric get selectedMetric => throw _privateConstructorUsedError;
+  bool get isLoading => throw _privateConstructorUsedError;
+  bool get notFound => throw _privateConstructorUsedError;
 
   /// Create a copy of AdminMemberDetail
   /// with the given fields replaced by the non-null parameter values.
@@ -62,6 +64,8 @@ abstract class $AdminMemberDetailCopyWith<$Res> {
     List<SessionHistoryEntry> history,
     Map<TrainerMetric, TrainerMetricSeries> seriesByMetric,
     TrainerMetric selectedMetric,
+    bool isLoading,
+    bool notFound,
   });
 }
 
@@ -94,6 +98,8 @@ class _$AdminMemberDetailCopyWithImpl<$Res, $Val extends AdminMemberDetail>
     Object? history = null,
     Object? seriesByMetric = null,
     Object? selectedMetric = null,
+    Object? isLoading = null,
+    Object? notFound = null,
   }) {
     return _then(
       _value.copyWith(
@@ -153,6 +159,14 @@ class _$AdminMemberDetailCopyWithImpl<$Res, $Val extends AdminMemberDetail>
                 ? _value.selectedMetric
                 : selectedMetric // ignore: cast_nullable_to_non_nullable
                       as TrainerMetric,
+            isLoading: null == isLoading
+                ? _value.isLoading
+                : isLoading // ignore: cast_nullable_to_non_nullable
+                      as bool,
+            notFound: null == notFound
+                ? _value.notFound
+                : notFound // ignore: cast_nullable_to_non_nullable
+                      as bool,
           )
           as $Val,
     );
@@ -183,6 +197,8 @@ abstract class _$$AdminMemberDetailImplCopyWith<$Res>
     List<SessionHistoryEntry> history,
     Map<TrainerMetric, TrainerMetricSeries> seriesByMetric,
     TrainerMetric selectedMetric,
+    bool isLoading,
+    bool notFound,
   });
 }
 
@@ -214,6 +230,8 @@ class __$$AdminMemberDetailImplCopyWithImpl<$Res>
     Object? history = null,
     Object? seriesByMetric = null,
     Object? selectedMetric = null,
+    Object? isLoading = null,
+    Object? notFound = null,
   }) {
     return _then(
       _$AdminMemberDetailImpl(
@@ -273,6 +291,14 @@ class __$$AdminMemberDetailImplCopyWithImpl<$Res>
             ? _value.selectedMetric
             : selectedMetric // ignore: cast_nullable_to_non_nullable
                   as TrainerMetric,
+        isLoading: null == isLoading
+            ? _value.isLoading
+            : isLoading // ignore: cast_nullable_to_non_nullable
+                  as bool,
+        notFound: null == notFound
+            ? _value.notFound
+            : notFound // ignore: cast_nullable_to_non_nullable
+                  as bool,
       ),
     );
   }
@@ -296,6 +322,8 @@ class _$AdminMemberDetailImpl extends _AdminMemberDetail {
     required final List<SessionHistoryEntry> history,
     required final Map<TrainerMetric, TrainerMetricSeries> seriesByMetric,
     this.selectedMetric = TrainerMetric.kilo,
+    this.isLoading = false,
+    this.notFound = false,
   }) : _history = history,
        _seriesByMetric = seriesByMetric,
        super._();
@@ -341,10 +369,16 @@ class _$AdminMemberDetailImpl extends _AdminMemberDetail {
   @override
   @JsonKey()
   final TrainerMetric selectedMetric;
+  @override
+  @JsonKey()
+  final bool isLoading;
+  @override
+  @JsonKey()
+  final bool notFound;
 
   @override
   String toString() {
-    return 'AdminMemberDetail(id: $id, initials: $initials, name: $name, phone: $phone, trainerName: $trainerName, remainingSessions: $remainingSessions, makeupSessions: $makeupSessions, packageEndDate: $packageEndDate, paymentTotalTl: $paymentTotalTl, paymentPaidTl: $paymentPaidTl, lastPaymentDate: $lastPaymentDate, history: $history, seriesByMetric: $seriesByMetric, selectedMetric: $selectedMetric)';
+    return 'AdminMemberDetail(id: $id, initials: $initials, name: $name, phone: $phone, trainerName: $trainerName, remainingSessions: $remainingSessions, makeupSessions: $makeupSessions, packageEndDate: $packageEndDate, paymentTotalTl: $paymentTotalTl, paymentPaidTl: $paymentPaidTl, lastPaymentDate: $lastPaymentDate, history: $history, seriesByMetric: $seriesByMetric, selectedMetric: $selectedMetric, isLoading: $isLoading, notFound: $notFound)';
   }
 
   @override
@@ -377,7 +411,11 @@ class _$AdminMemberDetailImpl extends _AdminMemberDetail {
               _seriesByMetric,
             ) &&
             (identical(other.selectedMetric, selectedMetric) ||
-                other.selectedMetric == selectedMetric));
+                other.selectedMetric == selectedMetric) &&
+            (identical(other.isLoading, isLoading) ||
+                other.isLoading == isLoading) &&
+            (identical(other.notFound, notFound) ||
+                other.notFound == notFound));
   }
 
   @override
@@ -397,6 +435,8 @@ class _$AdminMemberDetailImpl extends _AdminMemberDetail {
     const DeepCollectionEquality().hash(_history),
     const DeepCollectionEquality().hash(_seriesByMetric),
     selectedMetric,
+    isLoading,
+    notFound,
   );
 
   /// Create a copy of AdminMemberDetail
@@ -427,6 +467,8 @@ abstract class _AdminMemberDetail extends AdminMemberDetail {
     required final List<SessionHistoryEntry> history,
     required final Map<TrainerMetric, TrainerMetricSeries> seriesByMetric,
     final TrainerMetric selectedMetric,
+    final bool isLoading,
+    final bool notFound,
   }) = _$AdminMemberDetailImpl;
   const _AdminMemberDetail._() : super._();
 
@@ -458,6 +500,10 @@ abstract class _AdminMemberDetail extends AdminMemberDetail {
   Map<TrainerMetric, TrainerMetricSeries> get seriesByMetric;
   @override
   TrainerMetric get selectedMetric;
+  @override
+  bool get isLoading;
+  @override
+  bool get notFound;
 
   /// Create a copy of AdminMemberDetail
   /// with the given fields replaced by the non-null parameter values.
