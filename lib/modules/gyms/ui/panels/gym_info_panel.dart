@@ -30,6 +30,13 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
   late final TextEditingController _gymReportEmailController;
   late final TextEditingController _accountingReportEmailController;
 
+  bool _isSaving = false;
+  bool _hydratedFromProfile = false;
+  String? _nameError;
+  String? _addressError;
+  String? _phoneError;
+  String? _saveErrorMessage;
+
   @override
   void initState() {
     super.initState();
@@ -53,11 +60,25 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
   Widget build(BuildContext context) {
     final colors = context.appColors;
     final typography = context.appTypography;
+    final profileState = ref.watch(gymProfileControllerProvider);
     final profileController = ref.read(gymProfileControllerProvider.notifier);
     final recipientsState = ref.watch(reportRecipientsControllerProvider);
     final themeState = ref.watch(gymThemeControllerProvider);
     final themeController = ref.read(gymThemeControllerProvider.notifier);
     final active = themeController.activeTheme;
+
+    // `gyms/{gymId}` dokümanı initState'te henüz Firestore'dan yüklenmemiş
+    // olabilir (stream async çözülür) — gerçek veri ilk geldiğinde alanları
+    // bir kez doldur. Sonrasında kullanıcı yazarken tekrar üzerine yazmaz.
+    if (!_hydratedFromProfile &&
+        (profileState.name.isNotEmpty ||
+            profileState.address.isNotEmpty ||
+            profileState.phone.isNotEmpty)) {
+      _hydratedFromProfile = true;
+      _nameController.text = profileState.name;
+      _addressController.text = '${profileState.address}, ${profileState.city}';
+      _phoneController.text = profileState.phone;
+    }
 
     return Scaffold(
       body: SafeArea(
@@ -112,12 +133,14 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
                         AppTextField(
                           label: 'Salon adı',
                           controller: _nameController,
+                          errorText: _nameError,
                           onChanged: profileController.updateName,
                         ),
                         const SizedBox(height: AppSpacing.md),
                         AppTextField(
                           label: 'Adres',
                           controller: _addressController,
+                          errorText: _addressError,
                           onChanged: profileController.updateAddress,
                         ),
                         const SizedBox(height: AppSpacing.md),
@@ -125,6 +148,7 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
                           label: 'Telefon',
                           keyboardType: TextInputType.phone,
                           controller: _phoneController,
+                          errorText: _phoneError,
                           onChanged: profileController.updatePhone,
                         ),
                       ],
@@ -178,32 +202,34 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
                                 ),
                               ),
                               const SizedBox(height: AppSpacing.sm),
-                              Material(
-                                color: colors.surfaceRaised,
-                                borderRadius: BorderRadius.circular(
-                                  AppSpacing.radiusInner,
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: AppSpacing.md,
                                 ),
-                                child: InkWell(
-                                  onTap: () {},
+                                constraints: const BoxConstraints(
+                                  minHeight: 40,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: colors.surfaceRaised,
                                   borderRadius: BorderRadius.circular(
                                     AppSpacing.radiusInner,
                                   ),
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: AppSpacing.md,
-                                    ),
-                                    constraints: const BoxConstraints(
-                                      minHeight: 40,
-                                    ),
-                                    alignment: Alignment.centerLeft,
-                                    child: Text(
-                                      'Logoyu değiştir',
-                                      style: typography.headingSmall.copyWith(
-                                        fontSize: 14,
-                                        color: colors.onSurfaceVariant,
-                                      ),
-                                    ),
+                                ),
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  'Logoyu değiştir',
+                                  style: typography.headingSmall.copyWith(
+                                    fontSize: 14,
+                                    color: colors.onSurfaceMuted,
                                   ),
+                                ),
+                              ),
+                              const SizedBox(height: AppSpacing.sm),
+                              Text(
+                                'Logo değişikliği bu ekrandan henüz yapılamıyor.',
+                                style: typography.caption.copyWith(
+                                  color: colors.onSurfaceMuted,
+                                  fontSize: 12,
                                 ),
                               ),
                             ],
@@ -451,16 +477,60 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
                 AppSpacing.screenEdge,
                 AppSpacing.lg,
               ),
-              child: AppButton(
-                label: 'Kaydet',
-                onPressed: () =>
-                    ref.read(panelStackControllerProvider.notifier).pop(),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (_saveErrorMessage != null) ...[
+                    Text(
+                      _saveErrorMessage!,
+                      style: typography.bodyMedium.copyWith(
+                        color: colors.error,
+                        fontSize: 13,
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                  ],
+                  AppButton(
+                    label: _isSaving ? 'Kaydediliyor…' : 'Kaydet',
+                    onPressed: _isSaving ? null : _save,
+                  ),
+                ],
               ),
             ),
           ],
         ),
       ),
     );
+  }
+
+  Future<void> _save() async {
+    final name = _nameController.text.trim();
+    final address = _addressController.text.trim();
+    final phone = _phoneController.text.trim();
+    setState(() {
+      _nameError = name.isEmpty ? 'Salon adı boş olamaz.' : null;
+      _addressError = address.isEmpty ? 'Adres boş olamaz.' : null;
+      _phoneError = phone.isEmpty ? 'Telefon boş olamaz.' : null;
+      _saveErrorMessage = null;
+    });
+    if (_nameError != null || _addressError != null || _phoneError != null) {
+      return;
+    }
+
+    setState(() => _isSaving = true);
+    try {
+      await ref.read(gymProfileControllerProvider.notifier).save();
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _isSaving = false;
+        _saveErrorMessage = 'Salon bilgileri kaydedilemedi, tekrar dene.';
+      });
+      return;
+    }
+    if (!mounted) return;
+    ref.read(panelStackControllerProvider.notifier).pop();
   }
 
   @override
