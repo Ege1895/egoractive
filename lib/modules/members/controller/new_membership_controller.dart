@@ -93,6 +93,7 @@ class NewMembershipController extends _$NewMembershipController {
       await firestore.collection('users').doc(memberId).update({
         'remainingSessions': package.sessionCount,
         'packageEndDate': state.endDate.toIso8601String(),
+        'packageName': package.name,
       });
 
       await ref

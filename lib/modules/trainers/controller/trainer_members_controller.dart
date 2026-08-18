@@ -11,7 +11,10 @@ part 'trainer_members_controller.g.dart';
 /// zamanlı dinler. Security Rules ile de garanti altına alınacak (F2-6) —
 /// bu sorgu client tarafı ilk savunma hattı.
 @riverpod
-Stream<List<TrainerMemberSummary>> _membersForTrainer(_MembersForTrainerRef ref, String trainerUid) {
+Stream<List<TrainerMemberSummary>> _membersForTrainer(
+  _MembersForTrainerRef ref,
+  String trainerUid,
+) {
   return FirebaseFirestore.instance
       .collection('users')
       .where('role', isEqualTo: 'member')
@@ -20,16 +23,21 @@ Stream<List<TrainerMemberSummary>> _membersForTrainer(_MembersForTrainerRef ref,
       .map((snapshot) => snapshot.docs.map(_toSummary).toList());
 }
 
-TrainerMemberSummary _toSummary(QueryDocumentSnapshot<Map<String, dynamic>> doc) {
+TrainerMemberSummary _toSummary(
+  QueryDocumentSnapshot<Map<String, dynamic>> doc,
+) {
   final data = doc.data();
   final name = (data['name'] as String?)?.trim() ?? '';
+  final remainingSessions = (data['remainingSessions'] as num?)?.toInt() ?? 0;
+  final packageName = (data['packageName'] as String?)?.trim() ?? '';
   return TrainerMemberSummary(
     id: doc.id,
     initials: _initialsFor(name),
     name: name,
-    // Paket/seans verisi henüz gerçek değil (F3'te dolacak) — placeholder.
-    packageName: 'Paketi yok',
-    remainingSessions: 0,
+    packageName: remainingSessions <= 0 || packageName.isEmpty
+        ? 'Paketi yok'
+        : packageName,
+    remainingSessions: remainingSessions,
   );
 }
 
