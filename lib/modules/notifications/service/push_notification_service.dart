@@ -8,7 +8,9 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/panels/panel_stack_controller.dart';
+import '../../feedback/ui/panels/feedback_panel.dart';
 import '../../sessions/ui/panels/attendance_confirm_panel.dart';
+import '../../sessions/ui/panels/trainer_notifications_panel.dart';
 import '../../../firebase_options.dart';
 
 /// Uygulama tamamen kapalıyken gelen bildirimler ayrı bir isolate'te işlenir
@@ -27,7 +29,8 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 class PushNotificationService {
   PushNotificationService();
 
-  final FlutterLocalNotificationsPlugin _localNotifications = FlutterLocalNotificationsPlugin();
+  final FlutterLocalNotificationsPlugin _localNotifications =
+      FlutterLocalNotificationsPlugin();
 
   static const _androidChannel = AndroidNotificationChannel(
     'session_reminders',
@@ -40,7 +43,9 @@ class PushNotificationService {
     await FirebaseMessaging.instance.requestPermission();
 
     await _localNotifications
-        .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >()
         ?.createNotificationChannel(_androidChannel);
 
     await _localNotifications.initialize(
@@ -48,7 +53,8 @@ class PushNotificationService {
         android: AndroidInitializationSettings('@mipmap/ic_launcher'),
         iOS: DarwinInitializationSettings(),
       ),
-      onDidReceiveNotificationResponse: (_) => _navigateToReminderPanel(container),
+      onDidReceiveNotificationResponse: (response) =>
+          _navigateForType(container, response.payload),
     );
 
     // APNS token'ın cihaza/simülatöre ulaşması gecikebilir (ya da kullanıcı
@@ -66,10 +72,14 @@ class PushNotificationService {
     FirebaseMessaging.instance.onTokenRefresh.listen(_saveToken);
 
     FirebaseMessaging.onMessage.listen(_showForegroundNotification);
-    FirebaseMessaging.onMessageOpenedApp.listen((_) => _navigateToReminderPanel(container));
+    FirebaseMessaging.onMessageOpenedApp.listen(
+      (message) => _navigateForType(container, message.data['type'] as String?),
+    );
 
     final initialMessage = await FirebaseMessaging.instance.getInitialMessage();
-    if (initialMessage != null) _navigateToReminderPanel(container);
+    if (initialMessage != null) {
+      _navigateForType(container, initialMessage.data['type'] as String?);
+    }
   }
 
   /// `locale` de burada kaydediliyor — Cloud Functions'ın gönderdiği push
@@ -77,14 +87,13 @@ class PushNotificationService {
   Future<void> _saveToken(String token) async {
     final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid == null) return;
-    final locale = PlatformDispatcher.instance.locale.languageCode == 'tr' ? 'tr' : 'en';
-    await FirebaseFirestore.instance.collection('users').doc(uid).set(
-      {
-        'fcmTokens': FieldValue.arrayUnion([token]),
-        'locale': locale,
-      },
-      SetOptions(merge: true),
-    );
+    final locale = PlatformDispatcher.instance.locale.languageCode == 'tr'
+        ? 'tr'
+        : 'en';
+    await FirebaseFirestore.instance.collection('users').doc(uid).set({
+      'fcmTokens': FieldValue.arrayUnion([token]),
+      'locale': locale,
+    }, SetOptions(merge: true));
   }
 
   Future<void> _showForegroundNotification(RemoteMessage message) async {
@@ -95,15 +104,35 @@ class PushNotificationService {
       title: notification.title,
       body: notification.body,
       notificationDetails: NotificationDetails(
-        android: AndroidNotificationDetails(_androidChannel.id, _androidChannel.name),
+        android: AndroidNotificationDetails(
+          _androidChannel.id,
+          _androidChannel.name,
+        ),
         iOS: const DarwinNotificationDetails(),
       ),
+      payload: message.data['type'] as String?,
     );
   }
 
-  /// Bildirime dokununca gidilecek (mock) panel — seans hatırlatması,
-  /// üyenin "Gelecek misin?" onay ekranına düşer (F2-7 kabul kriteri).
-  void _navigateToReminderPanel(ProviderContainer container) {
-    container.read(panelStackControllerProvider.notifier).push(const AttendanceConfirmPanel());
+  /// Bildirime dokununca doğru panele yönlendirir — önceden `type` fark
+  /// etmeksizin (bir salon duyurusu bile olsa) hep [AttendanceConfirmPanel]'e
+  /// gidiliyordu. Cloud Functions tarafı zaten her push'ta `data.type`
+  /// gönderiyor (bkz. session-reminder-check.ts, session-completion-check.ts,
+  /// feedback-reminder-check.ts, send-manual-notification.ts).
+  void _navigateForType(ProviderContainer container, String? type) {
+    final panelStack = container.read(panelStackControllerProvider.notifier);
+    switch (type) {
+      case 'session_reminder':
+        panelStack.push(const AttendanceConfirmPanel());
+      case 'session_completion':
+        panelStack.push(const TrainerNotificationsPanel());
+      case 'feedback_reminder':
+        panelStack.push(const FeedbackPanel());
+      default:
+        // manual_notification (salon duyurusu) ya da bilinmeyen bir tür —
+        // ilgisiz bir onay ekranına zorlamak yerine uygulamayı sadece ön
+        // plana getirmekle yetinilir.
+        break;
+    }
   }
 }
