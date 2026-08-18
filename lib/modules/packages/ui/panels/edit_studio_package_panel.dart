@@ -35,6 +35,8 @@ class _EditStudioPackagePanelState
   bool _isSaving = false;
   bool _isDeleting = false;
   String? _nameError;
+  String? _sessionCountError;
+  String? _validityError;
   String? _errorMessage;
 
   @override
@@ -42,11 +44,14 @@ class _EditStudioPackagePanelState
     super.initState();
     final existing = widget.existing;
     _nameController = TextEditingController(text: existing?.name ?? '');
+    // Önceden yeni paket eklerken bu iki alan sabit 12/90 dolu geliyordu —
+    // admin fark etmeden gerçek olmayan değerleri kaydedebiliyordu. Yeni
+    // pakette boş başlar, sadece düzenlerken gerçek değer dolu gelir.
     _sessionCountController = TextEditingController(
-      text: '${existing?.sessionCount ?? 12}',
+      text: existing == null ? '' : '${existing.sessionCount}',
     );
     _validityController = TextEditingController(
-      text: '${existing?.validityDays ?? 90}',
+      text: existing == null ? '' : '${existing.validityDays}',
     );
     _priceController = TextEditingController(text: '${existing?.priceTl ?? 0}');
     _sessionType = existing?.sessionType ?? PackageSessionType.solo;
@@ -166,17 +171,24 @@ class _EditStudioPackagePanelState
                             Expanded(
                               child: AppTextField(
                                 label: 'Seans sayısı',
+                                hint: 'Örn. 12',
                                 controller: _sessionCountController,
                                 keyboardType: TextInputType.number,
-                                onChanged: (_) => setState(() {}),
+                                errorText: _sessionCountError,
+                                onChanged: (_) =>
+                                    setState(() => _sessionCountError = null),
                               ),
                             ),
                             const SizedBox(width: AppSpacing.sm),
                             Expanded(
                               child: AppTextField(
                                 label: 'Geçerlilik (gün)',
+                                hint: 'Örn. 90',
                                 controller: _validityController,
                                 keyboardType: TextInputType.number,
+                                errorText: _validityError,
+                                onChanged: (_) =>
+                                    setState(() => _validityError = null),
                               ),
                             ),
                           ],
@@ -359,10 +371,31 @@ class _EditStudioPackagePanelState
                         ? null
                         : () async {
                             final name = _nameController.text.trim();
-                            if (name.isEmpty) {
-                              setState(
-                                () => _nameError = 'Paket adı boş bırakılamaz.',
-                              );
+                            final sessionCount = int.tryParse(
+                              _sessionCountController.text.trim(),
+                            );
+                            final validityDays = int.tryParse(
+                              _validityController.text.trim(),
+                            );
+                            final nameError = name.isEmpty
+                                ? 'Paket adı boş bırakılamaz.'
+                                : null;
+                            final sessionCountError =
+                                sessionCount == null || sessionCount <= 0
+                                ? 'Geçerli bir seans sayısı gir.'
+                                : null;
+                            final validityError =
+                                validityDays == null || validityDays <= 0
+                                ? 'Geçerli bir gün sayısı gir.'
+                                : null;
+                            if (nameError != null ||
+                                sessionCountError != null ||
+                                validityError != null) {
+                              setState(() {
+                                _nameError = nameError;
+                                _sessionCountError = sessionCountError;
+                                _validityError = validityError;
+                              });
                               return;
                             }
                             if (widget.existing == null &&
@@ -384,14 +417,8 @@ class _EditStudioPackagePanelState
                                       name.toLowerCase().replaceAll(' ', '-'),
                                   name: name,
                                   sessionType: _sessionType,
-                                  sessionCount:
-                                      int.tryParse(
-                                        _sessionCountController.text,
-                                      ) ??
-                                      0,
-                                  validityDays:
-                                      int.tryParse(_validityController.text) ??
-                                      0,
+                                  sessionCount: sessionCount!,
+                                  validityDays: validityDays!,
                                   priceTl:
                                       int.tryParse(_priceController.text) ?? 0,
                                   activeForSale: _activeForSale,
