@@ -387,7 +387,9 @@ class _WeekDayCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.appColors;
     final typography = context.appTypography;
-    final isToday = day.year == 2026 && day.month == 8 && day.day == 3;
+    final now = DateTime.now();
+    final isToday =
+        day.year == now.year && day.month == now.month && day.day == now.day;
 
     return Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.sm),
