@@ -252,6 +252,10 @@ class _AddMeasurementPanelState extends BasePanelState<AddMeasurementPanel> {
       final parsed = double.tryParse(raw);
       if (parsed != null) values[entry.key] = parsed;
     }
+    if (values.isEmpty) {
+      setState(() => _errorMessage = 'En az bir ölçü gir.');
+      return;
+    }
     setState(() {
       _isSaving = true;
       _errorMessage = null;
