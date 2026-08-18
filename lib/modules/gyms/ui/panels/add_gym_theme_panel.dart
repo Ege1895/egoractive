@@ -22,15 +22,33 @@ class AddGymThemePanel extends BasePanel {
 
 class _AddGymThemePanelState extends BasePanelState<AddGymThemePanel> {
   late final TextEditingController _nameController;
+  late final TextEditingController _hexController;
   late bool _useGymLogo;
   Color _selectedColor = AppThemePalette.colors.first;
   bool _isSaving = false;
+  String? _hexError;
 
   @override
   void initState() {
     super.initState();
     _nameController = TextEditingController();
+    _hexController = TextEditingController(text: _hexOf(_selectedColor));
     _useGymLogo = ref.read(gymThemeControllerProvider).watermarkEnabled;
+  }
+
+  static String _hexOf(Color color) =>
+      color.toARGB32().toRadixString(16).substring(2).toUpperCase();
+
+  void _onHexChanged(String value) {
+    final normalized = value.trim().replaceFirst('#', '');
+    if (!RegExp(r'^[0-9a-fA-F]{6}$').hasMatch(normalized)) {
+      setState(() => _hexError = 'Geçerli bir HEX kod gir (ör. 05A6FA).');
+      return;
+    }
+    setState(() {
+      _hexError = null;
+      _selectedColor = Color(int.parse('FF$normalized', radix: 16));
+    });
   }
 
   @override
@@ -126,8 +144,11 @@ class _AddGymThemePanelState extends BasePanelState<AddGymThemePanel> {
                             final color = AppThemePalette.colors[index];
                             final selected = color == _selectedColor;
                             return GestureDetector(
-                              onTap: () =>
-                                  setState(() => _selectedColor = color),
+                              onTap: () => setState(() {
+                                _selectedColor = color;
+                                _hexError = null;
+                                _hexController.text = _hexOf(color);
+                              }),
                               child: Container(
                                 decoration: BoxDecoration(
                                   color: color,
@@ -162,41 +183,29 @@ class _AddGymThemePanelState extends BasePanelState<AddGymThemePanel> {
                           ),
                         ),
                         const SizedBox(height: AppSpacing.sm),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: AppSpacing.md,
-                          ),
-                          constraints: const BoxConstraints(minHeight: 48),
-                          decoration: BoxDecoration(
-                            color: colors.surfaceRaised,
-                            borderRadius: BorderRadius.circular(
-                              AppSpacing.radiusInner,
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: 48,
+                              height: 48,
+                              margin: const EdgeInsets.only(top: AppSpacing.xs),
+                              decoration: BoxDecoration(
+                                color: _selectedColor,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
                             ),
-                          ),
-                          child: Row(
-                            children: [
-                              Container(
-                                width: 26,
-                                height: 26,
-                                decoration: BoxDecoration(
-                                  color: _selectedColor,
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
+                            const SizedBox(width: AppSpacing.md),
+                            Expanded(
+                              child: AppTextField(
+                                label: null,
+                                controller: _hexController,
+                                prefixText: '#',
+                                errorText: _hexError,
+                                onChanged: _onHexChanged,
                               ),
-                              const SizedBox(width: AppSpacing.md),
-                              Expanded(
-                                child: Text(
-                                  '#${_selectedColor.toARGB32().toRadixString(16).substring(2).toUpperCase()}',
-                                  style: typography.dataMedium.copyWith(
-                                    color: colors.onSurface,
-                                    fontSize: 16,
-                                    letterSpacing: 0.5,
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                         const SizedBox(height: AppSpacing.xs),
                         Text(
@@ -436,6 +445,7 @@ class _AddGymThemePanelState extends BasePanelState<AddGymThemePanel> {
   @override
   void dispose() {
     _nameController.dispose();
+    _hexController.dispose();
     super.dispose();
   }
 }
