@@ -557,7 +557,6 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
     NewMemberController controller,
   ) {
     final colors = context.appColors;
-    final trainers = ref.read(adminTrainersControllerProvider);
     showModalBottomSheet<void>(
       context: context,
       backgroundColor: colors.surface,
@@ -580,14 +579,45 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
                   ),
                 ),
                 const SizedBox(height: AppSpacing.md),
-                for (final trainer in trainers)
-                  _TrainerOption(
-                    trainer: trainer,
-                    onTap: () {
-                      controller.selectTrainer(trainer.id, trainer.name);
-                      Navigator.of(sheetContext).pop();
-                    },
-                  ),
+                // `ref.read` ile tek seferlik alınan liste, sheet açıldığı
+                // anda antrenörler Firestore'dan henüz gelmemişse (ilk
+                // dinlemede stream henüz ilk snapshot'ını vermemişse) hep
+                // boş kalıyordu — sheet kendi build'i yenilenmediği için
+                // veri gelse bile ekrana yansımıyordu. Consumer ile
+                // reaktif izleniyor.
+                Consumer(
+                  builder: (context, ref, _) {
+                    final trainers = ref.watch(adminTrainersControllerProvider);
+                    if (trainers.isEmpty) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: AppSpacing.lg,
+                        ),
+                        child: Text(
+                          'Henüz antrenör yok.',
+                          style: context.appTypography.bodyMedium.copyWith(
+                            color: colors.onSurfaceMuted,
+                          ),
+                        ),
+                      );
+                    }
+                    return Column(
+                      children: [
+                        for (final trainer in trainers)
+                          _TrainerOption(
+                            trainer: trainer,
+                            onTap: () {
+                              controller.selectTrainer(
+                                trainer.id,
+                                trainer.name,
+                              );
+                              Navigator.of(sheetContext).pop();
+                            },
+                          ),
+                      ],
+                    );
+                  },
+                ),
               ],
             ),
           ),
