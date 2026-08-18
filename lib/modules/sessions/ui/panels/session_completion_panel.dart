@@ -325,12 +325,29 @@ class _SessionCompletionPanelState
                         ),
                       ),
                       const SizedBox(height: AppSpacing.md),
-                      AppButton(
-                        label: 'Geri al',
-                        variant: AppButtonVariant.secondary,
-                        onPressed: () =>
-                            setState(() => _answer = _CompletionAnswer.pending),
-                      ),
+                      if (widget.sessionId != null) ...[
+                        // Onay zaten Firestore'a yazıldı (remainingSessions
+                        // transaction içinde düşürüldü) — "Geri al" bu
+                        // yazımı geri almadan yalnızca local state'i
+                        // sıfırlarsa, kullanıcı tekrar onaylayınca kalan
+                        // ders sayısı iki kez düşer. Gerçek bir compensating
+                        // write olmadığı için yeniden gönderim tamamen
+                        // engelleniyor.
+                        AppButton(
+                          label: 'Bitti',
+                          variant: AppButtonVariant.secondary,
+                          onPressed: () => ref
+                              .read(panelStackControllerProvider.notifier)
+                              .pop(),
+                        ),
+                      ] else
+                        AppButton(
+                          label: 'Geri al',
+                          variant: AppButtonVariant.secondary,
+                          onPressed: () => setState(
+                            () => _answer = _CompletionAnswer.pending,
+                          ),
+                        ),
                     ],
                   ],
                 ),
