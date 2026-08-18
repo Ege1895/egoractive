@@ -9,10 +9,15 @@ import 'package:egoractive/modules/auth/repository/auth_repository.dart';
 /// panel geçişlerini test eder, Firebase entegrasyonunu değil.
 class _FakeAuthRepository implements AuthRepository {
   @override
-  Future<void> login(String phoneDigits) => Future<void>.delayed(const Duration(seconds: 2));
+  Future<void> login(String phoneDigits) =>
+      Future<void>.delayed(const Duration(seconds: 2));
 
   @override
-  Future<void> deleteAccount() => Future<void>.delayed(const Duration(seconds: 2));
+  Future<void> deleteAccount() =>
+      Future<void>.delayed(const Duration(seconds: 2));
+
+  @override
+  Future<void> signOut() async {}
 }
 
 /// Splash'ın mock oturum kontrolü süresi geçip [OnboardingRolePanel]'e
@@ -40,7 +45,9 @@ void main() {
     (tester) async {
       await tester.pumpWidget(
         ProviderScope(
-          overrides: [authRepositoryProvider.overrideWith((ref) => _FakeAuthRepository())],
+          overrides: [
+            authRepositoryProvider.overrideWith((ref) => _FakeAuthRepository()),
+          ],
           child: const EgoractiveApp(),
         ),
       );
@@ -60,7 +67,10 @@ void main() {
       // durmaz — tek kare basıp geçişin gerçekleştiğini doğruluyoruz.
       await tester.pump();
       expect(find.text('Seni tanıyoruz…'), findsOneWidget);
-      expect(find.text('+90 532 418 76 05 numarası stüdyoda aranıyor.'), findsOneWidget);
+      expect(
+        find.text('+90 532 418 76 05 numarası stüdyoda aranıyor.'),
+        findsOneWidget,
+      );
 
       // Fake login isteği (2sn) hâlâ sürerken iptal edilebiliyor.
       await tester.tap(find.text('İptal'));
@@ -79,7 +89,9 @@ void main() {
     (tester) async {
       await tester.pumpWidget(
         ProviderScope(
-          overrides: [authRepositoryProvider.overrideWith((ref) => _FakeAuthRepository())],
+          overrides: [
+            authRepositoryProvider.overrideWith((ref) => _FakeAuthRepository()),
+          ],
           child: const EgoractiveApp(),
         ),
       );
@@ -101,7 +113,9 @@ void main() {
     },
   );
 
-  testWidgets('Splash cannot be reached again via back after replaceRoot', (tester) async {
+  testWidgets('Splash cannot be reached again via back after replaceRoot', (
+    tester,
+  ) async {
     await tester.pumpWidget(const ProviderScope(child: EgoractiveApp()));
     await _navigateToPhoneLogin(tester);
 

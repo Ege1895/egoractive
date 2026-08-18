@@ -27,10 +27,15 @@ class _RootPanelState extends BasePanelState<_RootPanel> {
 /// panel geçişlerini test eder, Firebase entegrasyonunu değil.
 class _FakeAuthRepository implements AuthRepository {
   @override
-  Future<void> login(String phoneDigits) => Future<void>.delayed(const Duration(seconds: 2));
+  Future<void> login(String phoneDigits) =>
+      Future<void>.delayed(const Duration(seconds: 2));
 
   @override
-  Future<void> deleteAccount() => Future<void>.delayed(const Duration(seconds: 2));
+  Future<void> deleteAccount() =>
+      Future<void>.delayed(const Duration(seconds: 2));
+
+  @override
+  Future<void> signOut() async {}
 }
 
 void main() {
@@ -38,7 +43,9 @@ void main() {
     'Hesabımı sil is disabled until the checkbox is acknowledged, then navigates to login on completion',
     (tester) async {
       final container = ProviderContainer(
-        overrides: [authRepositoryProvider.overrideWith((ref) => _FakeAuthRepository())],
+        overrides: [
+          authRepositoryProvider.overrideWith((ref) => _FakeAuthRepository()),
+        ],
       );
       addTearDown(container.dispose);
       final notifier = container.read(panelStackControllerProvider.notifier);
@@ -49,7 +56,10 @@ void main() {
         UncontrolledProviderScope(
           container: container,
           child: MaterialApp(
-            theme: AppTheme.build(colors: AppColorScheme.defaultScheme(), typography: AppTypography.standard()),
+            theme: AppTheme.build(
+              colors: AppColorScheme.defaultScheme(),
+              typography: AppTypography.standard(),
+            ),
             home: const PanelStackView(),
           ),
         ),
@@ -63,7 +73,9 @@ void main() {
       await tester.pump();
       expect(find.text('Hesabını silmek geri alınamaz'), findsOneWidget);
 
-      await tester.tap(find.text('Anladım, hesabım ve tüm verilerim silinsin.'));
+      await tester.tap(
+        find.text('Anladım, hesabım ve tüm verilerim silinsin.'),
+      );
       await tester.pump();
 
       await tester.tap(find.text('Hesabımı sil'));
@@ -87,7 +99,10 @@ void main() {
       UncontrolledProviderScope(
         container: container,
         child: MaterialApp(
-          theme: AppTheme.build(colors: AppColorScheme.defaultScheme(), typography: AppTypography.standard()),
+          theme: AppTheme.build(
+            colors: AppColorScheme.defaultScheme(),
+            typography: AppTypography.standard(),
+          ),
           home: const PanelStackView(),
         ),
       ),

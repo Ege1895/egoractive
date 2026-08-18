@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/remote_config/remote_config_service.dart';
@@ -83,9 +85,14 @@ class AuthController extends _$AuthController {
     );
   }
 
-  /// Oturumu kapatır — F1-11'de gerçek `FirebaseAuth.signOut()` çağıracak.
+  /// Oturumu kapatır. UI hemen giriş ekranına döndüğü için local state
+  /// senkron sıfırlanıyor; gerçek `FirebaseAuth.signOut()` arkada
+  /// tamamlanıyor — aksi halde (önceki sürümde olduğu gibi) Auth oturumu
+  /// canlı kalır ve uygulama yeniden açıldığında aynı hesaba otomatik
+  /// giriş yapılır.
   void logout() {
     state = const AuthState();
+    unawaited(ref.read(authRepositoryProvider).signOut().catchError((_) {}));
   }
 
   String _messageFor(AuthLoginErrorReason reason) {
