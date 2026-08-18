@@ -91,7 +91,9 @@ class _AttendanceConfirmPanelState
                           ),
                           const SizedBox(height: AppSpacing.sm),
                           Text(
-                            'Berk Aydın seni bekliyor. Cevabını dersten 2 saat öncesine kadar değiştirebilirsin.',
+                            session.meta.isEmpty
+                                ? 'Cevabını dersten 2 saat öncesine kadar değiştirebilirsin.'
+                                : '${session.meta} seni bekliyor. Cevabını dersten 2 saat öncesine kadar değiştirebilirsin.',
                             style: typography.bodyMedium.copyWith(
                               color: colors.onSurfaceVariant,
                             ),
@@ -251,8 +253,10 @@ class _AttendanceConfirmPanelState
                                   Text(
                                     state.attendanceAnswer ==
                                             AttendanceAnswer.coming
-                                        ? "Berk Aydın'ın programında yerin ayrıldı. 4 Ağustos 16:30'a kadar değiştirebilirsin."
-                                        : "Ders kalan dersinden düşmedi, antrenörüne iletildi. 4 Ağustos 16:30'a kadar değiştirebilirsin.",
+                                        ? (session.meta.isEmpty
+                                              ? "Programda yerin ayrıldı. Dersten 2 saat öncesine kadar değiştirebilirsin."
+                                              : "${session.meta}'ın programında yerin ayrıldı. Dersten 2 saat öncesine kadar değiştirebilirsin.")
+                                        : "Ders kalan dersinden düşmedi, antrenörüne iletildi. Dersten 2 saat öncesine kadar değiştirebilirsin.",
                                     style: typography.bodyMedium.copyWith(
                                       color: colors.onSurfaceVariant,
                                     ),
