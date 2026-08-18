@@ -4,10 +4,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../../../shared/mock/trainer_mock_data.dart';
 import '../../../sessions/ui/panels/session_completion_panel.dart';
 import '../../../sessions/ui/panels/trainer_notifications_panel.dart';
 import '../../controller/trainer_home_controller.dart';
+import '../../controller/trainer_profile_controller.dart';
 import '../../domain/pending_confirmation.dart';
 import '../../domain/schedule_slot.dart';
 
@@ -23,6 +23,7 @@ class TrainerHomePanel extends ConsumerWidget {
     final state = ref.watch(trainerHomeControllerProvider);
     final controller = ref.read(trainerHomeControllerProvider.notifier);
     final panelStack = ref.read(panelStackControllerProvider.notifier);
+    final profile = ref.watch(trainerProfileControllerProvider);
 
     return Scaffold(
       body: SafeArea(
@@ -45,7 +46,7 @@ class TrainerHomePanel extends ConsumerWidget {
                   ),
                   alignment: Alignment.center,
                   child: Text(
-                    TrainerMockData.trainerInitials,
+                    profile.initials,
                     style: typography.headingSmall.copyWith(
                       color: colors.onPrimaryContainer,
                       fontSize: 16,
@@ -64,7 +65,9 @@ class TrainerHomePanel extends ConsumerWidget {
                         ),
                       ),
                       Text(
-                        'İyi çalışmalar ${TrainerMockData.trainerName.split(' ').first}',
+                        profile.name.trim().isEmpty
+                            ? 'İyi çalışmalar'
+                            : 'İyi çalışmalar ${profile.name.trim().split(' ').first}',
                         style: typography.headingMedium.copyWith(
                           color: colors.onSurface,
                         ),
