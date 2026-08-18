@@ -33,10 +33,7 @@ class _FeedbackPanelState extends BasePanelState<FeedbackPanel> {
   @override
   void initState() {
     super.initState();
-    _commentController = TextEditingController(
-      text:
-          'Isınma bölümü bu hafta çok iyiydi, esneme için 5 dakika daha olsa harika olur.',
-    );
+    _commentController = TextEditingController();
   }
 
   @override
@@ -178,11 +175,17 @@ class _FeedbackPanelState extends BasePanelState<FeedbackPanel> {
                               color: colors.onSurfaceVariant,
                               fontSize: 15,
                             ),
-                            decoration: const InputDecoration(
+                            decoration: InputDecoration(
                               isDense: true,
                               border: InputBorder.none,
                               counterText: '',
                               contentPadding: EdgeInsets.zero,
+                              hintText:
+                                  'Isınma bölümü bu hafta çok iyiydi, esneme için 5 dakika daha olsa harika olur.',
+                              hintStyle: typography.bodyLarge.copyWith(
+                                color: colors.onSurfaceMuted,
+                                fontSize: 15,
+                              ),
                             ),
                           ),
                           Text(
