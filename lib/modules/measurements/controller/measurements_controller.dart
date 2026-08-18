@@ -182,11 +182,20 @@ class MeasurementsController extends _$MeasurementsController {
     if (entries == null || entries.isEmpty) return mock;
 
     final real = _toState(entries, selectedDate: selectedDate);
+    // real.points sadece en az bir kez ölçülmüş metrikleri içerir — mock'un
+    // varsayılan selectedMetric'i (bel) o üye hiç bel ölçmediyse burada
+    // karşılık bulamaz, points[selectedMetric]! UI'da null'a patlar.
+    final selectedMetric = real.points.containsKey(mock.selectedMetric)
+        ? mock.selectedMetric
+        : (real.points.keys.isEmpty
+              ? mock.selectedMetric
+              : real.points.keys.first);
     return mock.copyWith(
       points: real.points,
       series: real.series,
       recordedDates: real.recordedDates,
       selectedDate: selectedDate,
+      selectedMetric: selectedMetric,
       hasRealData: true,
     );
   }
