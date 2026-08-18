@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../core/constants/app_spacing.dart';
 import '../../core/theme/app_theme.dart';
@@ -15,6 +16,8 @@ class AppTextField extends StatelessWidget {
     this.obscureText = false,
     this.enabled = true,
     this.onChanged,
+    this.inputFormatters,
+    this.prefixText,
     super.key,
   });
 
@@ -26,6 +29,10 @@ class AppTextField extends StatelessWidget {
   final bool obscureText;
   final bool enabled;
   final ValueChanged<String>? onChanged;
+  final List<TextInputFormatter>? inputFormatters;
+
+  /// Girdinin başında sabit gösterilen, düzenlenemeyen metin (ör. "+90 ").
+  final String? prefixText;
 
   @override
   Widget build(BuildContext context) {
@@ -38,11 +45,14 @@ class AppTextField extends StatelessWidget {
       obscureText: obscureText,
       enabled: enabled,
       onChanged: onChanged,
+      inputFormatters: inputFormatters,
       style: context.appTypography.bodyLarge.copyWith(color: colors.onSurface),
       decoration: InputDecoration(
         labelText: label,
         hintText: hint,
         errorText: errorText,
+        prefixText: prefixText,
+        prefixStyle: context.appTypography.bodyLarge.copyWith(color: colors.onSurfaceVariant),
         hintStyle: context.appTypography.bodyLarge.copyWith(color: colors.onSurfaceMuted),
         filled: true,
         fillColor: colors.surfaceRaised,
