@@ -29,6 +29,11 @@ mixin _$SubscriptionState {
   /// plan kartının "bekleniyor" durumunda gösterileceğini belirler.
   String? get pendingProductId => throw _privateConstructorUsedError;
 
+  /// Satın alma hatası (network, mağaza reddi, doğrulama başarısızlığı).
+  /// Kullanıcı kendi isteğiyle iptal ederse (`PurchaseStatus.canceled`)
+  /// bu alan boş kalır — o zaten kendi kararı, hata değil.
+  String? get purchaseErrorMessage => throw _privateConstructorUsedError;
+
   /// Create a copy of SubscriptionState
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -52,6 +57,7 @@ abstract class $SubscriptionStateCopyWith<$Res> {
     String? productId,
     bool isPurchasing,
     String? pendingProductId,
+    String? purchaseErrorMessage,
   });
 }
 
@@ -78,6 +84,7 @@ class _$SubscriptionStateCopyWithImpl<$Res, $Val extends SubscriptionState>
     Object? productId = freezed,
     Object? isPurchasing = null,
     Object? pendingProductId = freezed,
+    Object? purchaseErrorMessage = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -113,6 +120,10 @@ class _$SubscriptionStateCopyWithImpl<$Res, $Val extends SubscriptionState>
                 ? _value.pendingProductId
                 : pendingProductId // ignore: cast_nullable_to_non_nullable
                       as String?,
+            purchaseErrorMessage: freezed == purchaseErrorMessage
+                ? _value.purchaseErrorMessage
+                : purchaseErrorMessage // ignore: cast_nullable_to_non_nullable
+                      as String?,
           )
           as $Val,
     );
@@ -137,6 +148,7 @@ abstract class _$$SubscriptionStateImplCopyWith<$Res>
     String? productId,
     bool isPurchasing,
     String? pendingProductId,
+    String? purchaseErrorMessage,
   });
 }
 
@@ -162,6 +174,7 @@ class __$$SubscriptionStateImplCopyWithImpl<$Res>
     Object? productId = freezed,
     Object? isPurchasing = null,
     Object? pendingProductId = freezed,
+    Object? purchaseErrorMessage = freezed,
   }) {
     return _then(
       _$SubscriptionStateImpl(
@@ -197,6 +210,10 @@ class __$$SubscriptionStateImplCopyWithImpl<$Res>
             ? _value.pendingProductId
             : pendingProductId // ignore: cast_nullable_to_non_nullable
                   as String?,
+        purchaseErrorMessage: freezed == purchaseErrorMessage
+            ? _value.purchaseErrorMessage
+            : purchaseErrorMessage // ignore: cast_nullable_to_non_nullable
+                  as String?,
       ),
     );
   }
@@ -214,6 +231,7 @@ class _$SubscriptionStateImpl implements _SubscriptionState {
     this.productId,
     this.isPurchasing = false,
     this.pendingProductId,
+    this.purchaseErrorMessage,
   });
 
   @override
@@ -238,9 +256,15 @@ class _$SubscriptionStateImpl implements _SubscriptionState {
   @override
   final String? pendingProductId;
 
+  /// Satın alma hatası (network, mağaza reddi, doğrulama başarısızlığı).
+  /// Kullanıcı kendi isteğiyle iptal ederse (`PurchaseStatus.canceled`)
+  /// bu alan boş kalır — o zaten kendi kararı, hata değil.
+  @override
+  final String? purchaseErrorMessage;
+
   @override
   String toString() {
-    return 'SubscriptionState(status: $status, trialStartedAt: $trialStartedAt, trialEndsAt: $trialEndsAt, startedAt: $startedAt, expiresAt: $expiresAt, productId: $productId, isPurchasing: $isPurchasing, pendingProductId: $pendingProductId)';
+    return 'SubscriptionState(status: $status, trialStartedAt: $trialStartedAt, trialEndsAt: $trialEndsAt, startedAt: $startedAt, expiresAt: $expiresAt, productId: $productId, isPurchasing: $isPurchasing, pendingProductId: $pendingProductId, purchaseErrorMessage: $purchaseErrorMessage)';
   }
 
   @override
@@ -262,7 +286,9 @@ class _$SubscriptionStateImpl implements _SubscriptionState {
             (identical(other.isPurchasing, isPurchasing) ||
                 other.isPurchasing == isPurchasing) &&
             (identical(other.pendingProductId, pendingProductId) ||
-                other.pendingProductId == pendingProductId));
+                other.pendingProductId == pendingProductId) &&
+            (identical(other.purchaseErrorMessage, purchaseErrorMessage) ||
+                other.purchaseErrorMessage == purchaseErrorMessage));
   }
 
   @override
@@ -276,6 +302,7 @@ class _$SubscriptionStateImpl implements _SubscriptionState {
     productId,
     isPurchasing,
     pendingProductId,
+    purchaseErrorMessage,
   );
 
   /// Create a copy of SubscriptionState
@@ -300,6 +327,7 @@ abstract class _SubscriptionState implements SubscriptionState {
     final String? productId,
     final bool isPurchasing,
     final String? pendingProductId,
+    final String? purchaseErrorMessage,
   }) = _$SubscriptionStateImpl;
 
   @override
@@ -321,6 +349,12 @@ abstract class _SubscriptionState implements SubscriptionState {
   /// plan kartının "bekleniyor" durumunda gösterileceğini belirler.
   @override
   String? get pendingProductId;
+
+  /// Satın alma hatası (network, mağaza reddi, doğrulama başarısızlığı).
+  /// Kullanıcı kendi isteğiyle iptal ederse (`PurchaseStatus.canceled`)
+  /// bu alan boş kalır — o zaten kendi kararı, hata değil.
+  @override
+  String? get purchaseErrorMessage;
 
   /// Create a copy of SubscriptionState
   /// with the given fields replaced by the non-null parameter values.

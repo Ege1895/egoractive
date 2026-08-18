@@ -10,7 +10,10 @@ import '../repository/subscription_repository.dart';
 part 'subscription_controller.g.dart';
 
 @riverpod
-Stream<SubscriptionState> _subscriptionStateForGym(_SubscriptionStateForGymRef ref, String gymId) {
+Stream<SubscriptionState> _subscriptionStateForGym(
+  _SubscriptionStateForGymRef ref,
+  String gymId,
+) {
   return ref.watch(subscriptionRepositoryProvider).watchState(gymId);
 }
 
@@ -35,32 +38,54 @@ class SubscriptionController extends _$SubscriptionController {
   @override
   SubscriptionState build() {
     ref.onDispose(() => _purchaseSub?.cancel());
-    _purchaseSub ??= ref.watch(subscriptionRepositoryProvider).purchaseUpdates.listen(_onPurchaseUpdate);
+    _purchaseSub ??= ref
+        .watch(subscriptionRepositoryProvider)
+        .purchaseUpdates
+        .listen(_onPurchaseUpdate);
 
     final gymId = ref.watch(activeGymIdProvider).valueOrNull;
     final base = gymId == null
         ? const SubscriptionState()
-        : ref.watch(_subscriptionStateForGymProvider(gymId)).valueOrNull ?? const SubscriptionState();
-    return base.copyWith(isPurchasing: _isPurchasing, pendingProductId: _pendingProductId);
+        : ref.watch(_subscriptionStateForGymProvider(gymId)).valueOrNull ??
+              const SubscriptionState();
+    return base.copyWith(
+      isPurchasing: _isPurchasing,
+      pendingProductId: _pendingProductId,
+    );
   }
 
-  Future<List<SubscriptionProduct>> fetchProducts() => ref.read(subscriptionRepositoryProvider).fetchProducts();
+  Future<List<SubscriptionProduct>> fetchProducts() =>
+      ref.read(subscriptionRepositoryProvider).fetchProducts();
 
   /// `isPurchasing`, satın alma sadece başlatılırken değil — mağaza
   /// penceresi açıkken sonuç [_onPurchaseUpdate] üzerinden gelene kadar
   /// (satın alındı/geri yüklendi/hata/iptal) `true` kalır, ekran "mağaza
   /// bekleniyor" durumunu bu süre boyunca göstersin diye.
+  /// Önceki sürüm hatayı tamamen yutuyordu — kullanıcı parasının gidip
+  /// gitmediğini, işlemin neden tamamlanmadığını hiç öğrenemiyordu. Artık
+  /// hem başlatma hatası hem de mağazadan dönen `error` durumu bir mesaj
+  /// olarak gösteriliyor; kullanıcının kendi iptali (`canceled`) sessiz
+  /// kalmaya devam ediyor çünkü o zaten kendi kararı.
   Future<void> purchase(String productId) async {
     if (_isPurchasing) return;
     _isPurchasing = true;
     _pendingProductId = productId;
-    state = state.copyWith(isPurchasing: true, pendingProductId: productId);
+    state = state.copyWith(
+      isPurchasing: true,
+      pendingProductId: productId,
+      purchaseErrorMessage: null,
+    );
     try {
       await ref.read(subscriptionRepositoryProvider).buySubscription(productId);
     } catch (_) {
       _isPurchasing = false;
       _pendingProductId = null;
-      state = state.copyWith(isPurchasing: false, pendingProductId: null);
+      state = state.copyWith(
+        isPurchasing: false,
+        pendingProductId: null,
+        purchaseErrorMessage:
+            'Satın alma başlatılamadı, mağaza bağlantısını kontrol edip tekrar dene.',
+      );
     }
   }
 
@@ -69,19 +94,31 @@ class SubscriptionController extends _$SubscriptionController {
     final gymId = ref.read(activeGymIdProvider).valueOrNull;
 
     for (final purchase in purchases) {
-      if (purchase.status == PurchaseStatus.purchased || purchase.status == PurchaseStatus.restored) {
+      if (purchase.status == PurchaseStatus.purchased ||
+          purchase.status == PurchaseStatus.restored) {
         if (gymId != null) {
           await repo.verifyPurchase(gymId: gymId, purchase: purchase);
         }
         await repo.completePurchase(purchase);
         _isPurchasing = false;
         _pendingProductId = null;
-        state = state.copyWith(isPurchasing: false, pendingProductId: null);
-      } else if (purchase.status == PurchaseStatus.error || purchase.status == PurchaseStatus.canceled) {
+        state = state.copyWith(
+          isPurchasing: false,
+          pendingProductId: null,
+          purchaseErrorMessage: null,
+        );
+      } else if (purchase.status == PurchaseStatus.error ||
+          purchase.status == PurchaseStatus.canceled) {
         await repo.completePurchase(purchase);
         _isPurchasing = false;
         _pendingProductId = null;
-        state = state.copyWith(isPurchasing: false, pendingProductId: null);
+        state = state.copyWith(
+          isPurchasing: false,
+          pendingProductId: null,
+          purchaseErrorMessage: purchase.status == PurchaseStatus.error
+              ? 'Satın alma tamamlanamadı, mağaza bağlantısını kontrol edip tekrar dene.'
+              : null,
+        );
       }
     }
   }
