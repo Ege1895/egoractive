@@ -68,6 +68,7 @@ class PackageController extends _$PackageController {
       trainerName: trainerName,
       trainerSpecialty: trainerSpecialty,
       trainerInitials: _initialsFor(trainerName),
+      dueAmountTl: (packageData?['dueAmount'] as num?)?.toInt() ?? 0,
     );
   }
 

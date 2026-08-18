@@ -399,7 +399,7 @@ class _TrainerSpecialtyForIdProviderElement
   String get trainerId => (origin as _TrainerSpecialtyForIdProvider).trainerId;
 }
 
-String _$packageControllerHash() => r'4cf791f0b654fe6d765d0899abb05e15cd0eaf6e';
+String _$packageControllerHash() => r'2afe85d614a106e354472fe73b155703c6006cae';
 
 /// Üye 4 · Paketim. Oturum yoksa (test ortamı vb.) boş bir paket gösterir.
 ///

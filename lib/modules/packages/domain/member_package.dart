@@ -14,6 +14,7 @@ class MemberPackage with _$MemberPackage {
     required String trainerName,
     required String trainerSpecialty,
     required String trainerInitials,
+    @Default(0) int dueAmountTl,
   }) = _MemberPackage;
 
   const MemberPackage._();

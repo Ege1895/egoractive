@@ -4,11 +4,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../../../shared/mock/member_mock_profile.dart';
 import '../../../../shared/widgets/progress_ring.dart';
+import '../../../auth/controller/member_profile_controller.dart';
+import '../../../gyms/controller/gym_profile_controller.dart';
+import '../../../packages/controller/package_controller.dart';
+import '../../../packages/ui/panels/package_panel.dart';
 import '../../controller/sessions_controller.dart';
 import '../../domain/session.dart';
-import '../../../packages/ui/panels/package_panel.dart';
 import 'attendance_confirm_panel.dart';
 
 /// Üye · Ana Sayfa (Ana Sayfa sekmesi kökü).
@@ -21,6 +23,22 @@ class MemberHomePanel extends ConsumerWidget {
     final typography = context.appTypography;
     final state = ref.watch(sessionsControllerProvider);
     final controller = ref.read(sessionsControllerProvider.notifier);
+    final profile = ref.watch(memberProfileControllerProvider);
+    final gymProfile = ref.watch(gymProfileControllerProvider);
+    final pkg = ref.watch(packageControllerProvider);
+    final firstName = profile.name.trim().isEmpty
+        ? ''
+        : profile.name.trim().split(RegExp(r'\s+')).first;
+    final initials = profile.name.trim().isEmpty
+        ? '?'
+        : profile.name
+              .trim()
+              .split(RegExp(r'\s+'))
+              .where((p) => p.isNotEmpty)
+              .map((p) => p[0])
+              .take(2)
+              .join()
+              .toUpperCase();
 
     return Scaffold(
       body: SafeArea(
@@ -43,7 +61,7 @@ class MemberHomePanel extends ConsumerWidget {
                   ),
                   alignment: Alignment.center,
                   child: Text(
-                    'AY',
+                    initials,
                     style: typography.headingSmall.copyWith(
                       color: colors.onPrimaryContainer,
                       fontSize: 16,
@@ -56,13 +74,13 @@ class MemberHomePanel extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        MemberMockProfile.gymName,
+                        gymProfile.name.isEmpty ? '—' : gymProfile.name,
                         style: typography.caption.copyWith(
                           color: colors.onSurfaceMuted,
                         ),
                       ),
                       Text(
-                        'Merhaba ${MemberMockProfile.memberFirstName}',
+                        'Merhaba${firstName.isEmpty ? '' : ' $firstName'}',
                         style: typography.headingMedium.copyWith(
                           color: colors.onSurface,
                         ),
@@ -119,11 +137,9 @@ class MemberHomePanel extends ConsumerWidget {
                 children: [
                   ProgressRing(
                     size: 88,
-                    progress:
-                        MemberMockProfile.remainingSessions /
-                        MemberMockProfile.totalSessions,
+                    progress: pkg.progressRatio,
                     child: Text(
-                      '${MemberMockProfile.remainingSessions}',
+                      '${pkg.remainingSessions}',
                       style: typography.dataLarge.copyWith(
                         color: colors.onSurface,
                       ),
@@ -135,14 +151,14 @@ class MemberHomePanel extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Kalan dersin: ${MemberMockProfile.remainingSessions}',
+                          'Kalan dersin: ${pkg.remainingSessions}',
                           style: typography.headingSmall.copyWith(
                             color: colors.onSurface,
                           ),
                         ),
                         const SizedBox(height: AppSpacing.xs),
                         Text(
-                          '${MemberMockProfile.packageName} paketi · ${MemberMockProfile.packageEnd}\'e kadar geçerli',
+                          '${pkg.name} paketi · ${pkg.endDate}\'e kadar geçerli',
                           style: typography.bodyMedium.copyWith(
                             color: colors.onSurfaceVariant,
                           ),
@@ -153,7 +169,7 @@ class MemberHomePanel extends ConsumerWidget {
                 ],
               ),
             ),
-            if (state.paymentWarning != null) ...[
+            if (pkg.dueAmountTl > 0) ...[
               const SizedBox(height: AppSpacing.lg),
               Container(
                 padding: const EdgeInsets.all(AppSpacing.lg),
@@ -200,7 +216,7 @@ class MemberHomePanel extends ConsumerWidget {
                               ),
                               const SizedBox(height: AppSpacing.xs),
                               Text(
-                                '${state.paymentWarning!.amount} kalan ödemen ${state.paymentWarning!.dueDate}\'ta son buluyor. '
+                                '₺${pkg.dueAmountTl} kalan ödemen var. '
                                 'Antrenörüne bugün iletebilirsin.',
                                 style: typography.bodyMedium.copyWith(
                                   color: colors.onSurfaceVariant,

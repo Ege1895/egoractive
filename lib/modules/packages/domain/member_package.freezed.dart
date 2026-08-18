@@ -26,6 +26,7 @@ mixin _$MemberPackage {
   String get trainerName => throw _privateConstructorUsedError;
   String get trainerSpecialty => throw _privateConstructorUsedError;
   String get trainerInitials => throw _privateConstructorUsedError;
+  int get dueAmountTl => throw _privateConstructorUsedError;
 
   /// Create a copy of MemberPackage
   /// with the given fields replaced by the non-null parameter values.
@@ -51,6 +52,7 @@ abstract class $MemberPackageCopyWith<$Res> {
     String trainerName,
     String trainerSpecialty,
     String trainerInitials,
+    int dueAmountTl,
   });
 }
 
@@ -78,6 +80,7 @@ class _$MemberPackageCopyWithImpl<$Res, $Val extends MemberPackage>
     Object? trainerName = null,
     Object? trainerSpecialty = null,
     Object? trainerInitials = null,
+    Object? dueAmountTl = null,
   }) {
     return _then(
       _value.copyWith(
@@ -117,6 +120,10 @@ class _$MemberPackageCopyWithImpl<$Res, $Val extends MemberPackage>
                 ? _value.trainerInitials
                 : trainerInitials // ignore: cast_nullable_to_non_nullable
                       as String,
+            dueAmountTl: null == dueAmountTl
+                ? _value.dueAmountTl
+                : dueAmountTl // ignore: cast_nullable_to_non_nullable
+                      as int,
           )
           as $Val,
     );
@@ -142,6 +149,7 @@ abstract class _$$MemberPackageImplCopyWith<$Res>
     String trainerName,
     String trainerSpecialty,
     String trainerInitials,
+    int dueAmountTl,
   });
 }
 
@@ -168,6 +176,7 @@ class __$$MemberPackageImplCopyWithImpl<$Res>
     Object? trainerName = null,
     Object? trainerSpecialty = null,
     Object? trainerInitials = null,
+    Object? dueAmountTl = null,
   }) {
     return _then(
       _$MemberPackageImpl(
@@ -207,6 +216,10 @@ class __$$MemberPackageImplCopyWithImpl<$Res>
             ? _value.trainerInitials
             : trainerInitials // ignore: cast_nullable_to_non_nullable
                   as String,
+        dueAmountTl: null == dueAmountTl
+            ? _value.dueAmountTl
+            : dueAmountTl // ignore: cast_nullable_to_non_nullable
+                  as int,
       ),
     );
   }
@@ -225,6 +238,7 @@ class _$MemberPackageImpl extends _MemberPackage {
     required this.trainerName,
     required this.trainerSpecialty,
     required this.trainerInitials,
+    this.dueAmountTl = 0,
   }) : super._();
 
   @override
@@ -245,10 +259,13 @@ class _$MemberPackageImpl extends _MemberPackage {
   final String trainerSpecialty;
   @override
   final String trainerInitials;
+  @override
+  @JsonKey()
+  final int dueAmountTl;
 
   @override
   String toString() {
-    return 'MemberPackage(name: $name, remainingSessions: $remainingSessions, totalSessions: $totalSessions, makeupSessions: $makeupSessions, startDate: $startDate, endDate: $endDate, trainerName: $trainerName, trainerSpecialty: $trainerSpecialty, trainerInitials: $trainerInitials)';
+    return 'MemberPackage(name: $name, remainingSessions: $remainingSessions, totalSessions: $totalSessions, makeupSessions: $makeupSessions, startDate: $startDate, endDate: $endDate, trainerName: $trainerName, trainerSpecialty: $trainerSpecialty, trainerInitials: $trainerInitials, dueAmountTl: $dueAmountTl)';
   }
 
   @override
@@ -271,7 +288,9 @@ class _$MemberPackageImpl extends _MemberPackage {
             (identical(other.trainerSpecialty, trainerSpecialty) ||
                 other.trainerSpecialty == trainerSpecialty) &&
             (identical(other.trainerInitials, trainerInitials) ||
-                other.trainerInitials == trainerInitials));
+                other.trainerInitials == trainerInitials) &&
+            (identical(other.dueAmountTl, dueAmountTl) ||
+                other.dueAmountTl == dueAmountTl));
   }
 
   @override
@@ -286,6 +305,7 @@ class _$MemberPackageImpl extends _MemberPackage {
     trainerName,
     trainerSpecialty,
     trainerInitials,
+    dueAmountTl,
   );
 
   /// Create a copy of MemberPackage
@@ -308,6 +328,7 @@ abstract class _MemberPackage extends MemberPackage {
     required final String trainerName,
     required final String trainerSpecialty,
     required final String trainerInitials,
+    final int dueAmountTl,
   }) = _$MemberPackageImpl;
   const _MemberPackage._() : super._();
 
@@ -329,6 +350,8 @@ abstract class _MemberPackage extends MemberPackage {
   String get trainerSpecialty;
   @override
   String get trainerInitials;
+  @override
+  int get dueAmountTl;
 
   /// Create a copy of MemberPackage
   /// with the given fields replaced by the non-null parameter values.
