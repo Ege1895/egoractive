@@ -15,4 +15,21 @@ class MemberPackage with _$MemberPackage {
     required String trainerSpecialty,
     required String trainerInitials,
   }) = _MemberPackage;
+
+  const MemberPackage._();
+
+  static const empty = MemberPackage(
+    name: 'Aktif paket yok',
+    remainingSessions: 0,
+    totalSessions: 0,
+    makeupSessions: 0,
+    startDate: '—',
+    endDate: '—',
+    trainerName: '—',
+    trainerSpecialty: '',
+    trainerInitials: '?',
+  );
+
+  double get progressRatio =>
+      totalSessions == 0 ? 0 : remainingSessions / totalSessions;
 }

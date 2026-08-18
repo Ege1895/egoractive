@@ -25,9 +25,17 @@ class _PackagePanelState extends BasePanelState<PackagePanel> {
     return Scaffold(
       body: SafeArea(
         child: ListView(
-          padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.lg, AppSpacing.screenEdge, AppSpacing.lg),
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.screenEdge,
+            AppSpacing.lg,
+            AppSpacing.screenEdge,
+            AppSpacing.lg,
+          ),
           children: [
-            Text('Paketim', style: typography.headingLarge.copyWith(color: colors.onSurface)),
+            Text(
+              'Paketim',
+              style: typography.headingLarge.copyWith(color: colors.onSurface),
+            ),
             const SizedBox(height: AppSpacing.lg),
             Container(
               padding: const EdgeInsets.all(AppSpacing.xl),
@@ -43,12 +51,24 @@ class _PackagePanelState extends BasePanelState<PackagePanel> {
                     children: [
                       ProgressRing(
                         size: 96,
-                        progress: pkg.remainingSessions / pkg.totalSessions,
+                        progress: pkg.progressRatio,
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text('${pkg.remainingSessions}', style: typography.dataLarge.copyWith(color: colors.onSurface, fontSize: 32)),
-                            Text('kalan', style: typography.caption.copyWith(color: colors.onSurfaceMuted, fontSize: 11)),
+                            Text(
+                              '${pkg.remainingSessions}',
+                              style: typography.dataLarge.copyWith(
+                                color: colors.onSurface,
+                                fontSize: 32,
+                              ),
+                            ),
+                            Text(
+                              'kalan',
+                              style: typography.caption.copyWith(
+                                color: colors.onSurfaceMuted,
+                                fontSize: 11,
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -57,11 +77,19 @@ class _PackagePanelState extends BasePanelState<PackagePanel> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(pkg.name, style: typography.headingMedium.copyWith(color: colors.onSurface, fontSize: 19)),
+                            Text(
+                              pkg.name,
+                              style: typography.headingMedium.copyWith(
+                                color: colors.onSurface,
+                                fontSize: 19,
+                              ),
+                            ),
                             const SizedBox(height: AppSpacing.xs),
                             Text(
                               '${pkg.remainingSessions} dersin kaldı. Telafi hakkın: ${pkg.makeupSessions} seans.',
-                              style: typography.bodyMedium.copyWith(color: colors.onSurfaceVariant),
+                              style: typography.bodyMedium.copyWith(
+                                color: colors.onSurfaceVariant,
+                              ),
                             ),
                           ],
                         ),
@@ -71,9 +99,16 @@ class _PackagePanelState extends BasePanelState<PackagePanel> {
                   const SizedBox(height: AppSpacing.lg),
                   Row(
                     children: [
-                      Expanded(child: _InfoTile(label: 'Başlangıç', value: pkg.startDate)),
+                      Expanded(
+                        child: _InfoTile(
+                          label: 'Başlangıç',
+                          value: pkg.startDate,
+                        ),
+                      ),
                       const SizedBox(width: AppSpacing.sm),
-                      Expanded(child: _InfoTile(label: 'Bitiş', value: pkg.endDate)),
+                      Expanded(
+                        child: _InfoTile(label: 'Bitiş', value: pkg.endDate),
+                      ),
                     ],
                   ),
                 ],
@@ -85,7 +120,9 @@ class _PackagePanelState extends BasePanelState<PackagePanel> {
               decoration: BoxDecoration(
                 color: colors.warningContainer,
                 borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
-                border: Border.all(color: colors.warning.withValues(alpha: 0.32)),
+                border: Border.all(
+                  color: colors.warning.withValues(alpha: 0.32),
+                ),
               ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -93,9 +130,18 @@ class _PackagePanelState extends BasePanelState<PackagePanel> {
                   Container(
                     width: 26,
                     height: 26,
-                    decoration: BoxDecoration(color: colors.warning, shape: BoxShape.circle),
+                    decoration: BoxDecoration(
+                      color: colors.warning,
+                      shape: BoxShape.circle,
+                    ),
                     alignment: Alignment.center,
-                    child: Text('!', style: typography.headingSmall.copyWith(color: colors.warningContainer, fontSize: 14)),
+                    child: Text(
+                      '!',
+                      style: typography.headingSmall.copyWith(
+                        color: colors.warningContainer,
+                        fontSize: 14,
+                      ),
+                    ),
                   ),
                   const SizedBox(width: AppSpacing.md),
                   Expanded(
@@ -104,12 +150,17 @@ class _PackagePanelState extends BasePanelState<PackagePanel> {
                       children: [
                         Text(
                           'Son ${pkg.remainingSessions} dersin kaldı',
-                          style: typography.headingSmall.copyWith(color: colors.onWarningContainer, fontSize: 16),
+                          style: typography.headingSmall.copyWith(
+                            color: colors.onWarningContainer,
+                            fontSize: 16,
+                          ),
                         ),
                         const SizedBox(height: AppSpacing.xs),
                         Text(
                           'Paket bitmeden yenilemek istersen antrenörün ${pkg.trainerName} ile konuşabilirsin.',
-                          style: typography.bodyMedium.copyWith(color: colors.onSurfaceVariant),
+                          style: typography.bodyMedium.copyWith(
+                            color: colors.onSurfaceVariant,
+                          ),
                         ),
                       ],
                     ),
@@ -131,10 +182,19 @@ class _PackagePanelState extends BasePanelState<PackagePanel> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Antrenörün', style: typography.headingSmall.copyWith(color: colors.onSurface, fontSize: 16)),
+                        Text(
+                          'Antrenörün',
+                          style: typography.headingSmall.copyWith(
+                            color: colors.onSurface,
+                            fontSize: 16,
+                          ),
+                        ),
                         Text(
                           '${pkg.trainerName} · ${pkg.trainerSpecialty}',
-                          style: typography.bodyMedium.copyWith(color: colors.onSurfaceVariant, fontSize: 14),
+                          style: typography.bodyMedium.copyWith(
+                            color: colors.onSurfaceVariant,
+                            fontSize: 14,
+                          ),
                         ),
                       ],
                     ),
@@ -142,11 +202,17 @@ class _PackagePanelState extends BasePanelState<PackagePanel> {
                   Container(
                     width: 44,
                     height: 44,
-                    decoration: BoxDecoration(color: colors.primaryContainer, shape: BoxShape.circle),
+                    decoration: BoxDecoration(
+                      color: colors.primaryContainer,
+                      shape: BoxShape.circle,
+                    ),
                     alignment: Alignment.center,
                     child: Text(
                       pkg.trainerInitials,
-                      style: typography.headingSmall.copyWith(color: colors.onPrimaryContainer, fontSize: 15),
+                      style: typography.headingSmall.copyWith(
+                        color: colors.onPrimaryContainer,
+                        fontSize: 15,
+                      ),
                     ),
                   ),
                 ],
@@ -178,8 +244,20 @@ class _InfoTile extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: typography.caption.copyWith(color: colors.onSurfaceMuted, fontSize: 12)),
-          Text(value, style: typography.headingSmall.copyWith(color: colors.onSurface, fontSize: 15)),
+          Text(
+            label,
+            style: typography.caption.copyWith(
+              color: colors.onSurfaceMuted,
+              fontSize: 12,
+            ),
+          ),
+          Text(
+            value,
+            style: typography.headingSmall.copyWith(
+              color: colors.onSurface,
+              fontSize: 15,
+            ),
+          ),
         ],
       ),
     );

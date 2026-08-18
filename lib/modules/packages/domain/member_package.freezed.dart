@@ -214,7 +214,7 @@ class __$$MemberPackageImplCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$MemberPackageImpl implements _MemberPackage {
+class _$MemberPackageImpl extends _MemberPackage {
   const _$MemberPackageImpl({
     required this.name,
     required this.remainingSessions,
@@ -225,7 +225,7 @@ class _$MemberPackageImpl implements _MemberPackage {
     required this.trainerName,
     required this.trainerSpecialty,
     required this.trainerInitials,
-  });
+  }) : super._();
 
   @override
   final String name;
@@ -297,7 +297,7 @@ class _$MemberPackageImpl implements _MemberPackage {
       __$$MemberPackageImplCopyWithImpl<_$MemberPackageImpl>(this, _$identity);
 }
 
-abstract class _MemberPackage implements MemberPackage {
+abstract class _MemberPackage extends MemberPackage {
   const factory _MemberPackage({
     required final String name,
     required final int remainingSessions,
@@ -309,6 +309,7 @@ abstract class _MemberPackage implements MemberPackage {
     required final String trainerSpecialty,
     required final String trainerInitials,
   }) = _$MemberPackageImpl;
+  const _MemberPackage._() : super._();
 
   @override
   String get name;
