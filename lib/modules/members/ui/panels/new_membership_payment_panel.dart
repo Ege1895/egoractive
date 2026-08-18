@@ -327,12 +327,15 @@ class _NewMembershipPaymentPanelState
                                 ),
                               ),
                             ),
+                            // Gerçek bir vade tarihi hiçbir yerde
+                            // hesaplanmıyor/kaydedilmiyor — sabit bir tarih
+                            // (ör. "10 Ağu 2026") göstermek yerine, gerçek
+                            // bir vade politikası tanımlanana kadar bu alan
+                            // boş bırakılıyor.
                             Text(
-                              membership.isFullyPaid ? '—' : '10 Ağu 2026',
+                              '—',
                               style: typography.headingSmall.copyWith(
-                                color: membership.isFullyPaid
-                                    ? colors.onSurfaceMuted
-                                    : colors.onSurface,
+                                color: colors.onSurfaceMuted,
                                 fontSize: 15,
                               ),
                             ),
