@@ -53,13 +53,16 @@ AdminSessionSlot _toAdminSlot(QueryDocumentSnapshot<Map<String, dynamic>> doc) {
   final state = switch (statusStr) {
     'cancelled' => AdminSessionState.cancelled,
     'completed' => AdminSessionState.completed,
-    _ => now.isAfter(startTime) && now.isBefore(startTime.add(const Duration(hours: 1)))
-        ? AdminSessionState.current
-        : AdminSessionState.planned,
+    _ =>
+      now.isAfter(startTime) &&
+              now.isBefore(startTime.add(const Duration(hours: 1)))
+          ? AdminSessionState.current
+          : AdminSessionState.planned,
   };
   return AdminSessionSlot(
     id: doc.id,
-    time: '${startTime.hour.toString().padLeft(2, '0')}:${startTime.minute.toString().padLeft(2, '0')}',
+    time:
+        '${startTime.hour.toString().padLeft(2, '0')}:${startTime.minute.toString().padLeft(2, '0')}',
     title: (data['memberName'] as String?) ?? '',
     meta: '${(data['trainerName'] as String?) ?? ''} · Birebir',
     state: state,
@@ -73,16 +76,42 @@ class AdminCalendarController extends _$AdminCalendarController {
   @override
   AdminCalendarState build() {
     final selectedDate = ref.watch(_selectedCalendarDateProvider);
-    final gymId = ref.watch(activeGymIdProvider).valueOrNull;
-    if (gymId == null) {
-      return ref.watch(adminCalendarRepositoryProvider).loadInitial().copyWith(selectedDate: selectedDate);
+    final gymIdAsync = ref.watch(activeGymIdProvider);
+    // activeGymIdProvider kendi custom-claim okumasını yapıyor; bu panel
+    // ilk açıldığında henüz sonuçlanmamış olabilir — bu "gerçekten salon
+    // yok" ile aynı şey değil. O ana kadar mock'a düşülürse admin sahte bir
+    // seans kartına dokunup geçersiz id ile Firestore'a yazma denemesi
+    // yapabilir; bunun yerine boş takvim gösterilir.
+    if (gymIdAsync.isLoading) {
+      return AdminCalendarState(
+        selectedDate: selectedDate,
+        slotsByDayOfMonth: const {},
+      );
     }
-    final slots = ref
-        .watch(_sessionsForGymMonthProvider(gymId, selectedDate.year, selectedDate.month))
-        .valueOrNull ??
+    final gymId = gymIdAsync.valueOrNull;
+    if (gymId == null) {
+      return ref
+          .watch(adminCalendarRepositoryProvider)
+          .loadInitial()
+          .copyWith(selectedDate: selectedDate);
+    }
+    final slots =
+        ref
+            .watch(
+              _sessionsForGymMonthProvider(
+                gymId,
+                selectedDate.year,
+                selectedDate.month,
+              ),
+            )
+            .valueOrNull ??
         const {};
-    return AdminCalendarState(selectedDate: selectedDate, slotsByDayOfMonth: slots);
+    return AdminCalendarState(
+      selectedDate: selectedDate,
+      slotsByDayOfMonth: slots,
+    );
   }
 
-  void selectDate(DateTime date) => ref.read(_selectedCalendarDateProvider.notifier).select(date);
+  void selectDate(DateTime date) =>
+      ref.read(_selectedCalendarDateProvider.notifier).select(date);
 }
