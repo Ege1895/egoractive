@@ -47,5 +47,13 @@ class NewMemberController extends _$NewMemberController {
   void updateRegisteredAt(DateTime value) =>
       state = state.copyWith(registeredAt: value);
 
+  void toggleCanConfirmAttendance() =>
+      state = state.copyWith(canConfirmAttendance: !state.canConfirmAttendance);
+
+  /// Düzenleme modunda üyenin mevcut Firestore değerini forma yüklemek için
+  /// — bkz. [MemberInfoPanel.initState].
+  void setCanConfirmAttendance(bool value) =>
+      state = state.copyWith(canConfirmAttendance: value);
+
   void reset() => state = build();
 }

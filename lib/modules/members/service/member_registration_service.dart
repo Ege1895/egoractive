@@ -44,6 +44,7 @@ class MemberRegistrationService {
     required String trainerName,
     required DateTime registeredAt,
     MemberGender? gender,
+    required bool canConfirmAttendance,
   }) async {
     final doc = await FirebaseFirestore.instance.collection('users').add({
       'name': name,
@@ -57,6 +58,7 @@ class MemberRegistrationService {
       // MemberInfoPanel "Kayıt tarihi" alanı).
       'createdAt': Timestamp.fromDate(registeredAt),
       if (gender != null) 'gender': gender.name,
+      'canConfirmAttendance': canConfirmAttendance,
     });
     await _analytics.logEvent(
       AnalyticsEvent.membershipCreated,
@@ -76,6 +78,7 @@ class MemberRegistrationService {
     String? trainerId,
     String? trainerName,
     MemberGender? gender,
+    required bool canConfirmAttendance,
   }) {
     return FirebaseFirestore.instance.collection('users').doc(memberId).update({
       'name': name,
@@ -83,6 +86,7 @@ class MemberRegistrationService {
       if (trainerId != null) 'trainerId': trainerId,
       if (trainerName != null) 'trainerName': trainerName,
       if (gender != null) 'gender': gender.name,
+      'canConfirmAttendance': canConfirmAttendance,
     });
   }
 }

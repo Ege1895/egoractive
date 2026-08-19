@@ -6,7 +6,8 @@ part of 'sessions_controller.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$sessionsForMemberHash() => r'f7746ef4946a84f663fa75c87cb5f1eb4505e1b5';
+String _$canConfirmAttendanceForMemberHash() =>
+    r'e9959395707f1273571daaeff9dfc4222e0fad6d';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -28,6 +29,133 @@ class _SystemHash {
     return 0x1fffffff & (hash + ((0x00003fff & hash) << 15));
   }
 }
+
+/// See also [_canConfirmAttendanceForMember].
+@ProviderFor(_canConfirmAttendanceForMember)
+const _canConfirmAttendanceForMemberProvider =
+    _CanConfirmAttendanceForMemberFamily();
+
+/// See also [_canConfirmAttendanceForMember].
+class _CanConfirmAttendanceForMemberFamily extends Family<AsyncValue<bool>> {
+  /// See also [_canConfirmAttendanceForMember].
+  const _CanConfirmAttendanceForMemberFamily();
+
+  /// See also [_canConfirmAttendanceForMember].
+  _CanConfirmAttendanceForMemberProvider call(String memberId) {
+    return _CanConfirmAttendanceForMemberProvider(memberId);
+  }
+
+  @override
+  _CanConfirmAttendanceForMemberProvider getProviderOverride(
+    covariant _CanConfirmAttendanceForMemberProvider provider,
+  ) {
+    return call(provider.memberId);
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'_canConfirmAttendanceForMemberProvider';
+}
+
+/// See also [_canConfirmAttendanceForMember].
+class _CanConfirmAttendanceForMemberProvider
+    extends AutoDisposeStreamProvider<bool> {
+  /// See also [_canConfirmAttendanceForMember].
+  _CanConfirmAttendanceForMemberProvider(String memberId)
+    : this._internal(
+        (ref) => _canConfirmAttendanceForMember(
+          ref as _CanConfirmAttendanceForMemberRef,
+          memberId,
+        ),
+        from: _canConfirmAttendanceForMemberProvider,
+        name: r'_canConfirmAttendanceForMemberProvider',
+        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+            ? null
+            : _$canConfirmAttendanceForMemberHash,
+        dependencies: _CanConfirmAttendanceForMemberFamily._dependencies,
+        allTransitiveDependencies:
+            _CanConfirmAttendanceForMemberFamily._allTransitiveDependencies,
+        memberId: memberId,
+      );
+
+  _CanConfirmAttendanceForMemberProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.memberId,
+  }) : super.internal();
+
+  final String memberId;
+
+  @override
+  Override overrideWith(
+    Stream<bool> Function(_CanConfirmAttendanceForMemberRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: _CanConfirmAttendanceForMemberProvider._internal(
+        (ref) => create(ref as _CanConfirmAttendanceForMemberRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        memberId: memberId,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeStreamProviderElement<bool> createElement() {
+    return _CanConfirmAttendanceForMemberProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is _CanConfirmAttendanceForMemberProvider &&
+        other.memberId == memberId;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, memberId.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin _CanConfirmAttendanceForMemberRef on AutoDisposeStreamProviderRef<bool> {
+  /// The parameter `memberId` of this provider.
+  String get memberId;
+}
+
+class _CanConfirmAttendanceForMemberProviderElement
+    extends AutoDisposeStreamProviderElement<bool>
+    with _CanConfirmAttendanceForMemberRef {
+  _CanConfirmAttendanceForMemberProviderElement(super.provider);
+
+  @override
+  String get memberId =>
+      (origin as _CanConfirmAttendanceForMemberProvider).memberId;
+}
+
+String _$sessionsForMemberHash() => r'f7746ef4946a84f663fa75c87cb5f1eb4505e1b5';
 
 /// See also [_sessionsForMember].
 @ProviderFor(_sessionsForMember)
@@ -155,7 +283,7 @@ class _SessionsForMemberProviderElement
 }
 
 String _$sessionsControllerHash() =>
-    r'6ecb2be567193ececea811afd7bc0bcc4b2fda7a';
+    r'a72c5229c81c7216bf158929a178b40822aeb1bf';
 
 /// F3-3 — üyenin kendi seansları gerçek zamanlı `sessions` koleksiyonundan
 /// (memberId == kendi uid'si) okunur. `week`/`paymentWarning` bu task'ın

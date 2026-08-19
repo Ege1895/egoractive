@@ -24,6 +24,10 @@ class NewMemberForm with _$NewMemberForm {
     String? trainerName,
     required String note,
     required DateTime registeredAt,
+
+    /// Üyenin ana ekranında sıradaki dersi için "Gelicem"/"Gelmeyeceğim"
+    /// bildirimi yapabilme yetkisi — admin açıkça açmadıkça kapalı gelir.
+    @Default(false) bool canConfirmAttendance,
   }) = _NewMemberForm;
 
   const NewMemberForm._();

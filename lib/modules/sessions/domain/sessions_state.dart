@@ -34,5 +34,9 @@ class SessionsState with _$SessionsState {
     @Default(SessionsViewMode.list) SessionsViewMode viewMode,
     @Default(AttendanceAnswer.pending) AttendanceAnswer attendanceAnswer,
     String? attendanceErrorMessage,
+
+    /// Admin `MemberInfoPanel`'den açtıysa `true` — kapalıyken üye ana
+    /// ekranında "Gelicem"/"Gelmeyeceğim" bildirimi yapamaz.
+    @Default(false) bool canConfirmAttendance,
   }) = _SessionsState;
 }

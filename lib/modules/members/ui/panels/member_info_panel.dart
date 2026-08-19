@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -56,11 +57,22 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
       // alanına hiç dokunulmasa bile geçerli bir değer olsun diye mevcut
       // üyenin numarası buraya da yazılıyor (aksi halde phoneDigits boş
       // kalır ve validasyon "geçersiz numara" hatası verir).
-      WidgetsBinding.instance.addPostFrameCallback((_) {
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
         if (!mounted) return;
         final notifier = ref.read(newMemberControllerProvider.notifier);
         notifier.reset();
         notifier.updatePhoneDigits(phoneDigits);
+        // `AdminMemberSummary` (widget.existing) bu alanı taşımıyor —
+        // yazmadan önce gerçek değeri okumazsak her "Kaydet" yetkiyi
+        // sessizce false'a resetlerdi.
+        final doc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(widget.existing!.id)
+            .get();
+        if (!mounted) return;
+        notifier.setCanConfirmAttendance(
+          doc.data()?['canConfirmAttendance'] as bool? ?? false,
+        );
       });
     } else {
       // Yeni üye sihirbazı: bu provider panel stack'te önceki panelleri
@@ -487,6 +499,69 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
                       minLines: 1,
                       maxLines: 5,
                       onChanged: controller.updateNote,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.lg),
+                  Container(
+                    padding: const EdgeInsets.all(AppSpacing.lg),
+                    decoration: BoxDecoration(
+                      color: colors.surface,
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusCard,
+                      ),
+                      border: Border.all(color: colors.outline),
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Ders onayı gönderebilsin',
+                                style: typography.bodyLarge.copyWith(
+                                  color: colors.onSurface,
+                                  fontSize: 15,
+                                ),
+                              ),
+                              Text(
+                                'Üye ana ekranından sıradaki dersi için "Gelicem"/"Gelmeyeceğim" bildirebilir.',
+                                style: typography.caption.copyWith(
+                                  color: colors.onSurfaceMuted,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: controller.toggleCanConfirmAttendance,
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 150),
+                            width: 52,
+                            height: 32,
+                            padding: const EdgeInsets.all(3),
+                            decoration: BoxDecoration(
+                              color: form.canConfirmAttendance
+                                  ? colors.primary
+                                  : colors.surfaceRaised,
+                              borderRadius: BorderRadius.circular(
+                                AppSpacing.radiusPill,
+                              ),
+                            ),
+                            alignment: form.canConfirmAttendance
+                                ? Alignment.centerRight
+                                : Alignment.centerLeft,
+                            child: Container(
+                              width: 26,
+                              height: 26,
+                              decoration: BoxDecoration(
+                                color: colors.onSurface,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],

@@ -33,6 +33,18 @@ const _emptyNextSession = Session(
 );
 
 @riverpod
+Stream<bool> _canConfirmAttendanceForMember(
+  _CanConfirmAttendanceForMemberRef ref,
+  String memberId,
+) {
+  return FirebaseFirestore.instance
+      .collection('users')
+      .doc(memberId)
+      .snapshots()
+      .map((doc) => doc.data()?['canConfirmAttendance'] as bool? ?? false);
+}
+
+@riverpod
 Stream<(List<Session>, List<Session>)> _sessionsForMember(
   _SessionsForMemberRef ref,
   String memberId,
@@ -105,11 +117,15 @@ class SessionsController extends _$SessionsController {
         ref.watch(_sessionsForMemberProvider(uid)).valueOrNull ??
         (const <Session>[], const <Session>[]);
     final nextSession = upcoming.isEmpty ? _emptyNextSession : upcoming.first;
+    final canConfirmAttendance =
+        ref.watch(_canConfirmAttendanceForMemberProvider(uid)).valueOrNull ??
+        false;
     return mock.copyWith(
       nextSession: nextSession,
       upcoming: upcoming,
       past: past,
       attendanceAnswer: nextSession.confirmation,
+      canConfirmAttendance: canConfirmAttendance,
     );
   }
 
@@ -122,6 +138,7 @@ class SessionsController extends _$SessionsController {
   /// sürümünde yazma denenmeden önce optimistik güncelleniyor ve hata hiç
   /// yakalanmıyordu, bu da sessiz veri kaybına yol açabiliyordu.
   Future<void> confirmAttendance(bool coming) async {
+    if (!state.canConfirmAttendance) return;
     final sessionId = state.nextSession.id;
     if (sessionId == 'none') return;
     final previousAnswer = state.attendanceAnswer;

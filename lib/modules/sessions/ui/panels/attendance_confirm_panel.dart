@@ -172,7 +172,15 @@ class _AttendanceConfirmPanelState
                       ),
                       const SizedBox(height: AppSpacing.sm),
                     ],
-                    if (state.attendanceAnswer == AttendanceAnswer.pending) ...[
+                    if (!state.canConfirmAttendance) ...[
+                      Text(
+                        'Bu ders için geleceğini/gelmeyeceğini bildirme yetkin yok. Antrenörünle iletişime geç.',
+                        style: typography.bodyMedium.copyWith(
+                          color: colors.onSurfaceMuted,
+                        ),
+                      ),
+                    ] else if (state.attendanceAnswer ==
+                        AttendanceAnswer.pending) ...[
                       AppButton(
                         label: 'Gelicem',
                         onPressed: () => controller.confirmAttendance(true),

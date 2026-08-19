@@ -102,6 +102,7 @@ class MemberRegistrationController extends _$MemberRegistrationController {
         trainerName: form.trainerName!,
         registeredAt: form.registeredAt,
         gender: form.gender,
+        canConfirmAttendance: form.canConfirmAttendance,
       );
       state = state.copyWith(isSubmitting: false, createdMemberId: memberId);
       return true;
@@ -146,6 +147,7 @@ class MemberRegistrationController extends _$MemberRegistrationController {
             trainerId: form.trainerId,
             trainerName: form.trainerName,
             gender: form.gender,
+            canConfirmAttendance: form.canConfirmAttendance,
           );
       state = state.copyWith(isSubmitting: false);
       return true;
