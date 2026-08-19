@@ -53,10 +53,7 @@ class AdminHomePanel extends ConsumerWidget {
                         )
                       : Image.network(
                           profile.logoUrl,
-                          width: double.infinity,
-                          height: double.infinity,
                           fit: BoxFit.cover,
-                          alignment: Alignment.center,
                           errorBuilder: (context, error, stackTrace) => Icon(
                             Icons.fitness_center_rounded,
                             color: colors.onPrimaryContainer,
@@ -68,13 +65,15 @@ class AdminHomePanel extends ConsumerWidget {
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(
-                        state.monthLabel,
-                        style: typography.caption.copyWith(
-                          color: colors.onSurfaceMuted,
+                      if (state.monthLabel.isNotEmpty)
+                        Text(
+                          state.monthLabel,
+                          style: typography.caption.copyWith(
+                            color: colors.onSurfaceMuted,
+                          ),
                         ),
-                      ),
                       Text(
                         profile.name,
                         style: typography.headingMedium.copyWith(
@@ -117,8 +116,7 @@ class AdminHomePanel extends ConsumerWidget {
               child: Row(
                 children: [
                   ProgressRing(
-                    size: 260,
-                    strokeWidth: 12,
+                    size: 84,
                     progress: state.completionRatio,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
