@@ -7,6 +7,7 @@ import '../../../../core/panels/panel_stack_controller.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_back_button.dart';
 import '../../../../shared/widgets/app_button.dart';
+import '../../../../shared/widgets/native_date_picker.dart';
 import '../../controller/admin_calendar_controller.dart';
 import '../../domain/admin_calendar_state.dart';
 import '../../service/sessions_write_service.dart';
@@ -141,11 +142,21 @@ class _AdminSessionManagementPanelState
                     child: Row(
                       children: [
                         Expanded(
-                          child: Text(
-                            '${_date.day} ${_monthAbbrev[_date.month]} ${_weekdayNames[_date.weekday]}',
-                            style: typography.bodyMedium.copyWith(
-                              color: colors.onSurfaceVariant,
-                              fontSize: 14,
+                          child: GestureDetector(
+                            behavior: HitTestBehavior.opaque,
+                            onTap: () => showNativeDatePicker(
+                              context: context,
+                              initial: _date,
+                              firstDate: DateTime(2020),
+                              lastDate: DateTime(2100),
+                              onSelected: (d) => setState(() => _date = d),
+                            ),
+                            child: Text(
+                              '${_date.day} ${_monthAbbrev[_date.month]} ${_weekdayNames[_date.weekday]}',
+                              style: typography.bodyMedium.copyWith(
+                                color: colors.onSurfaceVariant,
+                                fontSize: 14,
+                              ),
                             ),
                           ),
                         ),
