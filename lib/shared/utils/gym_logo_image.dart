@@ -43,8 +43,25 @@ List<Color> extractGymPaletteColors(PaletteGenerator generator) {
     generator.lightVibrantColor?.color,
     generator.darkVibrantColor?.color,
     generator.mutedColor?.color,
-  ].whereType<Color>().toList();
+  ].whereType<Color>().map(_ensureVisibleOnDarkSurface).toList();
   return _dedupeSimilarColors(candidates).take(5).toList();
+}
+
+/// Uygulama koyu temalı — logodan çıkan renk neredeyse siyaha yakınsa
+/// (düşük luminans), koyu zeminlerde buton/vurgu rengi olarak seçildiğinde
+/// görünmez oluyor. Böyle bir renk tamamen elenmek yerine, koyu zeminde
+/// ayırt edilebilir olana kadar beyaza doğru adım adım aydınlatılır — logo
+/// tonunu korur, sadece kullanılamayacak kadar koyu kalmasını engeller.
+const _minLuminanceOnDark = 0.18;
+
+Color _ensureVisibleOnDarkSurface(Color color) {
+  var result = color;
+  var t = 0.0;
+  while (result.computeLuminance() < _minLuminanceOnDark && t < 1.0) {
+    t += 0.1;
+    result = Color.lerp(color, const Color(0xFFFFFFFF), t)!;
+  }
+  return result;
 }
 
 /// Palette_generator'ın döndürdüğü roller (dominant/vibrant/muted vb.) çoğu
