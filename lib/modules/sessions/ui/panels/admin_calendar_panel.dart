@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../shared/utils/thousands_input_formatter.dart';
 import '../../../../shared/widgets/app_button.dart';
+import '../../../expenses/domain/expense_state.dart';
 import '../../controller/admin_calendar_controller.dart';
 import '../../domain/admin_calendar_state.dart';
 import '../widgets/create_session_sheet.dart';
@@ -43,6 +45,9 @@ class AdminCalendarPanel extends ConsumerWidget {
     final selectedSlots =
         state.slotsByDayOfMonth[state.selectedDate.day] ??
         const <AdminSessionSlot>[];
+    final selectedExpenses =
+        state.expensesByDayOfMonth[state.selectedDate.day] ??
+        const <ExpenseEntry>[];
 
     return Scaffold(
       body: SafeArea(
@@ -187,7 +192,7 @@ class AdminCalendarPanel extends ConsumerWidget {
                             final sessionCount =
                                 state.slotsByDayOfMonth[dayNum]?.length ?? 0;
                             final expenseCount =
-                                state.expenseCountByDayOfMonth[dayNum] ?? 0;
+                                state.expensesByDayOfMonth[dayNum]?.length ?? 0;
                             final hasSessions = sessionCount > 0;
                             final hasExpenses = expenseCount > 0;
                             // Seans olan günler sarı, sadece gider olan (seans
@@ -290,41 +295,88 @@ class AdminCalendarPanel extends ConsumerWidget {
                     ),
                   ),
                   const SizedBox(height: AppSpacing.sm),
-                  if (selectedSlots.isEmpty)
-                    Text(
-                      'Bu günde seans yok.',
-                      style: typography.bodyMedium.copyWith(
-                        color: colors.onSurfaceMuted,
-                      ),
-                    )
-                  else
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacing.md,
-                      ),
-                      decoration: BoxDecoration(
-                        color: colors.surface,
-                        borderRadius: BorderRadius.circular(
-                          AppSpacing.radiusCard,
-                        ),
-                        border: Border.all(color: colors.outline),
-                      ),
-                      child: Column(
-                        children: [
-                          for (var i = 0; i < selectedSlots.length; i++)
-                            _AgendaRow(
-                              slot: selectedSlots[i],
-                              showDivider: i < selectedSlots.length - 1,
-                              onTap: () => _showSlotPopup(
-                                context,
-                                ref,
-                                selectedSlots[i],
-                                state.selectedDate,
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: selectedSlots.isEmpty
+                            ? Text(
+                                'Bu günde seans yok.',
+                                style: typography.bodyMedium.copyWith(
+                                  color: colors.onSurfaceMuted,
+                                ),
+                              )
+                            : Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: AppSpacing.md,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: colors.surface,
+                                  borderRadius: BorderRadius.circular(
+                                    AppSpacing.radiusCard,
+                                  ),
+                                  border: Border.all(color: colors.outline),
+                                ),
+                                child: Column(
+                                  children: [
+                                    for (
+                                      var i = 0;
+                                      i < selectedSlots.length;
+                                      i++
+                                    )
+                                      _AgendaRow(
+                                        slot: selectedSlots[i],
+                                        showDivider:
+                                            i < selectedSlots.length - 1,
+                                        onTap: () => _showSlotPopup(
+                                          context,
+                                          ref,
+                                          selectedSlots[i],
+                                          state.selectedDate,
+                                        ),
+                                      ),
+                                  ],
+                                ),
                               ),
-                            ),
-                        ],
                       ),
-                    ),
+                      const SizedBox(width: AppSpacing.md),
+                      Expanded(
+                        child: selectedExpenses.isEmpty
+                            ? Text(
+                                'Bu günde gider yok.',
+                                style: typography.bodyMedium.copyWith(
+                                  color: colors.onSurfaceMuted,
+                                ),
+                              )
+                            : Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: AppSpacing.md,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: colors.surface,
+                                  borderRadius: BorderRadius.circular(
+                                    AppSpacing.radiusCard,
+                                  ),
+                                  border: Border.all(color: colors.outline),
+                                ),
+                                child: Column(
+                                  children: [
+                                    for (
+                                      var i = 0;
+                                      i < selectedExpenses.length;
+                                      i++
+                                    )
+                                      _ExpenseAgendaRow(
+                                        entry: selectedExpenses[i],
+                                        showDivider:
+                                            i < selectedExpenses.length - 1,
+                                      ),
+                                  ],
+                                ),
+                              ),
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),
@@ -681,6 +733,49 @@ class _AgendaRow extends StatelessWidget {
             Icon(Icons.chevron_right, color: colors.onSurfaceMuted, size: 18),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _ExpenseAgendaRow extends StatelessWidget {
+  const _ExpenseAgendaRow({required this.entry, required this.showDivider});
+
+  final ExpenseEntry entry;
+  final bool showDivider;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+    final typography = context.appTypography;
+
+    return Container(
+      constraints: const BoxConstraints(minHeight: 60),
+      decoration: BoxDecoration(
+        border: showDivider
+            ? Border(bottom: BorderSide(color: colors.outline))
+            : null,
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              entry.category,
+              style: typography.bodyLarge.copyWith(
+                color: colors.onSurface,
+                fontSize: 14,
+              ),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          Text(
+            '₺${formatThousands(entry.amountTl)}',
+            style: typography.headingSmall.copyWith(
+              color: colors.error,
+              fontSize: 13,
+            ),
+          ),
+        ],
       ),
     );
   }

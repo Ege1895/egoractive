@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/theme/theme_controller.dart';
+import '../../expenses/domain/expense_state.dart';
 import '../domain/admin_calendar_state.dart';
 import '../repository/admin_calendar_repository.dart';
 
@@ -46,7 +47,7 @@ Stream<Map<int, List<AdminSessionSlot>>> _sessionsForGymMonth(
 }
 
 @riverpod
-Stream<Map<int, int>> _expensesForGymMonth(
+Stream<Map<int, List<ExpenseEntry>>> _expensesForGymMonth(
   _ExpensesForGymMonthRef ref,
   String gymId,
   int year,
@@ -61,10 +62,20 @@ Stream<Map<int, int>> _expensesForGymMonth(
       .where('date', isLessThan: Timestamp.fromDate(end))
       .snapshots()
       .map((snapshot) {
-        final byDay = <int, int>{};
+        final byDay = <int, List<ExpenseEntry>>{};
         for (final doc in snapshot.docs) {
-          final day = (doc.data()['date'] as Timestamp).toDate().day;
-          byDay[day] = (byDay[day] ?? 0) + 1;
+          final data = doc.data();
+          final day = (data['date'] as Timestamp).toDate().day;
+          (byDay[day] ??= []).add(
+            ExpenseEntry(
+              id: doc.id,
+              category: (data['category'] as String?) ?? '',
+              title: (data['title'] as String?) ?? '',
+              date: '',
+              amountTl: (data['amountTl'] as num?)?.toInt() ?? 0,
+              recurring: (data['recurring'] as bool?) ?? false,
+            ),
+          );
         }
         return byDay;
       });
@@ -131,7 +142,7 @@ class AdminCalendarController extends _$AdminCalendarController {
             )
             .valueOrNull ??
         const {};
-    final expenseCounts =
+    final expenses =
         ref
             .watch(
               _expensesForGymMonthProvider(
@@ -145,7 +156,7 @@ class AdminCalendarController extends _$AdminCalendarController {
     return AdminCalendarState(
       selectedDate: selectedDate,
       slotsByDayOfMonth: slots,
-      expenseCountByDayOfMonth: expenseCounts,
+      expensesByDayOfMonth: expenses,
     );
   }
 

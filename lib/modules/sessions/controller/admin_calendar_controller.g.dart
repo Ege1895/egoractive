@@ -184,14 +184,15 @@ class _SessionsForGymMonthProviderElement
 }
 
 String _$expensesForGymMonthHash() =>
-    r'b81fa6c1e5154763577bd99831a3e6a31e3495d3';
+    r'6a74b6084c395fea9b65f5e447245ec8985b8aac';
 
 /// See also [_expensesForGymMonth].
 @ProviderFor(_expensesForGymMonth)
 const _expensesForGymMonthProvider = _ExpensesForGymMonthFamily();
 
 /// See also [_expensesForGymMonth].
-class _ExpensesForGymMonthFamily extends Family<AsyncValue<Map<int, int>>> {
+class _ExpensesForGymMonthFamily
+    extends Family<AsyncValue<Map<int, List<ExpenseEntry>>>> {
   /// See also [_expensesForGymMonth].
   const _ExpensesForGymMonthFamily();
 
@@ -224,7 +225,7 @@ class _ExpensesForGymMonthFamily extends Family<AsyncValue<Map<int, int>>> {
 
 /// See also [_expensesForGymMonth].
 class _ExpensesForGymMonthProvider
-    extends AutoDisposeStreamProvider<Map<int, int>> {
+    extends AutoDisposeStreamProvider<Map<int, List<ExpenseEntry>>> {
   /// See also [_expensesForGymMonth].
   _ExpensesForGymMonthProvider(String gymId, int year, int month)
     : this._internal(
@@ -265,7 +266,10 @@ class _ExpensesForGymMonthProvider
 
   @override
   Override overrideWith(
-    Stream<Map<int, int>> Function(_ExpensesForGymMonthRef provider) create,
+    Stream<Map<int, List<ExpenseEntry>>> Function(
+      _ExpensesForGymMonthRef provider,
+    )
+    create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -284,7 +288,8 @@ class _ExpensesForGymMonthProvider
   }
 
   @override
-  AutoDisposeStreamProviderElement<Map<int, int>> createElement() {
+  AutoDisposeStreamProviderElement<Map<int, List<ExpenseEntry>>>
+  createElement() {
     return _ExpensesForGymMonthProviderElement(this);
   }
 
@@ -309,7 +314,8 @@ class _ExpensesForGymMonthProvider
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-mixin _ExpensesForGymMonthRef on AutoDisposeStreamProviderRef<Map<int, int>> {
+mixin _ExpensesForGymMonthRef
+    on AutoDisposeStreamProviderRef<Map<int, List<ExpenseEntry>>> {
   /// The parameter `gymId` of this provider.
   String get gymId;
 
@@ -321,7 +327,7 @@ mixin _ExpensesForGymMonthRef on AutoDisposeStreamProviderRef<Map<int, int>> {
 }
 
 class _ExpensesForGymMonthProviderElement
-    extends AutoDisposeStreamProviderElement<Map<int, int>>
+    extends AutoDisposeStreamProviderElement<Map<int, List<ExpenseEntry>>>
     with _ExpensesForGymMonthRef {
   _ExpensesForGymMonthProviderElement(super.provider);
 
@@ -355,7 +361,7 @@ final _selectedCalendarDateProvider =
 
 typedef _$SelectedCalendarDate = AutoDisposeNotifier<DateTime>;
 String _$adminCalendarControllerHash() =>
-    r'a3553539a9d338f8864aa5337742e0e01c114009';
+    r'5a3fbd7b6c4a8b8c6df25da16d1f80c76a87eb0c';
 
 /// F3-3 — aktif salonun bulunduğu aya ait seansları gerçek zamanlı
 /// dinler. Salon bilinmiyorsa (test ortamı vb.) mock repository'e düşer.

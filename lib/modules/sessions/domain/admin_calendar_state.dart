@@ -1,5 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
+import '../../expenses/domain/expense_state.dart';
+
 part 'admin_calendar_state.freezed.dart';
 
 enum AdminSessionState { planned, current, completed, cancelled }
@@ -21,8 +23,10 @@ class AdminCalendarState with _$AdminCalendarState {
     required DateTime selectedDate,
     required Map<int, List<AdminSessionSlot>> slotsByDayOfMonth,
 
-    /// Gün numarası → o gün eklenmiş gider kaydı sayısı (tutar değil, sayı
-    /// — takvimde bildirim rozeti olarak gösteriliyor).
-    @Default(<int, int>{}) Map<int, int> expenseCountByDayOfMonth,
+    /// Gün numarası → o gün eklenmiş gider kayıtları. Takvimde bildirim
+    /// rozeti sayısı için `.length`, seçili gün panelinde liste için
+    /// doğrudan kullanılır.
+    @Default(<int, List<ExpenseEntry>>{})
+    Map<int, List<ExpenseEntry>> expensesByDayOfMonth,
   }) = _AdminCalendarState;
 }
