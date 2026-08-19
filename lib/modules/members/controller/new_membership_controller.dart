@@ -38,6 +38,16 @@ class NewMembershipController extends _$NewMembershipController {
     state = state.copyWith(makeupSessions: state.makeupSessions - 1);
   }
 
+  /// Sayı klavyesinden elle giriş — negatif değer formatter tarafından zaten
+  /// engelleniyor, burada sadece savunma amaçlı 0'a clamp'lanıyor.
+  void setMakeupSessions(int value) =>
+      state = state.copyWith(makeupSessions: value < 0 ? 0 : value);
+
+  void updateStartDate(DateTime date) =>
+      state = state.copyWith(startDate: date);
+
+  void updateEndDate(DateTime date) => state = state.copyWith(endDate: date);
+
   void setPaidFull() => state = state.copyWith(paidAmount: state.totalAmount);
 
   void setPaidHalf() =>

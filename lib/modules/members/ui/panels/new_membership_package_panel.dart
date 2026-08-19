@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/app_spacing.dart';
@@ -6,6 +7,7 @@ import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_button.dart';
+import '../../../../shared/widgets/native_date_picker.dart';
 import '../../../packages/controller/studio_packages_controller.dart';
 import '../../../packages/domain/studio_package.dart';
 import '../../controller/new_member_controller.dart';
@@ -41,6 +43,19 @@ class NewMembershipPackagePanel extends BasePanel {
 
 class _NewMembershipPackagePanelState
     extends BasePanelState<NewMembershipPackagePanel> {
+  final _makeupController = TextEditingController();
+  final _makeupFocusNode = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+    // Odak kaybedildiğinde (ör. boş bırakılıp dışarı tıklandığında) alanı
+    // gerçek state değerine geri senkronlamak için build()'i tetikler.
+    _makeupFocusNode.addListener(() {
+      if (!_makeupFocusNode.hasFocus) setState(() {});
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
@@ -54,6 +69,10 @@ class _NewMembershipPackagePanelState
     final membershipController = ref.read(
       newMembershipControllerProvider.notifier,
     );
+    if (!_makeupFocusNode.hasFocus) {
+      final text = '${membership.makeupSessions}';
+      if (_makeupController.text != text) _makeupController.text = text;
+    }
 
     return Scaffold(
       body: SafeArea(
@@ -212,7 +231,6 @@ class _NewMembershipPackagePanelState
                       selected: membership.selectedPackage?.id == package.id,
                       onTap: () => membershipController.selectPackage(package),
                     ),
-                  const SizedBox(height: AppSpacing.md),
                   Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: AppSpacing.lg,
@@ -230,11 +248,25 @@ class _NewMembershipPackagePanelState
                           label: 'Başlangıç tarihi',
                           value: _formatDate(membership.startDate),
                           showDivider: true,
+                          onTap: () => showNativeDatePicker(
+                            context: context,
+                            initial: membership.startDate,
+                            firstDate: DateTime(DateTime.now().year - 5),
+                            lastDate: DateTime(DateTime.now().year + 2),
+                            onSelected: membershipController.updateStartDate,
+                          ),
                         ),
                         _InfoRow(
                           label: 'Bitiş tarihi',
                           value: _formatDate(membership.endDate),
                           showDivider: true,
+                          onTap: () => showNativeDatePicker(
+                            context: context,
+                            initial: membership.endDate,
+                            firstDate: membership.startDate,
+                            lastDate: DateTime(membership.startDate.year + 5),
+                            onSelected: membershipController.updateEndDate,
+                          ),
                         ),
                         _InfoRow(
                           label: 'Seans sayısı',
@@ -270,17 +302,37 @@ class _NewMembershipPackagePanelState
                                 icon: Icons.remove,
                                 onTap: membershipController.decrementMakeup,
                               ),
+                              const SizedBox(width: AppSpacing.xs),
                               SizedBox(
-                                width: 32,
-                                child: Text(
-                                  '${membership.makeupSessions}',
+                                width: 36,
+                                child: TextField(
+                                  controller: _makeupController,
+                                  focusNode: _makeupFocusNode,
                                   textAlign: TextAlign.center,
+                                  keyboardType: TextInputType.number,
+                                  inputFormatters: [
+                                    FilteringTextInputFormatter.digitsOnly,
+                                  ],
                                   style: typography.dataMedium.copyWith(
                                     color: colors.onSurface,
                                     fontSize: 17,
                                   ),
+                                  decoration: const InputDecoration(
+                                    isDense: true,
+                                    contentPadding: EdgeInsets.zero,
+                                    border: InputBorder.none,
+                                  ),
+                                  onChanged: (value) {
+                                    final parsed = int.tryParse(value);
+                                    if (parsed != null) {
+                                      membershipController.setMakeupSessions(
+                                        parsed,
+                                      );
+                                    }
+                                  },
                                 ),
                               ),
+                              const SizedBox(width: AppSpacing.xs),
                               _StepButton(
                                 icon: Icons.add,
                                 filled: true,
@@ -322,6 +374,13 @@ class _NewMembershipPackagePanelState
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _makeupController.dispose();
+    _makeupFocusNode.dispose();
+    super.dispose();
   }
 }
 
@@ -427,17 +486,19 @@ class _InfoRow extends StatelessWidget {
     required this.label,
     required this.value,
     required this.showDivider,
+    this.onTap,
   });
 
   final String label;
   final String value;
   final bool showDivider;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
     final typography = context.appTypography;
-    return Container(
+    final row = Container(
       constraints: const BoxConstraints(minHeight: 56),
       decoration: BoxDecoration(
         border: showDivider
@@ -456,19 +517,39 @@ class _InfoRow extends StatelessWidget {
           ),
           const SizedBox(width: AppSpacing.sm),
           Flexible(
-            child: Text(
-              value,
-              textAlign: TextAlign.right,
-              overflow: TextOverflow.ellipsis,
-              style: typography.headingSmall.copyWith(
-                color: colors.onSurface,
-                fontSize: 15,
+            child: Align(
+              alignment: Alignment.centerRight,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Flexible(
+                    child: Text(
+                      value,
+                      textAlign: TextAlign.right,
+                      overflow: TextOverflow.ellipsis,
+                      style: typography.headingSmall.copyWith(
+                        color: colors.onSurface,
+                        fontSize: 15,
+                      ),
+                    ),
+                  ),
+                  if (onTap != null) ...[
+                    const SizedBox(width: AppSpacing.xs),
+                    Icon(
+                      Icons.chevron_right,
+                      color: colors.onSurfaceMuted,
+                      size: 18,
+                    ),
+                  ],
+                ],
               ),
             ),
           ),
         ],
       ),
     );
+    if (onTap == null) return row;
+    return InkWell(onTap: onTap, child: row);
   }
 }
 

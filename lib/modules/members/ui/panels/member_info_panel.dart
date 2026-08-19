@@ -1,5 +1,3 @@
-import 'dart:io' show Platform;
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -13,6 +11,7 @@ import '../../../../shared/utils/phone_number_formatter.dart';
 import '../../../../shared/utils/tr_date_formatter.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_text_field.dart';
+import '../../../../shared/widgets/native_date_picker.dart';
 import '../../../trainers/controller/admin_trainers_controller.dart';
 import '../../../trainers/domain/admin_trainer_summary.dart';
 import '../../controller/member_registration_controller.dart';
@@ -427,9 +426,11 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
                           ),
                         InkWell(
                           onTap: widget.isNew
-                              ? () => _showRegisteredAtPicker(
+                              ? () => showNativeDatePicker(
                                   context: context,
                                   initial: form.registeredAt,
+                                  firstDate: DateTime(DateTime.now().year - 50),
+                                  lastDate: DateTime.now(),
                                   onSelected: controller.updateRegisteredAt,
                                 )
                               : null,
@@ -705,68 +706,6 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
         );
       },
     );
-  }
-
-  /// Kayıt tarihi için platformun kendi native tarih seçicisi: iOS'ta
-  /// gün/ay/yıl scroll wheel'i (CupertinoDatePicker), Android'de kendi
-  /// Material takvim diyaloğu (showDatePicker) — ikisi de eskiden beri
-  /// gelen bir üyeyi geçmiş bir tarihle kaydedebilmek için bugünden
-  /// öncesine izin verir.
-  Future<void> _showRegisteredAtPicker({
-    required BuildContext context,
-    required DateTime initial,
-    required ValueChanged<DateTime> onSelected,
-  }) async {
-    final now = DateTime.now();
-    final firstDate = DateTime(now.year - 50);
-    if (Platform.isIOS) {
-      final colors = context.appColors;
-      var selected = initial;
-      await showCupertinoModalPopup<void>(
-        context: context,
-        builder: (sheetContext) {
-          return Container(
-            height: 320,
-            padding: const EdgeInsets.only(top: AppSpacing.sm),
-            color: colors.surface,
-            child: SafeArea(
-              top: false,
-              child: Column(
-                children: [
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: CupertinoButton(
-                      child: const Text('Tamam'),
-                      onPressed: () {
-                        onSelected(selected);
-                        Navigator.of(sheetContext).pop();
-                      },
-                    ),
-                  ),
-                  Expanded(
-                    child: CupertinoDatePicker(
-                      mode: CupertinoDatePickerMode.date,
-                      initialDateTime: initial,
-                      minimumDate: firstDate,
-                      maximumDate: now,
-                      onDateTimeChanged: (date) => selected = date,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        },
-      );
-      return;
-    }
-    final picked = await showDatePicker(
-      context: context,
-      initialDate: initial,
-      firstDate: firstDate,
-      lastDate: now,
-    );
-    if (picked != null) onSelected(picked);
   }
 
   String _digitsOnly(String raw) {
