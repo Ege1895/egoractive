@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../shared/utils/thousands_input_formatter.dart';
 import '../../controller/expenses_controller.dart';
 import '../../domain/expense_state.dart';
 import 'add_expense_panel.dart';
@@ -106,7 +107,7 @@ class AdminExpensesPanel extends ConsumerWidget {
                         ),
                         const SizedBox(height: AppSpacing.xs),
                         Text(
-                          '₺${state.totalTl}',
+                          '₺${formatThousands(state.totalTl)}',
                           style: typography.dataLarge.copyWith(
                             color: colors.onSurface,
                             fontSize: 34,
@@ -231,7 +232,7 @@ class _CategoryRow extends StatelessWidget {
               ),
             ),
             Text(
-              '₺${total.amountTl}',
+              '₺${formatThousands(total.amountTl)}',
               style: typography.headingSmall.copyWith(
                 color: colors.onSurfaceVariant,
                 fontSize: 15,
@@ -299,7 +300,7 @@ class _ExpenseRow extends StatelessWidget {
             ),
           ),
           Text(
-            '₺${entry.amountTl}',
+            '₺${formatThousands(entry.amountTl)}',
             style: typography.headingSmall.copyWith(
               color: colors.onSurfaceVariant,
               fontSize: 15,

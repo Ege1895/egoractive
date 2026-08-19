@@ -7,6 +7,7 @@ import '../../../../core/panels/panel_stack_controller.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_back_button.dart';
 import '../../../../shared/widgets/app_button.dart';
+import '../../../../shared/utils/phone_number_formatter.dart';
 import '../../../../shared/widgets/trend_bar_chart.dart';
 import '../../../measurements/ui/panels/measurements_panel.dart';
 import '../../../trainers/domain/trainer_member_detail.dart';
@@ -192,7 +193,7 @@ class _AdminMemberDetailPanelState
                                     ),
                                   ),
                                   Text(
-                                    '${detail.phone} · Antrenör: ${detail.trainerName}',
+                                    '${formatTrPhoneDisplay(detail.phone)} · Antrenör: ${detail.trainerName}',
                                     style: typography.bodyMedium.copyWith(
                                       color: colors.onSurfaceMuted,
                                       fontSize: 14,

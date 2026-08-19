@@ -6,6 +6,7 @@ import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_back_button.dart';
+import '../../../../shared/utils/phone_number_formatter.dart';
 import '../../../../shared/widgets/trend_bar_chart.dart';
 import '../../../measurements/ui/panels/measurements_panel.dart';
 import '../../../sessions/ui/widgets/create_session_sheet.dart';
@@ -152,7 +153,7 @@ class _TrainerMemberDetailPanelState
                                     ),
                                   ),
                                   Text(
-                                    '${detail.phone} · ${detail.memberSince}',
+                                    '${formatTrPhoneDisplay(detail.phone)} · ${detail.memberSince}',
                                     style: typography.bodyMedium.copyWith(
                                       color: colors.onSurfaceMuted,
                                       fontSize: 14,
