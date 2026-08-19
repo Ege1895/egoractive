@@ -263,8 +263,11 @@ class _CreateGroupSessionPanelState
                   ),
                   const SizedBox(height: AppSpacing.lg),
                   Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.lg,
+                    padding: const EdgeInsets.fromLTRB(
+                      AppSpacing.lg,
+                      0,
+                      AppSpacing.lg,
+                      AppSpacing.lg,
                     ),
                     decoration: BoxDecoration(
                       color: colors.surface,
@@ -335,10 +338,20 @@ class _CreateGroupSessionPanelState
                             ],
                           ),
                         ),
+                        const SizedBox(height: AppSpacing.md),
                         AppTextField(
-                          label: 'Stüdyo',
+                          label: 'Ders yeri (opsiyonel)',
+                          hint: 'Örn. Stüdyo 1, Ana salon',
                           controller: _studioNameController,
                           onChanged: controller.setStudioName,
+                        ),
+                        const SizedBox(height: AppSpacing.xs),
+                        Text(
+                          'Dersin nerede yapılacağını üyelere gösterir.',
+                          style: typography.caption.copyWith(
+                            color: colors.onSurfaceMuted,
+                            fontSize: 12,
+                          ),
                         ),
                       ],
                     ),
