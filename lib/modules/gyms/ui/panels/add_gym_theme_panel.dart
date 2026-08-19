@@ -11,8 +11,9 @@ import '../../../../shared/widgets/app_text_field.dart';
 import '../../controller/gym_theme_controller.dart';
 import '../../domain/gym_theme.dart';
 
-/// Admin · Tema Ekle — paletten seç veya renk kodu gir, salon logosu
-/// kullanılsın mı seçeneği.
+/// Admin · Tema Ekle — paletten seç veya renk kodu gir. Salon logosunun
+/// arka planda gösterilip gösterilmeyeceği artık sadece Temalar
+/// (`GymThemesPanel`) ekranında ayarlanıyor — burada tekrarlanmıyor.
 class AddGymThemePanel extends BasePanel {
   const AddGymThemePanel({super.key});
 
@@ -23,7 +24,6 @@ class AddGymThemePanel extends BasePanel {
 class _AddGymThemePanelState extends BasePanelState<AddGymThemePanel> {
   late final TextEditingController _nameController;
   late final TextEditingController _hexController;
-  late bool _useGymLogo;
   Color _selectedColor = AppThemePalette.colors.first;
   bool _isSaving = false;
   String? _hexError;
@@ -33,7 +33,6 @@ class _AddGymThemePanelState extends BasePanelState<AddGymThemePanel> {
     super.initState();
     _nameController = TextEditingController();
     _hexController = TextEditingController(text: _hexOf(_selectedColor));
-    _useGymLogo = ref.read(gymThemeControllerProvider).watermarkEnabled;
   }
 
   static String _hexOf(Color color) =>
@@ -218,48 +217,6 @@ class _AddGymThemePanelState extends BasePanelState<AddGymThemePanel> {
                     ),
                   ),
                   const SizedBox(height: AppSpacing.lg),
-                  Container(
-                    padding: const EdgeInsets.all(AppSpacing.lg),
-                    decoration: BoxDecoration(
-                      color: colors.surface,
-                      borderRadius: BorderRadius.circular(
-                        AppSpacing.radiusCard,
-                      ),
-                      border: Border.all(color: colors.outline),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Salon logosu kullanılsın mı?',
-                          style: typography.headingSmall.copyWith(
-                            color: colors.onSurface,
-                            fontSize: 16,
-                          ),
-                        ),
-                        const SizedBox(height: AppSpacing.xs),
-                        Text(
-                          'Açıkken üye ve antrenör ekranlarının arkasında %25 opaklıkla görünür.',
-                          style: typography.caption.copyWith(
-                            color: colors.onSurfaceMuted,
-                          ),
-                        ),
-                        const SizedBox(height: AppSpacing.md),
-                        _LogoRadioRow(
-                          label: 'Evet, logoyu kullan',
-                          selected: _useGymLogo,
-                          onTap: () => setState(() => _useGymLogo = true),
-                        ),
-                        const SizedBox(height: AppSpacing.sm),
-                        _LogoRadioRow(
-                          label: 'Hayır, düz zemin',
-                          selected: !_useGymLogo,
-                          onTap: () => setState(() => _useGymLogo = false),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.lg),
                   Text(
                     'ÖNİZLEME',
                     style: typography.caption.copyWith(
@@ -399,28 +356,12 @@ class _AddGymThemePanelState extends BasePanelState<AddGymThemePanel> {
                                   Colors.white,
                                   0.35,
                                 )!,
-                                note: _useGymLogo
-                                    ? 'Salon logosu açık'
-                                    : 'Düz zemin',
+                                note: 'Özel renk',
                               ),
                             );
                             if (!mounted) return;
                             // addTheme başarısız olursa gymThemeControllerProvider.errorMessage
                             // dolu kalır — bu durumda panelde kalıp göstermeliyiz.
-                            if (ref
-                                    .read(gymThemeControllerProvider)
-                                    .errorMessage !=
-                                null) {
-                              setState(() => _isSaving = false);
-                              return;
-                            }
-                            if (_useGymLogo !=
-                                ref
-                                    .read(gymThemeControllerProvider)
-                                    .watermarkEnabled) {
-                              await controller.toggleWatermark();
-                            }
-                            if (!mounted) return;
                             if (ref
                                     .read(gymThemeControllerProvider)
                                     .errorMessage !=
@@ -447,72 +388,5 @@ class _AddGymThemePanelState extends BasePanelState<AddGymThemePanel> {
     _nameController.dispose();
     _hexController.dispose();
     super.dispose();
-  }
-}
-
-class _LogoRadioRow extends StatelessWidget {
-  const _LogoRadioRow({
-    required this.label,
-    required this.selected,
-    required this.onTap,
-  });
-
-  final String label;
-  final bool selected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = context.appColors;
-    final typography = context.appTypography;
-
-    return Material(
-      color: selected ? colors.primaryContainer : colors.surfaceRaised,
-      borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-          constraints: const BoxConstraints(minHeight: 48),
-          child: Row(
-            children: [
-              Container(
-                width: 20,
-                height: 20,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: selected ? colors.primary : colors.outlineStrong,
-                    width: 2,
-                  ),
-                ),
-                alignment: Alignment.center,
-                child: selected
-                    ? Container(
-                        width: 9,
-                        height: 9,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: colors.primary,
-                        ),
-                      )
-                    : null,
-              ),
-              const SizedBox(width: AppSpacing.md),
-              Expanded(
-                child: Text(
-                  label,
-                  style: typography.headingSmall.copyWith(
-                    color: colors.onSurface,
-                    fontSize: 15,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
   }
 }

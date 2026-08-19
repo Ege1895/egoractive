@@ -1,10 +1,17 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:palette_generator/palette_generator.dart';
 
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/theme/theme_controller.dart';
+import '../../../../shared/utils/gym_logo_image.dart';
+import '../../../../shared/utils/phone_number_formatter.dart';
 import '../../../../shared/widgets/app_back_button.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_text_field.dart';
@@ -13,6 +20,7 @@ import '../../../reports/domain/report_recipients.dart';
 import '../../controller/gym_profile_controller.dart';
 import '../../controller/gym_theme_controller.dart';
 import '../../domain/gym_theme.dart';
+import '../../service/gym_logo_service.dart';
 import 'gym_themes_panel.dart';
 
 /// Admin 2 · Salon Bilgileri — düzenleme + Temalar'a giriş.
@@ -37,6 +45,17 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
   String? _phoneError;
   String? _saveErrorMessage;
 
+  XFile? _pickedLogoFile;
+  bool _isUploadingLogo = false;
+  String? _logoError;
+
+  List<Color> _logoPalette = const [];
+  bool _isExtractingPalette = false;
+  String? _paletteSourceKey;
+
+  Color? _previewColor;
+  late final GymTheme _originalTheme;
+
   @override
   void initState() {
     super.initState();
@@ -45,7 +64,9 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
     _addressController = TextEditingController(
       text: '${profile.address}, ${profile.city}',
     );
-    _phoneController = TextEditingController(text: profile.phone);
+    _phoneController = TextEditingController(
+      text: formatTrPhoneDigits(profile.phone),
+    );
 
     final recipients = ref.read(reportRecipientsControllerProvider);
     _gymReportEmailController = TextEditingController(
@@ -54,6 +75,8 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
     _accountingReportEmailController = TextEditingController(
       text: recipients.accountingReportEmail,
     );
+
+    _originalTheme = ref.read(gymThemeControllerProvider.notifier).activeTheme;
   }
 
   @override
@@ -77,7 +100,16 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
       _hydratedFromProfile = true;
       _nameController.text = profileState.name;
       _addressController.text = '${profileState.address}, ${profileState.city}';
-      _phoneController.text = profileState.phone;
+      _phoneController.text = formatTrPhoneDigits(profileState.phone);
+    }
+
+    if (_pickedLogoFile == null &&
+        profileState.logoUrl.isNotEmpty &&
+        _paletteSourceKey != profileState.logoUrl &&
+        !_isExtractingPalette) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _extractPaletteFromNetwork(profileState.logoUrl);
+      });
     }
 
     return Scaffold(
@@ -148,6 +180,7 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
                           label: 'Telefon',
                           keyboardType: TextInputType.phone,
                           controller: _phoneController,
+                          inputFormatters: [TrPhoneNumberInputFormatter()],
                           errorText: _phoneError,
                           onChanged: profileController.updatePhone,
                         ),
@@ -173,23 +206,49 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
                       border: Border.all(color: colors.outline),
                     ),
                     child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Container(
-                          width: 72,
-                          height: 72,
-                          decoration: BoxDecoration(
-                            color: colors.surfaceRaised,
+                        if (_pickedLogoFile != null)
+                          ClipRRect(
                             borderRadius: BorderRadius.circular(
                               AppSpacing.radiusInner,
                             ),
-                            border: Border.all(color: colors.outlineStrong),
+                            child: Image.file(
+                              File(_pickedLogoFile!.path),
+                              width: 72,
+                              height: 72,
+                              fit: BoxFit.cover,
+                            ),
+                          )
+                        else if (profileState.logoUrl.isNotEmpty)
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(
+                              AppSpacing.radiusInner,
+                            ),
+                            child: Image.network(
+                              profileState.logoUrl,
+                              width: 72,
+                              height: 72,
+                              fit: BoxFit.cover,
+                            ),
+                          )
+                        else
+                          Container(
+                            width: 72,
+                            height: 72,
+                            decoration: BoxDecoration(
+                              color: colors.surfaceRaised,
+                              borderRadius: BorderRadius.circular(
+                                AppSpacing.radiusInner,
+                              ),
+                              border: Border.all(color: colors.outlineStrong),
+                            ),
+                            alignment: Alignment.center,
+                            child: Icon(
+                              Icons.image_outlined,
+                              color: colors.onSurfaceMuted,
+                            ),
                           ),
-                          alignment: Alignment.center,
-                          child: Icon(
-                            Icons.image_outlined,
-                            color: colors.onSurfaceMuted,
-                          ),
-                        ),
                         const SizedBox(width: AppSpacing.md),
                         Expanded(
                           child: Column(
@@ -202,36 +261,49 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
                                 ),
                               ),
                               const SizedBox(height: AppSpacing.sm),
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: AppSpacing.md,
+                              Material(
+                                color: colors.surfaceRaised,
+                                borderRadius: BorderRadius.circular(
+                                  AppSpacing.radiusInner,
                                 ),
-                                constraints: const BoxConstraints(
-                                  minHeight: 40,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: colors.surfaceRaised,
+                                child: InkWell(
+                                  onTap: _isUploadingLogo ? null : _pickLogo,
                                   borderRadius: BorderRadius.circular(
                                     AppSpacing.radiusInner,
                                   ),
-                                ),
-                                alignment: Alignment.centerLeft,
-                                child: Text(
-                                  'Logoyu değiştir',
-                                  style: typography.headingSmall.copyWith(
-                                    fontSize: 14,
-                                    color: colors.onSurfaceMuted,
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: AppSpacing.md,
+                                    ),
+                                    constraints: const BoxConstraints(
+                                      minHeight: 40,
+                                    ),
+                                    alignment: Alignment.centerLeft,
+                                    child: Text(
+                                      _isUploadingLogo
+                                          ? 'Yükleniyor…'
+                                          : (_pickedLogoFile == null &&
+                                                    profileState.logoUrl.isEmpty
+                                                ? 'Logo seç'
+                                                : 'Logoyu değiştir'),
+                                      style: typography.headingSmall.copyWith(
+                                        fontSize: 14,
+                                        color: colors.onSurfaceVariant,
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ),
-                              const SizedBox(height: AppSpacing.sm),
-                              Text(
-                                'Logo değişikliği bu ekrandan henüz yapılamıyor.',
-                                style: typography.caption.copyWith(
-                                  color: colors.onSurfaceMuted,
-                                  fontSize: 12,
+                              if (_logoError != null) ...[
+                                const SizedBox(height: AppSpacing.sm),
+                                Text(
+                                  _logoError!,
+                                  style: typography.caption.copyWith(
+                                    color: colors.error,
+                                    fontSize: 12,
+                                  ),
                                 ),
-                              ),
+                              ],
                             ],
                           ),
                         ),
@@ -259,23 +331,66 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Row(
-                          children: [
-                            for (final theme in themeState.themes)
-                              Padding(
-                                padding: const EdgeInsets.only(
-                                  right: AppSpacing.md,
-                                ),
-                                child: _ThemeDot(
-                                  theme: theme,
-                                  selected:
-                                      theme.id == themeState.activeThemeId,
-                                  onTap: () =>
-                                      themeController.selectTheme(theme.id),
+                        if (_isExtractingPalette)
+                          Row(
+                            children: [
+                              SizedBox(
+                                width: 18,
+                                height: 18,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: colors.primary,
                                 ),
                               ),
-                          ],
-                        ),
+                              const SizedBox(width: AppSpacing.sm),
+                              Text(
+                                'Logodan renkler çıkarılıyor…',
+                                style: typography.bodyMedium.copyWith(
+                                  color: colors.onSurfaceMuted,
+                                  fontSize: 13,
+                                ),
+                              ),
+                            ],
+                          )
+                        else if (_logoPalette.isNotEmpty)
+                          Row(
+                            children: [
+                              for (final color in _logoPalette)
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                    right: AppSpacing.md,
+                                  ),
+                                  child: _ColorDot(
+                                    color: color,
+                                    selected:
+                                        color.toARGB32() ==
+                                        (_previewColor ?? active.primary)
+                                            .toARGB32(),
+                                    onTap: () => _previewColorTap(color),
+                                  ),
+                                ),
+                            ],
+                          )
+                        else
+                          Row(
+                            children: [
+                              for (final theme in themeState.themes)
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                    right: AppSpacing.md,
+                                  ),
+                                  child: _ThemeDot(
+                                    theme: theme,
+                                    selected:
+                                        theme.primary.toARGB32() ==
+                                        (_previewColor ?? active.primary)
+                                            .toARGB32(),
+                                    onTap: () =>
+                                        _previewColorTap(theme.primary),
+                                  ),
+                                ),
+                            ],
+                          ),
                         if (themeState.errorMessage != null) ...[
                           const SizedBox(height: AppSpacing.sm),
                           Text(
@@ -317,25 +432,43 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
                                   ],
                                 ),
                               ),
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: AppSpacing.lg,
+                              Material(
+                                color: Colors.transparent,
+                                borderRadius: BorderRadius.circular(
+                                  AppSpacing.radiusInner,
                                 ),
-                                constraints: const BoxConstraints(
-                                  minHeight: 44,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: active.primary,
+                                child: InkWell(
+                                  onTap: _previewColor == null
+                                      ? null
+                                      : _saveTheme,
                                   borderRadius: BorderRadius.circular(
                                     AppSpacing.radiusInner,
                                   ),
-                                ),
-                                alignment: Alignment.center,
-                                child: Text(
-                                  'Kaydet',
-                                  style: typography.headingSmall.copyWith(
-                                    fontSize: 15,
-                                    color: colors.onPrimary,
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: AppSpacing.lg,
+                                    ),
+                                    constraints: const BoxConstraints(
+                                      minHeight: 44,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: _previewColor == null
+                                          ? active.primary.withValues(
+                                              alpha: 0.4,
+                                            )
+                                          : active.primary,
+                                      borderRadius: BorderRadius.circular(
+                                        AppSpacing.radiusInner,
+                                      ),
+                                    ),
+                                    alignment: Alignment.center,
+                                    child: Text(
+                                      'Kaydet',
+                                      style: typography.headingSmall.copyWith(
+                                        fontSize: 15,
+                                        color: colors.onPrimary,
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ),
@@ -514,6 +647,120 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
     );
   }
 
+  @override
+  void onPanelHide() {
+    if (_previewColor != null) {
+      ref
+          .read(themeControllerProvider.notifier)
+          .setAccentColor(_originalTheme.primary);
+    }
+    super.onPanelHide();
+  }
+
+  Future<void> _pickLogo() async {
+    final file = await ref.read(gymLogoServiceProvider).pickLogo();
+    if (file == null) return;
+    setState(() {
+      _pickedLogoFile = file;
+      _logoError = null;
+      _logoPalette = const [];
+      _paletteSourceKey = null;
+    });
+    await _extractPaletteFromFile(file);
+    await _uploadLogo(file);
+  }
+
+  Future<void> _uploadLogo(XFile file) async {
+    final gymId = await ref.read(activeGymIdProvider.future);
+    if (gymId == null) {
+      setState(() => _logoError = 'Logo yüklenemedi, tekrar dene.');
+      return;
+    }
+    setState(() => _isUploadingLogo = true);
+    try {
+      await ref
+          .read(gymLogoServiceProvider)
+          .uploadLogo(gymId: gymId, file: file);
+      if (!mounted) return;
+      setState(() => _isUploadingLogo = false);
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _isUploadingLogo = false;
+        _logoError = 'Logo yüklenemedi, tekrar dene.';
+      });
+    }
+  }
+
+  Future<void> _extractPaletteFromFile(XFile file) async {
+    setState(() => _isExtractingPalette = true);
+    try {
+      final generator = await PaletteGenerator.fromImageProvider(
+        FileImage(File(file.path)),
+        maximumColorCount: 12,
+      );
+      if (!mounted) return;
+      setState(() {
+        _logoPalette = extractGymPaletteColors(generator);
+        _isExtractingPalette = false;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _isExtractingPalette = false);
+    }
+  }
+
+  Future<void> _extractPaletteFromNetwork(String url) async {
+    if (_paletteSourceKey == url) return;
+    _paletteSourceKey = url;
+    setState(() => _isExtractingPalette = true);
+    try {
+      final generator = await PaletteGenerator.fromImageProvider(
+        NetworkImage(url),
+        maximumColorCount: 12,
+      );
+      if (!mounted) return;
+      setState(() {
+        _logoPalette = extractGymPaletteColors(generator);
+        _isExtractingPalette = false;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _isExtractingPalette = false);
+    }
+  }
+
+  void _previewColorTap(Color color) {
+    setState(() => _previewColor = color);
+    ref.read(themeControllerProvider.notifier).setAccentColor(color);
+  }
+
+  Future<void> _saveTheme() async {
+    final color = _previewColor;
+    if (color == null) return;
+    final themeState = ref.read(gymThemeControllerProvider);
+    final themeController = ref.read(gymThemeControllerProvider.notifier);
+    final matching = themeState.themes
+        .where((t) => t.primary.toARGB32() == color.toARGB32())
+        .firstOrNull;
+    if (matching != null) {
+      await themeController.selectTheme(matching.id);
+    } else {
+      final hex = color.toARGB32().toRadixString(16).substring(2).toUpperCase();
+      await themeController.addTheme(
+        GymTheme(
+          id: 'logo-$hex',
+          name: 'Logo rengi',
+          primary: color,
+          soft: Color.lerp(color, Colors.white, 0.35)!,
+          note: 'Logonuzdan çıkarıldı',
+        ),
+      );
+    }
+    if (!mounted) return;
+    setState(() => _previewColor = null);
+  }
+
   Future<void> _save() async {
     final name = _nameController.text.trim();
     final address = _addressController.text.trim();
@@ -589,6 +836,47 @@ class _ThemeDot extends StatelessWidget {
             shape: BoxShape.circle,
             color: theme.primary,
           ),
+        ),
+      ),
+    );
+  }
+}
+
+/// [_ThemeDot] ile aynı görünüm, ama hazır bir [GymTheme] presetine değil
+/// logodan çıkarılan ham bir [Color]'a bağlı (palette_generator önerisi) —
+/// bkz. [GymSetupPanel]'in aynı amaçla kullandığı `_ColorSwatch`.
+class _ColorDot extends StatelessWidget {
+  const _ColorDot({
+    required this.color,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final Color color;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 52,
+        height: 52,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: color.withValues(alpha: 0.16),
+          border: Border.all(
+            color: selected ? color : colors.outlineStrong,
+            width: 2,
+          ),
+        ),
+        alignment: Alignment.center,
+        child: Container(
+          width: 24,
+          height: 24,
+          decoration: BoxDecoration(shape: BoxShape.circle, color: color),
         ),
       ),
     );

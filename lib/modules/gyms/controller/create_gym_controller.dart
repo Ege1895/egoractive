@@ -8,6 +8,7 @@ import 'package:palette_generator/palette_generator.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/theme/theme_controller.dart';
+import '../../../shared/utils/gym_logo_image.dart';
 import '../domain/gym_profile.dart';
 import '../service/create_gym_service.dart';
 import 'gym_profile_controller.dart';
@@ -142,15 +143,7 @@ class CreateGymController extends _$CreateGymController {
         FileImage(File(file.path)),
         maximumColorCount: 12,
       );
-      final candidates = <Color?>[
-        generator.dominantColor?.color,
-        generator.vibrantColor?.color,
-        generator.lightVibrantColor?.color,
-        generator.darkVibrantColor?.color,
-        generator.mutedColor?.color,
-      ].whereType<Color>().toList();
-
-      final palette = _dedupeSimilarColors(candidates).take(5).toList();
+      final palette = extractGymPaletteColors(generator);
       state = state.copyWith(
         isExtractingPalette: false,
         logoPalette: palette,
@@ -159,25 +152,6 @@ class CreateGymController extends _$CreateGymController {
     } catch (_) {
       state = state.copyWith(isExtractingPalette: false, logoPalette: const []);
     }
-  }
-
-  /// Palette_generator'ın döndürdüğü roller (dominant/vibrant/muted vb.)
-  /// çoğu logoda birbirine çok yakın renkler verir — göz zar zor ayırt
-  /// edebileceği neredeyse aynı iki rengi ayrı seçenek olarak göstermemek
-  /// için kaba bir RGB mesafe eşiğiyle eleniyor.
-  List<Color> _dedupeSimilarColors(List<Color> colors) {
-    const threshold = 24;
-    final result = <Color>[];
-    for (final color in colors) {
-      final isSimilar = result.any((kept) {
-        final dr = (kept.r - color.r).abs() * 255;
-        final dg = (kept.g - color.g).abs() * 255;
-        final db = (kept.b - color.b).abs() * 255;
-        return dr < threshold && dg < threshold && db < threshold;
-      });
-      if (!isSimilar) result.add(color);
-    }
-    return result;
   }
 
   /// Zorunlu alan eksikse ilgili alanın hatasını doldurup `null` döner —
