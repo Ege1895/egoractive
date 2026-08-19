@@ -165,11 +165,14 @@ class _CreateSessionSheetState extends ConsumerState<_CreateSessionSheet> {
           const SizedBox(height: AppSpacing.lg),
           _PickerRow(
             label: 'Üye',
-            value: _member?.name ?? 'Seç',
+            value: _member == null
+                ? 'Seç'
+                : '${_member!.name} · ${_member!.remainingSessions} seans',
             onTap: () => _pickFromList<AdminMemberSummary>(
               title: 'Üye seç',
               items: members,
               labelOf: (m) => m.name,
+              subtitleOf: (m) => '${m.remainingSessions} seans',
               onSelected: (m) => setState(() => _member = m),
             ),
           ),
@@ -237,6 +240,7 @@ class _CreateSessionSheetState extends ConsumerState<_CreateSessionSheet> {
     required List<T> items,
     required String Function(T) labelOf,
     required void Function(T) onSelected,
+    String Function(T)? subtitleOf,
   }) {
     final colors = context.appColors;
     showModalBottomSheet<void>(
@@ -268,13 +272,25 @@ class _CreateSessionSheetState extends ConsumerState<_CreateSessionSheet> {
                   },
                   child: Container(
                     constraints: const BoxConstraints(minHeight: 52),
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      labelOf(item),
-                      style: context.appTypography.bodyLarge.copyWith(
-                        color: colors.onSurface,
-                        fontSize: 15,
-                      ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            labelOf(item),
+                            style: context.appTypography.bodyLarge.copyWith(
+                              color: colors.onSurface,
+                              fontSize: 15,
+                            ),
+                          ),
+                        ),
+                        if (subtitleOf != null)
+                          Text(
+                            subtitleOf(item),
+                            style: context.appTypography.caption.copyWith(
+                              color: colors.onSurfaceMuted,
+                            ),
+                          ),
+                      ],
                     ),
                   ),
                 ),

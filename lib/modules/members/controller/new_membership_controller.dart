@@ -48,6 +48,8 @@ class NewMembershipController extends _$NewMembershipController {
 
   void updateEndDate(DateTime date) => state = state.copyWith(endDate: date);
 
+  void updateDueDate(DateTime date) => state = state.copyWith(dueDate: date);
+
   void setPaidFull() => state = state.copyWith(paidAmount: state.totalAmount);
 
   void setPaidHalf() =>
@@ -92,6 +94,7 @@ class NewMembershipController extends _$NewMembershipController {
         'makeupSessions': state.makeupSessions,
         'startDate': state.startDate.toIso8601String(),
         'endDate': state.endDate.toIso8601String(),
+        if (state.dueDate != null) 'dueDate': state.dueDate!.toIso8601String(),
         'totalAmount': state.totalAmount,
         'paidAmount': state.paidAmount,
         'dueAmount': state.dueAmount,

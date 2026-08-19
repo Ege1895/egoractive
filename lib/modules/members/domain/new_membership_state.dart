@@ -10,6 +10,7 @@ class NewMembershipState with _$NewMembershipState {
     StudioPackage? selectedPackage,
     required DateTime startDate,
     required DateTime endDate,
+    DateTime? dueDate,
     required int makeupSessions,
     required int paidAmount,
     String? otherAmountDraft,

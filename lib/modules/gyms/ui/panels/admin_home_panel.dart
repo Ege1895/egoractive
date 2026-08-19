@@ -6,7 +6,7 @@ import '../../../../core/panels/panel_stack_controller.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/progress_ring.dart';
-import '../../../notifications/ui/panels/send_notification_panel.dart';
+import '../../../notifications/ui/panels/admin_notifications_panel.dart';
 import '../../../trainers/ui/panels/admin_trainer_management_panel.dart';
 import '../../controller/admin_home_controller.dart';
 import '../../controller/gym_profile_controller.dart';
@@ -53,7 +53,10 @@ class AdminHomePanel extends ConsumerWidget {
                         )
                       : Image.network(
                           profile.logoUrl,
+                          width: double.infinity,
+                          height: double.infinity,
                           fit: BoxFit.cover,
+                          alignment: Alignment.center,
                           errorBuilder: (context, error, stackTrace) => Icon(
                             Icons.fitness_center_rounded,
                             color: colors.onPrimaryContainer,
@@ -84,7 +87,7 @@ class AdminHomePanel extends ConsumerWidget {
                 ),
                 InkWell(
                   borderRadius: BorderRadius.circular(999),
-                  onTap: () => panelStack.push(const SendNotificationPanel()),
+                  onTap: () => panelStack.push(const AdminNotificationsPanel()),
                   child: Container(
                     width: 44,
                     height: 44,
@@ -114,7 +117,8 @@ class AdminHomePanel extends ConsumerWidget {
               child: Row(
                 children: [
                   ProgressRing(
-                    size: 84,
+                    size: 260,
+                    strokeWidth: 12,
                     progress: state.completionRatio,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,

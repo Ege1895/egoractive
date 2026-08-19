@@ -20,6 +20,7 @@ mixin _$NewMembershipState {
   StudioPackage? get selectedPackage => throw _privateConstructorUsedError;
   DateTime get startDate => throw _privateConstructorUsedError;
   DateTime get endDate => throw _privateConstructorUsedError;
+  DateTime? get dueDate => throw _privateConstructorUsedError;
   int get makeupSessions => throw _privateConstructorUsedError;
   int get paidAmount => throw _privateConstructorUsedError;
   String? get otherAmountDraft => throw _privateConstructorUsedError;
@@ -44,6 +45,7 @@ abstract class $NewMembershipStateCopyWith<$Res> {
     StudioPackage? selectedPackage,
     DateTime startDate,
     DateTime endDate,
+    DateTime? dueDate,
     int makeupSessions,
     int paidAmount,
     String? otherAmountDraft,
@@ -72,6 +74,7 @@ class _$NewMembershipStateCopyWithImpl<$Res, $Val extends NewMembershipState>
     Object? selectedPackage = freezed,
     Object? startDate = null,
     Object? endDate = null,
+    Object? dueDate = freezed,
     Object? makeupSessions = null,
     Object? paidAmount = null,
     Object? otherAmountDraft = freezed,
@@ -92,6 +95,10 @@ class _$NewMembershipStateCopyWithImpl<$Res, $Val extends NewMembershipState>
                 ? _value.endDate
                 : endDate // ignore: cast_nullable_to_non_nullable
                       as DateTime,
+            dueDate: freezed == dueDate
+                ? _value.dueDate
+                : dueDate // ignore: cast_nullable_to_non_nullable
+                      as DateTime?,
             makeupSessions: null == makeupSessions
                 ? _value.makeupSessions
                 : makeupSessions // ignore: cast_nullable_to_non_nullable
@@ -145,6 +152,7 @@ abstract class _$$NewMembershipStateImplCopyWith<$Res>
     StudioPackage? selectedPackage,
     DateTime startDate,
     DateTime endDate,
+    DateTime? dueDate,
     int makeupSessions,
     int paidAmount,
     String? otherAmountDraft,
@@ -173,6 +181,7 @@ class __$$NewMembershipStateImplCopyWithImpl<$Res>
     Object? selectedPackage = freezed,
     Object? startDate = null,
     Object? endDate = null,
+    Object? dueDate = freezed,
     Object? makeupSessions = null,
     Object? paidAmount = null,
     Object? otherAmountDraft = freezed,
@@ -193,6 +202,10 @@ class __$$NewMembershipStateImplCopyWithImpl<$Res>
             ? _value.endDate
             : endDate // ignore: cast_nullable_to_non_nullable
                   as DateTime,
+        dueDate: freezed == dueDate
+            ? _value.dueDate
+            : dueDate // ignore: cast_nullable_to_non_nullable
+                  as DateTime?,
         makeupSessions: null == makeupSessions
             ? _value.makeupSessions
             : makeupSessions // ignore: cast_nullable_to_non_nullable
@@ -225,6 +238,7 @@ class _$NewMembershipStateImpl extends _NewMembershipState {
     this.selectedPackage,
     required this.startDate,
     required this.endDate,
+    this.dueDate,
     required this.makeupSessions,
     required this.paidAmount,
     this.otherAmountDraft,
@@ -239,6 +253,8 @@ class _$NewMembershipStateImpl extends _NewMembershipState {
   @override
   final DateTime endDate;
   @override
+  final DateTime? dueDate;
+  @override
   final int makeupSessions;
   @override
   final int paidAmount;
@@ -252,7 +268,7 @@ class _$NewMembershipStateImpl extends _NewMembershipState {
 
   @override
   String toString() {
-    return 'NewMembershipState(selectedPackage: $selectedPackage, startDate: $startDate, endDate: $endDate, makeupSessions: $makeupSessions, paidAmount: $paidAmount, otherAmountDraft: $otherAmountDraft, isSaving: $isSaving, errorMessage: $errorMessage)';
+    return 'NewMembershipState(selectedPackage: $selectedPackage, startDate: $startDate, endDate: $endDate, dueDate: $dueDate, makeupSessions: $makeupSessions, paidAmount: $paidAmount, otherAmountDraft: $otherAmountDraft, isSaving: $isSaving, errorMessage: $errorMessage)';
   }
 
   @override
@@ -265,6 +281,7 @@ class _$NewMembershipStateImpl extends _NewMembershipState {
             (identical(other.startDate, startDate) ||
                 other.startDate == startDate) &&
             (identical(other.endDate, endDate) || other.endDate == endDate) &&
+            (identical(other.dueDate, dueDate) || other.dueDate == dueDate) &&
             (identical(other.makeupSessions, makeupSessions) ||
                 other.makeupSessions == makeupSessions) &&
             (identical(other.paidAmount, paidAmount) ||
@@ -283,6 +300,7 @@ class _$NewMembershipStateImpl extends _NewMembershipState {
     selectedPackage,
     startDate,
     endDate,
+    dueDate,
     makeupSessions,
     paidAmount,
     otherAmountDraft,
@@ -307,6 +325,7 @@ abstract class _NewMembershipState extends NewMembershipState {
     final StudioPackage? selectedPackage,
     required final DateTime startDate,
     required final DateTime endDate,
+    final DateTime? dueDate,
     required final int makeupSessions,
     required final int paidAmount,
     final String? otherAmountDraft,
@@ -321,6 +340,8 @@ abstract class _NewMembershipState extends NewMembershipState {
   DateTime get startDate;
   @override
   DateTime get endDate;
+  @override
+  DateTime? get dueDate;
   @override
   int get makeupSessions;
   @override

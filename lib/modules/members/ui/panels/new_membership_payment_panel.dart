@@ -11,6 +11,8 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_back_button.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_text_field.dart';
+import '../../../../shared/utils/tr_date_formatter.dart';
+import '../../../../shared/widgets/native_date_picker.dart';
 import '../../controller/admin_member_list_controller.dart';
 import '../../controller/member_registration_controller.dart';
 import '../../controller/new_member_controller.dart';
@@ -316,30 +318,47 @@ class _NewMembershipPaymentPanelState
                           ),
                         ),
                         const SizedBox(height: AppSpacing.md),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                'Son ödeme tarihi',
-                                style: typography.bodyLarge.copyWith(
-                                  color: colors.onSurfaceVariant,
+                        InkWell(
+                          borderRadius: BorderRadius.circular(
+                            AppSpacing.radiusInner,
+                          ),
+                          onTap: () => showNativeDatePicker(
+                            context: context,
+                            initial: membership.dueDate ?? DateTime.now(),
+                            firstDate: DateTime(membership.startDate.year - 1),
+                            lastDate: DateTime(membership.endDate.year + 2),
+                            onSelected: membershipController.updateDueDate,
+                          ),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  'Son ödeme tarihi',
+                                  style: typography.bodyLarge.copyWith(
+                                    color: colors.onSurfaceVariant,
+                                    fontSize: 15,
+                                  ),
+                                ),
+                              ),
+                              Text(
+                                membership.dueDate == null
+                                    ? '—'
+                                    : formatTrDate(membership.dueDate!),
+                                style: typography.headingSmall.copyWith(
+                                  color: membership.dueDate == null
+                                      ? colors.onSurfaceMuted
+                                      : colors.onSurface,
                                   fontSize: 15,
                                 ),
                               ),
-                            ),
-                            // Gerçek bir vade tarihi hiçbir yerde
-                            // hesaplanmıyor/kaydedilmiyor — sabit bir tarih
-                            // (ör. "10 Ağu 2026") göstermek yerine, gerçek
-                            // bir vade politikası tanımlanana kadar bu alan
-                            // boş bırakılıyor.
-                            Text(
-                              '—',
-                              style: typography.headingSmall.copyWith(
+                              const SizedBox(width: AppSpacing.xs),
+                              Icon(
+                                Icons.chevron_right,
                                 color: colors.onSurfaceMuted,
-                                fontSize: 15,
+                                size: 18,
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ],
                     ),
