@@ -192,4 +192,23 @@ class AdminMemberDetailController extends _$AdminMemberDetailController {
           paid: paid,
         );
   }
+
+  /// [EditMemberPaymentPanel]'in "Kaydet" butonu — toplam tutarı ve tüm
+  /// taksit planını değiştirir. `packageDocId` yoksa (üyenin hiç paketi
+  /// yoksa) sessizce hiçbir şey yapmaz, çağıran taraf bu ekranı zaten o
+  /// durumda açmamalı.
+  Future<void> saveInstallmentPlan({
+    required int totalAmountTl,
+    required List<MembershipInstallment> installments,
+  }) async {
+    final packageDocId = state.packageDocId;
+    if (packageDocId == null) return;
+    await ref
+        .read(membershipInstallmentWriteServiceProvider)
+        .setInstallmentPlan(
+          packageDocId: packageDocId,
+          totalAmountTl: totalAmountTl,
+          installments: installments,
+        );
+  }
 }

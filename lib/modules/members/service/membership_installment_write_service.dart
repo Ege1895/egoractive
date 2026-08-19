@@ -50,6 +50,29 @@ class MembershipInstallmentWriteService {
       'dueAmount': (totalAmount - paidTotal).clamp(0, totalAmount),
     });
   }
+
+  /// Toplam tutarı ve taksit planının tamamını değiştirir —
+  /// [EditMemberPaymentPanel]'in "Kaydet" butonu, eski üyeliklerde hiç
+  /// taksit kaydı olmayan (yalnızca `totalAmount`/`paidAmount` alanları
+  /// dolu) durumu da ilk kez taksitli hale getirebilsin diye.
+  Future<void> setInstallmentPlan({
+    required String packageDocId,
+    required int totalAmountTl,
+    required List<MembershipInstallment> installments,
+  }) async {
+    final paidTotal = installments
+        .where((installment) => installment.paid)
+        .fold<int>(0, (total, installment) => total + installment.amountTl);
+    await FirebaseFirestore.instance
+        .collection('memberPackages')
+        .doc(packageDocId)
+        .update({
+          'totalAmount': totalAmountTl,
+          'installments': installments.map(installmentToMap).toList(),
+          'paidAmount': paidTotal,
+          'dueAmount': (totalAmountTl - paidTotal).clamp(0, totalAmountTl),
+        });
+  }
 }
 
 @riverpod

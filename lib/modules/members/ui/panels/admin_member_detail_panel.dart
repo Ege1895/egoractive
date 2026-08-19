@@ -14,8 +14,8 @@ import '../../../trainers/domain/trainer_member_detail.dart';
 import '../../../trainers/domain/trainer_metric.dart';
 import '../../controller/admin_member_detail_controller.dart';
 import '../../domain/admin_member_summary.dart';
-import '../widgets/installment_edit_sheet.dart';
 import '../widgets/installment_row.dart';
+import 'edit_member_payment_panel.dart';
 import 'member_info_panel.dart';
 
 /// Admin 21 · Üye Detayı — yönetici görünümü, ödeme bilgisi dahil.
@@ -75,7 +75,6 @@ class _AdminMemberDetailPanelState
     }
 
     final series = detail.seriesByMetric[detail.selectedMetric]!;
-    final isPaidFull = detail.paymentDueTl == 0;
 
     return Scaffold(
       body: SafeArea(
@@ -254,119 +253,116 @@ class _AdminMemberDetailPanelState
                     ),
                   ),
                   const SizedBox(height: AppSpacing.lg),
-                  Container(
-                    padding: const EdgeInsets.all(AppSpacing.lg),
-                    decoration: BoxDecoration(
-                      color: colors.warningContainer,
+                  Material(
+                    color: colors.warningContainer,
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
+                    child: InkWell(
                       borderRadius: BorderRadius.circular(
                         AppSpacing.radiusCard,
                       ),
-                      border: Border.all(
-                        color: colors.warning.withValues(alpha: 0.32),
-                      ),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                'Ödeme durumu',
-                                style: typography.headingSmall.copyWith(
-                                  color: colors.onWarningContainer,
-                                  fontSize: 16,
-                                ),
-                              ),
-                            ),
-                            Text(
-                              'Son ödeme ${detail.lastPaymentDate}',
-                              style: typography.bodyMedium.copyWith(
-                                color: colors.onSurfaceVariant,
-                                fontSize: 13,
-                              ),
-                            ),
-                          ],
+                      onTap: () => ref
+                          .read(panelStackControllerProvider.notifier)
+                          .push(
+                            EditMemberPaymentPanel(memberId: widget.memberId),
+                          ),
+                      child: Container(
+                        padding: const EdgeInsets.all(AppSpacing.lg),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(
+                            AppSpacing.radiusCard,
+                          ),
+                          border: Border.all(
+                            color: colors.warning.withValues(alpha: 0.32),
+                          ),
                         ),
-                        const SizedBox(height: AppSpacing.md),
-                        Row(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Expanded(
-                              child: _PaymentTile(
-                                label: 'Toplam',
-                                value: '₺${detail.paymentTotalTl}',
-                                valueColor: colors.onSurface,
-                              ),
-                            ),
-                            const SizedBox(width: AppSpacing.sm),
-                            Expanded(
-                              child: _PaymentTile(
-                                label: 'Ödendi',
-                                value: '₺${detail.paymentPaidTl}',
-                                valueColor: colors.success,
-                              ),
-                            ),
-                            const SizedBox(width: AppSpacing.sm),
-                            Expanded(
-                              child: _PaymentTile(
-                                label: 'Kalan',
-                                value: '₺${detail.paymentDueTl}',
-                                valueColor: colors.onWarningContainer,
-                              ),
-                            ),
-                          ],
-                        ),
-                        if (detail.installments.isNotEmpty) ...[
-                          const SizedBox(height: AppSpacing.md),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: AppSpacing.md,
-                            ),
-                            decoration: BoxDecoration(
-                              color: colors.surface,
-                              borderRadius: BorderRadius.circular(
-                                AppSpacing.radiusInner,
-                              ),
-                            ),
-                            child: Column(
+                            Row(
                               children: [
-                                for (
-                                  var i = 0;
-                                  i < detail.installments.length;
-                                  i++
-                                )
-                                  InstallmentRow(
-                                    installment: detail.installments[i],
-                                    showDivider:
-                                        i < detail.installments.length - 1,
-                                    onTap: () => showInstallmentEditSheet(
-                                      context,
-                                      installment: detail.installments[i],
-                                      onSave:
-                                          ({
-                                            required amountTl,
-                                            required dueDate,
-                                            required paid,
-                                          }) => controller.updateInstallment(
-                                            detail.installments[i].index,
-                                            amountTl: amountTl,
-                                            dueDate: dueDate,
-                                            paid: paid,
-                                          ),
+                                Expanded(
+                                  child: Text(
+                                    'Ödeme durumu',
+                                    style: typography.headingSmall.copyWith(
+                                      color: colors.onWarningContainer,
+                                      fontSize: 16,
                                     ),
                                   ),
+                                ),
+                                Text(
+                                  'Son ödeme ${detail.lastPaymentDate}',
+                                  style: typography.bodyMedium.copyWith(
+                                    color: colors.onSurfaceVariant,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                                const SizedBox(width: AppSpacing.xs),
+                                Icon(
+                                  Icons.chevron_right,
+                                  color: colors.onSurfaceMuted,
+                                  size: 18,
+                                ),
                               ],
                             ),
-                          ),
-                        ] else if (isPaidFull) ...[
-                          const SizedBox(height: AppSpacing.md),
-                          AppButton(
-                            label: 'Ödeme tamamlandı',
-                            variant: AppButtonVariant.secondary,
-                            onPressed: null,
-                          ),
-                        ],
-                      ],
+                            const SizedBox(height: AppSpacing.md),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: _PaymentTile(
+                                    label: 'Toplam',
+                                    value: '₺${detail.paymentTotalTl}',
+                                    valueColor: colors.onSurface,
+                                  ),
+                                ),
+                                const SizedBox(width: AppSpacing.sm),
+                                Expanded(
+                                  child: _PaymentTile(
+                                    label: 'Ödendi',
+                                    value: '₺${detail.paymentPaidTl}',
+                                    valueColor: colors.success,
+                                  ),
+                                ),
+                                const SizedBox(width: AppSpacing.sm),
+                                Expanded(
+                                  child: _PaymentTile(
+                                    label: 'Kalan',
+                                    value: '₺${detail.paymentDueTl}',
+                                    valueColor: colors.onWarningContainer,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            if (detail.installments.isNotEmpty) ...[
+                              const SizedBox(height: AppSpacing.md),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: AppSpacing.md,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: colors.surface,
+                                  borderRadius: BorderRadius.circular(
+                                    AppSpacing.radiusInner,
+                                  ),
+                                ),
+                                child: Column(
+                                  children: [
+                                    for (
+                                      var i = 0;
+                                      i < detail.installments.length;
+                                      i++
+                                    )
+                                      InstallmentRow(
+                                        installment: detail.installments[i],
+                                        showDivider:
+                                            i < detail.installments.length - 1,
+                                      ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
                     ),
                   ),
                   const SizedBox(height: AppSpacing.lg),
