@@ -11,6 +11,7 @@ import '../../../members/domain/admin_member_summary.dart';
 import '../../../trainers/controller/admin_trainers_controller.dart';
 import '../../../trainers/domain/admin_trainer_summary.dart';
 import '../../service/sessions_write_service.dart';
+import 'repeat_session_calendar_sheet.dart';
 
 /// F3-3 — "+ Seans": üye + antrenör + tarih/saat seçip `sessions`
 /// koleksiyonuna gerçek bir doküman yazar.
@@ -99,6 +100,7 @@ class _CreateSessionSheetState extends ConsumerState<_CreateSessionSheet> {
   TimeOfDay _time = const TimeOfDay(hour: 18, minute: 0);
   AdminMemberSummary? _member;
   AdminTrainerSummary? _trainer;
+  List<DateTime> _repeatDates = [];
   bool _isCreating = false;
   String? _errorMessage;
 
@@ -114,46 +116,73 @@ class _CreateSessionSheetState extends ConsumerState<_CreateSessionSheet> {
       _isCreating = true;
       _errorMessage = null;
     });
-    try {
-      final gymId = await ref.read(activeGymIdProvider.future);
-      if (gymId == null) {
-        throw StateError('Aktif salon bulunamadı.');
-      }
-      await ref
-          .read(sessionsWriteServiceProvider)
-          .createSession(
-            gymId: gymId,
-            trainerId: _trainer!.id,
-            trainerName: _trainer!.name,
-            memberId: _member!.id,
-            memberName: _member!.name,
-            startTime: DateTime(
-              _date.year,
-              _date.month,
-              _date.day,
-              _time.hour,
-              _time.minute,
-            ),
-          );
-    } on TrainerConflictException catch (e) {
+    final gymId = await ref.read(activeGymIdProvider.future);
+    if (gymId == null) {
       if (mounted) {
         setState(() {
           _isCreating = false;
-          _errorMessage =
-              '${e.trainerName} bu saatte dolu, başka bir saat seç.';
-        });
-      }
-      return;
-    } catch (_) {
-      if (mounted) {
-        setState(() {
-          _isCreating = false;
-          _errorMessage = 'Seans oluşturulamadı, tekrar dene.';
+          _errorMessage = 'Aktif salon bulunamadı.';
         });
       }
       return;
     }
-    if (mounted) Navigator.of(context).pop();
+
+    // "Tekrarla"dan eklenen ek günler de aynı saatle, ana tarihle birlikte
+    // ayrı ayrı oluşturulur — her biri kendi antrenör çakışma kontrolünden
+    // geçer, biri çakışırsa diğerleri yine de oluşturulur.
+    final allDates = [_date, ..._repeatDates];
+    final failedDays = <String>[];
+    var anySucceeded = false;
+    for (final date in allDates) {
+      try {
+        await ref
+            .read(sessionsWriteServiceProvider)
+            .createSession(
+              gymId: gymId,
+              trainerId: _trainer!.id,
+              trainerName: _trainer!.name,
+              memberId: _member!.id,
+              memberName: _member!.name,
+              startTime: DateTime(
+                date.year,
+                date.month,
+                date.day,
+                _time.hour,
+                _time.minute,
+              ),
+            );
+        anySucceeded = true;
+      } on TrainerConflictException {
+        failedDays.add('${date.day}.${date.month}');
+      } catch (_) {
+        failedDays.add('${date.day}.${date.month}');
+      }
+    }
+
+    if (!mounted) return;
+    if (failedDays.isEmpty) {
+      Navigator.of(context).pop();
+      return;
+    }
+    if (anySucceeded) {
+      // Ana işlem (en az bir seans) başarılı — sheet kapanır, hangi
+      // günlerin çakışma yüzünden atlandığı bir SnackBar'la bildirilir
+      // (sheet kapanınca inline hata mesajı görünmeden kaybolurdu).
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Şu günler için antrenör dolu, atlandı: ${failedDays.join(', ')}.',
+          ),
+          duration: const Duration(seconds: 5),
+        ),
+      );
+      Navigator.of(context).pop();
+      return;
+    }
+    setState(() {
+      _isCreating = false;
+      _errorMessage = '${_trainer!.name} bu saatte dolu, başka bir saat seç.';
+    });
   }
 
   @override
@@ -192,7 +221,12 @@ class _CreateSessionSheetState extends ConsumerState<_CreateSessionSheet> {
               items: members,
               labelOf: (m) => m.name,
               subtitleOf: (m) => '${m.remainingSessions} seans',
-              onSelected: (m) => setState(() => _member = m),
+              onSelected: (m) => setState(() {
+                _member = m;
+                // Kalan seans sayısı üyeye özel — üye değişince önceki
+                // seçimler yeni üyenin kotasını hiç yansıtmıyor olur.
+                _repeatDates = [];
+              }),
             ),
           ),
           const SizedBox(height: AppSpacing.sm),
@@ -217,7 +251,12 @@ class _CreateSessionSheetState extends ConsumerState<_CreateSessionSheet> {
                 firstDate: DateTime.now().subtract(const Duration(days: 1)),
                 lastDate: DateTime.now().add(const Duration(days: 365)),
               );
-              if (picked != null) setState(() => _date = picked);
+              if (picked != null) {
+                setState(() {
+                  _date = picked;
+                  _repeatDates = [];
+                });
+              }
             },
           ),
           const SizedBox(height: AppSpacing.sm),
@@ -231,6 +270,26 @@ class _CreateSessionSheetState extends ConsumerState<_CreateSessionSheet> {
               );
               if (picked != null) setState(() => _time = picked);
             },
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          _PickerRow(
+            label: 'Tekrarla',
+            value: _repeatDates.isEmpty
+                ? 'Seç'
+                : '${_repeatDates.length} gün seçildi',
+            onTap: _member == null
+                ? null
+                : () async {
+                    final result = await showRepeatSessionCalendarSheet(
+                      context,
+                      baseDate: _date,
+                      remainingSessions: _member!.remainingSessions,
+                      initiallySelected: _repeatDates,
+                    );
+                    if (result != null) {
+                      setState(() => _repeatDates = result);
+                    }
+                  },
           ),
           const SizedBox(height: AppSpacing.lg),
           if (_errorMessage != null) ...[
@@ -330,12 +389,13 @@ class _PickerRow extends StatelessWidget {
 
   final String label;
   final String value;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
     final typography = context.appTypography;
+    final disabled = onTap == null;
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
@@ -352,7 +412,9 @@ class _PickerRow extends StatelessWidget {
               child: Text(
                 label,
                 style: typography.bodyLarge.copyWith(
-                  color: colors.onSurfaceVariant,
+                  color: disabled
+                      ? colors.onSurfaceMuted
+                      : colors.onSurfaceVariant,
                   fontSize: 15,
                 ),
               ),
@@ -360,7 +422,7 @@ class _PickerRow extends StatelessWidget {
             Text(
               value,
               style: typography.headingSmall.copyWith(
-                color: colors.onSurface,
+                color: disabled ? colors.onSurfaceMuted : colors.onSurface,
                 fontSize: 15,
               ),
             ),
