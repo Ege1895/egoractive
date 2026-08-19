@@ -7,7 +7,7 @@ part of 'create_group_session_controller.dart';
 // **************************************************************************
 
 String _$createGroupSessionControllerHash() =>
-    r'e517ce6bde72f05f9c0d519109b5a27bd284cbc8';
+    r'94e4d19a30e0741befa82a336f1987c4d85afa38';
 
 /// See also [CreateGroupSessionController].
 @ProviderFor(CreateGroupSessionController)

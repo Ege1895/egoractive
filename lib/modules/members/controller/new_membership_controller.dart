@@ -3,6 +3,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/analytics/analytics_service.dart';
 import '../../../core/theme/theme_controller.dart';
+import '../../../shared/domain/membership_installment.dart';
 import '../../packages/domain/studio_package.dart';
 import '../domain/new_membership_state.dart';
 
@@ -19,7 +20,8 @@ class NewMembershipController extends _$NewMembershipController {
       startDate: now,
       endDate: now,
       makeupSessions: 0,
-      paidAmount: 0,
+      totalAmountTl: 0,
+      installments: const [],
     );
   }
 
@@ -28,6 +30,7 @@ class NewMembershipController extends _$NewMembershipController {
       selectedPackage: package,
       endDate: state.startDate.add(Duration(days: package.validityDays)),
     );
+    _resplit(totalAmountTl: package.priceTl, count: 1);
   }
 
   void incrementMakeup() =>
@@ -48,19 +51,58 @@ class NewMembershipController extends _$NewMembershipController {
 
   void updateEndDate(DateTime date) => state = state.copyWith(endDate: date);
 
-  void updateDueDate(DateTime date) => state = state.copyWith(dueDate: date);
+  /// Toplam tutar elle değiştirildiğinde mevcut taksit sayısı korunarak
+  /// yeniden eşit bölünür.
+  void setTotalAmount(int amount) => _resplit(
+    totalAmountTl: amount,
+    count: state.installments.isEmpty ? 1 : state.installments.length,
+  );
 
-  void setPaidFull() => state = state.copyWith(paidAmount: state.totalAmount);
+  /// Taksit sayısı değiştiğinde mevcut toplam tutar yeniden eşit bölünür.
+  void setInstallmentCount(int count) =>
+      _resplit(totalAmountTl: state.totalAmountTl, count: count);
 
-  void setPaidHalf() =>
-      state = state.copyWith(paidAmount: (state.totalAmount / 2).round());
+  /// Tek bir taksitin tutarını/tarihini/ödendi durumunu değiştirir —
+  /// diğer taksitlere dokunmaz. Tutar değiştiyse toplam, tüm taksitlerin
+  /// yeni toplamına eşitlenir (admin taksitler üstünden hesabı kendi takip
+  /// eder).
+  void updateInstallment(
+    int index, {
+    int? amountTl,
+    DateTime? dueDate,
+    bool? paid,
+  }) {
+    final updated = [
+      for (final installment in state.installments)
+        if (installment.index == index)
+          installment.copyWith(
+            amountTl: amountTl ?? installment.amountTl,
+            dueDate: dueDate ?? installment.dueDate,
+            paid: paid ?? installment.paid,
+          )
+        else
+          installment,
+    ];
+    state = state.copyWith(
+      installments: updated,
+      totalAmountTl: updated.fold(0, (total, i) => total + i.amountTl),
+    );
+  }
 
-  void setPaidAmount(int amount) =>
-      state = state.copyWith(paidAmount: amount.clamp(0, state.totalAmount));
+  void _resplit({required int totalAmountTl, required int count}) {
+    state = state.copyWith(
+      totalAmountTl: totalAmountTl,
+      installments: splitIntoInstallments(
+        totalAmountTl: totalAmountTl,
+        count: count,
+        firstDueDate: state.startDate,
+      ),
+    );
+  }
 
   void reset() => state = build();
 
-  /// F3-2 — seçilen paket + ödeme bilgisiyle `memberPackages` dokümanını
+  /// F3-2 — seçilen paket + taksit planıyla `memberPackages` dokümanını
   /// oluşturur ve üyenin liste görünümünde okunan `remainingSessions`/
   /// `packageEndDate` alanlarını `users/{memberId}` üzerinde günceller
   /// (admin üye listesi ek bir sorgu yapmasın diye denormalize edilir).
@@ -94,10 +136,10 @@ class NewMembershipController extends _$NewMembershipController {
         'makeupSessions': state.makeupSessions,
         'startDate': state.startDate.toIso8601String(),
         'endDate': state.endDate.toIso8601String(),
-        if (state.dueDate != null) 'dueDate': state.dueDate!.toIso8601String(),
-        'totalAmount': state.totalAmount,
-        'paidAmount': state.paidAmount,
-        'dueAmount': state.dueAmount,
+        'totalAmount': state.totalAmountTl,
+        'paidAmount': state.paidAmountTl,
+        'dueAmount': state.dueAmountTl,
+        'installments': state.installments.map(installmentToMap).toList(),
         // F5-1/F5-2/F5-3'teki ciro aggregation'ları (memberPackages.paidAmount
         // sum()) bu alana göre ay/hafta aralığı filtreliyor.
         'purchasedAt': FieldValue.serverTimestamp(),
@@ -116,7 +158,7 @@ class NewMembershipController extends _$NewMembershipController {
             parameters: {
               'package_id': package.id,
               'gym_id': gymId,
-              'paid_amount': state.paidAmount,
+              'paid_amount': state.paidAmountTl,
             },
           );
 

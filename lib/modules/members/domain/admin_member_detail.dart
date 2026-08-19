@@ -1,5 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
+import '../../../shared/domain/membership_installment.dart';
 import '../../trainers/domain/trainer_member_detail.dart';
 import '../../trainers/domain/trainer_metric.dart';
 
@@ -24,6 +25,12 @@ class AdminMemberDetail with _$AdminMemberDetail {
     @Default(TrainerMetric.kilo) TrainerMetric selectedMetric,
     @Default(false) bool isLoading,
     @Default(false) bool notFound,
+
+    /// Aktif `memberPackages` dokümanının id'si — taksit güncellemesi
+    /// yazılırken hangi dokümanın patch'leneceğini bilmek için gerekli.
+    String? packageDocId,
+    @Default(<MembershipInstallment>[])
+    List<MembershipInstallment> installments,
   }) = _AdminMemberDetail;
 
   const AdminMemberDetail._();

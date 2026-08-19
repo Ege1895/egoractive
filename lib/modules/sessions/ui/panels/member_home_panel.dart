@@ -4,14 +4,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../shared/domain/membership_installment.dart';
 import '../../../../shared/widgets/progress_ring.dart';
+import '../../../../shared/utils/tr_date_formatter.dart';
 import '../../../auth/controller/member_profile_controller.dart';
 import '../../../gyms/controller/gym_profile_controller.dart';
 import '../../../packages/controller/package_controller.dart';
 import '../../../packages/ui/panels/package_panel.dart';
 import '../../controller/sessions_controller.dart';
-import '../../domain/session.dart';
-import 'attendance_confirm_panel.dart';
 
 /// Üye · Ana Sayfa (Ana Sayfa sekmesi kökü).
 class MemberHomePanel extends ConsumerWidget {
@@ -22,7 +22,6 @@ class MemberHomePanel extends ConsumerWidget {
     final colors = context.appColors;
     final typography = context.appTypography;
     final state = ref.watch(sessionsControllerProvider);
-    final controller = ref.read(sessionsControllerProvider.notifier);
     final profile = ref.watch(memberProfileControllerProvider);
     final gymProfile = ref.watch(gymProfileControllerProvider);
     final pkg = ref.watch(packageControllerProvider);
@@ -218,22 +217,18 @@ class MemberHomePanel extends ConsumerWidget {
                 ),
               ),
             ],
-            const SizedBox(height: AppSpacing.xl),
-            Text(
-              'SIRADAKİ DERSİN',
-              style: typography.caption.copyWith(
-                color: colors.onSurfaceMuted,
-                letterSpacing: 1.2,
+            if (pkg.installments.isNotEmpty) ...[
+              const SizedBox(height: AppSpacing.xl),
+              Text(
+                'TAKSİTLER',
+                style: typography.caption.copyWith(
+                  color: colors.onSurfaceMuted,
+                  letterSpacing: 1.2,
+                ),
               ),
-            ),
-            const SizedBox(height: AppSpacing.sm),
-            InkWell(
-              borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
-              onTap: () => ref
-                  .read(panelStackControllerProvider.notifier)
-                  .push(const AttendanceConfirmPanel()),
-              child: Container(
-                padding: const EdgeInsets.all(AppSpacing.lg),
+              const SizedBox(height: AppSpacing.sm),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
                 decoration: BoxDecoration(
                   color: colors.surface,
                   borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
@@ -241,111 +236,15 @@ class MemberHomePanel extends ConsumerWidget {
                 ),
                 child: Column(
                   children: [
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: AppSpacing.md,
-                            vertical: AppSpacing.sm,
-                          ),
-                          decoration: BoxDecoration(
-                            color: colors.surfaceRaised,
-                            borderRadius: BorderRadius.circular(
-                              AppSpacing.radiusInner,
-                            ),
-                          ),
-                          child: Column(
-                            children: [
-                              Text(
-                                state.nextSession.day,
-                                style: typography.dataMedium.copyWith(
-                                  color: colors.onSurface,
-                                ),
-                              ),
-                              Text(
-                                state.nextSession.month,
-                                style: typography.caption.copyWith(
-                                  color: colors.onSurfaceMuted,
-                                  fontSize: 12,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: AppSpacing.md),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                state.nextSession.title,
-                                style: typography.headingSmall.copyWith(
-                                  color: colors.onSurface,
-                                ),
-                              ),
-                              Text(
-                                state.nextSession.meta,
-                                style: typography.bodyMedium.copyWith(
-                                  color: colors.onSurfaceVariant,
-                                  fontSize: 14,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: AppSpacing.md),
-                    if (state.attendanceErrorMessage != null) ...[
-                      Text(
-                        state.attendanceErrorMessage!,
-                        style: typography.bodyMedium.copyWith(
-                          color: colors.error,
-                          fontSize: 13,
-                        ),
-                      ),
-                      const SizedBox(height: AppSpacing.sm),
-                    ],
-                    if (state.attendanceAnswer == AttendanceAnswer.pending)
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _QuickActionButton(
-                              label: 'Gelicem',
-                              filled: true,
-                              onTap: () => controller.confirmAttendance(true),
-                            ),
-                          ),
-                          const SizedBox(width: AppSpacing.sm),
-                          Expanded(
-                            child: _QuickActionButton(
-                              label: 'Gelmeyeceğim',
-                              filled: false,
-                              onTap: () => controller.confirmAttendance(false),
-                            ),
-                          ),
-                        ],
-                      )
-                    else
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          state.attendanceAnswer == AttendanceAnswer.coming
-                              ? 'Geleceğini bildirdin'
-                              : 'Gelmeyeceğini bildirdin',
-                          style: typography.bodyMedium.copyWith(
-                            color:
-                                state.attendanceAnswer ==
-                                    AttendanceAnswer.coming
-                                ? colors.success
-                                : colors.onWarningContainer,
-                          ),
-                        ),
+                    for (var i = 0; i < pkg.installments.length; i++)
+                      _MemberInstallmentRow(
+                        installment: pkg.installments[i],
+                        showDivider: i < pkg.installments.length - 1,
                       ),
                   ],
                 ),
               ),
-            ),
+            ],
             const SizedBox(height: AppSpacing.xl),
             Text(
               'BU HAFTA',
@@ -414,37 +313,66 @@ class MemberHomePanel extends ConsumerWidget {
   }
 }
 
-class _QuickActionButton extends StatelessWidget {
-  const _QuickActionButton({
-    required this.label,
-    required this.filled,
-    required this.onTap,
+class _MemberInstallmentRow extends StatelessWidget {
+  const _MemberInstallmentRow({
+    required this.installment,
+    required this.showDivider,
   });
 
-  final String label;
-  final bool filled;
-  final VoidCallback onTap;
+  final MembershipInstallment installment;
+  final bool showDivider;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
-    return Material(
-      color: filled ? colors.primary : colors.surfaceRaised,
-      borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
-        child: Container(
-          constraints: const BoxConstraints(minHeight: 44),
-          alignment: Alignment.center,
-          child: Text(
-            label,
-            style: context.appTypography.headingSmall.copyWith(
-              fontSize: 15,
-              color: filled ? colors.onPrimary : colors.onSurfaceVariant,
+    final typography = context.appTypography;
+    return Container(
+      constraints: const BoxConstraints(minHeight: 52),
+      decoration: BoxDecoration(
+        border: showDivider
+            ? Border(bottom: BorderSide(color: colors.outline))
+            : null,
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              '${installment.index}. Taksit',
+              style: typography.bodyLarge.copyWith(
+                color: colors.onSurface,
+                fontSize: 15,
+              ),
             ),
           ),
-        ),
+          if (!installment.paid) ...[
+            Text(
+              'Son ödeme ${formatTrDate(installment.dueDate)}',
+              style: typography.caption.copyWith(color: colors.onSurfaceMuted),
+            ),
+            const SizedBox(width: AppSpacing.sm),
+          ],
+          Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.sm,
+              vertical: 5,
+            ),
+            decoration: BoxDecoration(
+              color: installment.paid
+                  ? colors.successContainer
+                  : colors.warningContainer,
+              borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
+            ),
+            child: Text(
+              installment.paid ? 'Ödendi' : 'Ödenmedi',
+              style: typography.caption.copyWith(
+                color: installment.paid
+                    ? colors.onSuccessContainer
+                    : colors.onWarningContainer,
+                fontSize: 12,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -1,11 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../shared/domain/membership_installment.dart';
 import '../../trainers/domain/trainer_member_detail.dart';
 import '../../trainers/domain/trainer_metric.dart';
 import '../domain/admin_member_detail.dart';
 import '../domain/admin_member_detail_mapper.dart';
 import '../repository/admin_member_detail_repository.dart';
+import '../service/membership_installment_write_service.dart';
 
 part 'admin_member_detail_controller.g.dart';
 
@@ -146,6 +148,9 @@ class AdminMemberDetailController extends _$AdminMemberDetailController {
 
     final packageData = package?.data();
     final purchasedAt = (packageData?['purchasedAt'] as Timestamp?)?.toDate();
+    final installmentMaps =
+        (packageData?['installments'] as List?)?.cast<Map<String, dynamic>>() ??
+        const [];
     return base.copyWith(
       makeupSessions: (packageData?['makeupSessions'] as num?)?.toInt() ?? 0,
       paymentTotalTl: (packageData?['totalAmount'] as num?)?.toInt() ?? 0,
@@ -157,9 +162,34 @@ class AdminMemberDetailController extends _$AdminMemberDetailController {
       seriesByMetric: waistSeries == null
           ? base.seriesByMetric
           : {...base.seriesByMetric, TrainerMetric.belCevresi: waistSeries},
+      packageDocId: package?.id,
+      installments: installmentMaps.map(installmentFromMap).toList(),
     );
   }
 
   void selectMetric(TrainerMetric metric) =>
       state = state.copyWith(selectedMetric: metric);
+
+  /// [AdminMemberDetailPanel]'deki "Ödeme durumu" kartında bir taksite
+  /// dokunup düzenleme popup'ından "Kaydet"e basıldığında çağrılır —
+  /// Firestore'a yazar, `_latestPackageForMemberProvider` stream'i zaten
+  /// dinlendiği için state otomatik güncellenir.
+  Future<void> updateInstallment(
+    int index, {
+    required int amountTl,
+    required DateTime dueDate,
+    required bool paid,
+  }) async {
+    final packageDocId = state.packageDocId;
+    if (packageDocId == null) return;
+    await ref
+        .read(membershipInstallmentWriteServiceProvider)
+        .updateInstallment(
+          packageDocId: packageDocId,
+          index: index,
+          amountTl: amountTl,
+          dueDate: dueDate,
+          paid: paid,
+        );
+  }
 }

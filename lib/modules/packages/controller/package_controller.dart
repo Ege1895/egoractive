@@ -1,6 +1,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/router/app_router.dart';
+import '../../../shared/domain/membership_installment.dart';
 import '../../../shared/utils/tr_date_formatter.dart';
 import '../domain/member_package.dart';
 import '../repository/package_repository.dart';
@@ -57,6 +58,10 @@ class PackageController extends _$PackageController {
       (memberData['packageEndDate'] ?? packageData?['endDate']) as String?,
     );
 
+    final installmentMaps =
+        (packageData?['installments'] as List?)?.cast<Map<String, dynamic>>() ??
+        const [];
+
     return MemberPackage(
       name: (packageData?['packageName'] as String?) ?? 'Aktif paket yok',
       remainingSessions:
@@ -69,6 +74,7 @@ class PackageController extends _$PackageController {
       trainerSpecialty: trainerSpecialty,
       trainerInitials: _initialsFor(trainerName),
       dueAmountTl: (packageData?['dueAmount'] as num?)?.toInt() ?? 0,
+      installments: installmentMaps.map(installmentFromMap).toList(),
     );
   }
 

@@ -1,5 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
+import '../../../shared/domain/membership_installment.dart';
+
 part 'member_package.freezed.dart';
 
 @freezed
@@ -15,6 +17,8 @@ class MemberPackage with _$MemberPackage {
     required String trainerSpecialty,
     required String trainerInitials,
     @Default(0) int dueAmountTl,
+    @Default(<MembershipInstallment>[])
+    List<MembershipInstallment> installments,
   }) = _MemberPackage;
 
   const MemberPackage._();

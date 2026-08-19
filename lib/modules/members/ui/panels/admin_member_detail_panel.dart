@@ -14,6 +14,8 @@ import '../../../trainers/domain/trainer_member_detail.dart';
 import '../../../trainers/domain/trainer_metric.dart';
 import '../../controller/admin_member_detail_controller.dart';
 import '../../domain/admin_member_summary.dart';
+import '../widgets/installment_edit_sheet.dart';
+import '../widgets/installment_row.dart';
 import 'member_info_panel.dart';
 
 /// Admin 21 · Üye Detayı — yönetici görünümü, ödeme bilgisi dahil.
@@ -314,24 +316,54 @@ class _AdminMemberDetailPanelState
                             ),
                           ],
                         ),
-                        if (isPaidFull) ...[
+                        if (detail.installments.isNotEmpty) ...[
+                          const SizedBox(height: AppSpacing.md),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: AppSpacing.md,
+                            ),
+                            decoration: BoxDecoration(
+                              color: colors.surface,
+                              borderRadius: BorderRadius.circular(
+                                AppSpacing.radiusInner,
+                              ),
+                            ),
+                            child: Column(
+                              children: [
+                                for (
+                                  var i = 0;
+                                  i < detail.installments.length;
+                                  i++
+                                )
+                                  InstallmentRow(
+                                    installment: detail.installments[i],
+                                    showDivider:
+                                        i < detail.installments.length - 1,
+                                    onTap: () => showInstallmentEditSheet(
+                                      context,
+                                      installment: detail.installments[i],
+                                      onSave:
+                                          ({
+                                            required amountTl,
+                                            required dueDate,
+                                            required paid,
+                                          }) => controller.updateInstallment(
+                                            detail.installments[i].index,
+                                            amountTl: amountTl,
+                                            dueDate: dueDate,
+                                            paid: paid,
+                                          ),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+                        ] else if (isPaidFull) ...[
                           const SizedBox(height: AppSpacing.md),
                           AppButton(
                             label: 'Ödeme tamamlandı',
                             variant: AppButtonVariant.secondary,
                             onPressed: null,
-                          ),
-                        ] else ...[
-                          const SizedBox(height: AppSpacing.sm),
-                          // "Ödeme kaydet" butonu henüz gerçek bir ödeme
-                          // yazma akışına bağlı değil (üye ödeme verisi hâlâ
-                          // mock) — işlevsiz bir buton göstermek yerine bunu
-                          // açıkça belirtiyoruz.
-                          Text(
-                            'Ödeme kaydı bu ekrandan henüz alınamıyor.',
-                            style: typography.caption.copyWith(
-                              color: colors.onSurfaceMuted,
-                            ),
                           ),
                         ],
                       ],
