@@ -118,6 +118,8 @@ class _CreateGroupSessionPanelState
                               child: _InfoField(
                                 label: 'Başlangıç saati',
                                 value: form.startTime,
+                                onTap: () =>
+                                    _pickStartTime(context, controller, form),
                               ),
                             ),
                             const SizedBox(width: AppSpacing.sm),
@@ -125,6 +127,11 @@ class _CreateGroupSessionPanelState
                               child: _InfoField(
                                 label: 'Süre',
                                 value: '${form.durationMinutes} dk',
+                                onTap: () => _pickDuration(
+                                  context,
+                                  controller,
+                                  form.durationMinutes,
+                                ),
                               ),
                             ),
                           ],
@@ -393,37 +400,138 @@ class _CreateGroupSessionPanelState
   }
 }
 
+Future<void> _pickStartTime(
+  BuildContext context,
+  CreateGroupSessionController controller,
+  CreateGroupSessionForm form,
+) async {
+  final parts = form.startTime.split(':');
+  final hour = parts.isNotEmpty ? int.tryParse(parts[0]) ?? 9 : 9;
+  final minute = parts.length > 1 ? int.tryParse(parts[1]) ?? 0 : 0;
+  final picked = await showTimePicker(
+    context: context,
+    initialTime: TimeOfDay(hour: hour, minute: minute),
+  );
+  if (picked == null) return;
+  final hh = picked.hour.toString().padLeft(2, '0');
+  final mm = picked.minute.toString().padLeft(2, '0');
+  controller.setStartTime('$hh:$mm');
+}
+
+const _durationOptions = [30, 45, 60, 75, 90, 120];
+
+Future<void> _pickDuration(
+  BuildContext context,
+  CreateGroupSessionController controller,
+  int current,
+) {
+  final colors = context.appColors;
+  final typography = context.appTypography;
+  return showModalBottomSheet<void>(
+    context: context,
+    backgroundColor: colors.surface,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+    ),
+    builder: (sheetContext) {
+      return SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Süre seç',
+                style: typography.headingMedium.copyWith(
+                  color: colors.onSurface,
+                  fontSize: 20,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.md),
+              for (final minutes in _durationOptions)
+                InkWell(
+                  onTap: () {
+                    controller.setDurationMinutes(minutes);
+                    Navigator.of(sheetContext).pop();
+                  },
+                  child: Container(
+                    constraints: const BoxConstraints(minHeight: 52),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            '$minutes dk',
+                            style: typography.bodyLarge.copyWith(
+                              color: colors.onSurface,
+                              fontSize: 15,
+                            ),
+                          ),
+                        ),
+                        if (minutes == current)
+                          Icon(Icons.check, color: colors.primary, size: 18),
+                      ],
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+      );
+    },
+  );
+}
+
 class _InfoField extends StatelessWidget {
-  const _InfoField({required this.label, required this.value});
+  const _InfoField({required this.label, required this.value, this.onTap});
 
   final String label;
   final String value;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
     final typography = context.appTypography;
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.md),
-      decoration: BoxDecoration(
-        color: colors.surfaceRaised,
+    return Material(
+      color: colors.surfaceRaised,
+      borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+      child: InkWell(
         borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            label,
-            style: typography.caption.copyWith(color: colors.onSurfaceMuted),
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.all(AppSpacing.md),
+          child: Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      label,
+                      style: typography.caption.copyWith(
+                        color: colors.onSurfaceMuted,
+                      ),
+                    ),
+                    Text(
+                      value,
+                      style: typography.headingSmall.copyWith(
+                        color: colors.onSurface,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              if (onTap != null)
+                Icon(
+                  Icons.chevron_right,
+                  color: colors.onSurfaceMuted,
+                  size: 18,
+                ),
+            ],
           ),
-          Text(
-            value,
-            style: typography.headingSmall.copyWith(
-              color: colors.onSurface,
-              fontSize: 16,
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
