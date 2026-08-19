@@ -6,7 +6,6 @@ import '../domain/measurement_metric.dart';
 import '../domain/measurement_point.dart';
 import '../domain/measurement_series.dart';
 import '../domain/measurements_state.dart';
-import '../repository/measurements_repository.dart';
 import '../service/measurements_write_service.dart';
 
 part 'measurements_controller.g.dart';
@@ -26,15 +25,14 @@ const _monthAbbrev = {
   12: 'Ara',
 };
 
-/// Silüet üzerindeki tıklanabilir nokta konumları — gerçek ölçüm verisiyle
-/// hiçbir ilgisi yok, sadece görsel bir yerleşim sabiti (mock'takiyle aynı).
-const _avatarLayout = {
-  MeasurementMetric.gogus: (fx: 0.50, fy: 0.255, side: AvatarSide.right),
-  MeasurementMetric.kol: (fx: 0.335, fy: 0.345, side: AvatarSide.left),
-  MeasurementMetric.bel: (fx: 0.50, fy: 0.395, side: AvatarSide.right),
-  MeasurementMetric.kalca: (fx: 0.50, fy: 0.475, side: AvatarSide.left),
-  MeasurementMetric.bacak: (fx: 0.435, fy: 0.615, side: AvatarSide.right),
-};
+@riverpod
+Stream<String?> _memberGender(_MemberGenderRef ref, String uid) {
+  return FirebaseFirestore.instance
+      .collection('users')
+      .doc(uid)
+      .snapshots()
+      .map((doc) => doc.data()?['gender'] as String?);
+}
 
 typedef _Entry = (DateTime date, Map<MeasurementMetric, double> values);
 
@@ -104,7 +102,7 @@ MeasurementsState _toState(List<_Entry> entries, {DateTime? selectedDate}) {
       totalDeltaLabel: _formatDelta(totalDelta, zeroLabel: '0 cm'),
     );
 
-    final layout = _avatarLayout[metric];
+    final layout = avatarLayout[metric];
     if (layout == null) continue;
 
     final target = selectedDate == null
@@ -156,9 +154,10 @@ class MeasurementsViewedUid extends _$MeasurementsViewedUid {
 
 /// F4-1 — görüntülenen kişinin (kendisi ya da admin/antrenörün açtığı bir
 /// üye) ölçümleri gerçek zamanlı `measurements/{uid}/entries` alt
-/// koleksiyonundan okunur. Hiç ölçüm yoksa (yeni üye) mock veriye düşülür
-/// — boş bir avatar/grafik göstermek yerine örnek bir başlangıç durumu
-/// sunar.
+/// koleksiyonundan okunur. Hiç ölçüm yoksa (yeni üye) boş bir durum
+/// döner — avatar yine de `avatarLayout`'taki tüm noktaları çizer (ilk
+/// ölçümü eklemek için dokunulabilir), sadece "seçili nokta" kartı boş
+/// görünür.
 @riverpod
 class _MeasurementsSelectedDate extends _$MeasurementsSelectedDate {
   @override
@@ -175,28 +174,39 @@ class MeasurementsController extends _$MeasurementsController {
     final uid =
         ref.watch(measurementsViewedUidProvider) ??
         ref.watch(authStateProvider).valueOrNull?.uid;
-    final mock = ref.watch(measurementsRepositoryProvider).loadInitial();
-    if (uid == null) return mock;
+    final gender = uid == null
+        ? null
+        : ref.watch(_memberGenderProvider(uid)).valueOrNull;
+    if (uid == null) {
+      return MeasurementsState(
+        points: const {},
+        series: const {},
+        gender: gender,
+      );
+    }
 
     final entries = ref.watch(_measurementEntriesProvider(uid)).valueOrNull;
-    if (entries == null || entries.isEmpty) return mock;
+    if (entries == null || entries.isEmpty) {
+      return MeasurementsState(
+        points: const {},
+        series: const {},
+        gender: gender,
+      );
+    }
 
     final real = _toState(entries, selectedDate: selectedDate);
-    // real.points sadece en az bir kez ölçülmüş metrikleri içerir — mock'un
-    // varsayılan selectedMetric'i (bel) o üye hiç bel ölçmediyse burada
-    // karşılık bulamaz, points[selectedMetric]! UI'da null'a patlar.
-    final selectedMetric = real.points.containsKey(mock.selectedMetric)
-        ? mock.selectedMetric
+    // real.points sadece en az bir kez ölçülmüş metrikleri içerir —
+    // varsayılan selectedMetric (bel) o üye hiç bel ölçmediyse burada
+    // karşılık bulamaz, o durumda gerçekten ölçülmüş ilk metriğe düşülür.
+    final selectedMetric = real.points.containsKey(MeasurementMetric.bel)
+        ? MeasurementMetric.bel
         : (real.points.keys.isEmpty
-              ? mock.selectedMetric
+              ? MeasurementMetric.bel
               : real.points.keys.first);
-    return mock.copyWith(
-      points: real.points,
-      series: real.series,
-      recordedDates: real.recordedDates,
+    return real.copyWith(
       selectedDate: selectedDate,
       selectedMetric: selectedMetric,
-      hasRealData: true,
+      gender: gender,
     );
   }
 

@@ -23,10 +23,8 @@ class MeasurementsState with _$MeasurementsState {
     /// gerçek veri yoksa boş.
     @Default(<DateTime>[]) List<DateTime> recordedDates,
 
-    /// `points`/`series` gerçek bir kayda mı dayanıyor, yoksa (henüz hiç
-    /// ölçümü olmayan bir üye için) örnek/mock veriye mi düşüldü —
-    /// [AddMeasurementPanel] formu sadece gerçek veriyle önceden
-    /// doldurmalı, mock değerleri gerçek ölçüm gibi göstermemeli.
-    @Default(false) bool hasRealData,
+    /// `users/{uid}.gender` alanının ham değeri ('erkek' | 'kadin' | null) —
+    /// avatar silüetinin hangi görseli kullanacağını belirler.
+    String? gender,
   }) = _MeasurementsState;
 }

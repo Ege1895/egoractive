@@ -31,11 +31,9 @@ mixin _$MeasurementsState {
   /// gerçek veri yoksa boş.
   List<DateTime> get recordedDates => throw _privateConstructorUsedError;
 
-  /// `points`/`series` gerçek bir kayda mı dayanıyor, yoksa (henüz hiç
-  /// ölçümü olmayan bir üye için) örnek/mock veriye mi düşüldü —
-  /// [AddMeasurementPanel] formu sadece gerçek veriyle önceden
-  /// doldurmalı, mock değerleri gerçek ölçüm gibi göstermemeli.
-  bool get hasRealData => throw _privateConstructorUsedError;
+  /// `users/{uid}.gender` alanının ham değeri ('erkek' | 'kadin' | null) —
+  /// avatar silüetinin hangi görseli kullanacağını belirler.
+  String? get gender => throw _privateConstructorUsedError;
 
   /// Create a copy of MeasurementsState
   /// with the given fields replaced by the non-null parameter values.
@@ -58,7 +56,7 @@ abstract class $MeasurementsStateCopyWith<$Res> {
     MeasurementMetric selectedMetric,
     DateTime? selectedDate,
     List<DateTime> recordedDates,
-    bool hasRealData,
+    String? gender,
   });
 }
 
@@ -83,7 +81,7 @@ class _$MeasurementsStateCopyWithImpl<$Res, $Val extends MeasurementsState>
     Object? selectedMetric = null,
     Object? selectedDate = freezed,
     Object? recordedDates = null,
-    Object? hasRealData = null,
+    Object? gender = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -111,10 +109,10 @@ class _$MeasurementsStateCopyWithImpl<$Res, $Val extends MeasurementsState>
                 ? _value.recordedDates
                 : recordedDates // ignore: cast_nullable_to_non_nullable
                       as List<DateTime>,
-            hasRealData: null == hasRealData
-                ? _value.hasRealData
-                : hasRealData // ignore: cast_nullable_to_non_nullable
-                      as bool,
+            gender: freezed == gender
+                ? _value.gender
+                : gender // ignore: cast_nullable_to_non_nullable
+                      as String?,
           )
           as $Val,
     );
@@ -137,7 +135,7 @@ abstract class _$$MeasurementsStateImplCopyWith<$Res>
     MeasurementMetric selectedMetric,
     DateTime? selectedDate,
     List<DateTime> recordedDates,
-    bool hasRealData,
+    String? gender,
   });
 }
 
@@ -161,7 +159,7 @@ class __$$MeasurementsStateImplCopyWithImpl<$Res>
     Object? selectedMetric = null,
     Object? selectedDate = freezed,
     Object? recordedDates = null,
-    Object? hasRealData = null,
+    Object? gender = freezed,
   }) {
     return _then(
       _$MeasurementsStateImpl(
@@ -189,10 +187,10 @@ class __$$MeasurementsStateImplCopyWithImpl<$Res>
             ? _value._recordedDates
             : recordedDates // ignore: cast_nullable_to_non_nullable
                   as List<DateTime>,
-        hasRealData: null == hasRealData
-            ? _value.hasRealData
-            : hasRealData // ignore: cast_nullable_to_non_nullable
-                  as bool,
+        gender: freezed == gender
+            ? _value.gender
+            : gender // ignore: cast_nullable_to_non_nullable
+                  as String?,
       ),
     );
   }
@@ -208,7 +206,7 @@ class _$MeasurementsStateImpl implements _MeasurementsState {
     this.selectedMetric = MeasurementMetric.bel,
     this.selectedDate,
     final List<DateTime> recordedDates = const <DateTime>[],
-    this.hasRealData = false,
+    this.gender,
   }) : _points = points,
        _series = series,
        _recordedDates = recordedDates;
@@ -254,17 +252,14 @@ class _$MeasurementsStateImpl implements _MeasurementsState {
     return EqualUnmodifiableListView(_recordedDates);
   }
 
-  /// `points`/`series` gerçek bir kayda mı dayanıyor, yoksa (henüz hiç
-  /// ölçümü olmayan bir üye için) örnek/mock veriye mi düşüldü —
-  /// [AddMeasurementPanel] formu sadece gerçek veriyle önceden
-  /// doldurmalı, mock değerleri gerçek ölçüm gibi göstermemeli.
+  /// `users/{uid}.gender` alanının ham değeri ('erkek' | 'kadin' | null) —
+  /// avatar silüetinin hangi görseli kullanacağını belirler.
   @override
-  @JsonKey()
-  final bool hasRealData;
+  final String? gender;
 
   @override
   String toString() {
-    return 'MeasurementsState(points: $points, series: $series, viewMode: $viewMode, selectedMetric: $selectedMetric, selectedDate: $selectedDate, recordedDates: $recordedDates, hasRealData: $hasRealData)';
+    return 'MeasurementsState(points: $points, series: $series, viewMode: $viewMode, selectedMetric: $selectedMetric, selectedDate: $selectedDate, recordedDates: $recordedDates, gender: $gender)';
   }
 
   @override
@@ -284,8 +279,7 @@ class _$MeasurementsStateImpl implements _MeasurementsState {
               other._recordedDates,
               _recordedDates,
             ) &&
-            (identical(other.hasRealData, hasRealData) ||
-                other.hasRealData == hasRealData));
+            (identical(other.gender, gender) || other.gender == gender));
   }
 
   @override
@@ -297,7 +291,7 @@ class _$MeasurementsStateImpl implements _MeasurementsState {
     selectedMetric,
     selectedDate,
     const DeepCollectionEquality().hash(_recordedDates),
-    hasRealData,
+    gender,
   );
 
   /// Create a copy of MeasurementsState
@@ -320,7 +314,7 @@ abstract class _MeasurementsState implements MeasurementsState {
     final MeasurementMetric selectedMetric,
     final DateTime? selectedDate,
     final List<DateTime> recordedDates,
-    final bool hasRealData,
+    final String? gender,
   }) = _$MeasurementsStateImpl;
 
   @override
@@ -341,12 +335,10 @@ abstract class _MeasurementsState implements MeasurementsState {
   @override
   List<DateTime> get recordedDates;
 
-  /// `points`/`series` gerçek bir kayda mı dayanıyor, yoksa (henüz hiç
-  /// ölçümü olmayan bir üye için) örnek/mock veriye mi düşüldü —
-  /// [AddMeasurementPanel] formu sadece gerçek veriyle önceden
-  /// doldurmalı, mock değerleri gerçek ölçüm gibi göstermemeli.
+  /// `users/{uid}.gender` alanının ham değeri ('erkek' | 'kadin' | null) —
+  /// avatar silüetinin hangi görseli kullanacağını belirler.
   @override
-  bool get hasRealData;
+  String? get gender;
 
   /// Create a copy of MeasurementsState
   /// with the given fields replaced by the non-null parameter values.

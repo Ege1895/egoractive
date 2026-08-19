@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/app_spacing.dart';
@@ -11,7 +12,6 @@ import '../../controller/measurements_controller.dart';
 import '../../domain/measurement_metric.dart';
 import '../../domain/measurements_state.dart';
 import '../widgets/measurement_avatar.dart';
-import 'add_measurement_panel.dart';
 
 /// Üye · Ölçümlerim (Ölçümlerim sekmesi kökü, kendi verisi için sekme
 /// içine gömülü kullanılır) — avatar / grafik geçişi.
@@ -54,7 +54,9 @@ class _MeasurementsPanelState extends BasePanelState<MeasurementsPanel> {
     final state = ref.watch(measurementsControllerProvider);
     final controller = ref.read(measurementsControllerProvider.notifier);
     final isAvatar = state.viewMode == MeasurementsViewMode.avatar;
-    final title = widget.memberName != null ? '${widget.memberName} · Ölçümleri' : 'Ölçümlerim';
+    final title = widget.memberName != null
+        ? '${widget.memberName} · Ölçümleri'
+        : 'Ölçümlerim';
 
     return Scaffold(
       body: SafeArea(
@@ -62,21 +64,39 @@ class _MeasurementsPanelState extends BasePanelState<MeasurementsPanel> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.lg, AppSpacing.screenEdge, 0),
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.screenEdge,
+                AppSpacing.lg,
+                AppSpacing.screenEdge,
+                0,
+              ),
               child: Row(
                 children: [
                   if (widget.memberId != null) ...[
-                    AppBackButton(onTap: () => ref.read(panelStackControllerProvider.notifier).pop()),
+                    AppBackButton(
+                      onTap: () =>
+                          ref.read(panelStackControllerProvider.notifier).pop(),
+                    ),
                     const SizedBox(width: AppSpacing.md),
                   ],
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(title, style: typography.headingLarge.copyWith(color: colors.onSurface, fontSize: widget.memberId != null ? 20 : null)),
                         Text(
-                          isAvatar ? 'Noktalara dokunarak değerleri gör' : 'metrik çiplerine dokun',
-                          style: typography.caption.copyWith(color: colors.onSurfaceMuted),
+                          title,
+                          style: typography.headingLarge.copyWith(
+                            color: colors.onSurface,
+                            fontSize: widget.memberId != null ? 20 : null,
+                          ),
+                        ),
+                        Text(
+                          isAvatar
+                              ? 'Noktalara dokunarak değerleri gör'
+                              : 'metrik çiplerine dokun',
+                          style: typography.caption.copyWith(
+                            color: colors.onSurfaceMuted,
+                          ),
                         ),
                       ],
                     ),
@@ -84,7 +104,9 @@ class _MeasurementsPanelState extends BasePanelState<MeasurementsPanel> {
                   _ViewToggleChip(
                     label: isAvatar ? 'Grafik' : 'Avatar',
                     onTap: () => controller.setViewMode(
-                      isAvatar ? MeasurementsViewMode.chart : MeasurementsViewMode.avatar,
+                      isAvatar
+                          ? MeasurementsViewMode.chart
+                          : MeasurementsViewMode.avatar,
                     ),
                   ),
                 ],
@@ -116,14 +138,20 @@ class _ViewToggleChip extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.md,
+            vertical: AppSpacing.sm,
+          ),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
             border: Border.all(color: colors.outlineStrong),
           ),
           child: Text(
             label,
-            style: context.appTypography.headingSmall.copyWith(fontSize: 14, color: colors.onSurfaceVariant),
+            style: context.appTypography.headingSmall.copyWith(
+              fontSize: 14,
+              color: colors.onSurfaceVariant,
+            ),
           ),
         ),
       ),
@@ -132,21 +160,39 @@ class _ViewToggleChip extends StatelessWidget {
 }
 
 const _monthNames = {
-  1: 'Ocak', 2: 'Şubat', 3: 'Mart', 4: 'Nisan', 5: 'Mayıs', 6: 'Haziran',
-  7: 'Temmuz', 8: 'Ağustos', 9: 'Eylül', 10: 'Ekim', 11: 'Kasım', 12: 'Aralık',
+  1: 'Ocak',
+  2: 'Şubat',
+  3: 'Mart',
+  4: 'Nisan',
+  5: 'Mayıs',
+  6: 'Haziran',
+  7: 'Temmuz',
+  8: 'Ağustos',
+  9: 'Eylül',
+  10: 'Ekim',
+  11: 'Kasım',
+  12: 'Aralık',
 };
 
-String _formatDate(DateTime date) => '${date.day} ${_monthNames[date.month]} ${date.year}';
+String _formatDate(DateTime date) =>
+    '${date.day} ${_monthNames[date.month]} ${date.year}';
 
 /// F4-1 — üyenin geçmiş ölçüm kayıtlarından birini seçip avatar ekranında
 /// o tarihe ait değerleri görüntülemek için (en son kayıt varsayılan).
-void _showDatePicker(BuildContext context, WidgetRef ref, List<DateTime> dates, DateTime? selected) {
+void _showDatePicker(
+  BuildContext context,
+  WidgetRef ref,
+  List<DateTime> dates,
+  DateTime? selected,
+) {
   final colors = context.appColors;
   final typography = context.appTypography;
   showModalBottomSheet<void>(
     context: context,
     backgroundColor: colors.surface,
-    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+    ),
     builder: (sheetContext) {
       return SafeArea(
         child: Padding(
@@ -155,25 +201,36 @@ void _showDatePicker(BuildContext context, WidgetRef ref, List<DateTime> dates, 
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Tarih seç', style: typography.headingMedium.copyWith(color: colors.onSurface, fontSize: 20)),
+              Text(
+                'Tarih seç',
+                style: typography.headingMedium.copyWith(
+                  color: colors.onSurface,
+                  fontSize: 20,
+                ),
+              ),
               const SizedBox(height: AppSpacing.md),
               _DateOption(
                 label: 'Son kayıt',
                 selected: selected == null,
                 onTap: () {
-                  ref.read(measurementsControllerProvider.notifier).selectDate(null);
+                  ref
+                      .read(measurementsControllerProvider.notifier)
+                      .selectDate(null);
                   Navigator.of(sheetContext).pop();
                 },
               ),
               for (final date in dates)
                 _DateOption(
                   label: _formatDate(date),
-                  selected: selected != null &&
+                  selected:
+                      selected != null &&
                       selected.year == date.year &&
                       selected.month == date.month &&
                       selected.day == date.day,
                   onTap: () {
-                    ref.read(measurementsControllerProvider.notifier).selectDate(date);
+                    ref
+                        .read(measurementsControllerProvider.notifier)
+                        .selectDate(date);
                     Navigator.of(sheetContext).pop();
                   },
                 ),
@@ -186,7 +243,11 @@ void _showDatePicker(BuildContext context, WidgetRef ref, List<DateTime> dates, 
 }
 
 class _DateOption extends StatelessWidget {
-  const _DateOption({required this.label, required this.selected, required this.onTap});
+  const _DateOption({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
 
   final String label;
   final bool selected;
@@ -205,10 +266,11 @@ class _DateOption extends StatelessWidget {
           children: [
             Text(
               label,
-              style: (selected ? typography.headingSmall : typography.bodyLarge).copyWith(
-                color: selected ? colors.primary : colors.onSurface,
-                fontSize: 15,
-              ),
+              style: (selected ? typography.headingSmall : typography.bodyLarge)
+                  .copyWith(
+                    color: selected ? colors.primary : colors.onSurface,
+                    fontSize: 15,
+                  ),
             ),
             if (selected) Icon(Icons.check, size: 18, color: colors.primary),
           ],
@@ -218,44 +280,112 @@ class _DateOption extends StatelessWidget {
   }
 }
 
-class _AvatarView extends ConsumerWidget {
+class _AvatarView extends ConsumerStatefulWidget {
   const _AvatarView();
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_AvatarView> createState() => _AvatarViewState();
+}
+
+class _AvatarViewState extends ConsumerState<_AvatarView> {
+  final _valueController = TextEditingController();
+  final _valueFocusNode = FocusNode();
+  MeasurementMetric? _syncedMetric;
+  bool _isSaving = false;
+  String? _errorMessage;
+
+  Future<void> _save(MeasurementMetric metric) async {
+    final raw = _valueController.text.trim().replaceAll(',', '.');
+    final parsed = double.tryParse(raw);
+    if (parsed == null) return;
+    setState(() {
+      _isSaving = true;
+      _errorMessage = null;
+    });
+    try {
+      await ref.read(measurementsControllerProvider.notifier).addMeasurement({
+        metric: parsed,
+      });
+    } catch (_) {
+      if (mounted) {
+        setState(() => _errorMessage = 'Ölçüm kaydedilemedi, tekrar dene.');
+      }
+    } finally {
+      if (mounted) setState(() => _isSaving = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final colors = context.appColors;
     final typography = context.appTypography;
     final state = ref.watch(measurementsControllerProvider);
     final controller = ref.read(measurementsControllerProvider.notifier);
-    final selectedPoint = state.points[state.selectedMetric]!;
+    final selectedPoint = state.points[state.selectedMetric];
     final isLatest = state.selectedDate == null;
 
+    // Nokta değiştiğinde (avatar üzerinde başka bir yere dokunulunca)
+    // giriş alanı o noktanın güncel değerine (yoksa boşa) senkronlanır —
+    // yarım kalmış bir taslak bir sonraki metriğe sızmaz.
+    if (_syncedMetric != state.selectedMetric) {
+      _syncedMetric = state.selectedMetric;
+      _valueController.text = selectedPoint?.value ?? '';
+    }
+
     return ListView(
-      padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.md, AppSpacing.screenEdge, AppSpacing.lg),
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.screenEdge,
+        AppSpacing.md,
+        AppSpacing.screenEdge,
+        AppSpacing.lg,
+      ),
       children: [
         if (state.recordedDates.length > 1)
           Padding(
             padding: const EdgeInsets.only(bottom: AppSpacing.md),
             child: InkWell(
               borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
-              onTap: () => _showDatePicker(context, ref, state.recordedDates, state.selectedDate),
+              onTap: () => _showDatePicker(
+                context,
+                ref,
+                state.recordedDates,
+                state.selectedDate,
+              ),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.md,
+                  vertical: AppSpacing.sm,
+                ),
                 decoration: BoxDecoration(
                   color: colors.surfaceRaised,
                   borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.calendar_month, size: 16, color: colors.onSurfaceVariant),
+                    Icon(
+                      Icons.calendar_month,
+                      size: 16,
+                      color: colors.onSurfaceVariant,
+                    ),
                     const SizedBox(width: AppSpacing.sm),
                     Expanded(
                       child: Text(
-                        isLatest ? 'Son kayıt gösteriliyor' : '${_formatDate(state.selectedDate!)} gösteriliyor',
-                        style: typography.bodyMedium.copyWith(color: colors.onSurfaceVariant, fontSize: 13),
+                        isLatest
+                            ? 'Son kayıt gösteriliyor'
+                            : '${_formatDate(state.selectedDate!)} gösteriliyor',
+                        style: typography.bodyMedium.copyWith(
+                          color: colors.onSurfaceVariant,
+                          fontSize: 13,
+                        ),
                       ),
                     ),
-                    Text('Tarih değiştir', style: typography.headingSmall.copyWith(color: colors.primary, fontSize: 13)),
+                    Text(
+                      'Tarih değiştir',
+                      style: typography.headingSmall.copyWith(
+                        color: colors.primary,
+                        fontSize: 13,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -266,6 +396,7 @@ class _AvatarView extends ConsumerWidget {
             points: state.points,
             selected: state.selectedMetric,
             onSelect: controller.selectPoint,
+            gender: state.gender,
           ),
         ),
         const SizedBox(height: AppSpacing.md),
@@ -287,59 +418,150 @@ class _AvatarView extends ConsumerWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Seçili nokta', style: typography.caption.copyWith(color: colors.onSurfaceMuted)),
+                        Text(
+                          'Seçili nokta',
+                          style: typography.caption.copyWith(
+                            color: colors.onSurfaceMuted,
+                          ),
+                        ),
                         Text(
                           state.selectedMetric.label,
-                          style: typography.headingMedium.copyWith(color: colors.onSurface, fontSize: 19),
+                          style: typography.headingMedium.copyWith(
+                            color: colors.onSurface,
+                            fontSize: 19,
+                          ),
                         ),
                       ],
                     ),
                   ),
-                  Text.rich(
-                    TextSpan(
-                      text: selectedPoint.value,
-                      style: typography.dataLarge.copyWith(color: colors.onSurface, fontSize: 32),
-                      children: [
-                        TextSpan(text: ' cm', style: typography.bodyMedium.copyWith(color: colors.onSurfaceMuted, fontSize: 15)),
+                  SizedBox(
+                    width: 110,
+                    child: TextField(
+                      controller: _valueController,
+                      focusNode: _valueFocusNode,
+                      enabled: !_isSaving,
+                      textAlign: TextAlign.right,
+                      keyboardType: const TextInputType.numberWithOptions(
+                        decimal: true,
+                      ),
+                      inputFormatters: [
+                        FilteringTextInputFormatter.allow(RegExp(r'[0-9,.]')),
                       ],
+                      style: typography.dataLarge.copyWith(
+                        color: colors.onSurface,
+                        fontSize: 28,
+                      ),
+                      decoration: InputDecoration(
+                        isDense: true,
+                        border: InputBorder.none,
+                        contentPadding: EdgeInsets.zero,
+                        hintText: '—',
+                        hintStyle: typography.dataLarge.copyWith(
+                          color: colors.onSurfaceMuted,
+                          fontSize: 28,
+                        ),
+                        suffixText: ' cm',
+                        suffixStyle: typography.bodyMedium.copyWith(
+                          color: colors.onSurfaceMuted,
+                          fontSize: 15,
+                        ),
+                      ),
+                      onSubmitted: (_) => _save(state.selectedMetric),
                     ),
                   ),
                 ],
               ),
               const SizedBox(height: AppSpacing.sm),
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 5),
-                    decoration: BoxDecoration(
-                      color: selectedPoint.isImprovement ? colors.successContainer : colors.primaryContainer,
-                      borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
+              if (selectedPoint != null)
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.sm,
+                        vertical: 5,
+                      ),
+                      decoration: BoxDecoration(
+                        color: selectedPoint.isImprovement
+                            ? colors.successContainer
+                            : colors.primaryContainer,
+                        borderRadius: BorderRadius.circular(
+                          AppSpacing.radiusPill,
+                        ),
+                      ),
+                      child: Text(
+                        selectedPoint.delta,
+                        style: typography.caption.copyWith(
+                          color: selectedPoint.isImprovement
+                              ? colors.onSuccessContainer
+                              : colors.onPrimaryContainer,
+                          fontSize: 12,
+                        ),
+                      ),
                     ),
+                    const SizedBox(width: AppSpacing.sm),
+                    Expanded(
+                      child: Text(
+                        selectedPoint.since,
+                        style: typography.caption.copyWith(
+                          color: colors.onSurfaceMuted,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                )
+              else
+                Text(
+                  'Henüz ölçüm eklenmedi — yukarıdan bir değer gir.',
+                  style: typography.caption.copyWith(
+                    color: colors.onSurfaceMuted,
+                  ),
+                ),
+              if (_errorMessage != null) ...[
+                const SizedBox(height: AppSpacing.sm),
+                Text(
+                  _errorMessage!,
+                  style: typography.bodyMedium.copyWith(
+                    color: colors.error,
+                    fontSize: 13,
+                  ),
+                ),
+              ],
+              const SizedBox(height: AppSpacing.md),
+              Material(
+                color: colors.primary,
+                borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+                  onTap: _isSaving ? null : () => _save(state.selectedMetric),
+                  child: Container(
+                    width: double.infinity,
+                    constraints: const BoxConstraints(
+                      minHeight: AppSpacing.primaryActionHeight,
+                    ),
+                    alignment: Alignment.center,
                     child: Text(
-                      selectedPoint.delta,
-                      style: typography.caption.copyWith(
-                        color: selectedPoint.isImprovement ? colors.onSuccessContainer : colors.onPrimaryContainer,
-                        fontSize: 12,
+                      _isSaving ? 'Kaydediliyor…' : 'Kaydet',
+                      style: typography.headingSmall.copyWith(
+                        fontSize: 15,
+                        color: colors.onPrimary,
                       ),
                     ),
                   ),
-                  const SizedBox(width: AppSpacing.sm),
-                  Expanded(
-                    child: Text(
-                      selectedPoint.since,
-                      style: typography.caption.copyWith(color: colors.onSurfaceMuted),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ],
+                ),
               ),
-              const SizedBox(height: AppSpacing.md),
-              _AddMeasurementButton(),
             ],
           ),
         ),
       ],
     );
+  }
+
+  @override
+  void dispose() {
+    _valueController.dispose();
+    _valueFocusNode.dispose();
+    super.dispose();
   }
 }
 
@@ -352,13 +574,15 @@ class _ChartView extends ConsumerWidget {
     final typography = context.appTypography;
     final state = ref.watch(measurementsControllerProvider);
     final controller = ref.read(measurementsControllerProvider.notifier);
-    final series = state.series[state.selectedMetric]!;
-    final lastValue = series.values.last;
-    final prevValue = series.values.length > 1 ? series.values[series.values.length - 2] : lastValue;
-    final diff = lastValue - prevValue;
+    final series = state.series[state.selectedMetric];
 
     return ListView(
-      padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.md, AppSpacing.screenEdge, AppSpacing.lg),
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.screenEdge,
+        AppSpacing.md,
+        AppSpacing.screenEdge,
+        AppSpacing.lg,
+      ),
       children: [
         SizedBox(
           height: 44,
@@ -378,100 +602,200 @@ class _ChartView extends ConsumerWidget {
           ),
         ),
         const SizedBox(height: AppSpacing.md),
-        Container(
-          padding: const EdgeInsets.all(AppSpacing.lg),
-          decoration: BoxDecoration(
-            color: colors.surface,
-            borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
-            border: Border.all(color: colors.outline),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('${series.metric.label} · son ölçüm', style: typography.caption.copyWith(color: colors.onSurfaceMuted)),
-                      Text.rich(
-                        TextSpan(
-                          text: lastValue.toStringAsFixed(1).replaceAll('.', ','),
-                          style: typography.dataLarge.copyWith(color: colors.onSurface, fontSize: 40),
+        if (series == null)
+          Container(
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            decoration: BoxDecoration(
+              color: colors.surface,
+              borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
+              border: Border.all(color: colors.outline),
+            ),
+            child: Text(
+              '${state.selectedMetric.label} için henüz ölçüm yok.',
+              style: typography.bodyMedium.copyWith(
+                color: colors.onSurfaceMuted,
+              ),
+            ),
+          )
+        else ...[
+          Builder(
+            builder: (context) {
+              final lastValue = series.values.last;
+              final prevValue = series.values.length > 1
+                  ? series.values[series.values.length - 2]
+                  : lastValue;
+              final diff = lastValue - prevValue;
+              return Container(
+                padding: const EdgeInsets.all(AppSpacing.lg),
+                decoration: BoxDecoration(
+                  color: colors.surface,
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
+                  border: Border.all(color: colors.outline),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            TextSpan(text: ' cm', style: typography.bodyMedium.copyWith(color: colors.onSurfaceMuted, fontSize: 17)),
+                            Text(
+                              '${series.metric.label} · son ölçüm',
+                              style: typography.caption.copyWith(
+                                color: colors.onSurfaceMuted,
+                              ),
+                            ),
+                            Text.rich(
+                              TextSpan(
+                                text: lastValue
+                                    .toStringAsFixed(1)
+                                    .replaceAll('.', ','),
+                                style: typography.dataLarge.copyWith(
+                                  color: colors.onSurface,
+                                  fontSize: 40,
+                                ),
+                                children: [
+                                  TextSpan(
+                                    text: ' cm',
+                                    style: typography.bodyMedium.copyWith(
+                                      color: colors.onSurfaceMuted,
+                                      fontSize: 17,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ],
                         ),
-                      ),
-                    ],
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 5),
-                        decoration: BoxDecoration(
-                          color: diff == 0 ? colors.surfaceRaised : (diff < 0 ? colors.successContainer : colors.primaryContainer),
-                          borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: AppSpacing.sm,
+                                vertical: 5,
+                              ),
+                              decoration: BoxDecoration(
+                                color: diff == 0
+                                    ? colors.surfaceRaised
+                                    : (diff < 0
+                                          ? colors.successContainer
+                                          : colors.primaryContainer),
+                                borderRadius: BorderRadius.circular(
+                                  AppSpacing.radiusPill,
+                                ),
+                              ),
+                              child: Text(
+                                diff == 0
+                                    ? 'değişim yok'
+                                    : '${diff < 0 ? '−' : '+'}${diff.abs().toStringAsFixed(1).replaceAll('.', ',')} cm',
+                                style: typography.caption.copyWith(
+                                  fontSize: 12,
+                                  color: diff == 0
+                                      ? colors.onSurfaceMuted
+                                      : (diff < 0
+                                            ? colors.onSuccessContainer
+                                            : colors.onPrimaryContainer),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: AppSpacing.xs),
+                            Text(
+                              '6 ayda ${series.totalDeltaLabel}',
+                              style: typography.caption.copyWith(
+                                color: colors.onSurfaceMuted,
+                              ),
+                            ),
+                          ],
                         ),
-                        child: Text(
-                          diff == 0
-                              ? 'değişim yok'
-                              : '${diff < 0 ? '−' : '+'}${diff.abs().toStringAsFixed(1).replaceAll('.', ',')} cm',
-                          style: typography.caption.copyWith(
-                            fontSize: 12,
-                            color: diff == 0 ? colors.onSurfaceMuted : (diff < 0 ? colors.onSuccessContainer : colors.onPrimaryContainer),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: AppSpacing.xs),
-                      Text('6 ayda ${series.totalDeltaLabel}', style: typography.caption.copyWith(color: colors.onSurfaceMuted)),
-                    ],
-                  ),
-                ],
-              ),
-              const SizedBox(height: AppSpacing.lg),
-              TrendBarChart(
-                values: series.values,
-                labels: series.months,
-                valueFormatter: (value) => value.toStringAsFixed(1).replaceAll('.', ','),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: AppSpacing.lg),
-        Text('ÖLÇÜM GEÇMİŞİ', style: typography.caption.copyWith(color: colors.onSurfaceMuted, letterSpacing: 1.2)),
-        const SizedBox(height: AppSpacing.sm),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-          decoration: BoxDecoration(
-            color: colors.surface,
-            borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
-            border: Border.all(color: colors.outline),
-          ),
-          child: Column(
-            children: [
-              for (var i = series.values.length - 1; i >= 0 && i >= series.values.length - 4; i--)
-                _HistoryRow(
-                  date: i == series.values.length - 1 ? 'Son ölçüm' : series.months[i],
-                  value: series.values[i],
-                  delta: i == 0 ? null : series.values[i] - series.values[i - 1],
-                  showDivider: i > 0 && i >= series.values.length - 4,
+                      ],
+                    ),
+                    const SizedBox(height: AppSpacing.lg),
+                    TrendBarChart(
+                      values: series.values,
+                      labels: series.months,
+                      valueFormatter: (value) =>
+                          value.toStringAsFixed(1).replaceAll('.', ','),
+                    ),
+                  ],
                 ),
-            ],
+              );
+            },
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          Text(
+            'ÖLÇÜM GEÇMİŞİ',
+            style: typography.caption.copyWith(
+              color: colors.onSurfaceMuted,
+              letterSpacing: 1.2,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+            decoration: BoxDecoration(
+              color: colors.surface,
+              borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
+              border: Border.all(color: colors.outline),
+            ),
+            child: Column(
+              children: [
+                for (
+                  var i = series.values.length - 1;
+                  i >= 0 && i >= series.values.length - 4;
+                  i--
+                )
+                  _HistoryRow(
+                    date: i == series.values.length - 1
+                        ? 'Son ölçüm'
+                        : series.months[i],
+                    value: series.values[i],
+                    delta: i == 0
+                        ? null
+                        : series.values[i] - series.values[i - 1],
+                    showDivider: i > 0 && i >= series.values.length - 4,
+                  ),
+              ],
+            ),
+          ),
+        ],
+        const SizedBox(height: AppSpacing.lg),
+        Material(
+          color: colors.surfaceRaised,
+          borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+            onTap: () => controller.setViewMode(MeasurementsViewMode.avatar),
+            child: Container(
+              width: double.infinity,
+              constraints: const BoxConstraints(
+                minHeight: AppSpacing.primaryActionHeight,
+              ),
+              alignment: Alignment.center,
+              child: Text(
+                'Ölçüm eklemek için Avatar\'a geç',
+                style: typography.headingSmall.copyWith(
+                  fontSize: 15,
+                  color: colors.onSurfaceVariant,
+                ),
+              ),
+            ),
           ),
         ),
-        const SizedBox(height: AppSpacing.lg),
-        _AddMeasurementButton(),
       ],
     );
   }
 }
 
 class _MetricChip extends StatelessWidget {
-  const _MetricChip({required this.label, required this.selected, required this.onTap});
+  const _MetricChip({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
 
   final String label;
   final bool selected;
@@ -491,7 +815,9 @@ class _MetricChip extends StatelessWidget {
           alignment: Alignment.center,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
-            border: Border.all(color: selected ? colors.primary : colors.outlineStrong),
+            border: Border.all(
+              color: selected ? colors.primary : colors.outlineStrong,
+            ),
           ),
           child: Text(
             label,
@@ -507,7 +833,12 @@ class _MetricChip extends StatelessWidget {
 }
 
 class _HistoryRow extends StatelessWidget {
-  const _HistoryRow({required this.date, required this.value, required this.delta, required this.showDivider});
+  const _HistoryRow({
+    required this.date,
+    required this.value,
+    required this.delta,
+    required this.showDivider,
+  });
 
   final String date;
   final double value;
@@ -521,8 +852,8 @@ class _HistoryRow extends StatelessWidget {
     final deltaLabel = delta == null
         ? '—'
         : delta == 0
-            ? 'değişim yok'
-            : '${delta! < 0 ? '−' : '+'}${delta!.abs().toStringAsFixed(1).replaceAll('.', ',')}';
+        ? 'değişim yok'
+        : '${delta! < 0 ? '−' : '+'}${delta!.abs().toStringAsFixed(1).replaceAll('.', ',')}';
     final deltaColor = delta == null || delta == 0
         ? colors.onSurfaceMuted
         : (delta! < 0 ? colors.success : colors.onPrimaryContainer);
@@ -530,47 +861,40 @@ class _HistoryRow extends StatelessWidget {
     return Container(
       constraints: const BoxConstraints(minHeight: 52),
       decoration: BoxDecoration(
-        border: showDivider ? Border(bottom: BorderSide(color: colors.outline)) : null,
+        border: showDivider
+            ? Border(bottom: BorderSide(color: colors.outline))
+            : null,
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(date, style: typography.bodyLarge.copyWith(color: colors.onSurfaceVariant, fontSize: 15)),
+          Text(
+            date,
+            style: typography.bodyLarge.copyWith(
+              color: colors.onSurfaceVariant,
+              fontSize: 15,
+            ),
+          ),
           Row(
             children: [
               Text(
                 '${value.toStringAsFixed(1).replaceAll('.', ',')} cm',
-                style: typography.headingSmall.copyWith(color: colors.onSurface, fontSize: 16),
+                style: typography.headingSmall.copyWith(
+                  color: colors.onSurface,
+                  fontSize: 16,
+                ),
               ),
               const SizedBox(width: AppSpacing.sm),
-              Text(deltaLabel, style: typography.caption.copyWith(color: deltaColor, fontWeight: FontWeight.w600)),
+              Text(
+                deltaLabel,
+                style: typography.caption.copyWith(
+                  color: deltaColor,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ],
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _AddMeasurementButton extends ConsumerWidget {
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final colors = context.appColors;
-    return Material(
-      color: colors.primary,
-      borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
-        onTap: () => ref.read(panelStackControllerProvider.notifier).push(const AddMeasurementPanel()),
-        child: Container(
-          width: double.infinity,
-          constraints: const BoxConstraints(minHeight: AppSpacing.primaryActionHeight),
-          alignment: Alignment.center,
-          child: Text(
-            'Yeni ölçüm ekle',
-            style: context.appTypography.headingSmall.copyWith(fontSize: 15, color: colors.onPrimary),
-          ),
-        ),
       ),
     );
   }
