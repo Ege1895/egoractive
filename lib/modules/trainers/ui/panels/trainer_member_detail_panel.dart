@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
+import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_back_button.dart';
 import '../../../../shared/utils/phone_number_formatter.dart';
@@ -197,6 +198,10 @@ class _TrainerMemberDetailPanelState
                                     context,
                                     ref,
                                     DateTime.now(),
+                                    lockedTrainerId: ref
+                                        .read(authStateProvider)
+                                        .valueOrNull
+                                        ?.uid,
                                   ),
                                   borderRadius: BorderRadius.circular(
                                     AppSpacing.radiusInner,

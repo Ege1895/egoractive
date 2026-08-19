@@ -15,11 +15,16 @@ import 'repeat_session_calendar_sheet.dart';
 
 /// F3-3 — "+ Seans": üye + antrenör + tarih/saat seçip `sessions`
 /// koleksiyonuna gerçek bir doküman yazar.
+///
+/// [lockedTrainerId] verilirse (antrenörün kendi ekranından açılışı) antrenör
+/// seçim adımı gösterilmez, seans doğrudan o antrenöre atanır — bir antrenör
+/// başka bir antrenöre seans atayamaz, sadece üye seçer.
 Future<void> showCreateSessionSheet(
   BuildContext context,
   WidgetRef ref,
-  DateTime initialDate,
-) {
+  DateTime initialDate, {
+  String? lockedTrainerId,
+}) {
   return showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
@@ -27,7 +32,10 @@ Future<void> showCreateSessionSheet(
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
     ),
-    builder: (sheetContext) => _CreateSessionSheet(initialDate: initialDate),
+    builder: (sheetContext) => _CreateSessionSheet(
+      initialDate: initialDate,
+      lockedTrainerId: lockedTrainerId,
+    ),
   );
 }
 
@@ -86,9 +94,10 @@ Future<void> showRescheduleSessionSheet(
 }
 
 class _CreateSessionSheet extends ConsumerStatefulWidget {
-  const _CreateSessionSheet({required this.initialDate});
+  const _CreateSessionSheet({required this.initialDate, this.lockedTrainerId});
 
   final DateTime initialDate;
+  final String? lockedTrainerId;
 
   @override
   ConsumerState<_CreateSessionSheet> createState() =>
@@ -110,8 +119,23 @@ class _CreateSessionSheetState extends ConsumerState<_CreateSessionSheet> {
     _date = widget.initialDate;
   }
 
+  /// [widget.lockedTrainerId] verilmişse (antrenörün kendi ekranı) seçim her
+  /// zaman o antrenöre kilitlenir, [_trainer] hiç kullanılmaz.
+  AdminTrainerSummary? _resolveTrainer(List<AdminTrainerSummary> trainers) {
+    final lockedId = widget.lockedTrainerId;
+    if (lockedId != null) {
+      for (final trainer in trainers) {
+        if (trainer.id == lockedId) return trainer;
+      }
+      return null;
+    }
+    return _trainer;
+  }
+
   Future<void> _create() async {
     if (!await ensureSubscriptionAllowsWrite(context, ref)) return;
+    final trainer = _resolveTrainer(ref.read(adminTrainersControllerProvider));
+    if (trainer == null) return;
     setState(() {
       _isCreating = true;
       _errorMessage = null;
@@ -139,8 +163,8 @@ class _CreateSessionSheetState extends ConsumerState<_CreateSessionSheet> {
             .read(sessionsWriteServiceProvider)
             .createSession(
               gymId: gymId,
-              trainerId: _trainer!.id,
-              trainerName: _trainer!.name,
+              trainerId: trainer.id,
+              trainerName: trainer.name,
               memberId: _member!.id,
               memberName: _member!.name,
               startTime: DateTime(
@@ -181,7 +205,7 @@ class _CreateSessionSheetState extends ConsumerState<_CreateSessionSheet> {
     }
     setState(() {
       _isCreating = false;
-      _errorMessage = '${_trainer!.name} bu saatte dolu, başka bir saat seç.';
+      _errorMessage = '${trainer.name} bu saatte dolu, başka bir saat seç.';
     });
   }
 
@@ -191,6 +215,8 @@ class _CreateSessionSheetState extends ConsumerState<_CreateSessionSheet> {
     final typography = context.appTypography;
     final members = ref.watch(adminMembersControllerProvider);
     final trainers = ref.watch(adminTrainersControllerProvider);
+    final trainer = _resolveTrainer(trainers);
+    final trainerLocked = widget.lockedTrainerId != null;
 
     return Padding(
       padding: EdgeInsets.fromLTRB(
@@ -232,13 +258,15 @@ class _CreateSessionSheetState extends ConsumerState<_CreateSessionSheet> {
           const SizedBox(height: AppSpacing.sm),
           _PickerRow(
             label: 'Antrenör',
-            value: _trainer?.name ?? 'Seç',
-            onTap: () => _pickFromList<AdminTrainerSummary>(
-              title: 'Antrenör seç',
-              items: trainers,
-              labelOf: (t) => t.name,
-              onSelected: (t) => setState(() => _trainer = t),
-            ),
+            value: trainer?.name ?? (trainerLocked ? '—' : 'Seç'),
+            onTap: trainerLocked
+                ? null
+                : () => _pickFromList<AdminTrainerSummary>(
+                    title: 'Antrenör seç',
+                    items: trainers,
+                    labelOf: (t) => t.name,
+                    onSelected: (t) => setState(() => _trainer = t),
+                  ),
           ),
           const SizedBox(height: AppSpacing.sm),
           _PickerRow(
@@ -304,7 +332,7 @@ class _CreateSessionSheetState extends ConsumerState<_CreateSessionSheet> {
           ],
           AppButton(
             label: _isCreating ? 'Oluşturuluyor…' : 'Oluştur',
-            onPressed: _member == null || _trainer == null || _isCreating
+            onPressed: _member == null || trainer == null || _isCreating
                 ? null
                 : _create,
           ),
