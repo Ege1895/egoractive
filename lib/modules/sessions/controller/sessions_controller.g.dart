@@ -6,8 +6,8 @@ part of 'sessions_controller.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$canConfirmAttendanceForMemberHash() =>
-    r'e9959395707f1273571daaeff9dfc4222e0fad6d';
+String _$weekActivityForMemberHash() =>
+    r'c1ca7e458070bffad703c362aa1d3d5871990169';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -29,6 +29,163 @@ class _SystemHash {
     return 0x1fffffff & (hash + ((0x00003fff & hash) << 15));
   }
 }
+
+/// Bu haftanın (Pazartesi-Pazar) her günü için üyenin o gün iptal edilmemiş
+/// bir seansı var mı — "BU HAFTA" bar grafiğinin gerçek verisi. Önceden bu
+/// alan hep sabit mock değerlerle (`SessionsService.loadInitial`) doluyordu,
+/// üyenin gerçekte hiç seansı olmasa bile dolu görünüyordu.
+///
+/// Copied from [_weekActivityForMember].
+@ProviderFor(_weekActivityForMember)
+const _weekActivityForMemberProvider = _WeekActivityForMemberFamily();
+
+/// Bu haftanın (Pazartesi-Pazar) her günü için üyenin o gün iptal edilmemiş
+/// bir seansı var mı — "BU HAFTA" bar grafiğinin gerçek verisi. Önceden bu
+/// alan hep sabit mock değerlerle (`SessionsService.loadInitial`) doluyordu,
+/// üyenin gerçekte hiç seansı olmasa bile dolu görünüyordu.
+///
+/// Copied from [_weekActivityForMember].
+class _WeekActivityForMemberFamily
+    extends Family<AsyncValue<List<WeekActivityDay>>> {
+  /// Bu haftanın (Pazartesi-Pazar) her günü için üyenin o gün iptal edilmemiş
+  /// bir seansı var mı — "BU HAFTA" bar grafiğinin gerçek verisi. Önceden bu
+  /// alan hep sabit mock değerlerle (`SessionsService.loadInitial`) doluyordu,
+  /// üyenin gerçekte hiç seansı olmasa bile dolu görünüyordu.
+  ///
+  /// Copied from [_weekActivityForMember].
+  const _WeekActivityForMemberFamily();
+
+  /// Bu haftanın (Pazartesi-Pazar) her günü için üyenin o gün iptal edilmemiş
+  /// bir seansı var mı — "BU HAFTA" bar grafiğinin gerçek verisi. Önceden bu
+  /// alan hep sabit mock değerlerle (`SessionsService.loadInitial`) doluyordu,
+  /// üyenin gerçekte hiç seansı olmasa bile dolu görünüyordu.
+  ///
+  /// Copied from [_weekActivityForMember].
+  _WeekActivityForMemberProvider call(String memberId) {
+    return _WeekActivityForMemberProvider(memberId);
+  }
+
+  @override
+  _WeekActivityForMemberProvider getProviderOverride(
+    covariant _WeekActivityForMemberProvider provider,
+  ) {
+    return call(provider.memberId);
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'_weekActivityForMemberProvider';
+}
+
+/// Bu haftanın (Pazartesi-Pazar) her günü için üyenin o gün iptal edilmemiş
+/// bir seansı var mı — "BU HAFTA" bar grafiğinin gerçek verisi. Önceden bu
+/// alan hep sabit mock değerlerle (`SessionsService.loadInitial`) doluyordu,
+/// üyenin gerçekte hiç seansı olmasa bile dolu görünüyordu.
+///
+/// Copied from [_weekActivityForMember].
+class _WeekActivityForMemberProvider
+    extends AutoDisposeStreamProvider<List<WeekActivityDay>> {
+  /// Bu haftanın (Pazartesi-Pazar) her günü için üyenin o gün iptal edilmemiş
+  /// bir seansı var mı — "BU HAFTA" bar grafiğinin gerçek verisi. Önceden bu
+  /// alan hep sabit mock değerlerle (`SessionsService.loadInitial`) doluyordu,
+  /// üyenin gerçekte hiç seansı olmasa bile dolu görünüyordu.
+  ///
+  /// Copied from [_weekActivityForMember].
+  _WeekActivityForMemberProvider(String memberId)
+    : this._internal(
+        (ref) =>
+            _weekActivityForMember(ref as _WeekActivityForMemberRef, memberId),
+        from: _weekActivityForMemberProvider,
+        name: r'_weekActivityForMemberProvider',
+        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+            ? null
+            : _$weekActivityForMemberHash,
+        dependencies: _WeekActivityForMemberFamily._dependencies,
+        allTransitiveDependencies:
+            _WeekActivityForMemberFamily._allTransitiveDependencies,
+        memberId: memberId,
+      );
+
+  _WeekActivityForMemberProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.memberId,
+  }) : super.internal();
+
+  final String memberId;
+
+  @override
+  Override overrideWith(
+    Stream<List<WeekActivityDay>> Function(_WeekActivityForMemberRef provider)
+    create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: _WeekActivityForMemberProvider._internal(
+        (ref) => create(ref as _WeekActivityForMemberRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        memberId: memberId,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeStreamProviderElement<List<WeekActivityDay>> createElement() {
+    return _WeekActivityForMemberProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is _WeekActivityForMemberProvider &&
+        other.memberId == memberId;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, memberId.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin _WeekActivityForMemberRef
+    on AutoDisposeStreamProviderRef<List<WeekActivityDay>> {
+  /// The parameter `memberId` of this provider.
+  String get memberId;
+}
+
+class _WeekActivityForMemberProviderElement
+    extends AutoDisposeStreamProviderElement<List<WeekActivityDay>>
+    with _WeekActivityForMemberRef {
+  _WeekActivityForMemberProviderElement(super.provider);
+
+  @override
+  String get memberId => (origin as _WeekActivityForMemberProvider).memberId;
+}
+
+String _$canConfirmAttendanceForMemberHash() =>
+    r'e9959395707f1273571daaeff9dfc4222e0fad6d';
 
 /// See also [_canConfirmAttendanceForMember].
 @ProviderFor(_canConfirmAttendanceForMember)
@@ -283,11 +440,11 @@ class _SessionsForMemberProviderElement
 }
 
 String _$sessionsControllerHash() =>
-    r'a72c5229c81c7216bf158929a178b40822aeb1bf';
+    r'96ad243a1591831959b046802b65097203f31dac';
 
 /// F3-3 — üyenin kendi seansları gerçek zamanlı `sessions` koleksiyonundan
-/// (memberId == kendi uid'si) okunur. `week`/`paymentWarning` bu task'ın
-/// kapsamı dışında (ayrı devam eden mock alanlar).
+/// (memberId == kendi uid'si) okunur. `paymentWarning` hâlâ ayrı, devam eden
+/// bir mock alan (bu task'ın kapsamı dışında).
 ///
 /// F3-4 — `attendanceAnswer` artık ayrı bir yerel state değil, sıradaki
 /// seansın Firestore'daki `memberConfirmation` alanından türetiliyor.

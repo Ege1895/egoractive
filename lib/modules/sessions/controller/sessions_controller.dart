@@ -32,6 +32,63 @@ const _emptyNextSession = Session(
   status: SessionStatus.planned,
 );
 
+const _weekdayLabels = {
+  1: 'Pzt',
+  2: 'Sal',
+  3: 'Çar',
+  4: 'Per',
+  5: 'Cum',
+  6: 'Cmt',
+  7: 'Pzr',
+};
+
+/// Bu haftanın (Pazartesi-Pazar) her günü için üyenin o gün iptal edilmemiş
+/// bir seansı var mı — "BU HAFTA" bar grafiğinin gerçek verisi. Önceden bu
+/// alan hep sabit mock değerlerle (`SessionsService.loadInitial`) doluyordu,
+/// üyenin gerçekte hiç seansı olmasa bile dolu görünüyordu.
+@riverpod
+Stream<List<WeekActivityDay>> _weekActivityForMember(
+  _WeekActivityForMemberRef ref,
+  String memberId,
+) {
+  final now = DateTime.now();
+  final today = DateTime(now.year, now.month, now.day);
+  final monday = today.subtract(Duration(days: today.weekday - 1));
+  final nextMonday = monday.add(const Duration(days: 7));
+  return FirebaseFirestore.instance
+      .collection('sessions')
+      .where('memberId', isEqualTo: memberId)
+      .where('startTime', isGreaterThanOrEqualTo: Timestamp.fromDate(monday))
+      .where('startTime', isLessThan: Timestamp.fromDate(nextMonday))
+      .snapshots()
+      .map((snapshot) {
+        final activeWeekdays = <int>{};
+        for (final doc in snapshot.docs) {
+          final data = doc.data();
+          if ((data['status'] as String?) == 'cancelled') continue;
+          final startTime = (data['startTime'] as Timestamp).toDate();
+          activeWeekdays.add(startTime.weekday);
+        }
+        return [
+          for (var weekday = 1; weekday <= 7; weekday++)
+            WeekActivityDay(
+              label: _weekdayLabels[weekday]!,
+              intensity: activeWeekdays.contains(weekday) ? 0.85 : 0.12,
+              isRestDay: !activeWeekdays.contains(weekday),
+            ),
+        ];
+      });
+}
+
+final _emptyWeek = [
+  for (var weekday = 1; weekday <= 7; weekday++)
+    WeekActivityDay(
+      label: _weekdayLabels[weekday]!,
+      intensity: 0.12,
+      isRestDay: true,
+    ),
+];
+
 @riverpod
 Stream<bool> _canConfirmAttendanceForMember(
   _CanConfirmAttendanceForMemberRef ref,
@@ -100,8 +157,8 @@ Session _toSession(String id, Map<String, dynamic> data, DateTime startTime) {
 }
 
 /// F3-3 — üyenin kendi seansları gerçek zamanlı `sessions` koleksiyonundan
-/// (memberId == kendi uid'si) okunur. `week`/`paymentWarning` bu task'ın
-/// kapsamı dışında (ayrı devam eden mock alanlar).
+/// (memberId == kendi uid'si) okunur. `paymentWarning` hâlâ ayrı, devam eden
+/// bir mock alan (bu task'ın kapsamı dışında).
 ///
 /// F3-4 — `attendanceAnswer` artık ayrı bir yerel state değil, sıradaki
 /// seansın Firestore'daki `memberConfirmation` alanından türetiliyor.
@@ -120,10 +177,14 @@ class SessionsController extends _$SessionsController {
     final canConfirmAttendance =
         ref.watch(_canConfirmAttendanceForMemberProvider(uid)).valueOrNull ??
         false;
+    final week =
+        ref.watch(_weekActivityForMemberProvider(uid)).valueOrNull ??
+        _emptyWeek;
     return mock.copyWith(
       nextSession: nextSession,
       upcoming: upcoming,
       past: past,
+      week: week,
       attendanceAnswer: nextSession.confirmation,
       canConfirmAttendance: canConfirmAttendance,
     );
