@@ -13,7 +13,7 @@ import '../../../measurements/ui/panels/measurements_panel.dart';
 import '../../../trainers/domain/trainer_member_detail.dart';
 import '../../../trainers/domain/trainer_metric.dart';
 import '../../controller/admin_member_detail_controller.dart';
-import '../../controller/admin_members_controller.dart';
+import '../../domain/admin_member_summary.dart';
 import 'member_info_panel.dart';
 
 /// Admin 21 · Üye Detayı — yönetici görünümü, ödeme bilgisi dahil.
@@ -111,16 +111,31 @@ class _AdminMemberDetailPanelState
                         AppSpacing.radiusInner,
                       ),
                       onTap: () {
-                        final summaries = ref.read(
-                          adminMembersControllerProvider,
-                        );
-                        final index = summaries.indexWhere(
-                          (m) => m.id == widget.memberId,
-                        );
-                        if (index == -1) return;
+                        // `AdminMembersController` (global üye listesi) bu
+                        // panele hiç bağlanmıyor — sadece Üyeler listesinden
+                        // gelen `AdminMemberListController` bağlanıyor. O
+                        // yüzden `Düzenle`'ye ilk dokunuşta stream henüz
+                        // veri getirmemiş oluyor, arama boş listede
+                        // başarısız olup sessizce hiçbir şey yapmıyordu.
+                        // MemberInfoPanel edit modunda sadece id/isim/telefon
+                        // kullanıyor — bunlar zaten yüklenmiş `detail`'da
+                        // var, ayrı bir listeye bağımlı kalmaya gerek yok.
                         ref
                             .read(panelStackControllerProvider.notifier)
-                            .push(MemberInfoPanel(existing: summaries[index]));
+                            .push(
+                              MemberInfoPanel(
+                                existing: AdminMemberSummary(
+                                  id: widget.memberId,
+                                  initials: detail.initials,
+                                  name: detail.name,
+                                  phone: detail.phone,
+                                  trainerName: '',
+                                  remainingSessions: detail.remainingSessions,
+                                  packageEndDate: detail.packageEndDate,
+                                  status: MemberPackageStatus.none,
+                                ),
+                              ),
+                            );
                       },
                       child: Container(
                         padding: const EdgeInsets.symmetric(
