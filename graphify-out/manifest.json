@@ -1665,9 +1665,9 @@
     "semantic_hash": "7b62a80b3030d51446d84a5009fbb483"
   },
   "modules/sessions/ui/widgets/create_session_sheet.dart": {
-    "mtime": 1787181362.6242228,
-    "ast_hash": "9bc2b4a495d29a8a8daf9e0e26c0e53b",
-    "semantic_hash": "9bc2b4a495d29a8a8daf9e0e26c0e53b"
+    "mtime": 1787181916.973533,
+    "ast_hash": "3bfe7dd180db73dc6e319c5916c63df2",
+    "semantic_hash": "3bfe7dd180db73dc6e319c5916c63df2"
   },
   "modules/subscription/controller/subscription_controller.dart": {
     "mtime": 1787065805.5502388,
@@ -2035,9 +2035,9 @@
     "semantic_hash": "f2439d024862ba1103c373ca145ce23f"
   },
   "modules/trainers/ui/panels/trainer_member_detail_panel.dart": {
-    "mtime": 1787156650.1500335,
-    "ast_hash": "bc019e24812d0ed87f835b992a947ac1",
-    "semantic_hash": "bc019e24812d0ed87f835b992a947ac1"
+    "mtime": 1787181928.875416,
+    "ast_hash": "bfb3e3c31b55785b63095bc0d1a72b23",
+    "semantic_hash": "bfb3e3c31b55785b63095bc0d1a72b23"
   },
   "modules/trainers/ui/panels/trainer_members_list_panel.dart": {
     "mtime": 1785844341.4664805,
