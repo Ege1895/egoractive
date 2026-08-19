@@ -242,7 +242,7 @@ class AdminHomePanel extends ConsumerWidget {
             Text(
               'ÖDEME VAKTİ YAKLAŞAN',
               style: typography.caption.copyWith(
-                color: colors.onWarningContainer,
+                color: colors.primary,
                 letterSpacing: 1.2,
               ),
             ),
@@ -253,7 +253,7 @@ class AdminHomePanel extends ConsumerWidget {
                 color: colors.surface,
                 borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
                 border: Border.all(
-                  color: colors.warning.withValues(alpha: 0.25),
+                  color: colors.primary.withValues(alpha: 0.25),
                 ),
               ),
               child: state.duePaymentMemberCount == 0
@@ -277,7 +277,7 @@ class AdminHomePanel extends ConsumerWidget {
                         Text(
                           '₺${state.duePaymentTotalTl}',
                           style: typography.headingSmall.copyWith(
-                            color: colors.onWarningContainer,
+                            color: colors.primary,
                             fontSize: 16,
                           ),
                         ),
