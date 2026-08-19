@@ -62,6 +62,16 @@ Future<void> showRescheduleSessionSheet(
           sessionId,
           DateTime(date.year, date.month, date.day, time.hour, time.minute),
         );
+  } on TrainerConflictException catch (e) {
+    if (context.mounted) {
+      Navigator.of(context, rootNavigator: true).pop();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('${e.trainerName} bu saatte dolu, başka bir saat seç.'),
+        ),
+      );
+    }
+    return;
   } catch (_) {
     if (context.mounted) {
       Navigator.of(context, rootNavigator: true).pop();
@@ -125,6 +135,15 @@ class _CreateSessionSheetState extends ConsumerState<_CreateSessionSheet> {
               _time.minute,
             ),
           );
+    } on TrainerConflictException catch (e) {
+      if (mounted) {
+        setState(() {
+          _isCreating = false;
+          _errorMessage =
+              '${e.trainerName} bu saatte dolu, başka bir saat seç.';
+        });
+      }
+      return;
     } catch (_) {
       if (mounted) {
         setState(() {
