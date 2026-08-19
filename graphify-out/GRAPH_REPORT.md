@@ -1,608 +1,1050 @@
-# Graph Report - .  (2026-08-04)
+# Graph Report - lib  (2026-08-20)
 
 ## Corpus Check
-- 237 files · ~75,205 words
+- 429 files · ~160,141 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1626 nodes · 2334 edges · 124 communities (107 shown, 17 thin omitted)
-- Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 33 edges (avg confidence: 0.91)
-- Token cost: 264,447 input · 0 output
+- 4769 nodes · 7527 edges · 202 communities (196 shown, 6 thin omitted)
+- Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS
+- Token cost: 0 input · 0 output
 
 ## Community Hubs (Navigation)
-- [[_COMMUNITY_Trainers Domain|Trainers Domain]]
-- [[_COMMUNITY_Trainers Domain|Trainers Domain]]
-- [[_COMMUNITY_Sessions UI|Sessions UI]]
-- [[_COMMUNITY_Trainers Controller|Trainers Controller]]
-- [[_COMMUNITY_Theme & Color System|Theme & Color System]]
-- [[_COMMUNITY_Mock Data|Mock Data]]
-- [[_COMMUNITY_Documentation & Task Lists|Documentation & Task Lists]]
-- [[_COMMUNITY_Trainers Controller|Trainers Controller]]
-- [[_COMMUNITY_Theme & Color System|Theme & Color System]]
-- [[_COMMUNITY_Measurements UI|Measurements UI]]
-- [[_COMMUNITY_Trainers UI|Trainers UI]]
-- [[_COMMUNITY_Sessions UI|Sessions UI]]
-- [[_COMMUNITY_iOS Platform Files|iOS Platform Files]]
-- [[_COMMUNITY_Sessions Domain|Sessions Domain]]
-- [[_COMMUNITY_Auth UI|Auth UI]]
-- [[_COMMUNITY_Group Sessions Controller|Group Sessions Controller]]
-- [[_COMMUNITY_Shared UI Widgets|Shared UI Widgets]]
-- [[_COMMUNITY_Auth UI|Auth UI]]
-- [[_COMMUNITY_Trainers Repository|Trainers Repository]]
-- [[_COMMUNITY_Trainers UI|Trainers UI]]
-- [[_COMMUNITY_Shared UI Widgets|Shared UI Widgets]]
-- [[_COMMUNITY_Trainers Repository|Trainers Repository]]
-- [[_COMMUNITY_Sessions UI|Sessions UI]]
-- [[_COMMUNITY_Trainers Repository|Trainers Repository]]
-- [[_COMMUNITY_Trainers UI|Trainers UI]]
-- [[_COMMUNITY_Group Sessions Repository|Group Sessions Repository]]
-- [[_COMMUNITY_Packages Repository|Packages Repository]]
-- [[_COMMUNITY_Trainers Repository|Trainers Repository]]
-- [[_COMMUNITY_Badges Repository|Badges Repository]]
-- [[_COMMUNITY_Sessions Repository|Sessions Repository]]
-- [[_COMMUNITY_Trainers Repository|Trainers Repository]]
-- [[_COMMUNITY_App Constants|App Constants]]
-- [[_COMMUNITY_Trainers UI|Trainers UI]]
-- [[_COMMUNITY_Group Sessions Domain|Group Sessions Domain]]
-- [[_COMMUNITY_Sessions UI|Sessions UI]]
-- [[_COMMUNITY_Auth Repository|Auth Repository]]
-- [[_COMMUNITY_Group Sessions Domain|Group Sessions Domain]]
-- [[_COMMUNITY_Measurements UI|Measurements UI]]
-- [[_COMMUNITY_Measurements Domain|Measurements Domain]]
-- [[_COMMUNITY_Measurements Domain|Measurements Domain]]
-- [[_COMMUNITY_Panel Navigation Core|Panel Navigation Core]]
-- [[_COMMUNITY_Measurements Domain|Measurements Domain]]
-- [[_COMMUNITY_Sessions Domain|Sessions Domain]]
-- [[_COMMUNITY_Tests|Tests]]
-- [[_COMMUNITY_App Icons & Images|App Icons & Images]]
-- [[_COMMUNITY_Feedback Repository|Feedback Repository]]
-- [[_COMMUNITY_Packages Domain|Packages Domain]]
-- [[_COMMUNITY_Sessions Domain|Sessions Domain]]
-- [[_COMMUNITY_Role Shell Panels|Role Shell Panels]]
-- [[_COMMUNITY_Auth Domain|Auth Domain]]
-- [[_COMMUNITY_Trainers Domain|Trainers Domain]]
-- [[_COMMUNITY_Measurements UI|Measurements UI]]
-- [[_COMMUNITY_Tests|Tests]]
-- [[_COMMUNITY_Auth Domain|Auth Domain]]
-- [[_COMMUNITY_Group Sessions UI|Group Sessions UI]]
-- [[_COMMUNITY_Group Sessions UI|Group Sessions UI]]
-- [[_COMMUNITY_Auth UI|Auth UI]]
-- [[_COMMUNITY_Trainers Domain|Trainers Domain]]
-- [[_COMMUNITY_Trainers Domain|Trainers Domain]]
-- [[_COMMUNITY_Trainers Domain|Trainers Domain]]
-- [[_COMMUNITY_Trainers Domain|Trainers Domain]]
-- [[_COMMUNITY_Tests|Tests]]
-- [[_COMMUNITY_Feedback UI|Feedback UI]]
-- [[_COMMUNITY_Miscellaneous|Miscellaneous]]
-- [[_COMMUNITY_Auth Controller|Auth Controller]]
-- [[_COMMUNITY_Auth UI|Auth UI]]
-- [[_COMMUNITY_Auth UI|Auth UI]]
-- [[_COMMUNITY_Feedback Domain|Feedback Domain]]
-- [[_COMMUNITY_Measurements UI|Measurements UI]]
-- [[_COMMUNITY_Trainers UI|Trainers UI]]
-- [[_COMMUNITY_Role Shell Panels|Role Shell Panels]]
-- [[_COMMUNITY_Role Shell Panels|Role Shell Panels]]
-- [[_COMMUNITY_Badges Domain|Badges Domain]]
-- [[_COMMUNITY_Trainers Domain|Trainers Domain]]
-- [[_COMMUNITY_Tests|Tests]]
-- [[_COMMUNITY_Measurements Service|Measurements Service]]
-- [[_COMMUNITY_Measurements Repository|Measurements Repository]]
-- [[_COMMUNITY_Tests|Tests]]
-- [[_COMMUNITY_Role Shell Panels|Role Shell Panels]]
-- [[_COMMUNITY_Group Sessions UI|Group Sessions UI]]
-- [[_COMMUNITY_Documentation & Task Lists|Documentation & Task Lists]]
-- [[_COMMUNITY_Feedback Controller|Feedback Controller]]
-- [[_COMMUNITY_Measurements Controller|Measurements Controller]]
-- [[_COMMUNITY_iOS Platform Files|iOS Platform Files]]
-- [[_COMMUNITY_Shared Utilities|Shared Utilities]]
-- [[_COMMUNITY_Android Platform Files|Android Platform Files]]
-- [[_COMMUNITY_App Icons & Images|App Icons & Images]]
-- [[_COMMUNITY_Android Platform Files|Android Platform Files]]
-- [[_COMMUNITY_Tests|Tests]]
-- [[_COMMUNITY_Android Platform Files|Android Platform Files]]
-- [[_COMMUNITY_Badges Domain|Badges Domain]]
-- [[_COMMUNITY_Documentation & Task Lists|Documentation & Task Lists]]
-- [[_COMMUNITY_Group Sessions Domain|Group Sessions Domain]]
-- [[_COMMUNITY_Group Sessions Domain|Group Sessions Domain]]
-- [[_COMMUNITY_App Icons & Images|App Icons & Images]]
-- [[_COMMUNITY_Measurements Domain|Measurements Domain]]
-- [[_COMMUNITY_Measurements Domain|Measurements Domain]]
-- [[_COMMUNITY_Measurements Domain|Measurements Domain]]
-- [[_COMMUNITY_Measurements Domain|Measurements Domain]]
-- [[_COMMUNITY_Packages Domain|Packages Domain]]
-- [[_COMMUNITY_Sessions Domain|Sessions Domain]]
-- [[_COMMUNITY_Sessions Domain|Sessions Domain]]
-- [[_COMMUNITY_Sessions Domain|Sessions Domain]]
-- [[_COMMUNITY_Trainers Domain|Trainers Domain]]
-- [[_COMMUNITY_Trainers Domain|Trainers Domain]]
-- [[_COMMUNITY_App Icons & Images|App Icons & Images]]
-- [[_COMMUNITY_Documentation & Task Lists|Documentation & Task Lists]]
-- [[_COMMUNITY_Documentation & Task Lists|Documentation & Task Lists]]
-- [[_COMMUNITY_Documentation & Task Lists|Documentation & Task Lists]]
-- [[_COMMUNITY_Documentation & Task Lists|Documentation & Task Lists]]
-- [[_COMMUNITY_iOS Platform Files|iOS Platform Files]]
-- [[_COMMUNITY_App Icons & Images|App Icons & Images]]
-- [[_COMMUNITY_Documentation & Task Lists|Documentation & Task Lists]]
-- [[_COMMUNITY_Documentation & Task Lists|Documentation & Task Lists]]
-- [[_COMMUNITY_Documentation & Task Lists|Documentation & Task Lists]]
-- [[_COMMUNITY_Documentation & Task Lists|Documentation & Task Lists]]
-- [[_COMMUNITY_Auth Domain|Auth Domain]]
-- [[_COMMUNITY_Group Sessions Domain|Group Sessions Domain]]
-- [[_COMMUNITY_Trainers Controller|Trainers Controller]]
-- [[_COMMUNITY_Miscellaneous|Miscellaneous]]
-- [[_COMMUNITY_Miscellaneous|Miscellaneous]]
+- [[_COMMUNITY_core - remote config|core - remote config]]
+- [[_COMMUNITY_modules - sessions|modules - sessions]]
+- [[_COMMUNITY_modules - sessions|modules - sessions]]
+- [[_COMMUNITY_modules - gyms|modules - gyms]]
+- [[_COMMUNITY_modules - trainers|modules - trainers]]
+- [[_COMMUNITY_modules - subscription|modules - subscription]]
+- [[_COMMUNITY_modules - measurements|modules - measurements]]
+- [[_COMMUNITY_modules - expenses|modules - expenses]]
+- [[_COMMUNITY_modules - subscription|modules - subscription]]
+- [[_COMMUNITY_modules - sessions|modules - sessions]]
+- [[_COMMUNITY_modules - members|modules - members]]
+- [[_COMMUNITY_modules - gyms|modules - gyms]]
+- [[_COMMUNITY_modules - trainers|modules - trainers]]
+- [[_COMMUNITY_modules - expenses|modules - expenses]]
+- [[_COMMUNITY_modules - sessions|modules - sessions]]
+- [[_COMMUNITY_modules - members|modules - members]]
+- [[_COMMUNITY_modules - badges|modules - badges]]
+- [[_COMMUNITY_modules - members|modules - members]]
+- [[_COMMUNITY_modules - members|modules - members]]
+- [[_COMMUNITY_modules - trainers|modules - trainers]]
+- [[_COMMUNITY_modules - members|modules - members]]
+- [[_COMMUNITY_modules - feedback|modules - feedback]]
+- [[_COMMUNITY_modules - events|modules - events]]
+- [[_COMMUNITY_modules - trainers|modules - trainers]]
+- [[_COMMUNITY_shared - widgets|shared - widgets]]
+- [[_COMMUNITY_shared - domain|shared - domain]]
+- [[_COMMUNITY_modules - gyms|modules - gyms]]
+- [[_COMMUNITY_modules - trainers|modules - trainers]]
+- [[_COMMUNITY_modules - expenses|modules - expenses]]
+- [[_COMMUNITY_modules - sessions|modules - sessions]]
+- [[_COMMUNITY_modules - trainers|modules - trainers]]
+- [[_COMMUNITY_modules - notifications|modules - notifications]]
+- [[_COMMUNITY_modules - measurements|modules - measurements]]
+- [[_COMMUNITY_modules - packages|modules - packages]]
+- [[_COMMUNITY_modules - trainers|modules - trainers]]
+- [[_COMMUNITY_modules - reports|modules - reports]]
+- [[_COMMUNITY_modules - sessions|modules - sessions]]
+- [[_COMMUNITY_modules - auth|modules - auth]]
+- [[_COMMUNITY_modules - packages|modules - packages]]
+- [[_COMMUNITY_modules - group sessions|modules - group sessions]]
+- [[_COMMUNITY_modules - measurements|modules - measurements]]
+- [[_COMMUNITY_core - theme|core - theme]]
+- [[_COMMUNITY_modules - members|modules - members]]
+- [[_COMMUNITY_modules - group sessions|modules - group sessions]]
+- [[_COMMUNITY_modules - sessions|modules - sessions]]
+- [[_COMMUNITY_modules - trainers|modules - trainers]]
+- [[_COMMUNITY_modules - gyms|modules - gyms]]
+- [[_COMMUNITY_modules - trainers|modules - trainers]]
+- [[_COMMUNITY_modules - gyms|modules - gyms]]
+- [[_COMMUNITY_modules - auth|modules - auth]]
+- [[_COMMUNITY_modules - sessions|modules - sessions]]
+- [[_COMMUNITY_modules - subscription|modules - subscription]]
+- [[_COMMUNITY_modules - trainers|modules - trainers]]
+- [[_COMMUNITY_modules - group sessions|modules - group sessions]]
+- [[_COMMUNITY_core - theme|core - theme]]
+- [[_COMMUNITY_modules - trainers|modules - trainers]]
+- [[_COMMUNITY_modules - auth|modules - auth]]
+- [[_COMMUNITY_modules - auth|modules - auth]]
+- [[_COMMUNITY_modules - members|modules - members]]
+- [[_COMMUNITY_modules - gyms|modules - gyms]]
+- [[_COMMUNITY_modules - gyms|modules - gyms]]
+- [[_COMMUNITY_modules - expenses|modules - expenses]]
+- [[_COMMUNITY_modules - gyms|modules - gyms]]
+- [[_COMMUNITY_modules - members|modules - members]]
+- [[_COMMUNITY_modules - members|modules - members]]
+- [[_COMMUNITY_modules - trainers|modules - trainers]]
+- [[_COMMUNITY_modules - gyms|modules - gyms]]
+- [[_COMMUNITY_modules - trainers|modules - trainers]]
+- [[_COMMUNITY_modules - gyms|modules - gyms]]
+- [[_COMMUNITY_modules - members|modules - members]]
+- [[_COMMUNITY_modules - reports|modules - reports]]
+- [[_COMMUNITY_modules - feedback|modules - feedback]]
+- [[_COMMUNITY_modules - gyms|modules - gyms]]
+- [[_COMMUNITY_modules - expenses|modules - expenses]]
+- [[_COMMUNITY_modules - subscription|modules - subscription]]
+- [[_COMMUNITY_modules - sessions|modules - sessions]]
+- [[_COMMUNITY_core - panels|core - panels]]
+- [[_COMMUNITY_modules - group sessions|modules - group sessions]]
+- [[_COMMUNITY_modules - group sessions|modules - group sessions]]
+- [[_COMMUNITY_modules - gyms|modules - gyms]]
+- [[_COMMUNITY_modules - packages|modules - packages]]
+- [[_COMMUNITY_modules - events|modules - events]]
+- [[_COMMUNITY_modules - packages|modules - packages]]
+- [[_COMMUNITY_modules - measurements|modules - measurements]]
+- [[_COMMUNITY_core - ads|core - ads]]
+- [[_COMMUNITY_modules - group sessions|modules - group sessions]]
+- [[_COMMUNITY_modules - members|modules - members]]
+- [[_COMMUNITY_modules - packages|modules - packages]]
+- [[_COMMUNITY_modules - trainers|modules - trainers]]
+- [[_COMMUNITY_modules - feedback|modules - feedback]]
+- [[_COMMUNITY_modules - members|modules - members]]
+- [[_COMMUNITY_modules - badges|modules - badges]]
+- [[_COMMUNITY_modules - trainers|modules - trainers]]
+- [[_COMMUNITY_modules - notifications|modules - notifications]]
+- [[_COMMUNITY_modules - reports|modules - reports]]
+- [[_COMMUNITY_modules - sessions|modules - sessions]]
+- [[_COMMUNITY_modules - sessions|modules - sessions]]
+- [[_COMMUNITY_modules - auth|modules - auth]]
+- [[_COMMUNITY_modules - reports|modules - reports]]
+- [[_COMMUNITY_modules - gyms|modules - gyms]]
+- [[_COMMUNITY_modules - events|modules - events]]
+- [[_COMMUNITY_modules - sessions|modules - sessions]]
+- [[_COMMUNITY_modules - trainers|modules - trainers]]
+- [[_COMMUNITY_modules - members|modules - members]]
+- [[_COMMUNITY_modules - gyms|modules - gyms]]
+- [[_COMMUNITY_modules - feedback|modules - feedback]]
+- [[_COMMUNITY_modules - gyms|modules - gyms]]
+- [[_COMMUNITY_modules - notifications|modules - notifications]]
+- [[_COMMUNITY_modules - packages|modules - packages]]
+- [[_COMMUNITY_modules - sessions|modules - sessions]]
+- [[_COMMUNITY_modules - sessions|modules - sessions]]
+- [[_COMMUNITY_modules - trainers|modules - trainers]]
+- [[_COMMUNITY_shared - utils|shared - utils]]
+- [[_COMMUNITY_modules - notifications|modules - notifications]]
+- [[_COMMUNITY_core - constants|core - constants]]
+- [[_COMMUNITY_modules - reports|modules - reports]]
+- [[_COMMUNITY_shared - mock|shared - mock]]
+- [[_COMMUNITY_modules - members|modules - members]]
+- [[_COMMUNITY_modules - gyms|modules - gyms]]
+- [[_COMMUNITY_modules - trainers|modules - trainers]]
+- [[_COMMUNITY_shared - widgets|shared - widgets]]
+- [[_COMMUNITY_modules - group sessions|modules - group sessions]]
+- [[_COMMUNITY_modules - members|modules - members]]
+- [[_COMMUNITY_modules - gyms|modules - gyms]]
+- [[_COMMUNITY_modules - group sessions|modules - group sessions]]
+- [[_COMMUNITY_modules - auth|modules - auth]]
+- [[_COMMUNITY_core - subscription|core - subscription]]
+- [[_COMMUNITY_modules - gyms|modules - gyms]]
+- [[_COMMUNITY_modules - group sessions|modules - group sessions]]
+- [[_COMMUNITY_modules - gyms|modules - gyms]]
+- [[_COMMUNITY_shared - utils|shared - utils]]
+- [[_COMMUNITY_core - panels|core - panels]]
+- [[_COMMUNITY_core - router|core - router]]
+- [[_COMMUNITY_modules - measurements|modules - measurements]]
+- [[_COMMUNITY_modules - members|modules - members]]
+- [[_COMMUNITY_modules - trainers|modules - trainers]]
+- [[_COMMUNITY_modules - sessions|modules - sessions]]
+- [[_COMMUNITY_modules - trainers|modules - trainers]]
+- [[_COMMUNITY_shared - mock|shared - mock]]
+- [[_COMMUNITY_modules - sessions|modules - sessions]]
+- [[_COMMUNITY_modules - group sessions|modules - group sessions]]
+- [[_COMMUNITY_modules - trainers|modules - trainers]]
+- [[_COMMUNITY_Community 142|Community 142]]
+- [[_COMMUNITY_modules - trainers|modules - trainers]]
+- [[_COMMUNITY_modules - packages|modules - packages]]
+- [[_COMMUNITY_modules - sessions|modules - sessions]]
+- [[_COMMUNITY_modules - trainers|modules - trainers]]
+- [[_COMMUNITY_modules - feedback|modules - feedback]]
+- [[_COMMUNITY_modules - trainers|modules - trainers]]
+- [[_COMMUNITY_modules - trainers|modules - trainers]]
+- [[_COMMUNITY_core - ads|core - ads]]
+- [[_COMMUNITY_core - panels|core - panels]]
+- [[_COMMUNITY_modules - members|modules - members]]
+- [[_COMMUNITY_core - panels|core - panels]]
+- [[_COMMUNITY_core - theme|core - theme]]
+- [[_COMMUNITY_modules - trainers|modules - trainers]]
+- [[_COMMUNITY_core - panels|core - panels]]
+- [[_COMMUNITY_modules - members|modules - members]]
+- [[_COMMUNITY_modules - trainers|modules - trainers]]
+- [[_COMMUNITY_modules - members|modules - members]]
+- [[_COMMUNITY_core - ads|core - ads]]
+- [[_COMMUNITY_modules - measurements|modules - measurements]]
+- [[_COMMUNITY_modules - gyms|modules - gyms]]
+- [[_COMMUNITY_core - theme|core - theme]]
+- [[_COMMUNITY_core - constants|core - constants]]
+- [[_COMMUNITY_modules - trainers|modules - trainers]]
+- [[_COMMUNITY_modules - members|modules - members]]
+- [[_COMMUNITY_modules - auth|modules - auth]]
+- [[_COMMUNITY_modules - gyms|modules - gyms]]
+- [[_COMMUNITY_core - ads|core - ads]]
+- [[_COMMUNITY_core - panels|core - panels]]
+- [[_COMMUNITY_modules - trainers|modules - trainers]]
+- [[_COMMUNITY_modules - trainers|modules - trainers]]
+- [[_COMMUNITY_Community 173|Community 173]]
+- [[_COMMUNITY_modules - packages|modules - packages]]
+- [[_COMMUNITY_modules - reports|modules - reports]]
+- [[_COMMUNITY_modules - gyms|modules - gyms]]
+- [[_COMMUNITY_modules - trainers|modules - trainers]]
+- [[_COMMUNITY_core - constants|core - constants]]
+- [[_COMMUNITY_modules - gyms|modules - gyms]]
+- [[_COMMUNITY_modules - expenses|modules - expenses]]
+- [[_COMMUNITY_modules - feedback|modules - feedback]]
+- [[_COMMUNITY_modules - members|modules - members]]
+- [[_COMMUNITY_modules - trainers|modules - trainers]]
+- [[_COMMUNITY_modules - gyms|modules - gyms]]
+- [[_COMMUNITY_modules - gyms|modules - gyms]]
+- [[_COMMUNITY_modules - packages|modules - packages]]
+- [[_COMMUNITY_modules - reports|modules - reports]]
+- [[_COMMUNITY_modules - subscription|modules - subscription]]
+- [[_COMMUNITY_modules - trainers|modules - trainers]]
+- [[_COMMUNITY_modules - trainers|modules - trainers]]
+- [[_COMMUNITY_core - theme|core - theme]]
+- [[_COMMUNITY_core - constants|core - constants]]
+- [[_COMMUNITY_core - constants|core - constants]]
+- [[_COMMUNITY_modules - reports|modules - reports]]
+- [[_COMMUNITY_modules - sessions|modules - sessions]]
+- [[_COMMUNITY_modules - trainers|modules - trainers]]
+- [[_COMMUNITY_shared - utils|shared - utils]]
+- [[_COMMUNITY_core - remote config|core - remote config]]
+- [[_COMMUNITY_Community 199|Community 199]]
+- [[_COMMUNITY_Community 200|Community 200]]
+- [[_COMMUNITY_Community 201|Community 201]]
 
 ## God Nodes (most connected - your core abstractions)
-1. `BasePanelState` - 27 edges
-2. `BasePanel` - 26 edges
-3. `iOS App Icon Artwork (Flutter default logo, 1024x1024 master)` - 14 edges
-4. `Egoractive pubspec.yaml (Flutter Project Manifest)` - 9 edges
-5. `MeasurementMetric` - 7 edges
-6. `AppColorScheme` - 6 edges
-7. `AppTypography` - 6 edges
-8. `TrainerMemberDetailController` - 6 edges
-9. `AppDelegate` - 5 edges
-10. `PanelStackController` - 5 edges
+1. `activeGymIdProvider` - 63 edges
+2. `BasePanelState` - 49 edges
+3. `BasePanel` - 48 edges
+4. `MeasurementsController` - 8 edges
+5. `measurementsViewedUidProvider` - 8 edges
+6. `RemoteConfigService` - 7 edges
+7. `AppColorScheme` - 7 edges
+8. `DiscoverController` - 7 edges
+9. `MeasurementMetric` - 7 edges
+10. `AdminMemberDetailController` - 7 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `Egoractive README (Flutter Boilerplate)` --conceptually_related_to--> `Egoractive pubspec.yaml (Flutter Project Manifest)`  [INFERRED]
-  README.md → pubspec.yaml
-- `_DummyPanel` --inherits--> `BasePanel`  [EXTRACTED]
-  test/core/panel_stack_test.dart → lib/core/panels/base_panel.dart
-- `_RecordingPanel` --inherits--> `BasePanel`  [EXTRACTED]
-  test/core/panel_stack_test.dart → lib/core/panels/base_panel.dart
-- `_RootPanel` --inherits--> `BasePanel`  [EXTRACTED]
-  test/modules/auth/delete_account_confirm_panel_test.dart → lib/core/panels/base_panel.dart
-- `_DummyPanelState` --inherits--> `BasePanelState`  [EXTRACTED]
-  test/core/panel_stack_test.dart → lib/core/panels/base_panel.dart
+- `build` --references--> `activeGymIdProvider`  [EXTRACTED]
+  modules/events/ui/panels/create_event_panel.dart → core/theme/theme_controller.g.dart
+- `submit` --references--> `activeGymIdProvider`  [EXTRACTED]
+  modules/group_sessions/controller/create_group_session_controller.dart → core/theme/theme_controller.g.dart
+- `save` --references--> `activeGymIdProvider`  [EXTRACTED]
+  modules/gyms/controller/gym_profile_controller.dart → core/theme/theme_controller.g.dart
+- `saveRules` --references--> `activeGymIdProvider`  [EXTRACTED]
+  modules/gyms/controller/gym_rules_controller.dart → core/theme/theme_controller.g.dart
+- `addTheme` --references--> `activeGymIdProvider`  [EXTRACTED]
+  modules/gyms/controller/gym_theme_controller.dart → core/theme/theme_controller.g.dart
 
 ## Import Cycles
 - None detected.
 
-## Hyperedges (group relationships)
-- **BasePanel / PanelStackController / ThemeController Architecture Trio** — claude_md_basepanel, claude_md_panelstackcontroller, claude_md_themecontroller, claude_md_appcolorscheme [EXTRACTED 0.90]
-- **FAZ P0 Önkoşul Görevleri (Proje, Panel, UI Kit, Rol Shell)** — docs_egoractive_ui_panel_gorev_listesi_p0_1, docs_egoractive_ui_panel_gorev_listesi_p0_2, docs_egoractive_ui_panel_gorev_listesi_p0_3, docs_egoractive_ui_panel_gorev_listesi_p0_4 [EXTRACTED 0.90]
-- **Store Altyapısı İnsan Görevleri (Apple, Google Play, Gizlilik, Marka)** — docs_egoractive_manuel_gorevler_apple_developer, docs_egoractive_manuel_gorevler_google_play_console, docs_egoractive_manuel_gorevler_gizlilik_politikasi, docs_egoractive_manuel_gorevler_marka_kimligi, docs_egoractive_gorev_listesi_faz0 [EXTRACTED 0.85]
-- **Android Launcher Icon Set (Flutter mark, multi-density)** — android_app_src_main_res_mipmap_hdpi_ic_launcher_icon, android_app_src_main_res_mipmap_mdpi_ic_launcher_icon, android_app_src_main_res_mipmap_xhdpi_ic_launcher_icon, android_app_src_main_res_mipmap_xxhdpi_ic_launcher_icon, android_app_src_main_res_mipmap_xxxhdpi_ic_launcher_icon [INFERRED 0.90]
-- **iOS AppIcon Set** — ios_runner_assets_xcassets_appicon_appiconset_icon_app_1024x1024_1x, ios_runner_assets_xcassets_appicon_appiconset_icon_app_20x20_1x, ios_runner_assets_xcassets_appicon_appiconset_icon_app_20x20_2x, ios_runner_assets_xcassets_appicon_appiconset_icon_app_20x20_3x, ios_runner_assets_xcassets_appicon_appiconset_icon_app_29x29_1x, ios_runner_assets_xcassets_appicon_appiconset_icon_app_29x29_2x, ios_runner_assets_xcassets_appicon_appiconset_icon_app_29x29_3x, ios_runner_assets_xcassets_appicon_appiconset_icon_app_40x40_1x, ios_runner_assets_xcassets_appicon_appiconset_icon_app_40x40_2x, ios_runner_assets_xcassets_appicon_appiconset_icon_app_40x40_3x, ios_runner_assets_xcassets_appicon_appiconset_icon_app_60x60_2x, ios_runner_assets_xcassets_appicon_appiconset_icon_app_60x60_3x, ios_runner_assets_xcassets_appicon_appiconset_icon_app_76x76_1x, ios_runner_assets_xcassets_appicon_appiconset_icon_app_76x76_2x, ios_runner_assets_xcassets_appicon_appiconset_icon_app_83_5x83_5_2x [EXTRACTED 1.00]
+## Communities (202 total, 6 thin omitted)
 
-## Communities (124 total, 17 thin omitted)
+### Community 0 - "core - remote config"
+Cohesion: 0.01
+Nodes (353): authBadgesNavLabel, authDeleteAccountConfirmTitle, authDeleteAccountErrorGeneric, authGiveFeedbackNavLabel, authLoginButton, authLoginErrorGeneric, authLoginErrorNotFound, authLoginErrorRateLimited (+345 more)
 
-### Community 0 - "Trainers Domain"
+### Community 1 - "modules - sessions"
 Cohesion: 0.04
-Nodes (46): IconData, AppTabItem, AppTabShell, _AppTabShellState, build, builder, createState, icon (+38 more)
+Nodes (68): attendance_notification_detail_panel.dart, class, ../../controller/admin_feedback_controller.dart, ../../controller/admin_group_sessions_controller.dart, ../../controller/badges_controller.dart, ../../controller/dashboard_report_controller.dart, ../../controller/gym_events_controller.dart, ../../controller/studio_packages_controller.dart (+60 more)
 
-### Community 1 - "Trainers Domain"
+### Community 2 - "modules - sessions"
+Cohesion: 0.04
+Nodes (61): ../../controller/admin_calendar_controller.dart, ../../controller/trainer_report_controller.dart, _AgendaRow, _ArrowButton, build, _CalendarBadge, color, count (+53 more)
+
+### Community 3 - "modules - gyms"
 Cohesion: 0.05
-Nodes (42): build, handleSystemBack, _hideCallbacks, pop, popToRoot, push, registerActiveBackHandler, registerPanelCallbacks (+34 more)
+Nodes (64): BasePanel, BasePanelState, OnboardingRolePanel, _OnboardingRolePanelState, OnboardingTrainerPathPanel, _OnboardingTrainerPathPanelState, PhoneLoginPanel, _PhoneLoginPanelState (+56 more)
 
-### Community 2 - "Sessions UI"
-Cohesion: 0.05
-Nodes (39): ../../domain/session.dart, ../../domain/sessions_state.dart, build, confirmAttendance, resetAttendance, setViewMode, sessionsRepositoryProvider, loadInitial (+31 more)
-
-### Community 3 - "Trainers Controller"
-Cohesion: 0.06
-Nodes (38): @Deprecated, AutoDisposeNotifierProviderElement, AutoDisposeNotifierProviderImpl, AutoDisposeNotifierProviderRef, class TrainerMemberDetailControllerProvider, class _TrainerMemberDetailControllerProviderElement, Family, Iterable (+30 more)
-
-### Community 4 - "Theme & Color System"
-Cohesion: 0.05
-Nodes (37): Color?, background, copyWith, defaultScheme, error, errorContainer, lerp, onErrorContainer (+29 more)
-
-### Community 5 - "Mock Data"
-Cohesion: 0.06
-Nodes (34): gymName, makeupSessions, memberFirstName, memberFullName, MemberMockProfile, memberPhoneDigits, packageEnd, packageName (+26 more)
-
-### Community 6 - "Documentation & Task Lists"
+### Community 4 - "modules - trainers"
 Cohesion: 0.07
-Nodes (32): Analyzer Strict Mode Config (flutter_lints), IBM Plex Sans — SIL Open Font License, Outfit — SIL Open Font License, AppColorScheme Model, BasePanel / BasePanelState, Manager/Controller Sorumluluğu (UI'dan Habersiz Riverpod Notifier), Klasör Yapısı (lib/, modules/, functions/), Modüler Yapı (Feature-First Modules) (+24 more)
+Nodes (63): @Deprecated, AutoDisposeStreamProvider, AutoDisposeStreamProviderElement, AutoDisposeStreamProviderRef, _EventsForGymRef, _GroupSessionsForGymRef, List, TrainerMetricSeries (+55 more)
 
-### Community 7 - "Trainers Controller"
-Cohesion: 0.10
-Nodes (30): _, @riverpod, panelStackControllerProvider, PanelStackController, AuthController, authControllerProvider, BadgesController, badgesControllerProvider (+22 more)
+### Community 5 - "modules - subscription"
+Cohesion: 0.03
+Nodes (60): AnimationController, ../../controller/subscription_controller.dart, Future, accent, _activeView, badge, bg, body (+52 more)
 
-### Community 8 - "Theme & Color System"
+### Community 6 - "modules - measurements"
+Cohesion: 0.04
+Nodes (48): AvatarSide get, measurement_metric.dart, measurement_point.dart, measurement_series.dart, MeasurementMetric get, MeasurementPoint, MeasurementsState, MeasurementsViewMode get (+40 more)
+
+### Community 7 - "modules - expenses"
+Cohesion: 0.05
+Nodes (44): capacityServiceProvider, ../../domain/measurement_metric.dart, _capacityService, createEvent, join, leave, addExpense, _monthAbbrev (+36 more)
+
+### Community 8 - "modules - subscription"
+Cohesion: 0.04
+Nodes (47): ../../../../core/constants/subscription_constants.dart, dart:convert, dart:ui, InAppPurchase, createGym, _toHex, buySubscription, completePurchase (+39 more)
+
+### Community 9 - "modules - sessions"
+Cohesion: 0.05
+Nodes (41): build, notify, AnalyticsEvent, AnalyticsService, ../../../core/analytics/analytics_service.dart, analyticsServiceProvider, eventName, logEvent (+33 more)
+
+### Community 10 - "modules - members"
+Cohesion: 0.05
+Nodes (43): class AdminMemberDetailControllerProvider, class _AdminMemberDetailControllerProviderElement, class _LatestPackageForMemberProvider, class _LatestPackageForMemberProviderElement, _detailStreamForIdProvider, _latestPackageForMemberProvider, mixin _LatestPackageForMemberRef, build (+35 more)
+
+### Community 11 - "modules - gyms"
+Cohesion: 0.05
+Nodes (43): gym_themes_panel.dart, _accountingReportEmailController, _addressController, _addressError, build, color, _ColorDot, createState (+35 more)
+
+### Community 12 - "modules - trainers"
+Cohesion: 0.09
+Nodes (43): AsyncValue, Family, _ProfileDocForUidFamily, _EventsForGymFamily, _ExpensesForGymFamily, _FeedbackForGymFamily, _GroupSessionsForGymFamily, _EventsForGymFamily (+35 more)
+
+### Community 13 - "modules - expenses"
+Cohesion: 0.05
+Nodes (41): ../../domain/expense_state.dart, ExpensesState, addExpense, expenseCategoriesProvider, _empty, expenseCategories, locale, rc (+33 more)
+
+### Community 14 - "modules - sessions"
+Cohesion: 0.05
+Nodes (41): adminMemberListPageServiceProvider, @riverpod, _canConfirmAttendanceForMemberProvider, featureFlagsProvider, FeatureFlags, createGymServiceProvider, _latestPackageDocForIdProvider, measurementsWriteServiceProvider (+33 more)
+
+### Community 15 - "modules - members"
+Cohesion: 0.05
+Nodes (39): build, createState, onTap, selected, _selectedIds, _showTrainerPicker, trainer, _TrainerOption (+31 more)
+
+### Community 16 - "modules - badges"
+Cohesion: 0.05
+Nodes (36): ../../../../core/remote_config/remote_config_service.dart, remoteConfigServiceProvider, RemoteConfigService, ../../domain/admin_permissions.dart, ../../domain/badge_item.dart, ../../domain/subscription_state.dart, BadgesRepository, BadgesRepositoryImpl (+28 more)
+
+### Community 17 - "modules - members"
+Cohesion: 0.05
+Nodes (39): _, homeReturnSignalProvider, HomeReturnSignal, panelStackControllerProvider, PanelStackController, AuthController, authControllerProvider, feedbackControllerProvider (+31 more)
+
+### Community 18 - "modules - members"
+Cohesion: 0.05
+Nodes (37): admin_member_detail_panel.dart, ../../controller/admin_member_list_controller.dart, ../../controller/member_registration_controller.dart, ../../controller/new_member_controller.dart, ../../controller/new_membership_controller.dart, member_info_panel.dart, build, createState (+29 more)
+
+### Community 19 - "modules - trainers"
+Cohesion: 0.05
+Nodes (38): class TrainerMemberDetailControllerProvider, class _TrainerMemberDetailControllerProviderElement, build, data, build, isCompleted, _monthAbbrev, selectMetric (+30 more)
+
+### Community 20 - "modules - members"
+Cohesion: 0.05
+Nodes (37): ../../controller/admin_member_detail_controller.dart, ../../controller/trainer_member_detail_controller.dart, ../../domain/trainer_metric.dart, ../../../measurements/ui/panels/measurements_panel.dart, build, createState, entry, _HistoryRow (+29 more)
+
+### Community 21 - "modules - feedback"
+Cohesion: 0.06
+Nodes (36): FeedbackState, int get, FeedbackState, _FeedbackState, empty, String?, T, _ (+28 more)
+
+### Community 22 - "modules - events"
+Cohesion: 0.06
+Nodes (35): ../../domain/gym_event.dart, attendeeIds, data, dateTime, _monthAbbrev, now, time, _toGymEvent (+27 more)
+
+### Community 23 - "modules - trainers"
+Cohesion: 0.06
+Nodes (34): ../../controller/trainer_members_controller.dart, ../../domain/trainer_member_summary.dart, _MemberFilter, trainerMembersRepositoryProvider, loadMembers, _service, TrainerMembersRepository, TrainerMembersRepositoryImpl (+26 more)
+
+### Community 24 - "shared - widgets"
+Cohesion: 0.06
+Nodes (31): AppThemePalette, colors, ../../core/theme/app_theme.dart, EdgeInsetsGeometry, package:flutter/material.dart, AppButton, AppButtonVariant, build (+23 more)
+
+### Community 25 - "shared - domain"
+Cohesion: 0.06
+Nodes (35): DateTime, DateTime get, MembershipInstallment, TrainerCalendarState, _TrainerCalendarState, TrainerCalendarViewMode, base, clampedCount (+27 more)
+
+### Community 26 - "modules - gyms"
+Cohesion: 0.06
+Nodes (33): add_gym_theme_panel.dart, Color, ../../controller/gym_theme_controller.dart, ../../../../core/constants/theme_palette.dart, build, color, createState, dispose (+25 more)
+
+### Community 27 - "modules - trainers"
+Cohesion: 0.06
+Nodes (33): ../../controller/admin_trainers_controller.dart, ../../controller/auth_controller.dart, login_waiting_panel.dart, build, createState, LoginWaitingPanel, _LoginWaitingPanelState, build (+25 more)
+
+### Community 28 - "modules - expenses"
+Cohesion: 0.06
+Nodes (33): ../../../../core/subscription/subscription_write_gate.dart, ../../domain/expense_category.dart, _amountController, _amountError, build, _category, createState, _date (+25 more)
+
+### Community 29 - "modules - sessions"
+Cohesion: 0.06
+Nodes (35): _expensesForGymMonthProvider, AdminCalendarController, build, adminCalendarControllerProvider, data, end, _expensesForGymMonth, now (+27 more)
+
+### Community 30 - "modules - trainers"
+Cohesion: 0.06
+Nodes (31): admin_permissions_panel.dart, ../../../auth/controller/auth_controller.dart, ../../../auth/ui/panels/delete_account_confirm_panel.dart, ../../../auth/ui/panels/phone_login_panel.dart, ../../controller/trainer_profile_controller.dart, ../../../events/ui/panels/admin_events_panel.dart, ../../../feedback/ui/panels/admin_feedback_list_panel.dart, ../../../group_sessions/ui/panels/admin_group_sessions_panel.dart (+23 more)
+
+### Community 31 - "modules - notifications"
+Cohesion: 0.06
+Nodes (32): attendance_confirm_panel.dart, ../../../auth/controller/member_profile_controller.dart, ../../controller/send_notification_controller.dart, ../../controller/sessions_controller.dart, ../../../gyms/controller/gym_profile_controller.dart, ../../members/controller/admin_members_controller.dart, ../../../members/domain/admin_member_summary.dart, build (+24 more)
+
+### Community 32 - "modules - measurements"
+Cohesion: 0.06
+Nodes (33): ../../controller/measurements_controller.dart, ../../domain/measurements_state.dart, double?, build, colors, createState, date, _DateOption (+25 more)
+
+### Community 33 - "modules - packages"
+Cohesion: 0.06
+Nodes (32): build, color, ComponentShowcasePanel, _ComponentShowcasePanelState, createState, label, _Swatch, _activeForSale (+24 more)
+
+### Community 34 - "modules - trainers"
+Cohesion: 0.06
+Nodes (32): build, data, end, now, select, selectDate, _SelectedTrainerCalendarDate, _sessionsForTrainerMonth (+24 more)
+
+### Community 35 - "modules - reports"
 Cohesion: 0.08
-Nodes (27): @immutable, app_color_scheme.dart, app_typography.dart, AppColorScheme get, AppTypography get, BuildContext, AppColorScheme, appColors (+19 more)
+Nodes (31): AutoDisposeFutureProviderElement, AutoDisposeFutureProviderRef, DashboardSummary, ref, retry, watch, DashboardSummary, _DashboardSummary (+23 more)
 
-### Community 9 - "Measurements UI"
+### Community 36 - "modules - sessions"
+Cohesion: 0.06
+Nodes (31): _confirmationsForTrainerProvider, answeredAt, build, coming, _confirmationsForTrainer, data, first, _initialsFor (+23 more)
+
+### Community 37 - "modules - auth"
+Cohesion: 0.06
+Nodes (29): ../../domain/auth_login_exception.dart, ../domain/auth_state.dart, build, deleteAccount, logout, _messageFor, requestLogin, setPhoneDigits (+21 more)
+
+### Community 38 - "modules - packages"
+Cohesion: 0.08
+Nodes (31): ../domain/member_package.dart, Map, _dateFrom, _initialsFor, watch, ../repository/package_repository.dart, _ProfileDocForUidProvider, _allTransitiveDependencies (+23 more)
+
+### Community 39 - "modules - group sessions"
 Cohesion: 0.07
-Nodes (27): ../../controller/measurements_controller.dart, AddMeasurementPanel, _AddMeasurementPanelState, build, controller, _controllers, createState, dispose (+19 more)
+Nodes (28): createGroupSessionRepositoryProvider, ../../domain/create_group_session_form.dart, build, decrementCapacity, incrementCapacity, _nextOccurrence, setDurationMinutes, setStartTime (+20 more)
 
-### Community 10 - "Trainers UI"
+### Community 40 - "modules - measurements"
+Cohesion: 0.06
+Nodes (30): ../domain/measurement_series.dart, _Entry, _entryAtOrBefore, _formatDelta, formatted, _isSameDay, _monthAbbrev, points (+22 more)
+
+### Community 41 - "core - theme"
+Cohesion: 0.09
+Nodes (29): activeGymId, build, cleaned, themeControllerProvider, _parseHexColor, resetToDefault, setAccentColor, ThemeController (+21 more)
+
+### Community 42 - "modules - members"
+Cohesion: 0.07
+Nodes (27): DocumentSnapshot, ../../domain/admin_member_summary.dart, ../domain/admin_member_summary_mapper.dart, AdminMembersRepository, AdminMembersRepositoryImpl, adminMembersRepositoryProvider, loadMembers, _service (+19 more)
+
+### Community 43 - "modules - group sessions"
+Cohesion: 0.07
+Nodes (29): ../../events/service/events_write_service.dart, attendeeIds, data, dateTime, durationMinutes, lockHours, _monthAbbrev, now (+21 more)
+
+### Community 44 - "modules - sessions"
+Cohesion: 0.07
+Nodes (29): PaymentWarning, WeekActivityDay, _PaymentWarning, _WeekActivityDay, SessionsViewMode, PaymentWarning, PaymentWarning? get, session.dart (+21 more)
+
+### Community 45 - "modules - trainers"
+Cohesion: 0.07
+Nodes (29): data, end, first, _initialsFor, last, markAbsent, markCompleted, now (+21 more)
+
+### Community 46 - "modules - gyms"
 Cohesion: 0.08
-Nodes (27): ../../controller/trainer_calendar_controller.dart, ../../../group_sessions/ui/panels/create_group_session_panel.dart, _AgendaRow, build, createState, day, _dayNames, _initialsOf (+19 more)
+Nodes (28): AdminHomeState, @freezed, completionRatio, AdminHomeState, TrainerPerformance, _, empty, _AdminHomeState (+20 more)
 
-### Community 11 - "Sessions UI"
-Cohesion: 0.09
-Nodes (23): attendance_notification_detail_panel.dart, ../../controller/badges_controller.dart, ../../controller/sessions_controller.dart, ../../controller/trainer_notifications_controller.dart, ../../../../core/panels/base_panel.dart, ../../../../core/panels/panel_stack_controller.dart, badge, _BadgeTile (+15 more)
+### Community 47 - "modules - trainers"
+Cohesion: 0.07
+Nodes (28): ../../controller/trainer_calendar_controller.dart, ../../../group_sessions/ui/panels/create_group_session_panel.dart, _AgendaRow, build, createState, day, _dayNames, _initialsOf (+20 more)
 
-### Community 12 - "iOS Platform Files"
-Cohesion: 0.09
-Nodes (17): Any, Flutter, FlutterAppDelegate, FlutterImplicitEngineBridge, FlutterImplicitEngineDelegate, FlutterSceneDelegate, AppDelegate, Bool (+9 more)
-
-### Community 13 - "Sessions Domain"
+### Community 48 - "modules - gyms"
 Cohesion: 0.08
-Nodes (25): AttendanceAnswer get, PaymentWarning, _PaymentWarning, SessionsViewMode, PaymentWarning, PaymentWarning? get, session.dart, Session get (+17 more)
+Nodes (28): GymProfile, _emptyProfile, reset, save, updateAddress, updateCity, updateName, updatePhone (+20 more)
 
-### Community 14 - "Auth UI"
+### Community 49 - "modules - auth"
+Cohesion: 0.07
+Nodes (27): ../../../gyms/ui/panels/gym_setup_panel.dart, IconData, build, createState, _hint, icon, iconRadius, note (+19 more)
+
+### Community 50 - "modules - sessions"
+Cohesion: 0.07
+Nodes (28): confirmation, confirmationStr, confirmAttendance, _emptyNextSession, _monthAbbrev, resetAttendance, setViewMode, status (+20 more)
+
+### Community 51 - "modules - subscription"
+Cohesion: 0.08
+Nodes (28): fetchProducts, _isPurchasing, _onPurchaseUpdate, _pendingProductId, purchase, _purchaseSub, watch, SubscriptionState (+20 more)
+
+### Community 52 - "modules - trainers"
+Cohesion: 0.07
+Nodes (28): SessionHistoryEntry, _SessionHistoryEntry, SessionHistoryEntry, TrainerMetric get, _, date, hashCode, history (+20 more)
+
+### Community 53 - "modules - group sessions"
+Cohesion: 0.07
+Nodes (27): ../../controller/create_group_session_controller.dart, build, colors, createState, _DayChip, dispose, _durationOptions, filled (+19 more)
+
+### Community 54 - "core - theme"
+Cohesion: 0.07
+Nodes (27): background, copyWith, defaultScheme, error, errorContainer, lerp, onErrorContainer, onPrimary (+19 more)
+
+### Community 55 - "modules - trainers"
+Cohesion: 0.08
+Nodes (26): ExpenseCategoryOption, get, ExpenseCategoryOption, _ExpenseCategoryOption, TrainerMemberSummary, _TrainerMemberSummary, TrainerMemberSummary, _ (+18 more)
+
+### Community 56 - "modules - auth"
+Cohesion: 0.08
+Nodes (25): ../../controller/feedback_controller.dart, _AcknowledgeCheckbox, build, checked, createState, _DangerButton, DeleteAccountConfirmPanel, _DeleteAccountConfirmPanelState (+17 more)
+
+### Community 57 - "modules - auth"
+Cohesion: 0.07
+Nodes (25): ../../../core/router/app_router.dart, build, _digitsOnly, selectAvatar, toggleSessionReminder, build, hasError, repository (+17 more)
+
+### Community 58 - "modules - members"
+Cohesion: 0.07
+Nodes (25): ../../../core/theme/theme_controller.dart, ../domain/admin_member_list_state.dart, build, _gymId, _lastDocument, _loadFirstPage, loadMore, refresh (+17 more)
+
+### Community 59 - "modules - gyms"
+Cohesion: 0.08
+Nodes (25): ../../domain/gym_theme.dart, gymThemeRepositoryProvider, GymThemeRepository, GymThemeRepositoryImpl, savePresets, selectTheme, _service, setWatermarkEnabled (+17 more)
+
+### Community 60 - "modules - gyms"
+Cohesion: 0.08
+Nodes (26): GymTheme get, activeTheme, addTheme, build, gymThemeControllerProvider, _fallbackState, GymThemeController, selectTheme (+18 more)
+
+### Community 61 - "modules - expenses"
+Cohesion: 0.08
+Nodes (25): add_expense_panel.dart, ConsumerWidget, ../../controller/expenses_controller.dart, PanelStackView, EgoractiveApp, ProfilePanel, AdminExpensesPanel, build (+17 more)
+
+### Community 62 - "modules - gyms"
+Cohesion: 0.08
+Nodes (25): gym_profile_controller.dart, gym_theme_controller.dart, addressError, build, cityError, copyWith, CreateGymState, errorMessage (+17 more)
+
+### Community 63 - "modules - members"
+Cohesion: 0.08
+Nodes (25): MemberGender? get, age, NewMemberForm, _, _NewMemberForm, _, label, MemberGender (+17 more)
+
+### Community 64 - "modules - members"
+Cohesion: 0.08
+Nodes (25): _, _, paymentDueTl, hashCode, history, id, initials, installments (+17 more)
+
+### Community 65 - "modules - trainers"
+Cohesion: 0.08
+Nodes (25): name, data, first, name, _initialsFor, last, packageName, parts (+17 more)
+
+### Community 66 - "modules - gyms"
+Cohesion: 0.09
+Nodes (24): AutoDisposeFutureProvider, ../../feedback/controller/admin_feedback_controller.dart, watch, DuePaymentsSummary, ../../reports/controller/dashboard_report_controller.dart, ../repository/admin_home_repository.dart, adminHomeControllerProvider, _allTransitiveDependencies (+16 more)
+
+### Community 67 - "modules - trainers"
+Cohesion: 0.08
+Nodes (24): class _TrainerDocsForGymFamily, class _TrainerDocsForGymProvider, class _TrainerDocsForGymProviderElement, ../domain/admin_trainer_summary_mapper.dart, mixin _TrainerDocsForGymRef, addTrainer, ../repository/admin_trainers_repository.dart, adminTrainersControllerProvider (+16 more)
+
+### Community 68 - "modules - gyms"
+Cohesion: 0.09
+Nodes (23): ../../controller/gym_rules_controller.dart, gym_rules_editor_panel.dart, build, _controller, createState, dispose, _editorFocusNode, _errorMessage (+15 more)
+
+### Community 69 - "modules - members"
+Cohesion: 0.08
+Nodes (24): build, createState, dispose, filled, _formatDate, icon, _InfoRow, _initialsOf (+16 more)
+
+### Community 70 - "modules - reports"
+Cohesion: 0.09
+Nodes (24): _emailPattern, save, watch, ReportRecipients, _ReportRecipients, ReportRecipients, ../repository/report_recipients_repository.dart, static final (+16 more)
+
+### Community 71 - "modules - feedback"
+Cohesion: 0.09
+Nodes (23): AdminFeedbackSummary, Iterable, _empty, watch, AdminFeedbackSummary, _AdminFeedbackSummary, ../repository/admin_feedback_repository.dart, adminFeedbackControllerProvider (+15 more)
+
+### Community 72 - "modules - gyms"
+Cohesion: 0.08
+Nodes (22): ../../controller/admin_home_controller.dart, ../../controller/gym_profile_controller.dart, ../../controller/package_controller.dart, ../../domain/admin_home_state.dart, build, label, _MetricTile, note (+14 more)
+
+### Community 73 - "modules - expenses"
+Cohesion: 0.09
+Nodes (23): ExpenseCategoryTotal, ExpenseEntry, ExpenseCategoryTotal, ExpenseEntry, _, _ExpenseCategoryTotal, _ExpenseEntry, _ (+15 more)
+
+### Community 74 - "modules - subscription"
+Cohesion: 0.09
+Nodes (23): SubscriptionProduct, _SubscriptionProduct, SubscriptionStatus, SubscriptionProduct, SubscriptionStatus get, _, description, expiresAt (+15 more)
+
+### Community 75 - "modules - sessions"
+Cohesion: 0.09
+Nodes (22): AdminCalendarState, AdminSessionSlot, AdminSessionState get, ../../../expenses/domain/expense_state.dart, AdminSessionState, AdminCalendarState, AdminSessionSlot, _AdminCalendarState (+14 more)
+
+### Community 76 - "core - panels"
+Cohesion: 0.10
+Nodes (21): app_tab_shell.dart, ../base_panel.dart, AdminShellPanel, _AdminShellPanelState, build, createState, build, createState (+13 more)
+
+### Community 77 - "modules - group sessions"
+Cohesion: 0.09
+Nodes (22): CreateGroupSessionForm, CreateGroupSessionForm, _CreateGroupSessionForm, groupSessionDayLabels, _, capacity, capacityMax, copyWith (+14 more)
+
+### Community 78 - "modules - group sessions"
+Cohesion: 0.09
+Nodes (22): DiscoverCategory get, DiscoverItem, DiscoverItem, _, _DiscoverItem, _, isFull, capacity (+14 more)
+
+### Community 79 - "modules - gyms"
+Cohesion: 0.10
+Nodes (22): GymRules, saveRules, watch, GymRules, _GymRules, ../repository/gym_rules_repository.dart, _allTransitiveDependencies, call (+14 more)
+
+### Community 80 - "modules - packages"
+Cohesion: 0.09
+Nodes (22): MemberPackage, MemberPackage, _, empty, _MemberPackage, _, progressRatio, dueAmountTl (+14 more)
+
+### Community 81 - "modules - events"
+Cohesion: 0.09
+Nodes (22): build, _capacity, CreateEventPanel, _CreateEventPanelState, createState, _dateController, _dateError, _descriptionController (+14 more)
+
+### Community 82 - "modules - packages"
+Cohesion: 0.09
+Nodes (22): addOrUpdate, data, deletePackage, _toFirestoreMap, toggleActiveForSale, _toPackage, ../repository/studio_packages_repository.dart, _allTransitiveDependencies (+14 more)
+
+### Community 83 - "modules - measurements"
+Cohesion: 0.10
+Nodes (21): bool?, MeasurementHistoryEntry, MeasurementSeries, MeasurementHistoryEntry, MeasurementSeries, _MeasurementHistoryEntry, _MeasurementSeries, _ (+13 more)
+
+### Community 84 - "core - ads"
+Cohesion: 0.10
+Nodes (20): ../constants/ad_constants.dart, AdConsentService, adConsentServiceProvider, ensureConsent, build, createState, dispose, _firstAdTimer (+12 more)
+
+### Community 85 - "modules - group sessions"
+Cohesion: 0.09
+Nodes (21): attendeeIds, data, now, startTime, time, _toAdminGroupSession, _weekdayNames, ../repository/admin_group_sessions_repository.dart (+13 more)
+
+### Community 86 - "modules - members"
+Cohesion: 0.10
+Nodes (21): NewMembershipState, _, dueAmountTl, _NewMembershipState, _, isFullyPaid, paidAmountTl, NewMembershipState (+13 more)
+
+### Community 87 - "modules - packages"
+Cohesion: 0.10
+Nodes (21): StudioPackage, _, _StudioPackage, _, label, PackageSessionType, PackageSessionTypeLabel, pricePerSession (+13 more)
+
+### Community 88 - "modules - trainers"
+Cohesion: 0.09
+Nodes (21): cancelled, completed, _loadingState, monthStart, now, snapshot, total, ../repository/trainer_report_repository.dart (+13 more)
+
+### Community 89 - "modules - feedback"
+Cohesion: 0.10
+Nodes (20): AdminFeedbackEntry, double get, AdminFeedbackEntry, _AdminFeedbackEntry, _, average, comment, copyWith (+12 more)
+
+### Community 90 - "modules - members"
+Cohesion: 0.10
+Nodes (20): AdminMemberSummary?, MemberPackageStatus get, AdminMemberSummary, _AdminMemberSummary, label, MemberPackageStatus, MemberPackageStatusLabel, _ (+12 more)
+
+### Community 91 - "modules - badges"
+Cohesion: 0.10
+Nodes (19): BadgeItem, bool get, _flag, isGroupSessionsEnabled, _remoteConfig, BadgeItem, _BadgeItem, remote_config_service.dart (+11 more)
+
+### Community 92 - "modules - trainers"
+Cohesion: 0.10
+Nodes (20): ../../controller/trainer_home_controller.dart, build, _handleCompletionAction, label, _monthNames, now, onAbsent, onDone (+12 more)
+
+### Community 93 - "modules - notifications"
+Cohesion: 0.10
+Nodes (19): ../domain/send_notification_exception.dart, ../../domain/send_notification_form.dart, build, _genericErrorMessage, _rateLimitedMessage, reset, send, setTargetType (+11 more)
+
+### Community 94 - "modules - reports"
+Cohesion: 0.10
+Nodes (20): cancellationRatio, completionRatio, _, empty, _TrainerPerformance, _, from, netTl (+12 more)
+
+### Community 95 - "modules - sessions"
+Cohesion: 0.10
+Nodes (20): build, createState, _dayNames, faded, label, _monthAbbrev, onSelectDay, onTap (+12 more)
+
+### Community 96 - "modules - sessions"
 Cohesion: 0.11
-Nodes (26): BasePanel, BasePanelState, DevMenuPanel, _DevMenuPanelState, DeleteAccountConfirmPanel, _DeleteAccountConfirmPanelState, PhoneLoginPanel, _PhoneLoginPanelState (+18 more)
+Nodes (19): AttendanceAnswer get, AttendanceAnswer, Session, _Session, SessionStatus, Session, SessionStatus get, _ (+11 more)
 
-### Community 15 - "Group Sessions Controller"
-Cohesion: 0.09
-Nodes (22): ../../domain/create_group_session_form.dart, build, decrementCapacity, incrementCapacity, setTitle, toggleDay, toggleOnlineBooking, CreateGroupSessionRepository (+14 more)
-
-### Community 16 - "Shared UI Widgets"
-Cohesion: 0.09
-Nodes (21): ../../../auth/controller/auth_controller.dart, ../../../auth/ui/panels/delete_account_confirm_panel.dart, ../../../auth/ui/panels/phone_login_panel.dart, ../../core/constants/app_spacing.dart, build, isLast, label, labelColor (+13 more)
-
-### Community 17 - "Auth UI"
-Cohesion: 0.09
-Nodes (22): ../../../badges/ui/panels/badges_panel.dart, ../../controller/auth_controller.dart, ../../../../core/constants/avatar_palette.dart, delete_account_confirm_panel.dart, ../../../feedback/ui/panels/feedback_panel.dart, build, createState, LoginWaitingPanel (+14 more)
-
-### Community 18 - "Trainers Repository"
-Cohesion: 0.09
-Nodes (21): ../../domain/pending_confirmation.dart, ../../domain/schedule_slot.dart, ../domain/trainer_home_state.dart, build, markAbsent, markCompleted, trainerHomeRepositoryProvider, loadInitial (+13 more)
-
-### Community 19 - "Trainers UI"
-Cohesion: 0.09
-Nodes (22): ../../controller/trainer_home_controller.dart, PendingConfirmation, _PendingConfirmation, ScheduleSlot, _ScheduleSlot, build, label, onAbsent (+14 more)
-
-### Community 20 - "Shared UI Widgets"
-Cohesion: 0.10
-Nodes (18): ../../core/theme/app_theme.dart, EdgeInsetsGeometry, AppAvatarPalette, colors, AppCard, build, child, padding (+10 more)
-
-### Community 21 - "Trainers Repository"
-Cohesion: 0.10
-Nodes (19): ../../domain/trainer_calendar_state.dart, build, selectDate, setViewMode, trainerCalendarRepositoryProvider, loadInitial, _service, TrainerCalendarRepository (+11 more)
-
-### Community 22 - "Sessions UI"
-Cohesion: 0.10
-Nodes (18): attendance_confirm_panel.dart, ../../controller/package_controller.dart, build, createState, _InfoTile, label, value, build (+10 more)
-
-### Community 23 - "Trainers Repository"
+### Community 97 - "modules - auth"
 Cohesion: 0.11
-Nodes (19): AutoDisposeProviderRef, ../../domain/trainer_member_detail.dart, ../../domain/trainer_metric.dart, trainerMemberDetailRepositoryProvider, loadDetail, _service, TrainerMemberDetailRepository, TrainerMemberDetailRepositoryImpl (+11 more)
+Nodes (19): auth_login_exception.dart, AuthLoginErrorReason? get, AuthState, AuthState, _, _AuthState, _, isPhoneComplete (+11 more)
 
-### Community 24 - "Trainers UI"
+### Community 98 - "modules - reports"
+Cohesion: 0.11
+Nodes (18): ../../domain/dashboard_report.dart, dashboardReportRepositoryProvider, DashboardReportRepository, DashboardReportRepositoryImpl, loadSummary, loadTrainerPerformance, _service, dashboardReportServiceProvider (+10 more)
+
+### Community 99 - "modules - gyms"
+Cohesion: 0.11
+Nodes (18): ../domain/gym_rules.dart, gymRulesRepositoryProvider, GymRulesRepository, GymRulesRepositoryImpl, saveRules, _service, watchRules, gymRulesServiceProvider (+10 more)
+
+### Community 100 - "modules - events"
+Cohesion: 0.11
+Nodes (19): GymEvent, int?, capacityLabel, GymEvent, _, _GymEvent, _, capacity (+11 more)
+
+### Community 101 - "modules - sessions"
 Cohesion: 0.10
-Nodes (20): ../../controller/trainer_member_detail_controller.dart, SessionHistoryEntry, _SessionHistoryEntry, build, createState, entry, _HistoryRow, _InfoTile (+12 more)
+Nodes (19): build, _create, createState, date, _errorMessage, initialDate, initState, _isCreating (+11 more)
 
-### Community 25 - "Group Sessions Repository"
-Cohesion: 0.10
-Nodes (18): ../../domain/discover_item.dart, build, toggleJoin, discoverRepositoryProvider, DiscoverRepository, DiscoverRepositoryImpl, loadItems, _service (+10 more)
+### Community 102 - "modules - trainers"
+Cohesion: 0.11
+Nodes (19): TrainerReportBreakdown, _TrainerReportBreakdown, TrainerReportBreakdown, _, bonusAmount, breakdown, completedSessionCount, copyWith (+11 more)
 
-### Community 26 - "Packages Repository"
-Cohesion: 0.10
-Nodes (18): ../domain/member_package.dart, build, packageRepositoryProvider, loadActivePackage, PackageRepository, PackageRepositoryImpl, _service, packageServiceProvider (+10 more)
+### Community 103 - "modules - members"
+Cohesion: 0.11
+Nodes (18): admin_member_detail.dart, adminMemberDetailFromDoc, adminMemberDetailLoadingPlaceholder, adminMemberDetailNotFoundPlaceholder, data, _emptySeriesByMetric, first, _initialsFor (+10 more)
 
-### Community 27 - "Trainers Repository"
-Cohesion: 0.10
-Nodes (18): ../../domain/trainer_member_summary.dart, build, trainerMembersRepositoryProvider, loadMembers, _service, TrainerMembersRepository, TrainerMembersRepositoryImpl, trainerMembersServiceProvider (+10 more)
+### Community 104 - "modules - gyms"
+Cohesion: 0.11
+Nodes (18): Color get, GymTheme, GymTheme, _GymTheme, _, activeThemeId, errorMessage, hashCode (+10 more)
 
-### Community 28 - "Badges Repository"
+### Community 105 - "modules - feedback"
 Cohesion: 0.12
-Nodes (17): ../../domain/badge_item.dart, build, BadgesRepository, BadgesRepositoryImpl, badgesRepositoryProvider, loadBadges, _service, BadgesService (+9 more)
+Nodes (17): ../../domain/admin_feedback_entry.dart, AdminFeedbackRepository, AdminFeedbackRepositoryImpl, adminFeedbackRepositoryProvider, _service, watchSummary, AdminFeedbackService, adminFeedbackServiceProvider (+9 more)
 
-### Community 29 - "Sessions Repository"
+### Community 106 - "modules - gyms"
+Cohesion: 0.12
+Nodes (17): ../domain/gym_profile.dart, gymProfileRepositoryProvider, GymProfileRepository, GymProfileRepositoryImpl, saveProfile, _service, watchProfile, gymProfileServiceProvider (+9 more)
+
+### Community 107 - "modules - notifications"
 Cohesion: 0.11
-Nodes (17): ../../domain/trainer_notification.dart, build, trainerNotificationsRepositoryProvider, loadNotifications, _service, TrainerNotificationsRepository, TrainerNotificationsRepositoryImpl, trainerNotificationsServiceProvider (+9 more)
+Nodes (18): SendNotificationForm, _SendNotificationForm, NotificationTargetType, NotificationTargetType get, SendNotificationForm, _, copyWith, errorMessage (+10 more)
 
-### Community 30 - "Trainers Repository"
+### Community 108 - "modules - packages"
 Cohesion: 0.11
-Nodes (17): ../../domain/trainer_report_state.dart, build, trainerReportRepositoryProvider, loadInitial, _service, TrainerReportRepository, TrainerReportRepositoryImpl, trainerReportServiceProvider (+9 more)
+Nodes (17): packageRepositoryProvider, loadTrainerSpecialty, PackageRepository, PackageRepositoryImpl, _service, watchLatestPackageDoc, watchMemberDoc, packageServiceProvider (+9 more)
 
-### Community 31 - "App Constants"
+### Community 109 - "modules - sessions"
+Cohesion: 0.11
+Nodes (18): TrainerNotification, _TrainerNotification, TrainerNotification, _, answeredAt, answerIsPositive, answerLabel, body (+10 more)
+
+### Community 110 - "modules - sessions"
+Cohesion: 0.11
+Nodes (18): _answer, build, _CompletionAnswer, createState, _errorMessage, _isSubmitting, _markAbsent, _markCompleted (+10 more)
+
+### Community 111 - "modules - trainers"
+Cohesion: 0.11
+Nodes (18): build, _initialsFor, static const Iterable, _allTransitiveDependencies, call, combine, createElement, _dependencies (+10 more)
+
+### Community 112 - "shared - utils"
+Cohesion: 0.11
+Nodes (17): package:flutter/services.dart, digitsOnly, formatEditUpdate, formatTrPhoneDigits, formatTrPhoneDisplay, groups, join, last10 (+9 more)
+
+### Community 113 - "modules - notifications"
+Cohesion: 0.11
+Nodes (17): @pragma, ../../feedback/ui/panels/feedback_panel.dart, ../../../firebase_options.dart, FlutterLocalNotificationsPlugin, _androidChannel, firebaseMessagingBackgroundHandler, init, initializeApp (+9 more)
+
+### Community 114 - "core - constants"
 Cohesion: 0.11
 Nodes (17): AppSpacing, cardGap, headerHeight, lg, md, minTouchTarget, primaryActionHeight, radiusCard (+9 more)
 
-### Community 32 - "Trainers UI"
+### Community 115 - "modules - reports"
 Cohesion: 0.12
-Nodes (16): ../../controller/trainer_members_controller.dart, build, createState, dispose, _filter, _FilterChip, label, _matchesFilter (+8 more)
+Nodes (16): ../domain/report_recipients.dart, reportRecipientsRepositoryProvider, ReportRecipientsRepository, ReportRecipientsRepositoryImpl, saveRecipients, _service, watchRecipients, reportRecipientsServiceProvider (+8 more)
 
-### Community 33 - "Group Sessions Domain"
+### Community 116 - "shared - mock"
+Cohesion: 0.11
+Nodes (17): member_mock_profile.dart, gymName, id, initials, memberById, members, memberSince, name (+9 more)
+
+### Community 117 - "modules - members"
 Cohesion: 0.12
-Nodes (16): DiscoverCategory get, _, isFull, capacity, category, day, hashCode, id (+8 more)
+Nodes (17): mixin, ../repository/admin_members_repository.dart, adminMembersControllerProvider, _allTransitiveDependencies, call, combine, createElement, _dependencies (+9 more)
 
-### Community 34 - "Sessions UI"
+### Community 118 - "modules - gyms"
 Cohesion: 0.12
-Nodes (15): build, createState, _answer, build, _CompletionAnswer, createState, memberInitials, memberName (+7 more)
+Nodes (16): AdminHomeRepository, AdminHomeRepositoryImpl, adminHomeRepositoryProvider, loadDuePaymentsSummary, _service, AdminHomeService, adminHomeServiceProvider, empty (+8 more)
 
-### Community 35 - "Auth Repository"
+### Community 119 - "modules - trainers"
+Cohesion: 0.11
+Nodes (17): data, _emptySeriesByMetric, first, _initialsFor, last, memberId, name, packageEndDate (+9 more)
+
+### Community 120 - "shared - widgets"
+Cohesion: 0.11
+Nodes (17): ScrollController?, AppTextField, build, controller, enabled, errorText, hint, inputFormatters (+9 more)
+
+### Community 121 - "modules - group sessions"
 Cohesion: 0.12
-Nodes (15): AuthRepository, AuthRepositoryImpl, authRepositoryProvider, deleteAccount, login, _service, AuthService, authServiceProvider (+7 more)
+Nodes (16): AdminGroupSession, AdminGroupSession, _, _AdminGroupSession, _, isFull, remaining, capacity (+8 more)
 
-### Community 36 - "Group Sessions Domain"
+### Community 122 - "modules - members"
 Cohesion: 0.12
-Nodes (16): groupSessionDayLabels, Set, _, capacity, capacityMax, copyWith, durationMinutes, hashCode (+8 more)
+Nodes (16): AdminMemberListState, AdminMemberListState, _AdminMemberListState, _, copyWith, errorMessage, hashCode, hasMore (+8 more)
 
-### Community 37 - "Measurements UI"
-Cohesion: 0.12
-Nodes (15): add_measurement_panel.dart, double?, build, date, delta, _HistoryRow, label, _MetricChip (+7 more)
-
-### Community 38 - "Measurements Domain"
-Cohesion: 0.12
-Nodes (15): AvatarSide get, AvatarSide, _, delta, fx, fy, hashCode, isImprovement (+7 more)
-
-### Community 39 - "Measurements Domain"
-Cohesion: 0.12
-Nodes (15): double get, _, copyWith, date, deltaLabel, hashCode, isImprovement, metric (+7 more)
-
-### Community 40 - "Panel Navigation Core"
-Cohesion: 0.12
-Nodes (14): build, dispose, _handleHide, _handleShow, initState, _isPanelShown, onBackRequested, onPanelHide (+6 more)
-
-### Community 41 - "Measurements Domain"
-Cohesion: 0.12
-Nodes (15): MeasurementsViewMode, measurement_metric.dart, measurement_point.dart, measurement_series.dart, MeasurementMetric get, MeasurementsViewMode get, _, hashCode (+7 more)
-
-### Community 42 - "Sessions Domain"
-Cohesion: 0.12
-Nodes (15): _, answeredAt, answerIsPositive, answerLabel, body, hashCode, id, memberInitials (+7 more)
-
-### Community 43 - "Tests"
-Cohesion: 0.12
-Nodes (15): package:egoractive/modules/group_sessions/ui/panels/create_group_session_panel.dart, package:egoractive/modules/sessions/domain/trainer_notification.dart, package:egoractive/modules/sessions/ui/panels/attendance_notification_detail_panel.dart, package:egoractive/modules/sessions/ui/panels/session_completion_panel.dart, package:egoractive/modules/sessions/ui/panels/trainer_notifications_panel.dart, package:egoractive/modules/trainers/ui/panels/trainer_calendar_panel.dart, package:egoractive/modules/trainers/ui/panels/trainer_home_panel.dart, package:egoractive/modules/trainers/ui/panels/trainer_member_detail_panel.dart (+7 more)
-
-### Community 44 - "App Icons & Images"
+### Community 123 - "modules - gyms"
 Cohesion: 0.13
-Nodes (15): iOS App Icon Artwork (Flutter default logo, 1024x1024 master), AppIcon size variant 20x20@1x, AppIcon size variant 20x20@2x, AppIcon size variant 20x20@3x, AppIcon size variant 29x29@1x, AppIcon size variant 29x29@2x, AppIcon size variant 29x29@3x, AppIcon size variant 40x40@1x (+7 more)
+Nodes (16): AdminPermissions, AdminPermissions, TrainerReminderDelay, _AdminPermissions, trainerReminderDelay, label, TrainerReminderDelayLabel, TrainerReminderDelay get (+8 more)
 
-### Community 45 - "Feedback Repository"
+### Community 124 - "modules - group sessions"
+Cohesion: 0.14
+Nodes (15): AutoDisposeProviderRef, ../../domain/discover_item.dart, discoverRepositoryProvider, DiscoverRepository, DiscoverRepositoryImpl, loadItems, _service, discoverServiceProvider (+7 more)
+
+### Community 125 - "modules - auth"
+Cohesion: 0.12
+Nodes (16): ../../../badges/controller/badges_controller.dart, ../../../badges/ui/panels/badges_panel.dart, ../../controller/member_profile_controller.dart, ../../../../core/constants/avatar_palette.dart, delete_account_confirm_panel.dart, _AvatarCircle, build, color (+8 more)
+
+### Community 126 - "core - subscription"
 Cohesion: 0.15
-Nodes (13): feedbackRepositoryProvider, FeedbackRepository, FeedbackRepositoryImpl, _service, submit, feedbackServiceProvider, FeedbackService, submit (+5 more)
+Nodes (14): ../constants/app_spacing.dart, build, PlaceholderTabContent, title, build, SubscriptionStatusBanner, ensureSubscriptionAllowsWrite, false (+6 more)
 
-### Community 46 - "Packages Domain"
+### Community 127 - "modules - gyms"
+Cohesion: 0.12
+Nodes (16): ../../controller/create_gym_controller.dart, _addressController, build, _cityController, color, _ColorSwatch, createState, dispose (+8 more)
+
+### Community 128 - "modules - group sessions"
+Cohesion: 0.12
+Nodes (16): ../../controller/discover_controller.dart, ../../../../core/remote_config/feature_flags.dart, DiscoverCategory, build, _category, _CategoryTab, createState, _DiscoverCard (+8 more)
+
+### Community 129 - "modules - gyms"
+Cohesion: 0.12
+Nodes (16): ../../controller/trainer_permissions_controller.dart, build, createState, _DelayChip, _handlePermissionAction, initState, label, note (+8 more)
+
+### Community 130 - "shared - utils"
+Cohesion: 0.12
+Nodes (16): ../../core/constants/gym_logo_constants.dart, dart:typed_data, package:image/image.dart, package:palette_generator/palette_generator.dart, candidates, decoded, _dedupeSimilarColors, encoded (+8 more)
+
+### Community 131 - "core - panels"
+Cohesion: 0.12
+Nodes (16): AppTabItem, bottomAdSlot, build, builder, createState, icon, _index, item (+8 more)
+
+### Community 132 - "core - router"
+Cohesion: 0.12
+Nodes (16): AppRole, authState, currentRole, authStateProvider, currentRoleProvider, roleFromClaims, shellForRole, tokenResult (+8 more)
+
+### Community 133 - "modules - measurements"
+Cohesion: 0.12
+Nodes (16): ../../domain/measurement_point.dart, _boxHeight, _boxWidth, build, _buildPointLayer, gender, _imgHeight, _imgWidth (+8 more)
+
+### Community 134 - "modules - members"
+Cohesion: 0.12
+Nodes (16): ../domain/new_membership_state.dart, build, decrementMakeup, incrementMakeup, reset, _resplit, save, selectPackage (+8 more)
+
+### Community 135 - "modules - trainers"
 Cohesion: 0.13
-Nodes (14): _, endDate, hashCode, makeupSessions, name, operator, _privateConstructorUsedError, remainingSessions (+6 more)
+Nodes (15): ../../domain/schedule_slot.dart, ../../domain/trainer_calendar_state.dart, loadInitial, _service, TrainerCalendarRepository, TrainerCalendarRepositoryImpl, trainerCalendarServiceProvider, loadInitial (+7 more)
 
-### Community 47 - "Sessions Domain"
+### Community 136 - "modules - sessions"
 Cohesion: 0.13
-Nodes (14): AttendanceAnswer, SessionStatus, SessionStatus get, _, day, hashCode, id, meta (+6 more)
+Nodes (15): ../../domain/session.dart, ../../domain/sessions_state.dart, sessionsRepositoryProvider, loadInitial, _service, SessionsRepository, SessionsRepositoryImpl, sessionsServiceProvider (+7 more)
 
-### Community 48 - "Role Shell Panels"
-Cohesion: 0.16
-Nodes (12): admin_shell_panel.dart, ../constants/app_spacing.dart, build, PlaceholderTabContent, title, build, createState, RolePickerPanel (+4 more)
+### Community 137 - "modules - trainers"
+Cohesion: 0.12
+Nodes (16): ScheduleSlot, _ScheduleSlot, ScheduleSlotState, ScheduleSlot, ScheduleSlotState get, _, hashCode, id (+8 more)
 
-### Community 49 - "Auth Domain"
+### Community 138 - "shared - mock"
+Cohesion: 0.12
+Nodes (16): gymName, makeupSessions, memberFirstName, memberFullName, MemberMockProfile, memberPhoneDigits, packageEnd, packageName (+8 more)
+
+### Community 139 - "modules - sessions"
 Cohesion: 0.14
-Nodes (13): bool get, _, isPhoneComplete, deleteAccountAcknowledged, hashCode, isDeletingAccount, isRequestingLogin, operator (+5 more)
+Nodes (14): adminCalendarRepositoryProvider, ../../domain/admin_calendar_state.dart, AdminCalendarRepository, AdminCalendarRepositoryImpl, loadInitial, _service, AdminCalendarService, adminCalendarServiceProvider (+6 more)
 
-### Community 50 - "Trainers Domain"
+### Community 140 - "modules - group sessions"
 Cohesion: 0.14
-Nodes (13): DateTime, DateTime get, TrainerCalendarViewMode, TrainerCalendarViewMode get, _, copyWith, hashCode, operator (+5 more)
+Nodes (14): adminGroupSessionsRepositoryProvider, ../../domain/admin_group_session.dart, AdminGroupSessionsRepository, AdminGroupSessionsRepositoryImpl, loadGroupSessions, _service, AdminGroupSessionsService, adminGroupSessionsServiceProvider (+6 more)
 
-### Community 51 - "Measurements UI"
+### Community 141 - "modules - trainers"
+Cohesion: 0.13
+Nodes (15): AdminTrainerSummary, AdminTrainerSummary, _AdminTrainerSummary, trainerSpecialtyOptions, _, hashCode, id, initials (+7 more)
+
+### Community 142 - "Community 142"
+Cohesion: 0.13
+Nodes (15): core/constants/ad_constants.dart, core/panels/panel_stack_view.dart, ../../../../core/theme/app_color_scheme.dart, core/theme/app_typography.dart, _AppRoot, _AppRootState, build, createState (+7 more)
+
+### Community 143 - "modules - trainers"
 Cohesion: 0.14
-Nodes (13): _boxHeight, _boxWidth, build, _buildPointLayer, _imgHeight, _imgWidth, _imgX, _imgY (+5 more)
+Nodes (14): ../../domain/admin_trainer_summary.dart, AdminTrainersRepository, AdminTrainersRepositoryImpl, adminTrainersRepositoryProvider, loadTrainers, _service, AdminTrainersService, adminTrainersServiceProvider (+6 more)
 
-### Community 52 - "Tests"
+### Community 144 - "modules - packages"
 Cohesion: 0.14
-Nodes (13): package:egoractive/modules/auth/ui/panels/profile_panel.dart, package:egoractive/modules/badges/ui/panels/badges_panel.dart, package:egoractive/modules/feedback/ui/panels/feedback_panel.dart, package:egoractive/modules/group_sessions/ui/panels/discover_panel.dart, package:egoractive/modules/measurements/ui/panels/add_measurement_panel.dart, package:egoractive/modules/measurements/ui/panels/measurements_panel.dart, package:egoractive/modules/packages/ui/panels/package_panel.dart, package:egoractive/modules/sessions/ui/panels/attendance_confirm_panel.dart (+5 more)
+Nodes (14): ../../domain/studio_package.dart, studioPackagesRepositoryProvider, loadPackages, _service, StudioPackagesRepository, StudioPackagesRepositoryImpl, studioPackagesServiceProvider, loadPackages (+6 more)
 
-### Community 53 - "Auth Domain"
-Cohesion: 0.15
-Nodes (13): @freezed, AuthState, FeedbackState, AuthState, _AuthState, FeedbackState, _FeedbackState, SessionsState (+5 more)
+### Community 145 - "modules - sessions"
+Cohesion: 0.14
+Nodes (14): ../../domain/trainer_notification.dart, loadNotifications, _service, TrainerNotificationsRepository, TrainerNotificationsRepositoryImpl, trainerNotificationsServiceProvider, loadNotifications, TrainerNotificationsService (+6 more)
 
-### Community 54 - "Group Sessions UI"
-Cohesion: 0.15
-Nodes (12): ../../controller/create_group_session_controller.dart, build, createState, _DayChip, filled, icon, _InfoField, label (+4 more)
+### Community 146 - "modules - trainers"
+Cohesion: 0.14
+Nodes (14): ../../domain/trainer_report_state.dart, trainerReportRepositoryProvider, loadInitial, _service, TrainerReportRepository, TrainerReportRepositoryImpl, trainerReportServiceProvider, loadInitial (+6 more)
 
-### Community 55 - "Group Sessions UI"
-Cohesion: 0.15
-Nodes (12): ../../controller/discover_controller.dart, DiscoverCategory, build, _category, _CategoryTab, createState, _DiscoverCard, item (+4 more)
+### Community 147 - "modules - feedback"
+Cohesion: 0.13
+Nodes (14): feedbackRepositoryProvider, FeedbackRepository, FeedbackRepositoryImpl, _service, submit, feedbackServiceProvider, FeedbackService, submit (+6 more)
 
-### Community 56 - "Auth UI"
-Cohesion: 0.15
-Nodes (12): ../../../../core/panels/dev/dev_menu_panel.dart, build, createState, dispose, formatEditUpdate, initState, _phoneController, _PhoneNumberInputFormatter (+4 more)
+### Community 148 - "modules - trainers"
+Cohesion: 0.13
+Nodes (15): PendingConfirmation, _PendingConfirmation, PendingConfirmation, _, hashCode, id, memberId, memberInitials (+7 more)
 
-### Community 57 - "Trainers Domain"
-Cohesion: 0.15
-Nodes (12): get, _, copyWith, hashCode, id, initials, name, operator (+4 more)
+### Community 149 - "modules - trainers"
+Cohesion: 0.13
+Nodes (15): TrainerHomeState, _TrainerHomeState, pending_confirmation.dart, schedule_slot.dart, TrainerHomeState, _, completedCount, freeSlotCount (+7 more)
 
-### Community 58 - "Trainers Domain"
-Cohesion: 0.15
-Nodes (12): int get, _, hashCode, id, memberInitials, memberName, meta, operator (+4 more)
+### Community 150 - "core - ads"
+Cohesion: 0.14
+Nodes (14): ad_consent_service.dart, ad_gate.dart, BannerAd?, AdBannerWidget, _AdBannerWidgetState, _bannerAd, build, createState (+6 more)
 
-### Community 59 - "Trainers Domain"
-Cohesion: 0.15
-Nodes (12): ScheduleSlotState, ScheduleSlotState get, _, hashCode, id, meta, name, operator (+4 more)
+### Community 151 - "core - panels"
+Cohesion: 0.14
+Nodes (14): ../../ads/ad_banner_widget.dart, ../../ads/ad_interstitial_gate.dart, ../../ads/home_return_signal.dart, build, createState, MemberShellPanel, _MemberShellPanelState, onPanelShow (+6 more)
 
-### Community 60 - "Trainers Domain"
-Cohesion: 0.15
-Nodes (12): pending_confirmation.dart, schedule_slot.dart, _, completedCount, freeSlotCount, hashCode, operator, pendingConfirmations (+4 more)
+### Community 152 - "modules - members"
+Cohesion: 0.13
+Nodes (14): build, reset, selectTrainer, setCanConfirmAttendance, toggleCanConfirmAttendance, toggleGender, updateBirthYear, updateFirstName (+6 more)
 
-### Community 61 - "Tests"
+### Community 153 - "core - panels"
+Cohesion: 0.14
+Nodes (13): build, handleSystemBack, _hideCallbacks, pop, popToRoot, push, registerActiveBackHandler, registerPanelCallbacks (+5 more)
+
+### Community 154 - "core - theme"
+Cohesion: 0.14
+Nodes (13): bodyLarge, bodyMedium, caption, copyWith, dataLarge, dataMedium, dataSmall, headingLarge (+5 more)
+
+### Community 155 - "modules - trainers"
 Cohesion: 0.18
-Nodes (12): package:egoractive/core/panels/base_panel.dart, build, createState, _DummyPanel, _DummyPanelState, id, log, main (+4 more)
+Nodes (13): AutoDisposeNotifierProviderImpl, AutoDisposeNotifierProviderRef, TrainerMemberDetail, _TrainerMemberDetail, TrainerMemberDetail, AdminMemberDetailControllerProvider, _TrainerDetailStreamForIdProvider, _TrainerDetailStreamForIdProviderElement (+5 more)
 
-### Community 62 - "Feedback UI"
+### Community 156 - "core - panels"
+Cohesion: 0.15
+Nodes (12): build, dispose, _handleHide, _handleShow, initState, _isPanelShown, onBackRequested, onPanelHide (+4 more)
+
+### Community 157 - "modules - members"
 Cohesion: 0.17
-Nodes (11): ../../controller/feedback_controller.dart, build, _commentController, createState, dispose, filled, initState, _maxCommentLength (+3 more)
+Nodes (12): ../domain/admin_member_detail.dart, ../domain/admin_member_detail_mapper.dart, AdminMemberDetailRepository, AdminMemberDetailRepositoryImpl, adminMemberDetailRepositoryProvider, _service, watchDetail, AdminMemberDetailService (+4 more)
 
-### Community 63 - "Miscellaneous"
-Cohesion: 0.18
-Nodes (11): core/panels/panel_stack_view.dart, ../../../../core/theme/app_color_scheme.dart, core/theme/app_typography.dart, _AppRoot, _AppRootState, build, createState, EgoractiveApp (+3 more)
-
-### Community 64 - "Auth Controller"
+### Community 158 - "modules - trainers"
 Cohesion: 0.17
-Nodes (11): ../domain/auth_state.dart, build, deleteAccount, logout, requestLogin, selectAvatar, setPhoneDigits, toggleDeleteAcknowledged (+3 more)
+Nodes (12): ../../domain/trainer_member_detail.dart, ../domain/trainer_member_detail_mapper.dart, trainerMemberDetailRepositoryProvider, _service, TrainerMemberDetailRepository, TrainerMemberDetailRepositoryImpl, watchDetail, trainerMemberDetailServiceProvider (+4 more)
 
-### Community 65 - "Auth UI"
+### Community 159 - "modules - members"
 Cohesion: 0.17
-Nodes (11): _AcknowledgeCheckbox, build, checked, createState, _DangerButton, _deleteItems, enabled, _GhostBlock (+3 more)
+Nodes (11): admin_member_summary.dart, adminMemberSummaryFromDoc, data, first, _initialsFor, last, name, packageEndDate (+3 more)
 
-### Community 66 - "Auth UI"
+### Community 160 - "core - ads"
+Cohesion: 0.23
+Nodes (12): ConsumerState, ConsumerStatefulWidget, AdInterstitialGate, _AdInterstitialGateState, _AvatarView, _AvatarViewState, AdminMemberListPanel, _AdminMemberListPanelState (+4 more)
+
+### Community 161 - "modules - measurements"
+Cohesion: 0.21
+Nodes (12): _measurementEntriesProvider, _memberGenderProvider, addMeasurement, build, measurementsControllerProvider, _measurementEntries, MeasurementsController, _memberGender (+4 more)
+
+### Community 162 - "modules - gyms"
+Cohesion: 0.17
+Nodes (11): package:freezed_annotation/freezed_annotation.dart, _, address, city, hashCode, logoUrl, name, operator (+3 more)
+
+### Community 163 - "core - theme"
 Cohesion: 0.18
-Nodes (10): dart:async, build, color, createState, dispose, _Dot, onPanelShow, _sessionCheckTimer (+2 more)
+Nodes (10): app_color_scheme.dart, app_typography.dart, AppColorScheme get, AppTypography get, BuildContext, appColors, AppTheme, AppThemeContext (+2 more)
 
-### Community 67 - "Feedback Domain"
+### Community 164 - "core - constants"
 Cohesion: 0.18
-Nodes (10): package:freezed_annotation/freezed_annotation.dart, _, comment, hashCode, isSubmitted, isSubmitting, operator, _privateConstructorUsedError (+2 more)
+Nodes (10): _androidBannerAdUnitId, _androidInterstitialAdUnitId, _androidTestBannerAdUnitId, _androidTestInterstitialAdUnitId, debugTestDeviceIds, _iosBannerAdUnitId, _iosInterstitialAdUnitId, _iosTestBannerAdUnitId (+2 more)
 
-### Community 68 - "Measurements UI"
+### Community 165 - "modules - trainers"
 Cohesion: 0.20
-Nodes (10): ConsumerWidget, ProfilePanel, _AddMeasurementButton, _AvatarView, _ChartView, MeasurementsPanel, MemberHomePanel, TrainerHomePanel (+2 more)
+Nodes (9): admin_trainer_summary.dart, adminTrainerSummaryFromDoc, data, first, _initialsFor, last, name, parts (+1 more)
 
-### Community 69 - "Trainers UI"
-Cohesion: 0.20
-Nodes (9): ../../controller/trainer_report_controller.dart, breakdown, _BreakdownCard, build, _DateTile, label, _MiniStat, TrainerReportPanel (+1 more)
-
-### Community 70 - "Role Shell Panels"
-Cohesion: 0.22
-Nodes (9): build, createState, MemberShellPanel, _MemberShellPanelState, ../../../modules/auth/ui/panels/profile_panel.dart, ../../../modules/group_sessions/ui/panels/discover_panel.dart, ../../../modules/measurements/ui/panels/measurements_panel.dart, ../../../modules/sessions/ui/panels/member_home_panel.dart (+1 more)
-
-### Community 71 - "Role Shell Panels"
-Cohesion: 0.22
-Nodes (9): build, createState, TrainerShellPanel, _TrainerShellPanelState, ../../../modules/trainers/ui/panels/trainer_calendar_panel.dart, ../../../modules/trainers/ui/panels/trainer_home_panel.dart, ../../../modules/trainers/ui/panels/trainer_members_list_panel.dart, ../../../modules/trainers/ui/panels/trainer_profile_panel.dart (+1 more)
-
-### Community 72 - "Badges Domain"
-Cohesion: 0.20
-Nodes (9): T, _, earned, hashCode, note, operator, _privateConstructorUsedError, title (+1 more)
-
-### Community 73 - "Trainers Domain"
+### Community 166 - "modules - members"
 Cohesion: 0.24
-Nodes (8): label, MeasurementMetric, MeasurementMetricLabel, label, TrainerMetric, TrainerMetricLabel, unit, String get
+Nodes (10): AdminMemberDetail, AutoDisposeNotifierProviderElement, AdminMemberDetail, _AdminMemberDetail, AdminMemberDetailControllerFamily, _AdminMemberDetailControllerProviderElement, AdminMemberDetailControllerRef, _DetailStreamForIdProvider (+2 more)
 
-### Community 74 - "Tests"
+### Community 167 - "modules - auth"
+Cohesion: 0.20
+Nodes (8): Exception, AuthLoginErrorReason, AuthLoginException, reason, reason, SendNotificationErrorReason, SendNotificationException, TrainerConflictException
+
+### Community 168 - "modules - gyms"
+Cohesion: 0.20
+Nodes (9): gymLogoServiceProvider, GymLogoService, pickLogo, uploadLogo, package:firebase_storage/firebase_storage.dart, package:image_picker/image_picker.dart, ../../../../shared/utils/gym_logo_image.dart, gymLogoServiceProvider (+1 more)
+
+### Community 169 - "core - ads"
 Cohesion: 0.22
-Nodes (9): package:egoractive/core/panels/panel_stack_controller.dart, package:egoractive/core/panels/panel_stack_view.dart, package:egoractive/core/theme/app_typography.dart, package:egoractive/modules/auth/ui/panels/delete_account_confirm_panel.dart, build, createState, main, _RootPanel (+1 more)
+Nodes (8): adsGloballyEnabled, shouldShowAdsProvider, shouldShowAds, subscription, ../../modules/subscription/controller/subscription_controller.dart, ../remote_config/remote_config_service.dart, shouldShowAdsProvider, ShouldShowAdsRef
 
-### Community 75 - "Measurements Service"
-Cohesion: 0.22
-Nodes (8): ../../domain/measurement_point.dart, ../domain/measurement_series.dart, ../../domain/measurements_state.dart, measurementsServiceProvider, loadInitial, MeasurementsService, measurementsServiceProvider, MeasurementsServiceRef
+### Community 170 - "core - panels"
+Cohesion: 0.28
+Nodes (9): AppTabShell, _AppTabShellState, _InstallmentEditSheet, _InstallmentEditSheetState, _Spinner, _SpinnerState, SingleTickerProviderStateMixin, State (+1 more)
 
-### Community 76 - "Measurements Repository"
+### Community 171 - "modules - trainers"
 Cohesion: 0.25
-Nodes (8): measurementsRepositoryProvider, loadInitial, MeasurementsRepository, MeasurementsRepositoryImpl, _service, ../service/measurements_service.dart, measurementsRepositoryProvider, MeasurementsRepositoryRef
+Nodes (8): trainerHomeRepositoryProvider, loadInitial, _service, TrainerHomeRepository, TrainerHomeRepositoryImpl, ../service/trainer_home_service.dart, trainerHomeRepositoryProvider, TrainerHomeRepositoryRef
 
-### Community 77 - "Tests"
-Cohesion: 0.22
-Nodes (8): package:egoractive/core/panels/shell/admin_shell_panel.dart, package:egoractive/core/panels/shell/app_tab_shell.dart, package:egoractive/core/panels/shell/member_shell_panel.dart, package:egoractive/core/panels/shell/trainer_shell_panel.dart, package:egoractive/core/theme/app_color_scheme.dart, package:egoractive/core/theme/app_theme.dart, main, _wrap
+### Community 172 - "modules - trainers"
+Cohesion: 0.25
+Nodes (7): ../../domain/pending_confirmation.dart, ../domain/trainer_home_state.dart, trainerHomeServiceProvider, loadInitial, TrainerHomeService, trainerHomeServiceProvider, TrainerHomeServiceRef
 
-### Community 78 - "Role Shell Panels"
+### Community 173 - "Community 173"
 Cohesion: 0.29
-Nodes (7): app_tab_shell.dart, ../base_panel.dart, AdminShellPanel, _AdminShellPanelState, build, createState, placeholder_tab_content.dart
+Nodes (6): android, DefaultFirebaseOptions, ios, package:firebase_core/firebase_core.dart, package:flutter/foundation.dart, static const FirebaseOptions
 
-### Community 79 - "Group Sessions UI"
-Cohesion: 0.32
-Nodes (8): ConsumerState, ConsumerStatefulWidget, DiscoverPanel, _DiscoverPanelState, SessionsListPanel, _SessionsListPanelState, TrainerMembersListPanel, _TrainerMembersListPanelState
-
-### Community 80 - "Documentation & Task Lists"
-Cohesion: 0.29
-Nodes (8): F2-8 Hesap Silme Akışı, FAZ 2 — Yayınlanabilir İlk Sürüm, FAZ P1 — Ortak Ekranlar (Splash, Telefon Girişi, vb.), FAZ P2 — Üye Modülü (11 panel), FAZ P3 — Antrenör Modülü (8 panel), FAZ P4 — Admin Modülü Batch 1, FAZ P5 — Admin Modülü Batch 2, iOS Launch Screen Assets README
-
-### Community 81 - "Feedback Controller"
-Cohesion: 0.25
-Nodes (7): ../domain/feedback_state.dart, build, setComment, setRating, submit, ../repository/feedback_repository.dart, feedbackControllerProvider
-
-### Community 82 - "Measurements Controller"
-Cohesion: 0.25
-Nodes (7): ../../domain/measurement_metric.dart, addMeasurement, build, selectPoint, setViewMode, ../repository/measurements_repository.dart, measurementsControllerProvider
-
-### Community 83 - "iOS Platform Files"
+### Community 174 - "modules - packages"
 Cohesion: 0.33
-Nodes (5): handle_new_rx_page(), __lldb_init_module(), Intercept NOTIFY_DEBUGGER_ABOUT_RX_PAGES and touch the pages., SBDebugger, SBFrame
+Nodes (7): _memberDocForIdProvider, build, packageControllerProvider, _memberDocForId, PackageController, _trainerSpecialtyForId, _trainerSpecialtyForIdProvider
 
-### Community 84 - "Shared Utilities"
+### Community 175 - "modules - reports"
 Cohesion: 0.33
-Nodes (5): formatTrPhoneDigits, groups, join, parts, rest
+Nodes (7): build, dashboardReportControllerProvider, DashboardReportController, _summaryForGym, _trainerPerformanceForGym, _summaryForGymProvider, _trainerPerformanceForGymProvider
 
-### Community 85 - "Android Platform Files"
-Cohesion: 0.60
-Nodes (3): GeneratedPluginRegistrant, FlutterEngine, Keep
+### Community 176 - "modules - gyms"
+Cohesion: 0.40
+Nodes (6): GymThemeState, GymThemeState, _GymThemeState, _ThemeStateForGymProvider, _ThemeStateForGymProviderElement, _ThemeStateForGymRef
 
-### Community 86 - "App Icons & Images"
+### Community 177 - "modules - trainers"
+Cohesion: 0.40
+Nodes (6): TrainerReportState, _TrainerReportState, TrainerReportState, _ReportForTrainerProvider, _ReportForTrainerProviderElement, _ReportForTrainerRef
+
+### Community 178 - "core - constants"
+Cohesion: 0.40
+Nodes (4): androidPackageName, gymMonthlySubscriptionProductId, gymSubscriptionProductIds, gymYearlySubscriptionProductId
+
+### Community 179 - "modules - gyms"
+Cohesion: 0.40
+Nodes (5): _duePaymentsForGymProvider, AdminHomeController, build, adminHomeControllerProvider, _duePaymentsForGym
+
+### Community 180 - "modules - expenses"
+Cohesion: 0.40
+Nodes (5): _expensesForGymProvider, build, expensesControllerProvider, ExpensesController, _expensesForGym
+
+### Community 181 - "modules - feedback"
+Cohesion: 0.40
+Nodes (5): _feedbackForGymProvider, AdminFeedbackController, build, adminFeedbackControllerProvider, _feedbackForGym
+
+### Community 182 - "modules - members"
+Cohesion: 0.40
+Nodes (5): _membersForGymProvider, AdminMembersController, build, adminMembersControllerProvider, _membersForGym
+
+### Community 183 - "modules - trainers"
+Cohesion: 0.40
+Nodes (5): _membersForTrainerProvider, build, trainerMembersControllerProvider, _membersForTrainer, TrainerMembersController
+
+### Community 184 - "modules - gyms"
+Cohesion: 0.40
+Nodes (5): build, gymProfileControllerProvider, GymProfileController, _profileForGym, _profileForGymProvider
+
+### Community 185 - "modules - gyms"
+Cohesion: 0.40
+Nodes (5): build, gymRulesControllerProvider, GymRulesController, _rulesForGym, _rulesForGymProvider
+
+### Community 186 - "modules - packages"
+Cohesion: 0.40
+Nodes (5): build, studioPackagesControllerProvider, _packagesForGym, StudioPackagesController, _packagesForGymProvider
+
+### Community 187 - "modules - reports"
+Cohesion: 0.40
+Nodes (5): build, reportRecipientsControllerProvider, _recipientsForGym, ReportRecipientsController, _recipientsForGymProvider
+
+### Community 188 - "modules - subscription"
+Cohesion: 0.40
+Nodes (5): build, subscriptionControllerProvider, SubscriptionController, _subscriptionStateForGym, _subscriptionStateForGymProvider
+
+### Community 189 - "modules - trainers"
+Cohesion: 0.40
+Nodes (5): AdminTrainersController, build, adminTrainersControllerProvider, _trainerDocsForGym, _trainerDocsForGymProvider
+
+### Community 190 - "modules - trainers"
+Cohesion: 0.40
+Nodes (5): build, _pendingConfirmationsForTrainer, _todayScheduleForTrainer, _pendingConfirmationsForTrainerProvider, _todayScheduleForTrainerProvider
+
+### Community 191 - "core - theme"
 Cohesion: 1.00
-Nodes (5): Android Launcher Icon (hdpi), Android Launcher Icon (mdpi), Android Launcher Icon (xhdpi), Android Launcher Icon (xxhdpi), Android Launcher Icon (xxxhdpi)
+Nodes (4): @immutable, AppColorScheme, AppTypography, ThemeExtension
 
-### Community 87 - "Android Platform Files"
-Cohesion: 0.60
-Nodes (3): gradlew script, die(), warn()
-
-### Community 88 - "Tests"
+### Community 192 - "core - constants"
 Cohesion: 0.50
-Nodes (3): package:egoractive/modules/auth/controller/auth_controller.dart, package:flutter_test/flutter_test.dart, main
+Nodes (3): AppAvatarPalette, colors, static const
 
-### Community 90 - "Badges Domain"
+### Community 194 - "modules - reports"
 Cohesion: 0.67
-Nodes (3): BadgeItem, BadgeItem, _BadgeItem
+Nodes (3): DashboardReport, DashboardReport, _DashboardReport
 
-### Community 91 - "Documentation & Task Lists"
+### Community 195 - "modules - sessions"
 Cohesion: 0.67
-Nodes (3): Hardcode Yasağı — Const / Remote Config Ayrımı, RemoteConfigService, F1-7 Remote Config Kurulumu
+Nodes (3): SessionsState, _SessionsState, SessionsState
 
-### Community 92 - "Group Sessions Domain"
+### Community 196 - "modules - trainers"
 Cohesion: 0.67
-Nodes (3): CreateGroupSessionForm, CreateGroupSessionForm, _CreateGroupSessionForm
-
-### Community 93 - "Group Sessions Domain"
-Cohesion: 0.67
-Nodes (3): DiscoverItem, DiscoverItem, _DiscoverItem
-
-### Community 94 - "App Icons & Images"
-Cohesion: 0.67
-Nodes (3): LaunchImage (1x), LaunchImage (2x), LaunchImage (3x)
-
-### Community 95 - "Measurements Domain"
-Cohesion: 0.67
-Nodes (3): MeasurementPoint, _MeasurementPoint, MeasurementPoint
-
-### Community 96 - "Measurements Domain"
-Cohesion: 0.67
-Nodes (3): MeasurementHistoryEntry, _MeasurementHistoryEntry, MeasurementHistoryEntry
-
-### Community 97 - "Measurements Domain"
-Cohesion: 0.67
-Nodes (3): MeasurementSeries, _MeasurementSeries, MeasurementSeries
-
-### Community 98 - "Measurements Domain"
-Cohesion: 0.67
-Nodes (3): MeasurementsState, _MeasurementsState, MeasurementsState
-
-### Community 99 - "Packages Domain"
-Cohesion: 0.67
-Nodes (3): MemberPackage, _MemberPackage, MemberPackage
-
-### Community 100 - "Sessions Domain"
-Cohesion: 0.67
-Nodes (3): Session, _Session, Session
-
-### Community 101 - "Sessions Domain"
-Cohesion: 0.67
-Nodes (3): WeekActivityDay, _WeekActivityDay, WeekActivityDay
-
-### Community 102 - "Sessions Domain"
-Cohesion: 0.67
-Nodes (3): TrainerNotification, _TrainerNotification, TrainerNotification
-
-### Community 103 - "Trainers Domain"
-Cohesion: 0.67
-Nodes (3): TrainerCalendarState, _TrainerCalendarState, TrainerCalendarState
-
-### Community 104 - "Trainers Domain"
-Cohesion: 0.67
-Nodes (3): TrainerMemberSummary, _TrainerMemberSummary, TrainerMemberSummary
+Nodes (3): build, _reportForTrainer, _reportForTrainerProvider
 
 ## Knowledge Gaps
-- **905 isolated node(s):** `flutter_export_environment.sh script`, `+registerWithRegistry`, `XCTest`, `AppSpacing`, `unit` (+900 more)
+- **3041 isolated node(s):** `_bannerAd`, `_isLoaded`, `createState`, `initState`, `build` (+3036 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **17 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **6 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `BasePanelState` connect `Auth UI` to `Theme & Color System`, `Role Shell Panels`, `Role Shell Panels`, `Panel Navigation Core`, `Badges Domain`, `Measurements UI`, `Sessions UI`, `Tests`, `Role Shell Panels`, `Group Sessions UI`, `Role Shell Panels`, `Auth UI`, `Trainers UI`, `Tests`?**
-  _High betweenness centrality (0.046) - this node is a cross-community bridge._
-- **Why does `MeasurementMetric` connect `Trainers Domain` to `Measurements Domain`, `Measurements Domain`, `Measurements Domain`, `Measurements UI`, `Measurements UI`?**
-  _High betweenness centrality (0.014) - this node is a cross-community bridge._
-- **Why does `PanelStackController` connect `Trainers Controller` to `Panel Navigation Core`, `Trainers Domain`?**
-  _High betweenness centrality (0.014) - this node is a cross-community bridge._
-- **What connects `Intercept NOTIFY_DEBUGGER_ABOUT_RX_PAGES and touch the pages.`, `flutter_export_environment.sh script`, `+registerWithRegistry` to the rest of the system?**
-  _909 weakly-connected nodes found - possible documentation gaps or missing edges._
-- **Should `Trainers Domain` be split into smaller, more focused modules?**
-  _Cohesion score 0.041666666666666664 - nodes in this community are weakly interconnected._
-- **Should `Trainers Domain` be split into smaller, more focused modules?**
-  _Cohesion score 0.045454545454545456 - nodes in this community are weakly interconnected._
-- **Should `Sessions UI` be split into smaller, more focused modules?**
-  _Cohesion score 0.05094130675526024 - nodes in this community are weakly interconnected._
+- **Why does `RemoteConfigService` connect `modules - badges` to `core - remote config`, `modules - badges`, `modules - subscription`, `modules - sessions`?**
+  _High betweenness centrality (0.015) - this node is a cross-community bridge._
+- **Why does `activeGymIdProvider` connect `core - theme` to `modules - members`, `modules - gyms`, `modules - badges`, `modules - members`, `modules - sessions`, `core - ads`, `modules - reports`, `modules - group sessions`, `modules - reports`, `modules - gyms`, `modules - gyms`, `modules - expenses`, `modules - feedback`, `modules - members`, `modules - subscription`, `modules - gyms`, `modules - gyms`, `modules - packages`, `modules - members`, `modules - gyms`, `modules - reports`, `modules - subscription`, `modules - trainers`, `modules - reports`, `modules - gyms`, `modules - events`, `modules - packages`, `modules - sessions`?**
+  _High betweenness centrality (0.013) - this node is a cross-community bridge._
+- **Why does `SubscriptionController` connect `modules - subscription` to `modules - members`, `modules - subscription`, `modules - sessions`, `core - theme`?**
+  _High betweenness centrality (0.011) - this node is a cross-community bridge._
+- **What connects `_bannerAd`, `_isLoaded`, `createState` to the rest of the system?**
+  _3041 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **Should `core - remote config` be split into smaller, more focused modules?**
+  _Cohesion score 0.005649717514124294 - nodes in this community are weakly interconnected._
+- **Should `modules - sessions` be split into smaller, more focused modules?**
+  _Cohesion score 0.037658227848101265 - nodes in this community are weakly interconnected._
+- **Should `modules - sessions` be split into smaller, more focused modules?**
+  _Cohesion score 0.036210317460317464 - nodes in this community are weakly interconnected._
