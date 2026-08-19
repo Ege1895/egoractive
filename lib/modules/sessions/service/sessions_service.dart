@@ -78,4 +78,5 @@ class SessionsService {
 }
 
 @riverpod
-SessionsService sessionsService(SessionsServiceRef ref) => const SessionsService();
+SessionsService sessionsService(SessionsServiceRef ref) =>
+    const SessionsService();

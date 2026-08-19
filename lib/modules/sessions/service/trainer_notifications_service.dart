@@ -51,6 +51,8 @@ class TrainerNotificationsService {
 }
 
 @riverpod
-TrainerNotificationsService trainerNotificationsService(TrainerNotificationsServiceRef ref) {
+TrainerNotificationsService trainerNotificationsService(
+  TrainerNotificationsServiceRef ref,
+) {
   return const TrainerNotificationsService();
 }

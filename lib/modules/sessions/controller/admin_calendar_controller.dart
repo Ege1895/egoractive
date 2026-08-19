@@ -45,6 +45,31 @@ Stream<Map<int, List<AdminSessionSlot>>> _sessionsForGymMonth(
       });
 }
 
+@riverpod
+Stream<Map<int, int>> _expensesForGymMonth(
+  _ExpensesForGymMonthRef ref,
+  String gymId,
+  int year,
+  int month,
+) {
+  final start = DateTime(year, month, 1);
+  final end = DateTime(year, month + 1, 1);
+  return FirebaseFirestore.instance
+      .collection('expenses')
+      .where('gymId', isEqualTo: gymId)
+      .where('date', isGreaterThanOrEqualTo: Timestamp.fromDate(start))
+      .where('date', isLessThan: Timestamp.fromDate(end))
+      .snapshots()
+      .map((snapshot) {
+        final byDay = <int, int>{};
+        for (final doc in snapshot.docs) {
+          final day = (doc.data()['date'] as Timestamp).toDate().day;
+          byDay[day] = (byDay[day] ?? 0) + 1;
+        }
+        return byDay;
+      });
+}
+
 AdminSessionSlot _toAdminSlot(QueryDocumentSnapshot<Map<String, dynamic>> doc) {
   final data = doc.data();
   final startTime = (data['startTime'] as Timestamp).toDate();
@@ -106,9 +131,21 @@ class AdminCalendarController extends _$AdminCalendarController {
             )
             .valueOrNull ??
         const {};
+    final expenseCounts =
+        ref
+            .watch(
+              _expensesForGymMonthProvider(
+                gymId,
+                selectedDate.year,
+                selectedDate.month,
+              ),
+            )
+            .valueOrNull ??
+        const {};
     return AdminCalendarState(
       selectedDate: selectedDate,
       slotsByDayOfMonth: slots,
+      expenseCountByDayOfMonth: expenseCounts,
     );
   }
 

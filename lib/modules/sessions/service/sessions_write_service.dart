@@ -27,7 +27,9 @@ class SessionsWriteService {
     required String memberName,
     required DateTime startTime,
   }) async {
-    final endTime = startTime.add(const Duration(minutes: sessionDefaultDurationMinutes));
+    final endTime = startTime.add(
+      const Duration(minutes: sessionDefaultDurationMinutes),
+    );
     await FirebaseFirestore.instance.collection('sessions').add({
       'gymId': gymId,
       'trainerId': trainerId,
@@ -43,19 +45,33 @@ class SessionsWriteService {
     });
   }
 
-  Future<void> rescheduleSession(String sessionId, DateTime newStartTime) async {
-    final newEndTime = newStartTime.add(const Duration(minutes: sessionDefaultDurationMinutes));
-    await FirebaseFirestore.instance.collection('sessions').doc(sessionId).update({
-      'startTime': Timestamp.fromDate(newStartTime),
-      'endTime': Timestamp.fromDate(newEndTime),
-      'confirmationRequested': false,
-      'completionPushSent': false,
-    });
+  Future<void> rescheduleSession(
+    String sessionId,
+    DateTime newStartTime,
+  ) async {
+    final newEndTime = newStartTime.add(
+      const Duration(minutes: sessionDefaultDurationMinutes),
+    );
+    await FirebaseFirestore.instance
+        .collection('sessions')
+        .doc(sessionId)
+        .update({
+          'startTime': Timestamp.fromDate(newStartTime),
+          'endTime': Timestamp.fromDate(newEndTime),
+          'confirmationRequested': false,
+          'completionPushSent': false,
+        });
   }
 
   Future<void> cancelSession(String sessionId) async {
-    await FirebaseFirestore.instance.collection('sessions').doc(sessionId).update({'status': 'cancelled'});
-    await _analytics.logEvent(AnalyticsEvent.sessionCancelled, parameters: {'session_id': sessionId});
+    await FirebaseFirestore.instance
+        .collection('sessions')
+        .doc(sessionId)
+        .update({'status': 'cancelled'});
+    await _analytics.logEvent(
+      AnalyticsEvent.sessionCancelled,
+      parameters: {'session_id': sessionId},
+    );
   }
 }
 

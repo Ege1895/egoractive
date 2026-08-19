@@ -9,7 +9,8 @@ abstract interface class TrainerNotificationsRepository {
   List<TrainerNotification> loadNotifications();
 }
 
-class TrainerNotificationsRepositoryImpl implements TrainerNotificationsRepository {
+class TrainerNotificationsRepositoryImpl
+    implements TrainerNotificationsRepository {
   const TrainerNotificationsRepositoryImpl(this._service);
 
   final TrainerNotificationsService _service;
@@ -19,6 +20,10 @@ class TrainerNotificationsRepositoryImpl implements TrainerNotificationsReposito
 }
 
 @riverpod
-TrainerNotificationsRepository trainerNotificationsRepository(TrainerNotificationsRepositoryRef ref) {
-  return TrainerNotificationsRepositoryImpl(ref.watch(trainerNotificationsServiceProvider));
+TrainerNotificationsRepository trainerNotificationsRepository(
+  TrainerNotificationsRepositoryRef ref,
+) {
+  return TrainerNotificationsRepositoryImpl(
+    ref.watch(trainerNotificationsServiceProvider),
+  );
 }

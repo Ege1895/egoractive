@@ -6,12 +6,32 @@ import '../domain/expense_state.dart';
 part 'expenses_service.g.dart';
 
 const _monthNamesLong = {
-  1: 'Ocak', 2: 'Şubat', 3: 'Mart', 4: 'Nisan', 5: 'Mayıs', 6: 'Haziran',
-  7: 'Temmuz', 8: 'Ağustos', 9: 'Eylül', 10: 'Ekim', 11: 'Kasım', 12: 'Aralık',
+  1: 'Ocak',
+  2: 'Şubat',
+  3: 'Mart',
+  4: 'Nisan',
+  5: 'Mayıs',
+  6: 'Haziran',
+  7: 'Temmuz',
+  8: 'Ağustos',
+  9: 'Eylül',
+  10: 'Ekim',
+  11: 'Kasım',
+  12: 'Aralık',
 };
 const _monthAbbrev = {
-  1: 'Oca', 2: 'Şub', 3: 'Mar', 4: 'Nis', 5: 'May', 6: 'Haz',
-  7: 'Tem', 8: 'Ağu', 9: 'Eyl', 10: 'Eki', 11: 'Kas', 12: 'Ara',
+  1: 'Oca',
+  2: 'Şub',
+  3: 'Mar',
+  4: 'Nis',
+  5: 'May',
+  6: 'Haz',
+  7: 'Tem',
+  8: 'Ağu',
+  9: 'Eyl',
+  10: 'Eki',
+  11: 'Kas',
+  12: 'Ara',
 };
 
 /// F5-3 — `expenses` koleksiyonu (gymId, category, title, date, amountTl,
@@ -32,16 +52,25 @@ class ExpensesService {
         .where('date', isLessThan: Timestamp.fromDate(monthEnd))
         .snapshots()
         .asyncMap((snapshot) async {
-      final docs = snapshot.docs.toList()
-        ..sort((a, b) => (b.data()['date'] as Timestamp).compareTo(a.data()['date'] as Timestamp));
-      final entries = docs.map(_toEntry).toList();
-      final revenueRatioLabel = await _revenueRatioLabel(gymId, monthStart, monthEnd, entries);
-      return ExpensesState(
-        monthLabel: '${_monthNamesLong[now.month]} ${now.year}',
-        revenueRatioLabel: revenueRatioLabel,
-        entries: entries,
-      );
-    });
+          final docs = snapshot.docs.toList()
+            ..sort(
+              (a, b) => (b.data()['date'] as Timestamp).compareTo(
+                a.data()['date'] as Timestamp,
+              ),
+            );
+          final entries = docs.map(_toEntry).toList();
+          final revenueRatioLabel = await _revenueRatioLabel(
+            gymId,
+            monthStart,
+            monthEnd,
+            entries,
+          );
+          return ExpensesState(
+            monthLabel: '${_monthNamesLong[now.month]} ${now.year}',
+            revenueRatioLabel: revenueRatioLabel,
+            entries: entries,
+          );
+        });
   }
 
   Future<void> addExpense({
@@ -78,20 +107,39 @@ class ExpensesService {
 
   /// F5-1'deki dashboard ile aynı yaklaşım: ciro `memberPackages.paidAmount`
   /// aggregation'ından, tek bir sum() sorgusuyla.
-  Future<String> _revenueRatioLabel(String gymId, DateTime monthStart, DateTime monthEnd, List<ExpenseEntry> entries) async {
-    final totalTl = entries.fold<int>(0, (total, e) => total + e.amountTl);
-    final revenueSnapshot = await FirebaseFirestore.instance
-        .collection('memberPackages')
-        .where('gymId', isEqualTo: gymId)
-        .where('purchasedAt', isGreaterThanOrEqualTo: Timestamp.fromDate(monthStart))
-        .where('purchasedAt', isLessThan: Timestamp.fromDate(monthEnd))
-        .aggregate(sum('paidAmount'))
-        .get();
-    final revenueTl = (revenueSnapshot.getSum('paidAmount') ?? 0).round();
-    if (revenueTl <= 0) return '—';
-    return '%${((totalTl / revenueTl) * 100).round()}';
+  ///
+  /// Bu sorgu (ör. eksik izin/index) başarısız olursa önceden tüm
+  /// `watchMonth` stream'i hataya düşüyordu — gider kaydı gerçekten
+  /// yazılmış olsa bile "SON KAYITLAR" listesi sessizce boş görünüyordu.
+  /// Ciro oranı sadece kozmetik bir alan olduğu için hatası ayrı
+  /// yakalanıyor; asıl gider listesi bundan etkilenmez.
+  Future<String> _revenueRatioLabel(
+    String gymId,
+    DateTime monthStart,
+    DateTime monthEnd,
+    List<ExpenseEntry> entries,
+  ) async {
+    try {
+      final totalTl = entries.fold<int>(0, (total, e) => total + e.amountTl);
+      final revenueSnapshot = await FirebaseFirestore.instance
+          .collection('memberPackages')
+          .where('gymId', isEqualTo: gymId)
+          .where(
+            'purchasedAt',
+            isGreaterThanOrEqualTo: Timestamp.fromDate(monthStart),
+          )
+          .where('purchasedAt', isLessThan: Timestamp.fromDate(monthEnd))
+          .aggregate(sum('paidAmount'))
+          .get();
+      final revenueTl = (revenueSnapshot.getSum('paidAmount') ?? 0).round();
+      if (revenueTl <= 0) return '—';
+      return '%${((totalTl / revenueTl) * 100).round()}';
+    } catch (_) {
+      return '—';
+    }
   }
 }
 
 @riverpod
-ExpensesService expensesService(ExpensesServiceRef ref) => const ExpensesService();
+ExpensesService expensesService(ExpensesServiceRef ref) =>
+    const ExpensesService();

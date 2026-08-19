@@ -20,5 +20,9 @@ class AdminCalendarState with _$AdminCalendarState {
   const factory AdminCalendarState({
     required DateTime selectedDate,
     required Map<int, List<AdminSessionSlot>> slotsByDayOfMonth,
+
+    /// Gün numarası → o gün eklenmiş gider kaydı sayısı (tutar değil, sayı
+    /// — takvimde bildirim rozeti olarak gösteriliyor).
+    @Default(<int, int>{}) Map<int, int> expenseCountByDayOfMonth,
   }) = _AdminCalendarState;
 }

@@ -184,9 +184,20 @@ class AdminCalendarPanel extends ConsumerWidget {
                             );
                             final isSelected =
                                 date.day == state.selectedDate.day;
-                            final count =
+                            final sessionCount =
                                 state.slotsByDayOfMonth[dayNum]?.length ?? 0;
-                            final hasSessions = count > 0;
+                            final expenseCount =
+                                state.expenseCountByDayOfMonth[dayNum] ?? 0;
+                            final hasSessions = sessionCount > 0;
+                            final hasExpenses = expenseCount > 0;
+                            // Seans olan günler sarı, sadece gider olan (seans
+                            // olmayan) günler kırmızı yumuşak/ışımalı bir
+                            // halkayla vurgulanıyor. Sağ üst rozet seans
+                            // sayısı, sol üst rozet gider sayısı — ikisi de
+                            // varsa aynı anda gösterilir.
+                            final ringColor = hasSessions
+                                ? colors.primary
+                                : (hasExpenses ? colors.error : null);
                             return InkWell(
                               borderRadius: BorderRadius.circular(12),
                               onTap: () => controller.selectDate(date),
@@ -203,9 +214,6 @@ class AdminCalendarPanel extends ConsumerWidget {
                                   ),
                                 ),
                                 alignment: Alignment.center,
-                                // Seans olan günler yumuşak, hafif ışımalı bir
-                                // halka + sayı rozetiyle vurgulanıyor (bkz.
-                                // kullanıcının paylaştığı "Yumuşak Halka" tasarımı).
                                 child: SizedBox(
                                   width: 34,
                                   height: 34,
@@ -213,20 +221,21 @@ class AdminCalendarPanel extends ConsumerWidget {
                                     clipBehavior: Clip.none,
                                     alignment: Alignment.center,
                                     children: [
-                                      if (hasSessions)
+                                      if (ringColor != null)
                                         Container(
                                           width: 34,
                                           height: 34,
                                           decoration: BoxDecoration(
                                             shape: BoxShape.circle,
                                             border: Border.all(
-                                              color: colors.primary,
+                                              color: ringColor,
                                               width: 1.5,
                                             ),
                                             boxShadow: [
                                               BoxShadow(
-                                                color: colors.primary
-                                                    .withValues(alpha: 0.55),
+                                                color: ringColor.withValues(
+                                                  alpha: 0.55,
+                                                ),
                                                 blurRadius: 10,
                                                 spreadRadius: 1,
                                               ),
@@ -246,23 +255,20 @@ class AdminCalendarPanel extends ConsumerWidget {
                                         Positioned(
                                           top: -6,
                                           right: -6,
-                                          child: Container(
-                                            width: 16,
-                                            height: 16,
-                                            decoration: BoxDecoration(
-                                              color: colors.primary,
-                                              shape: BoxShape.circle,
-                                            ),
-                                            alignment: Alignment.center,
-                                            child: Text(
-                                              '$count',
-                                              style: typography.caption
-                                                  .copyWith(
-                                                    color: colors.onPrimary,
-                                                    fontSize: 9,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                            ),
+                                          child: _CalendarBadge(
+                                            count: sessionCount,
+                                            color: colors.primary,
+                                            onColor: colors.onPrimary,
+                                          ),
+                                        ),
+                                      if (hasExpenses)
+                                        Positioned(
+                                          top: -6,
+                                          left: -6,
+                                          child: _CalendarBadge(
+                                            count: expenseCount,
+                                            color: colors.error,
+                                            onColor: colors.onPrimary,
                                           ),
                                         ),
                                     ],
@@ -510,6 +516,36 @@ class AdminCalendarPanel extends ConsumerWidget {
           ),
         );
       },
+    );
+  }
+}
+
+class _CalendarBadge extends StatelessWidget {
+  const _CalendarBadge({
+    required this.count,
+    required this.color,
+    required this.onColor,
+  });
+
+  final int count;
+  final Color color;
+  final Color onColor;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 16,
+      height: 16,
+      decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+      alignment: Alignment.center,
+      child: Text(
+        '$count',
+        style: context.appTypography.caption.copyWith(
+          color: onColor,
+          fontSize: 9,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
     );
   }
 }

@@ -248,6 +248,11 @@ mixin _$AdminCalendarState {
   Map<int, List<AdminSessionSlot>> get slotsByDayOfMonth =>
       throw _privateConstructorUsedError;
 
+  /// Gün numarası → o gün eklenmiş gider kaydı sayısı (tutar değil, sayı
+  /// — takvimde bildirim rozeti olarak gösteriliyor).
+  Map<int, int> get expenseCountByDayOfMonth =>
+      throw _privateConstructorUsedError;
+
   /// Create a copy of AdminCalendarState
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -265,6 +270,7 @@ abstract class $AdminCalendarStateCopyWith<$Res> {
   $Res call({
     DateTime selectedDate,
     Map<int, List<AdminSessionSlot>> slotsByDayOfMonth,
+    Map<int, int> expenseCountByDayOfMonth,
   });
 }
 
@@ -282,7 +288,11 @@ class _$AdminCalendarStateCopyWithImpl<$Res, $Val extends AdminCalendarState>
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({Object? selectedDate = null, Object? slotsByDayOfMonth = null}) {
+  $Res call({
+    Object? selectedDate = null,
+    Object? slotsByDayOfMonth = null,
+    Object? expenseCountByDayOfMonth = null,
+  }) {
     return _then(
       _value.copyWith(
             selectedDate: null == selectedDate
@@ -293,6 +303,10 @@ class _$AdminCalendarStateCopyWithImpl<$Res, $Val extends AdminCalendarState>
                 ? _value.slotsByDayOfMonth
                 : slotsByDayOfMonth // ignore: cast_nullable_to_non_nullable
                       as Map<int, List<AdminSessionSlot>>,
+            expenseCountByDayOfMonth: null == expenseCountByDayOfMonth
+                ? _value.expenseCountByDayOfMonth
+                : expenseCountByDayOfMonth // ignore: cast_nullable_to_non_nullable
+                      as Map<int, int>,
           )
           as $Val,
     );
@@ -311,6 +325,7 @@ abstract class _$$AdminCalendarStateImplCopyWith<$Res>
   $Res call({
     DateTime selectedDate,
     Map<int, List<AdminSessionSlot>> slotsByDayOfMonth,
+    Map<int, int> expenseCountByDayOfMonth,
   });
 }
 
@@ -327,7 +342,11 @@ class __$$AdminCalendarStateImplCopyWithImpl<$Res>
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({Object? selectedDate = null, Object? slotsByDayOfMonth = null}) {
+  $Res call({
+    Object? selectedDate = null,
+    Object? slotsByDayOfMonth = null,
+    Object? expenseCountByDayOfMonth = null,
+  }) {
     return _then(
       _$AdminCalendarStateImpl(
         selectedDate: null == selectedDate
@@ -338,6 +357,10 @@ class __$$AdminCalendarStateImplCopyWithImpl<$Res>
             ? _value._slotsByDayOfMonth
             : slotsByDayOfMonth // ignore: cast_nullable_to_non_nullable
                   as Map<int, List<AdminSessionSlot>>,
+        expenseCountByDayOfMonth: null == expenseCountByDayOfMonth
+            ? _value._expenseCountByDayOfMonth
+            : expenseCountByDayOfMonth // ignore: cast_nullable_to_non_nullable
+                  as Map<int, int>,
       ),
     );
   }
@@ -349,7 +372,9 @@ class _$AdminCalendarStateImpl implements _AdminCalendarState {
   const _$AdminCalendarStateImpl({
     required this.selectedDate,
     required final Map<int, List<AdminSessionSlot>> slotsByDayOfMonth,
-  }) : _slotsByDayOfMonth = slotsByDayOfMonth;
+    final Map<int, int> expenseCountByDayOfMonth = const <int, int>{},
+  }) : _slotsByDayOfMonth = slotsByDayOfMonth,
+       _expenseCountByDayOfMonth = expenseCountByDayOfMonth;
 
   @override
   final DateTime selectedDate;
@@ -362,9 +387,24 @@ class _$AdminCalendarStateImpl implements _AdminCalendarState {
     return EqualUnmodifiableMapView(_slotsByDayOfMonth);
   }
 
+  /// Gün numarası → o gün eklenmiş gider kaydı sayısı (tutar değil, sayı
+  /// — takvimde bildirim rozeti olarak gösteriliyor).
+  final Map<int, int> _expenseCountByDayOfMonth;
+
+  /// Gün numarası → o gün eklenmiş gider kaydı sayısı (tutar değil, sayı
+  /// — takvimde bildirim rozeti olarak gösteriliyor).
+  @override
+  @JsonKey()
+  Map<int, int> get expenseCountByDayOfMonth {
+    if (_expenseCountByDayOfMonth is EqualUnmodifiableMapView)
+      return _expenseCountByDayOfMonth;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(_expenseCountByDayOfMonth);
+  }
+
   @override
   String toString() {
-    return 'AdminCalendarState(selectedDate: $selectedDate, slotsByDayOfMonth: $slotsByDayOfMonth)';
+    return 'AdminCalendarState(selectedDate: $selectedDate, slotsByDayOfMonth: $slotsByDayOfMonth, expenseCountByDayOfMonth: $expenseCountByDayOfMonth)';
   }
 
   @override
@@ -377,6 +417,10 @@ class _$AdminCalendarStateImpl implements _AdminCalendarState {
             const DeepCollectionEquality().equals(
               other._slotsByDayOfMonth,
               _slotsByDayOfMonth,
+            ) &&
+            const DeepCollectionEquality().equals(
+              other._expenseCountByDayOfMonth,
+              _expenseCountByDayOfMonth,
             ));
   }
 
@@ -385,6 +429,7 @@ class _$AdminCalendarStateImpl implements _AdminCalendarState {
     runtimeType,
     selectedDate,
     const DeepCollectionEquality().hash(_slotsByDayOfMonth),
+    const DeepCollectionEquality().hash(_expenseCountByDayOfMonth),
   );
 
   /// Create a copy of AdminCalendarState
@@ -403,12 +448,18 @@ abstract class _AdminCalendarState implements AdminCalendarState {
   const factory _AdminCalendarState({
     required final DateTime selectedDate,
     required final Map<int, List<AdminSessionSlot>> slotsByDayOfMonth,
+    final Map<int, int> expenseCountByDayOfMonth,
   }) = _$AdminCalendarStateImpl;
 
   @override
   DateTime get selectedDate;
   @override
   Map<int, List<AdminSessionSlot>> get slotsByDayOfMonth;
+
+  /// Gün numarası → o gün eklenmiş gider kaydı sayısı (tutar değil, sayı
+  /// — takvimde bildirim rozeti olarak gösteriliyor).
+  @override
+  Map<int, int> get expenseCountByDayOfMonth;
 
   /// Create a copy of AdminCalendarState
   /// with the given fields replaced by the non-null parameter values.

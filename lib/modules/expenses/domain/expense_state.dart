@@ -39,7 +39,9 @@ class ExpensesState with _$ExpensesState {
     for (final entry in entries) {
       totals[entry.category] = (totals[entry.category] ?? 0) + entry.amountTl;
     }
-    final result = totals.entries.map((e) => ExpenseCategoryTotal(category: e.key, amountTl: e.value)).toList();
+    final result = totals.entries
+        .map((e) => ExpenseCategoryTotal(category: e.key, amountTl: e.value))
+        .toList();
     result.sort((a, b) => b.amountTl.compareTo(a.amountTl));
     return result;
   }

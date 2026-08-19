@@ -6,25 +6,13 @@ import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
 import '../../../../core/subscription/subscription_write_gate.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../shared/utils/thousands_input_formatter.dart';
 import '../../../../shared/utils/tr_date_formatter.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_text_field.dart';
+import '../../../../shared/widgets/native_date_picker.dart';
 import '../../controller/expenses_controller.dart';
-
-const _monthAbbrevToNumber = {
-  'Oca': 1,
-  'Şub': 2,
-  'Mar': 3,
-  'Nis': 4,
-  'May': 5,
-  'Haz': 6,
-  'Tem': 7,
-  'Ağu': 8,
-  'Eyl': 9,
-  'Eki': 10,
-  'Kas': 11,
-  'Ara': 12,
-};
+import '../../domain/expense_category.dart';
 
 /// Admin 15 · Gider Ekle — kategori, tutar, tarih, tekrar. Kategori listesi
 /// Remote Config'ten (`cfg_expense_categories`) okunur — yeni bir kategori
@@ -39,15 +27,13 @@ class AddExpensePanel extends BasePanel {
 class _AddExpensePanelState extends BasePanelState<AddExpensePanel> {
   final _amountController = TextEditingController();
   final _titleController = TextEditingController();
-  final _dateController = TextEditingController(
-    text: formatTrDate(DateTime.now()),
-  );
+  final _titleScrollController = ScrollController();
+  DateTime _date = DateTime.now();
   String? _category;
   bool _recurring = false;
   bool _isSaving = false;
   String? _amountError;
   String? _titleError;
-  String? _dateError;
   String? _errorMessage;
 
   @override
@@ -57,6 +43,10 @@ class _AddExpensePanelState extends BasePanelState<AddExpensePanel> {
     final categories =
         ref.watch(expenseCategoriesProvider).valueOrNull ?? const [];
     _category ??= categories.isEmpty ? null : categories.first.id;
+    final selectedMatches = categories.where((c) => c.id == _category);
+    final selectedLabel = selectedMatches.isEmpty
+        ? null
+        : selectedMatches.first.label;
 
     return Scaffold(
       body: SafeArea(
@@ -117,7 +107,8 @@ class _AddExpensePanelState extends BasePanelState<AddExpensePanel> {
                       label: 'Tutar (₺)',
                       controller: _amountController,
                       keyboardType: TextInputType.number,
-                      hint: '8400',
+                      inputFormatters: [ThousandsInputFormatter()],
+                      hint: '8.400',
                       errorText: _amountError,
                       onChanged: (_) {
                         if (_amountError != null) {
@@ -135,17 +126,42 @@ class _AddExpensePanelState extends BasePanelState<AddExpensePanel> {
                     ),
                   ),
                   const SizedBox(height: AppSpacing.sm),
-                  Wrap(
-                    spacing: AppSpacing.sm,
-                    runSpacing: AppSpacing.sm,
-                    children: [
-                      for (final category in categories)
-                        _CategoryChip(
-                          label: category.label,
-                          selected: _category == category.id,
-                          onTap: () => setState(() => _category = category.id),
+                  InkWell(
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+                    onTap: categories.isEmpty
+                        ? null
+                        : () => _showCategoryPicker(context, categories),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.lg,
+                        vertical: AppSpacing.md,
+                      ),
+                      decoration: BoxDecoration(
+                        color: colors.surfaceRaised,
+                        borderRadius: BorderRadius.circular(
+                          AppSpacing.radiusInner,
                         ),
-                    ],
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              selectedLabel ?? 'Kategori seç',
+                              style: typography.bodyLarge.copyWith(
+                                color: selectedLabel == null
+                                    ? colors.onSurfaceMuted
+                                    : colors.onSurface,
+                              ),
+                            ),
+                          ),
+                          Icon(
+                            Icons.chevron_right,
+                            color: colors.onSurfaceMuted,
+                            size: 18,
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                   const SizedBox(height: AppSpacing.lg),
                   Container(
@@ -160,27 +176,80 @@ class _AddExpensePanelState extends BasePanelState<AddExpensePanel> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        AppTextField(
-                          label: 'Açıklama',
-                          controller: _titleController,
-                          hint: 'Reformer yay değişimi',
-                          errorText: _titleError,
-                          onChanged: (_) {
-                            if (_titleError != null) {
-                              setState(() => _titleError = null);
-                            }
-                          },
+                        Scrollbar(
+                          controller: _titleScrollController,
+                          thumbVisibility: true,
+                          interactive: true,
+                          thickness: 4,
+                          radius: const Radius.circular(4),
+                          child: AppTextField(
+                            label: 'Açıklama',
+                            controller: _titleController,
+                            scrollController: _titleScrollController,
+                            minLines: 1,
+                            maxLines: 5,
+                            hint: 'Reformer yay değişimi',
+                            errorText: _titleError,
+                            onChanged: (_) {
+                              if (_titleError != null) {
+                                setState(() => _titleError = null);
+                              }
+                            },
+                          ),
                         ),
                         const SizedBox(height: AppSpacing.md),
-                        AppTextField(
-                          label: 'Tarih',
-                          controller: _dateController,
-                          errorText: _dateError,
-                          onChanged: (_) {
-                            if (_dateError != null) {
-                              setState(() => _dateError = null);
-                            }
-                          },
+                        InkWell(
+                          borderRadius: BorderRadius.circular(
+                            AppSpacing.radiusInner,
+                          ),
+                          onTap: () => showNativeDatePicker(
+                            context: context,
+                            initial: _date,
+                            firstDate: DateTime(DateTime.now().year - 5),
+                            lastDate: DateTime(DateTime.now().year + 1),
+                            onSelected: (date) => setState(() => _date = date),
+                          ),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: AppSpacing.lg,
+                              vertical: AppSpacing.md,
+                            ),
+                            decoration: BoxDecoration(
+                              color: colors.surfaceRaised,
+                              borderRadius: BorderRadius.circular(
+                                AppSpacing.radiusInner,
+                              ),
+                            ),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Tarih',
+                                        style: typography.caption.copyWith(
+                                          color: colors.onSurfaceMuted,
+                                        ),
+                                      ),
+                                      Text(
+                                        formatTrDate(_date),
+                                        style: typography.bodyLarge.copyWith(
+                                          color: colors.onSurface,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Icon(
+                                  Icons.chevron_right,
+                                  color: colors.onSurfaceMuted,
+                                  size: 18,
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
                       ],
                     ),
@@ -290,10 +359,12 @@ class _AddExpensePanelState extends BasePanelState<AddExpensePanel> {
                         ? null
                         : () async {
                             final amount =
-                                int.tryParse(_amountController.text) ?? 0;
+                                int.tryParse(
+                                  _amountController.text.replaceAll('.', ''),
+                                ) ??
+                                0;
                             final title = _titleController.text.trim();
                             final category = _category;
-                            final date = _parseDate(_dateController.text);
                             var hasError = false;
                             if (amount <= 0) {
                               setState(
@@ -304,13 +375,6 @@ class _AddExpensePanelState extends BasePanelState<AddExpensePanel> {
                             if (title.isEmpty) {
                               setState(
                                 () => _titleError = 'Açıklama boş bırakılamaz.',
-                              );
-                              hasError = true;
-                            }
-                            if (date == null) {
-                              setState(
-                                () => _dateError =
-                                    'Tarihi "gün ay yıl" formatında gir (örn. 18 Tem 2026).',
                               );
                               hasError = true;
                             }
@@ -332,7 +396,7 @@ class _AddExpensePanelState extends BasePanelState<AddExpensePanel> {
                                   .addExpense(
                                     category: category!,
                                     title: title,
-                                    date: date!,
+                                    date: _date,
                                     amountTl: amount,
                                     recurring: _recurring,
                                   );
@@ -361,65 +425,72 @@ class _AddExpensePanelState extends BasePanelState<AddExpensePanel> {
     );
   }
 
-  /// "18 Tem 2026" formatını ayrıştırır — geçersizse null.
-  DateTime? _parseDate(String text) {
-    final parts = text.trim().split(RegExp(r'\s+'));
-    if (parts.length != 3) return null;
-    final day = int.tryParse(parts[0]);
-    final month = _monthAbbrevToNumber[parts[1]];
-    final year = int.tryParse(parts[2]);
-    if (day == null || month == null || year == null) return null;
-    return DateTime(year, month, day);
+  void _showCategoryPicker(
+    BuildContext context,
+    List<ExpenseCategoryOption> categories,
+  ) {
+    final colors = context.appColors;
+    final typography = context.appTypography;
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: colors.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      builder: (sheetContext) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Kategori seç',
+                  style: typography.headingMedium.copyWith(
+                    color: colors.onSurface,
+                    fontSize: 20,
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.md),
+                for (final category in categories)
+                  InkWell(
+                    onTap: () {
+                      setState(() => _category = category.id);
+                      Navigator.of(sheetContext).pop();
+                    },
+                    child: Container(
+                      constraints: const BoxConstraints(minHeight: 52),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              category.label,
+                              style: typography.bodyLarge.copyWith(
+                                color: colors.onSurface,
+                                fontSize: 15,
+                              ),
+                            ),
+                          ),
+                          if (category.id == _category)
+                            Icon(Icons.check, size: 18, color: colors.primary),
+                        ],
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   @override
   void dispose() {
     _amountController.dispose();
     _titleController.dispose();
-    _dateController.dispose();
+    _titleScrollController.dispose();
     super.dispose();
-  }
-}
-
-class _CategoryChip extends StatelessWidget {
-  const _CategoryChip({
-    required this.label,
-    required this.selected,
-    required this.onTap,
-  });
-
-  final String label;
-  final bool selected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = context.appColors;
-    return Material(
-      color: selected ? colors.primary : colors.surfaceRaised,
-      borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 13),
-          constraints: const BoxConstraints(minHeight: 34),
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
-            border: Border.all(
-              color: selected ? colors.primary : colors.outlineStrong,
-            ),
-          ),
-          child: Text(
-            label,
-            style: context.appTypography.headingSmall.copyWith(
-              fontSize: 14,
-              color: selected ? colors.onPrimary : colors.onSurfaceVariant,
-            ),
-          ),
-        ),
-      ),
-    );
   }
 }

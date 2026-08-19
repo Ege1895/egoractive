@@ -183,6 +183,156 @@ class _SessionsForGymMonthProviderElement
   int get month => (origin as _SessionsForGymMonthProvider).month;
 }
 
+String _$expensesForGymMonthHash() =>
+    r'b81fa6c1e5154763577bd99831a3e6a31e3495d3';
+
+/// See also [_expensesForGymMonth].
+@ProviderFor(_expensesForGymMonth)
+const _expensesForGymMonthProvider = _ExpensesForGymMonthFamily();
+
+/// See also [_expensesForGymMonth].
+class _ExpensesForGymMonthFamily extends Family<AsyncValue<Map<int, int>>> {
+  /// See also [_expensesForGymMonth].
+  const _ExpensesForGymMonthFamily();
+
+  /// See also [_expensesForGymMonth].
+  _ExpensesForGymMonthProvider call(String gymId, int year, int month) {
+    return _ExpensesForGymMonthProvider(gymId, year, month);
+  }
+
+  @override
+  _ExpensesForGymMonthProvider getProviderOverride(
+    covariant _ExpensesForGymMonthProvider provider,
+  ) {
+    return call(provider.gymId, provider.year, provider.month);
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'_expensesForGymMonthProvider';
+}
+
+/// See also [_expensesForGymMonth].
+class _ExpensesForGymMonthProvider
+    extends AutoDisposeStreamProvider<Map<int, int>> {
+  /// See also [_expensesForGymMonth].
+  _ExpensesForGymMonthProvider(String gymId, int year, int month)
+    : this._internal(
+        (ref) => _expensesForGymMonth(
+          ref as _ExpensesForGymMonthRef,
+          gymId,
+          year,
+          month,
+        ),
+        from: _expensesForGymMonthProvider,
+        name: r'_expensesForGymMonthProvider',
+        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+            ? null
+            : _$expensesForGymMonthHash,
+        dependencies: _ExpensesForGymMonthFamily._dependencies,
+        allTransitiveDependencies:
+            _ExpensesForGymMonthFamily._allTransitiveDependencies,
+        gymId: gymId,
+        year: year,
+        month: month,
+      );
+
+  _ExpensesForGymMonthProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.gymId,
+    required this.year,
+    required this.month,
+  }) : super.internal();
+
+  final String gymId;
+  final int year;
+  final int month;
+
+  @override
+  Override overrideWith(
+    Stream<Map<int, int>> Function(_ExpensesForGymMonthRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: _ExpensesForGymMonthProvider._internal(
+        (ref) => create(ref as _ExpensesForGymMonthRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        gymId: gymId,
+        year: year,
+        month: month,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeStreamProviderElement<Map<int, int>> createElement() {
+    return _ExpensesForGymMonthProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is _ExpensesForGymMonthProvider &&
+        other.gymId == gymId &&
+        other.year == year &&
+        other.month == month;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, gymId.hashCode);
+    hash = _SystemHash.combine(hash, year.hashCode);
+    hash = _SystemHash.combine(hash, month.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin _ExpensesForGymMonthRef on AutoDisposeStreamProviderRef<Map<int, int>> {
+  /// The parameter `gymId` of this provider.
+  String get gymId;
+
+  /// The parameter `year` of this provider.
+  int get year;
+
+  /// The parameter `month` of this provider.
+  int get month;
+}
+
+class _ExpensesForGymMonthProviderElement
+    extends AutoDisposeStreamProviderElement<Map<int, int>>
+    with _ExpensesForGymMonthRef {
+  _ExpensesForGymMonthProviderElement(super.provider);
+
+  @override
+  String get gymId => (origin as _ExpensesForGymMonthProvider).gymId;
+  @override
+  int get year => (origin as _ExpensesForGymMonthProvider).year;
+  @override
+  int get month => (origin as _ExpensesForGymMonthProvider).month;
+}
+
 String _$selectedCalendarDateHash() =>
     r'4e4f571021d3293cbcfea154b4e754841e8a2eda';
 
@@ -205,7 +355,7 @@ final _selectedCalendarDateProvider =
 
 typedef _$SelectedCalendarDate = AutoDisposeNotifier<DateTime>;
 String _$adminCalendarControllerHash() =>
-    r'53f6fced34cc4546c1f41cb378e44d5044ac3734';
+    r'a3553539a9d338f8864aa5337742e0e01c114009';
 
 /// F3-3 — aktif salonun bulunduğu aya ait seansları gerçek zamanlı
 /// dinler. Salon bilinmiyorsa (test ortamı vb.) mock repository'e düşer.

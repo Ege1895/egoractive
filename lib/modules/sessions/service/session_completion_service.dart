@@ -15,20 +15,29 @@ class SessionCompletionService {
   /// aynı üyenin başka bir seansı eşzamanlı tamamlanırsa iki yazma da
   /// birbirinin üstüne yazmadan, güncel değeri okuyup düşürür (kabul
   /// kriteri: race condition'a karşı korumalı).
-  Future<void> markCompleted({required String sessionId, required String memberId}) async {
+  Future<void> markCompleted({
+    required String sessionId,
+    required String memberId,
+  }) async {
     final firestore = FirebaseFirestore.instance;
     final sessionRef = firestore.collection('sessions').doc(sessionId);
     final memberRef = firestore.collection('users').doc(memberId);
 
     await firestore.runTransaction((transaction) async {
       final memberSnapshot = await transaction.get(memberRef);
-      final remaining = (memberSnapshot.data()?['remainingSessions'] as num?)?.toInt() ?? 0;
+      final remaining =
+          (memberSnapshot.data()?['remainingSessions'] as num?)?.toInt() ?? 0;
 
       transaction.update(sessionRef, {'status': 'completed', 'attended': true});
-      transaction.update(memberRef, {'remainingSessions': (remaining - 1).clamp(0, remaining)});
+      transaction.update(memberRef, {
+        'remainingSessions': (remaining - 1).clamp(0, remaining),
+      });
     });
 
-    await _analytics.logEvent(AnalyticsEvent.sessionCompleted, parameters: {'session_id': sessionId});
+    await _analytics.logEvent(
+      AnalyticsEvent.sessionCompleted,
+      parameters: {'session_id': sessionId},
+    );
   }
 
   /// Üye gelmediyse ders kalan seans sayısından düşülmez — session sadece
@@ -42,6 +51,8 @@ class SessionCompletionService {
 }
 
 @riverpod
-SessionCompletionService sessionCompletionService(SessionCompletionServiceRef ref) {
+SessionCompletionService sessionCompletionService(
+  SessionCompletionServiceRef ref,
+) {
   return SessionCompletionService(ref.watch(analyticsServiceProvider));
 }

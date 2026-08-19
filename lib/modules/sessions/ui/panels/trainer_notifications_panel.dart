@@ -16,10 +16,12 @@ class TrainerNotificationsPanel extends BasePanel {
   const TrainerNotificationsPanel({super.key});
 
   @override
-  ConsumerState<TrainerNotificationsPanel> createState() => _TrainerNotificationsPanelState();
+  ConsumerState<TrainerNotificationsPanel> createState() =>
+      _TrainerNotificationsPanelState();
 }
 
-class _TrainerNotificationsPanelState extends BasePanelState<TrainerNotificationsPanel> {
+class _TrainerNotificationsPanelState
+    extends BasePanelState<TrainerNotificationsPanel> {
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
@@ -32,12 +34,26 @@ class _TrainerNotificationsPanelState extends BasePanelState<TrainerNotification
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.md, AppSpacing.screenEdge, 0),
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.screenEdge,
+                AppSpacing.md,
+                AppSpacing.screenEdge,
+                0,
+              ),
               child: Row(
                 children: [
-                  AppBackButton(onTap: () => ref.read(panelStackControllerProvider.notifier).pop()),
+                  AppBackButton(
+                    onTap: () =>
+                        ref.read(panelStackControllerProvider.notifier).pop(),
+                  ),
                   const SizedBox(width: AppSpacing.md),
-                  Text('Bildirimler', style: typography.headingLarge.copyWith(color: colors.onSurface, fontSize: 24)),
+                  Text(
+                    'Bildirimler',
+                    style: typography.headingLarge.copyWith(
+                      color: colors.onSurface,
+                      fontSize: 24,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -46,13 +62,21 @@ class _TrainerNotificationsPanelState extends BasePanelState<TrainerNotification
                   ? Center(
                       child: Text(
                         'Henüz bildirim yok.',
-                        style: typography.bodyMedium.copyWith(color: colors.onSurfaceMuted),
+                        style: typography.bodyMedium.copyWith(
+                          color: colors.onSurfaceMuted,
+                        ),
                       ),
                     )
                   : ListView(
-                      padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.md, AppSpacing.screenEdge, AppSpacing.lg),
+                      padding: const EdgeInsets.fromLTRB(
+                        AppSpacing.screenEdge,
+                        AppSpacing.md,
+                        AppSpacing.screenEdge,
+                        AppSpacing.lg,
+                      ),
                       children: [
-                        for (final n in notifications) _NotificationRow(notification: n),
+                        for (final n in notifications)
+                          _NotificationRow(notification: n),
                       ],
                     ),
             ),
@@ -94,7 +118,9 @@ class _NotificationRow extends ConsumerWidget {
               height: 8,
               margin: const EdgeInsets.only(top: 6),
               decoration: BoxDecoration(
-                color: notification.answerIsPositive ? colors.success : colors.warning,
+                color: notification.answerIsPositive
+                    ? colors.success
+                    : colors.warning,
                 shape: BoxShape.circle,
               ),
             ),
@@ -103,8 +129,20 @@ class _NotificationRow extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(notification.title, style: typography.headingSmall.copyWith(color: colors.onSurface, fontSize: 15)),
-                  Text(notification.body, style: typography.bodyMedium.copyWith(color: colors.onSurfaceMuted, fontSize: 13)),
+                  Text(
+                    notification.title,
+                    style: typography.headingSmall.copyWith(
+                      color: colors.onSurface,
+                      fontSize: 15,
+                    ),
+                  ),
+                  Text(
+                    notification.body,
+                    style: typography.bodyMedium.copyWith(
+                      color: colors.onSurfaceMuted,
+                      fontSize: 13,
+                    ),
+                  ),
                 ],
               ),
             ),
