@@ -434,39 +434,65 @@ class _AvatarViewState extends ConsumerState<_AvatarView> {
                       ],
                     ),
                   ),
-                  SizedBox(
-                    width: 110,
-                    child: TextField(
-                      controller: _valueController,
-                      focusNode: _valueFocusNode,
-                      enabled: !_isSaving,
-                      textAlign: TextAlign.right,
-                      keyboardType: const TextInputType.numberWithOptions(
-                        decimal: true,
+                  Container(
+                    width: 130,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.sm,
+                    ),
+                    decoration: BoxDecoration(
+                      color: colors.surfaceRaised,
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusInner,
                       ),
-                      inputFormatters: [
-                        FilteringTextInputFormatter.allow(RegExp(r'[0-9,.]')),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.edit_outlined,
+                          size: 16,
+                          color: colors.onSurfaceMuted,
+                        ),
+                        const SizedBox(width: AppSpacing.xs),
+                        Expanded(
+                          child: TextField(
+                            controller: _valueController,
+                            focusNode: _valueFocusNode,
+                            enabled: !_isSaving,
+                            textAlign: TextAlign.right,
+                            keyboardType: const TextInputType.numberWithOptions(
+                              decimal: true,
+                            ),
+                            inputFormatters: [
+                              FilteringTextInputFormatter.allow(
+                                RegExp(r'[0-9,.]'),
+                              ),
+                            ],
+                            style: typography.dataLarge.copyWith(
+                              color: colors.onSurface,
+                              fontSize: 24,
+                            ),
+                            decoration: InputDecoration(
+                              isDense: true,
+                              border: InputBorder.none,
+                              contentPadding: const EdgeInsets.symmetric(
+                                vertical: AppSpacing.sm,
+                              ),
+                              hintText: 'Değer gir',
+                              hintStyle: typography.bodyMedium.copyWith(
+                                color: colors.onSurfaceMuted,
+                                fontSize: 14,
+                              ),
+                              suffixText: ' cm',
+                              suffixStyle: typography.bodyMedium.copyWith(
+                                color: colors.onSurfaceMuted,
+                                fontSize: 15,
+                              ),
+                            ),
+                            onSubmitted: (_) => _save(state.selectedMetric),
+                          ),
+                        ),
                       ],
-                      style: typography.dataLarge.copyWith(
-                        color: colors.onSurface,
-                        fontSize: 28,
-                      ),
-                      decoration: InputDecoration(
-                        isDense: true,
-                        border: InputBorder.none,
-                        contentPadding: EdgeInsets.zero,
-                        hintText: '—',
-                        hintStyle: typography.dataLarge.copyWith(
-                          color: colors.onSurfaceMuted,
-                          fontSize: 28,
-                        ),
-                        suffixText: ' cm',
-                        suffixStyle: typography.bodyMedium.copyWith(
-                          color: colors.onSurfaceMuted,
-                          fontSize: 15,
-                        ),
-                      ),
-                      onSubmitted: (_) => _save(state.selectedMetric),
                     ),
                   ),
                 ],
