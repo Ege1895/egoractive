@@ -12,6 +12,7 @@ import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_text_field.dart';
 import '../../controller/admin_trainers_controller.dart';
 import '../../domain/admin_trainer_summary.dart';
+import 'admin_trainer_detail_panel.dart';
 
 /// Admin 3 · Antrenör Yönetimi — liste + antrenör ekle (alt sayfa formu).
 class AdminTrainerManagementPanel extends BasePanel {
@@ -77,7 +78,13 @@ class _AdminTrainerManagementPanelState
                   AppSpacing.lg,
                 ),
                 children: [
-                  for (final trainer in trainers) _TrainerRow(trainer: trainer),
+                  for (final trainer in trainers)
+                    _TrainerRow(
+                      trainer: trainer,
+                      onTap: () => ref
+                          .read(panelStackControllerProvider.notifier)
+                          .push(AdminTrainerDetailPanel(trainer: trainer)),
+                    ),
                 ],
               ),
             ),
@@ -115,64 +122,73 @@ class _AdminTrainerManagementPanelState
 }
 
 class _TrainerRow extends StatelessWidget {
-  const _TrainerRow({required this.trainer});
+  const _TrainerRow({required this.trainer, required this.onTap});
 
   final AdminTrainerSummary trainer;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
     final typography = context.appTypography;
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: AppSpacing.md),
-      padding: const EdgeInsets.all(AppSpacing.md),
-      decoration: BoxDecoration(
-        color: colors.surface,
+    return Material(
+      color: colors.surface,
+      borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
+      child: InkWell(
+        onTap: onTap,
         borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
-        border: Border.all(color: colors.outline),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: colors.primaryContainer,
-              shape: BoxShape.circle,
-            ),
-            alignment: Alignment.center,
-            child: Text(
-              trainer.initials,
-              style: typography.headingSmall.copyWith(
-                color: colors.onPrimaryContainer,
-                fontSize: 15,
-              ),
-            ),
+        child: Container(
+          margin: const EdgeInsets.only(bottom: AppSpacing.md),
+          padding: const EdgeInsets.all(AppSpacing.md),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
+            border: Border.all(color: colors.outline),
           ),
-          const SizedBox(width: AppSpacing.md),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  trainer.name,
+          child: Row(
+            children: [
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: colors.primaryContainer,
+                  shape: BoxShape.circle,
+                ),
+                alignment: Alignment.center,
+                child: Text(
+                  trainer.initials,
                   style: typography.headingSmall.copyWith(
-                    color: colors.onSurface,
-                    fontSize: 16,
+                    color: colors.onPrimaryContainer,
+                    fontSize: 15,
                   ),
                 ),
-                Text(
-                  '${trainer.specialties.join(", ")} · ${trainer.memberCount} üye',
-                  style: typography.bodyMedium.copyWith(
-                    color: colors.onSurfaceMuted,
-                    fontSize: 13,
-                  ),
+              ),
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      trainer.name,
+                      style: typography.headingSmall.copyWith(
+                        color: colors.onSurface,
+                        fontSize: 16,
+                      ),
+                    ),
+                    Text(
+                      '${trainer.specialties.join(", ")} · ${trainer.memberCount} üye',
+                      style: typography.bodyMedium.copyWith(
+                        color: colors.onSurfaceMuted,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+              Icon(Icons.chevron_right, color: colors.onSurfaceMuted, size: 18),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

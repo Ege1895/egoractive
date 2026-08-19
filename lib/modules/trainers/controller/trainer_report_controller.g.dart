@@ -6,7 +6,7 @@ part of 'trainer_report_controller.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$reportForTrainerHash() => r'e34f0d8c5560136434340993a8001f5336a5bcc4';
+String _$reportForTrainerHash() => r'c0b7b60cf2a8b4aad25c422a905ddd3bdd0b95a4';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -29,23 +29,23 @@ class _SystemHash {
   }
 }
 
-/// See also [_reportForTrainer].
-@ProviderFor(_reportForTrainer)
-const _reportForTrainerProvider = _ReportForTrainerFamily();
+/// See also [reportForTrainer].
+@ProviderFor(reportForTrainer)
+const reportForTrainerProvider = ReportForTrainerFamily();
 
-/// See also [_reportForTrainer].
-class _ReportForTrainerFamily extends Family<AsyncValue<TrainerReportState>> {
-  /// See also [_reportForTrainer].
-  const _ReportForTrainerFamily();
+/// See also [reportForTrainer].
+class ReportForTrainerFamily extends Family<AsyncValue<TrainerReportState>> {
+  /// See also [reportForTrainer].
+  const ReportForTrainerFamily();
 
-  /// See also [_reportForTrainer].
-  _ReportForTrainerProvider call(String trainerId) {
-    return _ReportForTrainerProvider(trainerId);
+  /// See also [reportForTrainer].
+  ReportForTrainerProvider call(String trainerId) {
+    return ReportForTrainerProvider(trainerId);
   }
 
   @override
-  _ReportForTrainerProvider getProviderOverride(
-    covariant _ReportForTrainerProvider provider,
+  ReportForTrainerProvider getProviderOverride(
+    covariant ReportForTrainerProvider provider,
   ) {
     return call(provider.trainerId);
   }
@@ -62,28 +62,28 @@ class _ReportForTrainerFamily extends Family<AsyncValue<TrainerReportState>> {
       _allTransitiveDependencies;
 
   @override
-  String? get name => r'_reportForTrainerProvider';
+  String? get name => r'reportForTrainerProvider';
 }
 
-/// See also [_reportForTrainer].
-class _ReportForTrainerProvider
+/// See also [reportForTrainer].
+class ReportForTrainerProvider
     extends AutoDisposeFutureProvider<TrainerReportState> {
-  /// See also [_reportForTrainer].
-  _ReportForTrainerProvider(String trainerId)
+  /// See also [reportForTrainer].
+  ReportForTrainerProvider(String trainerId)
     : this._internal(
-        (ref) => _reportForTrainer(ref as _ReportForTrainerRef, trainerId),
-        from: _reportForTrainerProvider,
-        name: r'_reportForTrainerProvider',
+        (ref) => reportForTrainer(ref as ReportForTrainerRef, trainerId),
+        from: reportForTrainerProvider,
+        name: r'reportForTrainerProvider',
         debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
             ? null
             : _$reportForTrainerHash,
-        dependencies: _ReportForTrainerFamily._dependencies,
+        dependencies: ReportForTrainerFamily._dependencies,
         allTransitiveDependencies:
-            _ReportForTrainerFamily._allTransitiveDependencies,
+            ReportForTrainerFamily._allTransitiveDependencies,
         trainerId: trainerId,
       );
 
-  _ReportForTrainerProvider._internal(
+  ReportForTrainerProvider._internal(
     super._createNotifier, {
     required super.name,
     required super.dependencies,
@@ -97,12 +97,12 @@ class _ReportForTrainerProvider
 
   @override
   Override overrideWith(
-    FutureOr<TrainerReportState> Function(_ReportForTrainerRef provider) create,
+    FutureOr<TrainerReportState> Function(ReportForTrainerRef provider) create,
   ) {
     return ProviderOverride(
       origin: this,
-      override: _ReportForTrainerProvider._internal(
-        (ref) => create(ref as _ReportForTrainerRef),
+      override: ReportForTrainerProvider._internal(
+        (ref) => create(ref as ReportForTrainerRef),
         from: from,
         name: null,
         dependencies: null,
@@ -120,7 +120,7 @@ class _ReportForTrainerProvider
 
   @override
   bool operator ==(Object other) {
-    return other is _ReportForTrainerProvider && other.trainerId == trainerId;
+    return other is ReportForTrainerProvider && other.trainerId == trainerId;
   }
 
   @override
@@ -134,22 +134,22 @@ class _ReportForTrainerProvider
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-mixin _ReportForTrainerRef on AutoDisposeFutureProviderRef<TrainerReportState> {
+mixin ReportForTrainerRef on AutoDisposeFutureProviderRef<TrainerReportState> {
   /// The parameter `trainerId` of this provider.
   String get trainerId;
 }
 
 class _ReportForTrainerProviderElement
     extends AutoDisposeFutureProviderElement<TrainerReportState>
-    with _ReportForTrainerRef {
+    with ReportForTrainerRef {
   _ReportForTrainerProviderElement(super.provider);
 
   @override
-  String get trainerId => (origin as _ReportForTrainerProvider).trainerId;
+  String get trainerId => (origin as ReportForTrainerProvider).trainerId;
 }
 
 String _$trainerReportControllerHash() =>
-    r'f9c56cb22b4b33f2b6e8b3e71d363b6160010e88';
+    r'c28760fa76c9a74666dd507c4da88bb223a72d50';
 
 /// Antrenörün kendi (`trainerId == uid`) bu ayki seans özeti gerçek zamanlı
 /// hesaplanır. Oturum yoksa (test ortamı vb.) mock repository'e düşer.

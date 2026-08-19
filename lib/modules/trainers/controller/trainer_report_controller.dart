@@ -9,8 +9,8 @@ import '../repository/trainer_report_repository.dart';
 part 'trainer_report_controller.g.dart';
 
 @riverpod
-Future<TrainerReportState> _reportForTrainer(
-  _ReportForTrainerRef ref,
+Future<TrainerReportState> reportForTrainer(
+  ReportForTrainerRef ref,
   String trainerId,
 ) async {
   final now = DateTime.now();
@@ -78,7 +78,7 @@ class TrainerReportController extends _$TrainerReportController {
     if (uid == null) {
       return ref.watch(trainerReportRepositoryProvider).loadInitial();
     }
-    return ref.watch(_reportForTrainerProvider(uid)).valueOrNull ??
+    return ref.watch(reportForTrainerProvider(uid)).valueOrNull ??
         _loadingState();
   }
 
