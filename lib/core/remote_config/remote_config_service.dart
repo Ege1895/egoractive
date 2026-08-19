@@ -20,38 +20,49 @@ abstract final class RemoteConfigKeys {
       'cfg_session_reminder_minutes_before';
   static const defaultGroupSessionCapacity =
       'cfg_default_group_session_capacity';
+
+  /// Grup dersi oluşturma ekranındaki kontenjan stepper'ının üst sınırı.
+  static const groupSessionCapacityMax = 'cfg_group_session_capacity_max';
+
   /// F4-2 — grup dersine katılım/ayrılma başlangıca kaç saat kalana kadar
   /// açık (sonrasında UI'da kilitli görünür).
-  static const groupSessionLockHoursBefore = 'cfg_group_session_lock_hours_before';
+  static const groupSessionLockHoursBefore =
+      'cfg_group_session_lock_hours_before';
   static const feedbackReminderDayOfMonth =
       'cfg_feedback_reminder_day_of_month';
   static const freeVersionAdsEnabled = 'cfg_free_version_ads_enabled';
   static const featureFlags = 'cfg_feature_flags';
+
   /// F6-3 — yeni bir salon oluşturulduğunda `trialStartedAt`'ten itibaren
   /// kaç gün ücretsiz deneme süresi tanınır.
   static const trialDurationDays = 'cfg_trial_duration_days';
+
   /// F4-4 — rozet kriterleri: `[{id, title, note, type, threshold}]`.
   /// `type`: sessionsCompleted | groupSessionJoins | eventJoins |
   /// membershipMonths. Yeni bir rozet eklemek/eşiği değiştirmek için store
   /// güncellemesi gerekmiyor — `badgeCheck` scheduled function'ı da aynı
   /// şablonu okuyor.
   static const badgeCriteria = 'cfg_badge_criteria';
+
   /// F5-3 — gider kategorileri: `[{id, label_tr, label_en}]`. Firestore'a
   /// `id` yazılır, ekranda cihaz diline göre `label_tr`/`label_en` gösterilir
   /// — Firestore'da dilden bağımsız, ekranda doğru dilde. Yeni bir kategori
   /// eklemek için kod değişikliği/store güncellemesi gerekmiyor.
   static const expenseCategories = 'cfg_expense_categories';
+
   /// F3-3 — üye/antrenör için seans iptali son kaç saate kadar açık.
   /// Gerçek zorlama `firestore.rules`'ta (Security Rules Remote Config'e
   /// erişemediği için orada sabit 24 olarak tutuluyor) — bu değer sadece
   /// client-side gösterim/erken uyarı için kullanılır, ikisi değiştirilirse
   /// birlikte güncellenmeli.
   static const cancellationDeadlineHours = 'cfg_cancellation_deadline_hours';
+
   /// F3-6 — Yetki Ayarları'nın global varsayılanları. Bir salon
   /// `gyms/{gymId}.permissions` altında override yazmadıysa buradan okunur.
   static const defaultTrainerReminderDelayMinutes =
       'cfg_default_trainer_reminder_delay_minutes';
-  static const defaultOnlineBookingEnabled = 'cfg_default_online_booking_enabled';
+  static const defaultOnlineBookingEnabled =
+      'cfg_default_online_booking_enabled';
   static const defaultAllowSessionsAfterPackageExpiry =
       'cfg_default_allow_sessions_after_package_expiry';
   static const defaultMemberCanCancelSession =
@@ -64,10 +75,13 @@ abstract final class RemoteConfigKeys {
   /// değerlerle değiştiriliyor (kişiselleştirilmiş bildirim metni).
   static const notifSessionReminderTitle = 'lbl_notif_session_reminder_title';
   static const notifSessionReminderBody = 'lbl_notif_session_reminder_body';
+
   /// F3-5 — sessionCompletionCheck Cloud Function'ının antrenöre gönderdiği
   /// push metni. `{memberName}` yer tutucusu fonksiyon tarafında değişir.
-  static const notifSessionCompletionTitle = 'lbl_notif_session_completion_title';
+  static const notifSessionCompletionTitle =
+      'lbl_notif_session_completion_title';
   static const notifSessionCompletionBody = 'lbl_notif_session_completion_body';
+
   /// F5-4 — feedbackReminderCheck Cloud Function'ının üyelere gönderdiği
   /// push metni.
   static const notifFeedbackReminderTitle = 'lbl_notif_feedback_reminder_title';
@@ -135,7 +149,8 @@ abstract final class RemoteConfigKeys {
   static const authLoginErrorRateLimited = 'lbl_auth_login_error_rate_limited';
   static const authLoginErrorGeneric = 'lbl_auth_login_error_generic';
   static const authRetryButton = 'lbl_auth_retry_button';
-  static const authDeleteAccountErrorGeneric = 'lbl_auth_delete_account_error_generic';
+  static const authDeleteAccountErrorGeneric =
+      'lbl_auth_delete_account_error_generic';
   static const badgesTitle = 'lbl_badges_title';
   static const eventsAdminListTitle = 'lbl_events_admin_list_title';
   static const eventsAddEventButton = 'lbl_events_add_event_button';
@@ -490,29 +505,41 @@ abstract final class RemoteConfigKeys {
   // `{period}`/`{plan}` yer tutucuları panel tarafında dolduruluyor;
   // `{store}`/`{storeAccount}` ("App Store"/"Apple" ya da "Google Play"/
   // "Google") platforma göre kod içinde sabit — marka adı, iş kuralı değil.
-  static const subscriptionTrialBannerTitle = 'lbl_subscription_trial_banner_title';
-  static const subscriptionTrialBannerBody = 'lbl_subscription_trial_banner_body';
+  static const subscriptionTrialBannerTitle =
+      'lbl_subscription_trial_banner_title';
+  static const subscriptionTrialBannerBody =
+      'lbl_subscription_trial_banner_body';
   static const subscriptionTrialProgress = 'lbl_subscription_trial_progress';
-  static const subscriptionExpiredBannerTitle = 'lbl_subscription_expired_banner_title';
-  static const subscriptionExpiredBannerBody = 'lbl_subscription_expired_banner_body';
-  static const subscriptionRestrictedTitle = 'lbl_subscription_restricted_title';
+  static const subscriptionExpiredBannerTitle =
+      'lbl_subscription_expired_banner_title';
+  static const subscriptionExpiredBannerBody =
+      'lbl_subscription_expired_banner_body';
+  static const subscriptionRestrictedTitle =
+      'lbl_subscription_restricted_title';
   static const subscriptionRestrictedNote = 'lbl_subscription_restricted_note';
-  static const subscriptionActivePlanLabel = 'lbl_subscription_active_plan_label';
+  static const subscriptionActivePlanLabel =
+      'lbl_subscription_active_plan_label';
   static const subscriptionActiveBadge = 'lbl_subscription_active_badge';
   static const subscriptionRenewalLabel = 'lbl_subscription_renewal_label';
   static const subscriptionStartedLabel = 'lbl_subscription_started_label';
   static const subscriptionActiveNote = 'lbl_subscription_active_note';
   static const subscriptionStoreRowTitle = 'lbl_subscription_store_row_title';
-  static const subscriptionStoreRowSubtitle = 'lbl_subscription_store_row_subtitle';
+  static const subscriptionStoreRowSubtitle =
+      'lbl_subscription_store_row_subtitle';
   static const subscriptionManageCta = 'lbl_subscription_manage_cta';
   static const subscriptionManageCaption = 'lbl_subscription_manage_caption';
   static const subscriptionStoreNote = 'lbl_subscription_store_note';
-  static const subscriptionStoreNoteExpired = 'lbl_subscription_store_note_expired';
+  static const subscriptionStoreNoteExpired =
+      'lbl_subscription_store_note_expired';
   static const subscriptionPurchaseCta = 'lbl_subscription_purchase_cta';
-  static const subscriptionPurchaseCtaExpired = 'lbl_subscription_purchase_cta_expired';
-  static const subscriptionPurchaseCaption = 'lbl_subscription_purchase_caption';
-  static const subscriptionPendingBannerTitle = 'lbl_subscription_pending_banner_title';
-  static const subscriptionPendingBannerBody = 'lbl_subscription_pending_banner_body';
+  static const subscriptionPurchaseCtaExpired =
+      'lbl_subscription_purchase_cta_expired';
+  static const subscriptionPurchaseCaption =
+      'lbl_subscription_purchase_caption';
+  static const subscriptionPendingBannerTitle =
+      'lbl_subscription_pending_banner_title';
+  static const subscriptionPendingBannerBody =
+      'lbl_subscription_pending_banner_body';
   static const subscriptionPendingPill = 'lbl_subscription_pending_pill';
   static const subscriptionPendingCta = 'lbl_subscription_pending_cta';
   static const subscriptionPendingCaption = 'lbl_subscription_pending_caption';
@@ -521,10 +548,14 @@ abstract final class RemoteConfigKeys {
   static const subscriptionYearlySub = 'lbl_subscription_yearly_sub';
   static const subscriptionMonthlySub = 'lbl_subscription_monthly_sub';
   static const subscriptionNoProducts = 'lbl_subscription_no_products';
+
   /// `[{label_tr, label_en}]` — abonelikte dahil olan özellik listesi.
-  static const subscriptionIncludedFeatures = 'cfg_subscription_included_features';
+  static const subscriptionIncludedFeatures =
+      'cfg_subscription_included_features';
+
   /// `[{label_tr, label_en}]` — süresi dolduğunda kısıtlanan işlemler.
-  static const subscriptionRestrictedOperations = 'cfg_subscription_restricted_operations';
+  static const subscriptionRestrictedOperations =
+      'cfg_subscription_restricted_operations';
 }
 
 /// Firebase Remote Config'e tip güvenli erişim katmanı. `FirebaseRemoteConfig.instance`
@@ -574,6 +605,7 @@ class RemoteConfigService {
   static const Map<String, Object> _defaults = {
     RemoteConfigKeys.sessionReminderMinutesBefore: 60,
     RemoteConfigKeys.defaultGroupSessionCapacity: 6,
+    RemoteConfigKeys.groupSessionCapacityMax: 20,
     RemoteConfigKeys.groupSessionLockHoursBefore: 24,
     RemoteConfigKeys.cancellationDeadlineHours: 24,
     RemoteConfigKeys.defaultTrainerReminderDelayMinutes: 30,
@@ -587,11 +619,14 @@ class RemoteConfigService {
     RemoteConfigKeys.badgeCriteria: _defaultBadgeCriteriaJson,
     RemoteConfigKeys.expenseCategories: _defaultExpenseCategoriesJson,
     'lbl_notif_session_reminder_title_tr': '⏰ Bugün {time}\'de dersin var!',
-    'lbl_notif_session_reminder_body_tr': '{trainerName} seni bekliyor. Gelip gelmeyeceğini onaylamak için dokun 👇',
+    'lbl_notif_session_reminder_body_tr':
+        '{trainerName} seni bekliyor. Gelip gelmeyeceğini onaylamak için dokun 👇',
     'lbl_notif_session_completion_title_tr': '✅ Dersini onaylar mısın?',
-    'lbl_notif_session_completion_body_tr': '{memberName} ile dersin bitti. Tamamlandı mı, yoksa üye gelmedi mi?',
+    'lbl_notif_session_completion_body_tr':
+        '{memberName} ile dersin bitti. Tamamlandı mı, yoksa üye gelmedi mi?',
     'lbl_notif_feedback_reminder_title_tr': '💬 Bu ay nasıl geçti?',
-    'lbl_notif_feedback_reminder_body_tr': 'Deneyimini bizimle paylaşır mısın? 1 dakikanı alır.',
+    'lbl_notif_feedback_reminder_body_tr':
+        'Deneyimini bizimle paylaşır mısın? 1 dakikanı alır.',
     'lbl_common_vazgec_tr': 'Vazgeç',
     'lbl_common_kaydet_tr': 'Kaydet',
     'lbl_common_duzenle_tr': 'Düzenle',
@@ -894,11 +929,14 @@ class RemoteConfigService {
     'lbl_trainers_profile_footer_text_tr':
         'Egoractive · Egora Games · Sürüm 1.0',
     'lbl_notif_session_reminder_title_en': '⏰ Your session is at {time} today!',
-    'lbl_notif_session_reminder_body_en': '{trainerName} is waiting for you. Tap to confirm you\'re coming 👇',
+    'lbl_notif_session_reminder_body_en':
+        '{trainerName} is waiting for you. Tap to confirm you\'re coming 👇',
     'lbl_notif_session_completion_title_en': '✅ Can you confirm your session?',
-    'lbl_notif_session_completion_body_en': 'Your session with {memberName} has ended. Was it completed, or did they not show up?',
+    'lbl_notif_session_completion_body_en':
+        'Your session with {memberName} has ended. Was it completed, or did they not show up?',
     'lbl_notif_feedback_reminder_title_en': '💬 How was your month?',
-    'lbl_notif_feedback_reminder_body_en': 'Would you share your experience with us? It only takes a minute.',
+    'lbl_notif_feedback_reminder_body_en':
+        'Would you share your experience with us? It only takes a minute.',
     'lbl_common_vazgec_en': 'Cancel',
     'lbl_common_kaydet_en': 'Save',
     'lbl_common_duzenle_en': 'Edit',
@@ -952,8 +990,10 @@ class RemoteConfigService {
     'lbl_auth_delete_account_confirm_title_en': 'My Profile',
     'lbl_auth_login_error_not_found_en':
         'No account found with this number. The gym staff needs to add you first.',
-    'lbl_auth_login_error_rate_limited_en': 'Too many attempts. Try again in a minute.',
-    'lbl_auth_login_error_generic_en': 'Could not log in. Check your connection and try again.',
+    'lbl_auth_login_error_rate_limited_en':
+        'Too many attempts. Try again in a minute.',
+    'lbl_auth_login_error_generic_en':
+        'Could not log in. Check your connection and try again.',
     'lbl_auth_retry_button_en': 'Try again',
     'lbl_auth_delete_account_error_generic_en':
         'Could not delete account. Check your connection and try again.',
@@ -1201,18 +1241,25 @@ class RemoteConfigService {
     'lbl_trainers_profile_footer_text_en':
         'Egoractive · Egora Games · Version 1.0',
 
-    RemoteConfigKeys.subscriptionIncludedFeatures: _defaultSubscriptionIncludedFeaturesJson,
-    RemoteConfigKeys.subscriptionRestrictedOperations: _defaultSubscriptionRestrictedOperationsJson,
-    'lbl_subscription_trial_banner_title_tr': 'Deneme süreniz {days} gün sonra doluyor',
+    RemoteConfigKeys.subscriptionIncludedFeatures:
+        _defaultSubscriptionIncludedFeaturesJson,
+    RemoteConfigKeys.subscriptionRestrictedOperations:
+        _defaultSubscriptionRestrictedOperationsJson,
+    'lbl_subscription_trial_banner_title_tr':
+        'Deneme süreniz {days} gün sonra doluyor',
     'lbl_subscription_trial_banner_title_en': 'Your trial ends in {days} days',
     'lbl_subscription_trial_banner_body_tr':
         '{date} tarihine kadar tüm özellikler açık. Bir plan seçerseniz stüdyonuz kesintisiz çalışmaya devam eder.',
     'lbl_subscription_trial_banner_body_en':
         'All features are open until {date}. If you choose a plan, your studio keeps running without interruption.',
-    'lbl_subscription_trial_progress_tr': '{total} günlük denemenin {current}. günündesiniz',
-    'lbl_subscription_trial_progress_en': "You're on day {current} of your {total}-day trial",
-    'lbl_subscription_expired_banner_title_tr': 'Aboneliğiniz {date} tarihinde sona erdi',
-    'lbl_subscription_expired_banner_title_en': 'Your subscription ended on {date}',
+    'lbl_subscription_trial_progress_tr':
+        '{total} günlük denemenin {current}. günündesiniz',
+    'lbl_subscription_trial_progress_en':
+        "You're on day {current} of your {total}-day trial",
+    'lbl_subscription_expired_banner_title_tr':
+        'Aboneliğiniz {date} tarihinde sona erdi',
+    'lbl_subscription_expired_banner_title_en':
+        'Your subscription ended on {date}',
     'lbl_subscription_expired_banner_body_tr':
         'Verileriniz güvende ve eksiksiz duruyor. Bir plan seçtiğiniz anda her şey kaldığı yerden devam eder.',
     'lbl_subscription_expired_banner_body_en':
@@ -1237,12 +1284,15 @@ class RemoteConfigService {
         'Your subscription renews {period}. Plan changes, pausing and cancellation are done in {store} subscription settings, not in the app.',
     'lbl_subscription_store_row_title_tr': '{store} üzerinden',
     'lbl_subscription_store_row_title_en': 'Via {store}',
-    'lbl_subscription_store_row_subtitle_tr': 'Ödeme ve faturalar {storeAccount} hesabınızda',
-    'lbl_subscription_store_row_subtitle_en': 'Payments and invoices are on your {storeAccount} account',
+    'lbl_subscription_store_row_subtitle_tr':
+        'Ödeme ve faturalar {storeAccount} hesabınızda',
+    'lbl_subscription_store_row_subtitle_en':
+        'Payments and invoices are on your {storeAccount} account',
     'lbl_subscription_manage_cta_tr': 'Aboneliği yönet',
     'lbl_subscription_manage_cta_en': 'Manage subscription',
     'lbl_subscription_manage_caption_tr': '{store} abonelik ayarları açılır',
-    'lbl_subscription_manage_caption_en': '{store} subscription settings will open',
+    'lbl_subscription_manage_caption_en':
+        '{store} subscription settings will open',
     'lbl_subscription_store_note_tr':
         "Satın alma uygulama içinde yapılmaz. Devam ettiğinizde {store} açılır; ödeme, iptal ve faturalar {storeAccount} hesabınız üzerinden yürür. Dönem bitiminden 24 saat önce iptal edilmezse abonelik kendini yeniler.",
     'lbl_subscription_store_note_en':
@@ -1253,12 +1303,17 @@ class RemoteConfigService {
         'Purchases are not made in the app. When you continue, {store} opens; payment, cancellation and invoices are handled through your {storeAccount} account.',
     'lbl_subscription_purchase_cta_tr': "{plan} planla {store}'a git",
     'lbl_subscription_purchase_cta_en': 'Go to {store} with the {plan} plan',
-    'lbl_subscription_purchase_cta_expired_tr': "{plan} planı {store}'da başlat",
-    'lbl_subscription_purchase_cta_expired_en': 'Start the {plan} plan on {store}',
-    'lbl_subscription_purchase_caption_tr': "{store}'da açılır · Satın almayı geri yükle",
-    'lbl_subscription_purchase_caption_en': 'Opens in {store} · Restore purchase',
+    'lbl_subscription_purchase_cta_expired_tr':
+        "{plan} planı {store}'da başlat",
+    'lbl_subscription_purchase_cta_expired_en':
+        'Start the {plan} plan on {store}',
+    'lbl_subscription_purchase_caption_tr':
+        "{store}'da açılır · Satın almayı geri yükle",
+    'lbl_subscription_purchase_caption_en':
+        'Opens in {store} · Restore purchase',
     'lbl_subscription_pending_banner_title_tr': "{store}'a yönlendirildiniz",
-    'lbl_subscription_pending_banner_title_en': "You've been redirected to {store}",
+    'lbl_subscription_pending_banner_title_en':
+        "You've been redirected to {store}",
     'lbl_subscription_pending_banner_body_tr':
         'Satın almayı mağaza penceresinde tamamlayın; sonucu bu ekrana biz yansıtacağız.',
     'lbl_subscription_pending_banner_body_en':
@@ -1267,8 +1322,10 @@ class RemoteConfigService {
     'lbl_subscription_pending_pill_en': 'Opened in {store}',
     'lbl_subscription_pending_cta_tr': '{store} bekleniyor…',
     'lbl_subscription_pending_cta_en': 'Waiting for {store}…',
-    'lbl_subscription_pending_caption_tr': 'Mağaza penceresi kapanınca güncellenir',
-    'lbl_subscription_pending_caption_en': 'Updates once the store window closes',
+    'lbl_subscription_pending_caption_tr':
+        'Mağaza penceresi kapanınca güncellenir',
+    'lbl_subscription_pending_caption_en':
+        'Updates once the store window closes',
     'lbl_subscription_pending_note_tr':
         'Mağaza penceresini kapatır ya da iptal ederseniz bu ekrana geri dönersiniz; plan seçiminiz korunur.',
     'lbl_subscription_pending_note_en':
@@ -1279,8 +1336,10 @@ class RemoteConfigService {
     'lbl_subscription_yearly_sub_en': '2 months free',
     'lbl_subscription_monthly_sub_tr': 'aylık',
     'lbl_subscription_monthly_sub_en': 'monthly',
-    'lbl_subscription_no_products_tr': 'Şu an satın alınabilir bir abonelik ürünü bulunamadı.',
-    'lbl_subscription_no_products_en': 'No purchasable subscription product is available right now.',
+    'lbl_subscription_no_products_tr':
+        'Şu an satın alınabilir bir abonelik ürünü bulunamadı.',
+    'lbl_subscription_no_products_en':
+        'No purchasable subscription product is available right now.',
   };
 
   /// Şu anki dil — cihazın dilinden okunur. Cihaz dili Türkçe ise 'tr',
@@ -1296,6 +1355,9 @@ class RemoteConfigService {
   /// Grup dersi oluştururken varsayılan kontenjan.
   int get defaultGroupSessionCapacity =>
       getInt(RemoteConfigKeys.defaultGroupSessionCapacity);
+
+  int get groupSessionCapacityMax =>
+      getInt(RemoteConfigKeys.groupSessionCapacityMax);
 
   /// Grup dersine katılım/ayrılma başlangıca kaç saat kalana kadar açık.
   int get groupSessionLockHoursBefore =>
@@ -1398,7 +1460,9 @@ class RemoteConfigService {
     if (raw.isEmpty) return const [];
     try {
       final decoded = jsonDecode(raw);
-      return decoded is List ? decoded.whereType<Map<String, dynamic>>().toList() : const [];
+      return decoded is List
+          ? decoded.whereType<Map<String, dynamic>>().toList()
+          : const [];
     } on FormatException {
       return const [];
     }

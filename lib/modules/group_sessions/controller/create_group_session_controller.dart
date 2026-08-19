@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../core/remote_config/remote_config_service.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/theme_controller.dart';
 import '../domain/create_group_session_form.dart';
@@ -12,8 +13,26 @@ part 'create_group_session_controller.g.dart';
 @riverpod
 class CreateGroupSessionController extends _$CreateGroupSessionController {
   @override
-  CreateGroupSessionForm build() =>
-      ref.watch(createGroupSessionRepositoryProvider).loadInitial();
+  CreateGroupSessionForm build() {
+    final initial = ref
+        .watch(createGroupSessionRepositoryProvider)
+        .loadInitial();
+    // RC henüz Firebase ile fetch edilmemişse (ör. Firebase.initializeApp
+    // hiç çağrılmamış bir widget test ortamı) getInt çağrısı fırlatabilir —
+    // bu durumda mock servisteki sabit üst sınırla devam edilir.
+    int capacityMax;
+    try {
+      capacityMax = ref
+          .watch(remoteConfigServiceProvider)
+          .groupSessionCapacityMax;
+    } catch (_) {
+      capacityMax = initial.capacityMax;
+    }
+    return initial.copyWith(
+      capacityMax: capacityMax,
+      capacity: initial.capacity > capacityMax ? capacityMax : initial.capacity,
+    );
+  }
 
   void setTitle(String title) =>
       state = state.copyWith(title: title, titleError: null);
