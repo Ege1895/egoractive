@@ -1020,9 +1020,9 @@
     "semantic_hash": "e3140a261bd02ae65c048b398fe86ace"
   },
   "modules/members/controller/admin_member_detail_controller.dart": {
-    "mtime": 1787178975.2785518,
-    "ast_hash": "671478226154b9eeba912f502c7683b2",
-    "semantic_hash": "671478226154b9eeba912f502c7683b2"
+    "mtime": 1787182608.793481,
+    "ast_hash": "3610605df17c45ed99df84fff42655dc",
+    "semantic_hash": "3610605df17c45ed99df84fff42655dc"
   },
   "modules/members/controller/admin_member_detail_controller.g.dart": {
     "mtime": 1787180238.6108022,
@@ -1200,9 +1200,9 @@
     "semantic_hash": "9bbf46e469b7f42f4b2160e358e1731c"
   },
   "modules/members/service/membership_installment_write_service.dart": {
-    "mtime": 1787179018.4012833,
-    "ast_hash": "0216c4b582da232851c3b456e9456ad2",
-    "semantic_hash": "0216c4b582da232851c3b456e9456ad2"
+    "mtime": 1787182594.9165065,
+    "ast_hash": "37525bc0d979f8cd3434ed3866343edd",
+    "semantic_hash": "37525bc0d979f8cd3434ed3866343edd"
   },
   "modules/members/service/membership_installment_write_service.g.dart": {
     "mtime": 1787180238.611202,
@@ -1210,9 +1210,9 @@
     "semantic_hash": "f0cab0e3722e0bf48b7f36f762608a3e"
   },
   "modules/members/ui/panels/admin_member_detail_panel.dart": {
-    "mtime": 1787178975.2951648,
-    "ast_hash": "0285d2b445c43cece1b6827ab2b6bab7",
-    "semantic_hash": "0285d2b445c43cece1b6827ab2b6bab7"
+    "mtime": 1787182704.4896228,
+    "ast_hash": "dbd9404d31cee715ecfc11844499c77c",
+    "semantic_hash": "dbd9404d31cee715ecfc11844499c77c"
   },
   "modules/members/ui/panels/admin_member_list_panel.dart": {
     "mtime": 1787063009.4919553,
@@ -1240,9 +1240,9 @@
     "semantic_hash": "8d0dab612adebe7ad01c9cf49aba6306"
   },
   "modules/members/ui/widgets/installment_row.dart": {
-    "mtime": 1787179013.902676,
-    "ast_hash": "8b450cd827112302a9516d846727b025",
-    "semantic_hash": "8b450cd827112302a9516d846727b025"
+    "mtime": 1787182579.469491,
+    "ast_hash": "deacf756fa039cac9a21b8a7246f7ee9",
+    "semantic_hash": "deacf756fa039cac9a21b8a7246f7ee9"
   },
   "modules/notifications/controller/send_notification_controller.dart": {
     "mtime": 1787094065.3889244,
@@ -2148,5 +2148,10 @@
     "mtime": 1787181368.366514,
     "ast_hash": "3ef2e75d4545ff333027edb90e6aa162",
     "semantic_hash": "3ef2e75d4545ff333027edb90e6aa162"
+  },
+  "modules/members/ui/panels/edit_member_payment_panel.dart": {
+    "mtime": 1787182704.4730968,
+    "ast_hash": "e0f06c57d541377d7cd4c62b7b941490",
+    "semantic_hash": "e0f06c57d541377d7cd4c62b7b941490"
   }
 }
