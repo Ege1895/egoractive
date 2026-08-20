@@ -1,5 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../core/locale/locale_controller.dart';
 import '../../../core/remote_config/remote_config_service.dart';
 import '../../../core/theme/theme_controller.dart';
 import '../domain/expense_category.dart';
@@ -28,7 +29,7 @@ Stream<List<ExpenseCategoryOption>> expenseCategories(
   ExpenseCategoriesRef ref,
 ) async* {
   final rc = ref.watch(remoteConfigServiceProvider);
-  final locale = rc.currentLocale;
+  final locale = ref.watch(localeControllerProvider);
   yield rc.expenseCategories.map((raw) {
     final id = raw['id'] as String? ?? '';
     return ExpenseCategoryOption(

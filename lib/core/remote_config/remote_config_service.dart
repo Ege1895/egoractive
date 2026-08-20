@@ -1,8 +1,9 @@
 import 'dart:convert';
-import 'dart:ui' show PlatformDispatcher;
 
 import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+import '../locale/locale_controller.dart';
 
 part 'remote_config_service.g.dart';
 
@@ -120,6 +121,12 @@ abstract final class RemoteConfigKeys {
   static const commonUyeDetayiTitle = 'lbl_common_uye_detayi_title';
   static const commonBuGundeSeansYok = 'lbl_common_bu_gunde_seans_yok';
   static const commonBitisLabel = 'lbl_common_bitis_label';
+  static const commonLanguageNavLabel = 'lbl_common_language_nav_label';
+  static const languageSelectTitle = 'lbl_language_select_title';
+  static const languageSelectTurkishOption =
+      'lbl_language_select_turkish_option';
+  static const languageSelectEnglishOption =
+      'lbl_language_select_english_option';
   static const shellMemberTabDerslerim = 'lbl_shell_member_tab_derslerim';
   static const shellMemberTabOlcumlerim = 'lbl_shell_member_tab_olcumlerim';
   static const shellMemberTabKesfet = 'lbl_shell_member_tab_kesfet';
@@ -659,6 +666,10 @@ class RemoteConfigService {
     'lbl_common_uye_detayi_title_tr': 'Üye detayı',
     'lbl_common_bu_gunde_seans_yok_tr': 'Bu günde seans yok.',
     'lbl_common_bitis_label_tr': 'Bitiş',
+    'lbl_common_language_nav_label_tr': 'Dil',
+    'lbl_language_select_title_tr': 'Dil seç',
+    'lbl_language_select_turkish_option_tr': 'Türkçe',
+    'lbl_language_select_english_option_tr': 'English',
     'lbl_shell_member_tab_derslerim_tr': 'Derslerim',
     'lbl_shell_member_tab_olcumlerim_tr': 'Ölçümlerim',
     'lbl_shell_member_tab_kesfet_tr': 'Keşfet',
@@ -969,6 +980,10 @@ class RemoteConfigService {
     'lbl_common_uye_detayi_title_en': 'Member detail',
     'lbl_common_bu_gunde_seans_yok_en': 'No sessions on this day.',
     'lbl_common_bitis_label_en': 'End',
+    'lbl_common_language_nav_label_en': 'Language',
+    'lbl_language_select_title_en': 'Select language',
+    'lbl_language_select_turkish_option_en': 'Türkçe',
+    'lbl_language_select_english_option_en': 'English',
     'lbl_shell_member_tab_derslerim_en': 'My Sessions',
     'lbl_shell_member_tab_olcumlerim_en': 'My Measurements',
     'lbl_shell_member_tab_kesfet_en': 'Discover',
@@ -1348,12 +1363,6 @@ class RemoteConfigService {
         'No purchasable subscription product is available right now.',
   };
 
-  /// Şu anki dil — cihazın dilinden okunur. Cihaz dili Türkçe ise 'tr',
-  /// diğer tüm diller (İngilizce dahil) için 'en'. Uygulama içi ayrı bir
-  /// dil seçici henüz yok.
-  String get currentLocale =>
-      PlatformDispatcher.instance.locale.languageCode == 'tr' ? 'tr' : 'en';
-
   /// Ders/seans onay bildiriminin kaç dakika önce gönderileceği.
   int get sessionReminderMinutesBefore =>
       getInt(RemoteConfigKeys.sessionReminderMinutesBefore);
@@ -1422,9 +1431,13 @@ class RemoteConfigService {
   List<Map<String, dynamic>> get subscriptionRestrictedOperations =>
       _getJsonList(RemoteConfigKeys.subscriptionRestrictedOperations);
 
-  /// `lbl*` metinlerini okur: `<key>_<currentLocale>` parametresini getirir.
-  /// Kod içinde `_tr`/`_en` asla elle yazılmaz, bu metod ekler.
-  String getText(String baseKey) => getString('${baseKey}_$currentLocale');
+  /// `lbl*` metinlerini okur: `<key>_<locale>` parametresini getirir. Kod
+  /// içinde `_tr`/`_en` asla elle yazılmaz, bu metod ekler. Reaktif olmayan
+  /// (controller içi, tek seferlik) kullanım için — `locale` çağıran tarafça
+  /// `ref.read(localeControllerProvider)` ile verilir. Widget `build()`
+  /// içinde reaktif okuma için bunun yerine `rcTextProvider` kullanılır.
+  String getText(String baseKey, String locale) =>
+      getString('${baseKey}_$locale');
 
   /// Uygulama açılışında bir kez çağrılır: varsayılanları ayarlar, sonra
   /// fetch+activate dener. İnternet yoksa/başarısız olursa varsayılanlarla
@@ -1481,3 +1494,22 @@ class RemoteConfigService {
 @Riverpod(keepAlive: true)
 RemoteConfigService remoteConfigService(RemoteConfigServiceRef ref) =>
     const RemoteConfigService();
+
+/// Bir `lbl*` taban anahtarını aktif dile göre reaktif olarak çözer — bu
+/// provider'ı `watch` eden her widget, [localeControllerProvider] değişince
+/// otomatik yeniden çizilir (bkz. CLAUDE.md §2.5, `lbl*` metinleri).
+///
+/// Firebase.initializeApp hiç çağrılmamış bir widget test ortamında
+/// `FirebaseRemoteConfig.instance` erişimi fırlatabilir (bkz. aynı desen
+/// `profile_panel.dart`'taki `sessionReminderMinutesBefore` try/catch'i) —
+/// panel testte boş metinle render olsun diye burada da yutuluyor.
+@riverpod
+String rcText(RcTextRef ref, String baseKey) {
+  final rc = ref.watch(remoteConfigServiceProvider);
+  final locale = ref.watch(localeControllerProvider);
+  try {
+    return rc.getString('${baseKey}_$locale');
+  } catch (_) {
+    return '';
+  }
+}

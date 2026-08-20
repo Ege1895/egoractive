@@ -6,6 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/constants/subscription_constants.dart';
+import '../../../../core/locale/locale_controller.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
 import '../../../../core/remote_config/remote_config_service.dart';
@@ -204,7 +205,7 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
     RemoteConfigService rc,
   ) {
     final colors = context.appColors;
-    final locale = rc.currentLocale;
+    final locale = ref.watch(localeControllerProvider);
     final trialEndsAt = subscription.trialEndsAt;
     final trialStartedAt = subscription.trialStartedAt;
     final totalDays = rc.trialDurationDays;
@@ -234,14 +235,17 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
             child: Text('$daysRemaining'),
           ),
           title: _fill(
-            rc.getText(RemoteConfigKeys.subscriptionTrialBannerTitle),
+            rc.getText(RemoteConfigKeys.subscriptionTrialBannerTitle, locale),
             {'days': '$daysRemaining'},
           ),
           titleColor: colors.warning,
           body: trialEndsAt == null
               ? ''
               : _fill(
-                  rc.getText(RemoteConfigKeys.subscriptionTrialBannerBody),
+                  rc.getText(
+                    RemoteConfigKeys.subscriptionTrialBannerBody,
+                    locale,
+                  ),
                   {'date': _dateLong(trialEndsAt, locale)},
                 ),
           extra: Column(
@@ -254,10 +258,13 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
               ),
               const SizedBox(height: AppSpacing.xs),
               Text(
-                _fill(rc.getText(RemoteConfigKeys.subscriptionTrialProgress), {
-                  'total': '$totalDays',
-                  'current': '$currentDay',
-                }),
+                _fill(
+                  rc.getText(
+                    RemoteConfigKeys.subscriptionTrialProgress,
+                    locale,
+                  ),
+                  {'total': '$totalDays', 'current': '$currentDay'},
+                ),
                 style: context.appTypography.caption.copyWith(
                   color: colors.onSurfaceMuted,
                   fontSize: 12,
@@ -269,7 +276,7 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
         const SizedBox(height: AppSpacing.lg),
         if (products.isEmpty)
           Text(
-            rc.getText(RemoteConfigKeys.subscriptionNoProducts),
+            rc.getText(RemoteConfigKeys.subscriptionNoProducts, locale),
             style: context.appTypography.bodyMedium.copyWith(
               color: colors.onSurfaceMuted,
             ),
@@ -281,6 +288,7 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
             enabled: true,
             isYearly: _isYearly,
             rc: rc,
+            locale: locale,
             onSelect: (id) => setState(() => _selectedProductId = id),
           ),
         const SizedBox(height: AppSpacing.lg),
@@ -288,7 +296,7 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
         const SizedBox(height: AppSpacing.lg),
         _StoreDisclaimer(
           text: _fill(
-            rc.getText(RemoteConfigKeys.subscriptionStoreNote),
+            rc.getText(RemoteConfigKeys.subscriptionStoreNote, locale),
             _storePlaceholders,
           ),
         ),
@@ -307,12 +315,12 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
         _PrimaryCta(
           label: selected == null
               ? '…'
-              : _fill(rc.getText(RemoteConfigKeys.subscriptionPurchaseCta), {
-                  'plan': selected.title,
-                  'store': _storeName,
-                }),
+              : _fill(
+                  rc.getText(RemoteConfigKeys.subscriptionPurchaseCta, locale),
+                  {'plan': selected.title, 'store': _storeName},
+                ),
           caption: _fill(
-            rc.getText(RemoteConfigKeys.subscriptionPurchaseCaption),
+            rc.getText(RemoteConfigKeys.subscriptionPurchaseCaption, locale),
             {'store': _storeName},
           ),
           onTap: _selectedProductId == null
@@ -335,7 +343,7 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
   ) {
     final colors = context.appColors;
     final typography = context.appTypography;
-    final locale = rc.currentLocale;
+    final locale = ref.watch(localeControllerProvider);
     final productId = subscription.productId;
     final isYearly = productId != null && _isYearly(productId);
     final matchingProduct = products
@@ -375,6 +383,7 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
                         Text(
                           rc.getText(
                             RemoteConfigKeys.subscriptionActivePlanLabel,
+                            locale,
                           ),
                           style: typography.bodyMedium.copyWith(
                             color: colors.secondary,
@@ -403,7 +412,10 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
                     ),
                   ),
                   _Pill(
-                    label: rc.getText(RemoteConfigKeys.subscriptionActiveBadge),
+                    label: rc.getText(
+                      RemoteConfigKeys.subscriptionActiveBadge,
+                      locale,
+                    ),
                     bg: colors.success.withValues(alpha: 0.16),
                     fg: colors.success,
                   ),
@@ -416,6 +428,7 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
                     child: _DateChip(
                       label: rc.getText(
                         RemoteConfigKeys.subscriptionRenewalLabel,
+                        locale,
                       ),
                       value: subscription.expiresAt == null
                           ? '—'
@@ -427,6 +440,7 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
                     child: _DateChip(
                       label: rc.getText(
                         RemoteConfigKeys.subscriptionStartedLabel,
+                        locale,
                       ),
                       value: subscription.startedAt == null
                           ? '—'
@@ -437,10 +451,10 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
               ),
               const SizedBox(height: AppSpacing.md),
               Text(
-                _fill(rc.getText(RemoteConfigKeys.subscriptionActiveNote), {
-                  'period': period,
-                  'store': _storeName,
-                }),
+                _fill(
+                  rc.getText(RemoteConfigKeys.subscriptionActiveNote, locale),
+                  {'period': period, 'store': _storeName},
+                ),
                 style: typography.bodyMedium.copyWith(
                   color: colors.onSurfaceVariant,
                   fontSize: 13,
@@ -483,7 +497,10 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
                   children: [
                     Text(
                       _fill(
-                        rc.getText(RemoteConfigKeys.subscriptionStoreRowTitle),
+                        rc.getText(
+                          RemoteConfigKeys.subscriptionStoreRowTitle,
+                          locale,
+                        ),
                         {'store': _storeName},
                       ),
                       style: typography.headingSmall.copyWith(
@@ -496,6 +513,7 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
                       _fill(
                         rc.getText(
                           RemoteConfigKeys.subscriptionStoreRowSubtitle,
+                          locale,
                         ),
                         {'storeAccount': _storeAccountName},
                       ),
@@ -514,9 +532,9 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
         _IncludedFeaturesCard(rc: rc, locale: locale),
         const SizedBox(height: AppSpacing.lg),
         _SecondaryCta(
-          label: rc.getText(RemoteConfigKeys.subscriptionManageCta),
+          label: rc.getText(RemoteConfigKeys.subscriptionManageCta, locale),
           caption: _fill(
-            rc.getText(RemoteConfigKeys.subscriptionManageCaption),
+            rc.getText(RemoteConfigKeys.subscriptionManageCaption, locale),
             {'store': _storeName},
           ),
           onTap: _openStoreSubscriptionManagement,
@@ -535,7 +553,7 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
   ) {
     final colors = context.appColors;
     final typography = context.appTypography;
-    final locale = rc.currentLocale;
+    final locale = ref.watch(localeControllerProvider);
     final restricted = rc.subscriptionRestrictedOperations
         .map((raw) => (raw['label_$locale'] as String?) ?? '')
         .where((s) => s.isNotEmpty)
@@ -562,11 +580,17 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
           title: subscription.expiresAt == null
               ? ''
               : _fill(
-                  rc.getText(RemoteConfigKeys.subscriptionExpiredBannerTitle),
+                  rc.getText(
+                    RemoteConfigKeys.subscriptionExpiredBannerTitle,
+                    locale,
+                  ),
                   {'date': _dateLong(subscription.expiresAt!, locale)},
                 ),
           titleColor: colors.error,
-          body: rc.getText(RemoteConfigKeys.subscriptionExpiredBannerBody),
+          body: rc.getText(
+            RemoteConfigKeys.subscriptionExpiredBannerBody,
+            locale,
+          ),
           extra: Container(
             margin: const EdgeInsets.only(top: AppSpacing.sm),
             padding: const EdgeInsets.all(AppSpacing.md),
@@ -579,7 +603,10 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
               children: [
                 Text(
                   rc
-                      .getText(RemoteConfigKeys.subscriptionRestrictedTitle)
+                      .getText(
+                        RemoteConfigKeys.subscriptionRestrictedTitle,
+                        locale,
+                      )
                       .toUpperCase(),
                   style: typography.headingSmall.copyWith(
                     fontSize: 13,
@@ -619,7 +646,10 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
                     ),
                   ),
                 Text(
-                  rc.getText(RemoteConfigKeys.subscriptionRestrictedNote),
+                  rc.getText(
+                    RemoteConfigKeys.subscriptionRestrictedNote,
+                    locale,
+                  ),
                   style: typography.caption.copyWith(
                     color: colors.onSurfaceMuted,
                     fontSize: 13,
@@ -632,7 +662,7 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
         const SizedBox(height: AppSpacing.lg),
         if (products.isEmpty)
           Text(
-            rc.getText(RemoteConfigKeys.subscriptionNoProducts),
+            rc.getText(RemoteConfigKeys.subscriptionNoProducts, locale),
             style: typography.bodyMedium.copyWith(color: colors.onSurfaceMuted),
           )
         else
@@ -642,12 +672,13 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
             enabled: true,
             isYearly: _isYearly,
             rc: rc,
+            locale: locale,
             onSelect: (id) => setState(() => _selectedProductId = id),
           ),
         const SizedBox(height: AppSpacing.lg),
         _StoreDisclaimer(
           text: _fill(
-            rc.getText(RemoteConfigKeys.subscriptionStoreNoteExpired),
+            rc.getText(RemoteConfigKeys.subscriptionStoreNoteExpired, locale),
             _storePlaceholders,
           ),
         ),
@@ -667,11 +698,14 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
           label: selected == null
               ? '…'
               : _fill(
-                  rc.getText(RemoteConfigKeys.subscriptionPurchaseCtaExpired),
+                  rc.getText(
+                    RemoteConfigKeys.subscriptionPurchaseCtaExpired,
+                    locale,
+                  ),
                   {'plan': selected.title, 'store': _storeName},
                 ),
           caption: _fill(
-            rc.getText(RemoteConfigKeys.subscriptionPurchaseCaption),
+            rc.getText(RemoteConfigKeys.subscriptionPurchaseCaption, locale),
             {'store': _storeName},
           ),
           onTap: _selectedProductId == null
@@ -695,6 +729,7 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
     final colors = context.appColors;
     final typography = context.appTypography;
     final pendingId = subscription.pendingProductId;
+    final locale = ref.watch(localeControllerProvider);
 
     return ListView(
       padding: const EdgeInsets.fromLTRB(
@@ -725,6 +760,7 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
                       _fill(
                         rc.getText(
                           RemoteConfigKeys.subscriptionPendingBannerTitle,
+                          locale,
                         ),
                         {'store': _storeName},
                       ),
@@ -737,6 +773,7 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
                     Text(
                       rc.getText(
                         RemoteConfigKeys.subscriptionPendingBannerBody,
+                        locale,
                       ),
                       style: typography.bodyMedium.copyWith(
                         color: colors.onSurfaceVariant,
@@ -756,16 +793,17 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
           enabled: false,
           isYearly: _isYearly,
           rc: rc,
+          locale: locale,
           onSelect: (_) {},
           pendingId: pendingId,
           pendingLabel: _fill(
-            rc.getText(RemoteConfigKeys.subscriptionPendingPill),
+            rc.getText(RemoteConfigKeys.subscriptionPendingPill, locale),
             {'store': _storeName},
           ),
         ),
         const SizedBox(height: AppSpacing.md),
         Text(
-          rc.getText(RemoteConfigKeys.subscriptionPendingNote),
+          rc.getText(RemoteConfigKeys.subscriptionPendingNote, locale),
           style: typography.caption.copyWith(
             color: colors.onSurfaceMuted,
             fontSize: 12,
@@ -773,10 +811,14 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
         ),
         const SizedBox(height: AppSpacing.lg),
         _PendingCta(
-          label: _fill(rc.getText(RemoteConfigKeys.subscriptionPendingCta), {
-            'store': _storeName,
-          }),
-          caption: rc.getText(RemoteConfigKeys.subscriptionPendingCaption),
+          label: _fill(
+            rc.getText(RemoteConfigKeys.subscriptionPendingCta, locale),
+            {'store': _storeName},
+          ),
+          caption: rc.getText(
+            RemoteConfigKeys.subscriptionPendingCaption,
+            locale,
+          ),
         ),
       ],
     );
@@ -935,6 +977,7 @@ class _PlanList extends StatelessWidget {
     required this.enabled,
     required this.isYearly,
     required this.rc,
+    required this.locale,
     required this.onSelect,
     this.pendingId,
     this.pendingLabel,
@@ -945,6 +988,7 @@ class _PlanList extends StatelessWidget {
   final bool enabled;
   final bool Function(String productId) isYearly;
   final RemoteConfigService rc;
+  final String locale;
   final ValueChanged<String> onSelect;
   final String? pendingId;
   final String? pendingLabel;
@@ -961,11 +1005,11 @@ class _PlanList extends StatelessWidget {
               selected: product.id == selectedId,
               enabled: enabled,
               badge: isYearly(product.id)
-                  ? rc.getText(RemoteConfigKeys.subscriptionYearlyBadge)
+                  ? rc.getText(RemoteConfigKeys.subscriptionYearlyBadge, locale)
                   : null,
               subLabel: isYearly(product.id)
-                  ? rc.getText(RemoteConfigKeys.subscriptionYearlySub)
-                  : rc.getText(RemoteConfigKeys.subscriptionMonthlySub),
+                  ? rc.getText(RemoteConfigKeys.subscriptionYearlySub, locale)
+                  : rc.getText(RemoteConfigKeys.subscriptionMonthlySub, locale),
               onTap: enabled ? () => onSelect(product.id) : null,
               pendingLabel: product.id == pendingId ? pendingLabel : null,
             ),

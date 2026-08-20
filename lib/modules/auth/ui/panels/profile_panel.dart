@@ -13,6 +13,7 @@ import '../../../gyms/ui/panels/gym_rules_view_panel.dart';
 import '../../controller/auth_controller.dart';
 import '../../controller/member_profile_controller.dart';
 import 'delete_account_confirm_panel.dart';
+import 'language_select_panel.dart';
 import 'phone_login_panel.dart';
 
 /// Üye 8 · Profilim (Profil sekmesi kökü).
@@ -141,6 +142,12 @@ class ProfilePanel extends ConsumerWidget {
                   _NavRow(
                     label: 'Stüdyo kuralları',
                     onTap: () => panelStack.push(const GymRulesViewPanel()),
+                  ),
+                  _NavRow(
+                    label: ref.watch(
+                      rcTextProvider(RemoteConfigKeys.commonLanguageNavLabel),
+                    ),
+                    onTap: () => panelStack.push(const LanguageSelectPanel()),
                   ),
                   Container(
                     constraints: const BoxConstraints(minHeight: 56),

@@ -147,7 +147,7 @@ class _ExpensesForGymProviderElement
   String get gymId => (origin as _ExpensesForGymProvider).gymId;
 }
 
-String _$expenseCategoriesHash() => r'4e4f003b404ff4c3c2100ecd6f9f5f5319632371';
+String _$expenseCategoriesHash() => r'f5e0bab4ea58b5fc632430e5d0c2f534d5952192';
 
 /// F5-3 — `cfg_expense_categories` okuması burada async-wrapped: Remote
 /// Config henüz hazır olmadığı (ör. Firebase başlatılmamış test ortamı)

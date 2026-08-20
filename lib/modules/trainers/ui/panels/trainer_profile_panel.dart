@@ -3,9 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
+import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../auth/controller/auth_controller.dart';
 import '../../../auth/ui/panels/delete_account_confirm_panel.dart';
+import '../../../auth/ui/panels/language_select_panel.dart';
 import '../../../auth/ui/panels/phone_login_panel.dart';
 import '../../../gyms/ui/panels/gym_rules_view_panel.dart';
 import '../../controller/trainer_profile_controller.dart';
@@ -101,8 +103,14 @@ class TrainerProfilePanel extends ConsumerWidget {
                 children: [
                   _NavRow(
                     label: 'Stüdyo kuralları',
-                    isLast: true,
                     onTap: () => panelStack.push(const GymRulesViewPanel()),
+                  ),
+                  _NavRow(
+                    label: ref.watch(
+                      rcTextProvider(RemoteConfigKeys.commonLanguageNavLabel),
+                    ),
+                    isLast: true,
+                    onTap: () => panelStack.push(const LanguageSelectPanel()),
                   ),
                 ],
               ),

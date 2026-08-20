@@ -522,6 +522,56 @@
       },
       "valueType": "STRING"
     },
+    "lbl_common_language_nav_label_tr": {
+      "defaultValue": {
+        "value": "Dil"
+      },
+      "description": "Üye/antrenör profil ve admin ayarlar ekranlarındaki dil değiştirme satırının etiketi.",
+      "valueType": "STRING"
+    },
+    "lbl_common_language_nav_label_en": {
+      "defaultValue": {
+        "value": "Language"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_language_select_title_tr": {
+      "defaultValue": {
+        "value": "Dil seç"
+      },
+      "description": "Dil seçim ekranının başlığı.",
+      "valueType": "STRING"
+    },
+    "lbl_language_select_title_en": {
+      "defaultValue": {
+        "value": "Select language"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_language_select_turkish_option_tr": {
+      "defaultValue": {
+        "value": "Türkçe"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_language_select_turkish_option_en": {
+      "defaultValue": {
+        "value": "Türkçe"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_language_select_english_option_tr": {
+      "defaultValue": {
+        "value": "English"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_language_select_english_option_en": {
+      "defaultValue": {
+        "value": "English"
+      },
+      "valueType": "STRING"
+    },
     "lbl_shell_member_tab_derslerim_tr": {
       "defaultValue": {
         "value": "Derslerim"

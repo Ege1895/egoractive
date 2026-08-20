@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../core/locale/locale_controller.dart';
 import '../../../core/remote_config/remote_config_service.dart';
 import '../domain/auth_login_exception.dart';
 import '../domain/auth_state.dart';
@@ -69,7 +70,10 @@ class AuthController extends _$AuthController {
         isDeletingAccount: false,
         deleteAccountErrorMessage: ref
             .read(remoteConfigServiceProvider)
-            .getText(RemoteConfigKeys.authDeleteAccountErrorGeneric),
+            .getText(
+              RemoteConfigKeys.authDeleteAccountErrorGeneric,
+              ref.read(localeControllerProvider),
+            ),
       );
       return false;
     }
@@ -93,6 +97,6 @@ class AuthController extends _$AuthController {
         RemoteConfigKeys.authLoginErrorRateLimited,
       AuthLoginErrorReason.generic => RemoteConfigKeys.authLoginErrorGeneric,
     };
-    return rc.getText(key);
+    return rc.getText(key, ref.read(localeControllerProvider));
   }
 }
