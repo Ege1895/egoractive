@@ -36,7 +36,7 @@ class SessionsWriteService {
     required String memberName,
     required DateTime startTime,
   }) async {
-    if (await _trainerHasConflict(trainerId, startTime)) {
+    if (await _trainerHasConflict(gymId, trainerId, startTime)) {
       throw TrainerConflictException(trainerName);
     }
     final endTime = startTime.add(
@@ -65,10 +65,13 @@ class SessionsWriteService {
         .collection('sessions')
         .doc(sessionId)
         .get();
+    final gymId = currentDoc.data()?['gymId'] as String?;
     final trainerId = currentDoc.data()?['trainerId'] as String?;
     final trainerName = currentDoc.data()?['trainerName'] as String? ?? '';
-    if (trainerId != null &&
+    if (gymId != null &&
+        trainerId != null &&
         await _trainerHasConflict(
+          gymId,
           trainerId,
           newStartTime,
           excludeSessionId: sessionId,
@@ -92,13 +95,21 @@ class SessionsWriteService {
   /// Bir antrenörün aynı gün aynı saatte ikinci bir seansa atanmasını
   /// engeller — önceden bu kontrol hiç yapılmıyordu, aynı antrenöre aynı
   /// saatte birden fazla seans atanabiliyordu.
+  ///
+  /// `gymId` filtresi olmadan bu sorgu `firestore.rules`'taki
+  /// `resource.data.gymId == myGymId()` kuralı yüzünden her zaman
+  /// permission-denied ile reddediliyordu — bu da her seans oluşturma
+  /// denemesinde (antrenör gerçekte müsaitken bile) yanlışlıkla "antrenör bu
+  /// saatte dolu" hatası olarak görünüyordu.
   Future<bool> _trainerHasConflict(
+    String gymId,
     String trainerId,
     DateTime startTime, {
     String? excludeSessionId,
   }) async {
     final snapshot = await FirebaseFirestore.instance
         .collection('sessions')
+        .where('gymId', isEqualTo: gymId)
         .where('trainerId', isEqualTo: trainerId)
         .where('startTime', isEqualTo: Timestamp.fromDate(startTime))
         .get();
