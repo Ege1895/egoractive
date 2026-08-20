@@ -12,6 +12,7 @@ import '../../../trainers/ui/panels/admin_trainer_management_panel.dart';
 import '../../controller/admin_home_controller.dart';
 import '../../controller/gym_profile_controller.dart';
 import '../../domain/admin_home_state.dart';
+import 'gym_info_panel.dart';
 
 /// Admin 1 · Ana Sayfa (Özet Dashboard) — Ana Sayfa sekmesi kökü.
 class AdminHomePanel extends ConsumerWidget {
@@ -37,52 +38,65 @@ class AdminHomePanel extends ConsumerWidget {
           children: [
             Row(
               children: [
-                Container(
-                  width: 44,
-                  height: 44,
-                  clipBehavior: Clip.antiAlias,
-                  decoration: BoxDecoration(
-                    color: colors.primaryContainer,
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
-                  ),
-                  alignment: Alignment.center,
-                  child: profile.logoUrl.isEmpty
-                      ? Icon(
-                          Icons.fitness_center_rounded,
-                          color: colors.onPrimaryContainer,
-                          size: 20,
-                        )
-                      : Image.network(
-                          profile.logoUrl,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) => Icon(
-                            Icons.fitness_center_rounded,
-                            color: colors.onPrimaryContainer,
-                            size: 20,
-                          ),
-                        ),
-                ),
-                const SizedBox(width: AppSpacing.md),
                 Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      if (state.monthLabel.isNotEmpty)
-                        Text(
-                          state.monthLabel,
-                          style: typography.caption.copyWith(
-                            color: colors.onSurfaceMuted,
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+                    onTap: () => panelStack.push(const GymInfoPanel()),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 44,
+                          height: 44,
+                          clipBehavior: Clip.antiAlias,
+                          decoration: BoxDecoration(
+                            color: colors.primaryContainer,
+                            borderRadius: BorderRadius.circular(
+                              AppSpacing.radiusInner,
+                            ),
+                          ),
+                          alignment: Alignment.center,
+                          child: profile.logoUrl.isEmpty
+                              ? Icon(
+                                  Icons.fitness_center_rounded,
+                                  color: colors.onPrimaryContainer,
+                                  size: 20,
+                                )
+                              : Image.network(
+                                  profile.logoUrl,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) =>
+                                      Icon(
+                                        Icons.fitness_center_rounded,
+                                        color: colors.onPrimaryContainer,
+                                        size: 20,
+                                      ),
+                                ),
+                        ),
+                        const SizedBox(width: AppSpacing.md),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              if (state.monthLabel.isNotEmpty)
+                                Text(
+                                  state.monthLabel,
+                                  style: typography.caption.copyWith(
+                                    color: colors.onSurfaceMuted,
+                                  ),
+                                ),
+                              Text(
+                                profile.name,
+                                style: typography.headingMedium.copyWith(
+                                  color: colors.onSurface,
+                                  fontSize: 19,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                      Text(
-                        profile.name,
-                        style: typography.headingMedium.copyWith(
-                          color: colors.onSurface,
-                          fontSize: 19,
-                        ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
                 InkWell(
