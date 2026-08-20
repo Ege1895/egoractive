@@ -925,9 +925,9 @@
     "semantic_hash": "7bd857e40b04f556265428814dc38a8f"
   },
   "modules/gyms/ui/panels/gym_info_panel.dart": {
-    "mtime": 1787158640.3321269,
-    "ast_hash": "5c9c14ec53a596e57d255f49dbb6e110",
-    "semantic_hash": "5c9c14ec53a596e57d255f49dbb6e110"
+    "mtime": 1787186101.5722542,
+    "ast_hash": "9983c33876256922daa1337648b122db",
+    "semantic_hash": "9983c33876256922daa1337648b122db"
   },
   "modules/gyms/ui/panels/gym_rules_editor_panel.dart": {
     "mtime": 1787095796.93765,
@@ -1020,9 +1020,9 @@
     "semantic_hash": "e3140a261bd02ae65c048b398fe86ace"
   },
   "modules/members/controller/admin_member_detail_controller.dart": {
-    "mtime": 1787182608.793481,
-    "ast_hash": "3610605df17c45ed99df84fff42655dc",
-    "semantic_hash": "3610605df17c45ed99df84fff42655dc"
+    "mtime": 1787185908.3338966,
+    "ast_hash": "fa0aa56aa4e35a5f8b2a4e60c15dbb99",
+    "semantic_hash": "fa0aa56aa4e35a5f8b2a4e60c15dbb99"
   },
   "modules/members/controller/admin_member_detail_controller.g.dart": {
     "mtime": 1787183132.5760307,
@@ -1225,9 +1225,9 @@
     "semantic_hash": "e582789349bfd048cd83bd3ffbac7fba"
   },
   "modules/members/ui/panels/new_membership_package_panel.dart": {
-    "mtime": 1787099324.733276,
-    "ast_hash": "d2c22a1fcc9d3488eddefa6911fde8a8",
-    "semantic_hash": "d2c22a1fcc9d3488eddefa6911fde8a8"
+    "mtime": 1787186027.161175,
+    "ast_hash": "9961946a518cbec6789af398c23c4ebd",
+    "semantic_hash": "9961946a518cbec6789af398c23c4ebd"
   },
   "modules/members/ui/panels/new_membership_payment_panel.dart": {
     "mtime": 1787178975.2768543,
@@ -1235,9 +1235,9 @@
     "semantic_hash": "5810ac3183c979c30833b305ae9b0dab"
   },
   "modules/members/ui/widgets/installment_edit_sheet.dart": {
-    "mtime": 1787179007.640977,
-    "ast_hash": "8d0dab612adebe7ad01c9cf49aba6306",
-    "semantic_hash": "8d0dab612adebe7ad01c9cf49aba6306"
+    "mtime": 1787185923.5412421,
+    "ast_hash": "6f2852400a3c152264e105836e0d3320",
+    "semantic_hash": "6f2852400a3c152264e105836e0d3320"
   },
   "modules/members/ui/widgets/installment_row.dart": {
     "mtime": 1787182579.469491,
@@ -1605,9 +1605,9 @@
     "semantic_hash": "9a3559b8ba97bb9b9c404ab1a90f8dcf"
   },
   "modules/sessions/service/sessions_write_service.dart": {
-    "mtime": 1787177183.53045,
-    "ast_hash": "b93e7932618139bc47e29efcbb8d657c",
-    "semantic_hash": "b93e7932618139bc47e29efcbb8d657c"
+    "mtime": 1787185709.726691,
+    "ast_hash": "38ac3a57fd9997aa0bc64e5530258512",
+    "semantic_hash": "38ac3a57fd9997aa0bc64e5530258512"
   },
   "modules/sessions/service/sessions_write_service.g.dart": {
     "mtime": 1787178969.4940503,
@@ -1630,9 +1630,9 @@
     "semantic_hash": "eb3da15ae365d1b42c7d673c1725f530"
   },
   "modules/sessions/ui/panels/admin_session_management_panel.dart": {
-    "mtime": 1787158481.2543848,
-    "ast_hash": "2530f9fe604b988d1f72d716a011ad79",
-    "semantic_hash": "2530f9fe604b988d1f72d716a011ad79"
+    "mtime": 1787186101.552941,
+    "ast_hash": "43e8a7c9ac30f607dd5720a0d0cc8d34",
+    "semantic_hash": "43e8a7c9ac30f607dd5720a0d0cc8d34"
   },
   "modules/sessions/ui/panels/attendance_confirm_panel.dart": {
     "mtime": 1787180213.1262045,
@@ -2020,9 +2020,9 @@
     "semantic_hash": "7d5dea3ef1e0c5bbabb97ad4aec66002"
   },
   "modules/trainers/ui/panels/admin_trainer_management_panel.dart": {
-    "mtime": 1787183137.9384804,
-    "ast_hash": "40d04c216957167371202366e6f8a3d4",
-    "semantic_hash": "40d04c216957167371202366e6f8a3d4"
+    "mtime": 1787185959.8640838,
+    "ast_hash": "1c421dae800a07c313629dc59b95e4b5",
+    "semantic_hash": "1c421dae800a07c313629dc59b95e4b5"
   },
   "modules/trainers/ui/panels/trainer_calendar_panel.dart": {
     "mtime": 1787083092.464712,
