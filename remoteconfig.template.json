@@ -2,7 +2,7 @@
   "parameters": {
     "cfg_session_reminder_minutes_before": {
       "defaultValue": {
-        "value": "60"
+        "value": "120"
       },
       "description": "Ders/seans onay bildiriminin kaç dakika önce gönderileceği.",
       "valueType": "NUMBER"
@@ -12,6 +12,20 @@
         "value": "6"
       },
       "description": "Grup dersi oluştururken varsayılan kontenjan.",
+      "valueType": "NUMBER"
+    },
+    "cfg_group_session_capacity_max": {
+      "defaultValue": {
+        "value": "20"
+      },
+      "description": "Grup dersi oluşturma ekranındaki kontenjan stepper'ının üst sınırı.",
+      "valueType": "NUMBER"
+    },
+    "cfg_installment_due_soon_days": {
+      "defaultValue": {
+        "value": "3"
+      },
+      "description": "Üye anasayfasındaki taksit listesinde bir taksitin son ödeme tarihine kaç gün kala (veya geçmişse) kırmızı 'Ödeme yaklaşıyor' gösterileceği.",
       "valueType": "NUMBER"
     },
     "cfg_group_session_lock_hours_before": {
