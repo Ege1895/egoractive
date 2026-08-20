@@ -162,10 +162,31 @@ class _InstallmentEditSheetState extends State<_InstallmentEditSheet> {
                     ),
                   ),
                 ),
-                Switch(
-                  value: _paid,
-                  onChanged: (value) => setState(() => _paid = value),
-                  activeThumbColor: colors.primary,
+                GestureDetector(
+                  onTap: () => setState(() => _paid = !_paid),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 150),
+                    width: 52,
+                    height: 32,
+                    padding: const EdgeInsets.all(3),
+                    decoration: BoxDecoration(
+                      color: _paid ? colors.primary : colors.outlineStrong,
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusPill,
+                      ),
+                    ),
+                    alignment: _paid
+                        ? Alignment.centerRight
+                        : Alignment.centerLeft,
+                    child: Container(
+                      width: 26,
+                      height: 26,
+                      decoration: BoxDecoration(
+                        color: colors.onSurface,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                  ),
                 ),
               ],
             ),
