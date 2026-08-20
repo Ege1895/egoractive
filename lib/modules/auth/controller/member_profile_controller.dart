@@ -21,27 +21,16 @@ Stream<Map<String, dynamic>?> _profileDocForUid(
 /// önceden `MemberMockProfile`'dan sabit ("Ayşe Yılmaz") değer geliyordu,
 /// giriş yapan kullanıcı ne olursa olsun aynı isim gösteriliyordu.
 ///
-/// `selectedAvatarIndex`/`sessionReminderEnabled` de burada tutuluyor —
-/// önceden `AuthController`'da sadece bellekte tutulup hiçbir yere
-/// yazılmıyordu, oturum kapatılınca sessizce varsayılana dönüyordu.
+/// `sessionReminderEnabled` de burada tutuluyor — önceden `AuthController`'da
+/// sadece bellekte tutulup hiçbir yere yazılmıyordu, oturum kapatılınca
+/// sessizce varsayılana dönüyordu.
 @riverpod
 class MemberProfileController extends _$MemberProfileController {
   @override
-  ({
-    String name,
-    String phoneDigits,
-    int selectedAvatarIndex,
-    bool sessionReminderEnabled,
-  })
-  build() {
+  ({String name, String phoneDigits, bool sessionReminderEnabled}) build() {
     final uid = ref.watch(authStateProvider).valueOrNull?.uid;
     if (uid == null) {
-      return (
-        name: '',
-        phoneDigits: '',
-        selectedAvatarIndex: 0,
-        sessionReminderEnabled: true,
-      );
+      return (name: '', phoneDigits: '', sessionReminderEnabled: true);
     }
 
     final data = ref.watch(_profileDocForUidProvider(uid)).valueOrNull;
@@ -50,18 +39,9 @@ class MemberProfileController extends _$MemberProfileController {
     return (
       name: name,
       phoneDigits: phoneDigits,
-      selectedAvatarIndex: (data?['selectedAvatarIndex'] as num?)?.toInt() ?? 0,
       sessionReminderEnabled:
           (data?['sessionReminderEnabled'] as bool?) ?? true,
     );
-  }
-
-  Future<void> selectAvatar(int index) async {
-    final uid = ref.read(authStateProvider).valueOrNull?.uid;
-    if (uid == null) return;
-    await FirebaseFirestore.instance.collection('users').doc(uid).set({
-      'selectedAvatarIndex': index,
-    }, SetOptions(merge: true));
   }
 
   Future<void> toggleSessionReminder() async {

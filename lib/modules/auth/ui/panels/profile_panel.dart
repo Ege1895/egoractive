@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/app_spacing.dart';
-import '../../../../core/constants/avatar_palette.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
+import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/utils/phone_number_formatter.dart';
 import '../../../badges/controller/badges_controller.dart';
@@ -29,7 +29,16 @@ class ProfilePanel extends ConsumerWidget {
     final profileController = ref.read(
       memberProfileControllerProvider.notifier,
     );
-    final avatarColor = AppAvatarPalette.colors[profile.selectedAvatarIndex];
+    // Firebase.initializeApp hiç çağrılmamış bir widget test ortamında
+    // Remote Config okuması fırlatabilir (bkz. aynı desen member_home_panel.dart'ta).
+    int reminderMinutesBefore;
+    try {
+      reminderMinutesBefore = ref
+          .watch(remoteConfigServiceProvider)
+          .sessionReminderMinutesBefore;
+    } catch (_) {
+      reminderMinutesBefore = 120;
+    }
     final earnedBadgeCount = ref
         .watch(badgesControllerProvider)
         .where((b) => b.earned)
@@ -62,10 +71,9 @@ class ProfilePanel extends ConsumerWidget {
                 children: [
                   Row(
                     children: [
-                      _AvatarCircle(
-                        color: avatarColor,
+                      _InitialsAvatar(
+                        initials: _initialsOf(profile.name),
                         size: 64,
-                        selected: true,
                       ),
                       const SizedBox(width: AppSpacing.md),
                       Expanded(
@@ -89,29 +97,6 @@ class ProfilePanel extends ConsumerWidget {
                           ],
                         ),
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: AppSpacing.lg),
-                  Text(
-                    'Avatarını seç',
-                    style: typography.caption.copyWith(
-                      color: colors.onSurfaceMuted,
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.sm),
-                  Wrap(
-                    spacing: AppSpacing.sm,
-                    runSpacing: AppSpacing.sm,
-                    children: [
-                      for (var i = 0; i < AppAvatarPalette.colors.length; i++)
-                        GestureDetector(
-                          onTap: () => profileController.selectAvatar(i),
-                          child: _AvatarCircle(
-                            color: AppAvatarPalette.colors[i],
-                            size: 52,
-                            selected: i == profile.selectedAvatarIndex,
-                          ),
-                        ),
                     ],
                   ),
                 ],
@@ -173,7 +158,7 @@ class ProfilePanel extends ConsumerWidget {
                                 ),
                               ),
                               Text(
-                                'Dersinden 2 saat önce bildirim',
+                                'Dersinden $reminderMinutesBefore dakika önce bildirim',
                                 style: typography.caption.copyWith(
                                   color: colors.onSurfaceMuted,
                                 ),
@@ -258,16 +243,26 @@ class ProfilePanel extends ConsumerWidget {
   }
 }
 
-class _AvatarCircle extends StatelessWidget {
-  const _AvatarCircle({
-    required this.color,
-    required this.size,
-    required this.selected,
-  });
+/// Üyenin isim baş harfleri "Özlem Erbil" → "ÖE" — birden fazla kelimeden
+/// oluşan isim/soyisimlerde ilk ve son kelimenin baş harfi alınır (bu
+/// projede admin/antrenör özetlerinde de aynı kural kullanılıyor).
+String _initialsOf(String name) {
+  final parts = name
+      .trim()
+      .split(RegExp(r'\s+'))
+      .where((p) => p.isNotEmpty)
+      .toList();
+  if (parts.isEmpty) return '?';
+  final first = parts.first[0];
+  final last = parts.length > 1 ? parts.last[0] : '';
+  return '$first$last'.toUpperCase();
+}
 
-  final Color color;
+class _InitialsAvatar extends StatelessWidget {
+  const _InitialsAvatar({required this.initials, required this.size});
+
+  final String initials;
   final double size;
-  final bool selected;
 
   @override
   Widget build(BuildContext context) {
@@ -275,33 +270,13 @@ class _AvatarCircle extends StatelessWidget {
     return Container(
       width: size,
       height: size,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: Color.alphaBlend(
-          color.withValues(alpha: 0.26),
-          colors.background,
-        ),
-        border: Border.all(
-          color: selected ? colors.primary : colors.outline,
-          width: 2,
-        ),
-      ),
-      child: Center(
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: size * 0.16,
-              height: size * 0.16,
-              decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-            ),
-            SizedBox(width: size * 0.08),
-            Container(
-              width: size * 0.16,
-              height: size * 0.16,
-              decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-            ),
-          ],
+      decoration: BoxDecoration(color: colors.primary, shape: BoxShape.circle),
+      alignment: Alignment.center,
+      child: Text(
+        initials,
+        style: context.appTypography.headingMedium.copyWith(
+          color: colors.onPrimary,
+          fontSize: size * 0.34,
         ),
       ),
     );

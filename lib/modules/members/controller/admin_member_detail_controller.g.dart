@@ -613,7 +613,7 @@ class _WaistSeriesForAdminMemberProviderElement
 }
 
 String _$adminMemberDetailControllerHash() =>
-    r'04cdf55bb8ea286c7349f093ac34812695724713';
+    r'9785a5043456cfa87f3c99fe075de13aa1a02d1c';
 
 abstract class _$AdminMemberDetailController
     extends BuildlessAutoDisposeNotifier<AdminMemberDetail> {

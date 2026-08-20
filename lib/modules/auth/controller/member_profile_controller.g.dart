@@ -152,27 +152,22 @@ class _ProfileDocForUidProviderElement
 }
 
 String _$memberProfileControllerHash() =>
-    r'1b5c82a83cf20e1de90bae5f3047a16052f23326';
+    r'e4c1686f8a8ffccc6adfd4c4ec18f47f0215fcb7';
 
 /// [ProfilePanel]'in üst kartındaki gerçek kullanıcı adı/telefonu —
 /// önceden `MemberMockProfile`'dan sabit ("Ayşe Yılmaz") değer geliyordu,
 /// giriş yapan kullanıcı ne olursa olsun aynı isim gösteriliyordu.
 ///
-/// `selectedAvatarIndex`/`sessionReminderEnabled` de burada tutuluyor —
-/// önceden `AuthController`'da sadece bellekte tutulup hiçbir yere
-/// yazılmıyordu, oturum kapatılınca sessizce varsayılana dönüyordu.
+/// `sessionReminderEnabled` de burada tutuluyor — önceden `AuthController`'da
+/// sadece bellekte tutulup hiçbir yere yazılmıyordu, oturum kapatılınca
+/// sessizce varsayılana dönüyordu.
 ///
 /// Copied from [MemberProfileController].
 @ProviderFor(MemberProfileController)
 final memberProfileControllerProvider =
     AutoDisposeNotifierProvider<
       MemberProfileController,
-      ({
-        String name,
-        String phoneDigits,
-        int selectedAvatarIndex,
-        bool sessionReminderEnabled,
-      })
+      ({String name, String phoneDigits, bool sessionReminderEnabled})
     >.internal(
       MemberProfileController.new,
       name: r'memberProfileControllerProvider',
@@ -185,12 +180,7 @@ final memberProfileControllerProvider =
 
 typedef _$MemberProfileController =
     AutoDisposeNotifier<
-      ({
-        String name,
-        String phoneDigits,
-        int selectedAvatarIndex,
-        bool sessionReminderEnabled,
-      })
+      ({String name, String phoneDigits, bool sessionReminderEnabled})
     >;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
