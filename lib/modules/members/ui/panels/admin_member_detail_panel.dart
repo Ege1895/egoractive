@@ -32,7 +32,55 @@ class AdminMemberDetailPanel extends BasePanel {
 
 class _AdminMemberDetailPanelState
     extends BasePanelState<AdminMemberDetailPanel> {
-  bool _metricPickerOpen = false;
+  void _showMetricPicker(
+    BuildContext context,
+    TrainerMetric selected,
+    ValueChanged<TrainerMetric> onSelect,
+  ) {
+    final colors = context.appColors;
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: colors.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      builder: (sheetContext) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.screenEdge,
+            AppSpacing.lg,
+            AppSpacing.screenEdge,
+            AppSpacing.lg,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Center(
+                child: Container(
+                  width: 44,
+                  height: 5,
+                  decoration: BoxDecoration(
+                    color: colors.outlineStrong,
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
+                  ),
+                ),
+              ),
+              const SizedBox(height: AppSpacing.lg),
+              for (final metric in TrainerMetric.values)
+                _MetricPickerRow(
+                  label: metric.label,
+                  selected: metric == selected,
+                  onTap: () {
+                    onSelect(metric);
+                    Navigator.of(sheetContext).pop();
+                  },
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -448,8 +496,11 @@ class _AdminMemberDetailPanelState
                   const SizedBox(height: AppSpacing.lg),
                   InkWell(
                     borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
-                    onTap: () =>
-                        setState(() => _metricPickerOpen = !_metricPickerOpen),
+                    onTap: () => _showMetricPicker(
+                      context,
+                      detail.selectedMetric,
+                      controller.selectMetric,
+                    ),
                     child: Container(
                       constraints: const BoxConstraints(minHeight: 44),
                       padding: const EdgeInsets.symmetric(
@@ -490,30 +541,13 @@ class _AdminMemberDetailPanelState
                             ],
                           ),
                           Icon(
-                            _metricPickerOpen
-                                ? Icons.keyboard_arrow_up
-                                : Icons.keyboard_arrow_down,
+                            Icons.keyboard_arrow_down,
                             color: colors.onPrimaryContainer,
                           ),
                         ],
                       ),
                     ),
                   ),
-                  if (_metricPickerOpen) ...[
-                    const SizedBox(height: AppSpacing.sm),
-                    Wrap(
-                      spacing: AppSpacing.sm,
-                      runSpacing: AppSpacing.sm,
-                      children: [
-                        for (final metric in TrainerMetric.values)
-                          _MetricChip(
-                            label: metric.label,
-                            selected: metric == detail.selectedMetric,
-                            onTap: () => controller.selectMetric(metric),
-                          ),
-                      ],
-                    ),
-                  ],
                   const SizedBox(height: AppSpacing.sm),
                   Container(
                     padding: const EdgeInsets.all(AppSpacing.lg),
@@ -671,8 +705,8 @@ class _PaymentTile extends StatelessWidget {
   }
 }
 
-class _MetricChip extends StatelessWidget {
-  const _MetricChip({
+class _MetricPickerRow extends StatelessWidget {
+  const _MetricPickerRow({
     required this.label,
     required this.selected,
     required this.onTap,
@@ -685,29 +719,24 @@ class _MetricChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
-    return Material(
-      color: selected ? colors.primary : colors.surface,
-      borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 13),
-          constraints: const BoxConstraints(minHeight: 34),
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
-            border: Border.all(
-              color: selected ? colors.primary : colors.outlineStrong,
+    final typography = context.appTypography;
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        constraints: const BoxConstraints(minHeight: 56),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                label,
+                style: typography.bodyLarge.copyWith(
+                  color: colors.onSurface,
+                  fontSize: 15,
+                ),
+              ),
             ),
-          ),
-          child: Text(
-            label,
-            style: context.appTypography.headingSmall.copyWith(
-              fontSize: 14,
-              color: selected ? colors.onPrimary : colors.onSurfaceVariant,
-            ),
-          ),
+            if (selected) Icon(Icons.check, color: colors.primary, size: 20),
+          ],
         ),
       ),
     );
