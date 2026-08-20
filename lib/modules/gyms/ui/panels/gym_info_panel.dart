@@ -221,7 +221,7 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
                       border: Border.all(color: colors.outline),
                     ),
                     child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         if (_pickedLogoFile != null)
                           ClipRRect(
@@ -230,8 +230,8 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
                             ),
                             child: Image.file(
                               File(_pickedLogoFile!.path),
-                              width: 72,
-                              height: 72,
+                              width: 84,
+                              height: 84,
                               fit: BoxFit.cover,
                             ),
                           )
@@ -242,15 +242,15 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
                             ),
                             child: Image.network(
                               profileState.logoUrl,
-                              width: 72,
-                              height: 72,
+                              width: 84,
+                              height: 84,
                               fit: BoxFit.cover,
                             ),
                           )
                         else
                           Container(
-                            width: 72,
-                            height: 72,
+                            width: 84,
+                            height: 84,
                             decoration: BoxDecoration(
                               color: colors.surfaceRaised,
                               borderRadius: BorderRadius.circular(
@@ -444,40 +444,6 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
                             ),
                           ),
                         ],
-                        const SizedBox(height: AppSpacing.md),
-                        Material(
-                          color: Colors.transparent,
-                          borderRadius: BorderRadius.circular(
-                            AppSpacing.radiusInner,
-                          ),
-                          child: InkWell(
-                            onTap: _previewColor == null ? null : _saveTheme,
-                            borderRadius: BorderRadius.circular(
-                              AppSpacing.radiusInner,
-                            ),
-                            child: Container(
-                              constraints: const BoxConstraints(minHeight: 44),
-                              decoration: BoxDecoration(
-                                color: _previewColor == null
-                                    ? active.primary.withValues(alpha: 0.4)
-                                    : active.primary,
-                                borderRadius: BorderRadius.circular(
-                                  AppSpacing.radiusInner,
-                                ),
-                              ),
-                              alignment: Alignment.center,
-                              child: Text(
-                                ref.watch(
-                                  rcTextProvider(RemoteConfigKeys.commonKaydet),
-                                ),
-                                style: typography.headingSmall.copyWith(
-                                  fontSize: 15,
-                                  color: colors.onPrimary,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
                         const SizedBox(height: AppSpacing.sm),
                         Text(
                           ref.watch(
@@ -855,6 +821,7 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
     setState(() => _isSaving = true);
     try {
       await ref.read(gymProfileControllerProvider.notifier).save();
+      if (_previewColor != null) await _saveTheme();
     } catch (_) {
       if (!mounted) return;
       setState(() {
