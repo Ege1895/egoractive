@@ -87,10 +87,19 @@ service cloud.firestore {
         (myRole() == 'admin' &&
           resource.data.gymId == myGymId() &&
           request.resource.data.gymId == myGymId()) ||
-        // F3-5 — antrenör, kendine atanmış üyenin SADECE remainingSessions
-        // alanını, ders tamamlama transaction'ının parçası olarak düşürür.
+        // F3-5 — antrenör, ders tamamlama transaction'ının parçası olarak
+        // üyenin SADECE remainingSessions alanını düşürür. Bunu üyenin O
+        // ANKİ (resource.data.trainerId) atanmış antrenörüyle sınırlamak
+        // hataydı: üyenin antrenörü değiştirildiğinde ya da tamamlanan seans
+        // üyenin GÜNCEL atanmış antrenöründen farklı bir antrenöre aitse
+        // (ör. antrenör değişikliğinden önce oluşturulmuş bir seans) yazma
+        // PERMISSION_DENIED ile reddediliyordu — asıl yetki kontrolü zaten
+        // sessions/{sessionId}'deki isCompletingOwnSession() ile
+        // (resource.data.trainerId == request.auth.uid, SEANSIN kendi
+        // antrenörüne göre) yapılıyor; burada sadece aynı salondan olma
+        // şartı yeterli.
         (myRole() == 'trainer' &&
-          resource.data.trainerId == request.auth.uid &&
+          resource.data.gymId == myGymId() &&
           request.resource.data.diff(resource.data).affectedKeys().hasOnly(['remainingSessions']))
       );
 
