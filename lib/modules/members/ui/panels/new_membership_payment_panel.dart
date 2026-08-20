@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
+import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/subscription/subscription_write_gate.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/utils/thousands_input_formatter.dart';
@@ -84,7 +85,9 @@ class _NewMembershipPaymentPanelState
                       ),
                       const SizedBox(width: AppSpacing.md),
                       Text(
-                        'Ödeme bilgisi',
+                        ref.watch(
+                          rcTextProvider(RemoteConfigKeys.membersPaymentTitle),
+                        ),
                         style: typography.headingSmall.copyWith(
                           color: colors.onSurface,
                           fontSize: 18,
@@ -120,7 +123,11 @@ class _NewMembershipPaymentPanelState
                       ),
                       const SizedBox(width: AppSpacing.sm),
                       Text(
-                        '3 / 3',
+                        ref.watch(
+                          rcTextProvider(
+                            RemoteConfigKeys.membersPaymentStepIndicator3,
+                          ),
+                        ),
                         style: typography.headingSmall.copyWith(
                           fontSize: 13,
                           color: colors.onPrimaryContainer,
@@ -209,7 +216,11 @@ class _NewMembershipPaymentPanelState
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         AppTextField(
-                          label: 'Toplam tutar',
+                          label: ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.membersPaymentTotalLabel,
+                            ),
+                          ),
                           controller: _totalController,
                           keyboardType: TextInputType.number,
                           inputFormatters: [ThousandsInputFormatter()],
@@ -225,7 +236,12 @@ class _NewMembershipPaymentPanelState
                           children: [
                             Expanded(
                               child: Text(
-                                'Taksit sayısı',
+                                ref.watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys
+                                        .membersPaymentInstallmentCountLabel,
+                                  ),
+                                ),
                                 style: typography.bodyLarge.copyWith(
                                   color: colors.onSurfaceVariant,
                                   fontSize: 15,
@@ -317,7 +333,11 @@ class _NewMembershipPaymentPanelState
                   ),
                   const SizedBox(height: AppSpacing.sm),
                   Text(
-                    'Üye kendi ekranında yalnızca taksitlerin ödenip ödenmediğini görür; tutarlar üyeye gösterilmez.',
+                    ref.watch(
+                      rcTextProvider(
+                        RemoteConfigKeys.membersPaymentInstallmentNote,
+                      ),
+                    ),
                     style: typography.caption.copyWith(
                       color: colors.onSurfaceMuted,
                     ),
@@ -346,7 +366,13 @@ class _NewMembershipPaymentPanelState
                     const SizedBox(height: AppSpacing.sm),
                   ],
                   AppButton(
-                    label: membership.isSaving ? 'Kaydediliyor…' : 'Kaydet',
+                    label: membership.isSaving
+                        ? ref.watch(
+                            rcTextProvider(RemoteConfigKeys.membersSavingLabel),
+                          )
+                        : ref.watch(
+                            rcTextProvider(RemoteConfigKeys.commonKaydet),
+                          ),
                     onPressed: package == null || membership.isSaving
                         ? null
                         : () async {

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
+import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_back_button.dart';
 import '../../../../shared/widgets/app_button.dart';
@@ -61,7 +62,9 @@ class _AdminMemberDetailPanelState
                 ),
                 const SizedBox(height: AppSpacing.xl),
                 Text(
-                  'Üye bulunamadı.',
+                  ref.watch(
+                    rcTextProvider(RemoteConfigKeys.membersDetailNotFound),
+                  ),
                   style: typography.headingSmall.copyWith(
                     color: colors.onSurface,
                     fontSize: 17,
@@ -97,7 +100,9 @@ class _AdminMemberDetailPanelState
                   const SizedBox(width: AppSpacing.md),
                   Expanded(
                     child: Text(
-                      'Üye detayı',
+                      ref.watch(
+                        rcTextProvider(RemoteConfigKeys.commonUyeDetayiTitle),
+                      ),
                       style: typography.headingSmall.copyWith(
                         color: colors.onSurface,
                         fontSize: 18,
@@ -145,7 +150,9 @@ class _AdminMemberDetailPanelState
                         constraints: const BoxConstraints(minHeight: 40),
                         alignment: Alignment.center,
                         child: Text(
-                          'Düzenle',
+                          ref.watch(
+                            rcTextProvider(RemoteConfigKeys.commonDuzenle),
+                          ),
                           style: typography.headingSmall.copyWith(
                             fontSize: 14,
                             color: colors.onSurfaceVariant,
@@ -209,7 +216,21 @@ class _AdminMemberDetailPanelState
                                     ),
                                   ),
                                   Text(
-                                    '${formatTrPhoneDisplay(detail.phone)} · Antrenör: ${detail.trainerName}',
+                                    ref
+                                        .watch(
+                                          rcTextProvider(
+                                            RemoteConfigKeys
+                                                .membersDetailPhoneTrainerLine,
+                                          ),
+                                        )
+                                        .replaceAll(
+                                          '{phone}',
+                                          formatTrPhoneDisplay(detail.phone),
+                                        )
+                                        .replaceAll(
+                                          '{trainerName}',
+                                          detail.trainerName,
+                                        ),
                                     style: typography.bodyMedium.copyWith(
                                       color: colors.onSurfaceMuted,
                                       fontSize: 14,
@@ -225,7 +246,12 @@ class _AdminMemberDetailPanelState
                           children: [
                             Expanded(
                               child: _StatTile(
-                                label: 'Kalan ders',
+                                label: ref.watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys
+                                        .membersDetailRemainingSessionsLabel,
+                                  ),
+                                ),
                                 value: '${detail.remainingSessions}',
                                 valueColor: colors.onPrimaryContainer,
                               ),
@@ -233,7 +259,11 @@ class _AdminMemberDetailPanelState
                             const SizedBox(width: AppSpacing.sm),
                             Expanded(
                               child: _StatTile(
-                                label: 'Telafi',
+                                label: ref.watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys.membersDetailMakeupLabel,
+                                  ),
+                                ),
                                 value: '${detail.makeupSessions}',
                                 valueColor: colors.onSurface,
                               ),
@@ -241,7 +271,11 @@ class _AdminMemberDetailPanelState
                             const SizedBox(width: AppSpacing.sm),
                             Expanded(
                               child: _StatTile(
-                                label: 'Bitiş',
+                                label: ref.watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys.commonBitisLabel,
+                                  ),
+                                ),
                                 value: detail.packageEndDate,
                                 valueColor: colors.onSurface,
                                 small: true,
@@ -282,7 +316,12 @@ class _AdminMemberDetailPanelState
                               children: [
                                 Expanded(
                                   child: Text(
-                                    'Ödeme durumu',
+                                    ref.watch(
+                                      rcTextProvider(
+                                        RemoteConfigKeys
+                                            .membersDetailPaymentStatusLabel,
+                                      ),
+                                    ),
                                     style: typography.headingSmall.copyWith(
                                       color: colors.onWarningContainer,
                                       fontSize: 16,
@@ -290,7 +329,17 @@ class _AdminMemberDetailPanelState
                                   ),
                                 ),
                                 Text(
-                                  'Son ödeme ${detail.lastPaymentDate}',
+                                  ref
+                                      .watch(
+                                        rcTextProvider(
+                                          RemoteConfigKeys
+                                              .membersDetailLastPaymentLabel,
+                                        ),
+                                      )
+                                      .replaceAll(
+                                        '{date}',
+                                        detail.lastPaymentDate,
+                                      ),
                                   style: typography.bodyMedium.copyWith(
                                     color: colors.onSurfaceVariant,
                                     fontSize: 13,
@@ -309,7 +358,12 @@ class _AdminMemberDetailPanelState
                               children: [
                                 Expanded(
                                   child: _PaymentTile(
-                                    label: 'Toplam',
+                                    label: ref.watch(
+                                      rcTextProvider(
+                                        RemoteConfigKeys
+                                            .membersDetailTotalLabel,
+                                      ),
+                                    ),
                                     value: '₺${detail.paymentTotalTl}',
                                     valueColor: colors.onSurface,
                                   ),
@@ -317,7 +371,11 @@ class _AdminMemberDetailPanelState
                                 const SizedBox(width: AppSpacing.sm),
                                 Expanded(
                                   child: _PaymentTile(
-                                    label: 'Ödendi',
+                                    label: ref.watch(
+                                      rcTextProvider(
+                                        RemoteConfigKeys.membersDetailPaidLabel,
+                                      ),
+                                    ),
                                     value: '₺${detail.paymentPaidTl}',
                                     valueColor: colors.success,
                                   ),
@@ -325,7 +383,12 @@ class _AdminMemberDetailPanelState
                                 const SizedBox(width: AppSpacing.sm),
                                 Expanded(
                                   child: _PaymentTile(
-                                    label: 'Kalan',
+                                    label: ref.watch(
+                                      rcTextProvider(
+                                        RemoteConfigKeys
+                                            .membersDetailRemainingAmountLabel,
+                                      ),
+                                    ),
                                     value: '₺${detail.paymentDueTl}',
                                     valueColor: colors.onWarningContainer,
                                   ),
@@ -367,7 +430,11 @@ class _AdminMemberDetailPanelState
                   ),
                   const SizedBox(height: AppSpacing.lg),
                   AppButton(
-                    label: 'Ölçüm ekranını gör',
+                    label: ref.watch(
+                      rcTextProvider(
+                        RemoteConfigKeys.membersDetailViewMeasurementsButton,
+                      ),
+                    ),
                     variant: AppButtonVariant.secondary,
                     onPressed: () => ref
                         .read(panelStackControllerProvider.notifier)
@@ -402,7 +469,12 @@ class _AdminMemberDetailPanelState
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'ÖLÇÜM · 6 AY',
+                                ref.watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys
+                                        .commonOlcum6AySectionHeader,
+                                  ),
+                                ),
                                 style: typography.caption.copyWith(
                                   color: colors.onSurfaceMuted,
                                   fontSize: 11,
@@ -462,7 +534,11 @@ class _AdminMemberDetailPanelState
                   ),
                   const SizedBox(height: AppSpacing.lg),
                   Text(
-                    'DERS GEÇMİŞİ',
+                    ref.watch(
+                      rcTextProvider(
+                        RemoteConfigKeys.commonDersGecmisiSectionHeader,
+                      ),
+                    ),
                     style: typography.caption.copyWith(
                       color: colors.onSurfaceMuted,
                       letterSpacing: 1.2,

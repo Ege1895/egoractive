@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/app_spacing.dart';
+import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/domain/membership_installment.dart';
 import '../../../../shared/utils/thousands_input_formatter.dart';
@@ -35,7 +37,7 @@ Future<void> showInstallmentEditSheet(
   );
 }
 
-class _InstallmentEditSheet extends StatefulWidget {
+class _InstallmentEditSheet extends ConsumerStatefulWidget {
   const _InstallmentEditSheet({
     required this.installment,
     required this.onSave,
@@ -50,10 +52,11 @@ class _InstallmentEditSheet extends StatefulWidget {
   onSave;
 
   @override
-  State<_InstallmentEditSheet> createState() => _InstallmentEditSheetState();
+  ConsumerState<_InstallmentEditSheet> createState() =>
+      _InstallmentEditSheetState();
 }
 
-class _InstallmentEditSheetState extends State<_InstallmentEditSheet> {
+class _InstallmentEditSheetState extends ConsumerState<_InstallmentEditSheet> {
   late final TextEditingController _amountController;
   late DateTime _dueDate;
   late bool _paid;
@@ -85,7 +88,13 @@ class _InstallmentEditSheetState extends State<_InstallmentEditSheet> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '${widget.installment.index}. Taksit',
+            ref
+                .watch(
+                  rcTextProvider(
+                    RemoteConfigKeys.sessionsMemberHomeInstallmentIndexLabel,
+                  ),
+                )
+                .replaceAll('{index}', '${widget.installment.index}'),
             style: typography.headingMedium.copyWith(
               color: colors.onSurface,
               fontSize: 20,
@@ -93,7 +102,11 @@ class _InstallmentEditSheetState extends State<_InstallmentEditSheet> {
           ),
           const SizedBox(height: AppSpacing.lg),
           AppTextField(
-            label: 'Tutar',
+            label: ref.watch(
+              rcTextProvider(
+                RemoteConfigKeys.membersInstallmentAmountFieldLabel,
+              ),
+            ),
             controller: _amountController,
             keyboardType: TextInputType.number,
             inputFormatters: [ThousandsInputFormatter()],
@@ -119,7 +132,11 @@ class _InstallmentEditSheetState extends State<_InstallmentEditSheet> {
                 children: [
                   Expanded(
                     child: Text(
-                      'Son ödeme tarihi',
+                      ref.watch(
+                        rcTextProvider(
+                          RemoteConfigKeys.membersPaymentDueDateFieldLabel,
+                        ),
+                      ),
                       style: typography.bodyLarge.copyWith(
                         color: colors.onSurfaceVariant,
                         fontSize: 15,
@@ -155,7 +172,11 @@ class _InstallmentEditSheetState extends State<_InstallmentEditSheet> {
               children: [
                 Expanded(
                   child: Text(
-                    'Ödendi mi?',
+                    ref.watch(
+                      rcTextProvider(
+                        RemoteConfigKeys.membersInstallmentPaidToggleLabel,
+                      ),
+                    ),
                     style: typography.bodyLarge.copyWith(
                       color: colors.onSurfaceVariant,
                       fontSize: 15,
@@ -193,7 +214,7 @@ class _InstallmentEditSheetState extends State<_InstallmentEditSheet> {
           ),
           const SizedBox(height: AppSpacing.lg),
           AppButton(
-            label: 'Kaydet',
+            label: ref.watch(rcTextProvider(RemoteConfigKeys.commonKaydet)),
             onPressed: () {
               final digits = _amountController.text.replaceAll('.', '');
               widget.onSave(

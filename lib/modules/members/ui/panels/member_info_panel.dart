@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
+import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/subscription/subscription_write_gate.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/utils/phone_number_formatter.dart';
@@ -129,7 +130,17 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        widget.isNew ? 'Yeni üye' : 'Üye bilgileri',
+                        widget.isNew
+                            ? ref.watch(
+                                rcTextProvider(
+                                  RemoteConfigKeys.membersInfoNewTitle,
+                                ),
+                              )
+                            : ref.watch(
+                                rcTextProvider(
+                                  RemoteConfigKeys.membersInfoEditTitle,
+                                ),
+                              ),
                         style: typography.headingSmall.copyWith(
                           color: colors.onSurface,
                           fontSize: 18,
@@ -140,7 +151,9 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
                             .read(panelStackControllerProvider.notifier)
                             .pop(),
                         child: Text(
-                          'Vazgeç',
+                          ref.watch(
+                            rcTextProvider(RemoteConfigKeys.commonVazgec),
+                          ),
                           style: typography.bodyLarge.copyWith(
                             color: colors.onSurfaceMuted,
                             fontSize: 15,
@@ -190,7 +203,11 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
                         ),
                         const SizedBox(width: AppSpacing.sm),
                         Text(
-                          '1 / 3',
+                          ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.membersInfoStepIndicator1,
+                            ),
+                          ),
                           style: typography.headingSmall.copyWith(
                             fontSize: 13,
                             color: colors.onPrimaryContainer,
@@ -227,7 +244,11 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
                           children: [
                             Expanded(
                               child: AppTextField(
-                                label: 'Ad',
+                                label: ref.watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys.membersFirstNameFieldLabel,
+                                  ),
+                                ),
                                 controller: _firstNameController,
                                 errorText: registrationState.nameError,
                                 onChanged: controller.updateFirstName,
@@ -236,7 +257,11 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
                             const SizedBox(width: AppSpacing.sm),
                             Expanded(
                               child: AppTextField(
-                                label: 'Soyad',
+                                label: ref.watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys.membersLastNameFieldLabel,
+                                  ),
+                                ),
                                 controller: _lastNameController,
                                 onChanged: controller.updateLastName,
                               ),
@@ -245,8 +270,14 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
                         ),
                         const SizedBox(height: AppSpacing.md),
                         AppTextField(
-                          label: 'Telefon',
-                          hint: '5XX XXX XX XX',
+                          label: ref.watch(
+                            rcTextProvider(RemoteConfigKeys.commonTelefonLabel),
+                          ),
+                          hint: ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.membersInfoPhoneHint,
+                            ),
+                          ),
                           prefixText: '+90 ',
                           keyboardType: TextInputType.number,
                           controller: _phoneController,
@@ -258,7 +289,11 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
                         ),
                         const SizedBox(height: AppSpacing.xs),
                         Text(
-                          'Üye bu numarayla giriş yapar, şifre yok.',
+                          ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.membersInfoLoginHelper,
+                            ),
+                          ),
                           style: typography.caption.copyWith(
                             color: colors.onSurfaceMuted,
                           ),
@@ -268,9 +303,19 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
                           children: [
                             Expanded(
                               child: _StepperField(
-                                label: 'Doğum yılı',
+                                label: ref.watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys.membersBirthYearFieldLabel,
+                                  ),
+                                ),
                                 value: '${form.birthYear}',
-                                suffix: '${form.age} yaş',
+                                suffix: ref
+                                    .watch(
+                                      rcTextProvider(
+                                        RemoteConfigKeys.membersInfoAgeSuffix,
+                                      ),
+                                    )
+                                    .replaceAll('{age}', '${form.age}'),
                                 onMinus: () => controller.updateBirthYear(
                                   form.birthYear - 1,
                                 ),
@@ -279,7 +324,12 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
                                 ),
                                 onTapValue: () => _showNumberWheelPicker(
                                   context: context,
-                                  title: 'Doğum yılı',
+                                  title: ref.read(
+                                    rcTextProvider(
+                                      RemoteConfigKeys
+                                          .membersBirthYearFieldLabel,
+                                    ),
+                                  ),
                                   min: 1940,
                                   max: 2020,
                                   initial: form.birthYear,
@@ -290,9 +340,17 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
                             const SizedBox(width: AppSpacing.sm),
                             Expanded(
                               child: _StepperField(
-                                label: 'Boy',
+                                label: ref.watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys.membersHeightFieldLabel,
+                                  ),
+                                ),
                                 value: '${form.heightCm}',
-                                suffix: 'cm',
+                                suffix: ref.watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys.measurementsUnitCm,
+                                  ),
+                                ),
                                 onMinus: () => controller.updateHeightCm(
                                   form.heightCm - 1,
                                 ),
@@ -301,7 +359,12 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
                                 ),
                                 onTapValue: () => _showNumberWheelPicker(
                                   context: context,
-                                  title: 'Boy (cm)',
+                                  title: ref.read(
+                                    rcTextProvider(
+                                      RemoteConfigKeys
+                                          .membersInfoHeightPickerTitle,
+                                    ),
+                                  ),
                                   min: 130,
                                   max: 210,
                                   initial: form.heightCm,
@@ -313,7 +376,11 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
                         ),
                         const SizedBox(height: AppSpacing.md),
                         Text(
-                          'Cinsiyet (opsiyonel)',
+                          ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.membersInfoGenderLabel,
+                            ),
+                          ),
                           style: typography.bodyMedium.copyWith(
                             color: colors.onSurfaceMuted,
                             fontSize: 13,
@@ -342,7 +409,11 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
                         ),
                         const SizedBox(height: AppSpacing.xs),
                         Text(
-                          'Ölçüm avatarı bu bilgiye göre gösterilir; üye ekranında ayrıca seçim yapılmaz.',
+                          ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.membersInfoGenderHelper,
+                            ),
+                          ),
                           style: typography.caption.copyWith(
                             color: colors.onSurfaceMuted,
                           ),
@@ -383,7 +454,12 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
                               children: [
                                 Expanded(
                                   child: Text(
-                                    'Antrenör',
+                                    ref.watch(
+                                      rcTextProvider(
+                                        RemoteConfigKeys
+                                            .membersTrainerFieldLabel,
+                                      ),
+                                    ),
                                     style: typography.bodyLarge.copyWith(
                                       color: colors.onSurfaceVariant,
                                       fontSize: 15,
@@ -398,7 +474,13 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
                                       children: [
                                         Flexible(
                                           child: Text(
-                                            form.trainerName ?? 'Antrenör seç',
+                                            form.trainerName ??
+                                                ref.watch(
+                                                  rcTextProvider(
+                                                    RemoteConfigKeys
+                                                        .membersSelectTrainerButton,
+                                                  ),
+                                                ),
                                             style: typography.headingSmall
                                                 .copyWith(
                                                   color:
@@ -452,7 +534,12 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
                               children: [
                                 Expanded(
                                   child: Text(
-                                    'Kayıt tarihi',
+                                    ref.watch(
+                                      rcTextProvider(
+                                        RemoteConfigKeys
+                                            .membersRegistrationDateFieldLabel,
+                                      ),
+                                    ),
                                     style: typography.bodyLarge.copyWith(
                                       color: colors.onSurfaceVariant,
                                       fontSize: 15,
@@ -493,7 +580,9 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
                     thickness: 4,
                     radius: const Radius.circular(4),
                     child: AppTextField(
-                      label: 'Not (isteğe bağlı)',
+                      label: ref.watch(
+                        rcTextProvider(RemoteConfigKeys.membersNoteFieldLabel),
+                      ),
                       controller: _noteController,
                       scrollController: _noteScrollController,
                       minLines: 1,
@@ -518,14 +607,24 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Ders onayı gönderebilsin',
+                                ref.watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys
+                                        .membersInfoConfirmAttendanceLabel,
+                                  ),
+                                ),
                                 style: typography.bodyLarge.copyWith(
                                   color: colors.onSurface,
                                   fontSize: 15,
                                 ),
                               ),
                               Text(
-                                'Üye ana ekranından sıradaki dersi için "Gelicem"/"Gelmeyeceğim" bildirebilir.',
+                                ref.watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys
+                                        .membersInfoConfirmAttendanceHelper,
+                                  ),
+                                ),
                                 style: typography.caption.copyWith(
                                   color: colors.onSurfaceMuted,
                                 ),
@@ -590,11 +689,26 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
                   AppButton(
                     label: widget.isNew
                         ? (registrationState.isSubmitting
-                              ? 'Kaydediliyor…'
-                              : 'Paket seçimine geç')
+                              ? ref.watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys.membersSavingLabel,
+                                  ),
+                                )
+                              : ref.watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys
+                                        .membersInfoGoToPackageButton,
+                                  ),
+                                ))
                         : (registrationState.isSubmitting
-                              ? 'Kaydediliyor…'
-                              : 'Kaydet'),
+                              ? ref.watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys.membersSavingLabel,
+                                  ),
+                                )
+                              : ref.watch(
+                                  rcTextProvider(RemoteConfigKeys.commonKaydet),
+                                )),
                     onPressed: registrationState.isSubmitting
                         ? null
                         : () async {
@@ -652,7 +766,9 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Antrenör seç',
+                  ref.read(
+                    rcTextProvider(RemoteConfigKeys.membersSelectTrainerButton),
+                  ),
                   style: context.appTypography.headingMedium.copyWith(
                     color: colors.onSurface,
                     fontSize: 20,
@@ -674,7 +790,11 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
                           vertical: AppSpacing.lg,
                         ),
                         child: Text(
-                          'Henüz antrenör yok.',
+                          ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.membersInfoNoTrainersMessage,
+                            ),
+                          ),
                           style: context.appTypography.bodyMedium.copyWith(
                             color: colors.onSurfaceMuted,
                           ),
@@ -769,7 +889,11 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
                 ),
                 const SizedBox(height: AppSpacing.md),
                 AppButton(
-                  label: 'Seç',
+                  label: ref.read(
+                    rcTextProvider(
+                      RemoteConfigKeys.membersInfoPickerConfirmButton,
+                    ),
+                  ),
                   onPressed: () {
                     onSelected(selected);
                     Navigator.of(sheetContext).pop();

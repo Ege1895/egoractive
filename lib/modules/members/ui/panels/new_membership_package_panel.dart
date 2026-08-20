@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
+import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/native_date_picker.dart';
@@ -93,7 +94,11 @@ class _NewMembershipPackagePanelState
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Yeni üyelik',
+                        ref.watch(
+                          rcTextProvider(
+                            RemoteConfigKeys.membersNewMembershipTitle,
+                          ),
+                        ),
                         style: typography.headingSmall.copyWith(
                           color: colors.onSurface,
                           fontSize: 18,
@@ -104,7 +109,9 @@ class _NewMembershipPackagePanelState
                             .read(panelStackControllerProvider.notifier)
                             .popToRoot(),
                         child: Text(
-                          'Vazgeç',
+                          ref.watch(
+                            rcTextProvider(RemoteConfigKeys.commonVazgec),
+                          ),
                           style: typography.bodyLarge.copyWith(
                             color: colors.onSurfaceMuted,
                             fontSize: 15,
@@ -141,7 +148,11 @@ class _NewMembershipPackagePanelState
                       ),
                       const SizedBox(width: AppSpacing.sm),
                       Text(
-                        '2 / 3',
+                        ref.watch(
+                          rcTextProvider(
+                            RemoteConfigKeys.membersNewMembershipStepIndicator2,
+                          ),
+                        ),
                         style: typography.headingSmall.copyWith(
                           fontSize: 13,
                           color: colors.onPrimaryContainer,
@@ -204,7 +215,17 @@ class _NewMembershipPackagePanelState
                                 ),
                               ),
                               Text(
-                                'Antrenör: ${memberForm.trainerName}',
+                                ref
+                                    .watch(
+                                      rcTextProvider(
+                                        RemoteConfigKeys
+                                            .membersNewMembershipTrainerLabel,
+                                      ),
+                                    )
+                                    .replaceAll(
+                                      '{trainerName}',
+                                      '${memberForm.trainerName}',
+                                    ),
                                 style: typography.bodyMedium.copyWith(
                                   color: colors.onSurfaceMuted,
                                   fontSize: 13,
@@ -218,7 +239,11 @@ class _NewMembershipPackagePanelState
                   ),
                   const SizedBox(height: AppSpacing.lg),
                   Text(
-                    'PAKET SEÇ',
+                    ref.watch(
+                      rcTextProvider(
+                        RemoteConfigKeys.membersPackageSelectSection,
+                      ),
+                    ),
                     style: typography.caption.copyWith(
                       color: colors.onSurfaceMuted,
                       letterSpacing: 1.2,
@@ -245,7 +270,11 @@ class _NewMembershipPackagePanelState
                     child: Column(
                       children: [
                         _InfoRow(
-                          label: 'Başlangıç tarihi',
+                          label: ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.membersStartDateFieldLabel,
+                            ),
+                          ),
                           value: _formatDate(membership.startDate),
                           showDivider: true,
                           onTap: () => showNativeDatePicker(
@@ -257,7 +286,11 @@ class _NewMembershipPackagePanelState
                           ),
                         ),
                         _InfoRow(
-                          label: 'Bitiş tarihi',
+                          label: ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.membersEndDateFieldLabel,
+                            ),
+                          ),
                           value: _formatDate(membership.endDate),
                           showDivider: true,
                           onTap: () => showNativeDatePicker(
@@ -269,7 +302,11 @@ class _NewMembershipPackagePanelState
                           ),
                         ),
                         _InfoRow(
-                          label: 'Seans sayısı',
+                          label: ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.commonSeansSayisiLabel,
+                            ),
+                          ),
                           value:
                               '${membership.selectedPackage?.sessionCount ?? 0}',
                           showDivider: true,
@@ -283,14 +320,24 @@ class _NewMembershipPackagePanelState
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      'Telafi seans sayısı',
+                                      ref.watch(
+                                        rcTextProvider(
+                                          RemoteConfigKeys
+                                              .membersMakeupSessionCountLabel,
+                                        ),
+                                      ),
                                       style: typography.bodyLarge.copyWith(
                                         color: colors.onSurfaceVariant,
                                         fontSize: 15,
                                       ),
                                     ),
                                     Text(
-                                      'Paket bitince kullanılabilir',
+                                      ref.watch(
+                                        rcTextProvider(
+                                          RemoteConfigKeys
+                                              .membersMakeupSessionHelper,
+                                        ),
+                                      ),
                                       style: typography.caption.copyWith(
                                         color: colors.onSurfaceMuted,
                                       ),
@@ -346,7 +393,11 @@ class _NewMembershipPackagePanelState
                   ),
                   const SizedBox(height: AppSpacing.sm),
                   Text(
-                    'Bitiş tarihi ve seans sayısı seçtiğiniz pakete göre dolar; isterseniz elle değiştirebilirsiniz.',
+                    ref.watch(
+                      rcTextProvider(
+                        RemoteConfigKeys.membersNewMembershipAutofillNote,
+                      ),
+                    ),
                     style: typography.caption.copyWith(
                       color: colors.onSurfaceMuted,
                     ),
@@ -362,7 +413,9 @@ class _NewMembershipPackagePanelState
                 AppSpacing.lg,
               ),
               child: AppButton(
-                label: 'Ödeme bilgisine geç',
+                label: ref.watch(
+                  rcTextProvider(RemoteConfigKeys.membersGoToPaymentButton),
+                ),
                 onPressed: membership.selectedPackage == null
                     ? null
                     : () => ref

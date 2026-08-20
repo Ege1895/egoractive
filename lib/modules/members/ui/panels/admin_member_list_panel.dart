@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
+import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../controller/admin_member_list_controller.dart';
 import '../../controller/new_member_controller.dart';
@@ -66,7 +67,9 @@ class _AdminMemberListPanelState extends ConsumerState<AdminMemberListPanel> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Üyeler',
+                        ref.watch(
+                          rcTextProvider(RemoteConfigKeys.membersListTitle),
+                        ),
                         style: typography.headingLarge.copyWith(
                           color: colors.onSurface,
                         ),
@@ -95,7 +98,11 @@ class _AdminMemberListPanelState extends ConsumerState<AdminMemberListPanel> {
                             constraints: const BoxConstraints(minHeight: 40),
                             alignment: Alignment.center,
                             child: Text(
-                              '+ Üye ekle',
+                              ref.watch(
+                                rcTextProvider(
+                                  RemoteConfigKeys.membersAddMemberButton,
+                                ),
+                              ),
                               style: typography.headingSmall.copyWith(
                                 fontSize: 14,
                                 color: colors.onPrimary,
@@ -135,7 +142,11 @@ class _AdminMemberListPanelState extends ConsumerState<AdminMemberListPanel> {
                               fontSize: 15,
                             ),
                             decoration: InputDecoration(
-                              hintText: 'İsim ara',
+                              hintText: ref.watch(
+                                rcTextProvider(
+                                  RemoteConfigKeys.membersListSearchHint,
+                                ),
+                              ),
                               hintStyle: typography.bodyLarge.copyWith(
                                 color: colors.onSurfaceMuted,
                                 fontSize: 15,
@@ -155,21 +166,31 @@ class _AdminMemberListPanelState extends ConsumerState<AdminMemberListPanel> {
                       scrollDirection: Axis.horizontal,
                       children: [
                         _FilterChip(
-                          label: 'Tümü',
+                          label: ref.watch(
+                            rcTextProvider(RemoteConfigKeys.commonTumuFilter),
+                          ),
                           selected: _filter == _MemberFilter.all,
                           onTap: () =>
                               setState(() => _filter = _MemberFilter.all),
                         ),
                         const SizedBox(width: AppSpacing.sm),
                         _FilterChip(
-                          label: 'Aktif',
+                          label: ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.membersFilterActive,
+                            ),
+                          ),
                           selected: _filter == _MemberFilter.active,
                           onTap: () =>
                               setState(() => _filter = _MemberFilter.active),
                         ),
                         const SizedBox(width: AppSpacing.sm),
                         _FilterChip(
-                          label: 'Bitiyor',
+                          label: ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.membersFilterExpiring,
+                            ),
+                          ),
                           selected: _filter == _MemberFilter.endingSoon,
                           onTap: () => setState(
                             () => _filter = _MemberFilter.endingSoon,
@@ -177,7 +198,11 @@ class _AdminMemberListPanelState extends ConsumerState<AdminMemberListPanel> {
                         ),
                         const SizedBox(width: AppSpacing.sm),
                         _FilterChip(
-                          label: 'Paketi yok',
+                          label: ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.commonPaketiYokFilter,
+                            ),
+                          ),
                           selected: _filter == _MemberFilter.none,
                           onTap: () =>
                               setState(() => _filter = _MemberFilter.none),
@@ -209,7 +234,11 @@ class _AdminMemberListPanelState extends ConsumerState<AdminMemberListPanel> {
                     ),
                     TextButton(
                       onPressed: controller.refresh,
-                      child: const Text('Tekrar dene'),
+                      child: Text(
+                        ref.watch(
+                          rcTextProvider(RemoteConfigKeys.authRetryButton),
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -221,8 +250,16 @@ class _AdminMemberListPanelState extends ConsumerState<AdminMemberListPanel> {
                   ? Center(
                       child: Text(
                         state.errorMessage != null
-                            ? 'Liste yüklenemedi.'
-                            : 'Bu filtreye uyan üye yok.',
+                            ? ref.watch(
+                                rcTextProvider(
+                                  RemoteConfigKeys.membersListLoadError,
+                                ),
+                              )
+                            : ref.watch(
+                                rcTextProvider(
+                                  RemoteConfigKeys.membersListEmptyState,
+                                ),
+                              ),
                         style: typography.bodyMedium.copyWith(
                           color: colors.onSurfaceMuted,
                         ),
@@ -466,7 +503,11 @@ class _MemberCard extends ConsumerWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          'Kalan ders',
+                          ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.commonKalanDersLabel,
+                            ),
+                          ),
                           style: typography.caption.copyWith(
                             color: colors.onSurfaceMuted,
                             fontSize: 12,
@@ -501,7 +542,9 @@ class _MemberCard extends ConsumerWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          'Bitiş',
+                          ref.watch(
+                            rcTextProvider(RemoteConfigKeys.commonBitisLabel),
+                          ),
                           style: typography.caption.copyWith(
                             color: colors.onSurfaceMuted,
                             fontSize: 12,

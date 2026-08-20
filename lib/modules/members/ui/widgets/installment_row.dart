@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/app_spacing.dart';
+import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_color_scheme.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -12,7 +14,7 @@ import '../../../../shared/utils/tr_date_formatter.dart';
 /// oluştururken (`NewMembershipPaymentPanel`) ve mevcut bir üyenin
 /// taksitlerini yönetirken (`AdminMemberDetailPanel`) aynı görünüm/dokunma
 /// davranışı kullanılıyor.
-class InstallmentRow extends StatelessWidget {
+class InstallmentRow extends ConsumerWidget {
   const InstallmentRow({
     required this.installment,
     this.onTap,
@@ -28,16 +30,20 @@ class InstallmentRow extends StatelessWidget {
   final bool showDivider;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.appColors;
     final typography = context.appTypography;
-    final row = _buildRow(colors, typography);
+    final row = _buildRow(ref, colors, typography);
     if (onTap == null) return row;
 
     return InkWell(onTap: onTap, child: row);
   }
 
-  Widget _buildRow(AppColorScheme colors, AppTypography typography) {
+  Widget _buildRow(
+    WidgetRef ref,
+    AppColorScheme colors,
+    AppTypography typography,
+  ) {
     return Container(
       constraints: const BoxConstraints(minHeight: 56),
       decoration: BoxDecoration(
@@ -52,7 +58,14 @@ class InstallmentRow extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '${installment.index}. Taksit',
+                  ref
+                      .watch(
+                        rcTextProvider(
+                          RemoteConfigKeys
+                              .sessionsMemberHomeInstallmentIndexLabel,
+                        ),
+                      )
+                      .replaceAll('{index}', '${installment.index}'),
                   style: typography.bodyLarge.copyWith(
                     color: colors.onSurface,
                     fontSize: 15,
@@ -79,7 +92,16 @@ class InstallmentRow extends StatelessWidget {
               borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
             ),
             child: Text(
-              installment.paid ? 'Ödendi' : 'Ödenmedi',
+              installment.paid
+                  ? ref.watch(
+                      rcTextProvider(RemoteConfigKeys.membersDetailPaidLabel),
+                    )
+                  : ref.watch(
+                      rcTextProvider(
+                        RemoteConfigKeys
+                            .sessionsMemberHomeInstallmentUnpaidLabel,
+                      ),
+                    ),
               style: typography.caption.copyWith(
                 color: installment.paid
                     ? colors.onSuccessContainer

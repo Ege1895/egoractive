@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
+import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/domain/membership_installment.dart';
 import '../../../../shared/utils/thousands_input_formatter.dart';
@@ -124,7 +125,9 @@ class _EditMemberPaymentPanelState
       if (mounted) {
         setState(() {
           _isSaving = false;
-          _errorMessage = 'Kaydedilemedi, bağlantını kontrol edip tekrar dene.';
+          _errorMessage = ref.read(
+            rcTextProvider(RemoteConfigKeys.membersEditPaymentSaveError),
+          );
         });
       }
       return;
@@ -161,7 +164,9 @@ class _EditMemberPaymentPanelState
                   ),
                   const SizedBox(width: AppSpacing.md),
                   Text(
-                    'Ödeme bilgileri',
+                    ref.watch(
+                      rcTextProvider(RemoteConfigKeys.membersEditPaymentTitle),
+                    ),
                     style: typography.headingSmall.copyWith(
                       color: colors.onSurface,
                       fontSize: 18,
@@ -200,7 +205,11 @@ class _EditMemberPaymentPanelState
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         AppTextField(
-                          label: 'Toplam tutar',
+                          label: ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.membersPaymentTotalLabel,
+                            ),
+                          ),
                           controller: _totalController,
                           keyboardType: TextInputType.number,
                           inputFormatters: [ThousandsInputFormatter()],
@@ -219,7 +228,12 @@ class _EditMemberPaymentPanelState
                           children: [
                             Expanded(
                               child: Text(
-                                'Taksit sayısı',
+                                ref.watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys
+                                        .membersPaymentInstallmentCountLabel,
+                                  ),
+                                ),
                                 style: typography.bodyLarge.copyWith(
                                   color: colors.onSurfaceVariant,
                                   fontSize: 15,
@@ -311,7 +325,11 @@ class _EditMemberPaymentPanelState
                   ),
                   const SizedBox(height: AppSpacing.sm),
                   Text(
-                    'Üye kendi ekranında yalnızca taksitlerin ödenip ödenmediğini görür; tutarlar üyeye gösterilmez.',
+                    ref.watch(
+                      rcTextProvider(
+                        RemoteConfigKeys.membersPaymentInstallmentNote,
+                      ),
+                    ),
                     style: typography.caption.copyWith(
                       color: colors.onSurfaceMuted,
                     ),
@@ -340,7 +358,13 @@ class _EditMemberPaymentPanelState
                     const SizedBox(height: AppSpacing.sm),
                   ],
                   AppButton(
-                    label: _isSaving ? 'Kaydediliyor…' : 'Kaydet',
+                    label: _isSaving
+                        ? ref.watch(
+                            rcTextProvider(RemoteConfigKeys.membersSavingLabel),
+                          )
+                        : ref.watch(
+                            rcTextProvider(RemoteConfigKeys.commonKaydet),
+                          ),
                     onPressed: _isSaving ? null : _save,
                   ),
                 ],

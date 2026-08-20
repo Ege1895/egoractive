@@ -573,6 +573,49 @@ abstract final class RemoteConfigKeys {
       'lbl_members_start_date_field_label';
   static const membersEndDateFieldLabel = 'lbl_members_end_date_field_label';
   static const membersGoToPaymentButton = 'lbl_members_go_to_payment_button';
+  static const membersDetailNotFound = 'lbl_members_detail_not_found';
+  static const membersDetailLastPaymentLabel =
+      'lbl_members_detail_last_payment_label';
+  static const membersDetailViewMeasurementsButton =
+      'lbl_members_detail_view_measurements_button';
+  static const membersDetailPhoneTrainerLine =
+      'lbl_members_detail_phone_trainer_line';
+  static const membersListSearchHint = 'lbl_members_list_search_hint';
+  static const membersListLoadError = 'lbl_members_list_load_error';
+  static const membersEditPaymentTitle = 'lbl_members_edit_payment_title';
+  static const membersPaymentInstallmentCountLabel =
+      'lbl_members_payment_installment_count_label';
+  static const membersEditPaymentSaveError =
+      'lbl_members_edit_payment_save_error';
+  static const membersPaymentInstallmentNote =
+      'lbl_members_payment_installment_note';
+  static const membersSavingLabel = 'lbl_members_saving_label';
+  static const membersInfoNewTitle = 'lbl_members_info_new_title';
+  static const membersInfoEditTitle = 'lbl_members_info_edit_title';
+  static const membersInfoPhoneHint = 'lbl_members_info_phone_hint';
+  static const membersInfoAgeSuffix = 'lbl_members_info_age_suffix';
+  static const membersInfoHeightPickerTitle =
+      'lbl_members_info_height_picker_title';
+  static const membersInfoGenderLabel = 'lbl_members_info_gender_label';
+  static const membersInfoGenderHelper = 'lbl_members_info_gender_helper';
+  static const membersInfoConfirmAttendanceLabel =
+      'lbl_members_info_confirm_attendance_label';
+  static const membersInfoConfirmAttendanceHelper =
+      'lbl_members_info_confirm_attendance_helper';
+  static const membersInfoGoToPackageButton =
+      'lbl_members_info_go_to_package_button';
+  static const membersInfoNoTrainersMessage =
+      'lbl_members_info_no_trainers_message';
+  static const membersInfoPickerConfirmButton =
+      'lbl_members_info_picker_confirm_button';
+  static const membersNewMembershipTrainerLabel =
+      'lbl_members_new_membership_trainer_label';
+  static const membersNewMembershipAutofillNote =
+      'lbl_members_new_membership_autofill_note';
+  static const membersInstallmentAmountFieldLabel =
+      'lbl_members_installment_amount_field_label';
+  static const membersInstallmentPaidToggleLabel =
+      'lbl_members_installment_paid_toggle_label';
   static const notificationsTitle = 'lbl_notifications_title';
   static const notificationsTargetQuestionLabel =
       'lbl_notifications_target_question_label';
@@ -1293,6 +1336,43 @@ class RemoteConfigService {
     'lbl_members_start_date_field_label_tr': 'Başlangıç tarihi',
     'lbl_members_end_date_field_label_tr': 'Bitiş tarihi',
     'lbl_members_go_to_payment_button_tr': 'Ödeme bilgisine geç',
+    'lbl_members_detail_not_found_tr': 'Üye bulunamadı.',
+    'lbl_members_detail_last_payment_label_tr': 'Son ödeme {date}',
+    'lbl_members_detail_view_measurements_button_tr': 'Ölçüm ekranını gör',
+    'lbl_members_detail_phone_trainer_line_tr':
+        '{phone} · Antrenör: {trainerName}',
+    'lbl_members_list_search_hint_tr': 'İsim ara',
+    'lbl_members_list_load_error_tr': 'Liste yüklenemedi.',
+    'lbl_members_edit_payment_title_tr': 'Ödeme bilgileri',
+    'lbl_members_payment_installment_count_label_tr': 'Taksit sayısı',
+    'lbl_members_edit_payment_save_error_tr':
+        'Kaydedilemedi, bağlantını kontrol edip tekrar dene.',
+    'lbl_members_payment_installment_note_tr':
+        'Üye kendi ekranında yalnızca taksitlerin ödenip ödenmediğini görür; '
+        'tutarlar üyeye gösterilmez.',
+    'lbl_members_saving_label_tr': 'Kaydediliyor…',
+    'lbl_members_info_new_title_tr': 'Yeni üye',
+    'lbl_members_info_edit_title_tr': 'Üye bilgileri',
+    'lbl_members_info_phone_hint_tr': '5XX XXX XX XX',
+    'lbl_members_info_age_suffix_tr': '{age} yaş',
+    'lbl_members_info_height_picker_title_tr': 'Boy (cm)',
+    'lbl_members_info_gender_label_tr': 'Cinsiyet (opsiyonel)',
+    'lbl_members_info_gender_helper_tr':
+        'Ölçüm avatarı bu bilgiye göre gösterilir; üye ekranında ayrıca '
+        'seçim yapılmaz.',
+    'lbl_members_info_confirm_attendance_label_tr': 'Ders onayı gönderebilsin',
+    'lbl_members_info_confirm_attendance_helper_tr':
+        'Üye ana ekranından sıradaki dersi için "Gelicem"/"Gelmeyeceğim" '
+        'bildirebilir.',
+    'lbl_members_info_go_to_package_button_tr': 'Paket seçimine geç',
+    'lbl_members_info_no_trainers_message_tr': 'Henüz antrenör yok.',
+    'lbl_members_info_picker_confirm_button_tr': 'Seç',
+    'lbl_members_new_membership_trainer_label_tr': 'Antrenör: {trainerName}',
+    'lbl_members_new_membership_autofill_note_tr':
+        'Bitiş tarihi ve seans sayısı seçtiğiniz pakete göre dolar; '
+        'isterseniz elle değiştirebilirsiniz.',
+    'lbl_members_installment_amount_field_label_tr': 'Tutar',
+    'lbl_members_installment_paid_toggle_label_tr': 'Ödendi mi?',
     'lbl_notifications_title_tr': 'Bildirim gönder',
     'lbl_notifications_target_question_label_tr': 'Kime gidecek?',
     'lbl_notifications_target_single_member_option_tr': 'Tek üye',
@@ -1835,6 +1915,45 @@ class RemoteConfigService {
     'lbl_members_start_date_field_label_en': 'Start date',
     'lbl_members_end_date_field_label_en': 'End date',
     'lbl_members_go_to_payment_button_en': 'Continue to payment',
+    'lbl_members_detail_not_found_en': 'Member not found.',
+    'lbl_members_detail_last_payment_label_en': 'Last payment {date}',
+    'lbl_members_detail_view_measurements_button_en':
+        'View measurements screen',
+    'lbl_members_detail_phone_trainer_line_en':
+        '{phone} · Trainer: {trainerName}',
+    'lbl_members_list_search_hint_en': 'Search by name',
+    'lbl_members_list_load_error_en': 'Could not load the list.',
+    'lbl_members_edit_payment_title_en': 'Payment details',
+    'lbl_members_payment_installment_count_label_en': 'Installment count',
+    'lbl_members_edit_payment_save_error_en':
+        'Could not save, check your connection and try again.',
+    'lbl_members_payment_installment_note_en':
+        'The member only sees whether installments are paid on their own '
+        'screen; amounts are not shown to them.',
+    'lbl_members_saving_label_en': 'Saving…',
+    'lbl_members_info_new_title_en': 'New member',
+    'lbl_members_info_edit_title_en': 'Member details',
+    'lbl_members_info_phone_hint_en': '5XX XXX XX XX',
+    'lbl_members_info_age_suffix_en': '{age} yo',
+    'lbl_members_info_height_picker_title_en': 'Height (cm)',
+    'lbl_members_info_gender_label_en': 'Gender (optional)',
+    'lbl_members_info_gender_helper_en':
+        'The measurement avatar is shown based on this; no separate '
+        'selection is made on the member screen.',
+    'lbl_members_info_confirm_attendance_label_en':
+        'Can send session confirmations',
+    'lbl_members_info_confirm_attendance_helper_en':
+        'The member can report "I\'ll be there"/"I won\'t make it" for '
+        'their next session from the home screen.',
+    'lbl_members_info_go_to_package_button_en': 'Continue to package',
+    'lbl_members_info_no_trainers_message_en': 'No trainers yet.',
+    'lbl_members_info_picker_confirm_button_en': 'Select',
+    'lbl_members_new_membership_trainer_label_en': 'Trainer: {trainerName}',
+    'lbl_members_new_membership_autofill_note_en':
+        'End date and session count fill in based on the selected package; '
+        'you can edit them manually if you want.',
+    'lbl_members_installment_amount_field_label_en': 'Amount',
+    'lbl_members_installment_paid_toggle_label_en': 'Paid?',
     'lbl_notifications_title_en': 'Send notification',
     'lbl_notifications_target_question_label_en': 'Who should receive it?',
     'lbl_notifications_target_single_member_option_en': 'Single member',
