@@ -5,6 +5,24 @@ import { onDocumentWritten } from "firebase-functions/v2/firestore";
 import { usersCollection } from "../shared/firestore-paths";
 import { withFailureAlerting } from "../shared/function-health";
 
+/**
+ * `signupGymAdmin`/üye-antrenör ekleme akışları `users/{uid}` dokümanını
+ * henüz hiçbir Firebase Auth hesabı yokken yazıyor (lazy account creation,
+ * bkz. aşağıdaki `onUserRoleAssigned` yorumu) — bu durumda
+ * `setCustomUserClaims` her zaman `auth/user-not-found` ile başarısız olur.
+ * Bu, kullanıcı ilk girişini yapıp hesabı oluşana kadar KENDİ KENDİNE
+ * beklenen bir durum, gerçek bir hata değil — `withFailureAlerting`'in bunu
+ * "art arda 3 hata" alarmına saymaması için ayrıca işaretleniyor.
+ */
+export function isUserNotFoundError(error: unknown): boolean {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "code" in error &&
+    (error as { code?: unknown }).code === "auth/user-not-found"
+  );
+}
+
 export interface ClaimsUpdate {
   role: string;
   gymId: string | null;
@@ -52,15 +70,19 @@ export const onUserRoleAssigned = onDocumentWritten(
   // Eventarc'ın kendi backoff'uyla, kullanıcı `requestCustomToken` ile ilk
   // girişini yapıp hesabı oluştuktan sonra tekrar denenir.
   { document: `${usersCollection()}/{uid}`, retry: true },
-  withFailureAlerting("onUserRoleAssigned", async (event) => {
-    const before = event.data?.before;
-    const after = event.data?.after;
-    if (!after?.exists) return;
+  withFailureAlerting(
+    "onUserRoleAssigned",
+    async (event) => {
+      const before = event.data?.before;
+      const after = event.data?.after;
+      if (!after?.exists) return;
 
-    const update = resolveClaimsUpdate(before?.exists ? before.data() : undefined, after.data());
-    if (!update) return;
+      const update = resolveClaimsUpdate(before?.exists ? before.data() : undefined, after.data());
+      if (!update) return;
 
-    await getAuth().setCustomUserClaims(event.params.uid, update);
-    await after.ref.update({ claimsSyncedAt: FieldValue.serverTimestamp() });
-  }),
+      await getAuth().setCustomUserClaims(event.params.uid, update);
+      await after.ref.update({ claimsSyncedAt: FieldValue.serverTimestamp() });
+    },
+    { isIgnorable: isUserNotFoundError },
+  ),
 );

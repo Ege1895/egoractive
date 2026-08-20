@@ -1,7 +1,22 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { resolveClaimsUpdate } from "./on-user-role-assigned";
+import { isUserNotFoundError, resolveClaimsUpdate } from "./on-user-role-assigned";
+
+test("isUserNotFoundError recognizes the Firebase Auth 'user-not-found' code", () => {
+  assert.equal(isUserNotFoundError({ code: "auth/user-not-found" }), true);
+});
+
+test("isUserNotFoundError is false for other error codes", () => {
+  assert.equal(isUserNotFoundError({ code: "auth/internal-error" }), false);
+});
+
+test("isUserNotFoundError is false for non-error values", () => {
+  assert.equal(isUserNotFoundError(new Error("boom")), false);
+  assert.equal(isUserNotFoundError("boom"), false);
+  assert.equal(isUserNotFoundError(null), false);
+  assert.equal(isUserNotFoundError(undefined), false);
+});
 
 test("returns null when there is no after-data (document deleted)", () => {
   assert.equal(resolveClaimsUpdate({ role: "member" }, undefined), null);

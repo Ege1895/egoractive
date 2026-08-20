@@ -51,16 +51,28 @@ async function recordSuccess(functionName: string): Promise<void> {
  * çalışma sayacı sıfırlar. Hatayı yeniden fırlatır — Cloud Functions'ın
  * kendi hata loglaması/yeniden deneme davranışı bu sarmalayıcı yüzünden
  * bozulmasın diye.
+ *
+ * `isIgnorable` verilirse: bu tahmine uyan hatalar hâlâ fırlatılır (Cloud
+ * Functions'ın `retry: true` mekanizması hâlâ çalışsın diye) ama art arda
+ * hata sayacını artırmaz/alarm tetiklemez — kendi kendine düzelmesi
+ * beklenen, bilinen bir yarış durumu için (bkz. onUserRoleAssigned'daki
+ * `auth/user-not-found`) her denemede ayrı bir "gerçek" hata gibi
+ * sayılmasın diye.
  */
 export function withFailureAlerting<Args extends unknown[]>(
   functionName: string,
   handler: (...args: Args) => Promise<void>,
+  options?: { isIgnorable?: (error: unknown) => boolean },
 ): (...args: Args) => Promise<void> {
   return async (...args: Args) => {
     try {
       await handler(...args);
       await recordSuccess(functionName);
     } catch (error) {
+      if (options?.isIgnorable?.(error)) {
+        logger.info(`${functionName} beklenen bir hatayla karşılaştı, alarm sayılmadı`, error);
+        throw error;
+      }
       logger.error(`${functionName} hata verdi`, error);
       await recordFailure(functionName, error);
       throw error;
