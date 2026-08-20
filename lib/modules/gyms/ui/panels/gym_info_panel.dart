@@ -402,77 +402,35 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
                           ),
                         ],
                         const SizedBox(height: AppSpacing.md),
-                        Container(
-                          padding: const EdgeInsets.all(AppSpacing.md),
-                          decoration: BoxDecoration(
-                            color: colors.surfaceRaised,
+                        Material(
+                          color: Colors.transparent,
+                          borderRadius: BorderRadius.circular(
+                            AppSpacing.radiusInner,
+                          ),
+                          child: InkWell(
+                            onTap: _previewColor == null ? null : _saveTheme,
                             borderRadius: BorderRadius.circular(
                               AppSpacing.radiusInner,
                             ),
-                          ),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Önizleme',
-                                      style: typography.caption.copyWith(
-                                        color: colors.onSurfaceMuted,
-                                      ),
-                                    ),
-                                    Text(
-                                      'Birincil buton',
-                                      style: typography.headingSmall.copyWith(
-                                        color: colors.onSurface,
-                                        fontSize: 15,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Material(
-                                color: Colors.transparent,
+                            child: Container(
+                              constraints: const BoxConstraints(minHeight: 44),
+                              decoration: BoxDecoration(
+                                color: _previewColor == null
+                                    ? active.primary.withValues(alpha: 0.4)
+                                    : active.primary,
                                 borderRadius: BorderRadius.circular(
                                   AppSpacing.radiusInner,
                                 ),
-                                child: InkWell(
-                                  onTap: _previewColor == null
-                                      ? null
-                                      : _saveTheme,
-                                  borderRadius: BorderRadius.circular(
-                                    AppSpacing.radiusInner,
-                                  ),
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: AppSpacing.lg,
-                                    ),
-                                    constraints: const BoxConstraints(
-                                      minHeight: 44,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: _previewColor == null
-                                          ? active.primary.withValues(
-                                              alpha: 0.4,
-                                            )
-                                          : active.primary,
-                                      borderRadius: BorderRadius.circular(
-                                        AppSpacing.radiusInner,
-                                      ),
-                                    ),
-                                    alignment: Alignment.center,
-                                    child: Text(
-                                      'Kaydet',
-                                      style: typography.headingSmall.copyWith(
-                                        fontSize: 15,
-                                        color: colors.onPrimary,
-                                      ),
-                                    ),
-                                  ),
+                              ),
+                              alignment: Alignment.center,
+                              child: Text(
+                                'Kaydet',
+                                style: typography.headingSmall.copyWith(
+                                  fontSize: 15,
+                                  color: colors.onPrimary,
                                 ),
                               ),
-                            ],
+                            ),
                           ),
                         ),
                         const SizedBox(height: AppSpacing.sm),
