@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/constants/app_spacing.dart';
+import '../../core/remote_config/remote_config_service.dart';
 import '../../core/theme/app_theme.dart';
 
 /// P2-5 (Ölçümlerim) grafik kartından çıkarılan, antrenör üye detayında da
@@ -28,9 +30,13 @@ class TrendBarChart extends StatelessWidget {
       return SizedBox(
         height: height,
         child: Center(
-          child: Text(
-            'Henüz veri yok',
-            style: typography.bodyMedium.copyWith(color: colors.onSurfaceMuted),
+          child: Consumer(
+            builder: (context, ref, _) => Text(
+              ref.watch(rcTextProvider(RemoteConfigKeys.commonHenuzVeriYok)),
+              style: typography.bodyMedium.copyWith(
+                color: colors.onSurfaceMuted,
+              ),
+            ),
           ),
         ),
       );

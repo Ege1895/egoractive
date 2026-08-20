@@ -2,8 +2,10 @@ import 'dart:io' show Platform;
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/constants/app_spacing.dart';
+import '../../core/remote_config/remote_config_service.dart';
 import '../../core/theme/app_theme.dart';
 
 /// Platformun kendi native tarih seçicisi: iOS'ta gün/ay/yıl scroll wheel'i
@@ -35,7 +37,11 @@ Future<void> showNativeDatePicker({
                 Align(
                   alignment: Alignment.centerRight,
                   child: CupertinoButton(
-                    child: const Text('Tamam'),
+                    child: Text(
+                      ProviderScope.containerOf(sheetContext).read(
+                        rcTextProvider(RemoteConfigKeys.commonTamamButton),
+                      ),
+                    ),
                     onPressed: () {
                       onSelected(selected);
                       Navigator.of(sheetContext).pop();

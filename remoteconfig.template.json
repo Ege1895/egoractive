@@ -522,6 +522,32 @@
       },
       "valueType": "STRING"
     },
+    "lbl_common_tamam_button_tr": {
+      "defaultValue": {
+        "value": "Tamam"
+      },
+      "description": "Native tarih seçicideki (iOS) onay butonu.",
+      "valueType": "STRING"
+    },
+    "lbl_common_tamam_button_en": {
+      "defaultValue": {
+        "value": "Done"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_common_henuz_veri_yok_tr": {
+      "defaultValue": {
+        "value": "Henüz veri yok"
+      },
+      "description": "TrendBarChart boş veri durumu metni.",
+      "valueType": "STRING"
+    },
+    "lbl_common_henuz_veri_yok_en": {
+      "defaultValue": {
+        "value": "No data yet"
+      },
+      "valueType": "STRING"
+    },
     "lbl_common_language_nav_label_tr": {
       "defaultValue": {
         "value": "Dil"

@@ -122,6 +122,8 @@ abstract final class RemoteConfigKeys {
   static const commonBuGundeSeansYok = 'lbl_common_bu_gunde_seans_yok';
   static const commonBitisLabel = 'lbl_common_bitis_label';
   static const commonLanguageNavLabel = 'lbl_common_language_nav_label';
+  static const commonTamamButton = 'lbl_common_tamam_button';
+  static const commonHenuzVeriYok = 'lbl_common_henuz_veri_yok';
   static const languageSelectTitle = 'lbl_language_select_title';
   static const languageSelectTurkishOption =
       'lbl_language_select_turkish_option';
@@ -667,6 +669,8 @@ class RemoteConfigService {
     'lbl_common_bu_gunde_seans_yok_tr': 'Bu günde seans yok.',
     'lbl_common_bitis_label_tr': 'Bitiş',
     'lbl_common_language_nav_label_tr': 'Dil',
+    'lbl_common_tamam_button_tr': 'Tamam',
+    'lbl_common_henuz_veri_yok_tr': 'Henüz veri yok',
     'lbl_language_select_title_tr': 'Dil seç',
     'lbl_language_select_turkish_option_tr': 'Türkçe',
     'lbl_language_select_english_option_tr': 'English',
@@ -981,6 +985,8 @@ class RemoteConfigService {
     'lbl_common_bu_gunde_seans_yok_en': 'No sessions on this day.',
     'lbl_common_bitis_label_en': 'End',
     'lbl_common_language_nav_label_en': 'Language',
+    'lbl_common_tamam_button_en': 'Done',
+    'lbl_common_henuz_veri_yok_en': 'No data yet',
     'lbl_language_select_title_en': 'Select language',
     'lbl_language_select_turkish_option_en': 'Türkçe',
     'lbl_language_select_english_option_en': 'English',

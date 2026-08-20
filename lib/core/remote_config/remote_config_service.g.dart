@@ -24,7 +24,7 @@ final remoteConfigServiceProvider = Provider<RemoteConfigService>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef RemoteConfigServiceRef = ProviderRef<RemoteConfigService>;
-String _$rcTextHash() => r'e8ef1f8ab624d037efc48429ef5b89680a048174';
+String _$rcTextHash() => r'3faba1e60c4d54d94d7c368c8e71b9b63a0fdf9f';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -51,6 +51,11 @@ class _SystemHash {
 /// provider'ı `watch` eden her widget, [localeControllerProvider] değişince
 /// otomatik yeniden çizilir (bkz. CLAUDE.md §2.5, `lbl*` metinleri).
 ///
+/// Firebase.initializeApp hiç çağrılmamış bir widget test ortamında
+/// `FirebaseRemoteConfig.instance` erişimi fırlatabilir (bkz. aynı desen
+/// `profile_panel.dart`'taki `sessionReminderMinutesBefore` try/catch'i) —
+/// panel testte boş metinle render olsun diye burada da yutuluyor.
+///
 /// Copied from [rcText].
 @ProviderFor(rcText)
 const rcTextProvider = RcTextFamily();
@@ -59,11 +64,21 @@ const rcTextProvider = RcTextFamily();
 /// provider'ı `watch` eden her widget, [localeControllerProvider] değişince
 /// otomatik yeniden çizilir (bkz. CLAUDE.md §2.5, `lbl*` metinleri).
 ///
+/// Firebase.initializeApp hiç çağrılmamış bir widget test ortamında
+/// `FirebaseRemoteConfig.instance` erişimi fırlatabilir (bkz. aynı desen
+/// `profile_panel.dart`'taki `sessionReminderMinutesBefore` try/catch'i) —
+/// panel testte boş metinle render olsun diye burada da yutuluyor.
+///
 /// Copied from [rcText].
 class RcTextFamily extends Family<String> {
   /// Bir `lbl*` taban anahtarını aktif dile göre reaktif olarak çözer — bu
   /// provider'ı `watch` eden her widget, [localeControllerProvider] değişince
   /// otomatik yeniden çizilir (bkz. CLAUDE.md §2.5, `lbl*` metinleri).
+  ///
+  /// Firebase.initializeApp hiç çağrılmamış bir widget test ortamında
+  /// `FirebaseRemoteConfig.instance` erişimi fırlatabilir (bkz. aynı desen
+  /// `profile_panel.dart`'taki `sessionReminderMinutesBefore` try/catch'i) —
+  /// panel testte boş metinle render olsun diye burada da yutuluyor.
   ///
   /// Copied from [rcText].
   const RcTextFamily();
@@ -71,6 +86,11 @@ class RcTextFamily extends Family<String> {
   /// Bir `lbl*` taban anahtarını aktif dile göre reaktif olarak çözer — bu
   /// provider'ı `watch` eden her widget, [localeControllerProvider] değişince
   /// otomatik yeniden çizilir (bkz. CLAUDE.md §2.5, `lbl*` metinleri).
+  ///
+  /// Firebase.initializeApp hiç çağrılmamış bir widget test ortamında
+  /// `FirebaseRemoteConfig.instance` erişimi fırlatabilir (bkz. aynı desen
+  /// `profile_panel.dart`'taki `sessionReminderMinutesBefore` try/catch'i) —
+  /// panel testte boş metinle render olsun diye burada da yutuluyor.
   ///
   /// Copied from [rcText].
   RcTextProvider call(String baseKey) {
@@ -101,11 +121,21 @@ class RcTextFamily extends Family<String> {
 /// provider'ı `watch` eden her widget, [localeControllerProvider] değişince
 /// otomatik yeniden çizilir (bkz. CLAUDE.md §2.5, `lbl*` metinleri).
 ///
+/// Firebase.initializeApp hiç çağrılmamış bir widget test ortamında
+/// `FirebaseRemoteConfig.instance` erişimi fırlatabilir (bkz. aynı desen
+/// `profile_panel.dart`'taki `sessionReminderMinutesBefore` try/catch'i) —
+/// panel testte boş metinle render olsun diye burada da yutuluyor.
+///
 /// Copied from [rcText].
 class RcTextProvider extends AutoDisposeProvider<String> {
   /// Bir `lbl*` taban anahtarını aktif dile göre reaktif olarak çözer — bu
   /// provider'ı `watch` eden her widget, [localeControllerProvider] değişince
   /// otomatik yeniden çizilir (bkz. CLAUDE.md §2.5, `lbl*` metinleri).
+  ///
+  /// Firebase.initializeApp hiç çağrılmamış bir widget test ortamında
+  /// `FirebaseRemoteConfig.instance` erişimi fırlatabilir (bkz. aynı desen
+  /// `profile_panel.dart`'taki `sessionReminderMinutesBefore` try/catch'i) —
+  /// panel testte boş metinle render olsun diye burada da yutuluyor.
   ///
   /// Copied from [rcText].
   RcTextProvider(String baseKey)
