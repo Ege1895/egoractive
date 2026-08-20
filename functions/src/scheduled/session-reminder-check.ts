@@ -6,7 +6,7 @@ import * as logger from "firebase-functions/logger";
 
 import { withFailureAlerting } from "../shared/function-health";
 
-const DEFAULT_REMINDER_MINUTES = 60;
+const DEFAULT_REMINDER_MINUTES = 120;
 
 const DEFAULT_TEXT: Record<string, { tr: string; en: string }> = {
   lbl_notif_session_reminder_title: {
