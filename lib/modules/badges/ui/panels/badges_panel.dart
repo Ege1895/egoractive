@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
+import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_back_button.dart';
 import '../../controller/badges_controller.dart';
@@ -49,7 +50,7 @@ class _BadgesPanelState extends BasePanelState<BadgesPanel> {
                   ),
                   const SizedBox(width: AppSpacing.md),
                   Text(
-                    'Rozetlerim',
+                    ref.watch(rcTextProvider(RemoteConfigKeys.badgesTitle)),
                     style: typography.headingSmall.copyWith(
                       color: colors.onSurface,
                       fontSize: 18,
@@ -69,7 +70,9 @@ class _BadgesPanelState extends BasePanelState<BadgesPanel> {
                 children: [
                   if (hasError) ...[
                     Text(
-                      'Rozetler yüklenemedi.',
+                      ref.watch(
+                        rcTextProvider(RemoteConfigKeys.badgesLoadError),
+                      ),
                       style: typography.bodyMedium.copyWith(
                         color: colors.error,
                         fontSize: 13,
@@ -97,7 +100,14 @@ class _BadgesPanelState extends BasePanelState<BadgesPanel> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    '$earnedCount rozet kazandın',
+                                    ref
+                                        .watch(
+                                          rcTextProvider(
+                                            RemoteConfigKeys
+                                                .badgesEarnedCountLabel,
+                                          ),
+                                        )
+                                        .replaceAll('{count}', '$earnedCount'),
                                     style: typography.headingSmall.copyWith(
                                       color: colors.onSurface,
                                       fontSize: 18,
@@ -105,7 +115,17 @@ class _BadgesPanelState extends BasePanelState<BadgesPanel> {
                                   ),
                                   if (nextLocked != null)
                                     Text(
-                                      'Sıradaki: ${nextLocked.note}',
+                                      ref
+                                          .watch(
+                                            rcTextProvider(
+                                              RemoteConfigKeys
+                                                  .badgesNextLockedLabel,
+                                            ),
+                                          )
+                                          .replaceAll(
+                                            '{note}',
+                                            nextLocked.note,
+                                          ),
                                       style: typography.bodyMedium.copyWith(
                                         color: colors.onSurfaceVariant,
                                         fontSize: 14,

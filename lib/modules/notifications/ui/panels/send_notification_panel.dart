@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
+import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_text_field.dart';
@@ -56,7 +57,9 @@ class _SendNotificationPanelState
                 children: [
                   Expanded(
                     child: Text(
-                      'Bildirim gönder',
+                      ref.watch(
+                        rcTextProvider(RemoteConfigKeys.notificationsTitle),
+                      ),
                       style: typography.headingSmall.copyWith(
                         color: colors.onSurface,
                         fontSize: 18,
@@ -67,7 +70,7 @@ class _SendNotificationPanelState
                     onTap: () =>
                         ref.read(panelStackControllerProvider.notifier).pop(),
                     child: Text(
-                      'Vazgeç',
+                      ref.watch(rcTextProvider(RemoteConfigKeys.commonVazgec)),
                       style: typography.bodyLarge.copyWith(
                         color: colors.onSurfaceMuted,
                         fontSize: 15,
@@ -87,7 +90,11 @@ class _SendNotificationPanelState
                 ),
                 children: [
                   Text(
-                    'Kime gidecek?',
+                    ref.watch(
+                      rcTextProvider(
+                        RemoteConfigKeys.notificationsTargetQuestionLabel,
+                      ),
+                    ),
                     style: typography.bodyMedium.copyWith(
                       color: colors.onSurfaceMuted,
                       fontSize: 13,
@@ -98,7 +105,12 @@ class _SendNotificationPanelState
                     children: [
                       Expanded(
                         child: _TargetChip(
-                          label: 'Seçili üyeler',
+                          label: ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys
+                                  .notificationsTargetSelectedMembersOption,
+                            ),
+                          ),
                           selected:
                               form.targetType ==
                               NotificationTargetType.selectedMembers,
@@ -110,7 +122,12 @@ class _SendNotificationPanelState
                       const SizedBox(width: AppSpacing.sm),
                       Expanded(
                         child: _TargetChip(
-                          label: 'Tüm salon',
+                          label: ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys
+                                  .notificationsTargetWholeGymOption,
+                            ),
+                          ),
                           selected:
                               form.targetType ==
                               NotificationTargetType.wholeGym,
@@ -161,7 +178,12 @@ class _SendNotificationPanelState
                             Expanded(
                               child: Text(
                                 form.targetMembers.isEmpty
-                                    ? 'Üye seç'
+                                    ? ref.watch(
+                                        rcTextProvider(
+                                          RemoteConfigKeys
+                                              .notificationsSelectMemberButton,
+                                        ),
+                                      )
                                     : form.targetMembers.values.join(', '),
                                 overflow: TextOverflow.ellipsis,
                                 style: typography.headingSmall.copyWith(
@@ -171,7 +193,9 @@ class _SendNotificationPanelState
                               ),
                             ),
                             Text(
-                              'Değiştir',
+                              ref.watch(
+                                rcTextProvider(RemoteConfigKeys.commonDegistir),
+                              ),
                               style: typography.headingSmall.copyWith(
                                 color: colors.onPrimaryContainer,
                                 fontSize: 13,
@@ -195,7 +219,14 @@ class _SendNotificationPanelState
                         children: [
                           Expanded(
                             child: Text(
-                              '$gymName · tüm üyeler',
+                              ref
+                                  .watch(
+                                    rcTextProvider(
+                                      RemoteConfigKeys
+                                          .notificationsWholeGymSummaryLabel,
+                                    ),
+                                  )
+                                  .replaceAll('{gym}', gymName),
                               style: typography.bodyLarge.copyWith(
                                 color: colors.onSurfaceVariant,
                                 fontSize: 15,
@@ -232,7 +263,11 @@ class _SendNotificationPanelState
                           thickness: 4,
                           radius: const Radius.circular(4),
                           child: AppTextField(
-                            label: 'Başlık',
+                            label: ref.watch(
+                              rcTextProvider(
+                                RemoteConfigKeys.notificationsTitleFieldLabel,
+                              ),
+                            ),
                             controller: _titleController,
                             scrollController: _titleScrollController,
                             minLines: 1,
@@ -248,7 +283,11 @@ class _SendNotificationPanelState
                           thickness: 4,
                           radius: const Radius.circular(4),
                           child: AppTextField(
-                            label: 'Mesaj',
+                            label: ref.watch(
+                              rcTextProvider(
+                                RemoteConfigKeys.notificationsMessageFieldLabel,
+                              ),
+                            ),
                             controller: _messageController,
                             scrollController: _messageScrollController,
                             minLines: 1,
@@ -260,7 +299,18 @@ class _SendNotificationPanelState
                         Align(
                           alignment: Alignment.centerRight,
                           child: Text(
-                            '${form.message.length} / $_messageMaxLength',
+                            ref
+                                .watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys
+                                        .notificationsMessageCounterLabel,
+                                  ),
+                                )
+                                .replaceAll(
+                                  '{current}',
+                                  '${form.message.length}',
+                                )
+                                .replaceAll('{max}', '$_messageMaxLength'),
                             style: typography.caption.copyWith(
                               color: colors.onSurfaceMuted,
                             ),
@@ -295,7 +345,11 @@ class _SendNotificationPanelState
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Önizleme',
+                          ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.notificationsPreviewLabel,
+                            ),
+                          ),
                           style: typography.headingSmall.copyWith(
                             color: colors.onPrimaryContainer,
                             fontSize: 14,
@@ -303,7 +357,34 @@ class _SendNotificationPanelState
                         ),
                         const SizedBox(height: AppSpacing.xs),
                         Text(
-                          'Egoractive · ${form.title.isEmpty ? "Başlık" : form.title} — ${form.message.isEmpty ? "Mesaj metni…" : form.message}',
+                          ref
+                              .watch(
+                                rcTextProvider(
+                                  RemoteConfigKeys.notificationsPreviewTemplate,
+                                ),
+                              )
+                              .replaceAll(
+                                '{title}',
+                                form.title.isEmpty
+                                    ? ref.watch(
+                                        rcTextProvider(
+                                          RemoteConfigKeys
+                                              .notificationsTitleFieldLabel,
+                                        ),
+                                      )
+                                    : form.title,
+                              )
+                              .replaceAll(
+                                '{message}',
+                                form.message.isEmpty
+                                    ? ref.watch(
+                                        rcTextProvider(
+                                          RemoteConfigKeys
+                                              .notificationsPreviewMessagePlaceholder,
+                                        ),
+                                      )
+                                    : form.message,
+                              ),
                           style: typography.bodyMedium.copyWith(
                             color: colors.onSurfaceVariant,
                             fontSize: 14,
@@ -325,8 +406,23 @@ class _SendNotificationPanelState
               ),
               child: AppButton(
                 label: form.sent
-                    ? 'Gönderildi'
-                    : (form.isSending ? 'Gönderiliyor…' : 'Gönder'),
+                    ? ref.watch(
+                        rcTextProvider(
+                          RemoteConfigKeys.notificationsSentButtonLabel,
+                        ),
+                      )
+                    : (form.isSending
+                          ? ref.watch(
+                              rcTextProvider(
+                                RemoteConfigKeys
+                                    .notificationsSendingButtonLabel,
+                              ),
+                            )
+                          : ref.watch(
+                              rcTextProvider(
+                                RemoteConfigKeys.notificationsSendButtonLabel,
+                              ),
+                            )),
                 onPressed:
                     form.sent ||
                         form.isSending ||
@@ -375,7 +471,11 @@ class _SendNotificationPanelState
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Üye seç',
+                  ref.read(
+                    rcTextProvider(
+                      RemoteConfigKeys.notificationsSelectMemberButton,
+                    ),
+                  ),
                   style: context.appTypography.headingMedium.copyWith(
                     color: colors.onSurface,
                     fontSize: 20,
@@ -383,7 +483,11 @@ class _SendNotificationPanelState
                 ),
                 const SizedBox(height: AppSpacing.xs),
                 Text(
-                  'Bir ya da birden fazla üye seçebilirsin.',
+                  ref.read(
+                    rcTextProvider(
+                      RemoteConfigKeys.notificationsMemberPickerSubtitle,
+                    ),
+                  ),
                   style: context.appTypography.bodyMedium.copyWith(
                     color: colors.onSurfaceMuted,
                     fontSize: 13,
@@ -407,7 +511,12 @@ class _SendNotificationPanelState
                             vertical: AppSpacing.lg,
                           ),
                           child: Text(
-                            'Henüz üye yok.',
+                            ref.read(
+                              rcTextProvider(
+                                RemoteConfigKeys
+                                    .notificationsNoMembersEmptyState,
+                              ),
+                            ),
                             style: context.appTypography.bodyMedium.copyWith(
                               color: colors.onSurfaceMuted,
                             ),
@@ -433,7 +542,9 @@ class _SendNotificationPanelState
                 ),
                 const SizedBox(height: AppSpacing.md),
                 AppButton(
-                  label: 'Bitti',
+                  label: ref.read(
+                    rcTextProvider(RemoteConfigKeys.gymsPermissionsDoneButton),
+                  ),
                   onPressed: () => Navigator.of(sheetContext).pop(),
                 ),
               ],

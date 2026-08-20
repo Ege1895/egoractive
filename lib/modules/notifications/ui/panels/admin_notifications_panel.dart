@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
+import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_back_button.dart';
 
@@ -47,7 +48,9 @@ class _AdminNotificationsPanelState
                   ),
                   const SizedBox(width: AppSpacing.md),
                   Text(
-                    'Bildirimler',
+                    ref.watch(
+                      rcTextProvider(RemoteConfigKeys.notificationsTitle),
+                    ),
                     style: typography.headingSmall.copyWith(
                       color: colors.onSurface,
                       fontSize: 18,
@@ -59,7 +62,11 @@ class _AdminNotificationsPanelState
             Expanded(
               child: Center(
                 child: Text(
-                  'Henüz bildirim yok.',
+                  ref.watch(
+                    rcTextProvider(
+                      RemoteConfigKeys.sessionsTrainerNotificationsEmptyState,
+                    ),
+                  ),
                   style: typography.bodyMedium.copyWith(
                     color: colors.onSurfaceMuted,
                   ),

@@ -7365,6 +7365,294 @@
         "value": "Great"
       },
       "valueType": "STRING"
+    },
+    "lbl_badges_load_error_tr": {
+      "defaultValue": {
+        "value": "Rozetler y\u00fcklenemedi."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_badges_load_error_en": {
+      "defaultValue": {
+        "value": "Failed to load badges."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_badges_earned_count_label_tr": {
+      "defaultValue": {
+        "value": "{count} rozet kazand\u0131n"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_badges_earned_count_label_en": {
+      "defaultValue": {
+        "value": "You earned {count} badges"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_badges_next_locked_label_tr": {
+      "defaultValue": {
+        "value": "S\u0131radaki: {note}"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_badges_next_locked_label_en": {
+      "defaultValue": {
+        "value": "Next: {note}"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notifications_target_selected_members_option_tr": {
+      "defaultValue": {
+        "value": "Se\u00e7ili \u00fcyeler"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notifications_target_selected_members_option_en": {
+      "defaultValue": {
+        "value": "Selected members"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notifications_whole_gym_summary_label_tr": {
+      "defaultValue": {
+        "value": "{gym} \u00b7 t\u00fcm \u00fcyeler"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notifications_whole_gym_summary_label_en": {
+      "defaultValue": {
+        "value": "{gym} \u00b7 all members"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notifications_message_counter_label_tr": {
+      "defaultValue": {
+        "value": "{current} / {max}"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notifications_message_counter_label_en": {
+      "defaultValue": {
+        "value": "{current} / {max}"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notifications_preview_template_tr": {
+      "defaultValue": {
+        "value": "Egoractive \u00b7 {title} \u2014 {message}"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notifications_preview_template_en": {
+      "defaultValue": {
+        "value": "Egoractive \u00b7 {title} \u2014 {message}"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notifications_preview_message_placeholder_tr": {
+      "defaultValue": {
+        "value": "Mesaj metni\u2026"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notifications_preview_message_placeholder_en": {
+      "defaultValue": {
+        "value": "Message text\u2026"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notifications_send_button_label_tr": {
+      "defaultValue": {
+        "value": "G\u00f6nder"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notifications_send_button_label_en": {
+      "defaultValue": {
+        "value": "Send"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notifications_sending_button_label_tr": {
+      "defaultValue": {
+        "value": "G\u00f6nderiliyor\u2026"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notifications_sending_button_label_en": {
+      "defaultValue": {
+        "value": "Sending\u2026"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notifications_sent_button_label_tr": {
+      "defaultValue": {
+        "value": "G\u00f6nderildi"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notifications_sent_button_label_en": {
+      "defaultValue": {
+        "value": "Sent"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notifications_member_picker_subtitle_tr": {
+      "defaultValue": {
+        "value": "Bir ya da birden fazla \u00fcye se\u00e7ebilirsin."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notifications_member_picker_subtitle_en": {
+      "defaultValue": {
+        "value": "You can select one or more members."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notifications_no_members_empty_state_tr": {
+      "defaultValue": {
+        "value": "Hen\u00fcz \u00fcye yok."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notifications_no_members_empty_state_en": {
+      "defaultValue": {
+        "value": "No members yet."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_reports_summary_load_error_tr": {
+      "defaultValue": {
+        "value": "Rapor verileri \u015fu an y\u00fcklenemedi, l\u00fctfen daha sonra tekrar deneyin."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_reports_summary_load_error_en": {
+      "defaultValue": {
+        "value": "Report data could not be loaded right now, please try again later."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_reports_total_sessions_label_tr": {
+      "defaultValue": {
+        "value": "Toplam ders"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_reports_total_sessions_label_en": {
+      "defaultValue": {
+        "value": "Total sessions"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_reports_net_label_tr": {
+      "defaultValue": {
+        "value": "Net"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_reports_net_label_en": {
+      "defaultValue": {
+        "value": "Net"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_reports_trainer_performance_load_error_tr": {
+      "defaultValue": {
+        "value": "Antren\u00f6r verileri y\u00fcklenemedi."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_reports_trainer_performance_load_error_en": {
+      "defaultValue": {
+        "value": "Trainer data failed to load."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_reports_trainer_performance_empty_state_tr": {
+      "defaultValue": {
+        "value": "Bu ay i\u00e7in antren\u00f6r verisi yok."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_reports_trainer_performance_empty_state_en": {
+      "defaultValue": {
+        "value": "No trainer data for this month."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_yearly_plan_fallback_tr": {
+      "defaultValue": {
+        "value": "Y\u0131ll\u0131k"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_yearly_plan_fallback_en": {
+      "defaultValue": {
+        "value": "Yearly"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_monthly_plan_fallback_tr": {
+      "defaultValue": {
+        "value": "Ayl\u0131k"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_monthly_plan_fallback_en": {
+      "defaultValue": {
+        "value": "Monthly"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_yearly_period_word_tr": {
+      "defaultValue": {
+        "value": "her y\u0131l"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_yearly_period_word_en": {
+      "defaultValue": {
+        "value": "yearly"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_monthly_period_word_tr": {
+      "defaultValue": {
+        "value": "her ay"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_monthly_period_word_en": {
+      "defaultValue": {
+        "value": "monthly"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_store_badge_label_tr": {
+      "defaultValue": {
+        "value": "STORE"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_store_badge_label_en": {
+      "defaultValue": {
+        "value": "STORE"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_management_open_error_tr": {
+      "defaultValue": {
+        "value": "Abonelik y\u00f6netimi a\u00e7\u0131lamad\u0131."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_management_open_error_en": {
+      "defaultValue": {
+        "value": "Could not open subscription management."
+      },
+      "valueType": "STRING"
     }
   }
 }

@@ -149,7 +149,11 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
                   ),
                   const SizedBox(width: AppSpacing.md),
                   Text(
-                    'Abonelik',
+                    ref.watch(
+                      rcTextProvider(
+                        RemoteConfigKeys.gymsSettingsNavSubscription,
+                      ),
+                    ),
                     style: typography.headingSmall.copyWith(
                       color: colors.onSurface,
                       fontSize: 18,
@@ -349,10 +353,21 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
     final matchingProduct = products
         .where((p) => p.id == productId)
         .firstOrNull;
-    final planName = matchingProduct?.title ?? (isYearly ? 'Yıllık' : 'Aylık');
-    final period = isYearly
-        ? (locale == 'tr' ? 'her yıl' : 'yearly')
-        : (locale == 'tr' ? 'her ay' : 'monthly');
+    final String planNameFallback = ref.watch(
+      rcTextProvider(
+        isYearly
+            ? RemoteConfigKeys.subscriptionYearlyPlanFallback
+            : RemoteConfigKeys.subscriptionMonthlyPlanFallback,
+      ),
+    );
+    final String planName = matchingProduct?.title ?? planNameFallback;
+    final period = ref.watch(
+      rcTextProvider(
+        isYearly
+            ? RemoteConfigKeys.subscriptionYearlyPeriodWord
+            : RemoteConfigKeys.subscriptionMonthlyPeriodWord,
+      ),
+    );
 
     return ListView(
       padding: const EdgeInsets.fromLTRB(
@@ -482,7 +497,11 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
-                  'STORE',
+                  ref.watch(
+                    rcTextProvider(
+                      RemoteConfigKeys.subscriptionStoreBadgeLabel,
+                    ),
+                  ),
                   style: typography.headingSmall.copyWith(
                     fontSize: 10,
                     letterSpacing: 0.5,
@@ -841,7 +860,13 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     } else if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Abonelik yönetimi açılamadı.')),
+        SnackBar(
+          content: Text(
+            ref.read(
+              rcTextProvider(RemoteConfigKeys.subscriptionManagementOpenError),
+            ),
+          ),
+        ),
       );
     }
   }

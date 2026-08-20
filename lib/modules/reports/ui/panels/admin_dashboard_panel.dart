@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
+import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_back_button.dart';
 import '../../controller/dashboard_report_controller.dart';
@@ -57,7 +58,9 @@ class _AdminDashboardPanelState extends BasePanelState<AdminDashboardPanel> {
                   ),
                   const SizedBox(width: AppSpacing.md),
                   Text(
-                    'Raporlar',
+                    ref.watch(
+                      rcTextProvider(RemoteConfigKeys.gymsSettingsNavReports),
+                    ),
                     style: typography.headingSmall.copyWith(
                       color: colors.onSurface,
                       fontSize: 18,
@@ -79,7 +82,11 @@ class _AdminDashboardPanelState extends BasePanelState<AdminDashboardPanel> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(
-                              'Rapor verileri şu an yüklenemedi, lütfen daha sonra tekrar deneyin.',
+                              ref.watch(
+                                rcTextProvider(
+                                  RemoteConfigKeys.reportsSummaryLoadError,
+                                ),
+                              ),
                               textAlign: TextAlign.center,
                               style: typography.bodyMedium.copyWith(
                                 color: colors.onSurfaceVariant,
@@ -88,7 +95,13 @@ class _AdminDashboardPanelState extends BasePanelState<AdminDashboardPanel> {
                             const SizedBox(height: AppSpacing.md),
                             TextButton(
                               onPressed: controller.retry,
-                              child: const Text('Tekrar dene'),
+                              child: Text(
+                                ref.watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys.authRetryButton,
+                                  ),
+                                ),
+                              ),
                             ),
                           ],
                         ),
@@ -114,7 +127,11 @@ class _AdminDashboardPanelState extends BasePanelState<AdminDashboardPanel> {
                           children: [
                             Expanded(
                               child: _MetricCard(
-                                label: 'Toplam ders',
+                                label: ref.watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys.reportsTotalSessionsLabel,
+                                  ),
+                                ),
                                 value: '${report.totalSessions}',
                                 color: colors.onSurface,
                               ),
@@ -122,7 +139,12 @@ class _AdminDashboardPanelState extends BasePanelState<AdminDashboardPanel> {
                             const SizedBox(width: AppSpacing.sm),
                             Expanded(
                               child: _MetricCard(
-                                label: 'Tamamlanan',
+                                label: ref.watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys
+                                        .gymsAdminHomeCompletedLabel,
+                                  ),
+                                ),
                                 value: '${report.completedSessions}',
                                 color: colors.primary,
                               ),
@@ -130,7 +152,11 @@ class _AdminDashboardPanelState extends BasePanelState<AdminDashboardPanel> {
                             const SizedBox(width: AppSpacing.sm),
                             Expanded(
                               child: _MetricCard(
-                                label: 'İptal',
+                                label: ref.watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys.commonIptalLabel,
+                                  ),
+                                ),
                                 value: '${report.cancelledSessions}',
                                 color: colors.error,
                               ),
@@ -154,7 +180,12 @@ class _AdminDashboardPanelState extends BasePanelState<AdminDashboardPanel> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      'Tahmini ciro',
+                                      ref.watch(
+                                        rcTextProvider(
+                                          RemoteConfigKeys
+                                              .gymsAdminHomeEstimatedRevenueLabel,
+                                        ),
+                                      ),
                                       style: typography.caption.copyWith(
                                         color: colors.onSurfaceMuted,
                                       ),
@@ -174,7 +205,12 @@ class _AdminDashboardPanelState extends BasePanelState<AdminDashboardPanel> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      'Gider',
+                                      ref.watch(
+                                        rcTextProvider(
+                                          RemoteConfigKeys
+                                              .gymsAdminHomeExpenseLabel,
+                                        ),
+                                      ),
                                       style: typography.caption.copyWith(
                                         color: colors.onSurfaceMuted,
                                       ),
@@ -194,7 +230,11 @@ class _AdminDashboardPanelState extends BasePanelState<AdminDashboardPanel> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      'Net',
+                                      ref.watch(
+                                        rcTextProvider(
+                                          RemoteConfigKeys.reportsNetLabel,
+                                        ),
+                                      ),
                                       style: typography.caption.copyWith(
                                         color: colors.onSurfaceMuted,
                                       ),
@@ -216,7 +256,12 @@ class _AdminDashboardPanelState extends BasePanelState<AdminDashboardPanel> {
                         ),
                         const SizedBox(height: AppSpacing.lg),
                         Text(
-                          'ANTRENÖR PERFORMANSI',
+                          ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys
+                                  .gymsAdminHomeTrainerPerformanceSection,
+                            ),
+                          ),
                           style: typography.caption.copyWith(
                             color: colors.onSurfaceMuted,
                             letterSpacing: 1.2,
@@ -256,7 +301,12 @@ class _AdminDashboardPanelState extends BasePanelState<AdminDashboardPanel> {
                                   child: Column(
                                     children: [
                                       Text(
-                                        'Antrenör verileri yüklenemedi.',
+                                        ref.watch(
+                                          rcTextProvider(
+                                            RemoteConfigKeys
+                                                .reportsTrainerPerformanceLoadError,
+                                          ),
+                                        ),
                                         style: typography.bodyMedium.copyWith(
                                           color: colors.onSurfaceVariant,
                                         ),
@@ -264,7 +314,13 @@ class _AdminDashboardPanelState extends BasePanelState<AdminDashboardPanel> {
                                       const SizedBox(height: AppSpacing.sm),
                                       TextButton(
                                         onPressed: controller.retry,
-                                        child: const Text('Tekrar dene'),
+                                        child: Text(
+                                          ref.watch(
+                                            rcTextProvider(
+                                              RemoteConfigKeys.authRetryButton,
+                                            ),
+                                          ),
+                                        ),
                                       ),
                                     ],
                                   ),
@@ -275,7 +331,12 @@ class _AdminDashboardPanelState extends BasePanelState<AdminDashboardPanel> {
                                     vertical: AppSpacing.lg,
                                   ),
                                   child: Text(
-                                    'Bu ay için antrenör verisi yok.',
+                                    ref.watch(
+                                      rcTextProvider(
+                                        RemoteConfigKeys
+                                            .reportsTrainerPerformanceEmptyState,
+                                      ),
+                                    ),
                                     style: typography.bodyMedium.copyWith(
                                       color: colors.onSurfaceMuted,
                                     ),

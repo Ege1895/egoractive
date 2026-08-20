@@ -100,6 +100,7 @@ class _FakeRemoteConfigService extends RemoteConfigService {
 
   static const _values = <String, String>{
     'lbl_common_tamamlandi': 'Tamamlandı',
+    'lbl_notifications_target_selected_members_option': 'Seçili üyeler',
   };
 
   @override
@@ -201,7 +202,12 @@ void main() {
   testWidgets('SendNotificationPanel target switch renders without overflow', (
     tester,
   ) async {
-    await tester.pumpWidget(_wrap(const SendNotificationPanel()));
+    await tester.pumpWidget(
+      _wrap(
+        const SendNotificationPanel(),
+        overrides: _sessionManagementOverrides,
+      ),
+    );
     await tester.pump();
     await tester.tap(find.text('Seçili üyeler'));
     await tester.pump();

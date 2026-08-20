@@ -242,6 +242,13 @@ abstract final class RemoteConfigKeys {
   static const authSplashPublisher = 'lbl_auth_splash_publisher';
 
   static const badgesTitle = 'lbl_badges_title';
+  static const badgesLoadError = 'lbl_badges_load_error';
+
+  /// `{count}` yer tutucusu kazanılan rozet sayısıyla değiştirilir.
+  static const badgesEarnedCountLabel = 'lbl_badges_earned_count_label';
+
+  /// `{note}` yer tutucusu sıradaki rozetin açıklamasıyla değiştirilir.
+  static const badgesNextLockedLabel = 'lbl_badges_next_locked_label';
   static const eventsAdminListTitle = 'lbl_events_admin_list_title';
   static const eventsAddEventButton = 'lbl_events_add_event_button';
   static const eventsAttendingLabel = 'lbl_events_attending_label';
@@ -769,6 +776,33 @@ abstract final class RemoteConfigKeys {
       'lbl_notifications_title_field_label';
   static const notificationsMessageFieldLabel =
       'lbl_notifications_message_field_label';
+  static const notificationsTargetSelectedMembersOption =
+      'lbl_notifications_target_selected_members_option';
+
+  /// `{gym}` yer tutucusu salon adıyla değiştirilir.
+  static const notificationsWholeGymSummaryLabel =
+      'lbl_notifications_whole_gym_summary_label';
+
+  /// `{current}`/`{max}` yer tutucuları mesaj karakter sayacıyla değiştirilir.
+  static const notificationsMessageCounterLabel =
+      'lbl_notifications_message_counter_label';
+
+  /// `{title}`/`{message}` yer tutucuları önizleme başlığı/metniyle
+  /// değiştirilir.
+  static const notificationsPreviewTemplate =
+      'lbl_notifications_preview_template';
+  static const notificationsPreviewMessagePlaceholder =
+      'lbl_notifications_preview_message_placeholder';
+  static const notificationsSendButtonLabel =
+      'lbl_notifications_send_button_label';
+  static const notificationsSendingButtonLabel =
+      'lbl_notifications_sending_button_label';
+  static const notificationsSentButtonLabel =
+      'lbl_notifications_sent_button_label';
+  static const notificationsMemberPickerSubtitle =
+      'lbl_notifications_member_picker_subtitle';
+  static const notificationsNoMembersEmptyState =
+      'lbl_notifications_no_members_empty_state';
   static const packagesListTitle = 'lbl_packages_list_title';
   static const packagesAddPackageButton = 'lbl_packages_add_package_button';
   static const packagesEditSessionTypeFieldLabel =
@@ -825,6 +859,15 @@ abstract final class RemoteConfigKeys {
   static const packagesSessionCountValidityCaption =
       'lbl_packages_session_count_validity_caption';
   static const packagesOffSaleLabel = 'lbl_packages_off_sale_label';
+
+  static const reportsSummaryLoadError = 'lbl_reports_summary_load_error';
+  static const reportsTotalSessionsLabel = 'lbl_reports_total_sessions_label';
+  static const reportsNetLabel = 'lbl_reports_net_label';
+  static const reportsTrainerPerformanceLoadError =
+      'lbl_reports_trainer_performance_load_error';
+  static const reportsTrainerPerformanceEmptyState =
+      'lbl_reports_trainer_performance_empty_state';
+
   static const sessionsCalendarTitle = 'lbl_sessions_calendar_title';
   static const sessionsCalendarSlotTimeLabel =
       'lbl_sessions_calendar_slot_time_label';
@@ -1090,6 +1133,18 @@ abstract final class RemoteConfigKeys {
   static const subscriptionYearlySub = 'lbl_subscription_yearly_sub';
   static const subscriptionMonthlySub = 'lbl_subscription_monthly_sub';
   static const subscriptionNoProducts = 'lbl_subscription_no_products';
+  static const subscriptionYearlyPlanFallback =
+      'lbl_subscription_yearly_plan_fallback';
+  static const subscriptionMonthlyPlanFallback =
+      'lbl_subscription_monthly_plan_fallback';
+  static const subscriptionYearlyPeriodWord =
+      'lbl_subscription_yearly_period_word';
+  static const subscriptionMonthlyPeriodWord =
+      'lbl_subscription_monthly_period_word';
+  static const subscriptionStoreBadgeLabel =
+      'lbl_subscription_store_badge_label';
+  static const subscriptionManagementOpenError =
+      'lbl_subscription_management_open_error';
 
   /// `[{label_tr, label_en}]` — abonelikte dahil olan özellik listesi.
   static const subscriptionIncludedFeatures =
@@ -1294,6 +1349,9 @@ class RemoteConfigService {
     'lbl_auth_splash_tagline_tr': 'Spor salonu yönetimi',
     'lbl_auth_splash_publisher_tr': 'Egora Games',
     'lbl_badges_title_tr': 'Rozetlerim',
+    'lbl_badges_load_error_tr': 'Rozetler yüklenemedi.',
+    'lbl_badges_earned_count_label_tr': '{count} rozet kazandın',
+    'lbl_badges_next_locked_label_tr': 'Sıradaki: {note}',
     'lbl_events_admin_list_title_tr': 'Etkinlikler',
     'lbl_events_add_event_button_tr': '+ Etkinlik',
     'lbl_events_attending_label_tr': 'Katılan',
@@ -1673,6 +1731,18 @@ class RemoteConfigService {
     'lbl_notifications_select_member_button_tr': 'Üye seç',
     'lbl_notifications_title_field_label_tr': 'Başlık',
     'lbl_notifications_message_field_label_tr': 'Mesaj',
+    'lbl_notifications_target_selected_members_option_tr': 'Seçili üyeler',
+    'lbl_notifications_whole_gym_summary_label_tr': '{gym} · tüm üyeler',
+    'lbl_notifications_message_counter_label_tr': '{current} / {max}',
+    'lbl_notifications_preview_template_tr':
+        'Egoractive · {title} — {message}',
+    'lbl_notifications_preview_message_placeholder_tr': 'Mesaj metni…',
+    'lbl_notifications_send_button_label_tr': 'Gönder',
+    'lbl_notifications_sending_button_label_tr': 'Gönderiliyor…',
+    'lbl_notifications_sent_button_label_tr': 'Gönderildi',
+    'lbl_notifications_member_picker_subtitle_tr':
+        'Bir ya da birden fazla üye seçebilirsin.',
+    'lbl_notifications_no_members_empty_state_tr': 'Henüz üye yok.',
     'lbl_packages_list_title_tr': 'Paketler',
     'lbl_packages_add_package_button_tr': '+ Paket ekle',
     'lbl_packages_edit_session_type_field_label_tr': 'Ders tipi',
@@ -1708,6 +1778,14 @@ class RemoteConfigService {
     'lbl_packages_session_count_validity_caption_tr':
         '{count} seans · {days} gün',
     'lbl_packages_off_sale_label_tr': 'Kapalı',
+    'lbl_reports_summary_load_error_tr':
+        'Rapor verileri şu an yüklenemedi, lütfen daha sonra tekrar deneyin.',
+    'lbl_reports_total_sessions_label_tr': 'Toplam ders',
+    'lbl_reports_net_label_tr': 'Net',
+    'lbl_reports_trainer_performance_load_error_tr':
+        'Antrenör verileri yüklenemedi.',
+    'lbl_reports_trainer_performance_empty_state_tr':
+        'Bu ay için antrenör verisi yok.',
     'lbl_sessions_calendar_title_tr': 'Takvim',
     'lbl_sessions_calendar_slot_time_label_tr': 'Saat',
     'lbl_sessions_calendar_slot_status_label_tr': 'Durum',
@@ -2003,6 +2081,9 @@ class RemoteConfigService {
     'lbl_auth_splash_tagline_en': 'Gym management',
     'lbl_auth_splash_publisher_en': 'Egora Games',
     'lbl_badges_title_en': 'My Badges',
+    'lbl_badges_load_error_en': 'Failed to load badges.',
+    'lbl_badges_earned_count_label_en': 'You earned {count} badges',
+    'lbl_badges_next_locked_label_en': 'Next: {note}',
     'lbl_events_admin_list_title_en': 'Events',
     'lbl_events_add_event_button_en': '+ Event',
     'lbl_events_attending_label_en': 'Attending',
@@ -2385,6 +2466,19 @@ class RemoteConfigService {
     'lbl_notifications_select_member_button_en': 'Select member',
     'lbl_notifications_title_field_label_en': 'Title',
     'lbl_notifications_message_field_label_en': 'Message',
+    'lbl_notifications_target_selected_members_option_en':
+        'Selected members',
+    'lbl_notifications_whole_gym_summary_label_en': '{gym} · all members',
+    'lbl_notifications_message_counter_label_en': '{current} / {max}',
+    'lbl_notifications_preview_template_en':
+        'Egoractive · {title} — {message}',
+    'lbl_notifications_preview_message_placeholder_en': 'Message text…',
+    'lbl_notifications_send_button_label_en': 'Send',
+    'lbl_notifications_sending_button_label_en': 'Sending…',
+    'lbl_notifications_sent_button_label_en': 'Sent',
+    'lbl_notifications_member_picker_subtitle_en':
+        'You can select one or more members.',
+    'lbl_notifications_no_members_empty_state_en': 'No members yet.',
     'lbl_packages_list_title_en': 'Packages',
     'lbl_packages_add_package_button_en': '+ Add package',
     'lbl_packages_edit_session_type_field_label_en': 'Session type',
@@ -2420,6 +2514,14 @@ class RemoteConfigService {
     'lbl_packages_session_count_validity_caption_en':
         '{count} sessions · {days} days',
     'lbl_packages_off_sale_label_en': 'Off',
+    'lbl_reports_summary_load_error_en':
+        'Report data could not be loaded right now, please try again later.',
+    'lbl_reports_total_sessions_label_en': 'Total sessions',
+    'lbl_reports_net_label_en': 'Net',
+    'lbl_reports_trainer_performance_load_error_en':
+        'Trainer data failed to load.',
+    'lbl_reports_trainer_performance_empty_state_en':
+        'No trainer data for this month.',
     'lbl_sessions_calendar_title_en': 'Calendar',
     'lbl_sessions_calendar_slot_time_label_en': 'Time',
     'lbl_sessions_calendar_slot_status_label_en': 'Status',
@@ -2687,6 +2789,20 @@ class RemoteConfigService {
         'Şu an satın alınabilir bir abonelik ürünü bulunamadı.',
     'lbl_subscription_no_products_en':
         'No purchasable subscription product is available right now.',
+    'lbl_subscription_yearly_plan_fallback_tr': 'Yıllık',
+    'lbl_subscription_yearly_plan_fallback_en': 'Yearly',
+    'lbl_subscription_monthly_plan_fallback_tr': 'Aylık',
+    'lbl_subscription_monthly_plan_fallback_en': 'Monthly',
+    'lbl_subscription_yearly_period_word_tr': 'her yıl',
+    'lbl_subscription_yearly_period_word_en': 'yearly',
+    'lbl_subscription_monthly_period_word_tr': 'her ay',
+    'lbl_subscription_monthly_period_word_en': 'monthly',
+    'lbl_subscription_store_badge_label_tr': 'STORE',
+    'lbl_subscription_store_badge_label_en': 'STORE',
+    'lbl_subscription_management_open_error_tr':
+        'Abonelik yönetimi açılamadı.',
+    'lbl_subscription_management_open_error_en':
+        'Could not open subscription management.',
   };
 
   /// Ders/seans onay bildiriminin kaç dakika önce gönderileceği.
