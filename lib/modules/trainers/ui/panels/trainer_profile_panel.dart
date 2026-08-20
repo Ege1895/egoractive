@@ -35,7 +35,7 @@ class TrainerProfilePanel extends ConsumerWidget {
           ),
           children: [
             Text(
-              'Profil',
+              ref.watch(rcTextProvider(RemoteConfigKeys.commonProfilTab)),
               style: typography.headingLarge.copyWith(color: colors.onSurface),
             ),
             const SizedBox(height: AppSpacing.lg),
@@ -78,8 +78,22 @@ class TrainerProfilePanel extends ConsumerWidget {
                         ),
                         Text(
                           profile.specialty.isEmpty
-                              ? 'Antrenör'
-                              : '${profile.specialty} · Antrenör',
+                              ? ref.watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys.membersTrainerFieldLabel,
+                                  ),
+                                )
+                              : ref
+                                    .watch(
+                                      rcTextProvider(
+                                        RemoteConfigKeys
+                                            .trainersProfileSpecialtyRole,
+                                      ),
+                                    )
+                                    .replaceAll(
+                                      '{specialty}',
+                                      profile.specialty,
+                                    ),
                           style: typography.bodyMedium.copyWith(
                             color: colors.onSurfaceVariant,
                             fontSize: 14,
@@ -102,7 +116,9 @@ class TrainerProfilePanel extends ConsumerWidget {
               child: Column(
                 children: [
                   _NavRow(
-                    label: 'Stüdyo kuralları',
+                    label: ref.watch(
+                      rcTextProvider(RemoteConfigKeys.commonStudyoKurallariNav),
+                    ),
                     onTap: () => panelStack.push(const GymRulesViewPanel()),
                   ),
                   _NavRow(
@@ -126,14 +142,18 @@ class TrainerProfilePanel extends ConsumerWidget {
               child: Column(
                 children: [
                   _NavRow(
-                    label: 'Çıkış yap',
+                    label: ref.watch(
+                      rcTextProvider(RemoteConfigKeys.commonCikisYap),
+                    ),
                     onTap: () {
                       ref.read(authControllerProvider.notifier).logout();
                       panelStack.replaceRoot(const PhoneLoginPanel());
                     },
                   ),
                   _NavRow(
-                    label: 'Hesabımı sil',
+                    label: ref.watch(
+                      rcTextProvider(RemoteConfigKeys.commonHesabimiSil),
+                    ),
                     labelColor: colors.error,
                     isLast: true,
                     onTap: () =>
@@ -145,7 +165,9 @@ class TrainerProfilePanel extends ConsumerWidget {
             const SizedBox(height: AppSpacing.lg),
             Center(
               child: Text(
-                'Egoractive · Egora Games · Sürüm 1.0',
+                ref.watch(
+                  rcTextProvider(RemoteConfigKeys.trainersProfileFooterText),
+                ),
                 style: typography.caption.copyWith(
                   color: colors.onSurfaceMuted,
                 ),

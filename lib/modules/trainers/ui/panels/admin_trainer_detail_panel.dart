@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
+import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/utils/phone_number_formatter.dart';
 import '../../../../shared/widgets/app_back_button.dart';
@@ -36,6 +37,9 @@ class _AdminTrainerDetailPanelState
         ref.watch(adminTrainerDetailStatsProvider(trainer.id)).valueOrNull ??
         AdminTrainerDetailStats.empty;
     final monthly = ref.watch(reportForTrainerProvider(trainer.id));
+    final memberCountText = ref
+        .watch(rcTextProvider(RemoteConfigKeys.trainersMemberCountSuffix))
+        .replaceAll('{count}', '${trainer.memberCount}');
 
     return Scaffold(
       body: SafeArea(
@@ -57,7 +61,9 @@ class _AdminTrainerDetailPanelState
                   ),
                   const SizedBox(width: AppSpacing.md),
                   Text(
-                    'Antrenör detayı',
+                    ref.watch(
+                      rcTextProvider(RemoteConfigKeys.trainersDetailTitle),
+                    ),
                     style: typography.headingSmall.copyWith(
                       color: colors.onSurface,
                       fontSize: 18,
@@ -132,7 +138,7 @@ class _AdminTrainerDetailPanelState
                                   ),
                                 ),
                               Text(
-                                '${trainer.memberCount} üye',
+                                memberCountText,
                                 style: typography.caption.copyWith(
                                   color: colors.onSurfaceMuted,
                                 ),
@@ -145,7 +151,11 @@ class _AdminTrainerDetailPanelState
                   ),
                   const SizedBox(height: AppSpacing.lg),
                   Text(
-                    'TÜM ZAMANLAR',
+                    ref.watch(
+                      rcTextProvider(
+                        RemoteConfigKeys.trainersDetailAllTimeSection,
+                      ),
+                    ),
                     style: typography.caption.copyWith(
                       color: colors.onSurfaceMuted,
                       letterSpacing: 1.2,
@@ -165,28 +175,42 @@ class _AdminTrainerDetailPanelState
                       children: [
                         Expanded(
                           child: _StatTile(
-                            label: 'Toplam',
+                            label: ref.watch(
+                              rcTextProvider(
+                                RemoteConfigKeys.membersDetailTotalLabel,
+                              ),
+                            ),
                             value: '${stats.totalSessions}',
                             valueColor: colors.onSurface,
                           ),
                         ),
                         Expanded(
                           child: _StatTile(
-                            label: 'Tamamlanan',
+                            label: ref.watch(
+                              rcTextProvider(
+                                RemoteConfigKeys.trainersHomeCompletedLabel,
+                              ),
+                            ),
                             value: '${stats.completedSessions}',
                             valueColor: colors.success,
                           ),
                         ),
                         Expanded(
                           child: _StatTile(
-                            label: 'Planlanan',
+                            label: ref.watch(
+                              rcTextProvider(
+                                RemoteConfigKeys.trainersDetailPlannedLabel,
+                              ),
+                            ),
                             value: '${stats.plannedSessions}',
                             valueColor: colors.primary,
                           ),
                         ),
                         Expanded(
                           child: _StatTile(
-                            label: 'İptal',
+                            label: ref.watch(
+                              rcTextProvider(RemoteConfigKeys.commonIptalLabel),
+                            ),
                             value: '${stats.cancelledSessions}',
                             valueColor: colors.error,
                           ),
@@ -196,7 +220,11 @@ class _AdminTrainerDetailPanelState
                   ),
                   const SizedBox(height: AppSpacing.lg),
                   Text(
-                    'BU AY',
+                    ref.watch(
+                      rcTextProvider(
+                        RemoteConfigKeys.trainersDetailThisMonthSection,
+                      ),
+                    ),
                     style: typography.caption.copyWith(
                       color: colors.onSurfaceMuted,
                       letterSpacing: 1.2,
@@ -218,7 +246,11 @@ class _AdminTrainerDetailPanelState
                         child: Center(child: CircularProgressIndicator()),
                       ),
                       error: (_, _) => Text(
-                        'Bu ayın verileri yüklenemedi.',
+                        ref.watch(
+                          rcTextProvider(
+                            RemoteConfigKeys.trainersDetailMonthLoadError,
+                          ),
+                        ),
                         style: typography.bodyMedium.copyWith(
                           color: colors.onSurfaceMuted,
                         ),

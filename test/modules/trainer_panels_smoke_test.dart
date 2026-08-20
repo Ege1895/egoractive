@@ -42,6 +42,8 @@ class _FakeRemoteConfigService extends RemoteConfigService {
 
   static const _values = <String, String>{
     'lbl_common_tamamlandi': 'Tamamlandı',
+    'lbl_trainers_calendar_month_toggle': 'Ay',
+    'lbl_trainers_members_filter_expiring': 'Paketi bitiyor',
   };
 
   @override
@@ -49,7 +51,7 @@ class _FakeRemoteConfigService extends RemoteConfigService {
       _values[key.replaceFirst(RegExp(r'_(tr|en)$'), '')] ?? '';
 }
 
-final _sessionCompletionOverrides = [
+final _fakeRcOverrides = [
   remoteConfigServiceProvider.overrideWithValue(
     const _FakeRemoteConfigService(),
   ),
@@ -125,7 +127,9 @@ void main() {
   testWidgets('TrainerCalendarPanel month view renders without overflow', (
     tester,
   ) async {
-    await tester.pumpWidget(_wrap(const TrainerCalendarPanel()));
+    await tester.pumpWidget(
+      _wrap(const TrainerCalendarPanel(), overrides: _fakeRcOverrides),
+    );
     await tester.pump();
     await tester.tap(find.text('Ay'));
     await tester.pump();
@@ -135,7 +139,9 @@ void main() {
   testWidgets('TrainerMembersListPanel filter chips render without overflow', (
     tester,
   ) async {
-    await tester.pumpWidget(_wrap(const TrainerMembersListPanel()));
+    await tester.pumpWidget(
+      _wrap(const TrainerMembersListPanel(), overrides: _fakeRcOverrides),
+    );
     await tester.pump();
     await tester.tap(find.text('Paketi bitiyor'));
     await tester.pump();
@@ -154,7 +160,7 @@ void main() {
           meta: 'Birebir · 3 Ağustos 18:30',
           remainingBefore: 6,
         ),
-        overrides: _sessionCompletionOverrides,
+        overrides: _fakeRcOverrides,
       ),
     );
     await tester.pump();

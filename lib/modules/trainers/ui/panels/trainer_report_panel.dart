@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/app_spacing.dart';
+import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../controller/trainer_report_controller.dart';
 import '../../domain/trainer_report_state.dart';
@@ -16,6 +17,16 @@ class TrainerReportPanel extends ConsumerWidget {
     final colors = context.appColors;
     final typography = context.appTypography;
     final report = ref.watch(trainerReportControllerProvider);
+    final completedSummaryText = ref
+        .watch(rcTextProvider(RemoteConfigKeys.trainersReportCompletedSummary))
+        .replaceAll('{count}', '${report.completedSessionCount}')
+        .replaceAll('{rate}', report.perSessionRate);
+    final soloLabel = ref.watch(
+      rcTextProvider(RemoteConfigKeys.trainersReportOneOnOneToggle),
+    );
+    final groupLabel = ref.watch(
+      rcTextProvider(RemoteConfigKeys.trainersReportGroupToggle),
+    );
 
     return Scaffold(
       body: SafeArea(
@@ -28,7 +39,7 @@ class TrainerReportPanel extends ConsumerWidget {
           ),
           children: [
             Text(
-              'Seans raporum',
+              ref.watch(rcTextProvider(RemoteConfigKeys.trainersReportTitle)),
               style: typography.headingLarge.copyWith(color: colors.onSurface),
             ),
             const SizedBox(height: AppSpacing.lg),
@@ -36,13 +47,24 @@ class TrainerReportPanel extends ConsumerWidget {
               children: [
                 Expanded(
                   child: _DateTile(
-                    label: 'Başlangıç t.',
+                    label: ref.watch(
+                      rcTextProvider(
+                        RemoteConfigKeys.trainersReportStartDateFieldLabel,
+                      ),
+                    ),
                     value: report.startDate,
                   ),
                 ),
                 const SizedBox(width: AppSpacing.sm),
                 Expanded(
-                  child: _DateTile(label: 'Bitiş t.', value: report.endDate),
+                  child: _DateTile(
+                    label: ref.watch(
+                      rcTextProvider(
+                        RemoteConfigKeys.trainersReportEndDateFieldLabel,
+                      ),
+                    ),
+                    value: report.endDate,
+                  ),
                 ),
               ],
             ),
@@ -60,7 +82,11 @@ class TrainerReportPanel extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Kazanılan prim',
+                    ref.watch(
+                      rcTextProvider(
+                        RemoteConfigKeys.trainersReportEarnedCommissionLabel,
+                      ),
+                    ),
                     style: typography.bodyMedium.copyWith(
                       color: colors.onPrimaryContainer,
                       fontSize: 13,
@@ -76,7 +102,7 @@ class TrainerReportPanel extends ConsumerWidget {
                   ),
                   const SizedBox(height: AppSpacing.xs),
                   Text(
-                    '${report.completedSessionCount} tamamlanan seans · seans başı ${report.perSessionRate}',
+                    completedSummaryText,
                     style: typography.bodyMedium.copyWith(
                       color: colors.onSurfaceVariant,
                       fontSize: 13,
@@ -99,7 +125,11 @@ class TrainerReportPanel extends ConsumerWidget {
                           constraints: const BoxConstraints(minHeight: 44),
                           alignment: Alignment.center,
                           child: Text(
-                            'Detay',
+                            ref.watch(
+                              rcTextProvider(
+                                RemoteConfigKeys.trainersReportDetailLink,
+                              ),
+                            ),
                             style: typography.headingSmall.copyWith(
                               fontSize: 15,
                               color: colors.onSurfaceMuted,
@@ -119,7 +149,11 @@ class TrainerReportPanel extends ConsumerWidget {
                           constraints: const BoxConstraints(minHeight: 44),
                           alignment: Alignment.center,
                           child: Text(
-                            'Prim sistemine git',
+                            ref.watch(
+                              rcTextProvider(
+                                RemoteConfigKeys.trainersReportCommissionLink,
+                              ),
+                            ),
                             textAlign: TextAlign.center,
                             style: typography.headingSmall.copyWith(
                               fontSize: 15,
@@ -135,7 +169,11 @@ class TrainerReportPanel extends ConsumerWidget {
             ),
             const SizedBox(height: AppSpacing.lg),
             for (final b in report.breakdown) ...[
-              _BreakdownCard(breakdown: b),
+              _BreakdownCard(
+                breakdown: b,
+                soloLabel: soloLabel,
+                groupLabel: groupLabel,
+              ),
               const SizedBox(height: AppSpacing.md),
             ],
           ],
@@ -183,9 +221,15 @@ class _DateTile extends StatelessWidget {
 }
 
 class _BreakdownCard extends StatelessWidget {
-  const _BreakdownCard({required this.breakdown});
+  const _BreakdownCard({
+    required this.breakdown,
+    required this.soloLabel,
+    required this.groupLabel,
+  });
 
   final TrainerReportBreakdown breakdown;
+  final String soloLabel;
+  final String groupLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -228,11 +272,14 @@ class _BreakdownCard extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: _MiniStat(label: 'Birebir', value: '${breakdown.solo}'),
+                child: _MiniStat(label: soloLabel, value: '${breakdown.solo}'),
               ),
               const SizedBox(width: AppSpacing.sm),
               Expanded(
-                child: _MiniStat(label: 'Grup', value: '${breakdown.group}'),
+                child: _MiniStat(
+                  label: groupLabel,
+                  value: '${breakdown.group}',
+                ),
               ),
             ],
           ),

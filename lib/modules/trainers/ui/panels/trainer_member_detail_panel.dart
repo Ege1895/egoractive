@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
+import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_back_button.dart';
@@ -58,7 +59,9 @@ class _TrainerMemberDetailPanelState
                 ),
                 const SizedBox(height: AppSpacing.xl),
                 Text(
-                  'Üye bulunamadı.',
+                  ref.watch(
+                    rcTextProvider(RemoteConfigKeys.membersDetailNotFound),
+                  ),
                   style: typography.headingSmall.copyWith(
                     color: colors.onSurface,
                     fontSize: 17,
@@ -93,7 +96,9 @@ class _TrainerMemberDetailPanelState
                   ),
                   const SizedBox(width: AppSpacing.md),
                   Text(
-                    'Üye detayı',
+                    ref.watch(
+                      rcTextProvider(RemoteConfigKeys.commonUyeDetayiTitle),
+                    ),
                     style: typography.headingSmall.copyWith(
                       color: colors.onSurface,
                       fontSize: 18,
@@ -170,7 +175,12 @@ class _TrainerMemberDetailPanelState
                           children: [
                             Expanded(
                               child: _InfoTile(
-                                label: 'Kalan ders',
+                                label: ref.watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys
+                                        .trainersMemberDetailRemainingSessionsLabel,
+                                  ),
+                                ),
                                 value: '${detail.remainingSessions}',
                                 valueColor: colors.onPrimaryContainer,
                               ),
@@ -178,7 +188,12 @@ class _TrainerMemberDetailPanelState
                             const SizedBox(width: AppSpacing.sm),
                             Expanded(
                               child: _InfoTile(
-                                label: 'Paket bitişi',
+                                label: ref.watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys
+                                        .trainersMemberDetailPackageEndLabel,
+                                  ),
+                                ),
                                 value: detail.packageEndDate,
                               ),
                             ),
@@ -212,7 +227,12 @@ class _TrainerMemberDetailPanelState
                                     ),
                                     alignment: Alignment.center,
                                     child: Text(
-                                      'Seans oluştur',
+                                      ref.watch(
+                                        rcTextProvider(
+                                          RemoteConfigKeys
+                                              .trainersMemberDetailCreateSessionButton,
+                                        ),
+                                      ),
                                       style: typography.headingSmall.copyWith(
                                         fontSize: 15,
                                         color: colors.onPrimary,
@@ -249,7 +269,12 @@ class _TrainerMemberDetailPanelState
                                     ),
                                     alignment: Alignment.center,
                                     child: Text(
-                                      'Ölçüm ekle',
+                                      ref.watch(
+                                        rcTextProvider(
+                                          RemoteConfigKeys
+                                              .trainersMemberDetailAddMeasurementButton,
+                                        ),
+                                      ),
                                       style: typography.headingSmall.copyWith(
                                         fontSize: 15,
                                         color: colors.onSurfaceVariant,
@@ -288,7 +313,12 @@ class _TrainerMemberDetailPanelState
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'ÖLÇÜM · 6 AY',
+                                ref.watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys
+                                        .commonOlcum6AySectionHeader,
+                                  ),
+                                ),
                                 style: typography.caption.copyWith(
                                   color: colors.onSurfaceMuted,
                                   fontSize: 11,
@@ -348,7 +378,11 @@ class _TrainerMemberDetailPanelState
                   ),
                   const SizedBox(height: AppSpacing.lg),
                   Text(
-                    'DERS GEÇMİŞİ',
+                    ref.watch(
+                      rcTextProvider(
+                        RemoteConfigKeys.commonDersGecmisiSectionHeader,
+                      ),
+                    ),
                     style: typography.caption.copyWith(
                       color: colors.onSurfaceMuted,
                       letterSpacing: 1.2,

@@ -830,6 +830,39 @@ abstract final class RemoteConfigKeys {
       'lbl_trainers_report_one_on_one_toggle';
   static const trainersReportGroupToggle = 'lbl_trainers_report_group_toggle';
   static const trainersProfileFooterText = 'lbl_trainers_profile_footer_text';
+  static const trainersDetailTitle = 'lbl_trainers_detail_title';
+  static const trainersMemberCountSuffix = 'lbl_trainers_member_count_suffix';
+  static const trainersDetailAllTimeSection =
+      'lbl_trainers_detail_all_time_section';
+  static const trainersDetailPlannedLabel = 'lbl_trainers_detail_planned_label';
+  static const trainersDetailThisMonthSection =
+      'lbl_trainers_detail_this_month_section';
+  static const trainersDetailMonthLoadError =
+      'lbl_trainers_detail_month_load_error';
+  static const trainersAddTrainerNameRequiredError =
+      'lbl_trainers_add_trainer_name_required_error';
+  static const trainersAddTrainerError = 'lbl_trainers_add_trainer_error';
+  static const trainersAddTrainerNameHint =
+      'lbl_trainers_add_trainer_name_hint';
+  static const trainersManagementTrainerCountSuffix =
+      'lbl_trainers_management_trainer_count_suffix';
+  static const trainersAddTrainerSavingLabel =
+      'lbl_trainers_add_trainer_saving_label';
+  static const trainersCalendarWeekRange = 'lbl_trainers_calendar_week_range';
+  static const trainersCalendarDayEmptyMessage =
+      'lbl_trainers_calendar_day_empty_message';
+  static const trainersHomeGreeting = 'lbl_trainers_home_greeting';
+  static const trainersHomeGreetingWithName =
+      'lbl_trainers_home_greeting_with_name';
+  static const trainersHomeConfirmationSaveError =
+      'lbl_trainers_home_confirmation_save_error';
+  static const trainersMembersSearchHint = 'lbl_trainers_members_search_hint';
+  static const trainersProfileSpecialtyRole =
+      'lbl_trainers_profile_specialty_role';
+  static const trainersReportCompletedSummary =
+      'lbl_trainers_report_completed_summary';
+  static const trainersReportCommissionLink =
+      'lbl_trainers_report_commission_link';
 
   // F6-1 abonelik ekranı yeniden tasarımı — 4 durum (deneme/aktif/süresi
   // dolmuş/mağazaya yönlendirildi). `{days}`/`{date}`/`{total}`/`{current}`/
@@ -1530,6 +1563,30 @@ class RemoteConfigService {
     'lbl_trainers_report_group_toggle_tr': 'Grup',
     'lbl_trainers_profile_footer_text_tr':
         'Egoractive · Egora Games · Sürüm 1.0',
+    'lbl_trainers_detail_title_tr': 'Antrenör detayı',
+    'lbl_trainers_member_count_suffix_tr': '{count} üye',
+    'lbl_trainers_detail_all_time_section_tr': 'TÜM ZAMANLAR',
+    'lbl_trainers_detail_planned_label_tr': 'Planlanan',
+    'lbl_trainers_detail_this_month_section_tr': 'BU AY',
+    'lbl_trainers_detail_month_load_error_tr': 'Bu ayın verileri yüklenemedi.',
+    'lbl_trainers_add_trainer_name_required_error_tr': 'Ad soyad boş olamaz.',
+    'lbl_trainers_add_trainer_error_tr': 'Antrenör eklenemedi, tekrar dene.',
+    'lbl_trainers_add_trainer_name_hint_tr': 'Emre Kaya',
+    'lbl_trainers_management_trainer_count_suffix_tr': '{count} kişi',
+    'lbl_trainers_add_trainer_saving_label_tr': 'Ekleniyor…',
+    'lbl_trainers_calendar_week_range_tr':
+        '{startDay} – {endDay} {month} · {week}. hafta',
+    'lbl_trainers_calendar_day_empty_message_tr':
+        'Seans yok — bu güne seans ekleyebilirsiniz',
+    'lbl_trainers_home_greeting_tr': 'İyi çalışmalar',
+    'lbl_trainers_home_greeting_with_name_tr': 'İyi çalışmalar {name}',
+    'lbl_trainers_home_confirmation_save_error_tr':
+        'Onay kaydedilemedi, bağlantını kontrol edip tekrar dene.',
+    'lbl_trainers_members_search_hint_tr': 'Üye ara',
+    'lbl_trainers_profile_specialty_role_tr': '{specialty} · Antrenör',
+    'lbl_trainers_report_completed_summary_tr':
+        '{count} tamamlanan seans · seans başı {rate}',
+    'lbl_trainers_report_commission_link_tr': 'Prim sistemine git',
     'lbl_notif_session_reminder_title_en': '⏰ Your session is at {time} today!',
     'lbl_notif_session_reminder_body_en':
         '{trainerName} is waiting for you. Tap to confirm you\'re coming 👇',
@@ -2113,6 +2170,33 @@ class RemoteConfigService {
     'lbl_trainers_report_group_toggle_en': 'Group',
     'lbl_trainers_profile_footer_text_en':
         'Egoractive · Egora Games · Version 1.0',
+    'lbl_trainers_detail_title_en': 'Trainer detail',
+    'lbl_trainers_member_count_suffix_en': '{count} members',
+    'lbl_trainers_detail_all_time_section_en': 'ALL TIME',
+    'lbl_trainers_detail_planned_label_en': 'Planned',
+    'lbl_trainers_detail_this_month_section_en': 'THIS MONTH',
+    'lbl_trainers_detail_month_load_error_en':
+        'This month\'s data could not be loaded.',
+    'lbl_trainers_add_trainer_name_required_error_en':
+        'Full name cannot be empty.',
+    'lbl_trainers_add_trainer_error_en':
+        'Trainer could not be added, try again.',
+    'lbl_trainers_add_trainer_name_hint_en': 'John Smith',
+    'lbl_trainers_management_trainer_count_suffix_en': '{count} people',
+    'lbl_trainers_add_trainer_saving_label_en': 'Adding…',
+    'lbl_trainers_calendar_week_range_en':
+        '{startDay} – {endDay} {month} · Week {week}',
+    'lbl_trainers_calendar_day_empty_message_en':
+        'No sessions — you can add a session to this day',
+    'lbl_trainers_home_greeting_en': 'Have a great day',
+    'lbl_trainers_home_greeting_with_name_en': 'Have a great day, {name}',
+    'lbl_trainers_home_confirmation_save_error_en':
+        'Confirmation could not be saved, check your connection and try again.',
+    'lbl_trainers_members_search_hint_en': 'Search members',
+    'lbl_trainers_profile_specialty_role_en': '{specialty} · Trainer',
+    'lbl_trainers_report_completed_summary_en':
+        '{count} completed sessions · {rate} per session',
+    'lbl_trainers_report_commission_link_en': 'Go to commission system',
 
     RemoteConfigKeys.subscriptionIncludedFeatures:
         _defaultSubscriptionIncludedFeaturesJson,

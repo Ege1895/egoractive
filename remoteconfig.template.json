@@ -5710,6 +5710,255 @@
       },
       "valueType": "STRING"
     },
+    "lbl_trainers_detail_title_tr": {
+      "description": "Admin > antrenör detayı ekranı başlığı",
+      "defaultValue": {
+        "value": "Antrenör detayı"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_detail_title_en": {
+      "defaultValue": {
+        "value": "Trainer detail"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_member_count_suffix_tr": {
+      "description": "Antrenöre bağlı üye sayısı, {count} yer tutucu",
+      "defaultValue": {
+        "value": "{count} üye"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_member_count_suffix_en": {
+      "defaultValue": {
+        "value": "{count} members"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_detail_all_time_section_tr": {
+      "defaultValue": {
+        "value": "TÜM ZAMANLAR"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_detail_all_time_section_en": {
+      "defaultValue": {
+        "value": "ALL TIME"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_detail_planned_label_tr": {
+      "defaultValue": {
+        "value": "Planlanan"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_detail_planned_label_en": {
+      "defaultValue": {
+        "value": "Planned"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_detail_this_month_section_tr": {
+      "defaultValue": {
+        "value": "BU AY"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_detail_this_month_section_en": {
+      "defaultValue": {
+        "value": "THIS MONTH"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_detail_month_load_error_tr": {
+      "defaultValue": {
+        "value": "Bu ayın verileri yüklenemedi."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_detail_month_load_error_en": {
+      "defaultValue": {
+        "value": "This month's data could not be loaded."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_add_trainer_name_required_error_tr": {
+      "defaultValue": {
+        "value": "Ad soyad boş olamaz."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_add_trainer_name_required_error_en": {
+      "defaultValue": {
+        "value": "Full name cannot be empty."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_add_trainer_error_tr": {
+      "defaultValue": {
+        "value": "Antrenör eklenemedi, tekrar dene."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_add_trainer_error_en": {
+      "defaultValue": {
+        "value": "Trainer could not be added, try again."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_add_trainer_name_hint_tr": {
+      "description": "Antrenör ekle formundaki Ad soyad alanının örnek metni",
+      "defaultValue": {
+        "value": "Emre Kaya"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_add_trainer_name_hint_en": {
+      "defaultValue": {
+        "value": "John Smith"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_management_trainer_count_suffix_tr": {
+      "description": "Antrenör yönetimi başlığındaki toplam antrenör sayısı, {count} yer tutucu",
+      "defaultValue": {
+        "value": "{count} kişi"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_management_trainer_count_suffix_en": {
+      "defaultValue": {
+        "value": "{count} people"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_add_trainer_saving_label_tr": {
+      "defaultValue": {
+        "value": "Ekleniyor…"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_add_trainer_saving_label_en": {
+      "defaultValue": {
+        "value": "Adding…"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_calendar_week_range_tr": {
+      "description": "Antrenör takvimi hafta görünümü başlığı, {startDay}/{endDay}/{month}/{week} yer tutucuları",
+      "defaultValue": {
+        "value": "{startDay} – {endDay} {month} · {week}. hafta"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_calendar_week_range_en": {
+      "defaultValue": {
+        "value": "{startDay} – {endDay} {month} · Week {week}"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_calendar_day_empty_message_tr": {
+      "defaultValue": {
+        "value": "Seans yok — bu güne seans ekleyebilirsiniz"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_calendar_day_empty_message_en": {
+      "defaultValue": {
+        "value": "No sessions — you can add a session to this day"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_home_greeting_tr": {
+      "description": "Antrenör anasayfa karşılaması, isim bilinmediğinde",
+      "defaultValue": {
+        "value": "İyi çalışmalar"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_home_greeting_en": {
+      "defaultValue": {
+        "value": "Have a great day"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_home_greeting_with_name_tr": {
+      "description": "Antrenör anasayfa karşılaması, {name} yer tutucu",
+      "defaultValue": {
+        "value": "İyi çalışmalar {name}"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_home_greeting_with_name_en": {
+      "defaultValue": {
+        "value": "Have a great day, {name}"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_home_confirmation_save_error_tr": {
+      "defaultValue": {
+        "value": "Onay kaydedilemedi, bağlantını kontrol edip tekrar dene."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_home_confirmation_save_error_en": {
+      "defaultValue": {
+        "value": "Confirmation could not be saved, check your connection and try again."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_members_search_hint_tr": {
+      "defaultValue": {
+        "value": "Üye ara"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_members_search_hint_en": {
+      "defaultValue": {
+        "value": "Search members"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_profile_specialty_role_tr": {
+      "description": "Antrenör profili uzmanlık + rol satırı, {specialty} yer tutucu",
+      "defaultValue": {
+        "value": "{specialty} · Antrenör"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_profile_specialty_role_en": {
+      "defaultValue": {
+        "value": "{specialty} · Trainer"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_report_completed_summary_tr": {
+      "description": "Antrenör rapor ekranı özet satırı, {count}/{rate} yer tutucuları",
+      "defaultValue": {
+        "value": "{count} tamamlanan seans · seans başı {rate}"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_report_completed_summary_en": {
+      "defaultValue": {
+        "value": "{count} completed sessions · {rate} per session"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_report_commission_link_tr": {
+      "defaultValue": {
+        "value": "Prim sistemine git"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_report_commission_link_en": {
+      "defaultValue": {
+        "value": "Go to commission system"
+      },
+      "valueType": "STRING"
+    },
     "lbl_subscription_trial_banner_title_tr": {
       "defaultValue": {
         "value": "Deneme süreniz {days} gün sonra doluyor"

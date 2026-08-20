@@ -22,6 +22,7 @@ class _FakeRemoteConfigService extends RemoteConfigService {
 
   static const _values = <String, String>{
     'lbl_sessions_list_title': 'Derslerim',
+    'lbl_trainers_calendar_title': 'Takvimim',
   };
 
   @override

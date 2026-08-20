@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
+import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/subscription/subscription_write_gate.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/utils/phone_number_formatter.dart';
@@ -30,6 +31,14 @@ class _AdminTrainerManagementPanelState
     final colors = context.appColors;
     final typography = context.appTypography;
     final trainers = ref.watch(adminTrainersControllerProvider);
+    final trainerCountText = ref
+        .watch(
+          rcTextProvider(RemoteConfigKeys.trainersManagementTrainerCountSuffix),
+        )
+        .replaceAll('{count}', '${trainers.length}');
+    final memberCountText = ref.watch(
+      rcTextProvider(RemoteConfigKeys.trainersMemberCountSuffix),
+    );
 
     return Scaffold(
       body: SafeArea(
@@ -52,7 +61,11 @@ class _AdminTrainerManagementPanelState
                   const SizedBox(width: AppSpacing.md),
                   Expanded(
                     child: Text(
-                      'Antrenörler',
+                      ref.watch(
+                        rcTextProvider(
+                          RemoteConfigKeys.trainersManagementTitle,
+                        ),
+                      ),
                       style: typography.headingSmall.copyWith(
                         color: colors.onSurface,
                         fontSize: 18,
@@ -60,7 +73,7 @@ class _AdminTrainerManagementPanelState
                     ),
                   ),
                   Text(
-                    '${trainers.length} kişi',
+                    trainerCountText,
                     style: typography.headingSmall.copyWith(
                       color: colors.onSurfaceMuted,
                       fontSize: 15,
@@ -81,6 +94,7 @@ class _AdminTrainerManagementPanelState
                   for (final trainer in trainers)
                     _TrainerRow(
                       trainer: trainer,
+                      memberCountText: memberCountText,
                       onTap: () => ref
                           .read(panelStackControllerProvider.notifier)
                           .push(AdminTrainerDetailPanel(trainer: trainer)),
@@ -96,7 +110,9 @@ class _AdminTrainerManagementPanelState
                 AppSpacing.lg,
               ),
               child: AppButton(
-                label: '+ Antrenör ekle',
+                label: ref.watch(
+                  rcTextProvider(RemoteConfigKeys.trainersAddTrainerButton),
+                ),
                 variant: AppButtonVariant.secondary,
                 onPressed: () => _showAddTrainerSheet(context, ref),
               ),
@@ -122,9 +138,14 @@ class _AdminTrainerManagementPanelState
 }
 
 class _TrainerRow extends StatelessWidget {
-  const _TrainerRow({required this.trainer, required this.onTap});
+  const _TrainerRow({
+    required this.trainer,
+    required this.memberCountText,
+    required this.onTap,
+  });
 
   final AdminTrainerSummary trainer;
+  final String memberCountText;
   final VoidCallback onTap;
 
   @override
@@ -177,7 +198,8 @@ class _TrainerRow extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        '${trainer.specialties.join(", ")} · ${trainer.memberCount} üye',
+                        '${trainer.specialties.join(", ")} · '
+                        '${memberCountText.replaceAll('{count}', '${trainer.memberCount}')}',
                         style: typography.bodyMedium.copyWith(
                           color: colors.onSurfaceMuted,
                           fontSize: 13,
@@ -217,7 +239,10 @@ class _AddTrainerSheetState extends ConsumerState<_AddTrainerSheet> {
 
   Future<void> _submit() async {
     final name = _nameController.text.trim();
-    setState(() => _nameError = name.isEmpty ? 'Ad soyad boş olamaz.' : null);
+    final nameRequiredError = ref.read(
+      rcTextProvider(RemoteConfigKeys.trainersAddTrainerNameRequiredError),
+    );
+    setState(() => _nameError = name.isEmpty ? nameRequiredError : null);
     if (_nameError != null) return;
     if (!await ensureSubscriptionAllowsWrite(context, ref)) return;
 
@@ -240,7 +265,9 @@ class _AddTrainerSheetState extends ConsumerState<_AddTrainerSheet> {
       if (mounted) {
         setState(() {
           _isSaving = false;
-          _errorMessage = 'Antrenör eklenemedi, tekrar dene.';
+          _errorMessage = ref.read(
+            rcTextProvider(RemoteConfigKeys.trainersAddTrainerError),
+          );
         });
       }
       return;
@@ -276,7 +303,9 @@ class _AddTrainerSheetState extends ConsumerState<_AddTrainerSheet> {
           ),
           const SizedBox(height: AppSpacing.lg),
           Text(
-            'Antrenör ekle',
+            ref.watch(
+              rcTextProvider(RemoteConfigKeys.trainersAddTrainerFormTitle),
+            ),
             style: typography.headingLarge.copyWith(
               color: colors.onSurface,
               fontSize: 22,
@@ -284,22 +313,32 @@ class _AddTrainerSheetState extends ConsumerState<_AddTrainerSheet> {
           ),
           const SizedBox(height: AppSpacing.lg),
           AppTextField(
-            label: 'Ad soyad',
+            label: ref.watch(
+              rcTextProvider(RemoteConfigKeys.trainersFullNameFieldLabel),
+            ),
             controller: _nameController,
             errorText: _nameError,
-            hint: 'Emre Kaya',
+            hint: ref.watch(
+              rcTextProvider(RemoteConfigKeys.trainersAddTrainerNameHint),
+            ),
           ),
           const SizedBox(height: AppSpacing.md),
           AppTextField(
-            label: 'Telefon',
+            label: ref.watch(
+              rcTextProvider(RemoteConfigKeys.commonTelefonLabel),
+            ),
             controller: _phoneController,
             keyboardType: TextInputType.phone,
             inputFormatters: [TrPhoneNumberInputFormatter()],
-            hint: '5XX XXX XX XX',
+            hint: ref.watch(
+              rcTextProvider(RemoteConfigKeys.membersInfoPhoneHint),
+            ),
           ),
           const SizedBox(height: AppSpacing.md),
           Text(
-            'Uzmanlık',
+            ref.watch(
+              rcTextProvider(RemoteConfigKeys.trainersSpecialtyFieldLabel),
+            ),
             style: typography.bodyMedium.copyWith(
               color: colors.onSurfaceMuted,
               fontSize: 13,
@@ -334,7 +373,17 @@ class _AddTrainerSheetState extends ConsumerState<_AddTrainerSheet> {
             const SizedBox(height: AppSpacing.sm),
           ],
           AppButton(
-            label: _isSaving ? 'Ekleniyor…' : 'Antrenörü ekle',
+            label: _isSaving
+                ? ref.watch(
+                    rcTextProvider(
+                      RemoteConfigKeys.trainersAddTrainerSavingLabel,
+                    ),
+                  )
+                : ref.watch(
+                    rcTextProvider(
+                      RemoteConfigKeys.trainersAddTrainerSubmitButton,
+                    ),
+                  ),
             onPressed: _isSaving ? null : _submit,
           ),
         ],

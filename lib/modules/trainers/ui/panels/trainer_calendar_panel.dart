@@ -6,6 +6,7 @@ import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
 import '../../../../core/remote_config/feature_flags.dart';
+import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../group_sessions/ui/panels/create_group_session_panel.dart';
@@ -70,7 +71,11 @@ class _TrainerCalendarPanelState extends BasePanelState<TrainerCalendarPanel> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Takvimim',
+                        ref.watch(
+                          rcTextProvider(
+                            RemoteConfigKeys.trainersCalendarTitle,
+                          ),
+                        ),
                         style: typography.headingLarge.copyWith(
                           color: colors.onSurface,
                         ),
@@ -112,7 +117,11 @@ class _TrainerCalendarPanelState extends BasePanelState<TrainerCalendarPanel> {
                       children: [
                         Expanded(
                           child: _ToggleTab(
-                            label: 'Hafta',
+                            label: ref.watch(
+                              rcTextProvider(
+                                RemoteConfigKeys.trainersCalendarWeekToggle,
+                              ),
+                            ),
                             selected:
                                 state.viewMode == TrainerCalendarViewMode.week,
                             onTap: () => controller.setViewMode(
@@ -122,7 +131,11 @@ class _TrainerCalendarPanelState extends BasePanelState<TrainerCalendarPanel> {
                         ),
                         Expanded(
                           child: _ToggleTab(
-                            label: 'Ay',
+                            label: ref.watch(
+                              rcTextProvider(
+                                RemoteConfigKeys.trainersCalendarMonthToggle,
+                              ),
+                            ),
                             selected:
                                 state.viewMode == TrainerCalendarViewMode.month,
                             onTap: () => controller.setViewMode(
@@ -157,6 +170,10 @@ class _TrainerCalendarPanelState extends BasePanelState<TrainerCalendarPanel> {
   void _showSlotDetail(BuildContext context, ScheduleSlot slot) {
     final colors = context.appColors;
     final typography = context.appTypography;
+    final markCompletedLabel = ref.read(
+      rcTextProvider(RemoteConfigKeys.trainersCalendarMarkCompletedAction),
+    );
+    final closeLabel = ref.read(rcTextProvider(RemoteConfigKeys.commonKapat));
     showModalBottomSheet<void>(
       context: context,
       backgroundColor: colors.surface,
@@ -225,7 +242,7 @@ class _TrainerCalendarPanelState extends BasePanelState<TrainerCalendarPanel> {
                 children: [
                   Expanded(
                     child: AppButton(
-                      label: 'Tamamlandı işaretle',
+                      label: markCompletedLabel,
                       onPressed: () async {
                         Navigator.of(sheetContext).pop();
                         // slot.id/memberId sadece gerçek Firestore
@@ -267,7 +284,7 @@ class _TrainerCalendarPanelState extends BasePanelState<TrainerCalendarPanel> {
                   const SizedBox(width: AppSpacing.sm),
                   Expanded(
                     child: AppButton(
-                      label: 'Kapat',
+                      label: closeLabel,
                       variant: AppButtonVariant.secondary,
                       onPressed: () => Navigator.of(sheetContext).pop(),
                     ),
@@ -323,14 +340,14 @@ class _ToggleTab extends StatelessWidget {
   }
 }
 
-class _WeekView extends StatelessWidget {
+class _WeekView extends ConsumerWidget {
   const _WeekView({required this.state, required this.onSlotTap});
 
   final TrainerCalendarState state;
   final ValueChanged<ScheduleSlot> onSlotTap;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.appColors;
     final typography = context.appTypography;
     final weekStart = state.selectedDate.subtract(
@@ -344,6 +361,12 @@ class _WeekView extends StatelessWidget {
                 7)
             .ceil() +
         1;
+    final weekRangeText = ref
+        .watch(rcTextProvider(RemoteConfigKeys.trainersCalendarWeekRange))
+        .replaceAll('{startDay}', '${days.first.day}')
+        .replaceAll('{endDay}', '${days.last.day}')
+        .replaceAll('{month}', '${_monthNames[days.last.month]}')
+        .replaceAll('{week}', '$weekNumber');
 
     return ListView(
       padding: const EdgeInsets.fromLTRB(
@@ -354,7 +377,7 @@ class _WeekView extends StatelessWidget {
       ),
       children: [
         Text(
-          '${days.first.day} – ${days.last.day} ${_monthNames[days.last.month]} · $weekNumber. hafta',
+          weekRangeText,
           style: typography.headingSmall.copyWith(
             color: colors.onSurface,
             fontSize: 15,
@@ -372,7 +395,7 @@ class _WeekView extends StatelessWidget {
   }
 }
 
-class _WeekDayCard extends StatelessWidget {
+class _WeekDayCard extends ConsumerWidget {
   const _WeekDayCard({
     required this.day,
     required this.slots,
@@ -384,7 +407,7 @@ class _WeekDayCard extends StatelessWidget {
   final ValueChanged<ScheduleSlot> onSlotTap;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.appColors;
     final typography = context.appTypography;
     final now = DateTime.now();
@@ -431,7 +454,11 @@ class _WeekDayCard extends StatelessWidget {
                       vertical: AppSpacing.sm,
                     ),
                     child: Text(
-                      'Seans yok — bu güne seans ekleyebilirsiniz',
+                      ref.watch(
+                        rcTextProvider(
+                          RemoteConfigKeys.trainersCalendarDayEmptyMessage,
+                        ),
+                      ),
                       style: typography.bodyMedium.copyWith(
                         color: colors.onSurfaceMuted,
                         fontSize: 13,
@@ -509,7 +536,7 @@ class _SlotRow extends StatelessWidget {
   }
 }
 
-class _MonthView extends StatelessWidget {
+class _MonthView extends ConsumerWidget {
   const _MonthView({
     required this.state,
     required this.onSelectDay,
@@ -521,7 +548,7 @@ class _MonthView extends StatelessWidget {
   final ValueChanged<ScheduleSlot> onSlotTap;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.appColors;
     final typography = context.appTypography;
     final month = DateTime(state.selectedDate.year, state.selectedDate.month);
@@ -659,7 +686,7 @@ class _MonthView extends StatelessWidget {
         const SizedBox(height: AppSpacing.sm),
         if (selectedSlots.isEmpty)
           Text(
-            'Bu günde seans yok.',
+            ref.watch(rcTextProvider(RemoteConfigKeys.commonBuGundeSeansYok)),
             style: typography.bodyMedium.copyWith(color: colors.onSurfaceMuted),
           )
         else

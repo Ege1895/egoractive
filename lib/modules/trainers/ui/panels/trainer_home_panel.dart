@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
+import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../sessions/ui/panels/session_completion_panel.dart';
 import '../../../sessions/ui/panels/trainer_notifications_panel.dart';
@@ -95,8 +96,22 @@ class TrainerHomePanel extends ConsumerWidget {
                       ),
                       Text(
                         profile.name.trim().isEmpty
-                            ? 'İyi çalışmalar'
-                            : 'İyi çalışmalar ${profile.name.trim().split(' ').first}',
+                            ? ref.watch(
+                                rcTextProvider(
+                                  RemoteConfigKeys.trainersHomeGreeting,
+                                ),
+                              )
+                            : ref
+                                  .watch(
+                                    rcTextProvider(
+                                      RemoteConfigKeys
+                                          .trainersHomeGreetingWithName,
+                                    ),
+                                  )
+                                  .replaceAll(
+                                    '{name}',
+                                    profile.name.trim().split(' ').first,
+                                  ),
                         style: typography.headingMedium.copyWith(
                           color: colors.onSurface,
                         ),
@@ -152,7 +167,11 @@ class TrainerHomePanel extends ConsumerWidget {
               children: [
                 Expanded(
                   child: _StatTile(
-                    label: 'Bugünkü seans',
+                    label: ref.watch(
+                      rcTextProvider(
+                        RemoteConfigKeys.trainersHomeTodaySessionsLabel,
+                      ),
+                    ),
                     value: '${state.todaySessionCount}',
                     valueColor: colors.onSurface,
                   ),
@@ -160,7 +179,11 @@ class TrainerHomePanel extends ConsumerWidget {
                 const SizedBox(width: AppSpacing.sm),
                 Expanded(
                   child: _StatTile(
-                    label: 'Tamamlanan',
+                    label: ref.watch(
+                      rcTextProvider(
+                        RemoteConfigKeys.trainersHomeCompletedLabel,
+                      ),
+                    ),
                     value: '${state.completedCount}',
                     valueColor: colors.success,
                   ),
@@ -168,7 +191,11 @@ class TrainerHomePanel extends ConsumerWidget {
                 const SizedBox(width: AppSpacing.sm),
                 Expanded(
                   child: _StatTile(
-                    label: 'Boş saat',
+                    label: ref.watch(
+                      rcTextProvider(
+                        RemoteConfigKeys.trainersHomeFreeSlotLabel,
+                      ),
+                    ),
                     value: '${state.freeSlotCount}',
                     valueColor: colors.onSurface,
                   ),
@@ -178,7 +205,11 @@ class TrainerHomePanel extends ConsumerWidget {
             if (state.pendingConfirmations.isNotEmpty) ...[
               const SizedBox(height: AppSpacing.xl),
               Text(
-                'ONAYINIZI BEKLİYOR',
+                ref.watch(
+                  rcTextProvider(
+                    RemoteConfigKeys.trainersHomeAwaitingApprovalSection,
+                  ),
+                ),
                 style: typography.caption.copyWith(
                   color: colors.onWarningContainer,
                   letterSpacing: 1.2,
@@ -188,6 +219,12 @@ class TrainerHomePanel extends ConsumerWidget {
               for (final pending in state.pendingConfirmations)
                 _PendingCard(
                   pending: pending,
+                  doneLabel: ref.watch(
+                    rcTextProvider(RemoteConfigKeys.commonTamamlandi),
+                  ),
+                  absentLabel: ref.watch(
+                    rcTextProvider(RemoteConfigKeys.trainersHomeNoShowLabel),
+                  ),
                   onTap: () => panelStack.push(
                     SessionCompletionPanel(
                       time: pending.time,
@@ -211,7 +248,11 @@ class TrainerHomePanel extends ConsumerWidget {
             ],
             const SizedBox(height: AppSpacing.xl),
             Text(
-              'BUGÜNKÜ PROGRAMINIZ',
+              ref.watch(
+                rcTextProvider(
+                  RemoteConfigKeys.trainersHomeTodayScheduleSection,
+                ),
+              ),
               style: typography.caption.copyWith(
                 color: colors.onSurfaceMuted,
                 letterSpacing: 1.2,
@@ -255,13 +296,12 @@ Future<void> _handleCompletionAction(
     await action();
   } catch (_) {
     if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'Onay kaydedilemedi, bağlantını kontrol edip tekrar dene.',
-          ),
-        ),
+      final message = ProviderScope.containerOf(context).read(
+        rcTextProvider(RemoteConfigKeys.trainersHomeConfirmationSaveError),
       );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(message)));
     }
   }
 }
@@ -314,12 +354,16 @@ class _StatTile extends StatelessWidget {
 class _PendingCard extends StatelessWidget {
   const _PendingCard({
     required this.pending,
+    required this.doneLabel,
+    required this.absentLabel,
     required this.onTap,
     required this.onDone,
     required this.onAbsent,
   });
 
   final PendingConfirmation pending;
+  final String doneLabel;
+  final String absentLabel;
   final VoidCallback onTap;
   final VoidCallback onDone;
   final VoidCallback onAbsent;
@@ -400,7 +444,7 @@ class _PendingCard extends StatelessWidget {
                         constraints: const BoxConstraints(minHeight: 44),
                         alignment: Alignment.center,
                         child: Text(
-                          'Tamamlandı',
+                          doneLabel,
                           style: typography.headingSmall.copyWith(
                             fontSize: 15,
                             color: colors.onPrimary,
@@ -424,7 +468,7 @@ class _PendingCard extends StatelessWidget {
                         constraints: const BoxConstraints(minHeight: 44),
                         alignment: Alignment.center,
                         child: Text(
-                          'Gelmedi',
+                          absentLabel,
                           style: typography.headingSmall.copyWith(
                             fontSize: 15,
                             color: colors.onSurfaceVariant,
@@ -443,14 +487,14 @@ class _PendingCard extends StatelessWidget {
   }
 }
 
-class _ScheduleRow extends StatelessWidget {
+class _ScheduleRow extends ConsumerWidget {
   const _ScheduleRow({required this.slot, required this.showDivider});
 
   final ScheduleSlot slot;
   final bool showDivider;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.appColors;
     final typography = context.appTypography;
     final (
@@ -464,28 +508,28 @@ class _ScheduleRow extends StatelessWidget {
         colors.onSurfaceMuted,
         colors.success,
         colors.onSurfaceMuted,
-        'Tamamlandı',
+        ref.watch(rcTextProvider(RemoteConfigKeys.commonTamamlandi)),
         colors.success,
       ),
       ScheduleSlotState.current => (
         colors.primary,
         colors.primary,
         colors.onSurface,
-        'Şimdi',
+        ref.watch(rcTextProvider(RemoteConfigKeys.sessionsStatusNow)),
         colors.primary,
       ),
       ScheduleSlotState.cancelled => (
         colors.onSurfaceMuted,
         colors.error,
         colors.onSurfaceMuted,
-        'İptal',
+        ref.watch(rcTextProvider(RemoteConfigKeys.commonIptalLabel)),
         colors.error,
       ),
       ScheduleSlotState.planned => (
         colors.onSurface,
         colors.outlineStrong,
         colors.onSurface,
-        'Planlandı',
+        ref.watch(rcTextProvider(RemoteConfigKeys.sessionsFilterScheduled)),
         colors.onSurfaceVariant,
       ),
     };
