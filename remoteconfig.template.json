@@ -5989,13 +5989,13 @@
     },
     "lbl_trainers_calendar_mark_completed_action_tr": {
       "defaultValue": {
-        "value": "Tamamlandı işaretle"
+        "value": "Dersi onayla"
       },
       "valueType": "STRING"
     },
     "lbl_trainers_calendar_mark_completed_action_en": {
       "defaultValue": {
-        "value": "Mark as completed"
+        "value": "Confirm session"
       },
       "valueType": "STRING"
     },
