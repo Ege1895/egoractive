@@ -8,6 +8,7 @@ import 'package:palette_generator/palette_generator.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
+import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/theme/theme_controller.dart';
 import '../../../../shared/utils/gym_logo_image.dart';
@@ -132,7 +133,9 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
                   ),
                   const SizedBox(width: AppSpacing.md),
                   Text(
-                    'Salon bilgileri',
+                    ref.watch(
+                      rcTextProvider(RemoteConfigKeys.gymsGymInfoTitle),
+                    ),
                     style: typography.headingSmall.copyWith(
                       color: colors.onSurface,
                       fontSize: 18,
@@ -163,21 +166,31 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         AppTextField(
-                          label: 'Salon adı',
+                          label: ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.gymsGymInfoNameFieldLabel,
+                            ),
+                          ),
                           controller: _nameController,
                           errorText: _nameError,
                           onChanged: profileController.updateName,
                         ),
                         const SizedBox(height: AppSpacing.md),
                         AppTextField(
-                          label: 'Adres',
+                          label: ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.gymsGymInfoAddressFieldLabel,
+                            ),
+                          ),
                           controller: _addressController,
                           errorText: _addressError,
                           onChanged: profileController.updateAddress,
                         ),
                         const SizedBox(height: AppSpacing.md),
                         AppTextField(
-                          label: 'Telefon',
+                          label: ref.watch(
+                            rcTextProvider(RemoteConfigKeys.commonTelefonLabel),
+                          ),
                           keyboardType: TextInputType.phone,
                           controller: _phoneController,
                           inputFormatters: [TrPhoneNumberInputFormatter()],
@@ -189,7 +202,9 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
                   ),
                   const SizedBox(height: AppSpacing.lg),
                   Text(
-                    'LOGO',
+                    ref.watch(
+                      rcTextProvider(RemoteConfigKeys.gymsGymInfoLogoSection),
+                    ),
                     style: typography.caption.copyWith(
                       color: colors.onSurfaceMuted,
                       letterSpacing: 1.2,
@@ -255,7 +270,11 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Kare, en az 512×512 px PNG yükleyin.',
+                                ref.watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys.gymsGymInfoLogoHelper,
+                                  ),
+                                ),
                                 style: typography.bodyMedium.copyWith(
                                   color: colors.onSurfaceVariant,
                                 ),
@@ -281,11 +300,26 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
                                     alignment: Alignment.centerLeft,
                                     child: Text(
                                       _isUploadingLogo
-                                          ? 'Yükleniyor…'
+                                          ? ref.watch(
+                                              rcTextProvider(
+                                                RemoteConfigKeys
+                                                    .gymsGymInfoUploadingLabel,
+                                              ),
+                                            )
                                           : (_pickedLogoFile == null &&
                                                     profileState.logoUrl.isEmpty
-                                                ? 'Logo seç'
-                                                : 'Logoyu değiştir'),
+                                                ? ref.watch(
+                                                    rcTextProvider(
+                                                      RemoteConfigKeys
+                                                          .gymsGymSetupChooseLogoButton,
+                                                    ),
+                                                  )
+                                                : ref.watch(
+                                                    rcTextProvider(
+                                                      RemoteConfigKeys
+                                                          .gymsGymInfoChangeLogoButton,
+                                                    ),
+                                                  )),
                                       style: typography.headingSmall.copyWith(
                                         fontSize: 14,
                                         color: colors.onSurfaceVariant,
@@ -312,7 +346,11 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
                   ),
                   const SizedBox(height: AppSpacing.lg),
                   Text(
-                    'TEMA RENGİ',
+                    ref.watch(
+                      rcTextProvider(
+                        RemoteConfigKeys.gymsGymInfoThemeColorSection,
+                      ),
+                    ),
                     style: typography.caption.copyWith(
                       color: colors.onSurfaceMuted,
                       letterSpacing: 1.2,
@@ -344,7 +382,12 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
                               ),
                               const SizedBox(width: AppSpacing.sm),
                               Text(
-                                'Logodan renkler çıkarılıyor…',
+                                ref.watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys
+                                        .gymsGymInfoPaletteExtractingLabel,
+                                  ),
+                                ),
                                 style: typography.bodyMedium.copyWith(
                                   color: colors.onSurfaceMuted,
                                   fontSize: 13,
@@ -424,7 +467,9 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
                               ),
                               alignment: Alignment.center,
                               child: Text(
-                                'Kaydet',
+                                ref.watch(
+                                  rcTextProvider(RemoteConfigKeys.commonKaydet),
+                                ),
                                 style: typography.headingSmall.copyWith(
                                   fontSize: 15,
                                   color: colors.onPrimary,
@@ -435,7 +480,11 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
                         ),
                         const SizedBox(height: AppSpacing.sm),
                         Text(
-                          'Seçtiğiniz renk üyelerin uygulamasında da birincil renk olur; koyu zemin ve durum renkleri değişmez.',
+                          ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.gymsGymInfoThemeColorNote,
+                            ),
+                          ),
                           style: typography.bodyMedium.copyWith(
                             color: colors.onSurfaceMuted,
                             fontSize: 13,
@@ -458,7 +507,12 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
                               constraints: const BoxConstraints(minHeight: 44),
                               alignment: Alignment.centerLeft,
                               child: Text(
-                                'Tüm temaları gör ›',
+                                ref.watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys
+                                        .gymsGymInfoSeeAllThemesLink,
+                                  ),
+                                ),
                                 style: typography.headingSmall.copyWith(
                                   fontSize: 14,
                                   color: colors.onPrimaryContainer,
@@ -472,7 +526,11 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
                   ),
                   const SizedBox(height: AppSpacing.lg),
                   Text(
-                    'RAPOR E-POSTALARI',
+                    ref.watch(
+                      rcTextProvider(
+                        RemoteConfigKeys.gymsGymInfoReportEmailsSection,
+                      ),
+                    ),
                     style: typography.caption.copyWith(
                       color: colors.onSurfaceMuted,
                       letterSpacing: 1.2,
@@ -492,7 +550,12 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Haftalık salon ve muhasebe özeti bu adreslere e-posta ile gönderilir.',
+                          ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys
+                                  .gymsGymInfoReportEmailsDescription,
+                            ),
+                          ),
                           style: typography.caption.copyWith(
                             color: colors.onSurfaceMuted,
                             height: 1.4,
@@ -500,15 +563,33 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
                         ),
                         const SizedBox(height: AppSpacing.md),
                         AppTextField(
-                          label: 'Salon raporu e-postası',
-                          hint: 'admin@stüdyo.com',
+                          label: ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.gymsGymInfoGymReportEmailLabel,
+                            ),
+                          ),
+                          hint: ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.gymsGymInfoGymReportEmailHint,
+                            ),
+                          ),
                           keyboardType: TextInputType.emailAddress,
                           controller: _gymReportEmailController,
                         ),
                         const SizedBox(height: AppSpacing.md),
                         AppTextField(
-                          label: 'Muhasebe raporu e-postası',
-                          hint: 'muhasebe@stüdyo.com',
+                          label: ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys
+                                  .gymsGymInfoAccountingReportEmailLabel,
+                            ),
+                          ),
+                          hint: ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys
+                                  .gymsGymInfoAccountingReportEmailHint,
+                            ),
+                          ),
                           keyboardType: TextInputType.emailAddress,
                           controller: _accountingReportEmailController,
                         ),
@@ -555,8 +636,18 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
                               alignment: Alignment.centerLeft,
                               child: Text(
                                 recipientsState.isSaving
-                                    ? 'Kaydediliyor…'
-                                    : 'Rapor e-postalarını kaydet',
+                                    ? ref.watch(
+                                        rcTextProvider(
+                                          RemoteConfigKeys
+                                              .gymsGymInfoSavingLabel,
+                                        ),
+                                      )
+                                    : ref.watch(
+                                        rcTextProvider(
+                                          RemoteConfigKeys
+                                              .gymsGymInfoSaveReportEmailsButton,
+                                        ),
+                                      ),
                                 style: typography.headingSmall.copyWith(
                                   fontSize: 14,
                                   color: colors.onPrimaryContainer,
@@ -593,7 +684,15 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
                     const SizedBox(height: AppSpacing.sm),
                   ],
                   AppButton(
-                    label: _isSaving ? 'Kaydediliyor…' : 'Kaydet',
+                    label: _isSaving
+                        ? ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.gymsGymInfoSavingLabel,
+                            ),
+                          )
+                        : ref.watch(
+                            rcTextProvider(RemoteConfigKeys.commonKaydet),
+                          ),
                     onPressed: _isSaving ? null : _save,
                   ),
                 ],
@@ -631,7 +730,7 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
   Future<void> _uploadLogo(XFile file) async {
     final gymId = await ref.read(activeGymIdProvider.future);
     if (gymId == null) {
-      setState(() => _logoError = 'Logo yüklenemedi, tekrar dene.');
+      setState(() => _logoError = _logoUploadFailedError());
       return;
     }
     setState(() => _isUploadingLogo = true);
@@ -645,10 +744,14 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
       if (!mounted) return;
       setState(() {
         _isUploadingLogo = false;
-        _logoError = 'Logo yüklenemedi, tekrar dene.';
+        _logoError = _logoUploadFailedError();
       });
     }
   }
+
+  String _logoUploadFailedError() => ref.read(
+    rcTextProvider(RemoteConfigKeys.gymsGymInfoLogoUploadFailedError),
+  );
 
   Future<void> _extractPaletteFromFile(XFile file) async {
     setState(() => _isExtractingPalette = true);
@@ -708,10 +811,14 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
       await themeController.addTheme(
         GymTheme(
           id: 'logo-$hex',
-          name: 'Logo rengi',
+          name: ref.read(
+            rcTextProvider(RemoteConfigKeys.gymsGymInfoLogoColorThemeName),
+          ),
           primary: color,
           soft: Color.lerp(color, Colors.white, 0.35)!,
-          note: 'Logonuzdan çıkarıldı',
+          note: ref.read(
+            rcTextProvider(RemoteConfigKeys.gymsGymInfoLogoColorThemeNote),
+          ),
         ),
       );
     }
@@ -724,9 +831,21 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
     final address = _addressController.text.trim();
     final phone = _phoneController.text.trim();
     setState(() {
-      _nameError = name.isEmpty ? 'Salon adı boş olamaz.' : null;
-      _addressError = address.isEmpty ? 'Adres boş olamaz.' : null;
-      _phoneError = phone.isEmpty ? 'Telefon boş olamaz.' : null;
+      _nameError = name.isEmpty
+          ? ref.read(
+              rcTextProvider(RemoteConfigKeys.gymsGymInfoNameRequiredError),
+            )
+          : null;
+      _addressError = address.isEmpty
+          ? ref.read(
+              rcTextProvider(RemoteConfigKeys.gymsGymInfoAddressRequiredError),
+            )
+          : null;
+      _phoneError = phone.isEmpty
+          ? ref.read(
+              rcTextProvider(RemoteConfigKeys.gymsGymInfoPhoneRequiredError),
+            )
+          : null;
       _saveErrorMessage = null;
     });
     if (_nameError != null || _addressError != null || _phoneError != null) {
@@ -740,7 +859,9 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
       if (!mounted) return;
       setState(() {
         _isSaving = false;
-        _saveErrorMessage = 'Salon bilgileri kaydedilemedi, tekrar dene.';
+        _saveErrorMessage = ref.read(
+          rcTextProvider(RemoteConfigKeys.gymsGymInfoSaveFailedError),
+        );
       });
       return;
     }

@@ -5,6 +5,7 @@ import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/constants/theme_palette.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
+import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_text_field.dart';
@@ -41,7 +42,11 @@ class _AddGymThemePanelState extends BasePanelState<AddGymThemePanel> {
   void _onHexChanged(String value) {
     final normalized = value.trim().replaceFirst('#', '');
     if (!RegExp(r'^[0-9a-fA-F]{6}$').hasMatch(normalized)) {
-      setState(() => _hexError = 'Geçerli bir HEX kod gir (ör. 05A6FA).');
+      setState(
+        () => _hexError = ref.read(
+          rcTextProvider(RemoteConfigKeys.gymsAddThemeInvalidHexError),
+        ),
+      );
       return;
     }
     setState(() {
@@ -73,7 +78,9 @@ class _AddGymThemePanelState extends BasePanelState<AddGymThemePanel> {
                 children: [
                   Expanded(
                     child: Text(
-                      'Tema ekle',
+                      ref.watch(
+                        rcTextProvider(RemoteConfigKeys.gymsAddThemeTitle),
+                      ),
                       style: typography.headingSmall.copyWith(
                         color: colors.onSurface,
                         fontSize: 18,
@@ -84,7 +91,7 @@ class _AddGymThemePanelState extends BasePanelState<AddGymThemePanel> {
                     onTap: () =>
                         ref.read(panelStackControllerProvider.notifier).pop(),
                     child: Text(
-                      'Vazgeç',
+                      ref.watch(rcTextProvider(RemoteConfigKeys.commonVazgec)),
                       style: typography.bodyLarge.copyWith(
                         color: colors.onSurfaceMuted,
                         fontSize: 15,
@@ -116,13 +123,25 @@ class _AddGymThemePanelState extends BasePanelState<AddGymThemePanel> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         AppTextField(
-                          label: 'Tema adı',
+                          label: ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.gymsAddThemeNameFieldLabel,
+                            ),
+                          ),
                           controller: _nameController,
-                          hint: 'Vira İmza',
+                          hint: ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.gymsAddThemeNameFieldHint,
+                            ),
+                          ),
                         ),
                         const SizedBox(height: AppSpacing.lg),
                         Text(
-                          'Palet',
+                          ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.gymsAddThemePaletteLabel,
+                            ),
+                          ),
                           style: typography.bodyMedium.copyWith(
                             color: colors.onSurfaceMuted,
                             fontSize: 13,
@@ -175,7 +194,11 @@ class _AddGymThemePanelState extends BasePanelState<AddGymThemePanel> {
                         ),
                         const SizedBox(height: AppSpacing.lg),
                         Text(
-                          'Renk kodu',
+                          ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.gymsAddThemeColorCodeLabel,
+                            ),
+                          ),
                           style: typography.bodyMedium.copyWith(
                             color: colors.onSurfaceMuted,
                             fontSize: 13,
@@ -208,7 +231,11 @@ class _AddGymThemePanelState extends BasePanelState<AddGymThemePanel> {
                         ),
                         const SizedBox(height: AppSpacing.xs),
                         Text(
-                          'Paletten seçin ya da kendi HEX kodunuzu yazın.',
+                          ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.gymsAddThemeColorHelper,
+                            ),
+                          ),
                           style: typography.caption.copyWith(
                             color: colors.onSurfaceMuted,
                           ),
@@ -218,7 +245,11 @@ class _AddGymThemePanelState extends BasePanelState<AddGymThemePanel> {
                   ),
                   const SizedBox(height: AppSpacing.lg),
                   Text(
-                    'ÖNİZLEME',
+                    ref.watch(
+                      rcTextProvider(
+                        RemoteConfigKeys.gymsAddThemePreviewSection,
+                      ),
+                    ),
                     style: typography.caption.copyWith(
                       color: colors.onSurfaceMuted,
                       letterSpacing: 1.2,
@@ -271,14 +302,24 @@ class _AddGymThemePanelState extends BasePanelState<AddGymThemePanel> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      'Kalan dersin: 6',
+                                      ref.watch(
+                                        rcTextProvider(
+                                          RemoteConfigKeys
+                                              .gymsThemePreviewRemainingSessionsLabel,
+                                        ),
+                                      ),
                                       style: typography.headingSmall.copyWith(
                                         color: colors.onSurface,
                                         fontSize: 15,
                                       ),
                                     ),
                                     Text(
-                                      'Sıradaki ders 3 Ağustos 18:30',
+                                      ref.watch(
+                                        rcTextProvider(
+                                          RemoteConfigKeys
+                                              .gymsThemePreviewNextSessionLabel,
+                                        ),
+                                      ),
                                       style: typography.bodyMedium.copyWith(
                                         color: colors.onSurfaceVariant,
                                         fontSize: 13,
@@ -301,7 +342,9 @@ class _AddGymThemePanelState extends BasePanelState<AddGymThemePanel> {
                             constraints: const BoxConstraints(minHeight: 44),
                             alignment: Alignment.center,
                             child: Text(
-                              'Gelicem',
+                              ref.watch(
+                                rcTextProvider(RemoteConfigKeys.commonGelicem),
+                              ),
                               style: typography.headingSmall.copyWith(
                                 fontSize: 15,
                                 color: colors.onPrimary,
@@ -337,13 +380,25 @@ class _AddGymThemePanelState extends BasePanelState<AddGymThemePanel> {
                   ],
                   AppButton(
                     label: _isSaving
-                        ? 'Kaydediliyor…'
-                        : 'Temayı kaydet ve uygula',
+                        ? ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.gymsGymInfoSavingLabel,
+                            ),
+                          )
+                        : ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.gymsAddThemeSubmitButton,
+                            ),
+                          ),
                     onPressed: _isSaving
                         ? null
                         : () async {
                             final name = _nameController.text.trim().isEmpty
-                                ? 'Yeni Tema'
+                                ? ref.read(
+                                    rcTextProvider(
+                                      RemoteConfigKeys.gymsAddThemeDefaultName,
+                                    ),
+                                  )
                                 : _nameController.text.trim();
                             setState(() => _isSaving = true);
                             await controller.addTheme(
@@ -356,7 +411,12 @@ class _AddGymThemePanelState extends BasePanelState<AddGymThemePanel> {
                                   Colors.white,
                                   0.35,
                                 )!,
-                                note: 'Özel renk',
+                                note: ref.read(
+                                  rcTextProvider(
+                                    RemoteConfigKeys
+                                        .gymsAddThemeCustomColorNote,
+                                  ),
+                                ),
                               ),
                             );
                             if (!mounted) return;

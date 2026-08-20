@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
+import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../controller/gym_rules_controller.dart';
@@ -53,8 +54,9 @@ class _GymRulesEditorPanelState extends BasePanelState<GymRulesEditorPanel> {
     } catch (_) {
       if (mounted) {
         setState(
-          () => _errorMessage =
-              'Kurallar kaydedilemedi, bağlantını kontrol edip tekrar dene.',
+          () => _errorMessage = ref.read(
+            rcTextProvider(RemoteConfigKeys.gymsRulesEditorSaveFailedError),
+          ),
         );
       }
     } finally {
@@ -83,7 +85,11 @@ class _GymRulesEditorPanelState extends BasePanelState<GymRulesEditorPanel> {
                 children: [
                   Expanded(
                     child: Text(
-                      'Kuralları düzenle',
+                      ref.watch(
+                        rcTextProvider(
+                          RemoteConfigKeys.gymsEditStudioRulesTitle,
+                        ),
+                      ),
                       style: typography.headingSmall.copyWith(
                         color: colors.onSurface,
                         fontSize: 18,
@@ -94,7 +100,7 @@ class _GymRulesEditorPanelState extends BasePanelState<GymRulesEditorPanel> {
                     onTap: () =>
                         ref.read(panelStackControllerProvider.notifier).pop(),
                     child: Text(
-                      'Vazgeç',
+                      ref.watch(rcTextProvider(RemoteConfigKeys.commonVazgec)),
                       style: typography.bodyLarge.copyWith(
                         color: colors.onSurfaceMuted,
                         fontSize: 15,
@@ -112,7 +118,9 @@ class _GymRulesEditorPanelState extends BasePanelState<GymRulesEditorPanel> {
                 0,
               ),
               child: Text(
-                'Kalın/italik gibi biçimlendirme için araç çubuğunu, emoji için klavyenizin emoji tuşunu kullanabilirsiniz.',
+                ref.watch(
+                  rcTextProvider(RemoteConfigKeys.gymsRulesEditorToolbarHint),
+                ),
                 style: typography.caption.copyWith(
                   color: colors.onSurfaceMuted,
                   height: 1.4,
@@ -245,7 +253,15 @@ class _GymRulesEditorPanelState extends BasePanelState<GymRulesEditorPanel> {
                     const SizedBox(height: AppSpacing.sm),
                   ],
                   AppButton(
-                    label: _isSaving ? 'Kaydediliyor…' : 'Kaydet',
+                    label: _isSaving
+                        ? ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.gymsGymInfoSavingLabel,
+                            ),
+                          )
+                        : ref.watch(
+                            rcTextProvider(RemoteConfigKeys.commonKaydet),
+                          ),
                     onPressed: _isSaving ? null : _save,
                   ),
                 ],

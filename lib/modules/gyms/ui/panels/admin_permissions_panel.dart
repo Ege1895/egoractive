@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
+import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_back_button.dart';
 import '../../../../shared/widgets/app_button.dart';
@@ -55,7 +56,9 @@ class _AdminPermissionsPanelState
                   ),
                   const SizedBox(width: AppSpacing.md),
                   Text(
-                    'Yetki ayarları',
+                    ref.watch(
+                      rcTextProvider(RemoteConfigKeys.gymsPermissionsTitle),
+                    ),
                     style: typography.headingSmall.copyWith(
                       color: colors.onSurface,
                       fontSize: 18,
@@ -74,7 +77,11 @@ class _AdminPermissionsPanelState
                 ),
                 children: [
                   Text(
-                    'Hangi antrenöre yetkilendirme yapmak istiyorsun?',
+                    ref.watch(
+                      rcTextProvider(
+                        RemoteConfigKeys.gymsPermissionsTrainerQuestion,
+                      ),
+                    ),
                     style: typography.headingSmall.copyWith(
                       color: colors.onSurface,
                       fontSize: 16,
@@ -82,7 +89,11 @@ class _AdminPermissionsPanelState
                   ),
                   const SizedBox(height: AppSpacing.xs),
                   Text(
-                    'Bir ya da birden fazla antrenör seçebilirsin; aynı ayarlar hepsine uygulanır.',
+                    ref.watch(
+                      rcTextProvider(
+                        RemoteConfigKeys.gymsPermissionsTrainerHelper,
+                      ),
+                    ),
                     style: typography.bodyMedium.copyWith(
                       color: colors.onSurfaceMuted,
                       fontSize: 13,
@@ -125,7 +136,12 @@ class _AdminPermissionsPanelState
                           Expanded(
                             child: Text(
                               selectedTrainers.isEmpty
-                                  ? 'Antrenör seç'
+                                  ? ref.watch(
+                                      rcTextProvider(
+                                        RemoteConfigKeys
+                                            .membersSelectTrainerButton,
+                                      ),
+                                    )
                                   : selectedTrainers
                                         .map((t) => t.name)
                                         .join(', '),
@@ -137,7 +153,9 @@ class _AdminPermissionsPanelState
                             ),
                           ),
                           Text(
-                            'Değiştir',
+                            ref.watch(
+                              rcTextProvider(RemoteConfigKeys.commonDegistir),
+                            ),
                             style: typography.headingSmall.copyWith(
                               color: colors.onPrimaryContainer,
                               fontSize: 13,
@@ -158,7 +176,11 @@ class _AdminPermissionsPanelState
                 AppSpacing.lg,
               ),
               child: AppButton(
-                label: 'Yetkilendir',
+                label: ref.watch(
+                  rcTextProvider(
+                    RemoteConfigKeys.gymsPermissionsAuthorizeButton,
+                  ),
+                ),
                 onPressed: selectedTrainers.isEmpty
                     ? null
                     : () => ref
@@ -194,7 +216,9 @@ class _AdminPermissionsPanelState
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Antrenör seç',
+                  ProviderScope.containerOf(context).read(
+                    rcTextProvider(RemoteConfigKeys.membersSelectTrainerButton),
+                  ),
                   style: context.appTypography.headingMedium.copyWith(
                     color: colors.onSurface,
                     fontSize: 20,
@@ -213,7 +237,11 @@ class _AdminPermissionsPanelState
                             vertical: AppSpacing.lg,
                           ),
                           child: Text(
-                            'Henüz antrenör yok.',
+                            ref.watch(
+                              rcTextProvider(
+                                RemoteConfigKeys.gymsAdminHomeNoTrainersMessage,
+                              ),
+                            ),
                             style: context.appTypography.bodyMedium.copyWith(
                               color: colors.onSurfaceMuted,
                             ),
@@ -250,7 +278,9 @@ class _AdminPermissionsPanelState
                 ),
                 const SizedBox(height: AppSpacing.md),
                 AppButton(
-                  label: 'Bitti',
+                  label: ProviderScope.containerOf(context).read(
+                    rcTextProvider(RemoteConfigKeys.gymsPermissionsDoneButton),
+                  ),
                   onPressed: () => Navigator.of(sheetContext).pop(),
                 ),
               ],

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
+import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_back_button.dart';
 import '../../../../shared/widgets/app_button.dart';
@@ -68,7 +69,11 @@ class _TrainerPermissionsEditPanelState
                   const SizedBox(width: AppSpacing.md),
                   Expanded(
                     child: Text(
-                      'Yetkilendir',
+                      ref.watch(
+                        rcTextProvider(
+                          RemoteConfigKeys.gymsPermissionsAuthorizeButton,
+                        ),
+                      ),
                       style: typography.headingSmall.copyWith(
                         color: colors.onSurface,
                         fontSize: 18,
@@ -114,7 +119,12 @@ class _TrainerPermissionsEditPanelState
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Seans bitimi eğitmene ne zaman hatırlatılsın?',
+                          ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys
+                                  .gymsTrainerPermissionsReminderQuestion,
+                            ),
+                          ),
                           style: typography.headingSmall.copyWith(
                             color: colors.onSurface,
                             fontSize: 16,
@@ -122,7 +132,12 @@ class _TrainerPermissionsEditPanelState
                         ),
                         const SizedBox(height: AppSpacing.xs),
                         Text(
-                          'Bildirim seans bitiminden sonra gider',
+                          ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys
+                                  .gymsTrainerPermissionsReminderNote,
+                            ),
+                          ),
                           style: typography.bodyMedium.copyWith(
                             color: colors.onSurfaceMuted,
                             fontSize: 13,
@@ -176,9 +191,18 @@ class _TrainerPermissionsEditPanelState
                     child: Column(
                       children: [
                         _PermissionToggle(
-                          title: 'Online Rezervasyon',
-                          note:
-                              'Üyeler Keşfet üzerinden grup derslerine katılabilir',
+                          title: ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys
+                                  .gymsTrainerPermissionsOnlineBookingTitle,
+                            ),
+                          ),
+                          note: ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys
+                                  .gymsTrainerPermissionsOnlineBookingNote,
+                            ),
+                          ),
                           value: permissions.onlineBookingEnabled,
                           onTap: () => _handlePermissionAction(
                             context,
@@ -187,10 +211,18 @@ class _TrainerPermissionsEditPanelState
                           showDivider: true,
                         ),
                         _PermissionToggle(
-                          title:
-                              'Paket süresi bitince seans oluşturulabilsin mi?',
-                          note:
-                              'Kapalıysa paketi bitmiş üyeye yeni seans planlanamaz',
+                          title: ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys
+                                  .gymsTrainerPermissionsAllowAfterExpiryTitle,
+                            ),
+                          ),
+                          note: ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys
+                                  .gymsTrainerPermissionsAllowAfterExpiryNote,
+                            ),
+                          ),
                           value: permissions.allowSessionsAfterPackageExpiry,
                           onTap: () => _handlePermissionAction(
                             context,
@@ -201,9 +233,18 @@ class _TrainerPermissionsEditPanelState
                           showDivider: true,
                         ),
                         _PermissionToggle(
-                          title: 'Üye seans iptal edebilir',
-                          note:
-                              'Kapalıysa iptal yalnızca antrenör/yönetici yapabilir',
+                          title: ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys
+                                  .gymsTrainerPermissionsMemberCancelTitle,
+                            ),
+                          ),
+                          note: ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys
+                                  .gymsTrainerPermissionsMemberCancelNote,
+                            ),
+                          ),
                           value: permissions.memberCanCancelSession,
                           onTap: () => _handlePermissionAction(
                             context,
@@ -216,7 +257,11 @@ class _TrainerPermissionsEditPanelState
                   ),
                   const SizedBox(height: AppSpacing.sm),
                   Text(
-                    'Her değişiklik anında kaydedilir.',
+                    ref.watch(
+                      rcTextProvider(
+                        RemoteConfigKeys.gymsTrainerPermissionsAutoSaveNote,
+                      ),
+                    ),
                     style: typography.caption.copyWith(
                       color: colors.onSurfaceMuted,
                     ),
@@ -232,7 +277,7 @@ class _TrainerPermissionsEditPanelState
                 AppSpacing.lg,
               ),
               child: AppButton(
-                label: 'Kaydet',
+                label: ref.watch(rcTextProvider(RemoteConfigKeys.commonKaydet)),
                 onPressed: () =>
                     ref.read(panelStackControllerProvider.notifier).pop(),
               ),
@@ -253,9 +298,13 @@ Future<void> _handlePermissionAction(
   } catch (_) {
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text(
-            'Ayar kaydedilemedi, bağlantını kontrol edip tekrar dene.',
+            ProviderScope.containerOf(context).read(
+              rcTextProvider(
+                RemoteConfigKeys.gymsTrainerPermissionsSaveFailedError,
+              ),
+            ),
           ),
         ),
       );

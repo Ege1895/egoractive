@@ -395,6 +395,121 @@ abstract final class RemoteConfigKeys {
       'lbl_gyms_add_theme_name_field_label';
   static const gymsStudioRulesTitle = 'lbl_gyms_studio_rules_title';
   static const gymsEditStudioRulesTitle = 'lbl_gyms_edit_studio_rules_title';
+  static const gymsSettingsNavSubscription =
+      'lbl_gyms_settings_nav_subscription';
+  static const gymsSettingsNavReports = 'lbl_gyms_settings_nav_reports';
+  static const gymsAdminHomeThisMonthNote =
+      'lbl_gyms_admin_home_this_month_note';
+  static const gymsAdminHomeNoTrainersMessage =
+      'lbl_gyms_admin_home_no_trainers_message';
+  static const gymsAdminHomeAddTrainerButton =
+      'lbl_gyms_admin_home_add_trainer_button';
+  static const gymsAdminHomeNoPendingPaymentsMessage =
+      'lbl_gyms_admin_home_no_pending_payments_message';
+  static const gymsAdminHomeDuePaymentMembersTemplate =
+      'lbl_gyms_admin_home_due_payment_members_template';
+  static const gymsAdminHomeTotalFeedbackTemplate =
+      'lbl_gyms_admin_home_total_feedback_template';
+  static const gymsPermissionsTrainerQuestion =
+      'lbl_gyms_permissions_trainer_question';
+  static const gymsPermissionsTrainerHelper =
+      'lbl_gyms_permissions_trainer_helper';
+  static const gymsPermissionsAuthorizeButton =
+      'lbl_gyms_permissions_authorize_button';
+  static const gymsPermissionsDoneButton = 'lbl_gyms_permissions_done_button';
+  static const gymsGymInfoUploadingLabel = 'lbl_gyms_gym_info_uploading_label';
+  static const gymsGymInfoPaletteExtractingLabel =
+      'lbl_gyms_gym_info_palette_extracting_label';
+  static const gymsGymInfoThemeColorNote =
+      'lbl_gyms_gym_info_theme_color_note';
+  static const gymsGymInfoReportEmailsSection =
+      'lbl_gyms_gym_info_report_emails_section';
+  static const gymsGymInfoReportEmailsDescription =
+      'lbl_gyms_gym_info_report_emails_description';
+  static const gymsGymInfoGymReportEmailLabel =
+      'lbl_gyms_gym_info_gym_report_email_label';
+  static const gymsGymInfoGymReportEmailHint =
+      'lbl_gyms_gym_info_gym_report_email_hint';
+  static const gymsGymInfoAccountingReportEmailLabel =
+      'lbl_gyms_gym_info_accounting_report_email_label';
+  static const gymsGymInfoAccountingReportEmailHint =
+      'lbl_gyms_gym_info_accounting_report_email_hint';
+  static const gymsGymInfoSavingLabel = 'lbl_gyms_gym_info_saving_label';
+  static const gymsGymInfoSaveReportEmailsButton =
+      'lbl_gyms_gym_info_save_report_emails_button';
+  static const gymsGymInfoLogoUploadFailedError =
+      'lbl_gyms_gym_info_logo_upload_failed_error';
+  static const gymsGymInfoNameRequiredError =
+      'lbl_gyms_gym_info_name_required_error';
+  static const gymsGymInfoAddressRequiredError =
+      'lbl_gyms_gym_info_address_required_error';
+  static const gymsGymInfoPhoneRequiredError =
+      'lbl_gyms_gym_info_phone_required_error';
+  static const gymsGymInfoSaveFailedError =
+      'lbl_gyms_gym_info_save_failed_error';
+  static const gymsGymInfoLogoColorThemeName =
+      'lbl_gyms_gym_info_logo_color_theme_name';
+  static const gymsGymInfoLogoColorThemeNote =
+      'lbl_gyms_gym_info_logo_color_theme_note';
+  static const gymsGymSetupHeadline = 'lbl_gyms_gym_setup_headline';
+  static const gymsGymSetupPhoneFieldLabel =
+      'lbl_gyms_gym_setup_phone_field_label';
+  static const gymsGymSetupPhoneHint = 'lbl_gyms_gym_setup_phone_hint';
+  static const gymsGymSetupPhoneHelperNote =
+      'lbl_gyms_gym_setup_phone_helper_note';
+  static const gymsGymSetupLogoOptionalLabel =
+      'lbl_gyms_gym_setup_logo_optional_label';
+  static const gymsGymSetupLogoDescription =
+      'lbl_gyms_gym_setup_logo_description';
+  static const gymsGymSetupLogoColorHintNote =
+      'lbl_gyms_gym_setup_logo_color_hint_note';
+  static const gymsGymSetupSuggestedColorsLabel =
+      'lbl_gyms_gym_setup_suggested_colors_label';
+  static const gymsGymSetupChangeLaterNote =
+      'lbl_gyms_gym_setup_change_later_note';
+  static const gymsGymSetupSubmittingLabel =
+      'lbl_gyms_gym_setup_submitting_label';
+  static const gymsGymSetupSuccessBanner =
+      'lbl_gyms_gym_setup_success_banner';
+  static const gymsAddThemeNameFieldHint =
+      'lbl_gyms_add_theme_name_field_hint';
+  static const gymsAddThemeInvalidHexError =
+      'lbl_gyms_add_theme_invalid_hex_error';
+  static const gymsThemePreviewRemainingSessionsLabel =
+      'lbl_gyms_theme_preview_remaining_sessions_label';
+  static const gymsThemePreviewNextSessionLabel =
+      'lbl_gyms_theme_preview_next_session_label';
+  static const gymsAddThemeDefaultName = 'lbl_gyms_add_theme_default_name';
+  static const gymsAddThemeCustomColorNote =
+      'lbl_gyms_add_theme_custom_color_note';
+  static const gymsRulesEditorToolbarHint =
+      'lbl_gyms_rules_editor_toolbar_hint';
+  static const gymsRulesEditorSaveFailedError =
+      'lbl_gyms_rules_editor_save_failed_error';
+  static const gymsRulesViewLastUpdatedTemplate =
+      'lbl_gyms_rules_view_last_updated_template';
+  static const gymsThemesDescription = 'lbl_gyms_themes_description';
+  static const gymsThemesAddThemeButton = 'lbl_gyms_themes_add_theme_button';
+  static const gymsTrainerPermissionsReminderQuestion =
+      'lbl_gyms_trainer_permissions_reminder_question';
+  static const gymsTrainerPermissionsReminderNote =
+      'lbl_gyms_trainer_permissions_reminder_note';
+  static const gymsTrainerPermissionsOnlineBookingTitle =
+      'lbl_gyms_trainer_permissions_online_booking_title';
+  static const gymsTrainerPermissionsOnlineBookingNote =
+      'lbl_gyms_trainer_permissions_online_booking_note';
+  static const gymsTrainerPermissionsAllowAfterExpiryTitle =
+      'lbl_gyms_trainer_permissions_allow_after_expiry_title';
+  static const gymsTrainerPermissionsAllowAfterExpiryNote =
+      'lbl_gyms_trainer_permissions_allow_after_expiry_note';
+  static const gymsTrainerPermissionsMemberCancelTitle =
+      'lbl_gyms_trainer_permissions_member_cancel_title';
+  static const gymsTrainerPermissionsMemberCancelNote =
+      'lbl_gyms_trainer_permissions_member_cancel_note';
+  static const gymsTrainerPermissionsAutoSaveNote =
+      'lbl_gyms_trainer_permissions_auto_save_note';
+  static const gymsTrainerPermissionsSaveFailedError =
+      'lbl_gyms_trainer_permissions_save_failed_error';
   static const measurementsAddTitle = 'lbl_measurements_add_title';
   static const measurementsMeasurementDateLabel =
       'lbl_measurements_measurement_date_label';
@@ -951,6 +1066,103 @@ class RemoteConfigService {
     'lbl_gyms_add_theme_name_field_label_tr': 'Tema adı',
     'lbl_gyms_studio_rules_title_tr': 'Stüdyo kuralları',
     'lbl_gyms_edit_studio_rules_title_tr': 'Kuralları düzenle',
+    'lbl_gyms_settings_nav_subscription_tr': 'Abonelik',
+    'lbl_gyms_settings_nav_reports_tr': 'Raporlar',
+    'lbl_gyms_admin_home_this_month_note_tr': 'Bu ay',
+    'lbl_gyms_admin_home_no_trainers_message_tr': 'Henüz antrenör yok.',
+    'lbl_gyms_admin_home_add_trainer_button_tr': '+ Antrenör ekle',
+    'lbl_gyms_admin_home_no_pending_payments_message_tr':
+        'Bekleyen ödeme yok.',
+    'lbl_gyms_admin_home_due_payment_members_template_tr':
+        '{count} üyenin ödemesi bekleniyor',
+    'lbl_gyms_admin_home_total_feedback_template_tr':
+        'Toplam {count} değerlendirme',
+    'lbl_gyms_permissions_trainer_question_tr':
+        'Hangi antrenöre yetkilendirme yapmak istiyorsun?',
+    'lbl_gyms_permissions_trainer_helper_tr':
+        'Bir ya da birden fazla antrenör seçebilirsin; aynı ayarlar hepsine uygulanır.',
+    'lbl_gyms_permissions_authorize_button_tr': 'Yetkilendir',
+    'lbl_gyms_permissions_done_button_tr': 'Bitti',
+    'lbl_gyms_gym_info_uploading_label_tr': 'Yükleniyor…',
+    'lbl_gyms_gym_info_palette_extracting_label_tr':
+        'Logodan renkler çıkarılıyor…',
+    'lbl_gyms_gym_info_theme_color_note_tr':
+        'Seçtiğiniz renk üyelerin uygulamasında da birincil renk olur; koyu zemin ve durum renkleri değişmez.',
+    'lbl_gyms_gym_info_report_emails_section_tr': 'RAPOR E-POSTALARI',
+    'lbl_gyms_gym_info_report_emails_description_tr':
+        'Haftalık salon ve muhasebe özeti bu adreslere e-posta ile gönderilir.',
+    'lbl_gyms_gym_info_gym_report_email_label_tr': 'Salon raporu e-postası',
+    'lbl_gyms_gym_info_gym_report_email_hint_tr': 'admin@stüdyo.com',
+    'lbl_gyms_gym_info_accounting_report_email_label_tr':
+        'Muhasebe raporu e-postası',
+    'lbl_gyms_gym_info_accounting_report_email_hint_tr':
+        'muhasebe@stüdyo.com',
+    'lbl_gyms_gym_info_saving_label_tr': 'Kaydediliyor…',
+    'lbl_gyms_gym_info_save_report_emails_button_tr':
+        'Rapor e-postalarını kaydet',
+    'lbl_gyms_gym_info_logo_upload_failed_error_tr':
+        'Logo yüklenemedi, tekrar dene.',
+    'lbl_gyms_gym_info_name_required_error_tr': 'Salon adı boş olamaz.',
+    'lbl_gyms_gym_info_address_required_error_tr': 'Adres boş olamaz.',
+    'lbl_gyms_gym_info_phone_required_error_tr': 'Telefon boş olamaz.',
+    'lbl_gyms_gym_info_save_failed_error_tr':
+        'Salon bilgileri kaydedilemedi, tekrar dene.',
+    'lbl_gyms_gym_info_logo_color_theme_name_tr': 'Logo rengi',
+    'lbl_gyms_gym_info_logo_color_theme_note_tr': 'Logonuzdan çıkarıldı',
+    'lbl_gyms_gym_setup_headline_tr':
+        'Bu adımı tamamlayınca yönetici hesabınız aktifleşir ve uygulamaya girersiniz.',
+    'lbl_gyms_gym_setup_phone_field_label_tr': 'Telefon numaran (giriş için)',
+    'lbl_gyms_gym_setup_phone_hint_tr': '5XX XXX XX XX',
+    'lbl_gyms_gym_setup_phone_helper_note_tr':
+        'Salon kaydı tamamlanınca bu numarayla admin olarak giriş yapacaksın.',
+    'lbl_gyms_gym_setup_logo_optional_label_tr': 'Salon logosu (opsiyonel)',
+    'lbl_gyms_gym_setup_logo_description_tr':
+        'Kare PNG, en az 512×512. Eklersen üyelerin ve antrenörlerin her ekranında arka planda %25 opaklıkla silüet olarak görünür — sonradan Salon Bilgileri panelinden de ekleyebilirsin.',
+    'lbl_gyms_gym_setup_logo_color_hint_note_tr':
+        'Logo eklersen aşağıdaki tema rengi seçeneklerini logona göre öneririz.',
+    'lbl_gyms_gym_setup_suggested_colors_label_tr':
+        'Logona göre önerilen renkler',
+    'lbl_gyms_gym_setup_change_later_note_tr':
+        'Sonradan Temalar panelinden değiştirebilirsiniz.',
+    'lbl_gyms_gym_setup_submitting_label_tr': 'Oluşturuluyor…',
+    'lbl_gyms_gym_setup_success_banner_tr':
+        'Salonun oluşturuldu! Şimdi az önce girdiğin numarayla giriş yap.',
+    'lbl_gyms_add_theme_name_field_hint_tr': 'Vira İmza',
+    'lbl_gyms_add_theme_invalid_hex_error_tr':
+        'Geçerli bir HEX kod gir (ör. 05A6FA).',
+    'lbl_gyms_theme_preview_remaining_sessions_label_tr': 'Kalan dersin: 6',
+    'lbl_gyms_theme_preview_next_session_label_tr':
+        'Sıradaki ders 3 Ağustos 18:30',
+    'lbl_gyms_add_theme_default_name_tr': 'Yeni Tema',
+    'lbl_gyms_add_theme_custom_color_note_tr': 'Özel renk',
+    'lbl_gyms_rules_editor_toolbar_hint_tr':
+        'Kalın/italik gibi biçimlendirme için araç çubuğunu, emoji için klavyenizin emoji tuşunu kullanabilirsiniz.',
+    'lbl_gyms_rules_editor_save_failed_error_tr':
+        'Kurallar kaydedilemedi, bağlantını kontrol edip tekrar dene.',
+    'lbl_gyms_rules_view_last_updated_template_tr': 'Son güncelleme {date}',
+    'lbl_gyms_themes_description_tr':
+        'Seçtiğiniz tema salonunuzdaki tüm üye ve antrenörlerin uygulamasında görünür. Koyu zemin ve durum renkleri sabit kalır, değişen tek şey vurgu rengi.',
+    'lbl_gyms_themes_add_theme_button_tr': '+ Tema ekle',
+    'lbl_gyms_trainer_permissions_reminder_question_tr':
+        'Seans bitimi eğitmene ne zaman hatırlatılsın?',
+    'lbl_gyms_trainer_permissions_reminder_note_tr':
+        'Bildirim seans bitiminden sonra gider',
+    'lbl_gyms_trainer_permissions_online_booking_title_tr':
+        'Online Rezervasyon',
+    'lbl_gyms_trainer_permissions_online_booking_note_tr':
+        'Üyeler Keşfet üzerinden grup derslerine katılabilir',
+    'lbl_gyms_trainer_permissions_allow_after_expiry_title_tr':
+        'Paket süresi bitince seans oluşturulabilsin mi?',
+    'lbl_gyms_trainer_permissions_allow_after_expiry_note_tr':
+        'Kapalıysa paketi bitmiş üyeye yeni seans planlanamaz',
+    'lbl_gyms_trainer_permissions_member_cancel_title_tr':
+        'Üye seans iptal edebilir',
+    'lbl_gyms_trainer_permissions_member_cancel_note_tr':
+        'Kapalıysa iptal yalnızca antrenör/yönetici yapabilir',
+    'lbl_gyms_trainer_permissions_auto_save_note_tr':
+        'Her değişiklik anında kaydedilir.',
+    'lbl_gyms_trainer_permissions_save_failed_error_tr':
+        'Ayar kaydedilemedi, bağlantını kontrol edip tekrar dene.',
     'lbl_measurements_add_title_tr': 'Yeni ölçüm',
     'lbl_measurements_measurement_date_label_tr': 'Ölçüm tarihi',
     'lbl_measurements_measurements_section_tr': 'ÖLÇÜLER',
@@ -1324,6 +1536,102 @@ class RemoteConfigService {
     'lbl_gyms_add_theme_name_field_label_en': 'Theme name',
     'lbl_gyms_studio_rules_title_en': 'Studio rules',
     'lbl_gyms_edit_studio_rules_title_en': 'Edit rules',
+    'lbl_gyms_settings_nav_subscription_en': 'Subscription',
+    'lbl_gyms_settings_nav_reports_en': 'Reports',
+    'lbl_gyms_admin_home_this_month_note_en': 'This month',
+    'lbl_gyms_admin_home_no_trainers_message_en': 'No trainers yet.',
+    'lbl_gyms_admin_home_add_trainer_button_en': '+ Add trainer',
+    'lbl_gyms_admin_home_no_pending_payments_message_en':
+        'No pending payments.',
+    'lbl_gyms_admin_home_due_payment_members_template_en':
+        '{count} members have pending payments',
+    'lbl_gyms_admin_home_total_feedback_template_en':
+        '{count} reviews total',
+    'lbl_gyms_permissions_trainer_question_en':
+        'Which trainer do you want to authorize?',
+    'lbl_gyms_permissions_trainer_helper_en':
+        'You can select one or more trainers; the same settings apply to all of them.',
+    'lbl_gyms_permissions_authorize_button_en': 'Authorize',
+    'lbl_gyms_permissions_done_button_en': 'Done',
+    'lbl_gyms_gym_info_uploading_label_en': 'Uploading…',
+    'lbl_gyms_gym_info_palette_extracting_label_en':
+        'Extracting colors from logo…',
+    'lbl_gyms_gym_info_theme_color_note_en':
+        "The color you choose also becomes the primary color in members' app; the dark background and status colors stay unchanged.",
+    'lbl_gyms_gym_info_report_emails_section_en': 'REPORT EMAILS',
+    'lbl_gyms_gym_info_report_emails_description_en':
+        'The weekly gym and accounting summary is emailed to these addresses.',
+    'lbl_gyms_gym_info_gym_report_email_label_en': 'Gym report email',
+    'lbl_gyms_gym_info_gym_report_email_hint_en': 'admin@studio.com',
+    'lbl_gyms_gym_info_accounting_report_email_label_en':
+        'Accounting report email',
+    'lbl_gyms_gym_info_accounting_report_email_hint_en':
+        'accounting@studio.com',
+    'lbl_gyms_gym_info_saving_label_en': 'Saving…',
+    'lbl_gyms_gym_info_save_report_emails_button_en': 'Save report emails',
+    'lbl_gyms_gym_info_logo_upload_failed_error_en':
+        'Logo could not be uploaded, try again.',
+    'lbl_gyms_gym_info_name_required_error_en': 'Gym name cannot be empty.',
+    'lbl_gyms_gym_info_address_required_error_en': 'Address cannot be empty.',
+    'lbl_gyms_gym_info_phone_required_error_en': 'Phone cannot be empty.',
+    'lbl_gyms_gym_info_save_failed_error_en':
+        'Gym information could not be saved, try again.',
+    'lbl_gyms_gym_info_logo_color_theme_name_en': 'Logo color',
+    'lbl_gyms_gym_info_logo_color_theme_note_en': 'Extracted from your logo',
+    'lbl_gyms_gym_setup_headline_en':
+        'Once you complete this step, your admin account activates and you enter the app.',
+    'lbl_gyms_gym_setup_phone_field_label_en': 'Your phone number (for login)',
+    'lbl_gyms_gym_setup_phone_hint_en': '5XX XXX XX XX',
+    'lbl_gyms_gym_setup_phone_helper_note_en':
+        'Once gym registration is complete, you will log in as admin with this number.',
+    'lbl_gyms_gym_setup_logo_optional_label_en': 'Gym logo (optional)',
+    'lbl_gyms_gym_setup_logo_description_en':
+        'Square PNG, at least 512×512. If you add one, it appears as a 25%-opacity silhouette in the background on every screen for members and trainers — you can also add it later from the Gym Info panel.',
+    'lbl_gyms_gym_setup_logo_color_hint_note_en':
+        'If you add a logo, we will suggest the theme color options below based on it.',
+    'lbl_gyms_gym_setup_suggested_colors_label_en':
+        'Suggested colors based on your logo',
+    'lbl_gyms_gym_setup_change_later_note_en':
+        'You can change this later from the Themes panel.',
+    'lbl_gyms_gym_setup_submitting_label_en': 'Creating…',
+    'lbl_gyms_gym_setup_success_banner_en':
+        'Your gym has been created! Now log in with the number you just entered.',
+    'lbl_gyms_add_theme_name_field_hint_en': 'Vira Signature',
+    'lbl_gyms_add_theme_invalid_hex_error_en':
+        'Enter a valid HEX code (e.g. 05A6FA).',
+    'lbl_gyms_theme_preview_remaining_sessions_label_en': 'Sessions left: 6',
+    'lbl_gyms_theme_preview_next_session_label_en':
+        'Next session Aug 3, 6:30 PM',
+    'lbl_gyms_add_theme_default_name_en': 'New Theme',
+    'lbl_gyms_add_theme_custom_color_note_en': 'Custom color',
+    'lbl_gyms_rules_editor_toolbar_hint_en':
+        "Use the toolbar for formatting like bold/italic, and your keyboard's emoji key for emoji.",
+    'lbl_gyms_rules_editor_save_failed_error_en':
+        'Rules could not be saved, check your connection and try again.',
+    'lbl_gyms_rules_view_last_updated_template_en': 'Last updated {date}',
+    'lbl_gyms_themes_description_en':
+        "The theme you choose appears in the app for all your gym's members and trainers. The dark background and status colors stay fixed — only the accent color changes.",
+    'lbl_gyms_themes_add_theme_button_en': '+ Add theme',
+    'lbl_gyms_trainer_permissions_reminder_question_en':
+        'When should the trainer be reminded after the session ends?',
+    'lbl_gyms_trainer_permissions_reminder_note_en':
+        'The notification is sent after the session ends',
+    'lbl_gyms_trainer_permissions_online_booking_title_en':
+        'Online Booking',
+    'lbl_gyms_trainer_permissions_online_booking_note_en':
+        'Members can join group sessions via Discover',
+    'lbl_gyms_trainer_permissions_allow_after_expiry_title_en':
+        'Allow scheduling sessions after the package expires?',
+    'lbl_gyms_trainer_permissions_allow_after_expiry_note_en':
+        'When off, a new session cannot be scheduled for a member with an expired package',
+    'lbl_gyms_trainer_permissions_member_cancel_title_en':
+        'Member can cancel session',
+    'lbl_gyms_trainer_permissions_member_cancel_note_en':
+        'When off, only the trainer/admin can cancel',
+    'lbl_gyms_trainer_permissions_auto_save_note_en':
+        'Every change is saved instantly.',
+    'lbl_gyms_trainer_permissions_save_failed_error_en':
+        'Setting could not be saved, check your connection and try again.',
     'lbl_measurements_add_title_en': 'New measurement',
     'lbl_measurements_measurement_date_label_en': 'Measurement date',
     'lbl_measurements_measurements_section_en': 'MEASUREMENTS',

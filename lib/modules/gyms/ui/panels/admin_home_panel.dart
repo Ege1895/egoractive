@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
+import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/progress_ring.dart';
@@ -129,7 +130,11 @@ class AdminHomePanel extends ConsumerWidget {
                           ),
                         ),
                         Text(
-                          'tamamlanan',
+                          ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.gymsAdminHomeCompletedWord,
+                            ),
+                          ),
                           style: typography.caption.copyWith(
                             color: colors.onSurfaceMuted,
                             fontSize: 10,
@@ -143,19 +148,29 @@ class AdminHomePanel extends ConsumerWidget {
                     child: Column(
                       children: [
                         _StatRow(
-                          label: 'Toplam seans',
+                          label: ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.gymsAdminHomeTotalSessionsLabel,
+                            ),
+                          ),
                           value: '${state.totalSessions}',
                           valueColor: colors.onSurface,
                         ),
                         const SizedBox(height: AppSpacing.sm),
                         _StatRow(
-                          label: 'Tamamlanan',
+                          label: ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.gymsAdminHomeCompletedLabel,
+                            ),
+                          ),
                           value: '${state.completedSessions}',
                           valueColor: colors.success,
                         ),
                         const SizedBox(height: AppSpacing.sm),
                         _StatRow(
-                          label: 'İptal',
+                          label: ref.watch(
+                            rcTextProvider(RemoteConfigKeys.commonIptalLabel),
+                          ),
                           value: '${state.cancelledSessions}',
                           valueColor: colors.error,
                         ),
@@ -170,18 +185,34 @@ class AdminHomePanel extends ConsumerWidget {
               children: [
                 Expanded(
                   child: _MetricTile(
-                    label: 'Tahmini ciro',
+                    label: ref.watch(
+                      rcTextProvider(
+                        RemoteConfigKeys.gymsAdminHomeEstimatedRevenueLabel,
+                      ),
+                    ),
                     value: '₺${state.estimatedRevenueTl}',
-                    note: 'Bu ay',
+                    note: ref.watch(
+                      rcTextProvider(
+                        RemoteConfigKeys.gymsAdminHomeThisMonthNote,
+                      ),
+                    ),
                     noteColor: colors.onSurfaceMuted,
                   ),
                 ),
                 const SizedBox(width: AppSpacing.sm),
                 Expanded(
                   child: _MetricTile(
-                    label: 'Gider',
+                    label: ref.watch(
+                      rcTextProvider(
+                        RemoteConfigKeys.gymsAdminHomeExpenseLabel,
+                      ),
+                    ),
                     value: '₺${state.expensesTl}',
-                    note: 'Bu ay',
+                    note: ref.watch(
+                      rcTextProvider(
+                        RemoteConfigKeys.gymsAdminHomeThisMonthNote,
+                      ),
+                    ),
                     noteColor: colors.onSurfaceMuted,
                   ),
                 ),
@@ -189,7 +220,11 @@ class AdminHomePanel extends ConsumerWidget {
             ),
             const SizedBox(height: AppSpacing.xl),
             Text(
-              'ANTRENÖR PERFORMANSI',
+              ref.watch(
+                rcTextProvider(
+                  RemoteConfigKeys.gymsAdminHomeTrainerPerformanceSection,
+                ),
+              ),
               style: typography.caption.copyWith(
                 color: colors.onSurfaceMuted,
                 letterSpacing: 1.2,
@@ -207,14 +242,22 @@ class AdminHomePanel extends ConsumerWidget {
                   ? Column(
                       children: [
                         Text(
-                          'Henüz antrenör yok.',
+                          ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.gymsAdminHomeNoTrainersMessage,
+                            ),
+                          ),
                           style: typography.bodyMedium.copyWith(
                             color: colors.onSurfaceMuted,
                           ),
                         ),
                         const SizedBox(height: AppSpacing.md),
                         AppButton(
-                          label: '+ Antrenör ekle',
+                          label: ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.gymsAdminHomeAddTrainerButton,
+                            ),
+                          ),
                           variant: AppButtonVariant.secondary,
                           onPressed: () => panelStack.push(
                             const AdminTrainerManagementPanel(),
@@ -240,7 +283,11 @@ class AdminHomePanel extends ConsumerWidget {
             ),
             const SizedBox(height: AppSpacing.xl),
             Text(
-              'ÖDEME VAKTİ YAKLAŞAN',
+              ref.watch(
+                rcTextProvider(
+                  RemoteConfigKeys.gymsAdminHomeUpcomingPaymentsSection,
+                ),
+              ),
               style: typography.caption.copyWith(
                 color: colors.primary,
                 letterSpacing: 1.2,
@@ -258,7 +305,12 @@ class AdminHomePanel extends ConsumerWidget {
               ),
               child: state.duePaymentMemberCount == 0
                   ? Text(
-                      'Bekleyen ödeme yok.',
+                      ref.watch(
+                        rcTextProvider(
+                          RemoteConfigKeys
+                              .gymsAdminHomeNoPendingPaymentsMessage,
+                        ),
+                      ),
                       style: typography.bodyMedium.copyWith(
                         color: colors.onSurfaceMuted,
                       ),
@@ -267,7 +319,17 @@ class AdminHomePanel extends ConsumerWidget {
                       children: [
                         Expanded(
                           child: Text(
-                            '${state.duePaymentMemberCount} üyenin ödemesi bekleniyor',
+                            ref
+                                .watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys
+                                        .gymsAdminHomeDuePaymentMembersTemplate,
+                                  ),
+                                )
+                                .replaceAll(
+                                  '{count}',
+                                  '${state.duePaymentMemberCount}',
+                                ),
                             style: typography.bodyLarge.copyWith(
                               color: colors.onSurface,
                               fontSize: 15,
@@ -299,14 +361,25 @@ class AdminHomePanel extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Geri bildirimler',
+                          ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.gymsSettingsNavFeedback,
+                            ),
+                          ),
                           style: typography.headingSmall.copyWith(
                             color: colors.onSurface,
                             fontSize: 16,
                           ),
                         ),
                         Text(
-                          'Toplam ${state.feedbackCount} değerlendirme',
+                          ref
+                              .watch(
+                                rcTextProvider(
+                                  RemoteConfigKeys
+                                      .gymsAdminHomeTotalFeedbackTemplate,
+                                ),
+                              )
+                              .replaceAll('{count}', '${state.feedbackCount}'),
                           style: typography.bodyMedium.copyWith(
                             color: colors.onSurfaceMuted,
                             fontSize: 13,

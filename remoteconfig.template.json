@@ -2602,6 +2602,750 @@
       },
       "valueType": "STRING"
     },
+    "lbl_gyms_settings_nav_subscription_tr": {
+      "defaultValue": {
+        "value": "Abonelik"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_settings_nav_subscription_en": {
+      "defaultValue": {
+        "value": "Subscription"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_settings_nav_reports_tr": {
+      "defaultValue": {
+        "value": "Raporlar"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_settings_nav_reports_en": {
+      "defaultValue": {
+        "value": "Reports"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_admin_home_this_month_note_tr": {
+      "defaultValue": {
+        "value": "Bu ay"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_admin_home_this_month_note_en": {
+      "defaultValue": {
+        "value": "This month"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_admin_home_no_trainers_message_tr": {
+      "defaultValue": {
+        "value": "Henüz antrenör yok."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_admin_home_no_trainers_message_en": {
+      "defaultValue": {
+        "value": "No trainers yet."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_admin_home_add_trainer_button_tr": {
+      "defaultValue": {
+        "value": "+ Antrenör ekle"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_admin_home_add_trainer_button_en": {
+      "defaultValue": {
+        "value": "+ Add trainer"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_admin_home_no_pending_payments_message_tr": {
+      "defaultValue": {
+        "value": "Bekleyen ödeme yok."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_admin_home_no_pending_payments_message_en": {
+      "defaultValue": {
+        "value": "No pending payments."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_admin_home_due_payment_members_template_tr": {
+      "defaultValue": {
+        "value": "{count} üyenin ödemesi bekleniyor"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_admin_home_due_payment_members_template_en": {
+      "defaultValue": {
+        "value": "{count} members have pending payments"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_admin_home_total_feedback_template_tr": {
+      "defaultValue": {
+        "value": "Toplam {count} değerlendirme"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_admin_home_total_feedback_template_en": {
+      "defaultValue": {
+        "value": "{count} reviews total"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_permissions_trainer_question_tr": {
+      "defaultValue": {
+        "value": "Hangi antrenöre yetkilendirme yapmak istiyorsun?"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_permissions_trainer_question_en": {
+      "defaultValue": {
+        "value": "Which trainer do you want to authorize?"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_permissions_trainer_helper_tr": {
+      "defaultValue": {
+        "value": "Bir ya da birden fazla antrenör seçebilirsin; aynı ayarlar hepsine uygulanır."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_permissions_trainer_helper_en": {
+      "defaultValue": {
+        "value": "You can select one or more trainers; the same settings apply to all of them."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_permissions_authorize_button_tr": {
+      "defaultValue": {
+        "value": "Yetkilendir"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_permissions_authorize_button_en": {
+      "defaultValue": {
+        "value": "Authorize"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_permissions_done_button_tr": {
+      "defaultValue": {
+        "value": "Bitti"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_permissions_done_button_en": {
+      "defaultValue": {
+        "value": "Done"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_info_uploading_label_tr": {
+      "defaultValue": {
+        "value": "Yükleniyor…"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_info_uploading_label_en": {
+      "defaultValue": {
+        "value": "Uploading…"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_info_palette_extracting_label_tr": {
+      "defaultValue": {
+        "value": "Logodan renkler çıkarılıyor…"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_info_palette_extracting_label_en": {
+      "defaultValue": {
+        "value": "Extracting colors from logo…"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_info_theme_color_note_tr": {
+      "defaultValue": {
+        "value": "Seçtiğiniz renk üyelerin uygulamasında da birincil renk olur; koyu zemin ve durum renkleri değişmez."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_info_theme_color_note_en": {
+      "defaultValue": {
+        "value": "The color you choose also becomes the primary color in members' app; the dark background and status colors stay unchanged."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_info_report_emails_section_tr": {
+      "defaultValue": {
+        "value": "RAPOR E-POSTALARI"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_info_report_emails_section_en": {
+      "defaultValue": {
+        "value": "REPORT EMAILS"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_info_report_emails_description_tr": {
+      "defaultValue": {
+        "value": "Haftalık salon ve muhasebe özeti bu adreslere e-posta ile gönderilir."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_info_report_emails_description_en": {
+      "defaultValue": {
+        "value": "The weekly gym and accounting summary is emailed to these addresses."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_info_gym_report_email_label_tr": {
+      "defaultValue": {
+        "value": "Salon raporu e-postası"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_info_gym_report_email_label_en": {
+      "defaultValue": {
+        "value": "Gym report email"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_info_gym_report_email_hint_tr": {
+      "defaultValue": {
+        "value": "admin@stüdyo.com"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_info_gym_report_email_hint_en": {
+      "defaultValue": {
+        "value": "admin@studio.com"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_info_accounting_report_email_label_tr": {
+      "defaultValue": {
+        "value": "Muhasebe raporu e-postası"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_info_accounting_report_email_label_en": {
+      "defaultValue": {
+        "value": "Accounting report email"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_info_accounting_report_email_hint_tr": {
+      "defaultValue": {
+        "value": "muhasebe@stüdyo.com"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_info_accounting_report_email_hint_en": {
+      "defaultValue": {
+        "value": "accounting@studio.com"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_info_saving_label_tr": {
+      "defaultValue": {
+        "value": "Kaydediliyor…"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_info_saving_label_en": {
+      "defaultValue": {
+        "value": "Saving…"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_info_save_report_emails_button_tr": {
+      "defaultValue": {
+        "value": "Rapor e-postalarını kaydet"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_info_save_report_emails_button_en": {
+      "defaultValue": {
+        "value": "Save report emails"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_info_logo_upload_failed_error_tr": {
+      "defaultValue": {
+        "value": "Logo yüklenemedi, tekrar dene."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_info_logo_upload_failed_error_en": {
+      "defaultValue": {
+        "value": "Logo could not be uploaded, try again."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_info_name_required_error_tr": {
+      "defaultValue": {
+        "value": "Salon adı boş olamaz."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_info_name_required_error_en": {
+      "defaultValue": {
+        "value": "Gym name cannot be empty."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_info_address_required_error_tr": {
+      "defaultValue": {
+        "value": "Adres boş olamaz."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_info_address_required_error_en": {
+      "defaultValue": {
+        "value": "Address cannot be empty."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_info_phone_required_error_tr": {
+      "defaultValue": {
+        "value": "Telefon boş olamaz."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_info_phone_required_error_en": {
+      "defaultValue": {
+        "value": "Phone cannot be empty."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_info_save_failed_error_tr": {
+      "defaultValue": {
+        "value": "Salon bilgileri kaydedilemedi, tekrar dene."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_info_save_failed_error_en": {
+      "defaultValue": {
+        "value": "Gym information could not be saved, try again."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_info_logo_color_theme_name_tr": {
+      "defaultValue": {
+        "value": "Logo rengi"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_info_logo_color_theme_name_en": {
+      "defaultValue": {
+        "value": "Logo color"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_info_logo_color_theme_note_tr": {
+      "defaultValue": {
+        "value": "Logonuzdan çıkarıldı"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_info_logo_color_theme_note_en": {
+      "defaultValue": {
+        "value": "Extracted from your logo"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_setup_headline_tr": {
+      "defaultValue": {
+        "value": "Bu adımı tamamlayınca yönetici hesabınız aktifleşir ve uygulamaya girersiniz."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_setup_headline_en": {
+      "defaultValue": {
+        "value": "Once you complete this step, your admin account activates and you enter the app."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_setup_phone_field_label_tr": {
+      "defaultValue": {
+        "value": "Telefon numaran (giriş için)"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_setup_phone_field_label_en": {
+      "defaultValue": {
+        "value": "Your phone number (for login)"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_setup_phone_hint_tr": {
+      "defaultValue": {
+        "value": "5XX XXX XX XX"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_setup_phone_hint_en": {
+      "defaultValue": {
+        "value": "5XX XXX XX XX"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_setup_phone_helper_note_tr": {
+      "defaultValue": {
+        "value": "Salon kaydı tamamlanınca bu numarayla admin olarak giriş yapacaksın."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_setup_phone_helper_note_en": {
+      "defaultValue": {
+        "value": "Once gym registration is complete, you will log in as admin with this number."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_setup_logo_optional_label_tr": {
+      "defaultValue": {
+        "value": "Salon logosu (opsiyonel)"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_setup_logo_optional_label_en": {
+      "defaultValue": {
+        "value": "Gym logo (optional)"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_setup_logo_description_tr": {
+      "defaultValue": {
+        "value": "Kare PNG, en az 512×512. Eklersen üyelerin ve antrenörlerin her ekranında arka planda %25 opaklıkla silüet olarak görünür — sonradan Salon Bilgileri panelinden de ekleyebilirsin."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_setup_logo_description_en": {
+      "defaultValue": {
+        "value": "Square PNG, at least 512×512. If you add one, it appears as a 25%-opacity silhouette in the background on every screen for members and trainers — you can also add it later from the Gym Info panel."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_setup_logo_color_hint_note_tr": {
+      "defaultValue": {
+        "value": "Logo eklersen aşağıdaki tema rengi seçeneklerini logona göre öneririz."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_setup_logo_color_hint_note_en": {
+      "defaultValue": {
+        "value": "If you add a logo, we will suggest the theme color options below based on it."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_setup_suggested_colors_label_tr": {
+      "defaultValue": {
+        "value": "Logona göre önerilen renkler"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_setup_suggested_colors_label_en": {
+      "defaultValue": {
+        "value": "Suggested colors based on your logo"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_setup_change_later_note_tr": {
+      "defaultValue": {
+        "value": "Sonradan Temalar panelinden değiştirebilirsiniz."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_setup_change_later_note_en": {
+      "defaultValue": {
+        "value": "You can change this later from the Themes panel."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_setup_submitting_label_tr": {
+      "defaultValue": {
+        "value": "Oluşturuluyor…"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_setup_submitting_label_en": {
+      "defaultValue": {
+        "value": "Creating…"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_setup_success_banner_tr": {
+      "defaultValue": {
+        "value": "Salonun oluşturuldu! Şimdi az önce girdiğin numarayla giriş yap."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_setup_success_banner_en": {
+      "defaultValue": {
+        "value": "Your gym has been created! Now log in with the number you just entered."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_add_theme_name_field_hint_tr": {
+      "defaultValue": {
+        "value": "Vira İmza"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_add_theme_name_field_hint_en": {
+      "defaultValue": {
+        "value": "Vira Signature"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_add_theme_invalid_hex_error_tr": {
+      "defaultValue": {
+        "value": "Geçerli bir HEX kod gir (ör. 05A6FA)."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_add_theme_invalid_hex_error_en": {
+      "defaultValue": {
+        "value": "Enter a valid HEX code (e.g. 05A6FA)."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_theme_preview_remaining_sessions_label_tr": {
+      "defaultValue": {
+        "value": "Kalan dersin: 6"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_theme_preview_remaining_sessions_label_en": {
+      "defaultValue": {
+        "value": "Sessions left: 6"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_theme_preview_next_session_label_tr": {
+      "defaultValue": {
+        "value": "Sıradaki ders 3 Ağustos 18:30"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_theme_preview_next_session_label_en": {
+      "defaultValue": {
+        "value": "Next session Aug 3, 6:30 PM"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_add_theme_default_name_tr": {
+      "defaultValue": {
+        "value": "Yeni Tema"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_add_theme_default_name_en": {
+      "defaultValue": {
+        "value": "New Theme"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_add_theme_custom_color_note_tr": {
+      "defaultValue": {
+        "value": "Özel renk"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_add_theme_custom_color_note_en": {
+      "defaultValue": {
+        "value": "Custom color"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_rules_editor_toolbar_hint_tr": {
+      "defaultValue": {
+        "value": "Kalın/italik gibi biçimlendirme için araç çubuğunu, emoji için klavyenizin emoji tuşunu kullanabilirsiniz."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_rules_editor_toolbar_hint_en": {
+      "defaultValue": {
+        "value": "Use the toolbar for formatting like bold/italic, and your keyboard's emoji key for emoji."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_rules_editor_save_failed_error_tr": {
+      "defaultValue": {
+        "value": "Kurallar kaydedilemedi, bağlantını kontrol edip tekrar dene."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_rules_editor_save_failed_error_en": {
+      "defaultValue": {
+        "value": "Rules could not be saved, check your connection and try again."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_rules_view_last_updated_template_tr": {
+      "defaultValue": {
+        "value": "Son güncelleme {date}"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_rules_view_last_updated_template_en": {
+      "defaultValue": {
+        "value": "Last updated {date}"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_themes_description_tr": {
+      "defaultValue": {
+        "value": "Seçtiğiniz tema salonunuzdaki tüm üye ve antrenörlerin uygulamasında görünür. Koyu zemin ve durum renkleri sabit kalır, değişen tek şey vurgu rengi."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_themes_description_en": {
+      "defaultValue": {
+        "value": "The theme you choose appears in the app for all your gym's members and trainers. The dark background and status colors stay fixed — only the accent color changes."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_themes_add_theme_button_tr": {
+      "defaultValue": {
+        "value": "+ Tema ekle"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_themes_add_theme_button_en": {
+      "defaultValue": {
+        "value": "+ Add theme"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_trainer_permissions_reminder_question_tr": {
+      "defaultValue": {
+        "value": "Seans bitimi eğitmene ne zaman hatırlatılsın?"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_trainer_permissions_reminder_question_en": {
+      "defaultValue": {
+        "value": "When should the trainer be reminded after the session ends?"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_trainer_permissions_reminder_note_tr": {
+      "defaultValue": {
+        "value": "Bildirim seans bitiminden sonra gider"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_trainer_permissions_reminder_note_en": {
+      "defaultValue": {
+        "value": "The notification is sent after the session ends"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_trainer_permissions_online_booking_title_tr": {
+      "defaultValue": {
+        "value": "Online Rezervasyon"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_trainer_permissions_online_booking_title_en": {
+      "defaultValue": {
+        "value": "Online Booking"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_trainer_permissions_online_booking_note_tr": {
+      "defaultValue": {
+        "value": "Üyeler Keşfet üzerinden grup derslerine katılabilir"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_trainer_permissions_online_booking_note_en": {
+      "defaultValue": {
+        "value": "Members can join group sessions via Discover"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_trainer_permissions_allow_after_expiry_title_tr": {
+      "defaultValue": {
+        "value": "Paket süresi bitince seans oluşturulabilsin mi?"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_trainer_permissions_allow_after_expiry_title_en": {
+      "defaultValue": {
+        "value": "Allow scheduling sessions after the package expires?"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_trainer_permissions_allow_after_expiry_note_tr": {
+      "defaultValue": {
+        "value": "Kapalıysa paketi bitmiş üyeye yeni seans planlanamaz"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_trainer_permissions_allow_after_expiry_note_en": {
+      "defaultValue": {
+        "value": "When off, a new session cannot be scheduled for a member with an expired package"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_trainer_permissions_member_cancel_title_tr": {
+      "defaultValue": {
+        "value": "Üye seans iptal edebilir"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_trainer_permissions_member_cancel_title_en": {
+      "defaultValue": {
+        "value": "Member can cancel session"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_trainer_permissions_member_cancel_note_tr": {
+      "defaultValue": {
+        "value": "Kapalıysa iptal yalnızca antrenör/yönetici yapabilir"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_trainer_permissions_member_cancel_note_en": {
+      "defaultValue": {
+        "value": "When off, only the trainer/admin can cancel"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_trainer_permissions_auto_save_note_tr": {
+      "defaultValue": {
+        "value": "Her değişiklik anında kaydedilir."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_trainer_permissions_auto_save_note_en": {
+      "defaultValue": {
+        "value": "Every change is saved instantly."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_trainer_permissions_save_failed_error_tr": {
+      "defaultValue": {
+        "value": "Ayar kaydedilemedi, bağlantını kontrol edip tekrar dene."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_trainer_permissions_save_failed_error_en": {
+      "defaultValue": {
+        "value": "Setting could not be saved, check your connection and try again."
+      },
+      "valueType": "STRING"
+    },
     "lbl_measurements_add_title_tr": {
       "defaultValue": {
         "value": "Yeni ölçüm"

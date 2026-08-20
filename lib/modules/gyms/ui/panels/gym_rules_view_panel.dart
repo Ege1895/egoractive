@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
+import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_back_button.dart';
 import '../../controller/gym_rules_controller.dart';
@@ -68,7 +69,11 @@ class _GymRulesViewPanelState extends BasePanelState<GymRulesViewPanel> {
                   const SizedBox(width: AppSpacing.md),
                   Expanded(
                     child: Text(
-                      'Stüdyo kuralları',
+                      ref.watch(
+                        rcTextProvider(
+                          RemoteConfigKeys.commonStudyoKurallariNav,
+                        ),
+                      ),
                       style: typography.headingSmall.copyWith(
                         color: colors.onSurface,
                         fontSize: 18,
@@ -95,7 +100,9 @@ class _GymRulesViewPanelState extends BasePanelState<GymRulesViewPanel> {
                           constraints: const BoxConstraints(minHeight: 40),
                           alignment: Alignment.center,
                           child: Text(
-                            'Düzenle',
+                            ref.watch(
+                              rcTextProvider(RemoteConfigKeys.commonDuzenle),
+                            ),
                             style: typography.headingSmall.copyWith(
                               fontSize: 14,
                               color: colors.onPrimary,
@@ -120,7 +127,14 @@ class _GymRulesViewPanelState extends BasePanelState<GymRulesViewPanel> {
                   children: [
                     if (rules.lastUpdatedLabel != null) ...[
                       Text(
-                        'Son güncelleme ${rules.lastUpdatedLabel}',
+                        ref
+                            .watch(
+                              rcTextProvider(
+                                RemoteConfigKeys
+                                    .gymsRulesViewLastUpdatedTemplate,
+                              ),
+                            )
+                            .replaceAll('{date}', rules.lastUpdatedLabel ?? ''),
                         style: typography.bodyMedium.copyWith(
                           color: colors.onSurfaceMuted,
                           fontSize: 13,

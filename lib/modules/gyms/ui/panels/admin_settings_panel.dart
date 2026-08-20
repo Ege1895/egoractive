@@ -47,7 +47,7 @@ class AdminSettingsPanel extends ConsumerWidget {
           ),
           children: [
             Text(
-              'Ayarlar',
+              ref.watch(rcTextProvider(RemoteConfigKeys.gymsSettingsTitle)),
               style: typography.headingLarge.copyWith(color: colors.onSurface),
             ),
             const SizedBox(height: AppSpacing.lg),
@@ -61,24 +61,40 @@ class AdminSettingsPanel extends ConsumerWidget {
               child: Column(
                 children: [
                   _NavRow(
-                    label: 'Salon bilgileri',
+                    label: ref.watch(
+                      rcTextProvider(RemoteConfigKeys.gymsSettingsNavGymInfo),
+                    ),
                     onTap: () => panelStack.push(const GymInfoPanel()),
                   ),
                   _NavRow(
-                    label: 'Antrenör yönetimi',
+                    label: ref.watch(
+                      rcTextProvider(
+                        RemoteConfigKeys.gymsSettingsNavTrainerManagement,
+                      ),
+                    ),
                     onTap: () =>
                         panelStack.push(const AdminTrainerManagementPanel()),
                   ),
                   _NavRow(
-                    label: 'Stüdyo paketleri',
+                    label: ref.watch(
+                      rcTextProvider(
+                        RemoteConfigKeys.gymsSettingsNavStudioPackages,
+                      ),
+                    ),
                     onTap: () => panelStack.push(const StudioPackagesPanel()),
                   ),
                   _NavRow(
-                    label: 'Abonelik',
+                    label: ref.watch(
+                      rcTextProvider(
+                        RemoteConfigKeys.gymsSettingsNavSubscription,
+                      ),
+                    ),
                     onTap: () => panelStack.push(const SubscriptionPanel()),
                   ),
                   _NavRow(
-                    label: 'Raporlar',
+                    label: ref.watch(
+                      rcTextProvider(RemoteConfigKeys.gymsSettingsNavReports),
+                    ),
                     isLast: true,
                     onTap: () => panelStack.push(const AdminDashboardPanel()),
                   ),
@@ -96,18 +112,28 @@ class AdminSettingsPanel extends ConsumerWidget {
               child: Column(
                 children: [
                   _NavRow(
-                    label: 'Ders / seans yönetimi',
+                    label: ref.watch(
+                      rcTextProvider(
+                        RemoteConfigKeys.gymsSettingsNavSessionManagement,
+                      ),
+                    ),
                     onTap: () =>
                         panelStack.push(const AdminSessionManagementPanel()),
                   ),
                   if (groupSessionsEnabled)
                     _NavRow(
-                      label: 'Grup dersleri',
+                      label: ref.watch(
+                        rcTextProvider(
+                          RemoteConfigKeys.gymsSettingsNavGroupSessions,
+                        ),
+                      ),
                       onTap: () =>
                           panelStack.push(const AdminGroupSessionsPanel()),
                     ),
                   _NavRow(
-                    label: 'Etkinlikler',
+                    label: ref.watch(
+                      rcTextProvider(RemoteConfigKeys.gymsSettingsNavEvents),
+                    ),
                     isLast: true,
                     onTap: () => panelStack.push(const AdminEventsPanel()),
                   ),
@@ -125,22 +151,34 @@ class AdminSettingsPanel extends ConsumerWidget {
               child: Column(
                 children: [
                   _NavRow(
-                    label: 'Stüdyo kuralları',
+                    label: ref.watch(
+                      rcTextProvider(RemoteConfigKeys.gymsStudioRulesTitle),
+                    ),
                     onTap: () => panelStack.push(
                       const GymRulesViewPanel(showEditButton: true),
                     ),
                   ),
                   _NavRow(
-                    label: 'Yetki ayarları',
+                    label: ref.watch(
+                      rcTextProvider(
+                        RemoteConfigKeys.gymsSettingsNavPermissions,
+                      ),
+                    ),
                     onTap: () => panelStack.push(const AdminPermissionsPanel()),
                   ),
                   _NavRow(
-                    label: 'Geri bildirimler',
+                    label: ref.watch(
+                      rcTextProvider(RemoteConfigKeys.gymsSettingsNavFeedback),
+                    ),
                     onTap: () =>
                         panelStack.push(const AdminFeedbackListPanel()),
                   ),
                   _NavRow(
-                    label: 'Bildirim gönder',
+                    label: ref.watch(
+                      rcTextProvider(
+                        RemoteConfigKeys.gymsSettingsNavSendNotification,
+                      ),
+                    ),
                     onTap: () => panelStack.push(const SendNotificationPanel()),
                   ),
                   _NavRow(
@@ -164,7 +202,9 @@ class AdminSettingsPanel extends ConsumerWidget {
               child: Column(
                 children: [
                   _NavRow(
-                    label: 'Çıkış yap',
+                    label: ref.watch(
+                      rcTextProvider(RemoteConfigKeys.commonCikisYap),
+                    ),
                     isLast: true,
                     onTap: () {
                       ref.read(authControllerProvider.notifier).logout();

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
+import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_back_button.dart';
 import '../../../../shared/widgets/app_button.dart';
@@ -47,7 +48,7 @@ class _GymThemesPanelState extends BasePanelState<GymThemesPanel> {
                   ),
                   const SizedBox(width: AppSpacing.md),
                   Text(
-                    'Temalar',
+                    ref.watch(rcTextProvider(RemoteConfigKeys.gymsThemesTitle)),
                     style: typography.headingSmall.copyWith(
                       color: colors.onSurface,
                       fontSize: 18,
@@ -66,7 +67,9 @@ class _GymThemesPanelState extends BasePanelState<GymThemesPanel> {
                 ),
                 children: [
                   Text(
-                    'Seçtiğiniz tema salonunuzdaki tüm üye ve antrenörlerin uygulamasında görünür. Koyu zemin ve durum renkleri sabit kalır, değişen tek şey vurgu rengi.',
+                    ref.watch(
+                      rcTextProvider(RemoteConfigKeys.gymsThemesDescription),
+                    ),
                     style: typography.bodyMedium.copyWith(
                       color: colors.onSurfaceVariant,
                     ),
@@ -114,7 +117,11 @@ class _GymThemesPanelState extends BasePanelState<GymThemesPanel> {
                         ),
                         alignment: Alignment.center,
                         child: Text(
-                          '+ Tema ekle',
+                          ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.gymsThemesAddThemeButton,
+                            ),
+                          ),
                           style: typography.headingSmall.copyWith(
                             fontSize: 15,
                             color: colors.onPrimaryContainer,
@@ -125,7 +132,11 @@ class _GymThemesPanelState extends BasePanelState<GymThemesPanel> {
                   ),
                   const SizedBox(height: AppSpacing.lg),
                   Text(
-                    'ÜYE EKRANI ÖNİZLEMESİ',
+                    ref.watch(
+                      rcTextProvider(
+                        RemoteConfigKeys.gymsThemesMemberPreviewSection,
+                      ),
+                    ),
                     style: typography.caption.copyWith(
                       color: colors.onSurfaceMuted,
                       letterSpacing: 1.2,
@@ -179,14 +190,24 @@ class _GymThemesPanelState extends BasePanelState<GymThemesPanel> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      'Kalan dersin: 6',
+                                      ref.watch(
+                                        rcTextProvider(
+                                          RemoteConfigKeys
+                                              .gymsThemePreviewRemainingSessionsLabel,
+                                        ),
+                                      ),
                                       style: typography.headingSmall.copyWith(
                                         color: colors.onSurface,
                                         fontSize: 15,
                                       ),
                                     ),
                                     Text(
-                                      'Sıradaki ders 3 Ağustos 18:30',
+                                      ref.watch(
+                                        rcTextProvider(
+                                          RemoteConfigKeys
+                                              .gymsThemePreviewNextSessionLabel,
+                                        ),
+                                      ),
                                       style: typography.bodyMedium.copyWith(
                                         color: colors.onSurfaceVariant,
                                         fontSize: 13,
@@ -209,7 +230,9 @@ class _GymThemesPanelState extends BasePanelState<GymThemesPanel> {
                             constraints: const BoxConstraints(minHeight: 44),
                             alignment: Alignment.center,
                             child: Text(
-                              'Gelicem',
+                              ref.watch(
+                                rcTextProvider(RemoteConfigKeys.commonGelicem),
+                              ),
                               style: typography.headingSmall.copyWith(
                                 fontSize: 15,
                                 color: colors.onPrimary,
@@ -241,14 +264,24 @@ class _GymThemesPanelState extends BasePanelState<GymThemesPanel> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'Logo silüetini arka planda göster',
+                                  ref.watch(
+                                    rcTextProvider(
+                                      RemoteConfigKeys
+                                          .gymsThemesShowLogoSilhouetteToggleLabel,
+                                    ),
+                                  ),
                                   style: typography.bodyLarge.copyWith(
                                     color: colors.onSurface,
                                     fontSize: 15,
                                   ),
                                 ),
                                 Text(
-                                  'Üye ve antrenör ekranlarında %25 opaklıkla',
+                                  ref.watch(
+                                    rcTextProvider(
+                                      RemoteConfigKeys
+                                          .gymsThemesShowLogoSilhouetteToggleDescription,
+                                    ),
+                                  ),
                                   style: typography.caption.copyWith(
                                     color: colors.onSurfaceMuted,
                                   ),
@@ -303,7 +336,9 @@ class _GymThemesPanelState extends BasePanelState<GymThemesPanel> {
               // sadece ekranı kapatıyor; eski etiket ("...uygula") bunun
               // ayrı bir onay adımıymış gibi yanıltıyordu.
               child: AppButton(
-                label: 'Bitti',
+                label: ref.watch(
+                  rcTextProvider(RemoteConfigKeys.gymsPermissionsDoneButton),
+                ),
                 onPressed: () =>
                     ref.read(panelStackControllerProvider.notifier).pop(),
               ),

@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
+import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/utils/phone_number_formatter.dart';
 import '../../../../shared/widgets/app_back_button.dart';
@@ -121,7 +122,9 @@ class _GymSetupPanelState extends BasePanelState<GymSetupPanel> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'KURULUM 1 / 1',
+                      ref.watch(
+                        rcTextProvider(RemoteConfigKeys.gymsGymSetupStepHeader),
+                      ),
                       style: typography.caption.copyWith(
                         color: colors.onSurfaceMuted,
                         letterSpacing: 1.2,
@@ -129,7 +132,9 @@ class _GymSetupPanelState extends BasePanelState<GymSetupPanel> {
                     ),
                     const SizedBox(height: AppSpacing.sm),
                     Text(
-                      'Salonunu tanımla',
+                      ref.watch(
+                        rcTextProvider(RemoteConfigKeys.gymsGymSetupTitle),
+                      ),
                       style: typography.headingLarge.copyWith(
                         color: colors.onSurface,
                         fontSize: 28,
@@ -137,7 +142,9 @@ class _GymSetupPanelState extends BasePanelState<GymSetupPanel> {
                     ),
                     const SizedBox(height: AppSpacing.xs),
                     Text(
-                      'Bu adımı tamamlayınca yönetici hesabınız aktifleşir ve uygulamaya girersiniz.',
+                      ref.watch(
+                        rcTextProvider(RemoteConfigKeys.gymsGymSetupHeadline),
+                      ),
                       style: typography.bodyMedium.copyWith(
                         color: colors.onSurfaceVariant,
                       ),
@@ -167,14 +174,22 @@ class _GymSetupPanelState extends BasePanelState<GymSetupPanel> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           AppTextField(
-                            label: 'Salon adı',
+                            label: ref.watch(
+                              rcTextProvider(
+                                RemoteConfigKeys.gymsGymInfoNameFieldLabel,
+                              ),
+                            ),
                             controller: _nameController,
                             errorText: createGymState.nameError,
                             onChanged: profileController.updateName,
                           ),
                           const SizedBox(height: AppSpacing.md),
                           AppTextField(
-                            label: 'Şehir',
+                            label: ref.watch(
+                              rcTextProvider(
+                                RemoteConfigKeys.gymsGymSetupCityFieldLabel,
+                              ),
+                            ),
                             controller: _cityController,
                             errorText: createGymState.cityError,
                             onChanged: profileController.updateCity,
@@ -182,8 +197,16 @@ class _GymSetupPanelState extends BasePanelState<GymSetupPanel> {
                           const SizedBox(height: AppSpacing.md),
                           AppTextField(
                             key: _phoneFieldKey,
-                            label: 'Telefon numaran (giriş için)',
-                            hint: '5XX XXX XX XX',
+                            label: ref.watch(
+                              rcTextProvider(
+                                RemoteConfigKeys.gymsGymSetupPhoneFieldLabel,
+                              ),
+                            ),
+                            hint: ref.watch(
+                              rcTextProvider(
+                                RemoteConfigKeys.gymsGymSetupPhoneHint,
+                              ),
+                            ),
                             prefixText: '+90 ',
                             keyboardType: TextInputType.number,
                             controller: _phoneController,
@@ -193,7 +216,11 @@ class _GymSetupPanelState extends BasePanelState<GymSetupPanel> {
                           ),
                           const SizedBox(height: AppSpacing.xs),
                           Text(
-                            'Salon kaydı tamamlanınca bu numarayla admin olarak giriş yapacaksın.',
+                            ref.watch(
+                              rcTextProvider(
+                                RemoteConfigKeys.gymsGymSetupPhoneHelperNote,
+                              ),
+                            ),
                             style: typography.caption.copyWith(
                               color: colors.onSurfaceMuted,
                               fontSize: 12,
@@ -201,7 +228,11 @@ class _GymSetupPanelState extends BasePanelState<GymSetupPanel> {
                           ),
                           const SizedBox(height: AppSpacing.md),
                           AppTextField(
-                            label: 'Adres',
+                            label: ref.watch(
+                              rcTextProvider(
+                                RemoteConfigKeys.gymsGymInfoAddressFieldLabel,
+                              ),
+                            ),
                             controller: _addressController,
                             errorText: createGymState.addressError,
                             onChanged: profileController.updateAddress,
@@ -223,7 +254,11 @@ class _GymSetupPanelState extends BasePanelState<GymSetupPanel> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Salon logosu (opsiyonel)',
+                            ref.watch(
+                              rcTextProvider(
+                                RemoteConfigKeys.gymsGymSetupLogoOptionalLabel,
+                              ),
+                            ),
                             style: typography.headingSmall.copyWith(
                               color: colors.onSurface,
                               fontSize: 16,
@@ -231,7 +266,11 @@ class _GymSetupPanelState extends BasePanelState<GymSetupPanel> {
                           ),
                           const SizedBox(height: AppSpacing.xs),
                           Text(
-                            'Kare PNG, en az 512×512. Eklersen üyelerin ve antrenörlerin her ekranında arka planda %25 opaklıkla silüet olarak görünür — sonradan Salon Bilgileri panelinden de ekleyebilirsin.',
+                            ref.watch(
+                              rcTextProvider(
+                                RemoteConfigKeys.gymsGymSetupLogoDescription,
+                              ),
+                            ),
                             style: typography.bodyMedium.copyWith(
                               color: colors.onSurfaceMuted,
                               fontSize: 13,
@@ -239,7 +278,11 @@ class _GymSetupPanelState extends BasePanelState<GymSetupPanel> {
                           ),
                           const SizedBox(height: AppSpacing.xs),
                           Text(
-                            'Logo eklersen aşağıdaki tema rengi seçeneklerini logona göre öneririz.',
+                            ref.watch(
+                              rcTextProvider(
+                                RemoteConfigKeys.gymsGymSetupLogoColorHintNote,
+                              ),
+                            ),
                             style: typography.caption.copyWith(
                               color: colors.onSurfaceMuted,
                               fontSize: 12,
@@ -280,8 +323,18 @@ class _GymSetupPanelState extends BasePanelState<GymSetupPanel> {
                                 alignment: Alignment.centerLeft,
                                 child: Text(
                                   createGymState.logoFile == null
-                                      ? 'Logo seç'
-                                      : 'Logoyu değiştir',
+                                      ? ref.watch(
+                                          rcTextProvider(
+                                            RemoteConfigKeys
+                                                .gymsGymSetupChooseLogoButton,
+                                          ),
+                                        )
+                                      : ref.watch(
+                                          rcTextProvider(
+                                            RemoteConfigKeys
+                                                .gymsGymInfoChangeLogoButton,
+                                          ),
+                                        ),
                                   style: typography.headingSmall.copyWith(
                                     fontSize: 14,
                                     color: colors.onSurfaceVariant,
@@ -308,8 +361,18 @@ class _GymSetupPanelState extends BasePanelState<GymSetupPanel> {
                         children: [
                           Text(
                             createGymState.logoPalette.isNotEmpty
-                                ? 'Logona göre önerilen renkler'
-                                : 'Tema rengi',
+                                ? ref.watch(
+                                    rcTextProvider(
+                                      RemoteConfigKeys
+                                          .gymsGymSetupSuggestedColorsLabel,
+                                    ),
+                                  )
+                                : ref.watch(
+                                    rcTextProvider(
+                                      RemoteConfigKeys
+                                          .gymsGymSetupThemeColorLabel,
+                                    ),
+                                  ),
                             style: typography.headingSmall.copyWith(
                               color: colors.onSurface,
                               fontSize: 16,
@@ -329,7 +392,12 @@ class _GymSetupPanelState extends BasePanelState<GymSetupPanel> {
                                 ),
                                 const SizedBox(width: AppSpacing.sm),
                                 Text(
-                                  'Logodan renkler çıkarılıyor…',
+                                  ref.watch(
+                                    rcTextProvider(
+                                      RemoteConfigKeys
+                                          .gymsGymInfoPaletteExtractingLabel,
+                                    ),
+                                  ),
                                   style: typography.bodyMedium.copyWith(
                                     color: colors.onSurfaceMuted,
                                     fontSize: 13,
@@ -378,7 +446,11 @@ class _GymSetupPanelState extends BasePanelState<GymSetupPanel> {
                             ),
                           const SizedBox(height: AppSpacing.sm),
                           Text(
-                            'Sonradan Temalar panelinden değiştirebilirsiniz.',
+                            ref.watch(
+                              rcTextProvider(
+                                RemoteConfigKeys.gymsGymSetupChangeLaterNote,
+                              ),
+                            ),
                             style: typography.caption.copyWith(
                               color: colors.onSurfaceMuted,
                             ),
@@ -411,8 +483,16 @@ class _GymSetupPanelState extends BasePanelState<GymSetupPanel> {
                     ],
                     AppButton(
                       label: createGymState.isSubmitting
-                          ? 'Oluşturuluyor…'
-                          : 'Salonu oluştur ve girişi tamamla',
+                          ? ref.watch(
+                              rcTextProvider(
+                                RemoteConfigKeys.gymsGymSetupSubmittingLabel,
+                              ),
+                            )
+                          : ref.watch(
+                              rcTextProvider(
+                                RemoteConfigKeys.gymsGymSetupSubmitButton,
+                              ),
+                            ),
                       onPressed: createGymState.isSubmitting
                           ? null
                           : () async {
@@ -429,8 +509,12 @@ class _GymSetupPanelState extends BasePanelState<GymSetupPanel> {
                                         prefillPhoneDigits: ref
                                             .read(gymProfileControllerProvider)
                                             .phone,
-                                        successBanner:
-                                            'Salonun oluşturuldu! Şimdi az önce girdiğin numarayla giriş yap.',
+                                        successBanner: ref.read(
+                                          rcTextProvider(
+                                            RemoteConfigKeys
+                                                .gymsGymSetupSuccessBanner,
+                                          ),
+                                        ),
                                       ),
                                     );
                               }
