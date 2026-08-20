@@ -372,88 +372,92 @@ class _ThemeRow extends StatelessWidget {
     final colors = context.appColors;
     final typography = context.appTypography;
 
-    return Material(
-      color: selected ? primary.withValues(alpha: 0.1) : colors.surface,
-      borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
-      child: InkWell(
-        onTap: onTap,
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.md),
+      child: Material(
+        color: selected ? primary.withValues(alpha: 0.1) : colors.surface,
         borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
-        child: Container(
-          margin: const EdgeInsets.only(bottom: AppSpacing.md),
-          padding: const EdgeInsets.all(AppSpacing.lg),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
-            border: Border.all(
-              color: selected ? primary.withValues(alpha: 0.5) : colors.outline,
-            ),
-          ),
-          child: Row(
-            children: [
-              Row(
-                children: [
-                  Container(
-                    width: 26,
-                    height: 26,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: primary,
-                    ),
-                  ),
-                  const SizedBox(width: 6),
-                  Container(
-                    width: 26,
-                    height: 26,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: soft,
-                    ),
-                  ),
-                ],
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
+          child: Container(
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
+              border: Border.all(
+                color: selected
+                    ? primary.withValues(alpha: 0.5)
+                    : colors.outline,
               ),
-              const SizedBox(width: AppSpacing.md),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+            ),
+            child: Row(
+              children: [
+                Row(
                   children: [
-                    Text(
-                      name,
-                      style: typography.headingSmall.copyWith(
-                        color: colors.onSurface,
-                        fontSize: 16,
+                    Container(
+                      width: 26,
+                      height: 26,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: primary,
                       ),
                     ),
-                    Text(
-                      note,
-                      style: typography.caption.copyWith(
-                        color: colors.onSurfaceMuted,
+                    const SizedBox(width: 6),
+                    Container(
+                      width: 26,
+                      height: 26,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: soft,
                       ),
                     ),
                   ],
                 ),
-              ),
-              Container(
-                width: 22,
-                height: 22,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: selected ? primary : colors.outlineStrong,
-                    width: 2,
+                const SizedBox(width: AppSpacing.md),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        name,
+                        style: typography.headingSmall.copyWith(
+                          color: colors.onSurface,
+                          fontSize: 16,
+                        ),
+                      ),
+                      Text(
+                        note,
+                        style: typography.caption.copyWith(
+                          color: colors.onSurfaceMuted,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                alignment: Alignment.center,
-                child: selected
-                    ? Container(
-                        width: 10,
-                        height: 10,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: primary,
-                        ),
-                      )
-                    : null,
-              ),
-            ],
+                Container(
+                  width: 22,
+                  height: 22,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: selected ? primary : colors.outlineStrong,
+                      width: 2,
+                    ),
+                  ),
+                  alignment: Alignment.center,
+                  child: selected
+                      ? Container(
+                          width: 10,
+                          height: 10,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: primary,
+                          ),
+                        )
+                      : null,
+                ),
+              ],
+            ),
           ),
         ),
       ),
