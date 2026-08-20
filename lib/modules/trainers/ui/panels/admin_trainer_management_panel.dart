@@ -399,21 +399,42 @@ class _TrainerFormSheetState extends ConsumerState<_TrainerFormSheet> {
             ),
           ),
           const SizedBox(height: AppSpacing.sm),
-          Wrap(
-            spacing: AppSpacing.sm,
-            runSpacing: AppSpacing.sm,
-            children: [
-              for (final specialty in trainerSpecialtyOptions)
-                _SpecialtyChip(
-                  label: ref.watch(rcTextProvider(_specialtyKey(specialty))),
-                  selected: _selectedSpecialties.contains(specialty),
-                  onTap: () => setState(() {
-                    _selectedSpecialties.contains(specialty)
-                        ? _selectedSpecialties.remove(specialty)
-                        : _selectedSpecialties.add(specialty);
-                  }),
-                ),
-            ],
+          InkWell(
+            borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+            onTap: _showSpecialtyPicker,
+            child: Container(
+              constraints: const BoxConstraints(minHeight: 44),
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+              decoration: BoxDecoration(
+                color: colors.surface,
+                borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+                border: Border.all(color: colors.outline),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    ref.watch(
+                      rcTextProvider(
+                        _specialtyKey(
+                          _selectedSpecialties.isEmpty
+                              ? 'Fonksiyonel'
+                              : _selectedSpecialties.first,
+                        ),
+                      ),
+                    ),
+                    style: typography.bodyLarge.copyWith(
+                      color: colors.onSurface,
+                      fontSize: 15,
+                    ),
+                  ),
+                  Icon(
+                    Icons.keyboard_arrow_down,
+                    color: colors.onSurfaceVariant,
+                  ),
+                ],
+              ),
+            ),
           ),
           const SizedBox(height: AppSpacing.lg),
           if (_errorMessage != null) ...[
@@ -449,6 +470,59 @@ class _TrainerFormSheetState extends ConsumerState<_TrainerFormSheet> {
     );
   }
 
+  void _showSpecialtyPicker() {
+    final colors = context.appColors;
+    final current = _selectedSpecialties.isEmpty
+        ? 'Fonksiyonel'
+        : _selectedSpecialties.first;
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: colors.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      builder: (sheetContext) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.screenEdge,
+            AppSpacing.lg,
+            AppSpacing.screenEdge,
+            AppSpacing.lg,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Center(
+                child: Container(
+                  width: 44,
+                  height: 5,
+                  decoration: BoxDecoration(
+                    color: colors.outlineStrong,
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
+                  ),
+                ),
+              ),
+              const SizedBox(height: AppSpacing.lg),
+              for (final specialty in trainerSpecialtyOptions)
+                _SpecialtyPickerRow(
+                  label: ref.watch(rcTextProvider(_specialtyKey(specialty))),
+                  selected: specialty == current,
+                  onTap: () {
+                    setState(
+                      () => _selectedSpecialties
+                        ..clear()
+                        ..add(specialty),
+                    );
+                    Navigator.of(sheetContext).pop();
+                  },
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   void dispose() {
     _nameController.dispose();
@@ -457,8 +531,8 @@ class _TrainerFormSheetState extends ConsumerState<_TrainerFormSheet> {
   }
 }
 
-class _SpecialtyChip extends StatelessWidget {
-  const _SpecialtyChip({
+class _SpecialtyPickerRow extends StatelessWidget {
+  const _SpecialtyPickerRow({
     required this.label,
     required this.selected,
     required this.onTap,
@@ -471,29 +545,24 @@ class _SpecialtyChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
-    return Material(
-      color: selected ? colors.primary : colors.surfaceRaised,
-      borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 13),
-          constraints: const BoxConstraints(minHeight: 34),
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
-            border: Border.all(
-              color: selected ? colors.primary : colors.outlineStrong,
+    final typography = context.appTypography;
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        constraints: const BoxConstraints(minHeight: 56),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                label,
+                style: typography.bodyLarge.copyWith(
+                  color: colors.onSurface,
+                  fontSize: 15,
+                ),
+              ),
             ),
-          ),
-          child: Text(
-            label,
-            style: context.appTypography.headingSmall.copyWith(
-              fontSize: 14,
-              color: selected ? colors.onPrimary : colors.onSurfaceVariant,
-            ),
-          ),
+            if (selected) Icon(Icons.check, color: colors.primary, size: 20),
+          ],
         ),
       ),
     );
