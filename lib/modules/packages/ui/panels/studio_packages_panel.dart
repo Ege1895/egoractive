@@ -166,7 +166,15 @@ class _PackageCard extends ConsumerWidget {
                             ),
                           ),
                           child: Text(
-                            package.sessionType.label,
+                            ref.watch(
+                              rcTextProvider(
+                                isSolo
+                                    ? RemoteConfigKeys
+                                          .trainersReportOneOnOneToggle
+                                    : RemoteConfigKeys
+                                          .trainersReportGroupToggle,
+                              ),
+                            ),
                             style: typography.caption.copyWith(
                               color: typeFg,
                               fontSize: 11,

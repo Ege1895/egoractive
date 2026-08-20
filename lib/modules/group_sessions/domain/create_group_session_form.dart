@@ -2,8 +2,6 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'create_group_session_form.freezed.dart';
 
-const groupSessionDayLabels = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'];
-
 @freezed
 class CreateGroupSessionForm with _$CreateGroupSessionForm {
   const factory CreateGroupSessionForm({

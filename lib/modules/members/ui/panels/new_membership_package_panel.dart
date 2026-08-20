@@ -511,11 +511,34 @@ class _PackagePick extends StatelessWidget {
                           fontSize: 16,
                         ),
                       ),
-                      Text(
-                        '${package.sessionType.label} · ${package.validityDays} gün',
-                        style: typography.caption.copyWith(
-                          color: colors.onSurfaceMuted,
-                        ),
+                      Consumer(
+                        builder: (context, ref, _) {
+                          final typeLabel = ref.watch(
+                            rcTextProvider(
+                              package.sessionType == PackageSessionType.solo
+                                  ? RemoteConfigKeys
+                                        .trainersReportOneOnOneToggle
+                                  : RemoteConfigKeys.trainersReportGroupToggle,
+                            ),
+                          );
+                          return Text(
+                            ref
+                                .watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys
+                                        .membersPackagePickTypeValidityCaption,
+                                  ),
+                                )
+                                .replaceAll('{type}', typeLabel)
+                                .replaceAll(
+                                  '{days}',
+                                  '${package.validityDays}',
+                                ),
+                            style: typography.caption.copyWith(
+                              color: colors.onSurfaceMuted,
+                            ),
+                          );
+                        },
                       ),
                     ],
                   ),

@@ -740,10 +740,50 @@ abstract final class RemoteConfigKeys {
   static const membersInfoEditTitle = 'lbl_members_info_edit_title';
   static const membersInfoPhoneHint = 'lbl_members_info_phone_hint';
   static const membersInfoAgeSuffix = 'lbl_members_info_age_suffix';
+
+  /// `{type}`/`{days}` yer tutucuları paket seçim kartında seans türü ve
+  /// geçerlilik süresiyle değiştirilir.
+  static const membersPackagePickTypeValidityCaption =
+      'lbl_members_package_pick_type_validity_caption';
   static const membersInfoHeightPickerTitle =
       'lbl_members_info_height_picker_title';
   static const membersInfoGenderLabel = 'lbl_members_info_gender_label';
   static const membersInfoGenderHelper = 'lbl_members_info_gender_helper';
+  static const membersInfoGenderErkekOption =
+      'lbl_members_info_gender_erkek_option';
+  static const membersInfoGenderKadinOption =
+      'lbl_members_info_gender_kadin_option';
+
+  /// Antrenör uzmanlık seçenekleri (`trainerSpecialtyOptions`) — sabit,
+  /// kod-tanımlı liste; her biri için ayrı anahtar.
+  static const trainersSpecialtyFonksiyonelOption =
+      'lbl_trainers_specialty_fonksiyonel_option';
+  static const trainersSpecialtyPilatesOption =
+      'lbl_trainers_specialty_pilates_option';
+  static const trainersSpecialtyYogaOption =
+      'lbl_trainers_specialty_yoga_option';
+  static const trainersSpecialtyKickboxOption =
+      'lbl_trainers_specialty_kickbox_option';
+
+  /// Salon oluşturulurken önerilen varsayılan tema paletindeki isim/not
+  /// çiftleri (`GymThemeService`/`GymThemeController`'daki sabit presetler).
+  static const gymsThemePresetDefaultName =
+      'lbl_gyms_theme_preset_default_name';
+  static const gymsThemePresetDefaultNote =
+      'lbl_gyms_theme_preset_default_note';
+  static const gymsThemePresetOrangeName = 'lbl_gyms_theme_preset_orange_name';
+  static const gymsThemePresetOrangeNote = 'lbl_gyms_theme_preset_orange_note';
+  static const gymsThemePresetGreenName = 'lbl_gyms_theme_preset_green_name';
+  static const gymsThemePresetGreenNote = 'lbl_gyms_theme_preset_green_note';
+
+  /// `{value}` yer tutucusuz, virgülle ayrılmış 12 ay / 7 gün adı listesi —
+  /// `.split(',')` ile kullanılır. Bu projede birden çok dosyada aynı ay/gün
+  /// isim map'leri tekrarlanıyordu; bu anahtarlar en görünür tekrarı
+  /// (Seanslar ekranı tarih başlığı) gidermek için eklendi.
+  static const commonMonthNamesLong = 'lbl_common_month_names_long';
+  static const commonWeekdayNamesLong = 'lbl_common_weekday_names_long';
+  static const groupSessionsDayAbbreviations =
+      'lbl_group_sessions_day_abbreviations';
   static const membersInfoConfirmAttendanceLabel =
       'lbl_members_info_confirm_attendance_label';
   static const membersInfoConfirmAttendanceHelper =
@@ -1705,11 +1745,29 @@ class RemoteConfigService {
     'lbl_members_info_edit_title_tr': 'Üye bilgileri',
     'lbl_members_info_phone_hint_tr': '5XX XXX XX XX',
     'lbl_members_info_age_suffix_tr': '{age} yaş',
+    'lbl_members_package_pick_type_validity_caption_tr': '{type} · {days} gün',
     'lbl_members_info_height_picker_title_tr': 'Boy (cm)',
     'lbl_members_info_gender_label_tr': 'Cinsiyet (opsiyonel)',
     'lbl_members_info_gender_helper_tr':
         'Ölçüm avatarı bu bilgiye göre gösterilir; üye ekranında ayrıca '
         'seçim yapılmaz.',
+    'lbl_members_info_gender_erkek_option_tr': 'Erkek',
+    'lbl_members_info_gender_kadin_option_tr': 'Kadın',
+    'lbl_trainers_specialty_fonksiyonel_option_tr': 'Fonksiyonel',
+    'lbl_trainers_specialty_pilates_option_tr': 'Pilates',
+    'lbl_trainers_specialty_yoga_option_tr': 'Yoga',
+    'lbl_trainers_specialty_kickbox_option_tr': 'Kickbox',
+    'lbl_gyms_theme_preset_default_name_tr': 'Egora Mavisi',
+    'lbl_gyms_theme_preset_default_note_tr': 'Varsayılan tema',
+    'lbl_gyms_theme_preset_orange_name_tr': 'Turuncu Enerji',
+    'lbl_gyms_theme_preset_orange_note_tr': 'Sıcak, enerjik vurgu',
+    'lbl_gyms_theme_preset_green_name_tr': 'Yeşil Doğa',
+    'lbl_gyms_theme_preset_green_note_tr': 'Sakin, doğal vurgu',
+    'lbl_common_month_names_long_tr':
+        'Ocak,Şubat,Mart,Nisan,Mayıs,Haziran,Temmuz,Ağustos,Eylül,Ekim,Kasım,Aralık',
+    'lbl_common_weekday_names_long_tr':
+        'Pazartesi,Salı,Çarşamba,Perşembe,Cuma,Cumartesi,Pazar',
+    'lbl_group_sessions_day_abbreviations_tr': 'Pzt,Sal,Çar,Per,Cum,Cmt,Paz',
     'lbl_members_info_confirm_attendance_label_tr': 'Ders onayı gönderebilsin',
     'lbl_members_info_confirm_attendance_helper_tr':
         'Üye ana ekranından sıradaki dersi için "Gelicem"/"Gelmeyeceğim" '
@@ -1734,8 +1792,7 @@ class RemoteConfigService {
     'lbl_notifications_target_selected_members_option_tr': 'Seçili üyeler',
     'lbl_notifications_whole_gym_summary_label_tr': '{gym} · tüm üyeler',
     'lbl_notifications_message_counter_label_tr': '{current} / {max}',
-    'lbl_notifications_preview_template_tr':
-        'Egoractive · {title} — {message}',
+    'lbl_notifications_preview_template_tr': 'Egoractive · {title} — {message}',
     'lbl_notifications_preview_message_placeholder_tr': 'Mesaj metni…',
     'lbl_notifications_send_button_label_tr': 'Gönder',
     'lbl_notifications_sending_button_label_tr': 'Gönderiliyor…',
@@ -2439,11 +2496,29 @@ class RemoteConfigService {
     'lbl_members_info_edit_title_en': 'Member details',
     'lbl_members_info_phone_hint_en': '5XX XXX XX XX',
     'lbl_members_info_age_suffix_en': '{age} yo',
+    'lbl_members_package_pick_type_validity_caption_en': '{type} · {days} days',
     'lbl_members_info_height_picker_title_en': 'Height (cm)',
     'lbl_members_info_gender_label_en': 'Gender (optional)',
     'lbl_members_info_gender_helper_en':
         'The measurement avatar is shown based on this; no separate '
         'selection is made on the member screen.',
+    'lbl_members_info_gender_erkek_option_en': 'Male',
+    'lbl_members_info_gender_kadin_option_en': 'Female',
+    'lbl_trainers_specialty_fonksiyonel_option_en': 'Functional',
+    'lbl_trainers_specialty_pilates_option_en': 'Pilates',
+    'lbl_trainers_specialty_yoga_option_en': 'Yoga',
+    'lbl_trainers_specialty_kickbox_option_en': 'Kickboxing',
+    'lbl_gyms_theme_preset_default_name_en': 'Egora Blue',
+    'lbl_gyms_theme_preset_default_note_en': 'Default theme',
+    'lbl_gyms_theme_preset_orange_name_en': 'Orange Energy',
+    'lbl_gyms_theme_preset_orange_note_en': 'Warm, energetic accent',
+    'lbl_gyms_theme_preset_green_name_en': 'Green Nature',
+    'lbl_gyms_theme_preset_green_note_en': 'Calm, natural accent',
+    'lbl_common_month_names_long_en':
+        'January,February,March,April,May,June,July,August,September,October,November,December',
+    'lbl_common_weekday_names_long_en':
+        'Monday,Tuesday,Wednesday,Thursday,Friday,Saturday,Sunday',
+    'lbl_group_sessions_day_abbreviations_en': 'Mon,Tue,Wed,Thu,Fri,Sat,Sun',
     'lbl_members_info_confirm_attendance_label_en':
         'Can send session confirmations',
     'lbl_members_info_confirm_attendance_helper_en':
@@ -2466,12 +2541,10 @@ class RemoteConfigService {
     'lbl_notifications_select_member_button_en': 'Select member',
     'lbl_notifications_title_field_label_en': 'Title',
     'lbl_notifications_message_field_label_en': 'Message',
-    'lbl_notifications_target_selected_members_option_en':
-        'Selected members',
+    'lbl_notifications_target_selected_members_option_en': 'Selected members',
     'lbl_notifications_whole_gym_summary_label_en': '{gym} · all members',
     'lbl_notifications_message_counter_label_en': '{current} / {max}',
-    'lbl_notifications_preview_template_en':
-        'Egoractive · {title} — {message}',
+    'lbl_notifications_preview_template_en': 'Egoractive · {title} — {message}',
     'lbl_notifications_preview_message_placeholder_en': 'Message text…',
     'lbl_notifications_send_button_label_en': 'Send',
     'lbl_notifications_sending_button_label_en': 'Sending…',
@@ -2799,8 +2872,7 @@ class RemoteConfigService {
     'lbl_subscription_monthly_period_word_en': 'monthly',
     'lbl_subscription_store_badge_label_tr': 'STORE',
     'lbl_subscription_store_badge_label_en': 'STORE',
-    'lbl_subscription_management_open_error_tr':
-        'Abonelik yönetimi açılamadı.',
+    'lbl_subscription_management_open_error_tr': 'Abonelik yönetimi açılamadı.',
     'lbl_subscription_management_open_error_en':
         'Could not open subscription management.',
   };

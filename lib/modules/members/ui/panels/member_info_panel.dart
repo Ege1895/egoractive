@@ -398,7 +398,15 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
                                         : AppSpacing.sm,
                                   ),
                                   child: _GenderChip(
-                                    label: gender.label,
+                                    label: ref.watch(
+                                      rcTextProvider(
+                                        gender == MemberGender.erkek
+                                            ? RemoteConfigKeys
+                                                  .membersInfoGenderErkekOption
+                                            : RemoteConfigKeys
+                                                  .membersInfoGenderKadinOption,
+                                      ),
+                                    ),
                                     selected: form.gender == gender,
                                     onTap: () =>
                                         controller.toggleGender(gender),

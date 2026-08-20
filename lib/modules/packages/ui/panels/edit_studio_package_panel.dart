@@ -176,7 +176,15 @@ class _EditStudioPackagePanelState
                                         : AppSpacing.sm,
                                   ),
                                   child: _TypeChip(
-                                    label: type.label,
+                                    label: ref.watch(
+                                      rcTextProvider(
+                                        type == PackageSessionType.solo
+                                            ? RemoteConfigKeys
+                                                  .trainersReportOneOnOneToggle
+                                            : RemoteConfigKeys
+                                                  .trainersReportGroupToggle,
+                                      ),
+                                    ),
                                     selected: _sessionType == type,
                                     onTap: () =>
                                         setState(() => _sessionType = type),

@@ -474,7 +474,16 @@ class _MemberCard extends ConsumerWidget {
                     borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
                   ),
                   child: Text(
-                    member.status.label,
+                    ref.watch(
+                      rcTextProvider(switch (member.status) {
+                        MemberPackageStatus.active =>
+                          RemoteConfigKeys.membersFilterActive,
+                        MemberPackageStatus.endingSoon =>
+                          RemoteConfigKeys.membersFilterExpiring,
+                        MemberPackageStatus.none =>
+                          RemoteConfigKeys.commonPaketiYokFilter,
+                      }),
+                    ),
                     style: typography.caption.copyWith(
                       color: chipFg,
                       fontSize: 12,

@@ -14,30 +14,6 @@ import '../../domain/admin_calendar_state.dart';
 import '../../service/sessions_write_service.dart';
 import '../widgets/create_session_sheet.dart';
 
-const _monthAbbrev = {
-  1: 'Ocak',
-  2: 'Şubat',
-  3: 'Mart',
-  4: 'Nisan',
-  5: 'Mayıs',
-  6: 'Haziran',
-  7: 'Temmuz',
-  8: 'Ağustos',
-  9: 'Eylül',
-  10: 'Ekim',
-  11: 'Kasım',
-  12: 'Aralık',
-};
-const _weekdayNames = {
-  1: 'Pazartesi',
-  2: 'Salı',
-  3: 'Çarşamba',
-  4: 'Perşembe',
-  5: 'Cuma',
-  6: 'Cumartesi',
-  7: 'Pazar',
-};
-
 enum _SessionFilter { all, planned, completed, cancelled }
 
 /// Admin 10 · Ders / Seans Yönetimi — filtreler + aksiyon paneli, tarih
@@ -161,7 +137,7 @@ class _AdminSessionManagementPanelState
                               onSelected: (d) => setState(() => _date = d),
                             ),
                             child: Text(
-                              '${_date.day} ${_monthAbbrev[_date.month]} ${_weekdayNames[_date.weekday]}',
+                              '${_date.day} ${_monthName(_date.month)} ${_weekdayName(_date.weekday)}',
                               style: typography.bodyMedium.copyWith(
                                 color: colors.onSurfaceVariant,
                                 fontSize: 14,
@@ -282,6 +258,20 @@ class _AdminSessionManagementPanelState
       int.parse(parts[0]),
       int.parse(parts[1]),
     );
+  }
+
+  String _monthName(int month) {
+    final names = ref
+        .watch(rcTextProvider(RemoteConfigKeys.commonMonthNamesLong))
+        .split(',');
+    return month >= 1 && month <= names.length ? names[month - 1] : '';
+  }
+
+  String _weekdayName(int weekday) {
+    final names = ref
+        .watch(rcTextProvider(RemoteConfigKeys.commonWeekdayNamesLong))
+        .split(',');
+    return weekday >= 1 && weekday <= names.length ? names[weekday - 1] : '';
   }
 
   bool _matchesFilter(AdminSessionSlot slot) {

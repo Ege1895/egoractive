@@ -9,6 +9,7 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_back_button.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../controller/gym_theme_controller.dart';
+import '../../domain/gym_theme.dart';
 import 'add_gym_theme_panel.dart';
 
 /// Admin · Temalar — kayıtlı tema listesi, seçilen tema tüm üyelere uygulanır.
@@ -87,8 +88,8 @@ class _GymThemesPanelState extends BasePanelState<GymThemesPanel> {
                   const SizedBox(height: AppSpacing.lg),
                   for (final theme in state.themes)
                     _ThemeRow(
-                      name: theme.name,
-                      note: theme.note,
+                      name: _resolvedPresetName(theme),
+                      note: _resolvedPresetNote(theme),
                       primary: theme.primary,
                       soft: theme.soft,
                       selected: theme.id == state.activeThemeId,
@@ -348,7 +349,41 @@ class _GymThemesPanelState extends BasePanelState<GymThemesPanel> {
       ),
     );
   }
+
+  /// Yerleşik 3 varsayılan preset (`GymThemeService._defaultPresets`) ve
+  /// logo renginden otomatik oluşturulan temanın (`id` her zaman `logo-`
+  /// ile başlar) adı/notu Firestore'a o anki dilde YAZILIYOR — bu yüzden
+  /// gösterimde tekrar dile göre çözülmesi gerekiyor. Kullanıcının kendi
+  /// yazdığı özel tema adları (diğer tüm id'ler) veri olarak kalır,
+  /// çevrilmez.
+  String _resolvedPresetName(GymTheme theme) {
+    final key = _presetNameKey(theme.id);
+    return key == null ? theme.name : ref.watch(rcTextProvider(key));
+  }
+
+  String _resolvedPresetNote(GymTheme theme) {
+    final key = _presetNoteKey(theme.id);
+    return key == null ? theme.note : ref.watch(rcTextProvider(key));
+  }
 }
+
+String? _presetNameKey(String themeId) => switch (themeId) {
+  'egora-mavisi' => RemoteConfigKeys.gymsThemePresetDefaultName,
+  'turuncu-enerji' => RemoteConfigKeys.gymsThemePresetOrangeName,
+  'yesil-doga' => RemoteConfigKeys.gymsThemePresetGreenName,
+  _ when themeId.startsWith('logo-') =>
+    RemoteConfigKeys.gymsGymInfoLogoColorThemeName,
+  _ => null,
+};
+
+String? _presetNoteKey(String themeId) => switch (themeId) {
+  'egora-mavisi' => RemoteConfigKeys.gymsThemePresetDefaultNote,
+  'turuncu-enerji' => RemoteConfigKeys.gymsThemePresetOrangeNote,
+  'yesil-doga' => RemoteConfigKeys.gymsThemePresetGreenNote,
+  _ when themeId.startsWith('logo-') =>
+    RemoteConfigKeys.gymsGymInfoLogoColorThemeNote,
+  _ => null,
+};
 
 class _ThemeRow extends StatelessWidget {
   const _ThemeRow({

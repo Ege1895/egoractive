@@ -178,28 +178,39 @@ class _CreateGroupSessionPanelState
                           ),
                         ),
                         const SizedBox(height: AppSpacing.sm),
-                        Row(
-                          children: [
-                            for (
-                              var i = 0;
-                              i < groupSessionDayLabels.length;
-                              i++
-                            )
-                              Expanded(
-                                child: Padding(
-                                  padding: EdgeInsets.only(
-                                    right: i == groupSessionDayLabels.length - 1
-                                        ? 0
-                                        : AppSpacing.xs,
+                        Builder(
+                          builder: (context) {
+                            final dayLabels = ref
+                                .watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys
+                                        .groupSessionsDayAbbreviations,
                                   ),
-                                  child: _DayChip(
-                                    label: groupSessionDayLabels[i],
-                                    selected: form.selectedDays.contains(i + 1),
-                                    onTap: () => controller.toggleDay(i + 1),
+                                )
+                                .split(',');
+                            return Row(
+                              children: [
+                                for (var i = 0; i < dayLabels.length; i++)
+                                  Expanded(
+                                    child: Padding(
+                                      padding: EdgeInsets.only(
+                                        right: i == dayLabels.length - 1
+                                            ? 0
+                                            : AppSpacing.xs,
+                                      ),
+                                      child: _DayChip(
+                                        label: dayLabels[i],
+                                        selected: form.selectedDays.contains(
+                                          i + 1,
+                                        ),
+                                        onTap: () =>
+                                            controller.toggleDay(i + 1),
+                                      ),
+                                    ),
                                   ),
-                                ),
-                              ),
-                          ],
+                              ],
+                            );
+                          },
                         ),
                         if (form.daysError != null) ...[
                           const SizedBox(height: AppSpacing.xs),

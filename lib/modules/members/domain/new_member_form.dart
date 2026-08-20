@@ -4,13 +4,6 @@ part 'new_member_form.freezed.dart';
 
 enum MemberGender { erkek, kadin }
 
-extension MemberGenderLabel on MemberGender {
-  String get label => switch (this) {
-    MemberGender.erkek => 'Erkek',
-    MemberGender.kadin => 'Kadın',
-  };
-}
-
 @freezed
 class NewMemberForm with _$NewMemberForm {
   const factory NewMemberForm({

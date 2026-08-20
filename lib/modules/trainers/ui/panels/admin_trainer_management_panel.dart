@@ -132,7 +132,10 @@ class _AdminTrainerManagementPanelState
 /// (`admin_trainer_detail_panel.dart`) aynı formu paylaşır — `existing`
 /// verilirse alanlar önceki değerlerle dolu açılır ve kaydedince
 /// `updateTrainer` çağrılır.
-void showTrainerFormSheet(BuildContext context, {AdminTrainerSummary? existing}) {
+void showTrainerFormSheet(
+  BuildContext context, {
+  AdminTrainerSummary? existing,
+}) {
   final colors = context.appColors;
   showModalBottomSheet<void>(
     context: context,
@@ -144,6 +147,18 @@ void showTrainerFormSheet(BuildContext context, {AdminTrainerSummary? existing})
     builder: (sheetContext) => _TrainerFormSheet(existing: existing),
   );
 }
+
+/// `trainerSpecialtyOptions`'daki her sabit uzmanlık için RC anahtarı —
+/// depolanan/karşılaştırılan değer (Firestore'a yazılan, seçili durumun
+/// kontrolünde kullanılan) hep Türkçe sabit string kalır, sadece gösterim
+/// dile göre değişir.
+String _specialtyKey(String specialty) => switch (specialty) {
+  'Fonksiyonel' => RemoteConfigKeys.trainersSpecialtyFonksiyonelOption,
+  'Pilates' => RemoteConfigKeys.trainersSpecialtyPilatesOption,
+  'Yoga' => RemoteConfigKeys.trainersSpecialtyYogaOption,
+  'Kickbox' => RemoteConfigKeys.trainersSpecialtyKickboxOption,
+  _ => RemoteConfigKeys.trainersSpecialtyFonksiyonelOption,
+};
 
 class _TrainerRow extends StatelessWidget {
   const _TrainerRow({
@@ -246,10 +261,9 @@ class _TrainerFormSheetState extends ConsumerState<_TrainerFormSheet> {
   late final _phoneController = TextEditingController(
     text: widget.existing == null
         ? ''
-        : widget.existing!.phone.replaceAll(RegExp(r'[^0-9]'), '').replaceFirst(
-            RegExp(r'^90'),
-            '',
-          ),
+        : widget.existing!.phone
+              .replaceAll(RegExp(r'[^0-9]'), '')
+              .replaceFirst(RegExp(r'^90'), ''),
   );
   late final Set<String> _selectedSpecialties = {
     ...?widget.existing?.specialties,
@@ -391,7 +405,7 @@ class _TrainerFormSheetState extends ConsumerState<_TrainerFormSheet> {
             children: [
               for (final specialty in trainerSpecialtyOptions)
                 _SpecialtyChip(
-                  label: specialty,
+                  label: ref.watch(rcTextProvider(_specialtyKey(specialty))),
                   selected: _selectedSpecialties.contains(specialty),
                   onTap: () => setState(() {
                     _selectedSpecialties.contains(specialty)
