@@ -934,6 +934,474 @@
       },
       "valueType": "STRING"
     },
+    "lbl_auth_delete_account_item_remaining_sessions_tr": {
+      "defaultValue": {
+        "value": "Kalan {count} dersin ve telafi hakkın"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_delete_account_item_remaining_sessions_en": {
+      "defaultValue": {
+        "value": "Your {count} remaining sessions and makeup credit"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_delete_account_item_measurements_badges_tr": {
+      "defaultValue": {
+        "value": "Ölçüm geçmişin ve rozetlerin"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_delete_account_item_measurements_badges_en": {
+      "defaultValue": {
+        "value": "Your measurement history and badges"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_delete_account_item_feedback_tr": {
+      "defaultValue": {
+        "value": "Stüdyona bıraktığın geri bildirimler"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_delete_account_item_feedback_en": {
+      "defaultValue": {
+        "value": "The feedback you left for your studio"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_delete_account_confirm_heading_tr": {
+      "defaultValue": {
+        "value": "Hesabını silmek geri alınamaz"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_delete_account_confirm_heading_en": {
+      "defaultValue": {
+        "value": "Deleting your account cannot be undone"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_delete_account_confirm_body_tr": {
+      "defaultValue": {
+        "value": "Silme işlemi 24 saat içinde tamamlanır ve iptal edilemez. Kalan {count} dersin ve ölçüm geçmişin de silinir."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_delete_account_confirm_body_en": {
+      "defaultValue": {
+        "value": "The deletion is completed within 24 hours and cannot be cancelled. Your {count} remaining sessions and measurement history will also be deleted."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_delete_account_acknowledge_label_tr": {
+      "defaultValue": {
+        "value": "Anladım, hesabım ve tüm verilerim silinsin."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_delete_account_acknowledge_label_en": {
+      "defaultValue": {
+        "value": "I understand, delete my account and all my data."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_delete_account_in_progress_button_tr": {
+      "defaultValue": {
+        "value": "Siliniyor…"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_delete_account_in_progress_button_en": {
+      "defaultValue": {
+        "value": "Deleting…"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_login_waiting_heading_tr": {
+      "defaultValue": {
+        "value": "Seni tanıyoruz…"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_login_waiting_heading_en": {
+      "defaultValue": {
+        "value": "Getting to know you…"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_login_waiting_body_tr": {
+      "defaultValue": {
+        "value": "+90 {phone} numarası stüdyoda aranıyor."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_login_waiting_body_en": {
+      "defaultValue": {
+        "value": "Looking up +90 {phone} at the studio."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_login_waiting_hint_tr": {
+      "defaultValue": {
+        "value": "30 saniyeden uzun sürerse bağlantını kontrol edip tekrar dene."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_login_waiting_hint_en": {
+      "defaultValue": {
+        "value": "If it takes longer than 30 seconds, check your connection and try again."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_login_waiting_cancel_button_tr": {
+      "defaultValue": {
+        "value": "İptal"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_login_waiting_cancel_button_en": {
+      "defaultValue": {
+        "value": "Cancel"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_onboarding_role_brand_label_tr": {
+      "defaultValue": {
+        "value": "EGORACTIVE"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_onboarding_role_brand_label_en": {
+      "defaultValue": {
+        "value": "EGORACTIVE"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_onboarding_role_title_tr": {
+      "defaultValue": {
+        "value": "Hoş geldin"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_onboarding_role_title_en": {
+      "defaultValue": {
+        "value": "Welcome"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_onboarding_role_subtitle_tr": {
+      "defaultValue": {
+        "value": "Devam etmek için rolünü seç."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_onboarding_role_subtitle_en": {
+      "defaultValue": {
+        "value": "Choose your role to continue."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_onboarding_role_trainer_title_tr": {
+      "defaultValue": {
+        "value": "Antrenörüm"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_onboarding_role_trainer_title_en": {
+      "defaultValue": {
+        "value": "I'm a trainer"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_onboarding_role_trainer_note_tr": {
+      "defaultValue": {
+        "value": "Bir stüdyoda ders veriyorum"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_onboarding_role_trainer_note_en": {
+      "defaultValue": {
+        "value": "I teach at a studio"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_onboarding_role_member_title_tr": {
+      "defaultValue": {
+        "value": "Üyeyim"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_onboarding_role_member_title_en": {
+      "defaultValue": {
+        "value": "I'm a member"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_onboarding_role_member_note_tr": {
+      "defaultValue": {
+        "value": "Bir salona/stüdyoya kayıtlıyım"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_onboarding_role_member_note_en": {
+      "defaultValue": {
+        "value": "I'm registered at a gym/studio"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_onboarding_role_hint_trainer_tr": {
+      "defaultValue": {
+        "value": "Sonraki adımda bir salona bağlı mı olduğunu soracağız."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_onboarding_role_hint_trainer_en": {
+      "defaultValue": {
+        "value": "In the next step we'll ask if you're linked to a gym."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_onboarding_role_hint_member_tr": {
+      "defaultValue": {
+        "value": "Stüdyona kayıtlı telefon numaranla giriş yapacaksın."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_onboarding_role_hint_member_en": {
+      "defaultValue": {
+        "value": "You'll log in with the phone number registered at your studio."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_onboarding_role_continue_button_tr": {
+      "defaultValue": {
+        "value": "Devam et"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_onboarding_role_continue_button_en": {
+      "defaultValue": {
+        "value": "Continue"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_onboarding_role_go_to_login_button_tr": {
+      "defaultValue": {
+        "value": "Girişe geç"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_onboarding_role_go_to_login_button_en": {
+      "defaultValue": {
+        "value": "Go to login"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_trainer_path_title_tr": {
+      "defaultValue": {
+        "value": "Bir salona bağlı mısın?"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_trainer_path_title_en": {
+      "defaultValue": {
+        "value": "Are you linked to a gym?"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_trainer_path_subtitle_tr": {
+      "defaultValue": {
+        "value": "Zaten çalıştığın bir stüdyo varsa oraya bağlan; yoksa kendi salonunu sen oluştur."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_trainer_path_subtitle_en": {
+      "defaultValue": {
+        "value": "If you already work at a studio, link to it; otherwise create your own gym."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_trainer_path_linked_title_tr": {
+      "defaultValue": {
+        "value": "Bir salona bağlı çalışıyorum"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_trainer_path_linked_title_en": {
+      "defaultValue": {
+        "value": "I work at a linked gym"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_trainer_path_linked_note_tr": {
+      "defaultValue": {
+        "value": "Salon yönetimi beni zaten sisteme eklemiş olmalı"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_trainer_path_linked_note_en": {
+      "defaultValue": {
+        "value": "The gym management should have already added me to the system"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_trainer_path_new_gym_title_tr": {
+      "defaultValue": {
+        "value": "Yeni bir salon açmak istiyorum"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_trainer_path_new_gym_title_en": {
+      "defaultValue": {
+        "value": "I want to open a new gym"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_trainer_path_new_gym_note_tr": {
+      "defaultValue": {
+        "value": "Kendi stüdyomu/salonumu ilk kez kaydediyorum"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_trainer_path_new_gym_note_en": {
+      "defaultValue": {
+        "value": "I'm registering my own studio/gym for the first time"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_trainer_path_hint_linked_tr": {
+      "defaultValue": {
+        "value": "Numaran sistemde yoksa salon yönetiminden seni eklemesini isteyebilirsin."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_trainer_path_hint_linked_en": {
+      "defaultValue": {
+        "value": "If your number isn't in the system, you can ask the gym management to add you."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_trainer_path_hint_new_gym_tr": {
+      "defaultValue": {
+        "value": "Salon bilgilerini girdikten sonra yönetici olarak giriş yapacaksın."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_trainer_path_hint_new_gym_en": {
+      "defaultValue": {
+        "value": "After entering your gym details, you'll log in as an admin."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_trainer_path_create_gym_button_tr": {
+      "defaultValue": {
+        "value": "Salon oluşturmaya geç"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_trainer_path_create_gym_button_en": {
+      "defaultValue": {
+        "value": "Continue to create gym"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_phone_login_title_tr": {
+      "defaultValue": {
+        "value": "Telefonunla giriş yap"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_phone_login_title_en": {
+      "defaultValue": {
+        "value": "Log in with your phone"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_phone_login_subtitle_tr": {
+      "defaultValue": {
+        "value": "Stüdyona kayıtlı numaranı gir; şifre yok, tek dokunuşla girersin."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_phone_login_subtitle_en": {
+      "defaultValue": {
+        "value": "Enter the number registered at your studio; no password, one tap and you're in."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_phone_login_hint_tr": {
+      "defaultValue": {
+        "value": "Numaran kayıtlı değilse stüdyo yönetimi seni eklemeli."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_phone_login_hint_en": {
+      "defaultValue": {
+        "value": "If your number isn't registered, the studio management needs to add you."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_profile_member_caption_tr": {
+      "defaultValue": {
+        "value": "+90 {phone} · Üye"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_profile_member_caption_en": {
+      "defaultValue": {
+        "value": "+90 {phone} · Member"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_profile_session_reminder_description_tr": {
+      "defaultValue": {
+        "value": "Dersinden {minutes} dakika önce bildirim"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_profile_session_reminder_description_en": {
+      "defaultValue": {
+        "value": "Notification {minutes} minutes before your session"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_splash_title_tr": {
+      "defaultValue": {
+        "value": "Egoractive"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_splash_title_en": {
+      "defaultValue": {
+        "value": "Egoractive"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_splash_tagline_tr": {
+      "defaultValue": {
+        "value": "Spor salonu yönetimi"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_splash_tagline_en": {
+      "defaultValue": {
+        "value": "Gym management"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_splash_publisher_tr": {
+      "defaultValue": {
+        "value": "Egora Games"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_splash_publisher_en": {
+      "defaultValue": {
+        "value": "Egora Games"
+      },
+      "valueType": "STRING"
+    },
     "lbl_badges_title_tr": {
       "defaultValue": {
         "value": "Rozetlerim"

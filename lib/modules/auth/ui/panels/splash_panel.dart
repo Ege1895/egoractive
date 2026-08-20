@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
+import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import 'onboarding_role_panel.dart';
 
@@ -44,14 +45,16 @@ class _SplashPanelState extends BasePanelState<SplashPanel> {
                   decoration: BoxDecoration(
                     color: colors.primaryContainer,
                     borderRadius: BorderRadius.circular(32),
-                    border: Border.all(color: colors.primary.withValues(alpha: 0.3)),
+                    border: Border.all(
+                      color: colors.primary.withValues(alpha: 0.3),
+                    ),
                   ),
                   padding: const EdgeInsets.all(AppSpacing.lg),
                   child: Image.asset('assets/images/egora-logo.png'),
                 ),
                 const SizedBox(height: AppSpacing.lg),
                 Text(
-                  'Egoractive',
+                  ref.watch(rcTextProvider(RemoteConfigKeys.authSplashTitle)),
                   style: typography.headingMedium.copyWith(
                     color: colors.onSurface,
                     fontSize: 32,
@@ -59,8 +62,10 @@ class _SplashPanelState extends BasePanelState<SplashPanel> {
                 ),
                 const SizedBox(height: AppSpacing.xs),
                 Text(
-                  'Spor salonu yönetimi',
-                  style: typography.bodyMedium.copyWith(color: colors.onSurfaceMuted),
+                  ref.watch(rcTextProvider(RemoteConfigKeys.authSplashTagline)),
+                  style: typography.bodyMedium.copyWith(
+                    color: colors.onSurfaceMuted,
+                  ),
                 ),
                 const SizedBox(height: AppSpacing.xl),
                 Row(
@@ -82,8 +87,10 @@ class _SplashPanelState extends BasePanelState<SplashPanel> {
             bottom: 56,
             child: Center(
               child: Text(
-                'Egora Games',
-                style: typography.caption.copyWith(color: colors.onSurfaceMuted),
+                ref.watch(rcTextProvider(RemoteConfigKeys.authSplashPublisher)),
+                style: typography.caption.copyWith(
+                  color: colors.onSurfaceMuted,
+                ),
               ),
             ),
           ),
@@ -96,7 +103,9 @@ class _SplashPanelState extends BasePanelState<SplashPanel> {
   void onPanelShow() {
     _sessionCheckTimer = Timer(const Duration(milliseconds: 1600), () {
       if (!mounted) return;
-      ref.read(panelStackControllerProvider.notifier).replaceRoot(const OnboardingRolePanel());
+      ref
+          .read(panelStackControllerProvider.notifier)
+          .replaceRoot(const OnboardingRolePanel());
     });
   }
 

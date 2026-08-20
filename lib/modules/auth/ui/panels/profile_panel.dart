@@ -56,7 +56,7 @@ class ProfilePanel extends ConsumerWidget {
           ),
           children: [
             Text(
-              'Profilim',
+              ref.watch(rcTextProvider(RemoteConfigKeys.authProfileTitle)),
               style: typography.headingLarge.copyWith(color: colors.onSurface),
             ),
             const SizedBox(height: AppSpacing.lg),
@@ -89,7 +89,16 @@ class ProfilePanel extends ConsumerWidget {
                               ),
                             ),
                             Text(
-                              '+90 ${formatTrPhoneDigits(profile.phoneDigits)} · Üye',
+                              ref
+                                  .watch(
+                                    rcTextProvider(
+                                      RemoteConfigKeys.authProfileMemberCaption,
+                                    ),
+                                  )
+                                  .replaceAll(
+                                    '{phone}',
+                                    formatTrPhoneDigits(profile.phoneDigits),
+                                  ),
                               style: typography.bodyMedium.copyWith(
                                 color: colors.onSurfaceVariant,
                                 fontSize: 14,
@@ -114,7 +123,9 @@ class ProfilePanel extends ConsumerWidget {
               child: Column(
                 children: [
                   _NavRow(
-                    label: 'Rozetlerim',
+                    label: ref.watch(
+                      rcTextProvider(RemoteConfigKeys.authBadgesNavLabel),
+                    ),
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -136,11 +147,15 @@ class ProfilePanel extends ConsumerWidget {
                     onTap: () => panelStack.push(const BadgesPanel()),
                   ),
                   _NavRow(
-                    label: 'Geri bildirim ver',
+                    label: ref.watch(
+                      rcTextProvider(RemoteConfigKeys.authGiveFeedbackNavLabel),
+                    ),
                     onTap: () => panelStack.push(const FeedbackPanel()),
                   ),
                   _NavRow(
-                    label: 'Stüdyo kuralları',
+                    label: ref.watch(
+                      rcTextProvider(RemoteConfigKeys.commonStudyoKurallariNav),
+                    ),
                     onTap: () => panelStack.push(const GymRulesViewPanel()),
                   ),
                   _NavRow(
@@ -158,14 +173,29 @@ class ProfilePanel extends ConsumerWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Ders hatırlatmaları',
+                                ref.watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys
+                                        .authSessionRemindersToggleTitle,
+                                  ),
+                                ),
                                 style: typography.bodyLarge.copyWith(
                                   color: colors.onSurface,
                                   fontSize: 15,
                                 ),
                               ),
                               Text(
-                                'Dersinden $reminderMinutesBefore dakika önce bildirim',
+                                ref
+                                    .watch(
+                                      rcTextProvider(
+                                        RemoteConfigKeys
+                                            .authProfileSessionReminderDescription,
+                                      ),
+                                    )
+                                    .replaceAll(
+                                      '{minutes}',
+                                      '$reminderMinutesBefore',
+                                    ),
                                 style: typography.caption.copyWith(
                                   color: colors.onSurfaceMuted,
                                 ),
@@ -218,14 +248,18 @@ class ProfilePanel extends ConsumerWidget {
               child: Column(
                 children: [
                   _NavRow(
-                    label: 'Çıkış yap',
+                    label: ref.watch(
+                      rcTextProvider(RemoteConfigKeys.commonCikisYap),
+                    ),
                     onTap: () {
                       controller.logout();
                       panelStack.replaceRoot(const PhoneLoginPanel());
                     },
                   ),
                   _NavRow(
-                    label: 'Hesabımı sil',
+                    label: ref.watch(
+                      rcTextProvider(RemoteConfigKeys.commonHesabimiSil),
+                    ),
                     labelColor: colors.error,
                     isLast: true,
                     onTap: () =>
@@ -237,7 +271,9 @@ class ProfilePanel extends ConsumerWidget {
             const SizedBox(height: AppSpacing.lg),
             Center(
               child: Text(
-                'Egoractive · Egora Games · Sürüm 1.0',
+                ref.watch(
+                  rcTextProvider(RemoteConfigKeys.trainersProfileFooterText),
+                ),
                 style: typography.caption.copyWith(
                   color: colors.onSurfaceMuted,
                 ),

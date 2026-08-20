@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:egoractive/core/remote_config/remote_config_service.dart';
 import 'package:egoractive/main.dart';
 import 'package:egoractive/modules/auth/repository/auth_repository.dart';
 
@@ -18,6 +19,32 @@ class _FakeAuthRepository implements AuthRepository {
 
   @override
   Future<void> signOut() async {}
+}
+
+/// Gerçek Firebase Remote Config'e dokunmayan sahte servis — bu dosya panel
+/// geçişlerini test eder, Firebase entegrasyonunu değil. `rcTextProvider`,
+/// Firebase.initializeApp hiç çağrılmamış test ortamında `getString`'i
+/// yakalayıp boş döner (bkz. remote_config_service.dart); testin beklediği
+/// sabit metinleri döndürmek için `_tr`/`_en` eki fark etmeksizin taban
+/// anahtara göre çözüyoruz.
+class _FakeRemoteConfigService extends RemoteConfigService {
+  const _FakeRemoteConfigService();
+
+  static const _values = <String, String>{
+    'lbl_auth_splash_title': 'Egoractive',
+    'lbl_auth_onboarding_role_title': 'Hoş geldin',
+    'lbl_auth_onboarding_role_member_title': 'Üyeyim',
+    'lbl_auth_onboarding_role_go_to_login_button': 'Girişe geç',
+    'lbl_auth_phone_login_title': 'Telefonunla giriş yap',
+    'lbl_auth_login_button': 'Giriş yap',
+    'lbl_auth_login_waiting_heading': 'Seni tanıyoruz…',
+    'lbl_auth_login_waiting_body': '+90 {phone} numarası stüdyoda aranıyor.',
+    'lbl_auth_login_waiting_cancel_button': 'İptal',
+  };
+
+  @override
+  String getString(String key) =>
+      _values[key.replaceFirst(RegExp(r'_(tr|en)$'), '')] ?? '';
 }
 
 /// Splash'ın mock oturum kontrolü süresi geçip [OnboardingRolePanel]'e
@@ -47,6 +74,9 @@ void main() {
         ProviderScope(
           overrides: [
             authRepositoryProvider.overrideWith((ref) => _FakeAuthRepository()),
+            remoteConfigServiceProvider.overrideWithValue(
+              const _FakeRemoteConfigService(),
+            ),
           ],
           child: const EgoractiveApp(),
         ),
@@ -91,6 +121,9 @@ void main() {
         ProviderScope(
           overrides: [
             authRepositoryProvider.overrideWith((ref) => _FakeAuthRepository()),
+            remoteConfigServiceProvider.overrideWithValue(
+              const _FakeRemoteConfigService(),
+            ),
           ],
           child: const EgoractiveApp(),
         ),
@@ -116,7 +149,16 @@ void main() {
   testWidgets('Splash cannot be reached again via back after replaceRoot', (
     tester,
   ) async {
-    await tester.pumpWidget(const ProviderScope(child: EgoractiveApp()));
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          remoteConfigServiceProvider.overrideWithValue(
+            const _FakeRemoteConfigService(),
+          ),
+        ],
+        child: const EgoractiveApp(),
+      ),
+    );
     await _navigateToPhoneLogin(tester);
 
     // Sistem geri tuşu, PhoneLoginPanel'i pop edip bir önceki panele

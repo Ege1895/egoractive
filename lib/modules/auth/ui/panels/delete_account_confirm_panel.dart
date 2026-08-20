@@ -4,16 +4,23 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
+import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../packages/controller/package_controller.dart';
 import '../../controller/auth_controller.dart';
 import 'phone_login_panel.dart';
 
-List<String> _deleteItems(int remainingSessions) => [
-  'Kalan $remainingSessions dersin ve telafi hakkın',
-  'Ölçüm geçmişin ve rozetlerin',
-  'Stüdyona bıraktığın geri bildirimler',
+List<String> _deleteItems(WidgetRef ref, int remainingSessions) => [
+  ref
+      .watch(
+        rcTextProvider(RemoteConfigKeys.authDeleteAccountItemRemainingSessions),
+      )
+      .replaceAll('{count}', '$remainingSessions'),
+  ref.watch(
+    rcTextProvider(RemoteConfigKeys.authDeleteAccountItemMeasurementsBadges),
+  ),
+  ref.watch(rcTextProvider(RemoteConfigKeys.authDeleteAccountItemFeedback)),
 ];
 
 /// Ortak 4 · Hesap Silme Onayı — geri dönüşü olmadığını vurgulayan, çift
@@ -55,7 +62,11 @@ class _DeleteAccountConfirmPanelState
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Profilim',
+                      ref.watch(
+                        rcTextProvider(
+                          RemoteConfigKeys.authDeleteAccountConfirmTitle,
+                        ),
+                      ),
                       style: typography.headingLarge.copyWith(
                         color: colors.onSurface,
                       ),
@@ -110,7 +121,11 @@ class _DeleteAccountConfirmPanelState
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Hesabını silmek geri alınamaz',
+                        ref.watch(
+                          rcTextProvider(
+                            RemoteConfigKeys.authDeleteAccountConfirmHeading,
+                          ),
+                        ),
                         style: typography.headingMedium.copyWith(
                           color: colors.onSurface,
                           fontSize: 24,
@@ -118,8 +133,13 @@ class _DeleteAccountConfirmPanelState
                       ),
                       const SizedBox(height: AppSpacing.sm),
                       Text(
-                        'Silme işlemi 24 saat içinde tamamlanır ve iptal edilemez. '
-                        'Kalan $remainingSessions dersin ve ölçüm geçmişin de silinir.',
+                        ref
+                            .watch(
+                              rcTextProvider(
+                                RemoteConfigKeys.authDeleteAccountConfirmBody,
+                              ),
+                            )
+                            .replaceAll('{count}', '$remainingSessions'),
                         style: typography.bodyLarge.copyWith(
                           color: colors.onSurfaceVariant,
                           fontSize: 15,
@@ -140,7 +160,7 @@ class _DeleteAccountConfirmPanelState
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        for (final item in _deleteItems(remainingSessions))
+                        for (final item in _deleteItems(ref, remainingSessions))
                           Padding(
                             padding: const EdgeInsets.symmetric(
                               vertical: AppSpacing.xs,
@@ -190,8 +210,15 @@ class _DeleteAccountConfirmPanelState
                   const SizedBox(height: AppSpacing.lg),
                   _DangerButton(
                     label: authState.isDeletingAccount
-                        ? 'Siliniyor…'
-                        : 'Hesabımı sil',
+                        ? ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys
+                                  .authDeleteAccountInProgressButton,
+                            ),
+                          )
+                        : ref.watch(
+                            rcTextProvider(RemoteConfigKeys.commonHesabimiSil),
+                          ),
                     enabled:
                         authState.deleteAccountAcknowledged &&
                         !authState.isDeletingAccount,
@@ -207,7 +234,9 @@ class _DeleteAccountConfirmPanelState
                   ),
                   const SizedBox(height: AppSpacing.sm),
                   AppButton(
-                    label: 'Vazgeç',
+                    label: ref.watch(
+                      rcTextProvider(RemoteConfigKeys.commonVazgec),
+                    ),
                     variant: AppButtonVariant.text,
                     onPressed: () =>
                         ref.read(panelStackControllerProvider.notifier).pop(),
@@ -291,10 +320,16 @@ class _AcknowledgeCheckbox extends StatelessWidget {
               ),
               const SizedBox(width: AppSpacing.md),
               Expanded(
-                child: Text(
-                  'Anladım, hesabım ve tüm verilerim silinsin.',
-                  style: typography.bodyMedium.copyWith(
-                    color: colors.onSurfaceVariant,
+                child: Consumer(
+                  builder: (context, ref, _) => Text(
+                    ref.watch(
+                      rcTextProvider(
+                        RemoteConfigKeys.authDeleteAccountAcknowledgeLabel,
+                      ),
+                    ),
+                    style: typography.bodyMedium.copyWith(
+                      color: colors.onSurfaceVariant,
+                    ),
                   ),
                 ),
               ),

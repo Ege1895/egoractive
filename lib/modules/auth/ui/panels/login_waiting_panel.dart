@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
+import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/utils/phone_number_formatter.dart';
 import '../../../../shared/widgets/app_button.dart';
@@ -57,7 +58,11 @@ class _LoginWaitingPanelState extends BasePanelState<LoginWaitingPanel> {
                     const AppLoadingIndicator(size: 76),
                     const SizedBox(height: AppSpacing.xl),
                     Text(
-                      'Seni tanıyoruz…',
+                      ref.watch(
+                        rcTextProvider(
+                          RemoteConfigKeys.authLoginWaitingHeading,
+                        ),
+                      ),
                       style: typography.headingMedium.copyWith(
                         color: colors.onSurface,
                         fontSize: 22,
@@ -65,7 +70,16 @@ class _LoginWaitingPanelState extends BasePanelState<LoginWaitingPanel> {
                     ),
                     const SizedBox(height: AppSpacing.sm),
                     Text(
-                      '+90 ${formatTrPhoneDigits(authState.phoneDigits)} numarası stüdyoda aranıyor.',
+                      ref
+                          .watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.authLoginWaitingBody,
+                            ),
+                          )
+                          .replaceAll(
+                            '{phone}',
+                            formatTrPhoneDigits(authState.phoneDigits),
+                          ),
                       style: typography.bodyMedium.copyWith(
                         color: colors.onSurfaceVariant,
                       ),
@@ -101,7 +115,9 @@ class _LoginWaitingPanelState extends BasePanelState<LoginWaitingPanel> {
                     const SizedBox(width: AppSpacing.md),
                     Expanded(
                       child: Text(
-                        '30 saniyeden uzun sürerse bağlantını kontrol edip tekrar dene.',
+                        ref.watch(
+                          rcTextProvider(RemoteConfigKeys.authLoginWaitingHint),
+                        ),
                         style: typography.bodyMedium.copyWith(
                           color: colors.onSurfaceVariant,
                           fontSize: 14,
@@ -117,7 +133,9 @@ class _LoginWaitingPanelState extends BasePanelState<LoginWaitingPanel> {
               right: AppSpacing.screenEdge,
               bottom: 0,
               child: AppButton(
-                label: 'İptal',
+                label: ref.watch(
+                  rcTextProvider(RemoteConfigKeys.authLoginWaitingCancelButton),
+                ),
                 variant: AppButtonVariant.text,
                 onPressed: () =>
                     ref.read(panelStackControllerProvider.notifier).pop(),

@@ -165,6 +165,82 @@ abstract final class RemoteConfigKeys {
   static const authRetryButton = 'lbl_auth_retry_button';
   static const authDeleteAccountErrorGeneric =
       'lbl_auth_delete_account_error_generic';
+
+  /// F1 auth modülü UI migrasyonu — silme onayı ekranındaki liste
+  /// maddeleri, başlık/gövde metinleri ve buton durumları.
+  static const authDeleteAccountItemRemainingSessions =
+      'lbl_auth_delete_account_item_remaining_sessions';
+  static const authDeleteAccountItemMeasurementsBadges =
+      'lbl_auth_delete_account_item_measurements_badges';
+  static const authDeleteAccountItemFeedback =
+      'lbl_auth_delete_account_item_feedback';
+  static const authDeleteAccountConfirmHeading =
+      'lbl_auth_delete_account_confirm_heading';
+  static const authDeleteAccountConfirmBody =
+      'lbl_auth_delete_account_confirm_body';
+  static const authDeleteAccountAcknowledgeLabel =
+      'lbl_auth_delete_account_acknowledge_label';
+  static const authDeleteAccountInProgressButton =
+      'lbl_auth_delete_account_in_progress_button';
+
+  /// Giriş bekleniyor ekranı.
+  static const authLoginWaitingHeading = 'lbl_auth_login_waiting_heading';
+  static const authLoginWaitingBody = 'lbl_auth_login_waiting_body';
+  static const authLoginWaitingHint = 'lbl_auth_login_waiting_hint';
+  static const authLoginWaitingCancelButton =
+      'lbl_auth_login_waiting_cancel_button';
+
+  /// Onboarding — rol seçimi ekranı.
+  static const authOnboardingRoleBrandLabel =
+      'lbl_auth_onboarding_role_brand_label';
+  static const authOnboardingRoleTitle = 'lbl_auth_onboarding_role_title';
+  static const authOnboardingRoleSubtitle = 'lbl_auth_onboarding_role_subtitle';
+  static const authOnboardingRoleTrainerTitle =
+      'lbl_auth_onboarding_role_trainer_title';
+  static const authOnboardingRoleTrainerNote =
+      'lbl_auth_onboarding_role_trainer_note';
+  static const authOnboardingRoleMemberTitle =
+      'lbl_auth_onboarding_role_member_title';
+  static const authOnboardingRoleMemberNote =
+      'lbl_auth_onboarding_role_member_note';
+  static const authOnboardingRoleHintTrainer =
+      'lbl_auth_onboarding_role_hint_trainer';
+  static const authOnboardingRoleHintMember =
+      'lbl_auth_onboarding_role_hint_member';
+  static const authOnboardingRoleContinueButton =
+      'lbl_auth_onboarding_role_continue_button';
+  static const authOnboardingRoleGoToLoginButton =
+      'lbl_auth_onboarding_role_go_to_login_button';
+
+  /// Onboarding — antrenör alt seçimi ekranı.
+  static const authTrainerPathTitle = 'lbl_auth_trainer_path_title';
+  static const authTrainerPathSubtitle = 'lbl_auth_trainer_path_subtitle';
+  static const authTrainerPathLinkedTitle =
+      'lbl_auth_trainer_path_linked_title';
+  static const authTrainerPathLinkedNote = 'lbl_auth_trainer_path_linked_note';
+  static const authTrainerPathNewGymTitle =
+      'lbl_auth_trainer_path_new_gym_title';
+  static const authTrainerPathNewGymNote = 'lbl_auth_trainer_path_new_gym_note';
+  static const authTrainerPathHintLinked = 'lbl_auth_trainer_path_hint_linked';
+  static const authTrainerPathHintNewGym = 'lbl_auth_trainer_path_hint_new_gym';
+  static const authTrainerPathCreateGymButton =
+      'lbl_auth_trainer_path_create_gym_button';
+
+  /// Telefonla giriş ekranı.
+  static const authPhoneLoginTitle = 'lbl_auth_phone_login_title';
+  static const authPhoneLoginSubtitle = 'lbl_auth_phone_login_subtitle';
+  static const authPhoneLoginHint = 'lbl_auth_phone_login_hint';
+
+  /// Profil ekranı — kalan (henüz migrate edilmemiş) metinler.
+  static const authProfileMemberCaption = 'lbl_auth_profile_member_caption';
+  static const authProfileSessionReminderDescription =
+      'lbl_auth_profile_session_reminder_description';
+
+  /// Splash ekranı.
+  static const authSplashTitle = 'lbl_auth_splash_title';
+  static const authSplashTagline = 'lbl_auth_splash_tagline';
+  static const authSplashPublisher = 'lbl_auth_splash_publisher';
+
   static const badgesTitle = 'lbl_badges_title';
   static const eventsAdminListTitle = 'lbl_events_admin_list_title';
   static const eventsAddEventButton = 'lbl_events_add_event_button';
@@ -708,6 +784,63 @@ class RemoteConfigService {
     'lbl_auth_retry_button_tr': 'Tekrar dene',
     'lbl_auth_delete_account_error_generic_tr':
         'Hesap silinemedi. Bağlantını kontrol edip tekrar dene.',
+    'lbl_auth_delete_account_item_remaining_sessions_tr':
+        'Kalan {count} dersin ve telafi hakkın',
+    'lbl_auth_delete_account_item_measurements_badges_tr':
+        'Ölçüm geçmişin ve rozetlerin',
+    'lbl_auth_delete_account_item_feedback_tr':
+        'Stüdyona bıraktığın geri bildirimler',
+    'lbl_auth_delete_account_confirm_heading_tr':
+        'Hesabını silmek geri alınamaz',
+    'lbl_auth_delete_account_confirm_body_tr':
+        'Silme işlemi 24 saat içinde tamamlanır ve iptal edilemez. '
+        'Kalan {count} dersin ve ölçüm geçmişin de silinir.',
+    'lbl_auth_delete_account_acknowledge_label_tr':
+        'Anladım, hesabım ve tüm verilerim silinsin.',
+    'lbl_auth_delete_account_in_progress_button_tr': 'Siliniyor…',
+    'lbl_auth_login_waiting_heading_tr': 'Seni tanıyoruz…',
+    'lbl_auth_login_waiting_body_tr': '+90 {phone} numarası stüdyoda aranıyor.',
+    'lbl_auth_login_waiting_hint_tr':
+        '30 saniyeden uzun sürerse bağlantını kontrol edip tekrar dene.',
+    'lbl_auth_login_waiting_cancel_button_tr': 'İptal',
+    'lbl_auth_onboarding_role_brand_label_tr': 'EGORACTIVE',
+    'lbl_auth_onboarding_role_title_tr': 'Hoş geldin',
+    'lbl_auth_onboarding_role_subtitle_tr': 'Devam etmek için rolünü seç.',
+    'lbl_auth_onboarding_role_trainer_title_tr': 'Antrenörüm',
+    'lbl_auth_onboarding_role_trainer_note_tr': 'Bir stüdyoda ders veriyorum',
+    'lbl_auth_onboarding_role_member_title_tr': 'Üyeyim',
+    'lbl_auth_onboarding_role_member_note_tr': 'Bir salona/stüdyoya kayıtlıyım',
+    'lbl_auth_onboarding_role_hint_trainer_tr':
+        'Sonraki adımda bir salona bağlı mı olduğunu soracağız.',
+    'lbl_auth_onboarding_role_hint_member_tr':
+        'Stüdyona kayıtlı telefon numaranla giriş yapacaksın.',
+    'lbl_auth_onboarding_role_continue_button_tr': 'Devam et',
+    'lbl_auth_onboarding_role_go_to_login_button_tr': 'Girişe geç',
+    'lbl_auth_trainer_path_title_tr': 'Bir salona bağlı mısın?',
+    'lbl_auth_trainer_path_subtitle_tr':
+        'Zaten çalıştığın bir stüdyo varsa oraya bağlan; yoksa kendi salonunu sen oluştur.',
+    'lbl_auth_trainer_path_linked_title_tr': 'Bir salona bağlı çalışıyorum',
+    'lbl_auth_trainer_path_linked_note_tr':
+        'Salon yönetimi beni zaten sisteme eklemiş olmalı',
+    'lbl_auth_trainer_path_new_gym_title_tr': 'Yeni bir salon açmak istiyorum',
+    'lbl_auth_trainer_path_new_gym_note_tr':
+        'Kendi stüdyomu/salonumu ilk kez kaydediyorum',
+    'lbl_auth_trainer_path_hint_linked_tr':
+        'Numaran sistemde yoksa salon yönetiminden seni eklemesini isteyebilirsin.',
+    'lbl_auth_trainer_path_hint_new_gym_tr':
+        'Salon bilgilerini girdikten sonra yönetici olarak giriş yapacaksın.',
+    'lbl_auth_trainer_path_create_gym_button_tr': 'Salon oluşturmaya geç',
+    'lbl_auth_phone_login_title_tr': 'Telefonunla giriş yap',
+    'lbl_auth_phone_login_subtitle_tr':
+        'Stüdyona kayıtlı numaranı gir; şifre yok, tek dokunuşla girersin.',
+    'lbl_auth_phone_login_hint_tr':
+        'Numaran kayıtlı değilse stüdyo yönetimi seni eklemeli.',
+    'lbl_auth_profile_member_caption_tr': '+90 {phone} · Üye',
+    'lbl_auth_profile_session_reminder_description_tr':
+        'Dersinden {minutes} dakika önce bildirim',
+    'lbl_auth_splash_title_tr': 'Egoractive',
+    'lbl_auth_splash_tagline_tr': 'Spor salonu yönetimi',
+    'lbl_auth_splash_publisher_tr': 'Egora Games',
     'lbl_badges_title_tr': 'Rozetlerim',
     'lbl_events_admin_list_title_tr': 'Etkinlikler',
     'lbl_events_add_event_button_tr': '+ Etkinlik',
@@ -1024,6 +1157,63 @@ class RemoteConfigService {
     'lbl_auth_retry_button_en': 'Try again',
     'lbl_auth_delete_account_error_generic_en':
         'Could not delete account. Check your connection and try again.',
+    'lbl_auth_delete_account_item_remaining_sessions_en':
+        'Your {count} remaining sessions and makeup credit',
+    'lbl_auth_delete_account_item_measurements_badges_en':
+        'Your measurement history and badges',
+    'lbl_auth_delete_account_item_feedback_en':
+        'The feedback you left for your studio',
+    'lbl_auth_delete_account_confirm_heading_en':
+        'Deleting your account cannot be undone',
+    'lbl_auth_delete_account_confirm_body_en':
+        'The deletion is completed within 24 hours and cannot be cancelled. '
+        'Your {count} remaining sessions and measurement history will also be deleted.',
+    'lbl_auth_delete_account_acknowledge_label_en':
+        'I understand, delete my account and all my data.',
+    'lbl_auth_delete_account_in_progress_button_en': 'Deleting…',
+    'lbl_auth_login_waiting_heading_en': 'Getting to know you…',
+    'lbl_auth_login_waiting_body_en': 'Looking up +90 {phone} at the studio.',
+    'lbl_auth_login_waiting_hint_en':
+        'If it takes longer than 30 seconds, check your connection and try again.',
+    'lbl_auth_login_waiting_cancel_button_en': 'Cancel',
+    'lbl_auth_onboarding_role_brand_label_en': 'EGORACTIVE',
+    'lbl_auth_onboarding_role_title_en': 'Welcome',
+    'lbl_auth_onboarding_role_subtitle_en': 'Choose your role to continue.',
+    'lbl_auth_onboarding_role_trainer_title_en': "I'm a trainer",
+    'lbl_auth_onboarding_role_trainer_note_en': 'I teach at a studio',
+    'lbl_auth_onboarding_role_member_title_en': "I'm a member",
+    'lbl_auth_onboarding_role_member_note_en': "I'm registered at a gym/studio",
+    'lbl_auth_onboarding_role_hint_trainer_en':
+        "In the next step we'll ask if you're linked to a gym.",
+    'lbl_auth_onboarding_role_hint_member_en':
+        "You'll log in with the phone number registered at your studio.",
+    'lbl_auth_onboarding_role_continue_button_en': 'Continue',
+    'lbl_auth_onboarding_role_go_to_login_button_en': 'Go to login',
+    'lbl_auth_trainer_path_title_en': 'Are you linked to a gym?',
+    'lbl_auth_trainer_path_subtitle_en':
+        'If you already work at a studio, link to it; otherwise create your own gym.',
+    'lbl_auth_trainer_path_linked_title_en': 'I work at a linked gym',
+    'lbl_auth_trainer_path_linked_note_en':
+        'The gym management should have already added me to the system',
+    'lbl_auth_trainer_path_new_gym_title_en': 'I want to open a new gym',
+    'lbl_auth_trainer_path_new_gym_note_en':
+        "I'm registering my own studio/gym for the first time",
+    'lbl_auth_trainer_path_hint_linked_en':
+        "If your number isn't in the system, you can ask the gym management to add you.",
+    'lbl_auth_trainer_path_hint_new_gym_en':
+        "After entering your gym details, you'll log in as an admin.",
+    'lbl_auth_trainer_path_create_gym_button_en': 'Continue to create gym',
+    'lbl_auth_phone_login_title_en': 'Log in with your phone',
+    'lbl_auth_phone_login_subtitle_en':
+        "Enter the number registered at your studio; no password, one tap and you're in.",
+    'lbl_auth_phone_login_hint_en':
+        "If your number isn't registered, the studio management needs to add you.",
+    'lbl_auth_profile_member_caption_en': '+90 {phone} · Member',
+    'lbl_auth_profile_session_reminder_description_en':
+        'Notification {minutes} minutes before your session',
+    'lbl_auth_splash_title_en': 'Egoractive',
+    'lbl_auth_splash_tagline_en': 'Gym management',
+    'lbl_auth_splash_publisher_en': 'Egora Games',
     'lbl_badges_title_en': 'My Badges',
     'lbl_events_admin_list_title_en': 'Events',
     'lbl_events_add_event_button_en': '+ Event',

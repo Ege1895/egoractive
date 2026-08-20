@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
+import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/utils/phone_number_formatter.dart';
 import '../../../../shared/widgets/app_back_button.dart';
@@ -113,7 +114,7 @@ class _PhoneLoginPanelState extends BasePanelState<PhoneLoginPanel> {
                 const SizedBox(height: AppSpacing.lg),
               ],
               Text(
-                'Telefonunla giriş yap',
+                ref.watch(rcTextProvider(RemoteConfigKeys.authPhoneLoginTitle)),
                 style: typography.headingLarge.copyWith(
                   color: colors.onSurface,
                   fontSize: 30,
@@ -121,14 +122,18 @@ class _PhoneLoginPanelState extends BasePanelState<PhoneLoginPanel> {
               ),
               const SizedBox(height: AppSpacing.sm),
               Text(
-                'Stüdyona kayıtlı numaranı gir; şifre yok, tek dokunuşla girersin.',
+                ref.watch(
+                  rcTextProvider(RemoteConfigKeys.authPhoneLoginSubtitle),
+                ),
                 style: typography.bodyMedium.copyWith(
                   color: colors.onSurfaceVariant,
                 ),
               ),
               const SizedBox(height: AppSpacing.xl),
               Text(
-                'Telefon numarası',
+                ref.watch(
+                  rcTextProvider(RemoteConfigKeys.authPhoneNumberLabel),
+                ),
                 style: typography.caption.copyWith(
                   color: colors.onSurfaceMuted,
                 ),
@@ -195,7 +200,9 @@ class _PhoneLoginPanelState extends BasePanelState<PhoneLoginPanel> {
               const SizedBox(height: AppSpacing.sm),
               Text(
                 authState.loginErrorMessage ??
-                    'Numaran kayıtlı değilse stüdyo yönetimi seni eklemeli.',
+                    ref.watch(
+                      rcTextProvider(RemoteConfigKeys.authPhoneLoginHint),
+                    ),
                 style: typography.caption.copyWith(
                   color: authState.loginErrorMessage != null
                       ? colors.error
@@ -204,7 +211,9 @@ class _PhoneLoginPanelState extends BasePanelState<PhoneLoginPanel> {
               ),
               const SizedBox(height: AppSpacing.xl),
               AppButton(
-                label: 'Giriş yap',
+                label: ref.watch(
+                  rcTextProvider(RemoteConfigKeys.authLoginButton),
+                ),
                 onPressed: authState.isPhoneComplete
                     ? () {
                         authController.requestLogin();
