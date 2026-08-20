@@ -156,8 +156,24 @@ service cloud.firestore {
         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'attended']);
     }
 
+    // F3-3/F3-5 — okuma kuralı önceden tek başına resource.data.gymId ==
+    // myGymId() idi. Bu, admin'in gymId ile filtrelenmiş sorguları için
+    // çalışıyordu ama antrenörün trainerId ile, üyenin memberId ile
+    // filtrelediği TÜM sorguları sessizce reddediyordu — Firestore, bir
+    // "list"/"listen" sorgusunu sadece kuralın kullandığı alan sorgunun
+    // KENDİ filtresinde de varsa "kanıtlanabilir" sayıp izin veriyor;
+    // aksi halde sorgunun tamamını "Missing or insufficient permissions"
+    // ile reddediyor (dönen dokümanların gerçekte kurala uyup uymadığına
+    // hiç bakmadan). Antrenörün bugünkü program/onay bekleyenler akışı ve
+    // üyenin kendi seans listesi bu yüzden HİÇ veri almıyordu — bu,
+    // "tamamlandı/gelmedi" isteğinin sürekli reddedilmesinin asıl kök
+    // nedeniydi (yazma kuralı değil, okuma kuralıydı).
     match /sessions/{sessionId} {
-      allow read: if isSignedIn() && resource.data.gymId == myGymId();
+      allow read: if isSignedIn() && (
+        (myRole() == 'admin' && resource.data.gymId == myGymId()) ||
+        (myRole() == 'trainer' && resource.data.trainerId == request.auth.uid) ||
+        (myRole() == 'member' && resource.data.memberId == request.auth.uid)
+      );
       allow create: if isSignedIn() && myRole() == 'admin' && request.resource.data.gymId == myGymId() &&
         gymSubscriptionAllowsWrite(myGymId());
       allow update, delete: if isSignedIn() && resource.data.gymId == myGymId() && (
