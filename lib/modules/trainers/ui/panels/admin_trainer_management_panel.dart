@@ -132,61 +132,67 @@ class _TrainerRow extends StatelessWidget {
     final colors = context.appColors;
     final typography = context.appTypography;
 
-    return Material(
-      color: colors.surface,
-      borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
-      child: InkWell(
-        onTap: onTap,
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.md),
+      child: Material(
+        color: colors.surface,
         borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
-        child: Container(
-          margin: const EdgeInsets.only(bottom: AppSpacing.md),
-          padding: const EdgeInsets.all(AppSpacing.md),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
-            border: Border.all(color: colors.outline),
-          ),
-          child: Row(
-            children: [
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  color: colors.primaryContainer,
-                  shape: BoxShape.circle,
-                ),
-                alignment: Alignment.center,
-                child: Text(
-                  trainer.initials,
-                  style: typography.headingSmall.copyWith(
-                    color: colors.onPrimaryContainer,
-                    fontSize: 15,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
+          child: Container(
+            padding: const EdgeInsets.all(AppSpacing.md),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
+              border: Border.all(color: colors.outline),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: colors.primaryContainer,
+                    shape: BoxShape.circle,
+                  ),
+                  alignment: Alignment.center,
+                  child: Text(
+                    trainer.initials,
+                    style: typography.headingSmall.copyWith(
+                      color: colors.onPrimaryContainer,
+                      fontSize: 15,
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(width: AppSpacing.md),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      trainer.name,
-                      style: typography.headingSmall.copyWith(
-                        color: colors.onSurface,
-                        fontSize: 16,
+                const SizedBox(width: AppSpacing.md),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        trainer.name,
+                        style: typography.headingSmall.copyWith(
+                          color: colors.onSurface,
+                          fontSize: 16,
+                        ),
                       ),
-                    ),
-                    Text(
-                      '${trainer.specialties.join(", ")} · ${trainer.memberCount} üye',
-                      style: typography.bodyMedium.copyWith(
-                        color: colors.onSurfaceMuted,
-                        fontSize: 13,
+                      Text(
+                        '${trainer.specialties.join(", ")} · ${trainer.memberCount} üye',
+                        style: typography.bodyMedium.copyWith(
+                          color: colors.onSurfaceMuted,
+                          fontSize: 13,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-              Icon(Icons.chevron_right, color: colors.onSurfaceMuted, size: 18),
-            ],
+                Icon(
+                  Icons.chevron_right,
+                  color: colors.onSurfaceMuted,
+                  size: 18,
+                ),
+              ],
+            ),
           ),
         ),
       ),

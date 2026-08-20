@@ -406,74 +406,76 @@ class _PackagePick extends StatelessWidget {
     final colors = context.appColors;
     final typography = context.appTypography;
 
-    return Material(
-      color: selected ? colors.primaryContainer : colors.surface,
-      borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
-      child: InkWell(
-        onTap: onTap,
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.md),
+      child: Material(
+        color: selected ? colors.primaryContainer : colors.surface,
         borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
-        child: Container(
-          margin: const EdgeInsets.only(bottom: AppSpacing.md),
-          padding: const EdgeInsets.all(AppSpacing.md),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
-            border: Border.all(
-              color: selected ? colors.primary : colors.outline,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
+          child: Container(
+            padding: const EdgeInsets.all(AppSpacing.md),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
+              border: Border.all(
+                color: selected ? colors.primary : colors.outline,
+              ),
             ),
-          ),
-          child: Row(
-            children: [
-              Container(
-                width: 22,
-                height: 22,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: selected ? colors.primary : colors.outlineStrong,
-                    width: 2,
+            child: Row(
+              children: [
+                Container(
+                  width: 22,
+                  height: 22,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: selected ? colors.primary : colors.outlineStrong,
+                      width: 2,
+                    ),
+                  ),
+                  alignment: Alignment.center,
+                  child: selected
+                      ? Container(
+                          width: 10,
+                          height: 10,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: colors.primary,
+                          ),
+                        )
+                      : null,
+                ),
+                const SizedBox(width: AppSpacing.md),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        package.name,
+                        style: typography.headingSmall.copyWith(
+                          color: colors.onSurface,
+                          fontSize: 16,
+                        ),
+                      ),
+                      Text(
+                        '${package.sessionType.label} · ${package.validityDays} gün',
+                        style: typography.caption.copyWith(
+                          color: colors.onSurfaceMuted,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                alignment: Alignment.center,
-                child: selected
-                    ? Container(
-                        width: 10,
-                        height: 10,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: colors.primary,
-                        ),
-                      )
-                    : null,
-              ),
-              const SizedBox(width: AppSpacing.md),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      package.name,
-                      style: typography.headingSmall.copyWith(
-                        color: colors.onSurface,
-                        fontSize: 16,
-                      ),
-                    ),
-                    Text(
-                      '${package.sessionType.label} · ${package.validityDays} gün',
-                      style: typography.caption.copyWith(
-                        color: colors.onSurfaceMuted,
-                      ),
-                    ),
-                  ],
+                Text(
+                  '₺${package.priceTl}',
+                  style: typography.headingSmall.copyWith(
+                    color: colors.onSurfaceVariant,
+                    fontSize: 15,
+                  ),
                 ),
-              ),
-              Text(
-                '₺${package.priceTl}',
-                style: typography.headingSmall.copyWith(
-                  color: colors.onSurfaceVariant,
-                  fontSize: 15,
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

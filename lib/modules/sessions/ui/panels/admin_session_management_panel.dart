@@ -511,66 +511,71 @@ class _SessionCard extends StatelessWidget {
       ),
     };
 
-    return InkWell(
-      borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
-      onTap: onTap,
-      child: Container(
-        margin: const EdgeInsets.only(bottom: AppSpacing.md),
-        padding: const EdgeInsets.all(AppSpacing.md),
-        decoration: BoxDecoration(
-          color: colors.surface,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
-          border: Border.all(color: border),
-        ),
-        child: Row(
-          children: [
-            SizedBox(
-              width: 46,
-              child: Text(
-                slot.time,
-                style: typography.headingSmall.copyWith(
-                  color: colors.onSurface,
-                  fontSize: 15,
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.md),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.all(AppSpacing.md),
+          decoration: BoxDecoration(
+            color: colors.surface,
+            borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
+            border: Border.all(color: border),
+          ),
+          child: Row(
+            children: [
+              SizedBox(
+                width: 46,
+                child: Text(
+                  slot.time,
+                  style: typography.headingSmall.copyWith(
+                    color: colors.onSurface,
+                    fontSize: 15,
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(width: AppSpacing.sm),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    slot.title,
-                    style: typography.headingSmall.copyWith(
-                      color: colors.onSurface,
-                      fontSize: 16,
+              const SizedBox(width: AppSpacing.sm),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      slot.title,
+                      style: typography.headingSmall.copyWith(
+                        color: colors.onSurface,
+                        fontSize: 16,
+                      ),
                     ),
-                  ),
-                  Text(
-                    slot.meta,
-                    style: typography.bodyMedium.copyWith(
-                      color: colors.onSurfaceMuted,
-                      fontSize: 13,
+                    Text(
+                      slot.meta,
+                      style: typography.bodyMedium.copyWith(
+                        color: colors.onSurfaceMuted,
+                        fontSize: 13,
+                      ),
                     ),
+                  ],
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.sm,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: chipBg,
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
+                ),
+                child: Text(
+                  chipLabel,
+                  style: typography.caption.copyWith(
+                    color: chipFg,
+                    fontSize: 12,
                   ),
-                ],
+                ),
               ),
-            ),
-            Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.sm,
-                vertical: 6,
-              ),
-              decoration: BoxDecoration(
-                color: chipBg,
-                borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
-              ),
-              child: Text(
-                chipLabel,
-                style: typography.caption.copyWith(color: chipFg, fontSize: 12),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
