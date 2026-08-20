@@ -171,9 +171,12 @@ class AdminMemberDetailController extends _$AdminMemberDetailController {
       state = state.copyWith(selectedMetric: metric);
 
   /// [AdminMemberDetailPanel]'deki "Ödeme durumu" kartında bir taksite
-  /// dokunup düzenleme popup'ından "Kaydet"e basıldığında çağrılır —
-  /// Firestore'a yazar, `_latestPackageForMemberProvider` stream'i zaten
-  /// dinlendiği için state otomatik güncellenir.
+  /// dokunup düzenleme popup'ından "Kaydet"e basıldığında çağrılır.
+  /// Firestore yazımından sonra `state` doğrudan güncellenir — sadece
+  /// `_latestPackageForMemberProvider` stream'inin yeniden yayın yapmasına
+  /// güvenmek, bu ekran başka bir panelden (ör. [EditMemberPaymentPanel])
+  /// çağrıldığında geri dönülen panelin güncel veriyi göstermesi bir
+  /// sonraki manuel yenilemeye kadar gecikebiliyordu.
   Future<void> updateInstallment(
     int index, {
     required int amountTl,
@@ -191,12 +194,28 @@ class AdminMemberDetailController extends _$AdminMemberDetailController {
           dueDate: dueDate,
           paid: paid,
         );
+    final updatedInstallments = [
+      for (final installment in state.installments)
+        if (installment.index == index)
+          installment.copyWith(amountTl: amountTl, dueDate: dueDate, paid: paid)
+        else
+          installment,
+    ];
+    state = state.copyWith(
+      installments: updatedInstallments,
+      paymentPaidTl: updatedInstallments
+          .where((i) => i.paid)
+          .fold(0, (total, i) => total + i.amountTl),
+    );
   }
 
   /// [EditMemberPaymentPanel]'in "Kaydet" butonu — toplam tutarı ve tüm
   /// taksit planını değiştirir. `packageDocId` yoksa (üyenin hiç paketi
   /// yoksa) sessizce hiçbir şey yapmaz, çağıran taraf bu ekranı zaten o
-  /// durumda açmamalı.
+  /// durumda açmamalı. Firestore yazımından hemen sonra `state` doğrudan
+  /// güncellenir (bkz. [updateInstallment] üstündeki not) — geri dönülen
+  /// `AdminMemberDetailPanel` stream'in yeniden yayın yapmasını beklemeden
+  /// güncel veriyi gösterir.
   Future<void> saveInstallmentPlan({
     required int totalAmountTl,
     required List<MembershipInstallment> installments,
@@ -210,5 +229,12 @@ class AdminMemberDetailController extends _$AdminMemberDetailController {
           totalAmountTl: totalAmountTl,
           installments: installments,
         );
+    state = state.copyWith(
+      installments: installments,
+      paymentTotalTl: totalAmountTl,
+      paymentPaidTl: installments
+          .where((i) => i.paid)
+          .fold(0, (total, i) => total + i.amountTl),
+    );
   }
 }
