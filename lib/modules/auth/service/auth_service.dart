@@ -15,8 +15,12 @@ class AuthService {
   Future<void> requestLogin(String phoneDigits) async {
     final phoneNumber = '+90$phoneDigits';
     try {
-      final callable = FirebaseFunctions.instance.httpsCallable('requestCustomToken');
-      final result = await callable.call<Map<String, dynamic>>({'phoneNumber': phoneNumber});
+      final callable = FirebaseFunctions.instance.httpsCallable(
+        'requestCustomToken',
+      );
+      final result = await callable.call<Map<String, dynamic>>({
+        'phoneNumber': phoneNumber,
+      });
       final token = result.data['token'] as String;
       await FirebaseAuth.instance.signInWithCustomToken(token);
     } on FirebaseFunctionsException catch (e) {
@@ -29,9 +33,13 @@ class AuthService {
   }
 
   Future<void> deleteAccount() async {
-    await FirebaseFunctions.instance.httpsCallable('deleteAccount').call<void>();
+    await FirebaseFunctions.instance
+        .httpsCallable('deleteAccount')
+        .call<void>();
     await FirebaseAuth.instance.signOut();
   }
+
+  Future<void> signOut() => FirebaseAuth.instance.signOut();
 
   AuthLoginErrorReason _reasonForCode(String code) {
     switch (code) {

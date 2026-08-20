@@ -21,8 +21,11 @@ mixin _$NewMembershipState {
   DateTime get startDate => throw _privateConstructorUsedError;
   DateTime get endDate => throw _privateConstructorUsedError;
   int get makeupSessions => throw _privateConstructorUsedError;
-  int get paidAmount => throw _privateConstructorUsedError;
-  String? get otherAmountDraft => throw _privateConstructorUsedError;
+  int get totalAmountTl => throw _privateConstructorUsedError;
+  List<MembershipInstallment> get installments =>
+      throw _privateConstructorUsedError;
+  bool get isSaving => throw _privateConstructorUsedError;
+  String? get errorMessage => throw _privateConstructorUsedError;
 
   /// Create a copy of NewMembershipState
   /// with the given fields replaced by the non-null parameter values.
@@ -43,8 +46,10 @@ abstract class $NewMembershipStateCopyWith<$Res> {
     DateTime startDate,
     DateTime endDate,
     int makeupSessions,
-    int paidAmount,
-    String? otherAmountDraft,
+    int totalAmountTl,
+    List<MembershipInstallment> installments,
+    bool isSaving,
+    String? errorMessage,
   });
 
   $StudioPackageCopyWith<$Res>? get selectedPackage;
@@ -69,8 +74,10 @@ class _$NewMembershipStateCopyWithImpl<$Res, $Val extends NewMembershipState>
     Object? startDate = null,
     Object? endDate = null,
     Object? makeupSessions = null,
-    Object? paidAmount = null,
-    Object? otherAmountDraft = freezed,
+    Object? totalAmountTl = null,
+    Object? installments = null,
+    Object? isSaving = null,
+    Object? errorMessage = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -90,13 +97,21 @@ class _$NewMembershipStateCopyWithImpl<$Res, $Val extends NewMembershipState>
                 ? _value.makeupSessions
                 : makeupSessions // ignore: cast_nullable_to_non_nullable
                       as int,
-            paidAmount: null == paidAmount
-                ? _value.paidAmount
-                : paidAmount // ignore: cast_nullable_to_non_nullable
+            totalAmountTl: null == totalAmountTl
+                ? _value.totalAmountTl
+                : totalAmountTl // ignore: cast_nullable_to_non_nullable
                       as int,
-            otherAmountDraft: freezed == otherAmountDraft
-                ? _value.otherAmountDraft
-                : otherAmountDraft // ignore: cast_nullable_to_non_nullable
+            installments: null == installments
+                ? _value.installments
+                : installments // ignore: cast_nullable_to_non_nullable
+                      as List<MembershipInstallment>,
+            isSaving: null == isSaving
+                ? _value.isSaving
+                : isSaving // ignore: cast_nullable_to_non_nullable
+                      as bool,
+            errorMessage: freezed == errorMessage
+                ? _value.errorMessage
+                : errorMessage // ignore: cast_nullable_to_non_nullable
                       as String?,
           )
           as $Val,
@@ -132,8 +147,10 @@ abstract class _$$NewMembershipStateImplCopyWith<$Res>
     DateTime startDate,
     DateTime endDate,
     int makeupSessions,
-    int paidAmount,
-    String? otherAmountDraft,
+    int totalAmountTl,
+    List<MembershipInstallment> installments,
+    bool isSaving,
+    String? errorMessage,
   });
 
   @override
@@ -158,8 +175,10 @@ class __$$NewMembershipStateImplCopyWithImpl<$Res>
     Object? startDate = null,
     Object? endDate = null,
     Object? makeupSessions = null,
-    Object? paidAmount = null,
-    Object? otherAmountDraft = freezed,
+    Object? totalAmountTl = null,
+    Object? installments = null,
+    Object? isSaving = null,
+    Object? errorMessage = freezed,
   }) {
     return _then(
       _$NewMembershipStateImpl(
@@ -179,13 +198,21 @@ class __$$NewMembershipStateImplCopyWithImpl<$Res>
             ? _value.makeupSessions
             : makeupSessions // ignore: cast_nullable_to_non_nullable
                   as int,
-        paidAmount: null == paidAmount
-            ? _value.paidAmount
-            : paidAmount // ignore: cast_nullable_to_non_nullable
+        totalAmountTl: null == totalAmountTl
+            ? _value.totalAmountTl
+            : totalAmountTl // ignore: cast_nullable_to_non_nullable
                   as int,
-        otherAmountDraft: freezed == otherAmountDraft
-            ? _value.otherAmountDraft
-            : otherAmountDraft // ignore: cast_nullable_to_non_nullable
+        installments: null == installments
+            ? _value._installments
+            : installments // ignore: cast_nullable_to_non_nullable
+                  as List<MembershipInstallment>,
+        isSaving: null == isSaving
+            ? _value.isSaving
+            : isSaving // ignore: cast_nullable_to_non_nullable
+                  as bool,
+        errorMessage: freezed == errorMessage
+            ? _value.errorMessage
+            : errorMessage // ignore: cast_nullable_to_non_nullable
                   as String?,
       ),
     );
@@ -200,9 +227,12 @@ class _$NewMembershipStateImpl extends _NewMembershipState {
     required this.startDate,
     required this.endDate,
     required this.makeupSessions,
-    required this.paidAmount,
-    this.otherAmountDraft,
-  }) : super._();
+    required this.totalAmountTl,
+    required final List<MembershipInstallment> installments,
+    this.isSaving = false,
+    this.errorMessage,
+  }) : _installments = installments,
+       super._();
 
   @override
   final StudioPackage? selectedPackage;
@@ -213,13 +243,24 @@ class _$NewMembershipStateImpl extends _NewMembershipState {
   @override
   final int makeupSessions;
   @override
-  final int paidAmount;
+  final int totalAmountTl;
+  final List<MembershipInstallment> _installments;
   @override
-  final String? otherAmountDraft;
+  List<MembershipInstallment> get installments {
+    if (_installments is EqualUnmodifiableListView) return _installments;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_installments);
+  }
+
+  @override
+  @JsonKey()
+  final bool isSaving;
+  @override
+  final String? errorMessage;
 
   @override
   String toString() {
-    return 'NewMembershipState(selectedPackage: $selectedPackage, startDate: $startDate, endDate: $endDate, makeupSessions: $makeupSessions, paidAmount: $paidAmount, otherAmountDraft: $otherAmountDraft)';
+    return 'NewMembershipState(selectedPackage: $selectedPackage, startDate: $startDate, endDate: $endDate, makeupSessions: $makeupSessions, totalAmountTl: $totalAmountTl, installments: $installments, isSaving: $isSaving, errorMessage: $errorMessage)';
   }
 
   @override
@@ -234,10 +275,16 @@ class _$NewMembershipStateImpl extends _NewMembershipState {
             (identical(other.endDate, endDate) || other.endDate == endDate) &&
             (identical(other.makeupSessions, makeupSessions) ||
                 other.makeupSessions == makeupSessions) &&
-            (identical(other.paidAmount, paidAmount) ||
-                other.paidAmount == paidAmount) &&
-            (identical(other.otherAmountDraft, otherAmountDraft) ||
-                other.otherAmountDraft == otherAmountDraft));
+            (identical(other.totalAmountTl, totalAmountTl) ||
+                other.totalAmountTl == totalAmountTl) &&
+            const DeepCollectionEquality().equals(
+              other._installments,
+              _installments,
+            ) &&
+            (identical(other.isSaving, isSaving) ||
+                other.isSaving == isSaving) &&
+            (identical(other.errorMessage, errorMessage) ||
+                other.errorMessage == errorMessage));
   }
 
   @override
@@ -247,8 +294,10 @@ class _$NewMembershipStateImpl extends _NewMembershipState {
     startDate,
     endDate,
     makeupSessions,
-    paidAmount,
-    otherAmountDraft,
+    totalAmountTl,
+    const DeepCollectionEquality().hash(_installments),
+    isSaving,
+    errorMessage,
   );
 
   /// Create a copy of NewMembershipState
@@ -269,8 +318,10 @@ abstract class _NewMembershipState extends NewMembershipState {
     required final DateTime startDate,
     required final DateTime endDate,
     required final int makeupSessions,
-    required final int paidAmount,
-    final String? otherAmountDraft,
+    required final int totalAmountTl,
+    required final List<MembershipInstallment> installments,
+    final bool isSaving,
+    final String? errorMessage,
   }) = _$NewMembershipStateImpl;
   const _NewMembershipState._() : super._();
 
@@ -283,9 +334,13 @@ abstract class _NewMembershipState extends NewMembershipState {
   @override
   int get makeupSessions;
   @override
-  int get paidAmount;
+  int get totalAmountTl;
   @override
-  String? get otherAmountDraft;
+  List<MembershipInstallment> get installments;
+  @override
+  bool get isSaving;
+  @override
+  String? get errorMessage;
 
   /// Create a copy of NewMembershipState
   /// with the given fields replaced by the non-null parameter values.

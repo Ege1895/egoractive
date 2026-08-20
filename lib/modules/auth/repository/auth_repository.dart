@@ -7,6 +7,7 @@ part 'auth_repository.g.dart';
 abstract interface class AuthRepository {
   Future<void> login(String phoneDigits);
   Future<void> deleteAccount();
+  Future<void> signOut();
 }
 
 class AuthRepositoryImpl implements AuthRepository {
@@ -19,6 +20,9 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<void> deleteAccount() => _service.deleteAccount();
+
+  @override
+  Future<void> signOut() => _service.signOut();
 }
 
 @riverpod

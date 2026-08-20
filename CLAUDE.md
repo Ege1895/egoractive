@@ -215,8 +215,8 @@ functions/                # Cloud Functions (TypeScript)
 
 ## graphify
 
-Bu projede `graphify-out/graph.json` mevcut. Kod tabanı, mimari veya dosyalar arası ilişkilerle ilgili herhangi bir soruda:
-- ÖNCE `graphify query "<soru>"` çalıştır (geniş bağlam için), gerekirse `graphify path "A" "B"` (iki kavram arası yol) veya `graphify explain "X"` (bir node'un açıklaması) kullan.
-- Ham dosyaları `grep`/`find`/`Read` ile taramadan ÖNCE bunu dene — token tasarrufu sağlar.
-- Sadece grafik sorgusu yetersiz kalırsa (çok spesifik bir satır, güncel olmayan bir alan vb.) ham dosyaya dön.
-- Kod önemli ölçüde değiştiyse `/graphify . --update` ile grafiği güncelle (tam yeniden taramadan çok daha ucuz).
+Bu projede `graphify-out/graph.json` mevcut ve **kurulu** (`~/.local/bin/graphify`). Kod tabanı, mimari veya dosyalar arası ilişkilerle ilgili herhangi bir soruda — yeni bir görev/oturuma başlarken "önce kodu okuyup anlamaya çalışayım" refleksi yerine:
+- ÖNCE `graphify query "<soru>"` çalıştır (geniş bağlam için), gerekirse `graphify path "A" "B"` (iki kavram arası yol) veya `graphify explain "X"` (bir node'un açıklaması) kullan. Bu, ham dosyaları `grep`/`find`/`Read` ile taramaktan veya bir Explore/general-purpose agent'ı keşif için başlatmaktan ÖNCE denenmeli — token tasarrufu asıl buradan gelir.
+- Sadece grafik sorgusu yetersiz kalırsa (çok spesifik bir satır, güncel olmayan bir alan, henüz grafiğe girmemiş yeni bir dosya vb.) ham dosyaya/agent'a dön.
+- Kod önemli ölçüde değiştiyse `graphify update` çalıştırılan dizindeki grafiği günceller (tam yeniden taramadan çok daha ucuz).
+- **Tarama kökü `lib/`'dir, proje kökü DEĞİL** — `graphify-out/.graphify_root` `lib`'e ayarlı. Proje kökünde (`.`) tam taramaya ASLA dönme: `ios/Pods`, `functions/lib`, `functions/node_modules`, `android` gibi vendored/derlenmiş klasörler `.gitignore`'da olmadığı için taramaya girip 7000+ dosyaya şişiriyor (bir kere yaşandı, `lib/`e daraltılarak düzeltildi — 429 kod dosyası, 0 LLM token). Cloud Functions kaynak kodunu (`functions/src/`) sorgulaman gerekirse ayrı bir `graphify extract functions/src` + `graphify merge-graphs` gerekir, henüz kurulmadı.

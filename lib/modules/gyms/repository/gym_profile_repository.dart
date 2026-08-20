@@ -6,7 +6,9 @@ import '../service/gym_profile_service.dart';
 part 'gym_profile_repository.g.dart';
 
 abstract interface class GymProfileRepository {
-  GymProfile loadProfile();
+  Stream<GymProfile> watchProfile(String gymId);
+
+  Future<void> saveProfile(String gymId, GymProfile profile);
 }
 
 class GymProfileRepositoryImpl implements GymProfileRepository {
@@ -15,7 +17,11 @@ class GymProfileRepositoryImpl implements GymProfileRepository {
   final GymProfileService _service;
 
   @override
-  GymProfile loadProfile() => _service.loadProfile();
+  Stream<GymProfile> watchProfile(String gymId) => _service.watchProfile(gymId);
+
+  @override
+  Future<void> saveProfile(String gymId, GymProfile profile) =>
+      _service.saveProfile(gymId, profile);
 }
 
 @riverpod

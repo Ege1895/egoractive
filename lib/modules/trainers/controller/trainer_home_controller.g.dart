@@ -327,7 +327,7 @@ class _PendingConfirmationsForTrainerProviderElement
 }
 
 String _$trainerHomeControllerHash() =>
-    r'5826ddf0c8eca3009724742dbc238e7aebb16039';
+    r'1591fa3585d0a120c6936f0073229bff60f431fa';
 
 /// F3-3/F3-5 — antrenörün "Bugünkü program"ı ve onay bekleyen seansları
 /// gerçek zamanlı `sessions` koleksiyonundan (trainerId == kendi uid'si)

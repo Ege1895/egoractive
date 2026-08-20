@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
+import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_back_button.dart';
 import '../../../../shared/widgets/app_button.dart';
@@ -38,17 +39,78 @@ class SessionCompletionPanel extends BasePanel {
   final String? memberId;
 
   @override
-  ConsumerState<SessionCompletionPanel> createState() => _SessionCompletionPanelState();
+  ConsumerState<SessionCompletionPanel> createState() =>
+      _SessionCompletionPanelState();
 }
 
-class _SessionCompletionPanelState extends BasePanelState<SessionCompletionPanel> {
+class _SessionCompletionPanelState
+    extends BasePanelState<SessionCompletionPanel> {
   _CompletionAnswer _answer = _CompletionAnswer.pending;
+  bool _isSubmitting = false;
+  String? _errorMessage;
+
+  Future<void> _markCompleted() async {
+    final sessionId = widget.sessionId;
+    final memberId = widget.memberId;
+    setState(() {
+      _isSubmitting = true;
+      _errorMessage = null;
+    });
+    try {
+      if (sessionId != null && memberId != null) {
+        await ref
+            .read(sessionCompletionServiceProvider)
+            .markCompleted(sessionId: sessionId, memberId: memberId);
+      }
+      if (mounted) setState(() => _answer = _CompletionAnswer.done);
+    } catch (_) {
+      if (mounted) {
+        setState(
+          () => _errorMessage = ref.read(
+            rcTextProvider(RemoteConfigKeys.sessionsCompletionConfirmError),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isSubmitting = false);
+    }
+  }
+
+  Future<void> _markAbsent() async {
+    final sessionId = widget.sessionId;
+    final memberId = widget.memberId;
+    setState(() {
+      _isSubmitting = true;
+      _errorMessage = null;
+    });
+    try {
+      if (sessionId != null && memberId != null) {
+        await ref
+            .read(sessionCompletionServiceProvider)
+            .markAbsent(sessionId: sessionId, memberId: memberId);
+      }
+      if (mounted) setState(() => _answer = _CompletionAnswer.absent);
+    } catch (_) {
+      if (mounted) {
+        setState(
+          () => _errorMessage = ref.read(
+            rcTextProvider(RemoteConfigKeys.sessionsCompletionConfirmError),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isSubmitting = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
     final typography = context.appTypography;
-    final remainingAfter = (widget.remainingBefore - 1).clamp(0, widget.remainingBefore);
+    final remainingAfter = (widget.remainingBefore - 1).clamp(
+      0,
+      widget.remainingBefore,
+    );
 
     return Scaffold(
       body: SafeArea(
@@ -56,12 +118,28 @@ class _SessionCompletionPanelState extends BasePanelState<SessionCompletionPanel
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.md, AppSpacing.screenEdge, 0),
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.screenEdge,
+                AppSpacing.md,
+                AppSpacing.screenEdge,
+                0,
+              ),
               child: Row(
                 children: [
-                  AppBackButton(onTap: () => ref.read(panelStackControllerProvider.notifier).pop()),
+                  AppBackButton(
+                    onTap: () =>
+                        ref.read(panelStackControllerProvider.notifier).pop(),
+                  ),
                   const SizedBox(width: AppSpacing.md),
-                  Text('Seans onayı', style: typography.headingSmall.copyWith(color: colors.onSurface, fontSize: 18)),
+                  Text(
+                    ref.watch(
+                      rcTextProvider(RemoteConfigKeys.sessionsCompletionTitle),
+                    ),
+                    style: typography.headingSmall.copyWith(
+                      color: colors.onSurface,
+                      fontSize: 18,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -81,44 +159,88 @@ class _SessionCompletionPanelState extends BasePanelState<SessionCompletionPanel
                       padding: const EdgeInsets.all(AppSpacing.xl),
                       decoration: BoxDecoration(
                         color: colors.surface,
-                        borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
+                        borderRadius: BorderRadius.circular(
+                          AppSpacing.radiusCard,
+                        ),
                         border: Border.all(color: colors.outline),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            '${widget.time} ${widget.memberName} seansını tamamladınız mı?',
-                            style: typography.headingMedium.copyWith(color: colors.onSurface, fontSize: 26),
+                            ref
+                                .watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys.sessionsCompletionQuestion,
+                                  ),
+                                )
+                                .replaceAll('{time}', widget.time)
+                                .replaceAll('{name}', widget.memberName),
+                            style: typography.headingMedium.copyWith(
+                              color: colors.onSurface,
+                              fontSize: 26,
+                            ),
                           ),
                           const SizedBox(height: AppSpacing.lg),
                           Container(
                             padding: const EdgeInsets.all(AppSpacing.md),
                             decoration: BoxDecoration(
                               color: colors.surfaceRaised,
-                              borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+                              borderRadius: BorderRadius.circular(
+                                AppSpacing.radiusInner,
+                              ),
                             ),
                             child: Row(
                               children: [
                                 Container(
                                   width: 44,
                                   height: 44,
-                                  decoration: BoxDecoration(color: colors.primaryContainer, shape: BoxShape.circle),
+                                  decoration: BoxDecoration(
+                                    color: colors.primaryContainer,
+                                    shape: BoxShape.circle,
+                                  ),
                                   alignment: Alignment.center,
                                   child: Text(
                                     widget.memberInitials,
-                                    style: typography.headingSmall.copyWith(color: colors.onPrimaryContainer, fontSize: 15),
+                                    style: typography.headingSmall.copyWith(
+                                      color: colors.onPrimaryContainer,
+                                      fontSize: 15,
+                                    ),
                                   ),
                                 ),
                                 const SizedBox(width: AppSpacing.md),
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-                                      Text(widget.meta, style: typography.headingSmall.copyWith(color: colors.onSurface, fontSize: 16)),
                                       Text(
-                                        'Onaylarsanız kalan dersi ${widget.remainingBefore}\'dan $remainingAfter\'e düşer',
-                                        style: typography.bodyMedium.copyWith(color: colors.onSurfaceVariant, fontSize: 13),
+                                        widget.meta,
+                                        style: typography.headingSmall.copyWith(
+                                          color: colors.onSurface,
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                      Text(
+                                        ref
+                                            .watch(
+                                              rcTextProvider(
+                                                RemoteConfigKeys
+                                                    .sessionsCompletionSummary,
+                                              ),
+                                            )
+                                            .replaceAll(
+                                              '{before}',
+                                              '${widget.remainingBefore}',
+                                            )
+                                            .replaceAll(
+                                              '{after}',
+                                              '$remainingAfter',
+                                            ),
+                                        style: typography.bodyMedium.copyWith(
+                                          color: colors.onSurfaceVariant,
+                                          fontSize: 13,
+                                        ),
                                       ),
                                     ],
                                   ),
@@ -131,46 +253,71 @@ class _SessionCompletionPanelState extends BasePanelState<SessionCompletionPanel
                     ),
                     const SizedBox(height: AppSpacing.lg),
                     if (_answer == _CompletionAnswer.pending) ...[
+                      if (_errorMessage != null) ...[
+                        Text(
+                          _errorMessage!,
+                          textAlign: TextAlign.center,
+                          style: typography.bodyMedium.copyWith(
+                            color: colors.error,
+                            fontSize: 13,
+                          ),
+                        ),
+                        const SizedBox(height: AppSpacing.sm),
+                      ],
                       AppButton(
-                        label: 'Tamamlandı',
-                        onPressed: () async {
-                          final sessionId = widget.sessionId;
-                          final memberId = widget.memberId;
-                          if (sessionId != null && memberId != null) {
-                            await ref
-                                .read(sessionCompletionServiceProvider)
-                                .markCompleted(sessionId: sessionId, memberId: memberId);
-                          }
-                          if (mounted) setState(() => _answer = _CompletionAnswer.done);
-                        },
+                        label: _isSubmitting
+                            ? ref.watch(
+                                rcTextProvider(
+                                  RemoteConfigKeys.gymsGymSetupSubmittingLabel,
+                                ),
+                              )
+                            : ref.watch(
+                                rcTextProvider(
+                                  RemoteConfigKeys.commonTamamlandi,
+                                ),
+                              ),
+                        onPressed: _isSubmitting ? null : _markCompleted,
                       ),
                       const SizedBox(height: AppSpacing.sm),
                       AppButton(
-                        label: 'Üye gelmedi',
+                        label: ref.watch(
+                          rcTextProvider(
+                            RemoteConfigKeys
+                                .sessionsCompletionMemberNoShowOption,
+                          ),
+                        ),
                         variant: AppButtonVariant.secondary,
-                        onPressed: () async {
-                          final sessionId = widget.sessionId;
-                          if (sessionId != null) {
-                            await ref.read(sessionCompletionServiceProvider).markAbsent(sessionId);
-                          }
-                          if (mounted) setState(() => _answer = _CompletionAnswer.absent);
-                        },
+                        onPressed: _isSubmitting ? null : _markAbsent,
                       ),
                       const SizedBox(height: AppSpacing.sm),
                       Text(
-                        'Onayı 24 saat içinde verebilirsiniz, sonrasında yönetici onayı gerekir.',
+                        ref.watch(
+                          rcTextProvider(
+                            RemoteConfigKeys.sessionsCompletionTimeLimitNote,
+                          ),
+                        ),
                         textAlign: TextAlign.center,
-                        style: typography.caption.copyWith(color: colors.onSurfaceMuted),
+                        style: typography.caption.copyWith(
+                          color: colors.onSurfaceMuted,
+                        ),
                       ),
                     ] else ...[
                       Container(
                         width: double.infinity,
                         padding: const EdgeInsets.all(AppSpacing.lg),
                         decoration: BoxDecoration(
-                          color: _answer == _CompletionAnswer.done ? colors.successContainer : colors.warningContainer,
-                          borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
+                          color: _answer == _CompletionAnswer.done
+                              ? colors.successContainer
+                              : colors.warningContainer,
+                          borderRadius: BorderRadius.circular(
+                            AppSpacing.radiusCard,
+                          ),
                           border: Border.all(
-                            color: (_answer == _CompletionAnswer.done ? colors.success : colors.warning).withValues(alpha: 0.32),
+                            color:
+                                (_answer == _CompletionAnswer.done
+                                        ? colors.success
+                                        : colors.warning)
+                                    .withValues(alpha: 0.32),
                           ),
                         ),
                         child: Row(
@@ -180,13 +327,18 @@ class _SessionCompletionPanelState extends BasePanelState<SessionCompletionPanel
                               width: 26,
                               height: 26,
                               decoration: BoxDecoration(
-                                color: _answer == _CompletionAnswer.done ? colors.success : colors.warning,
+                                color: _answer == _CompletionAnswer.done
+                                    ? colors.success
+                                    : colors.warning,
                                 shape: BoxShape.circle,
                               ),
                               alignment: Alignment.center,
                               child: Text(
                                 _answer == _CompletionAnswer.done ? '✓' : '–',
-                                style: typography.headingSmall.copyWith(color: colors.background, fontSize: 14),
+                                style: typography.headingSmall.copyWith(
+                                  color: colors.background,
+                                  fontSize: 14,
+                                ),
                               ),
                             ),
                             const SizedBox(width: AppSpacing.md),
@@ -195,18 +347,58 @@ class _SessionCompletionPanelState extends BasePanelState<SessionCompletionPanel
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    _answer == _CompletionAnswer.done ? 'Ders tamamlandı işaretlendi' : 'Üye gelmedi olarak işaretlendi',
+                                    _answer == _CompletionAnswer.done
+                                        ? ref.watch(
+                                            rcTextProvider(
+                                              RemoteConfigKeys
+                                                  .sessionsCompletionDoneMarked,
+                                            ),
+                                          )
+                                        : ref.watch(
+                                            rcTextProvider(
+                                              RemoteConfigKeys
+                                                  .sessionsCompletionAbsentMarked,
+                                            ),
+                                          ),
                                     style: typography.headingSmall.copyWith(
-                                      color: _answer == _CompletionAnswer.done ? colors.onSuccessContainer : colors.onWarningContainer,
+                                      color: _answer == _CompletionAnswer.done
+                                          ? colors.onSuccessContainer
+                                          : colors.onWarningContainer,
                                       fontSize: 16,
                                     ),
                                   ),
                                   const SizedBox(height: AppSpacing.xs),
                                   Text(
                                     _answer == _CompletionAnswer.done
-                                        ? '${widget.memberName}\'ın kalan dersi $remainingAfter\'e düştü.'
-                                        : '${widget.memberName}\'ın kalan dersi düşmedi, yöneticiye iletildi.',
-                                    style: typography.bodyMedium.copyWith(color: colors.onSurfaceVariant),
+                                        ? ref
+                                              .watch(
+                                                rcTextProvider(
+                                                  RemoteConfigKeys
+                                                      .sessionsCompletionDoneSummary,
+                                                ),
+                                              )
+                                              .replaceAll(
+                                                '{name}',
+                                                widget.memberName,
+                                              )
+                                              .replaceAll(
+                                                '{after}',
+                                                '$remainingAfter',
+                                              )
+                                        : ref
+                                              .watch(
+                                                rcTextProvider(
+                                                  RemoteConfigKeys
+                                                      .sessionsCompletionAbsentSummary,
+                                                ),
+                                              )
+                                              .replaceAll(
+                                                '{name}',
+                                                widget.memberName,
+                                              ),
+                                    style: typography.bodyMedium.copyWith(
+                                      color: colors.onSurfaceVariant,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -215,11 +407,37 @@ class _SessionCompletionPanelState extends BasePanelState<SessionCompletionPanel
                         ),
                       ),
                       const SizedBox(height: AppSpacing.md),
-                      AppButton(
-                        label: 'Geri al',
-                        variant: AppButtonVariant.secondary,
-                        onPressed: () => setState(() => _answer = _CompletionAnswer.pending),
-                      ),
+                      if (widget.sessionId != null) ...[
+                        // Onay zaten Firestore'a yazıldı (remainingSessions
+                        // transaction içinde düşürüldü) — "Geri al" bu
+                        // yazımı geri almadan yalnızca local state'i
+                        // sıfırlarsa, kullanıcı tekrar onaylayınca kalan
+                        // ders sayısı iki kez düşer. Gerçek bir compensating
+                        // write olmadığı için yeniden gönderim tamamen
+                        // engelleniyor.
+                        AppButton(
+                          label: ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.gymsPermissionsDoneButton,
+                            ),
+                          ),
+                          variant: AppButtonVariant.secondary,
+                          onPressed: () => ref
+                              .read(panelStackControllerProvider.notifier)
+                              .pop(),
+                        ),
+                      ] else
+                        AppButton(
+                          label: ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.sessionsCompletionUndoButton,
+                            ),
+                          ),
+                          variant: AppButtonVariant.secondary,
+                          onPressed: () => setState(
+                            () => _answer = _CompletionAnswer.pending,
+                          ),
+                        ),
                     ],
                   ],
                 ),

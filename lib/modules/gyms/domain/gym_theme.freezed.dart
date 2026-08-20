@@ -230,6 +230,7 @@ mixin _$GymThemeState {
   List<GymTheme> get themes => throw _privateConstructorUsedError;
   String get activeThemeId => throw _privateConstructorUsedError;
   bool get watermarkEnabled => throw _privateConstructorUsedError;
+  String? get errorMessage => throw _privateConstructorUsedError;
 
   /// Create a copy of GymThemeState
   /// with the given fields replaced by the non-null parameter values.
@@ -249,6 +250,7 @@ abstract class $GymThemeStateCopyWith<$Res> {
     List<GymTheme> themes,
     String activeThemeId,
     bool watermarkEnabled,
+    String? errorMessage,
   });
 }
 
@@ -270,6 +272,7 @@ class _$GymThemeStateCopyWithImpl<$Res, $Val extends GymThemeState>
     Object? themes = null,
     Object? activeThemeId = null,
     Object? watermarkEnabled = null,
+    Object? errorMessage = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -285,6 +288,10 @@ class _$GymThemeStateCopyWithImpl<$Res, $Val extends GymThemeState>
                 ? _value.watermarkEnabled
                 : watermarkEnabled // ignore: cast_nullable_to_non_nullable
                       as bool,
+            errorMessage: freezed == errorMessage
+                ? _value.errorMessage
+                : errorMessage // ignore: cast_nullable_to_non_nullable
+                      as String?,
           )
           as $Val,
     );
@@ -304,6 +311,7 @@ abstract class _$$GymThemeStateImplCopyWith<$Res>
     List<GymTheme> themes,
     String activeThemeId,
     bool watermarkEnabled,
+    String? errorMessage,
   });
 }
 
@@ -324,6 +332,7 @@ class __$$GymThemeStateImplCopyWithImpl<$Res>
     Object? themes = null,
     Object? activeThemeId = null,
     Object? watermarkEnabled = null,
+    Object? errorMessage = freezed,
   }) {
     return _then(
       _$GymThemeStateImpl(
@@ -339,6 +348,10 @@ class __$$GymThemeStateImplCopyWithImpl<$Res>
             ? _value.watermarkEnabled
             : watermarkEnabled // ignore: cast_nullable_to_non_nullable
                   as bool,
+        errorMessage: freezed == errorMessage
+            ? _value.errorMessage
+            : errorMessage // ignore: cast_nullable_to_non_nullable
+                  as String?,
       ),
     );
   }
@@ -351,6 +364,7 @@ class _$GymThemeStateImpl implements _GymThemeState {
     required final List<GymTheme> themes,
     required this.activeThemeId,
     this.watermarkEnabled = true,
+    this.errorMessage,
   }) : _themes = themes;
 
   final List<GymTheme> _themes;
@@ -366,10 +380,12 @@ class _$GymThemeStateImpl implements _GymThemeState {
   @override
   @JsonKey()
   final bool watermarkEnabled;
+  @override
+  final String? errorMessage;
 
   @override
   String toString() {
-    return 'GymThemeState(themes: $themes, activeThemeId: $activeThemeId, watermarkEnabled: $watermarkEnabled)';
+    return 'GymThemeState(themes: $themes, activeThemeId: $activeThemeId, watermarkEnabled: $watermarkEnabled, errorMessage: $errorMessage)';
   }
 
   @override
@@ -381,7 +397,9 @@ class _$GymThemeStateImpl implements _GymThemeState {
             (identical(other.activeThemeId, activeThemeId) ||
                 other.activeThemeId == activeThemeId) &&
             (identical(other.watermarkEnabled, watermarkEnabled) ||
-                other.watermarkEnabled == watermarkEnabled));
+                other.watermarkEnabled == watermarkEnabled) &&
+            (identical(other.errorMessage, errorMessage) ||
+                other.errorMessage == errorMessage));
   }
 
   @override
@@ -390,6 +408,7 @@ class _$GymThemeStateImpl implements _GymThemeState {
     const DeepCollectionEquality().hash(_themes),
     activeThemeId,
     watermarkEnabled,
+    errorMessage,
   );
 
   /// Create a copy of GymThemeState
@@ -406,6 +425,7 @@ abstract class _GymThemeState implements GymThemeState {
     required final List<GymTheme> themes,
     required final String activeThemeId,
     final bool watermarkEnabled,
+    final String? errorMessage,
   }) = _$GymThemeStateImpl;
 
   @override
@@ -414,6 +434,8 @@ abstract class _GymThemeState implements GymThemeState {
   String get activeThemeId;
   @override
   bool get watermarkEnabled;
+  @override
+  String? get errorMessage;
 
   /// Create a copy of GymThemeState
   /// with the given fields replaced by the non-null parameter values.

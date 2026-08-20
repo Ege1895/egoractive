@@ -8,8 +8,18 @@ import '../repository/gym_events_repository.dart';
 part 'gym_events_controller.g.dart';
 
 const _monthAbbrev = {
-  1: 'Oca', 2: 'Şub', 3: 'Mar', 4: 'Nis', 5: 'May', 6: 'Haz',
-  7: 'Tem', 8: 'Ağu', 9: 'Eyl', 10: 'Eki', 11: 'Kas', 12: 'Ara',
+  1: 'Oca',
+  2: 'Şub',
+  3: 'Mar',
+  4: 'Nis',
+  5: 'May',
+  6: 'Haz',
+  7: 'Tem',
+  8: 'Ağu',
+  9: 'Eyl',
+  10: 'Eki',
+  11: 'Kas',
+  12: 'Ara',
 };
 
 @riverpod
@@ -27,8 +37,11 @@ Stream<List<GymEvent>> _eventsForGym(_EventsForGymRef ref, String gymId) {
 GymEvent _toGymEvent(QueryDocumentSnapshot<Map<String, dynamic>> doc) {
   final data = doc.data();
   final dateTime = (data['dateTime'] as Timestamp).toDate();
-  final time = '${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
-  final attendeeIds = List<String>.from(data['attendeeIds'] as List? ?? const []);
+  final time =
+      '${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
+  final attendeeIds = List<String>.from(
+    data['attendeeIds'] as List? ?? const [],
+  );
   return GymEvent(
     id: doc.id,
     name: (data['name'] as String?) ?? '',
@@ -46,8 +59,16 @@ GymEvent _toGymEvent(QueryDocumentSnapshot<Map<String, dynamic>> doc) {
 class GymEventsController extends _$GymEventsController {
   @override
   List<GymEvent> build() {
-    final gymId = ref.watch(activeGymIdProvider).valueOrNull;
-    if (gymId == null) return ref.watch(gymEventsRepositoryProvider).loadEvents();
+    final gymIdAsync = ref.watch(activeGymIdProvider);
+    // activeGymIdProvider ilk izlendiğinde henüz sonuçlanmamış olabilir —
+    // bu durum "gerçekten salon yok" ile aynı değil; o ana kadar mock'a
+    // düşülürse admin panelinde bir an sahte etkinlik/katılımcı sayısı
+    // gerçekmiş gibi görünür.
+    if (gymIdAsync.isLoading) return const [];
+    final gymId = gymIdAsync.valueOrNull;
+    if (gymId == null) {
+      return ref.watch(gymEventsRepositoryProvider).loadEvents();
+    }
     return ref.watch(_eventsForGymProvider(gymId)).valueOrNull ?? const [];
   }
 }

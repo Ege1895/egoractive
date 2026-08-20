@@ -22,6 +22,7 @@ mixin _$AdminSessionSlot {
   String get title => throw _privateConstructorUsedError;
   String get meta => throw _privateConstructorUsedError;
   AdminSessionState get state => throw _privateConstructorUsedError;
+  String get memberId => throw _privateConstructorUsedError;
 
   /// Create a copy of AdminSessionSlot
   /// with the given fields replaced by the non-null parameter values.
@@ -43,6 +44,7 @@ abstract class $AdminSessionSlotCopyWith<$Res> {
     String title,
     String meta,
     AdminSessionState state,
+    String memberId,
   });
 }
 
@@ -66,6 +68,7 @@ class _$AdminSessionSlotCopyWithImpl<$Res, $Val extends AdminSessionSlot>
     Object? title = null,
     Object? meta = null,
     Object? state = null,
+    Object? memberId = null,
   }) {
     return _then(
       _value.copyWith(
@@ -89,6 +92,10 @@ class _$AdminSessionSlotCopyWithImpl<$Res, $Val extends AdminSessionSlot>
                 ? _value.state
                 : state // ignore: cast_nullable_to_non_nullable
                       as AdminSessionState,
+            memberId: null == memberId
+                ? _value.memberId
+                : memberId // ignore: cast_nullable_to_non_nullable
+                      as String,
           )
           as $Val,
     );
@@ -110,6 +117,7 @@ abstract class _$$AdminSessionSlotImplCopyWith<$Res>
     String title,
     String meta,
     AdminSessionState state,
+    String memberId,
   });
 }
 
@@ -132,6 +140,7 @@ class __$$AdminSessionSlotImplCopyWithImpl<$Res>
     Object? title = null,
     Object? meta = null,
     Object? state = null,
+    Object? memberId = null,
   }) {
     return _then(
       _$AdminSessionSlotImpl(
@@ -155,6 +164,10 @@ class __$$AdminSessionSlotImplCopyWithImpl<$Res>
             ? _value.state
             : state // ignore: cast_nullable_to_non_nullable
                   as AdminSessionState,
+        memberId: null == memberId
+            ? _value.memberId
+            : memberId // ignore: cast_nullable_to_non_nullable
+                  as String,
       ),
     );
   }
@@ -169,6 +182,7 @@ class _$AdminSessionSlotImpl implements _AdminSessionSlot {
     required this.title,
     required this.meta,
     required this.state,
+    this.memberId = '',
   });
 
   @override
@@ -181,10 +195,13 @@ class _$AdminSessionSlotImpl implements _AdminSessionSlot {
   final String meta;
   @override
   final AdminSessionState state;
+  @override
+  @JsonKey()
+  final String memberId;
 
   @override
   String toString() {
-    return 'AdminSessionSlot(id: $id, time: $time, title: $title, meta: $meta, state: $state)';
+    return 'AdminSessionSlot(id: $id, time: $time, title: $title, meta: $meta, state: $state, memberId: $memberId)';
   }
 
   @override
@@ -196,11 +213,14 @@ class _$AdminSessionSlotImpl implements _AdminSessionSlot {
             (identical(other.time, time) || other.time == time) &&
             (identical(other.title, title) || other.title == title) &&
             (identical(other.meta, meta) || other.meta == meta) &&
-            (identical(other.state, state) || other.state == state));
+            (identical(other.state, state) || other.state == state) &&
+            (identical(other.memberId, memberId) ||
+                other.memberId == memberId));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, id, time, title, meta, state);
+  int get hashCode =>
+      Object.hash(runtimeType, id, time, title, meta, state, memberId);
 
   /// Create a copy of AdminSessionSlot
   /// with the given fields replaced by the non-null parameter values.
@@ -221,6 +241,7 @@ abstract class _AdminSessionSlot implements AdminSessionSlot {
     required final String title,
     required final String meta,
     required final AdminSessionState state,
+    final String memberId,
   }) = _$AdminSessionSlotImpl;
 
   @override
@@ -233,6 +254,8 @@ abstract class _AdminSessionSlot implements AdminSessionSlot {
   String get meta;
   @override
   AdminSessionState get state;
+  @override
+  String get memberId;
 
   /// Create a copy of AdminSessionSlot
   /// with the given fields replaced by the non-null parameter values.
@@ -246,6 +269,12 @@ abstract class _AdminSessionSlot implements AdminSessionSlot {
 mixin _$AdminCalendarState {
   DateTime get selectedDate => throw _privateConstructorUsedError;
   Map<int, List<AdminSessionSlot>> get slotsByDayOfMonth =>
+      throw _privateConstructorUsedError;
+
+  /// Gün numarası → o gün eklenmiş gider kayıtları. Takvimde bildirim
+  /// rozeti sayısı için `.length`, seçili gün panelinde liste için
+  /// doğrudan kullanılır.
+  Map<int, List<ExpenseEntry>> get expensesByDayOfMonth =>
       throw _privateConstructorUsedError;
 
   /// Create a copy of AdminCalendarState
@@ -265,6 +294,7 @@ abstract class $AdminCalendarStateCopyWith<$Res> {
   $Res call({
     DateTime selectedDate,
     Map<int, List<AdminSessionSlot>> slotsByDayOfMonth,
+    Map<int, List<ExpenseEntry>> expensesByDayOfMonth,
   });
 }
 
@@ -282,7 +312,11 @@ class _$AdminCalendarStateCopyWithImpl<$Res, $Val extends AdminCalendarState>
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({Object? selectedDate = null, Object? slotsByDayOfMonth = null}) {
+  $Res call({
+    Object? selectedDate = null,
+    Object? slotsByDayOfMonth = null,
+    Object? expensesByDayOfMonth = null,
+  }) {
     return _then(
       _value.copyWith(
             selectedDate: null == selectedDate
@@ -293,6 +327,10 @@ class _$AdminCalendarStateCopyWithImpl<$Res, $Val extends AdminCalendarState>
                 ? _value.slotsByDayOfMonth
                 : slotsByDayOfMonth // ignore: cast_nullable_to_non_nullable
                       as Map<int, List<AdminSessionSlot>>,
+            expensesByDayOfMonth: null == expensesByDayOfMonth
+                ? _value.expensesByDayOfMonth
+                : expensesByDayOfMonth // ignore: cast_nullable_to_non_nullable
+                      as Map<int, List<ExpenseEntry>>,
           )
           as $Val,
     );
@@ -311,6 +349,7 @@ abstract class _$$AdminCalendarStateImplCopyWith<$Res>
   $Res call({
     DateTime selectedDate,
     Map<int, List<AdminSessionSlot>> slotsByDayOfMonth,
+    Map<int, List<ExpenseEntry>> expensesByDayOfMonth,
   });
 }
 
@@ -327,7 +366,11 @@ class __$$AdminCalendarStateImplCopyWithImpl<$Res>
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({Object? selectedDate = null, Object? slotsByDayOfMonth = null}) {
+  $Res call({
+    Object? selectedDate = null,
+    Object? slotsByDayOfMonth = null,
+    Object? expensesByDayOfMonth = null,
+  }) {
     return _then(
       _$AdminCalendarStateImpl(
         selectedDate: null == selectedDate
@@ -338,6 +381,10 @@ class __$$AdminCalendarStateImplCopyWithImpl<$Res>
             ? _value._slotsByDayOfMonth
             : slotsByDayOfMonth // ignore: cast_nullable_to_non_nullable
                   as Map<int, List<AdminSessionSlot>>,
+        expensesByDayOfMonth: null == expensesByDayOfMonth
+            ? _value._expensesByDayOfMonth
+            : expensesByDayOfMonth // ignore: cast_nullable_to_non_nullable
+                  as Map<int, List<ExpenseEntry>>,
       ),
     );
   }
@@ -349,7 +396,10 @@ class _$AdminCalendarStateImpl implements _AdminCalendarState {
   const _$AdminCalendarStateImpl({
     required this.selectedDate,
     required final Map<int, List<AdminSessionSlot>> slotsByDayOfMonth,
-  }) : _slotsByDayOfMonth = slotsByDayOfMonth;
+    final Map<int, List<ExpenseEntry>> expensesByDayOfMonth =
+        const <int, List<ExpenseEntry>>{},
+  }) : _slotsByDayOfMonth = slotsByDayOfMonth,
+       _expensesByDayOfMonth = expensesByDayOfMonth;
 
   @override
   final DateTime selectedDate;
@@ -362,9 +412,26 @@ class _$AdminCalendarStateImpl implements _AdminCalendarState {
     return EqualUnmodifiableMapView(_slotsByDayOfMonth);
   }
 
+  /// Gün numarası → o gün eklenmiş gider kayıtları. Takvimde bildirim
+  /// rozeti sayısı için `.length`, seçili gün panelinde liste için
+  /// doğrudan kullanılır.
+  final Map<int, List<ExpenseEntry>> _expensesByDayOfMonth;
+
+  /// Gün numarası → o gün eklenmiş gider kayıtları. Takvimde bildirim
+  /// rozeti sayısı için `.length`, seçili gün panelinde liste için
+  /// doğrudan kullanılır.
+  @override
+  @JsonKey()
+  Map<int, List<ExpenseEntry>> get expensesByDayOfMonth {
+    if (_expensesByDayOfMonth is EqualUnmodifiableMapView)
+      return _expensesByDayOfMonth;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(_expensesByDayOfMonth);
+  }
+
   @override
   String toString() {
-    return 'AdminCalendarState(selectedDate: $selectedDate, slotsByDayOfMonth: $slotsByDayOfMonth)';
+    return 'AdminCalendarState(selectedDate: $selectedDate, slotsByDayOfMonth: $slotsByDayOfMonth, expensesByDayOfMonth: $expensesByDayOfMonth)';
   }
 
   @override
@@ -377,6 +444,10 @@ class _$AdminCalendarStateImpl implements _AdminCalendarState {
             const DeepCollectionEquality().equals(
               other._slotsByDayOfMonth,
               _slotsByDayOfMonth,
+            ) &&
+            const DeepCollectionEquality().equals(
+              other._expensesByDayOfMonth,
+              _expensesByDayOfMonth,
             ));
   }
 
@@ -385,6 +456,7 @@ class _$AdminCalendarStateImpl implements _AdminCalendarState {
     runtimeType,
     selectedDate,
     const DeepCollectionEquality().hash(_slotsByDayOfMonth),
+    const DeepCollectionEquality().hash(_expensesByDayOfMonth),
   );
 
   /// Create a copy of AdminCalendarState
@@ -403,12 +475,19 @@ abstract class _AdminCalendarState implements AdminCalendarState {
   const factory _AdminCalendarState({
     required final DateTime selectedDate,
     required final Map<int, List<AdminSessionSlot>> slotsByDayOfMonth,
+    final Map<int, List<ExpenseEntry>> expensesByDayOfMonth,
   }) = _$AdminCalendarStateImpl;
 
   @override
   DateTime get selectedDate;
   @override
   Map<int, List<AdminSessionSlot>> get slotsByDayOfMonth;
+
+  /// Gün numarası → o gün eklenmiş gider kayıtları. Takvimde bildirim
+  /// rozeti sayısı için `.length`, seçili gün panelinde liste için
+  /// doğrudan kullanılır.
+  @override
+  Map<int, List<ExpenseEntry>> get expensesByDayOfMonth;
 
   /// Create a copy of AdminCalendarState
   /// with the given fields replaced by the non-null parameter values.

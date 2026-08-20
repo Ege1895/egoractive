@@ -20,11 +20,15 @@ mixin _$AuthState {
   String get phoneDigits => throw _privateConstructorUsedError;
   bool get isRequestingLogin => throw _privateConstructorUsedError;
   String? get loginErrorMessage => throw _privateConstructorUsedError;
+
+  /// Hatanın telefon alanına mı (notFound) yoksa genele mi (rate limit,
+  /// network) ait olduğunu ayırt eder — [PhoneLoginPanel] buna göre
+  /// hatayı field-seviyeli mi yoksa genel bir satır olarak mı gösterir.
+  AuthLoginErrorReason? get loginErrorReason =>
+      throw _privateConstructorUsedError;
   bool get deleteAccountAcknowledged => throw _privateConstructorUsedError;
   bool get isDeletingAccount => throw _privateConstructorUsedError;
   String? get deleteAccountErrorMessage => throw _privateConstructorUsedError;
-  int get selectedAvatarIndex => throw _privateConstructorUsedError;
-  bool get sessionReminderEnabled => throw _privateConstructorUsedError;
 
   /// Create a copy of AuthState
   /// with the given fields replaced by the non-null parameter values.
@@ -42,11 +46,10 @@ abstract class $AuthStateCopyWith<$Res> {
     String phoneDigits,
     bool isRequestingLogin,
     String? loginErrorMessage,
+    AuthLoginErrorReason? loginErrorReason,
     bool deleteAccountAcknowledged,
     bool isDeletingAccount,
     String? deleteAccountErrorMessage,
-    int selectedAvatarIndex,
-    bool sessionReminderEnabled,
   });
 }
 
@@ -68,11 +71,10 @@ class _$AuthStateCopyWithImpl<$Res, $Val extends AuthState>
     Object? phoneDigits = null,
     Object? isRequestingLogin = null,
     Object? loginErrorMessage = freezed,
+    Object? loginErrorReason = freezed,
     Object? deleteAccountAcknowledged = null,
     Object? isDeletingAccount = null,
     Object? deleteAccountErrorMessage = freezed,
-    Object? selectedAvatarIndex = null,
-    Object? sessionReminderEnabled = null,
   }) {
     return _then(
       _value.copyWith(
@@ -88,6 +90,10 @@ class _$AuthStateCopyWithImpl<$Res, $Val extends AuthState>
                 ? _value.loginErrorMessage
                 : loginErrorMessage // ignore: cast_nullable_to_non_nullable
                       as String?,
+            loginErrorReason: freezed == loginErrorReason
+                ? _value.loginErrorReason
+                : loginErrorReason // ignore: cast_nullable_to_non_nullable
+                      as AuthLoginErrorReason?,
             deleteAccountAcknowledged: null == deleteAccountAcknowledged
                 ? _value.deleteAccountAcknowledged
                 : deleteAccountAcknowledged // ignore: cast_nullable_to_non_nullable
@@ -100,14 +106,6 @@ class _$AuthStateCopyWithImpl<$Res, $Val extends AuthState>
                 ? _value.deleteAccountErrorMessage
                 : deleteAccountErrorMessage // ignore: cast_nullable_to_non_nullable
                       as String?,
-            selectedAvatarIndex: null == selectedAvatarIndex
-                ? _value.selectedAvatarIndex
-                : selectedAvatarIndex // ignore: cast_nullable_to_non_nullable
-                      as int,
-            sessionReminderEnabled: null == sessionReminderEnabled
-                ? _value.sessionReminderEnabled
-                : sessionReminderEnabled // ignore: cast_nullable_to_non_nullable
-                      as bool,
           )
           as $Val,
     );
@@ -127,11 +125,10 @@ abstract class _$$AuthStateImplCopyWith<$Res>
     String phoneDigits,
     bool isRequestingLogin,
     String? loginErrorMessage,
+    AuthLoginErrorReason? loginErrorReason,
     bool deleteAccountAcknowledged,
     bool isDeletingAccount,
     String? deleteAccountErrorMessage,
-    int selectedAvatarIndex,
-    bool sessionReminderEnabled,
   });
 }
 
@@ -152,11 +149,10 @@ class __$$AuthStateImplCopyWithImpl<$Res>
     Object? phoneDigits = null,
     Object? isRequestingLogin = null,
     Object? loginErrorMessage = freezed,
+    Object? loginErrorReason = freezed,
     Object? deleteAccountAcknowledged = null,
     Object? isDeletingAccount = null,
     Object? deleteAccountErrorMessage = freezed,
-    Object? selectedAvatarIndex = null,
-    Object? sessionReminderEnabled = null,
   }) {
     return _then(
       _$AuthStateImpl(
@@ -172,6 +168,10 @@ class __$$AuthStateImplCopyWithImpl<$Res>
             ? _value.loginErrorMessage
             : loginErrorMessage // ignore: cast_nullable_to_non_nullable
                   as String?,
+        loginErrorReason: freezed == loginErrorReason
+            ? _value.loginErrorReason
+            : loginErrorReason // ignore: cast_nullable_to_non_nullable
+                  as AuthLoginErrorReason?,
         deleteAccountAcknowledged: null == deleteAccountAcknowledged
             ? _value.deleteAccountAcknowledged
             : deleteAccountAcknowledged // ignore: cast_nullable_to_non_nullable
@@ -184,14 +184,6 @@ class __$$AuthStateImplCopyWithImpl<$Res>
             ? _value.deleteAccountErrorMessage
             : deleteAccountErrorMessage // ignore: cast_nullable_to_non_nullable
                   as String?,
-        selectedAvatarIndex: null == selectedAvatarIndex
-            ? _value.selectedAvatarIndex
-            : selectedAvatarIndex // ignore: cast_nullable_to_non_nullable
-                  as int,
-        sessionReminderEnabled: null == sessionReminderEnabled
-            ? _value.sessionReminderEnabled
-            : sessionReminderEnabled // ignore: cast_nullable_to_non_nullable
-                  as bool,
       ),
     );
   }
@@ -204,11 +196,10 @@ class _$AuthStateImpl extends _AuthState {
     this.phoneDigits = '',
     this.isRequestingLogin = false,
     this.loginErrorMessage,
+    this.loginErrorReason,
     this.deleteAccountAcknowledged = false,
     this.isDeletingAccount = false,
     this.deleteAccountErrorMessage,
-    this.selectedAvatarIndex = 0,
-    this.sessionReminderEnabled = true,
   }) : super._();
 
   @override
@@ -219,6 +210,12 @@ class _$AuthStateImpl extends _AuthState {
   final bool isRequestingLogin;
   @override
   final String? loginErrorMessage;
+
+  /// Hatanın telefon alanına mı (notFound) yoksa genele mi (rate limit,
+  /// network) ait olduğunu ayırt eder — [PhoneLoginPanel] buna göre
+  /// hatayı field-seviyeli mi yoksa genel bir satır olarak mı gösterir.
+  @override
+  final AuthLoginErrorReason? loginErrorReason;
   @override
   @JsonKey()
   final bool deleteAccountAcknowledged;
@@ -227,16 +224,10 @@ class _$AuthStateImpl extends _AuthState {
   final bool isDeletingAccount;
   @override
   final String? deleteAccountErrorMessage;
-  @override
-  @JsonKey()
-  final int selectedAvatarIndex;
-  @override
-  @JsonKey()
-  final bool sessionReminderEnabled;
 
   @override
   String toString() {
-    return 'AuthState(phoneDigits: $phoneDigits, isRequestingLogin: $isRequestingLogin, loginErrorMessage: $loginErrorMessage, deleteAccountAcknowledged: $deleteAccountAcknowledged, isDeletingAccount: $isDeletingAccount, deleteAccountErrorMessage: $deleteAccountErrorMessage, selectedAvatarIndex: $selectedAvatarIndex, sessionReminderEnabled: $sessionReminderEnabled)';
+    return 'AuthState(phoneDigits: $phoneDigits, isRequestingLogin: $isRequestingLogin, loginErrorMessage: $loginErrorMessage, loginErrorReason: $loginErrorReason, deleteAccountAcknowledged: $deleteAccountAcknowledged, isDeletingAccount: $isDeletingAccount, deleteAccountErrorMessage: $deleteAccountErrorMessage)';
   }
 
   @override
@@ -250,6 +241,8 @@ class _$AuthStateImpl extends _AuthState {
                 other.isRequestingLogin == isRequestingLogin) &&
             (identical(other.loginErrorMessage, loginErrorMessage) ||
                 other.loginErrorMessage == loginErrorMessage) &&
+            (identical(other.loginErrorReason, loginErrorReason) ||
+                other.loginErrorReason == loginErrorReason) &&
             (identical(
                   other.deleteAccountAcknowledged,
                   deleteAccountAcknowledged,
@@ -261,11 +254,7 @@ class _$AuthStateImpl extends _AuthState {
                   other.deleteAccountErrorMessage,
                   deleteAccountErrorMessage,
                 ) ||
-                other.deleteAccountErrorMessage == deleteAccountErrorMessage) &&
-            (identical(other.selectedAvatarIndex, selectedAvatarIndex) ||
-                other.selectedAvatarIndex == selectedAvatarIndex) &&
-            (identical(other.sessionReminderEnabled, sessionReminderEnabled) ||
-                other.sessionReminderEnabled == sessionReminderEnabled));
+                other.deleteAccountErrorMessage == deleteAccountErrorMessage));
   }
 
   @override
@@ -274,11 +263,10 @@ class _$AuthStateImpl extends _AuthState {
     phoneDigits,
     isRequestingLogin,
     loginErrorMessage,
+    loginErrorReason,
     deleteAccountAcknowledged,
     isDeletingAccount,
     deleteAccountErrorMessage,
-    selectedAvatarIndex,
-    sessionReminderEnabled,
   );
 
   /// Create a copy of AuthState
@@ -295,11 +283,10 @@ abstract class _AuthState extends AuthState {
     final String phoneDigits,
     final bool isRequestingLogin,
     final String? loginErrorMessage,
+    final AuthLoginErrorReason? loginErrorReason,
     final bool deleteAccountAcknowledged,
     final bool isDeletingAccount,
     final String? deleteAccountErrorMessage,
-    final int selectedAvatarIndex,
-    final bool sessionReminderEnabled,
   }) = _$AuthStateImpl;
   const _AuthState._() : super._();
 
@@ -309,16 +296,18 @@ abstract class _AuthState extends AuthState {
   bool get isRequestingLogin;
   @override
   String? get loginErrorMessage;
+
+  /// Hatanın telefon alanına mı (notFound) yoksa genele mi (rate limit,
+  /// network) ait olduğunu ayırt eder — [PhoneLoginPanel] buna göre
+  /// hatayı field-seviyeli mi yoksa genel bir satır olarak mı gösterir.
+  @override
+  AuthLoginErrorReason? get loginErrorReason;
   @override
   bool get deleteAccountAcknowledged;
   @override
   bool get isDeletingAccount;
   @override
   String? get deleteAccountErrorMessage;
-  @override
-  int get selectedAvatarIndex;
-  @override
-  bool get sessionReminderEnabled;
 
   /// Create a copy of AuthState
   /// with the given fields replaced by the non-null parameter values.

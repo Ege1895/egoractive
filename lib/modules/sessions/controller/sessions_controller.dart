@@ -9,8 +9,18 @@ import '../repository/sessions_repository.dart';
 part 'sessions_controller.g.dart';
 
 const _monthAbbrev = {
-  1: 'Oca', 2: 'Şub', 3: 'Mar', 4: 'Nis', 5: 'May', 6: 'Haz',
-  7: 'Tem', 8: 'Ağu', 9: 'Eyl', 10: 'Eki', 11: 'Kas', 12: 'Ara',
+  1: 'Oca',
+  2: 'Şub',
+  3: 'Mar',
+  4: 'Nis',
+  5: 'May',
+  6: 'Haz',
+  7: 'Tem',
+  8: 'Ağu',
+  9: 'Eyl',
+  10: 'Eki',
+  11: 'Kas',
+  12: 'Ara',
 };
 
 const _emptyNextSession = Session(
@@ -22,8 +32,80 @@ const _emptyNextSession = Session(
   status: SessionStatus.planned,
 );
 
+const _weekdayLabels = {
+  1: 'Pzt',
+  2: 'Sal',
+  3: 'Çar',
+  4: 'Per',
+  5: 'Cum',
+  6: 'Cmt',
+  7: 'Pzr',
+};
+
+/// Bu haftanın (Pazartesi-Pazar) her günü için üyenin o gün iptal edilmemiş
+/// bir seansı var mı — "BU HAFTA" bar grafiğinin gerçek verisi. Önceden bu
+/// alan hep sabit mock değerlerle (`SessionsService.loadInitial`) doluyordu,
+/// üyenin gerçekte hiç seansı olmasa bile dolu görünüyordu.
 @riverpod
-Stream<(List<Session>, List<Session>)> _sessionsForMember(_SessionsForMemberRef ref, String memberId) {
+Stream<List<WeekActivityDay>> _weekActivityForMember(
+  _WeekActivityForMemberRef ref,
+  String memberId,
+) {
+  final now = DateTime.now();
+  final today = DateTime(now.year, now.month, now.day);
+  final monday = today.subtract(Duration(days: today.weekday - 1));
+  final nextMonday = monday.add(const Duration(days: 7));
+  return FirebaseFirestore.instance
+      .collection('sessions')
+      .where('memberId', isEqualTo: memberId)
+      .where('startTime', isGreaterThanOrEqualTo: Timestamp.fromDate(monday))
+      .where('startTime', isLessThan: Timestamp.fromDate(nextMonday))
+      .snapshots()
+      .map((snapshot) {
+        final activeWeekdays = <int>{};
+        for (final doc in snapshot.docs) {
+          final data = doc.data();
+          if ((data['status'] as String?) == 'cancelled') continue;
+          final startTime = (data['startTime'] as Timestamp).toDate();
+          activeWeekdays.add(startTime.weekday);
+        }
+        return [
+          for (var weekday = 1; weekday <= 7; weekday++)
+            WeekActivityDay(
+              label: _weekdayLabels[weekday]!,
+              intensity: activeWeekdays.contains(weekday) ? 0.85 : 0.12,
+              isRestDay: !activeWeekdays.contains(weekday),
+            ),
+        ];
+      });
+}
+
+final _emptyWeek = [
+  for (var weekday = 1; weekday <= 7; weekday++)
+    WeekActivityDay(
+      label: _weekdayLabels[weekday]!,
+      intensity: 0.12,
+      isRestDay: true,
+    ),
+];
+
+@riverpod
+Stream<bool> _canConfirmAttendanceForMember(
+  _CanConfirmAttendanceForMemberRef ref,
+  String memberId,
+) {
+  return FirebaseFirestore.instance
+      .collection('users')
+      .doc(memberId)
+      .snapshots()
+      .map((doc) => doc.data()?['canConfirmAttendance'] as bool? ?? false);
+}
+
+@riverpod
+Stream<(List<Session>, List<Session>)> _sessionsForMember(
+  _SessionsForMemberRef ref,
+  String memberId,
+) {
   return FirebaseFirestore.instance
       .collection('sessions')
       .where('memberId', isEqualTo: memberId)
@@ -37,7 +119,8 @@ Stream<(List<Session>, List<Session>)> _sessionsForMember(_SessionsForMemberRef 
           final data = doc.data();
           final startTime = (data['startTime'] as Timestamp).toDate();
           final session = _toSession(doc.id, data, startTime);
-          if (session.status == SessionStatus.planned && startTime.isAfter(now)) {
+          if (session.status == SessionStatus.planned &&
+              startTime.isAfter(now)) {
             upcoming.add(session);
           } else {
             past.add(session);
@@ -49,9 +132,11 @@ Stream<(List<Session>, List<Session>)> _sessionsForMember(_SessionsForMemberRef 
 
 Session _toSession(String id, Map<String, dynamic> data, DateTime startTime) {
   final statusStr = data['status'] as String? ?? 'planned';
+  final attended = data['attended'] as bool?;
   final status = switch (statusStr) {
     'cancelled' => SessionStatus.cancelled,
-    'completed' => SessionStatus.completed,
+    'completed' =>
+      attended == false ? SessionStatus.absent : SessionStatus.completed,
     _ => SessionStatus.planned,
   };
   final confirmationStr = data['memberConfirmation'] as String?;
@@ -60,7 +145,8 @@ Session _toSession(String id, Map<String, dynamic> data, DateTime startTime) {
     'notComing' => AttendanceAnswer.notComing,
     _ => AttendanceAnswer.pending,
   };
-  final time = '${startTime.hour.toString().padLeft(2, '0')}:${startTime.minute.toString().padLeft(2, '0')}';
+  final time =
+      '${startTime.hour.toString().padLeft(2, '0')}:${startTime.minute.toString().padLeft(2, '0')}';
   return Session(
     id: id,
     day: startTime.day.toString().padLeft(2, '0'),
@@ -73,8 +159,8 @@ Session _toSession(String id, Map<String, dynamic> data, DateTime startTime) {
 }
 
 /// F3-3 — üyenin kendi seansları gerçek zamanlı `sessions` koleksiyonundan
-/// (memberId == kendi uid'si) okunur. `week`/`paymentWarning` bu task'ın
-/// kapsamı dışında (ayrı devam eden mock alanlar).
+/// (memberId == kendi uid'si) okunur. `paymentWarning` hâlâ ayrı, devam eden
+/// bir mock alan (bu task'ın kapsamı dışında).
 ///
 /// F3-4 — `attendanceAnswer` artık ayrı bir yerel state değil, sıradaki
 /// seansın Firestore'daki `memberConfirmation` alanından türetiliyor.
@@ -86,13 +172,23 @@ class SessionsController extends _$SessionsController {
     final mock = ref.watch(sessionsRepositoryProvider).loadInitial();
     if (uid == null) return mock;
 
-    final (upcoming, past) = ref.watch(_sessionsForMemberProvider(uid)).valueOrNull ?? (const <Session>[], const <Session>[]);
+    final (upcoming, past) =
+        ref.watch(_sessionsForMemberProvider(uid)).valueOrNull ??
+        (const <Session>[], const <Session>[]);
     final nextSession = upcoming.isEmpty ? _emptyNextSession : upcoming.first;
+    final canConfirmAttendance =
+        ref.watch(_canConfirmAttendanceForMemberProvider(uid)).valueOrNull ??
+        false;
+    final week =
+        ref.watch(_weekActivityForMemberProvider(uid)).valueOrNull ??
+        _emptyWeek;
     return mock.copyWith(
       nextSession: nextSession,
       upcoming: upcoming,
       past: past,
+      week: week,
       attendanceAnswer: nextSession.confirmation,
+      canConfirmAttendance: canConfirmAttendance,
     );
   }
 
@@ -100,21 +196,63 @@ class SessionsController extends _$SessionsController {
     state = state.copyWith(viewMode: mode);
   }
 
+  /// Yazma başarısız olursa (network/izin) UI'da yanlış bir "onaylandı"
+  /// görünümü kalmasın diye önceki cevaba geri dönülür — F3-4'ün ilk
+  /// sürümünde yazma denenmeden önce optimistik güncelleniyor ve hata hiç
+  /// yakalanmıyordu, bu da sessiz veri kaybına yol açabiliyordu.
   Future<void> confirmAttendance(bool coming) async {
+    if (!state.canConfirmAttendance) return;
     final sessionId = state.nextSession.id;
     if (sessionId == 'none') return;
-    final answer = coming ? AttendanceAnswer.coming : AttendanceAnswer.notComing;
-    state = state.copyWith(attendanceAnswer: answer);
-    await FirebaseFirestore.instance
-        .collection('sessions')
-        .doc(sessionId)
-        .update({'memberConfirmation': coming ? 'coming' : 'notComing'});
+    final previousAnswer = state.attendanceAnswer;
+    final answer = coming
+        ? AttendanceAnswer.coming
+        : AttendanceAnswer.notComing;
+    state = state.copyWith(
+      attendanceAnswer: answer,
+      attendanceErrorMessage: null,
+    );
+    try {
+      await FirebaseFirestore.instance
+          .collection('sessions')
+          .doc(sessionId)
+          .update({
+            'memberConfirmation': coming ? 'coming' : 'notComing',
+            // Antrenörün bildirim listesi (bkz. TrainerNotificationsController)
+            // en son yanıtları önce göstermek için bu alanı kullanıyor.
+            'confirmationRespondedAt': FieldValue.serverTimestamp(),
+          });
+    } catch (_) {
+      state = state.copyWith(
+        attendanceAnswer: previousAnswer,
+        attendanceErrorMessage:
+            'Cevabın kaydedilemedi, bağlantını kontrol edip tekrar dene.',
+      );
+    }
   }
 
   Future<void> resetAttendance() async {
     final sessionId = state.nextSession.id;
-    state = state.copyWith(attendanceAnswer: AttendanceAnswer.pending);
+    final previousAnswer = state.attendanceAnswer;
+    state = state.copyWith(
+      attendanceAnswer: AttendanceAnswer.pending,
+      attendanceErrorMessage: null,
+    );
     if (sessionId == 'none') return;
-    await FirebaseFirestore.instance.collection('sessions').doc(sessionId).update({'memberConfirmation': FieldValue.delete()});
+    try {
+      await FirebaseFirestore.instance
+          .collection('sessions')
+          .doc(sessionId)
+          .update({
+            'memberConfirmation': FieldValue.delete(),
+            'confirmationRespondedAt': FieldValue.delete(),
+          });
+    } catch (_) {
+      state = state.copyWith(
+        attendanceAnswer: previousAnswer,
+        attendanceErrorMessage:
+            'Cevabın kaydedilemedi, bağlantını kontrol edip tekrar dene.',
+      );
+    }
   }
 }

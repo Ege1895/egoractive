@@ -6,6 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/constants/subscription_constants.dart';
+import '../../../../core/locale/locale_controller.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
 import '../../../../core/remote_config/remote_config_service.dart';
@@ -15,16 +16,46 @@ import '../../controller/subscription_controller.dart';
 import '../../domain/subscription_state.dart';
 
 const _monthNamesShortTr = {
-  1: 'Oca', 2: 'Şub', 3: 'Mar', 4: 'Nis', 5: 'May', 6: 'Haz',
-  7: 'Tem', 8: 'Ağu', 9: 'Eyl', 10: 'Eki', 11: 'Kas', 12: 'Ara',
+  1: 'Oca',
+  2: 'Şub',
+  3: 'Mar',
+  4: 'Nis',
+  5: 'May',
+  6: 'Haz',
+  7: 'Tem',
+  8: 'Ağu',
+  9: 'Eyl',
+  10: 'Eki',
+  11: 'Kas',
+  12: 'Ara',
 };
 const _monthNamesLongTr = {
-  1: 'Ocak', 2: 'Şubat', 3: 'Mart', 4: 'Nisan', 5: 'Mayıs', 6: 'Haziran',
-  7: 'Temmuz', 8: 'Ağustos', 9: 'Eylül', 10: 'Ekim', 11: 'Kasım', 12: 'Aralık',
+  1: 'Ocak',
+  2: 'Şubat',
+  3: 'Mart',
+  4: 'Nisan',
+  5: 'Mayıs',
+  6: 'Haziran',
+  7: 'Temmuz',
+  8: 'Ağustos',
+  9: 'Eylül',
+  10: 'Ekim',
+  11: 'Kasım',
+  12: 'Aralık',
 };
 const _monthNamesShortEn = {
-  1: 'Jan', 2: 'Feb', 3: 'Mar', 4: 'Apr', 5: 'May', 6: 'Jun',
-  7: 'Jul', 8: 'Aug', 9: 'Sep', 10: 'Oct', 11: 'Nov', 12: 'Dec',
+  1: 'Jan',
+  2: 'Feb',
+  3: 'Mar',
+  4: 'Apr',
+  5: 'May',
+  6: 'Jun',
+  7: 'Jul',
+  8: 'Aug',
+  9: 'Sep',
+  10: 'Oct',
+  11: 'Nov',
+  12: 'Dec',
 };
 
 /// F6-1 — Admin · Ayarlar > Abonelik. Sadece admin hesapları bu panele
@@ -52,15 +83,21 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
   @override
   void initState() {
     super.initState();
-    _productsFuture = ref.read(subscriptionControllerProvider.notifier).fetchProducts();
+    _productsFuture = ref
+        .read(subscriptionControllerProvider.notifier)
+        .fetchProducts();
   }
 
-  bool _isYearly(String productId) => productId == gymYearlySubscriptionProductId;
+  bool _isYearly(String productId) =>
+      productId == gymYearlySubscriptionProductId;
 
   void _ensureSelection(List<SubscriptionProduct> products) {
-    if (_selectedProductId != null && products.any((p) => p.id == _selectedProductId)) return;
+    if (_selectedProductId != null &&
+        products.any((p) => p.id == _selectedProductId))
+      return;
     final yearly = products.where((p) => _isYearly(p.id)).firstOrNull;
-    _selectedProductId = yearly?.id ?? (products.isEmpty ? null : products.first.id);
+    _selectedProductId =
+        yearly?.id ?? (products.isEmpty ? null : products.first.id);
   }
 
   String _fill(String template, Map<String, String> values) {
@@ -80,7 +117,9 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
   String _dateShort(DateTime date, String locale) {
     final months = locale == 'tr' ? _monthNamesShortTr : _monthNamesShortEn;
     final month = months[date.month] ?? '';
-    return locale == 'tr' ? '${date.day} $month ${date.year}' : '$month ${date.day}, ${date.year}';
+    return locale == 'tr'
+        ? '${date.day} $month ${date.year}'
+        : '$month ${date.day}, ${date.year}';
   }
 
   @override
@@ -96,12 +135,30 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.md, AppSpacing.screenEdge, 0),
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.screenEdge,
+                AppSpacing.md,
+                AppSpacing.screenEdge,
+                0,
+              ),
               child: Row(
                 children: [
-                  AppBackButton(onTap: () => ref.read(panelStackControllerProvider.notifier).pop()),
+                  AppBackButton(
+                    onTap: () =>
+                        ref.read(panelStackControllerProvider.notifier).pop(),
+                  ),
                   const SizedBox(width: AppSpacing.md),
-                  Text('Abonelik', style: typography.headingSmall.copyWith(color: colors.onSurface, fontSize: 18)),
+                  Text(
+                    ref.watch(
+                      rcTextProvider(
+                        RemoteConfigKeys.gymsSettingsNavSubscription,
+                      ),
+                    ),
+                    style: typography.headingSmall.copyWith(
+                      color: colors.onSurface,
+                      fontSize: 18,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -130,7 +187,8 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
     SubscriptionState subscription,
     RemoteConfigService rc,
   ) {
-    if (subscription.isPurchasing) return _pendingView(context, products, subscription, rc);
+    if (subscription.isPurchasing)
+      return _pendingView(context, products, subscription, rc);
     switch (subscription.status) {
       case SubscriptionStatus.active:
         return _activeView(context, products, subscription, rc);
@@ -151,36 +209,70 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
     RemoteConfigService rc,
   ) {
     final colors = context.appColors;
-    final locale = rc.currentLocale;
+    final locale = ref.watch(localeControllerProvider);
     final trialEndsAt = subscription.trialEndsAt;
     final trialStartedAt = subscription.trialStartedAt;
     final totalDays = rc.trialDurationDays;
-    final daysRemaining = trialEndsAt == null ? 0 : trialEndsAt.difference(DateTime.now()).inDays.clamp(0, totalDays);
+    final daysRemaining = trialEndsAt == null
+        ? 0
+        : trialEndsAt.difference(DateTime.now()).inDays.clamp(0, totalDays);
     final currentDay = trialStartedAt == null
         ? totalDays
         : (totalDays - daysRemaining).clamp(1, totalDays);
-    final selected = products.where((p) => p.id == _selectedProductId).firstOrNull;
+    final selected = products
+        .where((p) => p.id == _selectedProductId)
+        .firstOrNull;
 
     return ListView(
-      padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.md, AppSpacing.screenEdge, AppSpacing.xl),
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.screenEdge,
+        AppSpacing.md,
+        AppSpacing.screenEdge,
+        AppSpacing.xl,
+      ),
       children: [
         _Banner(
           accent: colors.warning,
-          leading: _BadgeCircle(color: colors.warning, fg: colors.onPrimary, child: Text('$daysRemaining')),
-          title: _fill(rc.getText(RemoteConfigKeys.subscriptionTrialBannerTitle), {'days': '$daysRemaining'}),
+          leading: _BadgeCircle(
+            color: colors.warning,
+            fg: colors.onPrimary,
+            child: Text('$daysRemaining'),
+          ),
+          title: _fill(
+            rc.getText(RemoteConfigKeys.subscriptionTrialBannerTitle, locale),
+            {'days': '$daysRemaining'},
+          ),
           titleColor: colors.warning,
           body: trialEndsAt == null
               ? ''
-              : _fill(rc.getText(RemoteConfigKeys.subscriptionTrialBannerBody), {'date': _dateLong(trialEndsAt, locale)}),
+              : _fill(
+                  rc.getText(
+                    RemoteConfigKeys.subscriptionTrialBannerBody,
+                    locale,
+                  ),
+                  {'date': _dateLong(trialEndsAt, locale)},
+                ),
           extra: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: AppSpacing.sm),
-              _ProgressBar(value: currentDay / totalDays, color: colors.warning),
+              _ProgressBar(
+                value: currentDay / totalDays,
+                color: colors.warning,
+              ),
               const SizedBox(height: AppSpacing.xs),
               Text(
-                _fill(rc.getText(RemoteConfigKeys.subscriptionTrialProgress), {'total': '$totalDays', 'current': '$currentDay'}),
-                style: context.appTypography.caption.copyWith(color: colors.onSurfaceMuted, fontSize: 12),
+                _fill(
+                  rc.getText(
+                    RemoteConfigKeys.subscriptionTrialProgress,
+                    locale,
+                  ),
+                  {'total': '$totalDays', 'current': '$currentDay'},
+                ),
+                style: context.appTypography.caption.copyWith(
+                  color: colors.onSurfaceMuted,
+                  fontSize: 12,
+                ),
               ),
             ],
           ),
@@ -188,8 +280,10 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
         const SizedBox(height: AppSpacing.lg),
         if (products.isEmpty)
           Text(
-            rc.getText(RemoteConfigKeys.subscriptionNoProducts),
-            style: context.appTypography.bodyMedium.copyWith(color: colors.onSurfaceMuted),
+            rc.getText(RemoteConfigKeys.subscriptionNoProducts, locale),
+            style: context.appTypography.bodyMedium.copyWith(
+              color: colors.onSurfaceMuted,
+            ),
           )
         else
           _PlanList(
@@ -198,21 +292,46 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
             enabled: true,
             isYearly: _isYearly,
             rc: rc,
+            locale: locale,
             onSelect: (id) => setState(() => _selectedProductId = id),
           ),
         const SizedBox(height: AppSpacing.lg),
         _IncludedFeaturesCard(rc: rc, locale: locale),
         const SizedBox(height: AppSpacing.lg),
-        _StoreDisclaimer(text: _fill(rc.getText(RemoteConfigKeys.subscriptionStoreNote), _storePlaceholders)),
+        _StoreDisclaimer(
+          text: _fill(
+            rc.getText(RemoteConfigKeys.subscriptionStoreNote, locale),
+            _storePlaceholders,
+          ),
+        ),
         const SizedBox(height: AppSpacing.lg),
+        if (subscription.purchaseErrorMessage != null) ...[
+          Text(
+            subscription.purchaseErrorMessage!,
+            textAlign: TextAlign.center,
+            style: context.appTypography.bodyMedium.copyWith(
+              color: colors.error,
+              fontSize: 13,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.sm),
+        ],
         _PrimaryCta(
           label: selected == null
               ? '…'
-              : _fill(rc.getText(RemoteConfigKeys.subscriptionPurchaseCta), {'plan': selected.title, 'store': _storeName}),
-          caption: _fill(rc.getText(RemoteConfigKeys.subscriptionPurchaseCaption), {'store': _storeName}),
+              : _fill(
+                  rc.getText(RemoteConfigKeys.subscriptionPurchaseCta, locale),
+                  {'plan': selected.title, 'store': _storeName},
+                ),
+          caption: _fill(
+            rc.getText(RemoteConfigKeys.subscriptionPurchaseCaption, locale),
+            {'store': _storeName},
+          ),
           onTap: _selectedProductId == null
               ? null
-              : () => ref.read(subscriptionControllerProvider.notifier).purchase(_selectedProductId!),
+              : () => ref
+                    .read(subscriptionControllerProvider.notifier)
+                    .purchase(_selectedProductId!),
         ),
       ],
     );
@@ -228,15 +347,35 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
   ) {
     final colors = context.appColors;
     final typography = context.appTypography;
-    final locale = rc.currentLocale;
+    final locale = ref.watch(localeControllerProvider);
     final productId = subscription.productId;
     final isYearly = productId != null && _isYearly(productId);
-    final matchingProduct = products.where((p) => p.id == productId).firstOrNull;
-    final planName = matchingProduct?.title ?? (isYearly ? 'Yıllık' : 'Aylık');
-    final period = isYearly ? (locale == 'tr' ? 'her yıl' : 'yearly') : (locale == 'tr' ? 'her ay' : 'monthly');
+    final matchingProduct = products
+        .where((p) => p.id == productId)
+        .firstOrNull;
+    final String planNameFallback = ref.watch(
+      rcTextProvider(
+        isYearly
+            ? RemoteConfigKeys.subscriptionYearlyPlanFallback
+            : RemoteConfigKeys.subscriptionMonthlyPlanFallback,
+      ),
+    );
+    final String planName = matchingProduct?.title ?? planNameFallback;
+    final period = ref.watch(
+      rcTextProvider(
+        isYearly
+            ? RemoteConfigKeys.subscriptionYearlyPeriodWord
+            : RemoteConfigKeys.subscriptionMonthlyPeriodWord,
+      ),
+    );
 
     return ListView(
-      padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.md, AppSpacing.screenEdge, AppSpacing.xl),
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.screenEdge,
+        AppSpacing.md,
+        AppSpacing.screenEdge,
+        AppSpacing.xl,
+      ),
       children: [
         Container(
           width: double.infinity,
@@ -257,23 +396,41 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          rc.getText(RemoteConfigKeys.subscriptionActivePlanLabel),
-                          style: typography.bodyMedium.copyWith(color: colors.secondary, fontSize: 13),
+                          rc.getText(
+                            RemoteConfigKeys.subscriptionActivePlanLabel,
+                            locale,
+                          ),
+                          style: typography.bodyMedium.copyWith(
+                            color: colors.secondary,
+                            fontSize: 13,
+                          ),
                         ),
                         const SizedBox(height: AppSpacing.xs),
-                        Text(planName, style: typography.headingLarge.copyWith(color: colors.onSurface, fontSize: 26)),
+                        Text(
+                          planName,
+                          style: typography.headingLarge.copyWith(
+                            color: colors.onSurface,
+                            fontSize: 26,
+                          ),
+                        ),
                         if (matchingProduct != null) ...[
                           const SizedBox(height: AppSpacing.xs),
                           Text(
                             matchingProduct.price,
-                            style: typography.headingSmall.copyWith(color: colors.onSurfaceVariant, fontSize: 16),
+                            style: typography.headingSmall.copyWith(
+                              color: colors.onSurfaceVariant,
+                              fontSize: 16,
+                            ),
                           ),
                         ],
                       ],
                     ),
                   ),
                   _Pill(
-                    label: rc.getText(RemoteConfigKeys.subscriptionActiveBadge),
+                    label: rc.getText(
+                      RemoteConfigKeys.subscriptionActiveBadge,
+                      locale,
+                    ),
                     bg: colors.success.withValues(alpha: 0.16),
                     fg: colors.success,
                   ),
@@ -284,23 +441,39 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
                 children: [
                   Expanded(
                     child: _DateChip(
-                      label: rc.getText(RemoteConfigKeys.subscriptionRenewalLabel),
-                      value: subscription.expiresAt == null ? '—' : _dateShort(subscription.expiresAt!, locale),
+                      label: rc.getText(
+                        RemoteConfigKeys.subscriptionRenewalLabel,
+                        locale,
+                      ),
+                      value: subscription.expiresAt == null
+                          ? '—'
+                          : _dateShort(subscription.expiresAt!, locale),
                     ),
                   ),
                   const SizedBox(width: AppSpacing.sm),
                   Expanded(
                     child: _DateChip(
-                      label: rc.getText(RemoteConfigKeys.subscriptionStartedLabel),
-                      value: subscription.startedAt == null ? '—' : _dateShort(subscription.startedAt!, locale),
+                      label: rc.getText(
+                        RemoteConfigKeys.subscriptionStartedLabel,
+                        locale,
+                      ),
+                      value: subscription.startedAt == null
+                          ? '—'
+                          : _dateShort(subscription.startedAt!, locale),
                     ),
                   ),
                 ],
               ),
               const SizedBox(height: AppSpacing.md),
               Text(
-                _fill(rc.getText(RemoteConfigKeys.subscriptionActiveNote), {'period': period, 'store': _storeName}),
-                style: typography.bodyMedium.copyWith(color: colors.onSurfaceVariant, fontSize: 13),
+                _fill(
+                  rc.getText(RemoteConfigKeys.subscriptionActiveNote, locale),
+                  {'period': period, 'store': _storeName},
+                ),
+                style: typography.bodyMedium.copyWith(
+                  color: colors.onSurfaceVariant,
+                  fontSize: 13,
+                ),
               ),
             ],
           ),
@@ -319,10 +492,21 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
                 width: 44,
                 height: 30,
                 alignment: Alignment.center,
-                decoration: BoxDecoration(color: colors.surfaceRaised, borderRadius: BorderRadius.circular(8)),
+                decoration: BoxDecoration(
+                  color: colors.surfaceRaised,
+                  borderRadius: BorderRadius.circular(8),
+                ),
                 child: Text(
-                  'STORE',
-                  style: typography.headingSmall.copyWith(fontSize: 10, letterSpacing: 0.5, color: colors.onSurfaceVariant),
+                  ref.watch(
+                    rcTextProvider(
+                      RemoteConfigKeys.subscriptionStoreBadgeLabel,
+                    ),
+                  ),
+                  style: typography.headingSmall.copyWith(
+                    fontSize: 10,
+                    letterSpacing: 0.5,
+                    color: colors.onSurfaceVariant,
+                  ),
                 ),
               ),
               const SizedBox(width: AppSpacing.md),
@@ -331,13 +515,31 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      _fill(rc.getText(RemoteConfigKeys.subscriptionStoreRowTitle), {'store': _storeName}),
-                      style: typography.headingSmall.copyWith(color: colors.onSurface, fontSize: 15),
+                      _fill(
+                        rc.getText(
+                          RemoteConfigKeys.subscriptionStoreRowTitle,
+                          locale,
+                        ),
+                        {'store': _storeName},
+                      ),
+                      style: typography.headingSmall.copyWith(
+                        color: colors.onSurface,
+                        fontSize: 15,
+                      ),
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      _fill(rc.getText(RemoteConfigKeys.subscriptionStoreRowSubtitle), {'storeAccount': _storeAccountName}),
-                      style: typography.caption.copyWith(color: colors.onSurfaceMuted, fontSize: 12),
+                      _fill(
+                        rc.getText(
+                          RemoteConfigKeys.subscriptionStoreRowSubtitle,
+                          locale,
+                        ),
+                        {'storeAccount': _storeAccountName},
+                      ),
+                      style: typography.caption.copyWith(
+                        color: colors.onSurfaceMuted,
+                        fontSize: 12,
+                      ),
                     ),
                   ],
                 ),
@@ -349,8 +551,11 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
         _IncludedFeaturesCard(rc: rc, locale: locale),
         const SizedBox(height: AppSpacing.lg),
         _SecondaryCta(
-          label: rc.getText(RemoteConfigKeys.subscriptionManageCta),
-          caption: _fill(rc.getText(RemoteConfigKeys.subscriptionManageCaption), {'store': _storeName}),
+          label: rc.getText(RemoteConfigKeys.subscriptionManageCta, locale),
+          caption: _fill(
+            rc.getText(RemoteConfigKeys.subscriptionManageCaption, locale),
+            {'store': _storeName},
+          ),
           onTap: _openStoreSubscriptionManagement,
         ),
       ],
@@ -367,24 +572,44 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
   ) {
     final colors = context.appColors;
     final typography = context.appTypography;
-    final locale = rc.currentLocale;
+    final locale = ref.watch(localeControllerProvider);
     final restricted = rc.subscriptionRestrictedOperations
         .map((raw) => (raw['label_$locale'] as String?) ?? '')
         .where((s) => s.isNotEmpty)
         .toList();
-    final selected = products.where((p) => p.id == _selectedProductId).firstOrNull;
+    final selected = products
+        .where((p) => p.id == _selectedProductId)
+        .firstOrNull;
 
     return ListView(
-      padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.md, AppSpacing.screenEdge, AppSpacing.xl),
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.screenEdge,
+        AppSpacing.md,
+        AppSpacing.screenEdge,
+        AppSpacing.xl,
+      ),
       children: [
         _Banner(
           accent: colors.error,
-          leading: _BadgeCircle(color: colors.error, fg: colors.onPrimary, child: const Text('!')),
+          leading: _BadgeCircle(
+            color: colors.error,
+            fg: colors.onPrimary,
+            child: const Text('!'),
+          ),
           title: subscription.expiresAt == null
               ? ''
-              : _fill(rc.getText(RemoteConfigKeys.subscriptionExpiredBannerTitle), {'date': _dateLong(subscription.expiresAt!, locale)}),
+              : _fill(
+                  rc.getText(
+                    RemoteConfigKeys.subscriptionExpiredBannerTitle,
+                    locale,
+                  ),
+                  {'date': _dateLong(subscription.expiresAt!, locale)},
+                ),
           titleColor: colors.error,
-          body: rc.getText(RemoteConfigKeys.subscriptionExpiredBannerBody),
+          body: rc.getText(
+            RemoteConfigKeys.subscriptionExpiredBannerBody,
+            locale,
+          ),
           extra: Container(
             margin: const EdgeInsets.only(top: AppSpacing.sm),
             padding: const EdgeInsets.all(AppSpacing.md),
@@ -396,8 +621,17 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  rc.getText(RemoteConfigKeys.subscriptionRestrictedTitle).toUpperCase(),
-                  style: typography.headingSmall.copyWith(fontSize: 13, letterSpacing: 1, color: colors.onSurfaceMuted),
+                  rc
+                      .getText(
+                        RemoteConfigKeys.subscriptionRestrictedTitle,
+                        locale,
+                      )
+                      .toUpperCase(),
+                  style: typography.headingSmall.copyWith(
+                    fontSize: 13,
+                    letterSpacing: 1,
+                    color: colors.onSurfaceMuted,
+                  ),
                 ),
                 const SizedBox(height: AppSpacing.sm),
                 for (final item in restricted)
@@ -411,19 +645,34 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
                           child: Container(
                             width: 5,
                             height: 5,
-                            decoration: BoxDecoration(shape: BoxShape.circle, color: colors.error.withValues(alpha: 0.7)),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: colors.error.withValues(alpha: 0.7),
+                            ),
                           ),
                         ),
                         const SizedBox(width: AppSpacing.sm),
                         Expanded(
-                          child: Text(item, style: typography.bodyMedium.copyWith(color: colors.onSurfaceVariant, fontSize: 14)),
+                          child: Text(
+                            item,
+                            style: typography.bodyMedium.copyWith(
+                              color: colors.onSurfaceVariant,
+                              fontSize: 14,
+                            ),
+                          ),
                         ),
                       ],
                     ),
                   ),
                 Text(
-                  rc.getText(RemoteConfigKeys.subscriptionRestrictedNote),
-                  style: typography.caption.copyWith(color: colors.onSurfaceMuted, fontSize: 13),
+                  rc.getText(
+                    RemoteConfigKeys.subscriptionRestrictedNote,
+                    locale,
+                  ),
+                  style: typography.caption.copyWith(
+                    color: colors.onSurfaceMuted,
+                    fontSize: 13,
+                  ),
                 ),
               ],
             ),
@@ -432,7 +681,7 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
         const SizedBox(height: AppSpacing.lg),
         if (products.isEmpty)
           Text(
-            rc.getText(RemoteConfigKeys.subscriptionNoProducts),
+            rc.getText(RemoteConfigKeys.subscriptionNoProducts, locale),
             style: typography.bodyMedium.copyWith(color: colors.onSurfaceMuted),
           )
         else
@@ -442,19 +691,47 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
             enabled: true,
             isYearly: _isYearly,
             rc: rc,
+            locale: locale,
             onSelect: (id) => setState(() => _selectedProductId = id),
           ),
         const SizedBox(height: AppSpacing.lg),
-        _StoreDisclaimer(text: _fill(rc.getText(RemoteConfigKeys.subscriptionStoreNoteExpired), _storePlaceholders)),
+        _StoreDisclaimer(
+          text: _fill(
+            rc.getText(RemoteConfigKeys.subscriptionStoreNoteExpired, locale),
+            _storePlaceholders,
+          ),
+        ),
         const SizedBox(height: AppSpacing.lg),
+        if (subscription.purchaseErrorMessage != null) ...[
+          Text(
+            subscription.purchaseErrorMessage!,
+            textAlign: TextAlign.center,
+            style: typography.bodyMedium.copyWith(
+              color: colors.error,
+              fontSize: 13,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.sm),
+        ],
         _PrimaryCta(
           label: selected == null
               ? '…'
-              : _fill(rc.getText(RemoteConfigKeys.subscriptionPurchaseCtaExpired), {'plan': selected.title, 'store': _storeName}),
-          caption: _fill(rc.getText(RemoteConfigKeys.subscriptionPurchaseCaption), {'store': _storeName}),
+              : _fill(
+                  rc.getText(
+                    RemoteConfigKeys.subscriptionPurchaseCtaExpired,
+                    locale,
+                  ),
+                  {'plan': selected.title, 'store': _storeName},
+                ),
+          caption: _fill(
+            rc.getText(RemoteConfigKeys.subscriptionPurchaseCaption, locale),
+            {'store': _storeName},
+          ),
           onTap: _selectedProductId == null
               ? null
-              : () => ref.read(subscriptionControllerProvider.notifier).purchase(_selectedProductId!),
+              : () => ref
+                    .read(subscriptionControllerProvider.notifier)
+                    .purchase(_selectedProductId!),
         ),
       ],
     );
@@ -471,9 +748,15 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
     final colors = context.appColors;
     final typography = context.appTypography;
     final pendingId = subscription.pendingProductId;
+    final locale = ref.watch(localeControllerProvider);
 
     return ListView(
-      padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.md, AppSpacing.screenEdge, AppSpacing.xl),
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.screenEdge,
+        AppSpacing.md,
+        AppSpacing.screenEdge,
+        AppSpacing.xl,
+      ),
       children: [
         Container(
           width: double.infinity,
@@ -493,13 +776,28 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      _fill(rc.getText(RemoteConfigKeys.subscriptionPendingBannerTitle), {'store': _storeName}),
-                      style: typography.headingSmall.copyWith(color: colors.secondary, fontSize: 16),
+                      _fill(
+                        rc.getText(
+                          RemoteConfigKeys.subscriptionPendingBannerTitle,
+                          locale,
+                        ),
+                        {'store': _storeName},
+                      ),
+                      style: typography.headingSmall.copyWith(
+                        color: colors.secondary,
+                        fontSize: 16,
+                      ),
                     ),
                     const SizedBox(height: AppSpacing.xs),
                     Text(
-                      rc.getText(RemoteConfigKeys.subscriptionPendingBannerBody),
-                      style: typography.bodyMedium.copyWith(color: colors.onSurfaceVariant, fontSize: 14),
+                      rc.getText(
+                        RemoteConfigKeys.subscriptionPendingBannerBody,
+                        locale,
+                      ),
+                      style: typography.bodyMedium.copyWith(
+                        color: colors.onSurfaceVariant,
+                        fontSize: 14,
+                      ),
                     ),
                   ],
                 ),
@@ -514,34 +812,62 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
           enabled: false,
           isYearly: _isYearly,
           rc: rc,
+          locale: locale,
           onSelect: (_) {},
           pendingId: pendingId,
-          pendingLabel: _fill(rc.getText(RemoteConfigKeys.subscriptionPendingPill), {'store': _storeName}),
+          pendingLabel: _fill(
+            rc.getText(RemoteConfigKeys.subscriptionPendingPill, locale),
+            {'store': _storeName},
+          ),
         ),
         const SizedBox(height: AppSpacing.md),
         Text(
-          rc.getText(RemoteConfigKeys.subscriptionPendingNote),
-          style: typography.caption.copyWith(color: colors.onSurfaceMuted, fontSize: 12),
+          rc.getText(RemoteConfigKeys.subscriptionPendingNote, locale),
+          style: typography.caption.copyWith(
+            color: colors.onSurfaceMuted,
+            fontSize: 12,
+          ),
         ),
         const SizedBox(height: AppSpacing.lg),
         _PendingCta(
-          label: _fill(rc.getText(RemoteConfigKeys.subscriptionPendingCta), {'store': _storeName}),
-          caption: rc.getText(RemoteConfigKeys.subscriptionPendingCaption),
+          label: _fill(
+            rc.getText(RemoteConfigKeys.subscriptionPendingCta, locale),
+            {'store': _storeName},
+          ),
+          caption: rc.getText(
+            RemoteConfigKeys.subscriptionPendingCaption,
+            locale,
+          ),
         ),
       ],
     );
   }
 
-  Map<String, String> get _storePlaceholders => {'store': _storeName, 'storeAccount': _storeAccountName};
+  Map<String, String> get _storePlaceholders => {
+    'store': _storeName,
+    'storeAccount': _storeAccountName,
+  };
 
   /// "Aboneliği yönet" — cihazın kendi abonelik yönetim sayfasını açar.
   /// Uygulama içinde plan değişikliği/iptal işlemi yok, hepsi mağazada.
   Future<void> _openStoreSubscriptionManagement() async {
     final uri = Platform.isIOS
         ? Uri.parse('https://apps.apple.com/account/subscriptions')
-        : Uri.parse('https://play.google.com/store/account/subscriptions?package=$androidPackageName');
+        : Uri.parse(
+            'https://play.google.com/store/account/subscriptions?package=$androidPackageName',
+          );
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            ref.read(
+              rcTextProvider(RemoteConfigKeys.subscriptionManagementOpenError),
+            ),
+          ),
+        ),
+      );
     }
   }
 }
@@ -591,9 +917,21 @@ class _Banner extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(title, style: typography.headingSmall.copyWith(color: titleColor, fontSize: 17)),
+                    Text(
+                      title,
+                      style: typography.headingSmall.copyWith(
+                        color: titleColor,
+                        fontSize: 17,
+                      ),
+                    ),
                     const SizedBox(height: 3),
-                    Text(body, style: typography.bodyMedium.copyWith(color: colors.onSurfaceVariant, fontSize: 14)),
+                    Text(
+                      body,
+                      style: typography.bodyMedium.copyWith(
+                        color: colors.onSurfaceVariant,
+                        fontSize: 14,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -607,7 +945,11 @@ class _Banner extends StatelessWidget {
 }
 
 class _BadgeCircle extends StatelessWidget {
-  const _BadgeCircle({required this.color, required this.fg, required this.child});
+  const _BadgeCircle({
+    required this.color,
+    required this.fg,
+    required this.child,
+  });
 
   final Color color;
   final Color fg;
@@ -660,6 +1002,7 @@ class _PlanList extends StatelessWidget {
     required this.enabled,
     required this.isYearly,
     required this.rc,
+    required this.locale,
     required this.onSelect,
     this.pendingId,
     this.pendingLabel,
@@ -670,6 +1013,7 @@ class _PlanList extends StatelessWidget {
   final bool enabled;
   final bool Function(String productId) isYearly;
   final RemoteConfigService rc;
+  final String locale;
   final ValueChanged<String> onSelect;
   final String? pendingId;
   final String? pendingLabel;
@@ -685,10 +1029,12 @@ class _PlanList extends StatelessWidget {
               product: product,
               selected: product.id == selectedId,
               enabled: enabled,
-              badge: isYearly(product.id) ? rc.getText(RemoteConfigKeys.subscriptionYearlyBadge) : null,
+              badge: isYearly(product.id)
+                  ? rc.getText(RemoteConfigKeys.subscriptionYearlyBadge, locale)
+                  : null,
               subLabel: isYearly(product.id)
-                  ? rc.getText(RemoteConfigKeys.subscriptionYearlySub)
-                  : rc.getText(RemoteConfigKeys.subscriptionMonthlySub),
+                  ? rc.getText(RemoteConfigKeys.subscriptionYearlySub, locale)
+                  : rc.getText(RemoteConfigKeys.subscriptionMonthlySub, locale),
               onTap: enabled ? () => onSelect(product.id) : null,
               pendingLabel: product.id == pendingId ? pendingLabel : null,
             ),
@@ -726,7 +1072,9 @@ class _PlanCard extends StatelessWidget {
     return Opacity(
       opacity: dimmed ? 0.45 : 1,
       child: Material(
-        color: selected ? colors.primary.withValues(alpha: 0.08) : colors.surface,
+        color: selected
+            ? colors.primary.withValues(alpha: 0.08)
+            : colors.surface,
         borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
         child: InkWell(
           onTap: onTap,
@@ -735,7 +1083,10 @@ class _PlanCard extends StatelessWidget {
             padding: const EdgeInsets.all(AppSpacing.lg),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
-              border: Border.all(color: selected ? colors.primary : colors.outline, width: selected ? 2 : 1),
+              border: Border.all(
+                color: selected ? colors.primary : colors.outline,
+                width: selected ? 2 : 1,
+              ),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -751,10 +1102,22 @@ class _PlanCard extends StatelessWidget {
                         alignment: Alignment.center,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          border: Border.all(color: selected ? colors.primary : colors.outlineStrong, width: 2),
+                          border: Border.all(
+                            color: selected
+                                ? colors.primary
+                                : colors.outlineStrong,
+                            width: 2,
+                          ),
                         ),
                         child: selected
-                            ? Container(width: 10, height: 10, decoration: BoxDecoration(shape: BoxShape.circle, color: colors.primary))
+                            ? Container(
+                                width: 10,
+                                height: 10,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: colors.primary,
+                                ),
+                              )
                             : null,
                       ),
                     ),
@@ -767,17 +1130,33 @@ class _PlanCard extends StatelessWidget {
                             crossAxisAlignment: WrapCrossAlignment.center,
                             spacing: AppSpacing.sm,
                             children: [
-                              Text(product.title, style: typography.headingSmall.copyWith(color: colors.onSurface, fontSize: 19)),
+                              Text(
+                                product.title,
+                                style: typography.headingSmall.copyWith(
+                                  color: colors.onSurface,
+                                  fontSize: 19,
+                                ),
+                              ),
                               if (badge != null)
                                 _Pill(
                                   label: badge!,
-                                  bg: selected ? colors.primary.withValues(alpha: 0.14) : colors.outline,
-                                  fg: selected ? colors.secondary : colors.onSurfaceMuted,
+                                  bg: selected
+                                      ? colors.primary.withValues(alpha: 0.14)
+                                      : colors.outline,
+                                  fg: selected
+                                      ? colors.secondary
+                                      : colors.onSurfaceMuted,
                                 ),
                             ],
                           ),
                           const SizedBox(height: AppSpacing.xs),
-                          Text(product.description, style: typography.bodyMedium.copyWith(color: colors.onSurfaceMuted, fontSize: 14)),
+                          Text(
+                            product.description,
+                            style: typography.bodyMedium.copyWith(
+                              color: colors.onSurfaceMuted,
+                              fontSize: 14,
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -786,12 +1165,17 @@ class _PlanCard extends StatelessWidget {
                       children: [
                         Text(
                           product.price,
-                          style: typography.headingLarge.copyWith(color: colors.onSurface, fontSize: 22),
+                          style: typography.headingLarge.copyWith(
+                            color: colors.onSurface,
+                            fontSize: 22,
+                          ),
                         ),
                         Text(
                           subLabel,
                           style: typography.caption.copyWith(
-                            color: selected ? colors.secondary : colors.onSurfaceMuted,
+                            color: selected
+                                ? colors.secondary
+                                : colors.onSurfaceMuted,
                             fontSize: 12,
                           ),
                         ),
@@ -807,16 +1191,25 @@ class _PlanCard extends StatelessWidget {
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
                       color: colors.primary.withValues(alpha: 0.14),
-                      borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusInner,
+                      ),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        _Spinner(size: 16, thickness: 2, color: colors.secondary),
+                        _Spinner(
+                          size: 16,
+                          thickness: 2,
+                          color: colors.secondary,
+                        ),
                         const SizedBox(width: AppSpacing.sm),
                         Text(
                           pendingLabel!,
-                          style: typography.headingSmall.copyWith(color: colors.secondary, fontSize: 15),
+                          style: typography.headingSmall.copyWith(
+                            color: colors.secondary,
+                            fontSize: 15,
+                          ),
                         ),
                       ],
                     ),
@@ -847,7 +1240,10 @@ class _IncludedFeaturesCard extends StatelessWidget {
         .toList();
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.xs),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.lg,
+        vertical: AppSpacing.xs,
+      ),
       decoration: BoxDecoration(
         color: colors.surface,
         borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
@@ -869,12 +1265,21 @@ class _IncludedFeaturesCard extends StatelessWidget {
                     width: 18,
                     height: 18,
                     alignment: Alignment.center,
-                    decoration: BoxDecoration(shape: BoxShape.circle, color: colors.success.withValues(alpha: 0.16)),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: colors.success.withValues(alpha: 0.16),
+                    ),
                     child: Icon(Icons.check, size: 11, color: colors.success),
                   ),
                   const SizedBox(width: AppSpacing.md),
                   Expanded(
-                    child: Text(items[i], style: typography.bodyMedium.copyWith(color: colors.onSurfaceVariant, fontSize: 14)),
+                    child: Text(
+                      items[i],
+                      style: typography.bodyMedium.copyWith(
+                        color: colors.onSurfaceVariant,
+                        fontSize: 14,
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -908,12 +1313,26 @@ class _StoreDisclaimer extends StatelessWidget {
             width: 26,
             height: 26,
             alignment: Alignment.center,
-            decoration: BoxDecoration(color: colors.surfaceRaised, borderRadius: BorderRadius.circular(8)),
-            child: Icon(Icons.north_east, size: 14, color: colors.onSurfaceVariant),
+            decoration: BoxDecoration(
+              color: colors.surfaceRaised,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(
+              Icons.north_east,
+              size: 14,
+              color: colors.onSurfaceVariant,
+            ),
           ),
           const SizedBox(width: AppSpacing.md),
           Expanded(
-            child: Text(text, style: typography.caption.copyWith(color: colors.onSurfaceMuted, fontSize: 13, height: 1.5)),
+            child: Text(
+              text,
+              style: typography.caption.copyWith(
+                color: colors.onSurfaceMuted,
+                fontSize: 13,
+                height: 1.5,
+              ),
+            ),
           ),
         ],
       ),
@@ -932,8 +1351,18 @@ class _Pill extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(AppSpacing.radiusPill)),
-      child: Text(label, style: context.appTypography.caption.copyWith(fontSize: 11, fontWeight: FontWeight.w600, color: fg)),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
+      ),
+      child: Text(
+        label,
+        style: context.appTypography.caption.copyWith(
+          fontSize: 11,
+          fontWeight: FontWeight.w600,
+          color: fg,
+        ),
+      ),
     );
   }
 }
@@ -950,13 +1379,28 @@ class _DateChip extends StatelessWidget {
     final typography = context.appTypography;
     return Container(
       padding: const EdgeInsets.all(AppSpacing.md),
-      decoration: BoxDecoration(color: colors.surfaceRaised, borderRadius: BorderRadius.circular(AppSpacing.radiusInner)),
+      decoration: BoxDecoration(
+        color: colors.surfaceRaised,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: typography.caption.copyWith(color: colors.onSurfaceMuted, fontSize: 12)),
+          Text(
+            label,
+            style: typography.caption.copyWith(
+              color: colors.onSurfaceMuted,
+              fontSize: 12,
+            ),
+          ),
           const SizedBox(height: 3),
-          Text(value, style: typography.headingSmall.copyWith(color: colors.onSurface, fontSize: 15)),
+          Text(
+            value,
+            style: typography.headingSmall.copyWith(
+              color: colors.onSurface,
+              fontSize: 15,
+            ),
+          ),
         ],
       ),
     );
@@ -964,7 +1408,11 @@ class _DateChip extends StatelessWidget {
 }
 
 class _Spinner extends StatefulWidget {
-  const _Spinner({required this.size, required this.thickness, required this.color});
+  const _Spinner({
+    required this.size,
+    required this.thickness,
+    required this.color,
+  });
 
   final double size;
   final double thickness;
@@ -974,13 +1422,17 @@ class _Spinner extends StatefulWidget {
   State<_Spinner> createState() => _SpinnerState();
 }
 
-class _SpinnerState extends State<_Spinner> with SingleTickerProviderStateMixin {
+class _SpinnerState extends State<_Spinner>
+    with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 900))..repeat();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 900),
+    )..repeat();
   }
 
   @override
@@ -1007,7 +1459,11 @@ class _SpinnerState extends State<_Spinner> with SingleTickerProviderStateMixin 
 }
 
 class _PrimaryCta extends StatelessWidget {
-  const _PrimaryCta({required this.label, required this.caption, required this.onTap});
+  const _PrimaryCta({
+    required this.label,
+    required this.caption,
+    required this.onTap,
+  });
 
   final String label;
   final String caption;
@@ -1027,7 +1483,9 @@ class _PrimaryCta extends StatelessWidget {
             onTap: onTap,
             borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
             child: Container(
-              constraints: const BoxConstraints(minHeight: AppSpacing.primaryActionHeight),
+              constraints: const BoxConstraints(
+                minHeight: AppSpacing.primaryActionHeight,
+              ),
               decoration: BoxDecoration(
                 color: disabled ? colors.surfaceRaised : colors.primary,
                 borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
@@ -1038,24 +1496,43 @@ class _PrimaryCta extends StatelessWidget {
                 children: [
                   Text(
                     label,
-                    style: typography.headingSmall.copyWith(fontSize: 17, color: disabled ? colors.onSurfaceMuted : colors.onPrimary),
+                    style: typography.headingSmall.copyWith(
+                      fontSize: 17,
+                      color: disabled
+                          ? colors.onSurfaceMuted
+                          : colors.onPrimary,
+                    ),
                   ),
                   const SizedBox(width: AppSpacing.sm),
-                  Icon(Icons.north_east, size: 16, color: disabled ? colors.onSurfaceMuted : colors.onPrimary),
+                  Icon(
+                    Icons.north_east,
+                    size: 16,
+                    color: disabled ? colors.onSurfaceMuted : colors.onPrimary,
+                  ),
                 ],
               ),
             ),
           ),
         ),
         const SizedBox(height: AppSpacing.sm),
-        Text(caption, style: typography.caption.copyWith(color: colors.onSurfaceMuted, fontSize: 12)),
+        Text(
+          caption,
+          style: typography.caption.copyWith(
+            color: colors.onSurfaceMuted,
+            fontSize: 12,
+          ),
+        ),
       ],
     );
   }
 }
 
 class _SecondaryCta extends StatelessWidget {
-  const _SecondaryCta({required this.label, required this.caption, required this.onTap});
+  const _SecondaryCta({
+    required this.label,
+    required this.caption,
+    required this.onTap,
+  });
 
   final String label;
   final String caption;
@@ -1074,7 +1551,9 @@ class _SecondaryCta extends StatelessWidget {
             onTap: onTap,
             borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
             child: Container(
-              constraints: const BoxConstraints(minHeight: AppSpacing.primaryActionHeight),
+              constraints: const BoxConstraints(
+                minHeight: AppSpacing.primaryActionHeight,
+              ),
               decoration: BoxDecoration(
                 color: colors.surfaceRaised,
                 borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
@@ -1084,16 +1563,32 @@ class _SecondaryCta extends StatelessWidget {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(label, style: typography.headingSmall.copyWith(fontSize: 17, color: colors.onSurface)),
+                  Text(
+                    label,
+                    style: typography.headingSmall.copyWith(
+                      fontSize: 17,
+                      color: colors.onSurface,
+                    ),
+                  ),
                   const SizedBox(width: AppSpacing.sm),
-                  Icon(Icons.north_east, size: 16, color: colors.onSurfaceVariant),
+                  Icon(
+                    Icons.north_east,
+                    size: 16,
+                    color: colors.onSurfaceVariant,
+                  ),
                 ],
               ),
             ),
           ),
         ),
         const SizedBox(height: AppSpacing.sm),
-        Text(caption, style: typography.caption.copyWith(color: colors.onSurfaceMuted, fontSize: 12)),
+        Text(
+          caption,
+          style: typography.caption.copyWith(
+            color: colors.onSurfaceMuted,
+            fontSize: 12,
+          ),
+        ),
       ],
     );
   }
@@ -1113,20 +1608,37 @@ class _PendingCta extends StatelessWidget {
     return Column(
       children: [
         Container(
-          constraints: const BoxConstraints(minHeight: AppSpacing.primaryActionHeight),
-          decoration: BoxDecoration(color: colors.surfaceRaised, borderRadius: BorderRadius.circular(AppSpacing.radiusInner)),
+          constraints: const BoxConstraints(
+            minHeight: AppSpacing.primaryActionHeight,
+          ),
+          decoration: BoxDecoration(
+            color: colors.surfaceRaised,
+            borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+          ),
           alignment: Alignment.center,
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               _Spinner(size: 18, thickness: 2, color: colors.onSurfaceMuted),
               const SizedBox(width: AppSpacing.sm),
-              Text(label, style: typography.headingSmall.copyWith(fontSize: 17, color: colors.onSurfaceMuted)),
+              Text(
+                label,
+                style: typography.headingSmall.copyWith(
+                  fontSize: 17,
+                  color: colors.onSurfaceMuted,
+                ),
+              ),
             ],
           ),
         ),
         const SizedBox(height: AppSpacing.sm),
-        Text(caption, style: typography.caption.copyWith(color: colors.onSurfaceMuted, fontSize: 12)),
+        Text(
+          caption,
+          style: typography.caption.copyWith(
+            color: colors.onSurfaceMuted,
+            fontSize: 12,
+          ),
+        ),
       ],
     );
   }

@@ -24,6 +24,7 @@ mixin _$AdminMemberListState {
   bool get isSearching => throw _privateConstructorUsedError;
   List<AdminMemberSummary>? get searchResults =>
       throw _privateConstructorUsedError;
+  String? get errorMessage => throw _privateConstructorUsedError;
 
   /// Create a copy of AdminMemberListState
   /// with the given fields replaced by the non-null parameter values.
@@ -46,6 +47,7 @@ abstract class $AdminMemberListStateCopyWith<$Res> {
     bool hasMore,
     bool isSearching,
     List<AdminMemberSummary>? searchResults,
+    String? errorMessage,
   });
 }
 
@@ -73,6 +75,7 @@ class _$AdminMemberListStateCopyWithImpl<
     Object? hasMore = null,
     Object? isSearching = null,
     Object? searchResults = freezed,
+    Object? errorMessage = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -100,6 +103,10 @@ class _$AdminMemberListStateCopyWithImpl<
                 ? _value.searchResults
                 : searchResults // ignore: cast_nullable_to_non_nullable
                       as List<AdminMemberSummary>?,
+            errorMessage: freezed == errorMessage
+                ? _value.errorMessage
+                : errorMessage // ignore: cast_nullable_to_non_nullable
+                      as String?,
           )
           as $Val,
     );
@@ -122,6 +129,7 @@ abstract class _$$AdminMemberListStateImplCopyWith<$Res>
     bool hasMore,
     bool isSearching,
     List<AdminMemberSummary>? searchResults,
+    String? errorMessage,
   });
 }
 
@@ -145,6 +153,7 @@ class __$$AdminMemberListStateImplCopyWithImpl<$Res>
     Object? hasMore = null,
     Object? isSearching = null,
     Object? searchResults = freezed,
+    Object? errorMessage = freezed,
   }) {
     return _then(
       _$AdminMemberListStateImpl(
@@ -172,6 +181,10 @@ class __$$AdminMemberListStateImplCopyWithImpl<$Res>
             ? _value._searchResults
             : searchResults // ignore: cast_nullable_to_non_nullable
                   as List<AdminMemberSummary>?,
+        errorMessage: freezed == errorMessage
+            ? _value.errorMessage
+            : errorMessage // ignore: cast_nullable_to_non_nullable
+                  as String?,
       ),
     );
   }
@@ -187,6 +200,7 @@ class _$AdminMemberListStateImpl implements _AdminMemberListState {
     this.hasMore = false,
     this.isSearching = false,
     final List<AdminMemberSummary>? searchResults,
+    this.errorMessage,
   }) : _items = items,
        _searchResults = searchResults;
 
@@ -222,8 +236,11 @@ class _$AdminMemberListStateImpl implements _AdminMemberListState {
   }
 
   @override
+  final String? errorMessage;
+
+  @override
   String toString() {
-    return 'AdminMemberListState(items: $items, isLoading: $isLoading, isLoadingMore: $isLoadingMore, hasMore: $hasMore, isSearching: $isSearching, searchResults: $searchResults)';
+    return 'AdminMemberListState(items: $items, isLoading: $isLoading, isLoadingMore: $isLoadingMore, hasMore: $hasMore, isSearching: $isSearching, searchResults: $searchResults, errorMessage: $errorMessage)';
   }
 
   @override
@@ -242,7 +259,9 @@ class _$AdminMemberListStateImpl implements _AdminMemberListState {
             const DeepCollectionEquality().equals(
               other._searchResults,
               _searchResults,
-            ));
+            ) &&
+            (identical(other.errorMessage, errorMessage) ||
+                other.errorMessage == errorMessage));
   }
 
   @override
@@ -254,6 +273,7 @@ class _$AdminMemberListStateImpl implements _AdminMemberListState {
     hasMore,
     isSearching,
     const DeepCollectionEquality().hash(_searchResults),
+    errorMessage,
   );
 
   /// Create a copy of AdminMemberListState
@@ -277,6 +297,7 @@ abstract class _AdminMemberListState implements AdminMemberListState {
     final bool hasMore,
     final bool isSearching,
     final List<AdminMemberSummary>? searchResults,
+    final String? errorMessage,
   }) = _$AdminMemberListStateImpl;
 
   @override
@@ -291,6 +312,8 @@ abstract class _AdminMemberListState implements AdminMemberListState {
   bool get isSearching;
   @override
   List<AdminMemberSummary>? get searchResults;
+  @override
+  String? get errorMessage;
 
   /// Create a copy of AdminMemberListState
   /// with the given fields replaced by the non-null parameter values.

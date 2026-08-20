@@ -10,23 +10,24 @@ part 'new_member_controller.g.dart';
 class NewMemberController extends _$NewMemberController {
   @override
   NewMemberForm build() {
-    return const NewMemberForm(
+    return NewMemberForm(
       firstName: '',
       lastName: '',
       phoneDigits: '',
       birthYear: 1995,
       heightCm: 170,
-      trainerId: 'berk-aydin',
-      trainerName: 'Berk Aydın',
       note: '',
+      registeredAt: DateTime.now(),
     );
   }
 
-  void updateFirstName(String value) => state = state.copyWith(firstName: value);
+  void updateFirstName(String value) =>
+      state = state.copyWith(firstName: value);
 
   void updateLastName(String value) => state = state.copyWith(lastName: value);
 
-  void updatePhoneDigits(String value) => state = state.copyWith(phoneDigits: value);
+  void updatePhoneDigits(String value) =>
+      state = state.copyWith(phoneDigits: value);
 
   void updateBirthYear(int value) => state = state.copyWith(birthYear: value);
 
@@ -38,9 +39,21 @@ class NewMemberController extends _$NewMemberController {
     state = state.copyWith(gender: state.gender == value ? null : value);
   }
 
-  void selectTrainer(String id, String name) => state = state.copyWith(trainerId: id, trainerName: name);
+  void selectTrainer(String id, String name) =>
+      state = state.copyWith(trainerId: id, trainerName: name);
 
   void updateNote(String value) => state = state.copyWith(note: value);
+
+  void updateRegisteredAt(DateTime value) =>
+      state = state.copyWith(registeredAt: value);
+
+  void toggleCanConfirmAttendance() =>
+      state = state.copyWith(canConfirmAttendance: !state.canConfirmAttendance);
+
+  /// Düzenleme modunda üyenin mevcut Firestore değerini forma yüklemek için
+  /// — bkz. [MemberInfoPanel.initState].
+  void setCanConfirmAttendance(bool value) =>
+      state = state.copyWith(canConfirmAttendance: value);
 
   void reset() => state = build();
 }

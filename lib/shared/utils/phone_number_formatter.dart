@@ -14,6 +14,18 @@ String formatTrPhoneDigits(String digits) {
   return parts.join(' ');
 }
 
+/// Firestore'da saklanan ham numarayı (`+905551234567` gibi) görüntüleme
+/// için "555 123 45 67" haline getirir — ülke kodu/başındaki 0 atılır, son
+/// 10 hane gruplanır. Ölçüm/üye/antrenör detay ekranlarında telefon
+/// gösterilen her yerde kullanılır.
+String formatTrPhoneDisplay(String rawPhone) {
+  final digitsOnly = rawPhone.replaceAll(RegExp(r'[^0-9]'), '');
+  final last10 = digitsOnly.length > 10
+      ? digitsOnly.substring(digitsOnly.length - 10)
+      : digitsOnly;
+  return formatTrPhoneDigits(last10);
+}
+
 /// Kullanıcı yazdıkça haneleri "5XX XXX XX XX" olarak gruplar — telefon
 /// numarasıyla giriş yapılan her yerde (Telefonla Giriş, Salon Kurulumu)
 /// aynı davranışı garanti etmek için ortak bir formatter.

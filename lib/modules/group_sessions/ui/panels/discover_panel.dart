@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/remote_config/feature_flags.dart';
+import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../controller/discover_controller.dart';
 import '../../domain/discover_item.dart';
@@ -22,9 +23,14 @@ class _DiscoverPanelState extends ConsumerState<DiscoverPanel> {
   Widget build(BuildContext context) {
     final colors = context.appColors;
     final typography = context.appTypography;
-    final groupSessionsEnabled = ref.watch(featureFlagsProvider).isGroupSessionsEnabled;
+    final groupSessionsEnabled = ref
+        .watch(featureFlagsProvider)
+        .isGroupSessionsEnabled;
     final category = groupSessionsEnabled ? _category : DiscoverCategory.events;
-    final items = ref.watch(discoverControllerProvider).where((i) => i.category == category).toList();
+    final items = ref
+        .watch(discoverControllerProvider)
+        .where((i) => i.category == category)
+        .toList();
     final controller = ref.read(discoverControllerProvider.notifier);
 
     return Scaffold(
@@ -33,11 +39,25 @@ class _DiscoverPanelState extends ConsumerState<DiscoverPanel> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.lg, AppSpacing.screenEdge, 0),
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.screenEdge,
+                AppSpacing.lg,
+                AppSpacing.screenEdge,
+                0,
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Keşfet', style: typography.headingLarge.copyWith(color: colors.onSurface)),
+                  Text(
+                    ref.watch(
+                      rcTextProvider(
+                        RemoteConfigKeys.groupSessionsDiscoverTitle,
+                      ),
+                    ),
+                    style: typography.headingLarge.copyWith(
+                      color: colors.onSurface,
+                    ),
+                  ),
                   const SizedBox(height: AppSpacing.md),
                   if (groupSessionsEnabled)
                     Container(
@@ -45,22 +65,40 @@ class _DiscoverPanelState extends ConsumerState<DiscoverPanel> {
                       decoration: BoxDecoration(
                         color: colors.surface,
                         border: Border.all(color: colors.outline),
-                        borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+                        borderRadius: BorderRadius.circular(
+                          AppSpacing.radiusInner,
+                        ),
                       ),
                       child: Row(
                         children: [
                           Expanded(
                             child: _CategoryTab(
-                              label: 'Grup dersleri',
-                              selected: category == DiscoverCategory.groupSessions,
-                              onTap: () => setState(() => _category = DiscoverCategory.groupSessions),
+                              label: ref.watch(
+                                rcTextProvider(
+                                  RemoteConfigKeys
+                                      .groupSessionsDiscoverTabGroupSessions,
+                                ),
+                              ),
+                              selected:
+                                  category == DiscoverCategory.groupSessions,
+                              onTap: () => setState(
+                                () =>
+                                    _category = DiscoverCategory.groupSessions,
+                              ),
                             ),
                           ),
                           Expanded(
                             child: _CategoryTab(
-                              label: 'Etkinlikler',
+                              label: ref.watch(
+                                rcTextProvider(
+                                  RemoteConfigKeys
+                                      .groupSessionsDiscoverTabEvents,
+                                ),
+                              ),
                               selected: category == DiscoverCategory.events,
-                              onTap: () => setState(() => _category = DiscoverCategory.events),
+                              onTap: () => setState(
+                                () => _category = DiscoverCategory.events,
+                              ),
                             ),
                           ),
                         ],
@@ -73,15 +111,33 @@ class _DiscoverPanelState extends ConsumerState<DiscoverPanel> {
               child: items.isEmpty
                   ? Center(
                       child: Text(
-                        'Şu anda açık kayıt yok — yeni bir tarih eklendiğinde burada görünecek.',
+                        ref.watch(
+                          rcTextProvider(
+                            RemoteConfigKeys.groupSessionsDiscoverEmptyState,
+                          ),
+                        ),
                         textAlign: TextAlign.center,
-                        style: typography.bodyMedium.copyWith(color: colors.onSurfaceMuted),
+                        style: typography.bodyMedium.copyWith(
+                          color: colors.onSurfaceMuted,
+                        ),
                       ),
                     )
                   : ListView(
-                      padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.md, AppSpacing.screenEdge, AppSpacing.lg),
+                      padding: const EdgeInsets.fromLTRB(
+                        AppSpacing.screenEdge,
+                        AppSpacing.md,
+                        AppSpacing.screenEdge,
+                        AppSpacing.lg,
+                      ),
                       children: [
-                        for (final item in items) _DiscoverCard(item: item, onToggleJoin: () => controller.toggleJoin(item.id)),
+                        for (final item in items)
+                          _DiscoverCard(
+                            item: item,
+                            onToggleJoin: () => _handleToggleJoin(
+                              context,
+                              () => controller.toggleJoin(item.id),
+                            ),
+                          ),
                       ],
                     ),
             ),
@@ -92,8 +148,37 @@ class _DiscoverPanelState extends ConsumerState<DiscoverPanel> {
   }
 }
 
+/// Katıl/ayrıl hatası (kontenjan dolu, network) daha önce sessizce
+/// yutuluyordu — üye butona basıyor, hiçbir şey olmuyordu. Artık kısa bir
+/// snackbar ile açıklanıyor.
+Future<void> _handleToggleJoin(
+  BuildContext context,
+  Future<void> Function() action,
+) async {
+  try {
+    await action();
+  } catch (error) {
+    if (!context.mounted) return;
+    final container = ProviderScope.containerOf(context);
+    final message = error is StateError && error.message == 'Kontenjan doldu.'
+        ? container.read(
+            rcTextProvider(RemoteConfigKeys.groupSessionsJoinFullErrorSnackbar),
+          )
+        : container.read(
+            rcTextProvider(RemoteConfigKeys.groupSessionsJoinFailedSnackbar),
+          );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
+  }
+}
+
 class _CategoryTab extends StatelessWidget {
-  const _CategoryTab({required this.label, required this.selected, required this.onTap});
+  const _CategoryTab({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
 
   final String label;
   final bool selected;
@@ -124,14 +209,14 @@ class _CategoryTab extends StatelessWidget {
   }
 }
 
-class _DiscoverCard extends StatelessWidget {
+class _DiscoverCard extends ConsumerWidget {
   const _DiscoverCard({required this.item, required this.onToggleJoin});
 
   final DiscoverItem item;
   final VoidCallback onToggleJoin;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.appColors;
     final typography = context.appTypography;
     final capacity = item.capacity;
@@ -143,34 +228,48 @@ class _DiscoverCard extends StatelessWidget {
     if (item.isFull) {
       capFg = colors.error;
       barColor = colors.error;
-      capNote = 'Kontenjan doldu';
+      capNote = ref.watch(
+        rcTextProvider(RemoteConfigKeys.groupSessionsCapacityFullNote),
+      );
     } else if (remaining != null && remaining <= 2) {
       capFg = colors.onWarningContainer;
       barColor = colors.warning;
-      capNote = 'Son $remaining yer';
+      capNote = ref
+          .watch(rcTextProvider(RemoteConfigKeys.groupSessionsCapacityLowNote))
+          .replaceAll('{remaining}', '$remaining');
     } else {
       capFg = colors.onSurfaceVariant;
       barColor = colors.primary;
-      capNote = 'Yer var';
+      capNote = ref.watch(
+        rcTextProvider(RemoteConfigKeys.groupSessionsCapacityAvailableNote),
+      );
     }
 
     final String btnLabel;
     final Color btnBg;
     final Color btnFg;
     if (item.isLocked) {
-      btnLabel = 'Kilitli · Başlangıç yaklaştı';
+      btnLabel = ref.watch(
+        rcTextProvider(RemoteConfigKeys.groupSessionsLockedJoinButton),
+      );
       btnBg = colors.surfaceRaised;
       btnFg = colors.onSurfaceMuted;
     } else if (item.isFull) {
-      btnLabel = 'Yedek listesine yaz';
+      btnLabel = ref.watch(
+        rcTextProvider(RemoteConfigKeys.groupSessionsWaitlistJoinButton),
+      );
       btnBg = colors.surfaceRaised;
       btnFg = colors.onSurfaceVariant;
     } else if (item.joined) {
-      btnLabel = 'Katılıyorsun · Vazgeç';
+      btnLabel = ref.watch(
+        rcTextProvider(RemoteConfigKeys.groupSessionsJoinedLeaveButton),
+      );
       btnBg = colors.primaryContainer;
       btnFg = colors.onPrimaryContainer;
     } else {
-      btnLabel = 'Katılıyorum';
+      btnLabel = ref.watch(
+        rcTextProvider(RemoteConfigKeys.groupSessionsJoinButton),
+      );
       btnBg = colors.primary;
       btnFg = colors.onPrimary;
     }
@@ -198,8 +297,20 @@ class _DiscoverCard extends StatelessWidget {
                 ),
                 child: Column(
                   children: [
-                    Text(item.day, style: typography.dataMedium.copyWith(color: colors.onSurface, fontSize: 20)),
-                    Text(item.month, style: typography.caption.copyWith(color: colors.onSurfaceMuted, fontSize: 11)),
+                    Text(
+                      item.day,
+                      style: typography.dataMedium.copyWith(
+                        color: colors.onSurface,
+                        fontSize: 20,
+                      ),
+                    ),
+                    Text(
+                      item.month,
+                      style: typography.caption.copyWith(
+                        color: colors.onSurfaceMuted,
+                        fontSize: 11,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -208,8 +319,19 @@ class _DiscoverCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(item.title, style: typography.headingSmall.copyWith(color: colors.onSurface)),
-                    Text(item.meta, style: typography.bodyMedium.copyWith(color: colors.onSurfaceVariant, fontSize: 13)),
+                    Text(
+                      item.title,
+                      style: typography.headingSmall.copyWith(
+                        color: colors.onSurface,
+                      ),
+                    ),
+                    Text(
+                      item.meta,
+                      style: typography.bodyMedium.copyWith(
+                        color: colors.onSurfaceVariant,
+                        fontSize: 13,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -220,12 +342,38 @@ class _DiscoverCard extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  capacity == null ? '${item.taken} kişi katılıyor' : '${item.taken} / $capacity kişi',
-                  style: typography.bodyMedium.copyWith(color: colors.onSurfaceVariant, fontSize: 13),
+                  capacity == null
+                      ? ref
+                            .watch(
+                              rcTextProvider(
+                                RemoteConfigKeys
+                                    .groupSessionsAttendingCountNoCapacity,
+                              ),
+                            )
+                            .replaceAll('{taken}', '${item.taken}')
+                      : ref
+                            .watch(
+                              rcTextProvider(
+                                RemoteConfigKeys
+                                    .groupSessionsAttendingCountWithCapacity,
+                              ),
+                            )
+                            .replaceAll('{taken}', '${item.taken}')
+                            .replaceAll('{capacity}', '$capacity'),
+                  style: typography.bodyMedium.copyWith(
+                    color: colors.onSurfaceVariant,
+                    fontSize: 13,
+                  ),
                 ),
               ),
               const SizedBox(width: AppSpacing.sm),
-              Text(capNote, style: typography.headingSmall.copyWith(color: capFg, fontSize: 13)),
+              Text(
+                capNote,
+                style: typography.headingSmall.copyWith(
+                  color: capFg,
+                  fontSize: 13,
+                ),
+              ),
             ],
           ),
           const SizedBox(height: AppSpacing.xs),
@@ -249,7 +397,13 @@ class _DiscoverCard extends StatelessWidget {
                 width: double.infinity,
                 constraints: const BoxConstraints(minHeight: 48),
                 alignment: Alignment.center,
-                child: Text(btnLabel, style: typography.headingSmall.copyWith(fontSize: 15, color: btnFg)),
+                child: Text(
+                  btnLabel,
+                  style: typography.headingSmall.copyWith(
+                    fontSize: 15,
+                    color: btnFg,
+                  ),
+                ),
               ),
             ),
           ),

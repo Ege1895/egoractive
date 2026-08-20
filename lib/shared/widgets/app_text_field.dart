@@ -18,6 +18,9 @@ class AppTextField extends StatelessWidget {
     this.onChanged,
     this.inputFormatters,
     this.prefixText,
+    this.minLines,
+    this.maxLines = 1,
+    this.scrollController,
     super.key,
   });
 
@@ -31,6 +34,17 @@ class AppTextField extends StatelessWidget {
   final ValueChanged<String>? onChanged;
   final List<TextInputFormatter>? inputFormatters;
 
+  /// `maxLines` 1'den büyükse (çok satırlı not alanı gibi) `minLines`'tan
+  /// başlayıp `maxLines`'a kadar büyür, sonrasında TextField'ın kendi iç
+  /// scroll'una düşer.
+  final int? minLines;
+  final int? maxLines;
+
+  /// Çok satırlı alanı sarmalayan bir [Scrollbar]'ın (ör. `thumbVisibility:
+  /// true`) hedef alacağı controller — verilmezse TextField kendi iç
+  /// scroll'unu PrimaryScrollController olmadan yönetir.
+  final ScrollController? scrollController;
+
   /// Girdinin başında sabit gösterilen, düzenlenemeyen metin (ör. "+90 ").
   final String? prefixText;
 
@@ -41,27 +55,41 @@ class AppTextField extends StatelessWidget {
 
     return TextField(
       controller: controller,
+      scrollController: scrollController,
       keyboardType: keyboardType,
       obscureText: obscureText,
       enabled: enabled,
       onChanged: onChanged,
       inputFormatters: inputFormatters,
+      minLines: minLines,
+      maxLines: maxLines,
       style: context.appTypography.bodyLarge.copyWith(color: colors.onSurface),
       decoration: InputDecoration(
         labelText: label,
+        alignLabelWithHint: maxLines != 1,
         hintText: hint,
         errorText: errorText,
         prefixText: prefixText,
-        prefixStyle: context.appTypography.bodyLarge.copyWith(color: colors.onSurfaceVariant),
-        hintStyle: context.appTypography.bodyLarge.copyWith(color: colors.onSurfaceMuted),
+        prefixStyle: context.appTypography.bodyLarge.copyWith(
+          color: colors.onSurfaceVariant,
+        ),
+        hintStyle: context.appTypography.bodyLarge.copyWith(
+          color: colors.onSurfaceMuted,
+        ),
         filled: true,
         fillColor: colors.surfaceRaised,
         contentPadding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.lg,
           vertical: AppSpacing.md,
         ),
-        border: OutlineInputBorder(borderRadius: radius, borderSide: BorderSide.none),
-        enabledBorder: OutlineInputBorder(borderRadius: radius, borderSide: BorderSide.none),
+        border: OutlineInputBorder(
+          borderRadius: radius,
+          borderSide: BorderSide.none,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: radius,
+          borderSide: BorderSide.none,
+        ),
         focusedBorder: OutlineInputBorder(
           borderRadius: radius,
           borderSide: BorderSide(color: colors.primary, width: 1.5),

@@ -7,10 +7,23 @@ import 'new_member_controller.dart';
 part 'member_registration_controller.g.dart';
 
 class MemberRegistrationState {
-  const MemberRegistrationState({this.isSubmitting = false, this.errorMessage, this.createdMemberId});
+  const MemberRegistrationState({
+    this.isSubmitting = false,
+    this.errorMessage,
+    this.nameError,
+    this.phoneError,
+    this.trainerError,
+    this.createdMemberId,
+  });
 
   final bool isSubmitting;
+
+  /// Alana bağlanamayan hatalar (aktif salon bulunamadı, network) için —
+  /// field-seviyeli hatalar aşağıdaki ayrı alanlarda tutulur.
   final String? errorMessage;
+  final String? nameError;
+  final String? phoneError;
+  final String? trainerError;
 
   /// F3-2 — paket satış akışı `memberPackages` dokümanını bu üyeye
   /// bağlamak için kullanır.
@@ -38,7 +51,10 @@ class MemberRegistrationController extends _$MemberRegistrationController {
   @override
   MemberRegistrationState build() => const MemberRegistrationState();
 
-  /// Başarılıysa `true` döner (çağıran taraf sonraki adıma geçer).
+  /// Başarılıysa `true` döner (çağıran taraf sonraki adıma geçer). Önceki
+  /// sürüm "zaten kayıtlı"/boş alan/antrenör seçilmedi hatalarının hepsini
+  /// tek bir genel banner'da gösteriyordu — artık her biri ilgili alanın
+  /// altında.
   Future<bool> submit() async {
     if (state.isSubmitting) return false;
 
@@ -46,8 +62,19 @@ class MemberRegistrationController extends _$MemberRegistrationController {
     final name = '${form.firstName.trim()} ${form.lastName.trim()}'.trim();
     final phoneDigits = form.phoneDigits.trim();
 
-    if (name.isEmpty || phoneDigits.length != 10) {
-      state = state.copyWith(errorMessage: 'Lütfen ad, soyad ve telefon numarasını gir.');
+    final nameError = name.isEmpty ? 'Ad ve soyad gerekli.' : null;
+    final phoneError = phoneDigits.length != 10
+        ? 'Geçerli bir telefon numarası gir.'
+        : null;
+    final trainerError = form.trainerId == null || form.trainerName == null
+        ? 'Bir antrenör seç.'
+        : null;
+    if (nameError != null || phoneError != null || trainerError != null) {
+      state = MemberRegistrationState(
+        nameError: nameError,
+        phoneError: phoneError,
+        trainerError: trainerError,
+      );
       return false;
     }
 
@@ -62,21 +89,74 @@ class MemberRegistrationController extends _$MemberRegistrationController {
     final service = ref.read(memberRegistrationServiceProvider);
     try {
       if (await service.phoneNumberIsTaken(phoneNumber)) {
-        state = state.copyWith(isSubmitting: false, errorMessage: 'Bu telefon numarası zaten kayıtlı.');
+        state = MemberRegistrationState(
+          phoneError: 'Bu telefon numarası zaten kayıtlı.',
+        );
         return false;
       }
       final memberId = await service.registerMember(
         name: name,
         phoneNumber: phoneNumber,
         gymId: gymId,
-        trainerId: form.trainerId,
-        trainerName: form.trainerName,
+        trainerId: form.trainerId!,
+        trainerName: form.trainerName!,
+        registeredAt: form.registeredAt,
         gender: form.gender,
+        canConfirmAttendance: form.canConfirmAttendance,
       );
       state = state.copyWith(isSubmitting: false, createdMemberId: memberId);
       return true;
     } catch (_) {
-      state = state.copyWith(isSubmitting: false, errorMessage: 'Üye eklenemedi. Bağlantını kontrol edip tekrar dene.');
+      state = state.copyWith(
+        isSubmitting: false,
+        errorMessage: 'Üye eklenemedi. Bağlantını kontrol edip tekrar dene.',
+      );
+      return false;
+    }
+  }
+
+  /// [MemberInfoPanel]'in mevcut üye düzenleme modu — daha önce sadece
+  /// paneli kapatıp hiçbir şey yazmıyordu (false-success).
+  Future<bool> submitEdit({required String memberId}) async {
+    if (state.isSubmitting) return false;
+
+    final form = ref.read(newMemberControllerProvider);
+    final name = '${form.firstName.trim()} ${form.lastName.trim()}'.trim();
+    final phoneDigits = form.phoneDigits.trim();
+
+    final nameError = name.isEmpty ? 'Ad ve soyad gerekli.' : null;
+    final phoneError = phoneDigits.length != 10
+        ? 'Geçerli bir telefon numarası gir.'
+        : null;
+    if (nameError != null || phoneError != null) {
+      state = MemberRegistrationState(
+        nameError: nameError,
+        phoneError: phoneError,
+      );
+      return false;
+    }
+
+    state = state.copyWith(isSubmitting: true, clearError: true);
+    try {
+      await ref
+          .read(memberRegistrationServiceProvider)
+          .updateMember(
+            memberId: memberId,
+            name: name,
+            phoneNumber: '+90$phoneDigits',
+            trainerId: form.trainerId,
+            trainerName: form.trainerName,
+            gender: form.gender,
+            canConfirmAttendance: form.canConfirmAttendance,
+          );
+      state = state.copyWith(isSubmitting: false);
+      return true;
+    } catch (_) {
+      state = state.copyWith(
+        isSubmitting: false,
+        errorMessage:
+            'Üye güncellenemedi. Bağlantını kontrol edip tekrar dene.',
+      );
       return false;
     }
   }

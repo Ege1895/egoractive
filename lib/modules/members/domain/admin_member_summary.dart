@@ -4,14 +4,6 @@ part 'admin_member_summary.freezed.dart';
 
 enum MemberPackageStatus { active, endingSoon, none }
 
-extension MemberPackageStatusLabel on MemberPackageStatus {
-  String get label => switch (this) {
-        MemberPackageStatus.active => 'Aktif',
-        MemberPackageStatus.endingSoon => 'Bitiyor',
-        MemberPackageStatus.none => 'Paketi yok',
-      };
-}
-
 @freezed
 class AdminMemberSummary with _$AdminMemberSummary {
   const factory AdminMemberSummary({

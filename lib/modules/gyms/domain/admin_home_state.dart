@@ -12,31 +12,35 @@ class TrainerPerformance with _$TrainerPerformance {
 }
 
 @freezed
-class DuePayment with _$DuePayment {
-  const factory DuePayment({
-    required String memberName,
-    required String dueDate,
-    required String amount,
-  }) = _DuePayment;
-}
-
-@freezed
 class AdminHomeState with _$AdminHomeState {
   const factory AdminHomeState({
     required String monthLabel,
     required int totalSessions,
     required int completedSessions,
     required int cancelledSessions,
-    required String estimatedRevenue,
-    required String revenueChangeLabel,
-    required String expenses,
+    required int estimatedRevenueTl,
+    required int expensesTl,
     required List<TrainerPerformance> trainerPerformance,
-    required List<DuePayment> duePayments,
-    required int pendingFeedbackCount,
-    required int recentFeedbackDays,
+    required int duePaymentMemberCount,
+    required int duePaymentTotalTl,
+    required int feedbackCount,
   }) = _AdminHomeState;
 
   const AdminHomeState._();
 
-  double get completionRatio => totalSessions == 0 ? 0 : completedSessions / totalSessions;
+  static const empty = AdminHomeState(
+    monthLabel: '',
+    totalSessions: 0,
+    completedSessions: 0,
+    cancelledSessions: 0,
+    estimatedRevenueTl: 0,
+    expensesTl: 0,
+    trainerPerformance: [],
+    duePaymentMemberCount: 0,
+    duePaymentTotalTl: 0,
+    feedbackCount: 0,
+  );
+
+  double get completionRatio =>
+      totalSessions == 0 ? 0 : completedSessions / totalSessions;
 }

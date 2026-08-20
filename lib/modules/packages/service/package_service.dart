@@ -1,26 +1,45 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-
-import '../../../shared/mock/member_mock_profile.dart';
-import '../domain/member_package.dart';
 
 part 'package_service.g.dart';
 
-/// Mock servis — Faz 2'de `memberPackages/{id}` dokümanına bağlanacak.
 class PackageService {
   const PackageService();
 
-  MemberPackage loadActivePackage() {
-    return const MemberPackage(
-      name: MemberMockProfile.packageName,
-      remainingSessions: MemberMockProfile.remainingSessions,
-      totalSessions: MemberMockProfile.totalSessions,
-      makeupSessions: MemberMockProfile.makeupSessions,
-      startDate: MemberMockProfile.packageStart,
-      endDate: MemberMockProfile.packageEnd,
-      trainerName: MemberMockProfile.trainerName,
-      trainerSpecialty: MemberMockProfile.trainerSpecialty,
-      trainerInitials: MemberMockProfile.trainerInitials,
-    );
+  Stream<Map<String, dynamic>?> watchMemberDoc(String memberId) {
+    return FirebaseFirestore.instance
+        .collection('users')
+        .doc(memberId)
+        .snapshots()
+        .map((doc) => doc.data());
+  }
+
+  /// `memberPackages`'te tek bir üye için birden fazla doküman birikebilir
+  /// (her yenilemede yeni bir doküman yazılıyor, bkz.
+  /// `NewMembershipController.save`) — en son satın alınan paket
+  /// `purchasedAt`'e göre alınır.
+  Stream<Map<String, dynamic>?> watchLatestPackageDoc(String memberId) {
+    return FirebaseFirestore.instance
+        .collection('memberPackages')
+        .where('memberId', isEqualTo: memberId)
+        .orderBy('purchasedAt', descending: true)
+        .limit(1)
+        .snapshots()
+        .map(
+          (snapshot) =>
+              snapshot.docs.isEmpty ? null : snapshot.docs.first.data(),
+        );
+  }
+
+  Future<String> loadTrainerSpecialty(String trainerId) async {
+    final doc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(trainerId)
+        .get();
+    final specialties =
+        (doc.data()?['specialties'] as List?)?.whereType<String>().toList() ??
+        const [];
+    return specialties.isEmpty ? '' : specialties.first;
   }
 }
 

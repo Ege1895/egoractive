@@ -9,5 +9,6 @@ class FeedbackState with _$FeedbackState {
     @Default('') String comment,
     @Default(false) bool isSubmitting,
     @Default(false) bool isSubmitted,
+    String? errorMessage,
   }) = _FeedbackState;
 }

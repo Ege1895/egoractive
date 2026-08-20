@@ -20,5 +20,6 @@ class GymThemeState with _$GymThemeState {
     required List<GymTheme> themes,
     required String activeThemeId,
     @Default(true) bool watermarkEnabled,
+    String? errorMessage,
   }) = _GymThemeState;
 }

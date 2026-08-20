@@ -1,10 +1,18 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:palette_generator/palette_generator.dart';
 
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
+import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/theme/theme_controller.dart';
+import '../../../../shared/utils/gym_logo_image.dart';
+import '../../../../shared/utils/phone_number_formatter.dart';
 import '../../../../shared/widgets/app_back_button.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_text_field.dart';
@@ -13,6 +21,7 @@ import '../../../reports/domain/report_recipients.dart';
 import '../../controller/gym_profile_controller.dart';
 import '../../controller/gym_theme_controller.dart';
 import '../../domain/gym_theme.dart';
+import '../../service/gym_logo_service.dart';
 import 'gym_themes_panel.dart';
 
 /// Admin 2 · Salon Bilgileri — düzenleme + Temalar'a giriş.
@@ -30,27 +39,79 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
   late final TextEditingController _gymReportEmailController;
   late final TextEditingController _accountingReportEmailController;
 
+  bool _isSaving = false;
+  bool _hydratedFromProfile = false;
+  String? _nameError;
+  String? _addressError;
+  String? _phoneError;
+  String? _saveErrorMessage;
+
+  XFile? _pickedLogoFile;
+  bool _isUploadingLogo = false;
+  String? _logoError;
+
+  List<Color> _logoPalette = const [];
+  bool _isExtractingPalette = false;
+  String? _paletteSourceKey;
+
+  Color? _previewColor;
+  late final GymTheme _originalTheme;
+
   @override
   void initState() {
     super.initState();
     final profile = ref.read(gymProfileControllerProvider);
     _nameController = TextEditingController(text: profile.name);
-    _addressController = TextEditingController(text: '${profile.address}, ${profile.city}');
-    _phoneController = TextEditingController(text: profile.phone);
+    _addressController = TextEditingController(
+      text: '${profile.address}, ${profile.city}',
+    );
+    _phoneController = TextEditingController(
+      text: formatTrPhoneDigits(profile.phone),
+    );
 
     final recipients = ref.read(reportRecipientsControllerProvider);
-    _gymReportEmailController = TextEditingController(text: recipients.gymReportEmail);
-    _accountingReportEmailController = TextEditingController(text: recipients.accountingReportEmail);
+    _gymReportEmailController = TextEditingController(
+      text: recipients.gymReportEmail,
+    );
+    _accountingReportEmailController = TextEditingController(
+      text: recipients.accountingReportEmail,
+    );
+
+    _originalTheme = ref.read(gymThemeControllerProvider.notifier).activeTheme;
   }
 
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
     final typography = context.appTypography;
+    final profileState = ref.watch(gymProfileControllerProvider);
     final profileController = ref.read(gymProfileControllerProvider.notifier);
+    final recipientsState = ref.watch(reportRecipientsControllerProvider);
     final themeState = ref.watch(gymThemeControllerProvider);
     final themeController = ref.read(gymThemeControllerProvider.notifier);
     final active = themeController.activeTheme;
+
+    // `gyms/{gymId}` dokümanı initState'te henüz Firestore'dan yüklenmemiş
+    // olabilir (stream async çözülür) — gerçek veri ilk geldiğinde alanları
+    // bir kez doldur. Sonrasında kullanıcı yazarken tekrar üzerine yazmaz.
+    if (!_hydratedFromProfile &&
+        (profileState.name.isNotEmpty ||
+            profileState.address.isNotEmpty ||
+            profileState.phone.isNotEmpty)) {
+      _hydratedFromProfile = true;
+      _nameController.text = profileState.name;
+      _addressController.text = '${profileState.address}, ${profileState.city}';
+      _phoneController.text = formatTrPhoneDigits(profileState.phone);
+    }
+
+    if (_pickedLogoFile == null &&
+        profileState.logoUrl.isNotEmpty &&
+        _paletteSourceKey != profileState.logoUrl &&
+        !_isExtractingPalette) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _extractPaletteFromNetwork(profileState.logoUrl);
+      });
+    }
 
     return Scaffold(
       body: SafeArea(
@@ -58,86 +119,225 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.md, AppSpacing.screenEdge, 0),
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.screenEdge,
+                AppSpacing.md,
+                AppSpacing.screenEdge,
+                0,
+              ),
               child: Row(
                 children: [
-                  AppBackButton(onTap: () => ref.read(panelStackControllerProvider.notifier).pop()),
+                  AppBackButton(
+                    onTap: () =>
+                        ref.read(panelStackControllerProvider.notifier).pop(),
+                  ),
                   const SizedBox(width: AppSpacing.md),
-                  Text('Salon bilgileri', style: typography.headingSmall.copyWith(color: colors.onSurface, fontSize: 18)),
+                  Text(
+                    ref.watch(
+                      rcTextProvider(RemoteConfigKeys.gymsGymInfoTitle),
+                    ),
+                    style: typography.headingSmall.copyWith(
+                      color: colors.onSurface,
+                      fontSize: 18,
+                    ),
+                  ),
                 ],
               ),
             ),
             Expanded(
               child: ListView(
-                padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.md, AppSpacing.screenEdge, AppSpacing.lg),
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.screenEdge,
+                  AppSpacing.md,
+                  AppSpacing.screenEdge,
+                  AppSpacing.lg,
+                ),
                 children: [
                   Container(
                     padding: const EdgeInsets.all(AppSpacing.lg),
                     decoration: BoxDecoration(
                       color: colors.surface,
-                      borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusCard,
+                      ),
                       border: Border.all(color: colors.outline),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        AppTextField(label: 'Salon adı', controller: _nameController, onChanged: profileController.updateName),
-                        const SizedBox(height: AppSpacing.md),
-                        AppTextField(label: 'Adres', controller: _addressController, onChanged: profileController.updateAddress),
+                        AppTextField(
+                          label: ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.gymsGymInfoNameFieldLabel,
+                            ),
+                          ),
+                          controller: _nameController,
+                          errorText: _nameError,
+                          onChanged: profileController.updateName,
+                        ),
                         const SizedBox(height: AppSpacing.md),
                         AppTextField(
-                          label: 'Telefon',
+                          label: ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.gymsGymInfoAddressFieldLabel,
+                            ),
+                          ),
+                          controller: _addressController,
+                          errorText: _addressError,
+                          onChanged: profileController.updateAddress,
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+                        AppTextField(
+                          label: ref.watch(
+                            rcTextProvider(RemoteConfigKeys.commonTelefonLabel),
+                          ),
                           keyboardType: TextInputType.phone,
                           controller: _phoneController,
+                          inputFormatters: [TrPhoneNumberInputFormatter()],
+                          errorText: _phoneError,
                           onChanged: profileController.updatePhone,
                         ),
                       ],
                     ),
                   ),
                   const SizedBox(height: AppSpacing.lg),
-                  Text('LOGO', style: typography.caption.copyWith(color: colors.onSurfaceMuted, letterSpacing: 1.2)),
+                  Text(
+                    ref.watch(
+                      rcTextProvider(RemoteConfigKeys.gymsGymInfoLogoSection),
+                    ),
+                    style: typography.caption.copyWith(
+                      color: colors.onSurfaceMuted,
+                      letterSpacing: 1.2,
+                    ),
+                  ),
                   const SizedBox(height: AppSpacing.sm),
                   Container(
                     padding: const EdgeInsets.all(AppSpacing.lg),
                     decoration: BoxDecoration(
                       color: colors.surface,
-                      borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusCard,
+                      ),
                       border: Border.all(color: colors.outline),
                     ),
                     child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Container(
-                          width: 72,
-                          height: 72,
-                          decoration: BoxDecoration(
-                            color: colors.surfaceRaised,
-                            borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
-                            border: Border.all(color: colors.outlineStrong),
+                        if (_pickedLogoFile != null)
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(
+                              AppSpacing.radiusInner,
+                            ),
+                            child: Image.file(
+                              File(_pickedLogoFile!.path),
+                              width: 84,
+                              height: 84,
+                              fit: BoxFit.cover,
+                            ),
+                          )
+                        else if (profileState.logoUrl.isNotEmpty)
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(
+                              AppSpacing.radiusInner,
+                            ),
+                            child: Image.network(
+                              profileState.logoUrl,
+                              width: 84,
+                              height: 84,
+                              fit: BoxFit.cover,
+                            ),
+                          )
+                        else
+                          Container(
+                            width: 84,
+                            height: 84,
+                            decoration: BoxDecoration(
+                              color: colors.surfaceRaised,
+                              borderRadius: BorderRadius.circular(
+                                AppSpacing.radiusInner,
+                              ),
+                              border: Border.all(color: colors.outlineStrong),
+                            ),
+                            alignment: Alignment.center,
+                            child: Icon(
+                              Icons.image_outlined,
+                              color: colors.onSurfaceMuted,
+                            ),
                           ),
-                          alignment: Alignment.center,
-                          child: Icon(Icons.image_outlined, color: colors.onSurfaceMuted),
-                        ),
                         const SizedBox(width: AppSpacing.md),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('Kare, en az 512×512 px PNG yükleyin.', style: typography.bodyMedium.copyWith(color: colors.onSurfaceVariant)),
+                              Text(
+                                ref.watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys.gymsGymInfoLogoHelper,
+                                  ),
+                                ),
+                                style: typography.bodyMedium.copyWith(
+                                  color: colors.onSurfaceVariant,
+                                ),
+                              ),
                               const SizedBox(height: AppSpacing.sm),
                               Material(
                                 color: colors.surfaceRaised,
-                                borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+                                borderRadius: BorderRadius.circular(
+                                  AppSpacing.radiusInner,
+                                ),
                                 child: InkWell(
-                                  onTap: () {},
-                                  borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+                                  onTap: _isUploadingLogo ? null : _pickLogo,
+                                  borderRadius: BorderRadius.circular(
+                                    AppSpacing.radiusInner,
+                                  ),
                                   child: Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-                                    constraints: const BoxConstraints(minHeight: 40),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: AppSpacing.md,
+                                    ),
+                                    constraints: const BoxConstraints(
+                                      minHeight: 40,
+                                    ),
                                     alignment: Alignment.centerLeft,
-                                    child: Text('Logoyu değiştir', style: typography.headingSmall.copyWith(fontSize: 14, color: colors.onSurfaceVariant)),
+                                    child: Text(
+                                      _isUploadingLogo
+                                          ? ref.watch(
+                                              rcTextProvider(
+                                                RemoteConfigKeys
+                                                    .gymsGymInfoUploadingLabel,
+                                              ),
+                                            )
+                                          : (_pickedLogoFile == null &&
+                                                    profileState.logoUrl.isEmpty
+                                                ? ref.watch(
+                                                    rcTextProvider(
+                                                      RemoteConfigKeys
+                                                          .gymsGymSetupChooseLogoButton,
+                                                    ),
+                                                  )
+                                                : ref.watch(
+                                                    rcTextProvider(
+                                                      RemoteConfigKeys
+                                                          .gymsGymInfoChangeLogoButton,
+                                                    ),
+                                                  )),
+                                      style: typography.headingSmall.copyWith(
+                                        fontSize: 14,
+                                        color: colors.onSurfaceVariant,
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ),
+                              if (_logoError != null) ...[
+                                const SizedBox(height: AppSpacing.sm),
+                                Text(
+                                  _logoError!,
+                                  style: typography.caption.copyWith(
+                                    color: colors.error,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ],
                             ],
                           ),
                         ),
@@ -145,72 +345,145 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
                     ),
                   ),
                   const SizedBox(height: AppSpacing.lg),
-                  Text('TEMA RENGİ', style: typography.caption.copyWith(color: colors.onSurfaceMuted, letterSpacing: 1.2)),
+                  Text(
+                    ref.watch(
+                      rcTextProvider(
+                        RemoteConfigKeys.gymsGymInfoThemeColorSection,
+                      ),
+                    ),
+                    style: typography.caption.copyWith(
+                      color: colors.onSurfaceMuted,
+                      letterSpacing: 1.2,
+                    ),
+                  ),
                   const SizedBox(height: AppSpacing.sm),
                   Container(
                     padding: const EdgeInsets.all(AppSpacing.lg),
                     decoration: BoxDecoration(
                       color: colors.surface,
-                      borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusCard,
+                      ),
                       border: Border.all(color: colors.outline),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Row(
-                          children: [
-                            for (final theme in themeState.themes)
-                              Padding(
-                                padding: const EdgeInsets.only(right: AppSpacing.md),
-                                child: _ThemeDot(
-                                  theme: theme,
-                                  selected: theme.id == themeState.activeThemeId,
-                                  onTap: () => themeController.selectTheme(theme.id),
-                                ),
-                              ),
-                          ],
-                        ),
-                        const SizedBox(height: AppSpacing.md),
-                        Container(
-                          padding: const EdgeInsets.all(AppSpacing.md),
-                          decoration: BoxDecoration(color: colors.surfaceRaised, borderRadius: BorderRadius.circular(AppSpacing.radiusInner)),
-                          child: Row(
+                        if (_isExtractingPalette)
+                          Row(
                             children: [
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text('Önizleme', style: typography.caption.copyWith(color: colors.onSurfaceMuted)),
-                                    Text('Birincil buton', style: typography.headingSmall.copyWith(color: colors.onSurface, fontSize: 15)),
-                                  ],
+                              SizedBox(
+                                width: 18,
+                                height: 18,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: colors.primary,
                                 ),
                               ),
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-                                constraints: const BoxConstraints(minHeight: 44),
-                                decoration: BoxDecoration(color: active.primary, borderRadius: BorderRadius.circular(AppSpacing.radiusInner)),
-                                alignment: Alignment.center,
-                                child: Text('Kaydet', style: typography.headingSmall.copyWith(fontSize: 15, color: colors.onPrimary)),
+                              const SizedBox(width: AppSpacing.sm),
+                              Text(
+                                ref.watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys
+                                        .gymsGymInfoPaletteExtractingLabel,
+                                  ),
+                                ),
+                                style: typography.bodyMedium.copyWith(
+                                  color: colors.onSurfaceMuted,
+                                  fontSize: 13,
+                                ),
                               ),
                             ],
+                          )
+                        else if (_logoPalette.isNotEmpty)
+                          Row(
+                            children: [
+                              for (final color in _logoPalette)
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                    right: AppSpacing.md,
+                                  ),
+                                  child: _ColorDot(
+                                    color: color,
+                                    selected:
+                                        color.toARGB32() ==
+                                        (_previewColor ?? active.primary)
+                                            .toARGB32(),
+                                    onTap: () => _previewColorTap(color),
+                                  ),
+                                ),
+                            ],
+                          )
+                        else
+                          Row(
+                            children: [
+                              for (final theme in themeState.themes)
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                    right: AppSpacing.md,
+                                  ),
+                                  child: _ThemeDot(
+                                    theme: theme,
+                                    selected:
+                                        theme.primary.toARGB32() ==
+                                        (_previewColor ?? active.primary)
+                                            .toARGB32(),
+                                    onTap: () =>
+                                        _previewColorTap(theme.primary),
+                                  ),
+                                ),
+                            ],
                           ),
-                        ),
+                        if (themeState.errorMessage != null) ...[
+                          const SizedBox(height: AppSpacing.sm),
+                          Text(
+                            themeState.errorMessage!,
+                            style: typography.bodyMedium.copyWith(
+                              color: colors.error,
+                              fontSize: 13,
+                            ),
+                          ),
+                        ],
                         const SizedBox(height: AppSpacing.sm),
                         Text(
-                          'Seçtiğiniz renk üyelerin uygulamasında da birincil renk olur; koyu zemin ve durum renkleri değişmez.',
-                          style: typography.bodyMedium.copyWith(color: colors.onSurfaceMuted, fontSize: 13),
+                          ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.gymsGymInfoThemeColorNote,
+                            ),
+                          ),
+                          style: typography.bodyMedium.copyWith(
+                            color: colors.onSurfaceMuted,
+                            fontSize: 13,
+                          ),
                         ),
                         const SizedBox(height: AppSpacing.md),
                         Material(
                           color: Colors.transparent,
-                          borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+                          borderRadius: BorderRadius.circular(
+                            AppSpacing.radiusInner,
+                          ),
                           child: InkWell(
-                            borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
-                            onTap: () => ref.read(panelStackControllerProvider.notifier).push(const GymThemesPanel()),
+                            borderRadius: BorderRadius.circular(
+                              AppSpacing.radiusInner,
+                            ),
+                            onTap: () => ref
+                                .read(panelStackControllerProvider.notifier)
+                                .push(const GymThemesPanel()),
                             child: Container(
                               constraints: const BoxConstraints(minHeight: 44),
                               alignment: Alignment.centerLeft,
-                              child: Text('Tüm temaları gör ›', style: typography.headingSmall.copyWith(fontSize: 14, color: colors.onPrimaryContainer)),
+                              child: Text(
+                                ref.watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys
+                                        .gymsGymInfoSeeAllThemesLink,
+                                  ),
+                                ),
+                                style: typography.headingSmall.copyWith(
+                                  fontSize: 14,
+                                  color: colors.onPrimaryContainer,
+                                ),
+                              ),
                             ),
                           ),
                         ),
@@ -218,52 +491,134 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
                     ),
                   ),
                   const SizedBox(height: AppSpacing.lg),
-                  Text('RAPOR E-POSTALARI', style: typography.caption.copyWith(color: colors.onSurfaceMuted, letterSpacing: 1.2)),
+                  Text(
+                    ref.watch(
+                      rcTextProvider(
+                        RemoteConfigKeys.gymsGymInfoReportEmailsSection,
+                      ),
+                    ),
+                    style: typography.caption.copyWith(
+                      color: colors.onSurfaceMuted,
+                      letterSpacing: 1.2,
+                    ),
+                  ),
                   const SizedBox(height: AppSpacing.sm),
                   Container(
                     padding: const EdgeInsets.all(AppSpacing.lg),
                     decoration: BoxDecoration(
                       color: colors.surface,
-                      borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusCard,
+                      ),
                       border: Border.all(color: colors.outline),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Haftalık salon ve muhasebe özeti bu adreslere e-posta ile gönderilir.',
-                          style: typography.caption.copyWith(color: colors.onSurfaceMuted, height: 1.4),
+                          ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys
+                                  .gymsGymInfoReportEmailsDescription,
+                            ),
+                          ),
+                          style: typography.caption.copyWith(
+                            color: colors.onSurfaceMuted,
+                            height: 1.4,
+                          ),
                         ),
                         const SizedBox(height: AppSpacing.md),
                         AppTextField(
-                          label: 'Salon raporu e-postası',
-                          hint: 'admin@stüdyo.com',
+                          label: ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.gymsGymInfoGymReportEmailLabel,
+                            ),
+                          ),
+                          hint: ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.gymsGymInfoGymReportEmailHint,
+                            ),
+                          ),
                           keyboardType: TextInputType.emailAddress,
                           controller: _gymReportEmailController,
                         ),
                         const SizedBox(height: AppSpacing.md),
                         AppTextField(
-                          label: 'Muhasebe raporu e-postası',
-                          hint: 'muhasebe@stüdyo.com',
+                          label: ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys
+                                  .gymsGymInfoAccountingReportEmailLabel,
+                            ),
+                          ),
+                          hint: ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys
+                                  .gymsGymInfoAccountingReportEmailHint,
+                            ),
+                          ),
                           keyboardType: TextInputType.emailAddress,
                           controller: _accountingReportEmailController,
                         ),
                         const SizedBox(height: AppSpacing.md),
+                        if (recipientsState.errorMessage != null) ...[
+                          Text(
+                            recipientsState.errorMessage!,
+                            style: typography.bodyMedium.copyWith(
+                              color: colors.error,
+                              fontSize: 13,
+                            ),
+                          ),
+                          const SizedBox(height: AppSpacing.sm),
+                        ],
                         Material(
                           color: Colors.transparent,
-                          borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+                          borderRadius: BorderRadius.circular(
+                            AppSpacing.radiusInner,
+                          ),
                           child: InkWell(
-                            borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
-                            onTap: () => ref.read(reportRecipientsControllerProvider.notifier).save(
-                                  ReportRecipients(
-                                    gymReportEmail: _gymReportEmailController.text.trim(),
-                                    accountingReportEmail: _accountingReportEmailController.text.trim(),
-                                  ),
-                                ),
+                            borderRadius: BorderRadius.circular(
+                              AppSpacing.radiusInner,
+                            ),
+                            onTap: recipientsState.isSaving
+                                ? null
+                                : () => ref
+                                      .read(
+                                        reportRecipientsControllerProvider
+                                            .notifier,
+                                      )
+                                      .save(
+                                        ReportRecipients(
+                                          gymReportEmail:
+                                              _gymReportEmailController.text
+                                                  .trim(),
+                                          accountingReportEmail:
+                                              _accountingReportEmailController
+                                                  .text
+                                                  .trim(),
+                                        ),
+                                      ),
                             child: Container(
                               constraints: const BoxConstraints(minHeight: 44),
                               alignment: Alignment.centerLeft,
-                              child: Text('Rapor e-postalarını kaydet', style: typography.headingSmall.copyWith(fontSize: 14, color: colors.onPrimaryContainer)),
+                              child: Text(
+                                recipientsState.isSaving
+                                    ? ref.watch(
+                                        rcTextProvider(
+                                          RemoteConfigKeys
+                                              .gymsGymInfoSavingLabel,
+                                        ),
+                                      )
+                                    : ref.watch(
+                                        rcTextProvider(
+                                          RemoteConfigKeys
+                                              .gymsGymInfoSaveReportEmailsButton,
+                                        ),
+                                      ),
+                                style: typography.headingSmall.copyWith(
+                                  fontSize: 14,
+                                  color: colors.onPrimaryContainer,
+                                ),
+                              ),
                             ),
                           ),
                         ),
@@ -274,13 +629,211 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.md, AppSpacing.screenEdge, AppSpacing.lg),
-              child: AppButton(label: 'Kaydet', onPressed: () => ref.read(panelStackControllerProvider.notifier).pop()),
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.screenEdge,
+                AppSpacing.md,
+                AppSpacing.screenEdge,
+                AppSpacing.lg,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (_saveErrorMessage != null) ...[
+                    Text(
+                      _saveErrorMessage!,
+                      style: typography.bodyMedium.copyWith(
+                        color: colors.error,
+                        fontSize: 13,
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                  ],
+                  AppButton(
+                    label: _isSaving
+                        ? ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.gymsGymInfoSavingLabel,
+                            ),
+                          )
+                        : ref.watch(
+                            rcTextProvider(RemoteConfigKeys.commonKaydet),
+                          ),
+                    onPressed: _isSaving ? null : _save,
+                  ),
+                ],
+              ),
             ),
           ],
         ),
       ),
     );
+  }
+
+  @override
+  void onPanelHide() {
+    if (_previewColor != null) {
+      ref
+          .read(themeControllerProvider.notifier)
+          .setAccentColor(_originalTheme.primary);
+    }
+    super.onPanelHide();
+  }
+
+  Future<void> _pickLogo() async {
+    final file = await ref.read(gymLogoServiceProvider).pickLogo();
+    if (file == null) return;
+    setState(() {
+      _pickedLogoFile = file;
+      _logoError = null;
+      _logoPalette = const [];
+      _paletteSourceKey = null;
+    });
+    await _extractPaletteFromFile(file);
+    await _uploadLogo(file);
+  }
+
+  Future<void> _uploadLogo(XFile file) async {
+    final gymId = await ref.read(activeGymIdProvider.future);
+    if (gymId == null) {
+      setState(() => _logoError = _logoUploadFailedError());
+      return;
+    }
+    setState(() => _isUploadingLogo = true);
+    try {
+      await ref
+          .read(gymLogoServiceProvider)
+          .uploadLogo(gymId: gymId, file: file);
+      if (!mounted) return;
+      setState(() => _isUploadingLogo = false);
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _isUploadingLogo = false;
+        _logoError = _logoUploadFailedError();
+      });
+    }
+  }
+
+  String _logoUploadFailedError() => ref.read(
+    rcTextProvider(RemoteConfigKeys.gymsGymInfoLogoUploadFailedError),
+  );
+
+  Future<void> _extractPaletteFromFile(XFile file) async {
+    setState(() => _isExtractingPalette = true);
+    try {
+      final generator = await PaletteGenerator.fromImageProvider(
+        FileImage(File(file.path)),
+        maximumColorCount: 12,
+      );
+      if (!mounted) return;
+      setState(() {
+        _logoPalette = extractGymPaletteColors(generator);
+        _isExtractingPalette = false;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _isExtractingPalette = false);
+    }
+  }
+
+  Future<void> _extractPaletteFromNetwork(String url) async {
+    if (_paletteSourceKey == url) return;
+    _paletteSourceKey = url;
+    setState(() => _isExtractingPalette = true);
+    try {
+      final generator = await PaletteGenerator.fromImageProvider(
+        NetworkImage(url),
+        maximumColorCount: 12,
+      );
+      if (!mounted) return;
+      setState(() {
+        _logoPalette = extractGymPaletteColors(generator);
+        _isExtractingPalette = false;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _isExtractingPalette = false);
+    }
+  }
+
+  void _previewColorTap(Color color) {
+    setState(() => _previewColor = color);
+    ref.read(themeControllerProvider.notifier).setAccentColor(color);
+  }
+
+  Future<void> _saveTheme() async {
+    final color = _previewColor;
+    if (color == null) return;
+    final themeState = ref.read(gymThemeControllerProvider);
+    final themeController = ref.read(gymThemeControllerProvider.notifier);
+    final matching = themeState.themes
+        .where((t) => t.primary.toARGB32() == color.toARGB32())
+        .firstOrNull;
+    if (matching != null) {
+      await themeController.selectTheme(matching.id);
+    } else {
+      final hex = color.toARGB32().toRadixString(16).substring(2).toUpperCase();
+      await themeController.addTheme(
+        GymTheme(
+          id: 'logo-$hex',
+          name: ref.read(
+            rcTextProvider(RemoteConfigKeys.gymsGymInfoLogoColorThemeName),
+          ),
+          primary: color,
+          soft: Color.lerp(color, Colors.white, 0.35)!,
+          note: ref.read(
+            rcTextProvider(RemoteConfigKeys.gymsGymInfoLogoColorThemeNote),
+          ),
+        ),
+      );
+    }
+    if (!mounted) return;
+    setState(() => _previewColor = null);
+  }
+
+  Future<void> _save() async {
+    final name = _nameController.text.trim();
+    final address = _addressController.text.trim();
+    final phone = _phoneController.text.trim();
+    setState(() {
+      _nameError = name.isEmpty
+          ? ref.read(
+              rcTextProvider(RemoteConfigKeys.gymsGymInfoNameRequiredError),
+            )
+          : null;
+      _addressError = address.isEmpty
+          ? ref.read(
+              rcTextProvider(RemoteConfigKeys.gymsGymInfoAddressRequiredError),
+            )
+          : null;
+      _phoneError = phone.isEmpty
+          ? ref.read(
+              rcTextProvider(RemoteConfigKeys.gymsGymInfoPhoneRequiredError),
+            )
+          : null;
+      _saveErrorMessage = null;
+    });
+    if (_nameError != null || _addressError != null || _phoneError != null) {
+      return;
+    }
+
+    setState(() => _isSaving = true);
+    try {
+      await ref.read(gymProfileControllerProvider.notifier).save();
+      if (_previewColor != null) await _saveTheme();
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _isSaving = false;
+        _saveErrorMessage = ref.read(
+          rcTextProvider(RemoteConfigKeys.gymsGymInfoSaveFailedError),
+        );
+      });
+      return;
+    }
+    if (!mounted) return;
+    ref.read(panelStackControllerProvider.notifier).pop();
   }
 
   @override
@@ -295,7 +848,11 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
 }
 
 class _ThemeDot extends StatelessWidget {
-  const _ThemeDot({required this.theme, required this.selected, required this.onTap});
+  const _ThemeDot({
+    required this.theme,
+    required this.selected,
+    required this.onTap,
+  });
 
   final GymTheme theme;
   final bool selected;
@@ -312,10 +869,61 @@ class _ThemeDot extends StatelessWidget {
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           color: theme.primary.withValues(alpha: 0.16),
-          border: Border.all(color: selected ? theme.primary : colors.outlineStrong, width: 2),
+          border: Border.all(
+            color: selected ? theme.primary : colors.outlineStrong,
+            width: 2,
+          ),
         ),
         alignment: Alignment.center,
-        child: Container(width: 24, height: 24, decoration: BoxDecoration(shape: BoxShape.circle, color: theme.primary)),
+        child: Container(
+          width: 24,
+          height: 24,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: theme.primary,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// [_ThemeDot] ile aynı görünüm, ama hazır bir [GymTheme] presetine değil
+/// logodan çıkarılan ham bir [Color]'a bağlı (palette_generator önerisi) —
+/// bkz. [GymSetupPanel]'in aynı amaçla kullandığı `_ColorSwatch`.
+class _ColorDot extends StatelessWidget {
+  const _ColorDot({
+    required this.color,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final Color color;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 52,
+        height: 52,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: color.withValues(alpha: 0.16),
+          border: Border.all(
+            color: selected ? color : colors.outlineStrong,
+            width: 2,
+          ),
+        ),
+        alignment: Alignment.center,
+        child: Container(
+          width: 24,
+          height: 24,
+          decoration: BoxDecoration(shape: BoxShape.circle, color: color),
+        ),
       ),
     );
   }

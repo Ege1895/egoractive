@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -10,6 +11,8 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import 'core/constants/ad_constants.dart';
+import 'core/locale/locale_controller.dart';
+import 'core/locale/locale_prefs.dart';
 import 'core/panels/panel_stack_controller.dart';
 import 'core/panels/panel_stack_view.dart';
 import 'core/remote_config/remote_config_service.dart';
@@ -32,9 +35,12 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await const RemoteConfigService().init();
+  await LocalePrefs.init();
   unawaited(MobileAds.instance.initialize());
   if (debugTestDeviceIds.isNotEmpty) {
-    MobileAds.instance.updateRequestConfiguration(RequestConfiguration(testDeviceIds: debugTestDeviceIds));
+    MobileAds.instance.updateRequestConfiguration(
+      RequestConfiguration(testDeviceIds: debugTestDeviceIds),
+    );
   }
   FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
   // Push bildirim kurulumu opsiyonel bir iyileştirme — burada oluşacak
@@ -43,9 +49,16 @@ void main() async {
   try {
     await PushNotificationService().init(_providerContainer);
   } on Exception catch (error) {
-    debugPrint('Push bildirim kurulumu başarısız oldu, uygulama yine de açılıyor: $error');
+    debugPrint(
+      'Push bildirim kurulumu başarısız oldu, uygulama yine de açılıyor: $error',
+    );
   }
-  runApp(UncontrolledProviderScope(container: _providerContainer, child: const EgoractiveApp()));
+  runApp(
+    UncontrolledProviderScope(
+      container: _providerContainer,
+      child: const EgoractiveApp(),
+    ),
+  );
 }
 
 class EgoractiveApp extends ConsumerWidget {
@@ -53,14 +66,24 @@ class EgoractiveApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final colors = ref.watch(themeControllerProvider).valueOrNull ?? AppColorScheme.defaultScheme();
+    final colors =
+        ref.watch(themeControllerProvider).valueOrNull ??
+        AppColorScheme.defaultScheme();
+    final locale = ref.watch(localeControllerProvider);
     return MaterialApp(
       title: 'Egoractive',
       theme: AppTheme.build(
         colors: colors,
         typography: AppTypography.standard(),
       ),
-      localizationsDelegates: const [FlutterQuillLocalizations.delegate],
+      locale: Locale(locale),
+      supportedLocales: const [Locale('tr'), Locale('en')],
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+        FlutterQuillLocalizations.delegate,
+      ],
       home: const _AppRoot(),
     );
   }

@@ -1,5 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../core/locale/locale_controller.dart';
 import '../../../core/remote_config/remote_config_service.dart';
 import '../../../core/theme/theme_controller.dart';
 import '../domain/expense_category.dart';
@@ -8,7 +9,11 @@ import '../repository/expenses_repository.dart';
 
 part 'expenses_controller.g.dart';
 
-const _empty = ExpensesState(monthLabel: '', revenueRatioLabel: '—', entries: []);
+const _empty = ExpensesState(
+  monthLabel: '',
+  revenueRatioLabel: '—',
+  entries: [],
+);
 
 @riverpod
 Stream<ExpensesState> _expensesForGym(_ExpensesForGymRef ref, String gymId) {
@@ -20,12 +25,17 @@ Stream<ExpensesState> _expensesForGym(_ExpensesForGymRef ref, String gymId) {
 /// durumlarda panel çökmesin diye. Cihaz diline göre `label_tr`/`label_en`
 /// çözümlenir — Firestore'a yazılan `id` dilden bağımsız kalır.
 @riverpod
-Stream<List<ExpenseCategoryOption>> expenseCategories(ExpenseCategoriesRef ref) async* {
+Stream<List<ExpenseCategoryOption>> expenseCategories(
+  ExpenseCategoriesRef ref,
+) async* {
   final rc = ref.watch(remoteConfigServiceProvider);
-  final locale = rc.currentLocale;
+  final locale = ref.watch(localeControllerProvider);
   yield rc.expenseCategories.map((raw) {
     final id = raw['id'] as String? ?? '';
-    return ExpenseCategoryOption(id: id, label: (raw['label_$locale'] as String?) ?? id);
+    return ExpenseCategoryOption(
+      id: id,
+      label: (raw['label_$locale'] as String?) ?? id,
+    );
   }).toList();
 }
 
@@ -47,7 +57,9 @@ class ExpensesController extends _$ExpensesController {
   }) async {
     final gymId = ref.read(activeGymIdProvider).valueOrNull;
     if (gymId == null) return;
-    await ref.read(expensesRepositoryProvider).addExpense(
+    await ref
+        .read(expensesRepositoryProvider)
+        .addExpense(
           gymId: gymId,
           category: category,
           title: title,

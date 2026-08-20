@@ -3,12 +3,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
+import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../../../shared/mock/member_mock_profile.dart';
+import '../../../../shared/domain/membership_installment.dart';
 import '../../../../shared/widgets/progress_ring.dart';
+import '../../../../shared/utils/tr_date_formatter.dart';
+import '../../../auth/controller/member_profile_controller.dart';
+import '../../../gyms/controller/gym_profile_controller.dart';
+import '../../../packages/controller/package_controller.dart';
 import '../../controller/sessions_controller.dart';
 import '../../domain/session.dart';
-import '../../../packages/ui/panels/package_panel.dart';
 import 'attendance_confirm_panel.dart';
 
 /// Üye · Ana Sayfa (Ana Sayfa sekmesi kökü).
@@ -20,7 +24,34 @@ class MemberHomePanel extends ConsumerWidget {
     final colors = context.appColors;
     final typography = context.appTypography;
     final state = ref.watch(sessionsControllerProvider);
-    final controller = ref.read(sessionsControllerProvider.notifier);
+    final sessionsController = ref.read(sessionsControllerProvider.notifier);
+    final profile = ref.watch(memberProfileControllerProvider);
+    final gymProfile = ref.watch(gymProfileControllerProvider);
+    final pkg = ref.watch(packageControllerProvider);
+    // Firebase.initializeApp hiç çağrılmamış bir widget test ortamında
+    // Remote Config okuması fırlatabilir — bu durumda mock/sabit eşikle
+    // devam edilir (bkz. create_group_session_controller.dart'taki aynı desen).
+    int dueSoonDays;
+    try {
+      dueSoonDays = ref
+          .watch(remoteConfigServiceProvider)
+          .installmentDueSoonDays;
+    } catch (_) {
+      dueSoonDays = 3;
+    }
+    final firstName = profile.name.trim().isEmpty
+        ? ''
+        : profile.name.trim().split(RegExp(r'\s+')).first;
+    final initials = profile.name.trim().isEmpty
+        ? '?'
+        : profile.name
+              .trim()
+              .split(RegExp(r'\s+'))
+              .where((p) => p.isNotEmpty)
+              .map((p) => p[0])
+              .take(2)
+              .join()
+              .toUpperCase();
 
     return Scaffold(
       body: SafeArea(
@@ -43,8 +74,11 @@ class MemberHomePanel extends ConsumerWidget {
                   ),
                   alignment: Alignment.center,
                   child: Text(
-                    'AY',
-                    style: typography.headingSmall.copyWith(color: colors.onPrimaryContainer, fontSize: 16),
+                    initials,
+                    style: typography.headingSmall.copyWith(
+                      color: colors.onPrimaryContainer,
+                      fontSize: 16,
+                    ),
                   ),
                 ),
                 const SizedBox(width: AppSpacing.md),
@@ -52,10 +86,26 @@ class MemberHomePanel extends ConsumerWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(MemberMockProfile.gymName, style: typography.caption.copyWith(color: colors.onSurfaceMuted)),
                       Text(
-                        'Merhaba ${MemberMockProfile.memberFirstName}',
-                        style: typography.headingMedium.copyWith(color: colors.onSurface),
+                        gymProfile.name.isEmpty ? '—' : gymProfile.name,
+                        style: typography.caption.copyWith(
+                          color: colors.onSurfaceMuted,
+                        ),
+                      ),
+                      Text(
+                        ref
+                            .watch(
+                              rcTextProvider(
+                                RemoteConfigKeys.sessionsMemberHomeGreeting,
+                              ),
+                            )
+                            .replaceAll(
+                              '{name}',
+                              firstName.isEmpty ? '' : ' $firstName',
+                            ),
+                        style: typography.headingMedium.copyWith(
+                          color: colors.onSurface,
+                        ),
                       ),
                     ],
                   ),
@@ -68,24 +118,11 @@ class MemberHomePanel extends ConsumerWidget {
                     shape: BoxShape.circle,
                     border: Border.all(color: colors.outlineStrong),
                   ),
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      Icon(Icons.notifications_outlined, size: 18, color: colors.onSurfaceVariant),
-                      Positioned(
-                        top: 10,
-                        right: 11,
-                        child: Container(
-                          width: 8,
-                          height: 8,
-                          decoration: BoxDecoration(
-                            color: colors.warning,
-                            shape: BoxShape.circle,
-                            border: Border.all(color: colors.background, width: 2),
-                          ),
-                        ),
-                      ),
-                    ],
+                  alignment: Alignment.center,
+                  child: Icon(
+                    Icons.notifications_outlined,
+                    size: 18,
+                    color: colors.onSurfaceVariant,
                   ),
                 ),
               ],
@@ -102,10 +139,12 @@ class MemberHomePanel extends ConsumerWidget {
                 children: [
                   ProgressRing(
                     size: 88,
-                    progress: MemberMockProfile.remainingSessions / MemberMockProfile.totalSessions,
+                    progress: pkg.progressRatio,
                     child: Text(
-                      '${MemberMockProfile.remainingSessions}',
-                      style: typography.dataLarge.copyWith(color: colors.onSurface),
+                      '${pkg.remainingSessions}',
+                      style: typography.dataLarge.copyWith(
+                        color: colors.onSurface,
+                      ),
                     ),
                   ),
                   const SizedBox(width: AppSpacing.lg),
@@ -114,13 +153,35 @@ class MemberHomePanel extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Kalan dersin: ${MemberMockProfile.remainingSessions}',
-                          style: typography.headingSmall.copyWith(color: colors.onSurface),
+                          ref
+                              .watch(
+                                rcTextProvider(
+                                  RemoteConfigKeys
+                                      .sessionsMemberHomeRemainingSessionsLabel,
+                                ),
+                              )
+                              .replaceAll(
+                                '{count}',
+                                '${pkg.remainingSessions}',
+                              ),
+                          style: typography.headingSmall.copyWith(
+                            color: colors.onSurface,
+                          ),
                         ),
                         const SizedBox(height: AppSpacing.xs),
                         Text(
-                          '${MemberMockProfile.packageName} paketi · ${MemberMockProfile.packageEnd}\'e kadar geçerli',
-                          style: typography.bodyMedium.copyWith(color: colors.onSurfaceVariant),
+                          ref
+                              .watch(
+                                rcTextProvider(
+                                  RemoteConfigKeys
+                                      .sessionsMemberHomePackageValidUntil,
+                                ),
+                              )
+                              .replaceAll('{name}', pkg.name)
+                              .replaceAll('{date}', pkg.endDate),
+                          style: typography.bodyMedium.copyWith(
+                            color: colors.onSurfaceVariant,
+                          ),
                         ),
                       ],
                     ),
@@ -128,69 +189,26 @@ class MemberHomePanel extends ConsumerWidget {
                 ],
               ),
             ),
-            if (state.paymentWarning != null) ...[
-              const SizedBox(height: AppSpacing.lg),
-              Container(
-                padding: const EdgeInsets.all(AppSpacing.lg),
-                decoration: BoxDecoration(
-                  color: colors.warningContainer,
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
-                  border: Border.all(color: colors.warning.withValues(alpha: 0.32)),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          width: 28,
-                          height: 28,
-                          decoration: BoxDecoration(color: colors.warning, shape: BoxShape.circle),
-                          alignment: Alignment.center,
-                          child: Text(
-                            '!',
-                            style: typography.headingSmall.copyWith(color: colors.warningContainer, fontSize: 15),
-                          ),
-                        ),
-                        const SizedBox(width: AppSpacing.md),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Ödeme zamanı yaklaşıyor',
-                                style: typography.headingSmall.copyWith(color: colors.onWarningContainer, fontSize: 16),
-                              ),
-                              const SizedBox(height: AppSpacing.xs),
-                              Text(
-                                '${state.paymentWarning!.amount} kalan ödemen ${state.paymentWarning!.dueDate}\'ta son buluyor. '
-                                'Antrenörüne bugün iletebilirsin.',
-                                style: typography.bodyMedium.copyWith(color: colors.onSurfaceVariant),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: AppSpacing.md),
-                    _SecondaryActionButton(
-                      label: 'Paketimi gör',
-                      onTap: () => ref.read(panelStackControllerProvider.notifier).push(const PackagePanel()),
-                    ),
-                  ],
-                ),
-              ),
-            ],
             const SizedBox(height: AppSpacing.xl),
             Text(
-              'SIRADAKİ DERSİN',
-              style: typography.caption.copyWith(color: colors.onSurfaceMuted, letterSpacing: 1.2),
+              ref.watch(
+                rcTextProvider(
+                  RemoteConfigKeys.sessionsMemberHomeNextSessionSection,
+                ),
+              ),
+              style: typography.caption.copyWith(
+                color: colors.onSurfaceMuted,
+                letterSpacing: 1.2,
+              ),
             ),
             const SizedBox(height: AppSpacing.sm),
             InkWell(
               borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
-              onTap: () => ref.read(panelStackControllerProvider.notifier).push(const AttendanceConfirmPanel()),
+              onTap: !state.canConfirmAttendance
+                  ? null
+                  : () => ref
+                        .read(panelStackControllerProvider.notifier)
+                        .push(const AttendanceConfirmPanel()),
               child: Container(
                 padding: const EdgeInsets.all(AppSpacing.lg),
                 decoration: BoxDecoration(
@@ -203,20 +221,30 @@ class MemberHomePanel extends ConsumerWidget {
                     Row(
                       children: [
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: AppSpacing.md,
+                            vertical: AppSpacing.sm,
+                          ),
                           decoration: BoxDecoration(
                             color: colors.surfaceRaised,
-                            borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+                            borderRadius: BorderRadius.circular(
+                              AppSpacing.radiusInner,
+                            ),
                           ),
                           child: Column(
                             children: [
                               Text(
                                 state.nextSession.day,
-                                style: typography.dataMedium.copyWith(color: colors.onSurface),
+                                style: typography.dataMedium.copyWith(
+                                  color: colors.onSurface,
+                                ),
                               ),
                               Text(
                                 state.nextSession.month,
-                                style: typography.caption.copyWith(color: colors.onSurfaceMuted, fontSize: 12),
+                                style: typography.caption.copyWith(
+                                  color: colors.onSurfaceMuted,
+                                  fontSize: 12,
+                                ),
                               ),
                             ],
                           ),
@@ -228,58 +256,145 @@ class MemberHomePanel extends ConsumerWidget {
                             children: [
                               Text(
                                 state.nextSession.title,
-                                style: typography.headingSmall.copyWith(color: colors.onSurface),
+                                style: typography.headingSmall.copyWith(
+                                  color: colors.onSurface,
+                                ),
                               ),
                               Text(
                                 state.nextSession.meta,
-                                style: typography.bodyMedium.copyWith(color: colors.onSurfaceVariant, fontSize: 14),
+                                style: typography.bodyMedium.copyWith(
+                                  color: colors.onSurfaceVariant,
+                                  fontSize: 14,
+                                ),
                               ),
                             ],
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: AppSpacing.md),
-                    if (state.attendanceAnswer == AttendanceAnswer.pending)
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _QuickActionButton(
-                              label: 'Gelicem',
-                              filled: true,
-                              onTap: () => controller.confirmAttendance(true),
-                            ),
-                          ),
-                          const SizedBox(width: AppSpacing.sm),
-                          Expanded(
-                            child: _QuickActionButton(
-                              label: 'Gelmeyeceğim',
-                              filled: false,
-                              onTap: () => controller.confirmAttendance(false),
-                            ),
-                          ),
-                        ],
-                      )
-                    else
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          state.attendanceAnswer == AttendanceAnswer.coming
-                              ? 'Geleceğini bildirdin'
-                              : 'Gelmeyeceğini bildirdin',
+                    if (state.canConfirmAttendance) ...[
+                      const SizedBox(height: AppSpacing.md),
+                      if (state.attendanceErrorMessage != null) ...[
+                        Text(
+                          state.attendanceErrorMessage!,
                           style: typography.bodyMedium.copyWith(
-                            color: state.attendanceAnswer == AttendanceAnswer.coming
-                                ? colors.success
-                                : colors.onWarningContainer,
+                            color: colors.error,
+                            fontSize: 13,
                           ),
                         ),
-                      ),
+                        const SizedBox(height: AppSpacing.sm),
+                      ],
+                      if (state.attendanceAnswer == AttendanceAnswer.pending)
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _QuickActionButton(
+                                label: ref.watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys.commonGelicem,
+                                  ),
+                                ),
+                                filled: true,
+                                onTap: () =>
+                                    sessionsController.confirmAttendance(true),
+                              ),
+                            ),
+                            const SizedBox(width: AppSpacing.sm),
+                            Expanded(
+                              child: _QuickActionButton(
+                                label: ref.watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys.commonGelmeyecegim,
+                                  ),
+                                ),
+                                filled: false,
+                                onTap: () =>
+                                    sessionsController.confirmAttendance(false),
+                              ),
+                            ),
+                          ],
+                        )
+                      else
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            state.attendanceAnswer == AttendanceAnswer.coming
+                                ? ref.watch(
+                                    rcTextProvider(
+                                      RemoteConfigKeys
+                                          .sessionsConfirmAttendingAnswerText,
+                                    ),
+                                  )
+                                : ref.watch(
+                                    rcTextProvider(
+                                      RemoteConfigKeys
+                                          .sessionsConfirmNotAttendingAnswerText,
+                                    ),
+                                  ),
+                            style: typography.bodyMedium.copyWith(
+                              color:
+                                  state.attendanceAnswer ==
+                                      AttendanceAnswer.coming
+                                  ? colors.success
+                                  : colors.onWarningContainer,
+                            ),
+                          ),
+                        ),
+                    ],
                   ],
                 ),
               ),
             ),
+            if (pkg.installments.isNotEmpty) ...[
+              const SizedBox(height: AppSpacing.xl),
+              Text(
+                ref.watch(
+                  rcTextProvider(
+                    RemoteConfigKeys.sessionsMemberHomeInstallmentsSection,
+                  ),
+                ),
+                style: typography.caption.copyWith(
+                  color: colors.onSurfaceMuted,
+                  letterSpacing: 1.2,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+                decoration: BoxDecoration(
+                  color: colors.surface,
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
+                  border: Border.all(color: colors.outline),
+                ),
+                child: Column(
+                  children: [
+                    for (var i = 0; i < pkg.installments.length; i++)
+                      _MemberInstallmentRow(
+                        installment: pkg.installments[i],
+                        showDivider: i < pkg.installments.length - 1,
+                        isDueSoon:
+                            !pkg.installments[i].paid &&
+                            pkg.installments[i].dueDate
+                                    .difference(DateTime.now())
+                                    .inDays <=
+                                dueSoonDays,
+                      ),
+                  ],
+                ),
+              ),
+            ],
             const SizedBox(height: AppSpacing.xl),
-            Text('BU HAFTA', style: typography.caption.copyWith(color: colors.onSurfaceMuted, letterSpacing: 1.2)),
+            Text(
+              ref.watch(
+                rcTextProvider(
+                  RemoteConfigKeys.sessionsMemberHomeThisWeekSection,
+                ),
+              ),
+              style: typography.caption.copyWith(
+                color: colors.onSurfaceMuted,
+                letterSpacing: 1.2,
+              ),
+            ),
             const SizedBox(height: AppSpacing.sm),
             Container(
               height: 118,
@@ -295,7 +410,9 @@ class MemberHomePanel extends ConsumerWidget {
                   for (final day in state.week)
                     Expanded(
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.xs,
+                        ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
@@ -305,7 +422,11 @@ class MemberHomePanel extends ConsumerWidget {
                                 heightFactor: day.intensity.clamp(0.08, 1.0),
                                 child: Container(
                                   decoration: BoxDecoration(
-                                    color: day.isRestDay ? colors.surfaceRaised : colors.primary.withValues(alpha: 0.85),
+                                    color: day.isRestDay
+                                        ? colors.surfaceRaised
+                                        : colors.primary.withValues(
+                                            alpha: 0.85,
+                                          ),
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                 ),
@@ -315,7 +436,10 @@ class MemberHomePanel extends ConsumerWidget {
                             Text(
                               day.label,
                               textAlign: TextAlign.center,
-                              style: typography.caption.copyWith(color: colors.onSurfaceMuted, fontSize: 12),
+                              style: typography.caption.copyWith(
+                                color: colors.onSurfaceMuted,
+                                fontSize: 12,
+                              ),
                             ),
                           ],
                         ),
@@ -332,7 +456,11 @@ class MemberHomePanel extends ConsumerWidget {
 }
 
 class _QuickActionButton extends StatelessWidget {
-  const _QuickActionButton({required this.label, required this.filled, required this.onTap});
+  const _QuickActionButton({
+    required this.label,
+    required this.filled,
+    required this.onTap,
+  });
 
   final String label;
   final bool filled;
@@ -363,30 +491,102 @@ class _QuickActionButton extends StatelessWidget {
   }
 }
 
-class _SecondaryActionButton extends StatelessWidget {
-  const _SecondaryActionButton({required this.label, required this.onTap});
+class _MemberInstallmentRow extends ConsumerWidget {
+  const _MemberInstallmentRow({
+    required this.installment,
+    required this.showDivider,
+    required this.isDueSoon,
+  });
 
-  final String label;
-  final VoidCallback onTap;
+  final MembershipInstallment installment;
+  final bool showDivider;
+
+  /// Son ödeme tarihine RC eşiği kadar (veya daha az) gün kaldıysa ya da
+  /// geçmişse `true` — sadece ödenmemiş taksitler için anlamlı.
+  final bool isDueSoon;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.appColors;
-    return Material(
-      color: colors.surface,
-      borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
-        child: Container(
-          width: double.infinity,
-          constraints: const BoxConstraints(minHeight: 44),
-          alignment: Alignment.center,
-          child: Text(
-            label,
-            style: context.appTypography.headingSmall.copyWith(fontSize: 15, color: colors.onSurface),
+    final typography = context.appTypography;
+    final (badgeLabel, badgeBg, badgeFg) = installment.paid
+        ? (
+            ref.watch(rcTextProvider(RemoteConfigKeys.membersDetailPaidLabel)),
+            colors.successContainer,
+            colors.onSuccessContainer,
+          )
+        : isDueSoon
+        ? (
+            ref.watch(
+              rcTextProvider(
+                RemoteConfigKeys.sessionsMemberHomeInstallmentDueSoonLabel,
+              ),
+            ),
+            colors.errorContainer,
+            colors.onErrorContainer,
+          )
+        : (
+            ref.watch(
+              rcTextProvider(
+                RemoteConfigKeys.sessionsMemberHomeInstallmentUnpaidLabel,
+              ),
+            ),
+            colors.warningContainer,
+            colors.onWarningContainer,
+          );
+    return Container(
+      constraints: const BoxConstraints(minHeight: 52),
+      decoration: BoxDecoration(
+        border: showDivider
+            ? Border(bottom: BorderSide(color: colors.outline))
+            : null,
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              ref
+                  .watch(
+                    rcTextProvider(
+                      RemoteConfigKeys.sessionsMemberHomeInstallmentIndexLabel,
+                    ),
+                  )
+                  .replaceAll('{index}', '${installment.index}'),
+              style: typography.bodyLarge.copyWith(
+                color: colors.onSurface,
+                fontSize: 15,
+              ),
+            ),
           ),
-        ),
+          if (!installment.paid) ...[
+            Text(
+              ref
+                  .watch(
+                    rcTextProvider(
+                      RemoteConfigKeys
+                          .sessionsMemberHomeInstallmentDueDateLabel,
+                    ),
+                  )
+                  .replaceAll('{date}', formatTrDate(installment.dueDate)),
+              style: typography.caption.copyWith(color: colors.onSurfaceMuted),
+            ),
+            const SizedBox(width: AppSpacing.sm),
+          ],
+          Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.sm,
+              vertical: 5,
+            ),
+            decoration: BoxDecoration(
+              color: badgeBg,
+              borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
+            ),
+            child: Text(
+              badgeLabel,
+              style: typography.caption.copyWith(color: badgeFg, fontSize: 12),
+            ),
+          ),
+        ],
       ),
     );
   }

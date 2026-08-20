@@ -17,9 +17,10 @@ final _privateConstructorUsedError = UnsupportedError(
 
 /// @nodoc
 mixin _$SendNotificationForm {
-  NotificationTargetType get targetType => throw _privateConstructorUsedError;
-  String? get targetMemberId => throw _privateConstructorUsedError;
-  String? get targetMemberName => throw _privateConstructorUsedError;
+  NotificationTargetType get targetType =>
+      throw _privateConstructorUsedError; // id -> isim, seçim sırasını korumak için Map yerine LinkedHashMap
+  // davranışına sahip Dart'ın varsayılan Map'i kullanılıyor.
+  Map<String, String> get targetMembers => throw _privateConstructorUsedError;
   String get title => throw _privateConstructorUsedError;
   String get message => throw _privateConstructorUsedError;
   bool get sent => throw _privateConstructorUsedError;
@@ -42,8 +43,7 @@ abstract class $SendNotificationFormCopyWith<$Res> {
   @useResult
   $Res call({
     NotificationTargetType targetType,
-    String? targetMemberId,
-    String? targetMemberName,
+    Map<String, String> targetMembers,
     String title,
     String message,
     bool sent,
@@ -71,8 +71,7 @@ class _$SendNotificationFormCopyWithImpl<
   @override
   $Res call({
     Object? targetType = null,
-    Object? targetMemberId = freezed,
-    Object? targetMemberName = freezed,
+    Object? targetMembers = null,
     Object? title = null,
     Object? message = null,
     Object? sent = null,
@@ -85,14 +84,10 @@ class _$SendNotificationFormCopyWithImpl<
                 ? _value.targetType
                 : targetType // ignore: cast_nullable_to_non_nullable
                       as NotificationTargetType,
-            targetMemberId: freezed == targetMemberId
-                ? _value.targetMemberId
-                : targetMemberId // ignore: cast_nullable_to_non_nullable
-                      as String?,
-            targetMemberName: freezed == targetMemberName
-                ? _value.targetMemberName
-                : targetMemberName // ignore: cast_nullable_to_non_nullable
-                      as String?,
+            targetMembers: null == targetMembers
+                ? _value.targetMembers
+                : targetMembers // ignore: cast_nullable_to_non_nullable
+                      as Map<String, String>,
             title: null == title
                 ? _value.title
                 : title // ignore: cast_nullable_to_non_nullable
@@ -130,8 +125,7 @@ abstract class _$$SendNotificationFormImplCopyWith<$Res>
   @useResult
   $Res call({
     NotificationTargetType targetType,
-    String? targetMemberId,
-    String? targetMemberName,
+    Map<String, String> targetMembers,
     String title,
     String message,
     bool sent,
@@ -155,8 +149,7 @@ class __$$SendNotificationFormImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? targetType = null,
-    Object? targetMemberId = freezed,
-    Object? targetMemberName = freezed,
+    Object? targetMembers = null,
     Object? title = null,
     Object? message = null,
     Object? sent = null,
@@ -169,14 +162,10 @@ class __$$SendNotificationFormImplCopyWithImpl<$Res>
             ? _value.targetType
             : targetType // ignore: cast_nullable_to_non_nullable
                   as NotificationTargetType,
-        targetMemberId: freezed == targetMemberId
-            ? _value.targetMemberId
-            : targetMemberId // ignore: cast_nullable_to_non_nullable
-                  as String?,
-        targetMemberName: freezed == targetMemberName
-            ? _value.targetMemberName
-            : targetMemberName // ignore: cast_nullable_to_non_nullable
-                  as String?,
+        targetMembers: null == targetMembers
+            ? _value._targetMembers
+            : targetMembers // ignore: cast_nullable_to_non_nullable
+                  as Map<String, String>,
         title: null == title
             ? _value.title
             : title // ignore: cast_nullable_to_non_nullable
@@ -207,22 +196,30 @@ class __$$SendNotificationFormImplCopyWithImpl<$Res>
 class _$SendNotificationFormImpl implements _SendNotificationForm {
   const _$SendNotificationFormImpl({
     this.targetType = NotificationTargetType.wholeGym,
-    this.targetMemberId,
-    this.targetMemberName,
+    final Map<String, String> targetMembers = const <String, String>{},
     this.title = '',
     this.message = '',
     this.sent = false,
     this.isSending = false,
     this.errorMessage,
-  });
+  }) : _targetMembers = targetMembers;
 
   @override
   @JsonKey()
   final NotificationTargetType targetType;
+  // id -> isim, seçim sırasını korumak için Map yerine LinkedHashMap
+  // davranışına sahip Dart'ın varsayılan Map'i kullanılıyor.
+  final Map<String, String> _targetMembers;
+  // id -> isim, seçim sırasını korumak için Map yerine LinkedHashMap
+  // davranışına sahip Dart'ın varsayılan Map'i kullanılıyor.
   @override
-  final String? targetMemberId;
-  @override
-  final String? targetMemberName;
+  @JsonKey()
+  Map<String, String> get targetMembers {
+    if (_targetMembers is EqualUnmodifiableMapView) return _targetMembers;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(_targetMembers);
+  }
+
   @override
   @JsonKey()
   final String title;
@@ -240,7 +237,7 @@ class _$SendNotificationFormImpl implements _SendNotificationForm {
 
   @override
   String toString() {
-    return 'SendNotificationForm(targetType: $targetType, targetMemberId: $targetMemberId, targetMemberName: $targetMemberName, title: $title, message: $message, sent: $sent, isSending: $isSending, errorMessage: $errorMessage)';
+    return 'SendNotificationForm(targetType: $targetType, targetMembers: $targetMembers, title: $title, message: $message, sent: $sent, isSending: $isSending, errorMessage: $errorMessage)';
   }
 
   @override
@@ -250,10 +247,10 @@ class _$SendNotificationFormImpl implements _SendNotificationForm {
             other is _$SendNotificationFormImpl &&
             (identical(other.targetType, targetType) ||
                 other.targetType == targetType) &&
-            (identical(other.targetMemberId, targetMemberId) ||
-                other.targetMemberId == targetMemberId) &&
-            (identical(other.targetMemberName, targetMemberName) ||
-                other.targetMemberName == targetMemberName) &&
+            const DeepCollectionEquality().equals(
+              other._targetMembers,
+              _targetMembers,
+            ) &&
             (identical(other.title, title) || other.title == title) &&
             (identical(other.message, message) || other.message == message) &&
             (identical(other.sent, sent) || other.sent == sent) &&
@@ -267,8 +264,7 @@ class _$SendNotificationFormImpl implements _SendNotificationForm {
   int get hashCode => Object.hash(
     runtimeType,
     targetType,
-    targetMemberId,
-    targetMemberName,
+    const DeepCollectionEquality().hash(_targetMembers),
     title,
     message,
     sent,
@@ -292,8 +288,7 @@ class _$SendNotificationFormImpl implements _SendNotificationForm {
 abstract class _SendNotificationForm implements SendNotificationForm {
   const factory _SendNotificationForm({
     final NotificationTargetType targetType,
-    final String? targetMemberId,
-    final String? targetMemberName,
+    final Map<String, String> targetMembers,
     final String title,
     final String message,
     final bool sent,
@@ -302,11 +297,10 @@ abstract class _SendNotificationForm implements SendNotificationForm {
   }) = _$SendNotificationFormImpl;
 
   @override
-  NotificationTargetType get targetType;
+  NotificationTargetType get targetType; // id -> isim, seçim sırasını korumak için Map yerine LinkedHashMap
+  // davranışına sahip Dart'ın varsayılan Map'i kullanılıyor.
   @override
-  String? get targetMemberId;
-  @override
-  String? get targetMemberName;
+  Map<String, String> get targetMembers;
   @override
   String get title;
   @override

@@ -22,6 +22,7 @@ mixin _$ScheduleSlot {
   String get name => throw _privateConstructorUsedError;
   String get meta => throw _privateConstructorUsedError;
   ScheduleSlotState get state => throw _privateConstructorUsedError;
+  String get memberId => throw _privateConstructorUsedError;
 
   /// Create a copy of ScheduleSlot
   /// with the given fields replaced by the non-null parameter values.
@@ -43,6 +44,7 @@ abstract class $ScheduleSlotCopyWith<$Res> {
     String name,
     String meta,
     ScheduleSlotState state,
+    String memberId,
   });
 }
 
@@ -66,6 +68,7 @@ class _$ScheduleSlotCopyWithImpl<$Res, $Val extends ScheduleSlot>
     Object? name = null,
     Object? meta = null,
     Object? state = null,
+    Object? memberId = null,
   }) {
     return _then(
       _value.copyWith(
@@ -89,6 +92,10 @@ class _$ScheduleSlotCopyWithImpl<$Res, $Val extends ScheduleSlot>
                 ? _value.state
                 : state // ignore: cast_nullable_to_non_nullable
                       as ScheduleSlotState,
+            memberId: null == memberId
+                ? _value.memberId
+                : memberId // ignore: cast_nullable_to_non_nullable
+                      as String,
           )
           as $Val,
     );
@@ -110,6 +117,7 @@ abstract class _$$ScheduleSlotImplCopyWith<$Res>
     String name,
     String meta,
     ScheduleSlotState state,
+    String memberId,
   });
 }
 
@@ -132,6 +140,7 @@ class __$$ScheduleSlotImplCopyWithImpl<$Res>
     Object? name = null,
     Object? meta = null,
     Object? state = null,
+    Object? memberId = null,
   }) {
     return _then(
       _$ScheduleSlotImpl(
@@ -155,6 +164,10 @@ class __$$ScheduleSlotImplCopyWithImpl<$Res>
             ? _value.state
             : state // ignore: cast_nullable_to_non_nullable
                   as ScheduleSlotState,
+        memberId: null == memberId
+            ? _value.memberId
+            : memberId // ignore: cast_nullable_to_non_nullable
+                  as String,
       ),
     );
   }
@@ -169,6 +182,7 @@ class _$ScheduleSlotImpl implements _ScheduleSlot {
     required this.name,
     required this.meta,
     required this.state,
+    this.memberId = '',
   });
 
   @override
@@ -181,10 +195,13 @@ class _$ScheduleSlotImpl implements _ScheduleSlot {
   final String meta;
   @override
   final ScheduleSlotState state;
+  @override
+  @JsonKey()
+  final String memberId;
 
   @override
   String toString() {
-    return 'ScheduleSlot(id: $id, time: $time, name: $name, meta: $meta, state: $state)';
+    return 'ScheduleSlot(id: $id, time: $time, name: $name, meta: $meta, state: $state, memberId: $memberId)';
   }
 
   @override
@@ -196,11 +213,14 @@ class _$ScheduleSlotImpl implements _ScheduleSlot {
             (identical(other.time, time) || other.time == time) &&
             (identical(other.name, name) || other.name == name) &&
             (identical(other.meta, meta) || other.meta == meta) &&
-            (identical(other.state, state) || other.state == state));
+            (identical(other.state, state) || other.state == state) &&
+            (identical(other.memberId, memberId) ||
+                other.memberId == memberId));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, id, time, name, meta, state);
+  int get hashCode =>
+      Object.hash(runtimeType, id, time, name, meta, state, memberId);
 
   /// Create a copy of ScheduleSlot
   /// with the given fields replaced by the non-null parameter values.
@@ -218,6 +238,7 @@ abstract class _ScheduleSlot implements ScheduleSlot {
     required final String name,
     required final String meta,
     required final ScheduleSlotState state,
+    final String memberId,
   }) = _$ScheduleSlotImpl;
 
   @override
@@ -230,6 +251,8 @@ abstract class _ScheduleSlot implements ScheduleSlot {
   String get meta;
   @override
   ScheduleSlotState get state;
+  @override
+  String get memberId;
 
   /// Create a copy of ScheduleSlot
   /// with the given fields replaced by the non-null parameter values.

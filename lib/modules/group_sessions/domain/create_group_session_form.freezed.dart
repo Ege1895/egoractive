@@ -25,6 +25,10 @@ mixin _$CreateGroupSessionForm {
   int get capacityMax => throw _privateConstructorUsedError;
   bool get onlineBookingEnabled => throw _privateConstructorUsedError;
   String get studioName => throw _privateConstructorUsedError;
+  bool get isSubmitting => throw _privateConstructorUsedError;
+  String? get titleError => throw _privateConstructorUsedError;
+  String? get daysError => throw _privateConstructorUsedError;
+  String? get errorMessage => throw _privateConstructorUsedError;
 
   /// Create a copy of CreateGroupSessionForm
   /// with the given fields replaced by the non-null parameter values.
@@ -49,6 +53,10 @@ abstract class $CreateGroupSessionFormCopyWith<$Res> {
     int capacityMax,
     bool onlineBookingEnabled,
     String studioName,
+    bool isSubmitting,
+    String? titleError,
+    String? daysError,
+    String? errorMessage,
   });
 }
 
@@ -78,6 +86,10 @@ class _$CreateGroupSessionFormCopyWithImpl<
     Object? capacityMax = null,
     Object? onlineBookingEnabled = null,
     Object? studioName = null,
+    Object? isSubmitting = null,
+    Object? titleError = freezed,
+    Object? daysError = freezed,
+    Object? errorMessage = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -113,6 +125,22 @@ class _$CreateGroupSessionFormCopyWithImpl<
                 ? _value.studioName
                 : studioName // ignore: cast_nullable_to_non_nullable
                       as String,
+            isSubmitting: null == isSubmitting
+                ? _value.isSubmitting
+                : isSubmitting // ignore: cast_nullable_to_non_nullable
+                      as bool,
+            titleError: freezed == titleError
+                ? _value.titleError
+                : titleError // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            daysError: freezed == daysError
+                ? _value.daysError
+                : daysError // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            errorMessage: freezed == errorMessage
+                ? _value.errorMessage
+                : errorMessage // ignore: cast_nullable_to_non_nullable
+                      as String?,
           )
           as $Val,
     );
@@ -137,6 +165,10 @@ abstract class _$$CreateGroupSessionFormImplCopyWith<$Res>
     int capacityMax,
     bool onlineBookingEnabled,
     String studioName,
+    bool isSubmitting,
+    String? titleError,
+    String? daysError,
+    String? errorMessage,
   });
 }
 
@@ -163,6 +195,10 @@ class __$$CreateGroupSessionFormImplCopyWithImpl<$Res>
     Object? capacityMax = null,
     Object? onlineBookingEnabled = null,
     Object? studioName = null,
+    Object? isSubmitting = null,
+    Object? titleError = freezed,
+    Object? daysError = freezed,
+    Object? errorMessage = freezed,
   }) {
     return _then(
       _$CreateGroupSessionFormImpl(
@@ -198,6 +234,22 @@ class __$$CreateGroupSessionFormImplCopyWithImpl<$Res>
             ? _value.studioName
             : studioName // ignore: cast_nullable_to_non_nullable
                   as String,
+        isSubmitting: null == isSubmitting
+            ? _value.isSubmitting
+            : isSubmitting // ignore: cast_nullable_to_non_nullable
+                  as bool,
+        titleError: freezed == titleError
+            ? _value.titleError
+            : titleError // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        daysError: freezed == daysError
+            ? _value.daysError
+            : daysError // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        errorMessage: freezed == errorMessage
+            ? _value.errorMessage
+            : errorMessage // ignore: cast_nullable_to_non_nullable
+                  as String?,
       ),
     );
   }
@@ -215,6 +267,10 @@ class _$CreateGroupSessionFormImpl implements _CreateGroupSessionForm {
     required this.capacityMax,
     required this.onlineBookingEnabled,
     required this.studioName,
+    this.isSubmitting = false,
+    this.titleError,
+    this.daysError,
+    this.errorMessage,
   }) : _selectedDays = selectedDays;
 
   @override
@@ -239,10 +295,19 @@ class _$CreateGroupSessionFormImpl implements _CreateGroupSessionForm {
   final bool onlineBookingEnabled;
   @override
   final String studioName;
+  @override
+  @JsonKey()
+  final bool isSubmitting;
+  @override
+  final String? titleError;
+  @override
+  final String? daysError;
+  @override
+  final String? errorMessage;
 
   @override
   String toString() {
-    return 'CreateGroupSessionForm(title: $title, startTime: $startTime, durationMinutes: $durationMinutes, selectedDays: $selectedDays, capacity: $capacity, capacityMax: $capacityMax, onlineBookingEnabled: $onlineBookingEnabled, studioName: $studioName)';
+    return 'CreateGroupSessionForm(title: $title, startTime: $startTime, durationMinutes: $durationMinutes, selectedDays: $selectedDays, capacity: $capacity, capacityMax: $capacityMax, onlineBookingEnabled: $onlineBookingEnabled, studioName: $studioName, isSubmitting: $isSubmitting, titleError: $titleError, daysError: $daysError, errorMessage: $errorMessage)';
   }
 
   @override
@@ -266,7 +331,15 @@ class _$CreateGroupSessionFormImpl implements _CreateGroupSessionForm {
             (identical(other.onlineBookingEnabled, onlineBookingEnabled) ||
                 other.onlineBookingEnabled == onlineBookingEnabled) &&
             (identical(other.studioName, studioName) ||
-                other.studioName == studioName));
+                other.studioName == studioName) &&
+            (identical(other.isSubmitting, isSubmitting) ||
+                other.isSubmitting == isSubmitting) &&
+            (identical(other.titleError, titleError) ||
+                other.titleError == titleError) &&
+            (identical(other.daysError, daysError) ||
+                other.daysError == daysError) &&
+            (identical(other.errorMessage, errorMessage) ||
+                other.errorMessage == errorMessage));
   }
 
   @override
@@ -280,6 +353,10 @@ class _$CreateGroupSessionFormImpl implements _CreateGroupSessionForm {
     capacityMax,
     onlineBookingEnabled,
     studioName,
+    isSubmitting,
+    titleError,
+    daysError,
+    errorMessage,
   );
 
   /// Create a copy of CreateGroupSessionForm
@@ -305,6 +382,10 @@ abstract class _CreateGroupSessionForm implements CreateGroupSessionForm {
     required final int capacityMax,
     required final bool onlineBookingEnabled,
     required final String studioName,
+    final bool isSubmitting,
+    final String? titleError,
+    final String? daysError,
+    final String? errorMessage,
   }) = _$CreateGroupSessionFormImpl;
 
   @override
@@ -323,6 +404,14 @@ abstract class _CreateGroupSessionForm implements CreateGroupSessionForm {
   bool get onlineBookingEnabled;
   @override
   String get studioName;
+  @override
+  bool get isSubmitting;
+  @override
+  String? get titleError;
+  @override
+  String? get daysError;
+  @override
+  String? get errorMessage;
 
   /// Create a copy of CreateGroupSessionForm
   /// with the given fields replaced by the non-null parameter values.

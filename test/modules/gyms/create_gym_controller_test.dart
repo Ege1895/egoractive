@@ -23,7 +23,7 @@ void main() {
       expect(container.read(createGymControllerProvider).isSubmitting, isFalse);
     });
 
-    test('fails with an empty-fields message when a required field is blank', () async {
+    test('fails with a field-level error when a required field is blank', () async {
       final container = ProviderContainer();
       addTearDown(container.dispose);
       container.read(gymProfileControllerProvider.notifier).updateName('');
@@ -32,7 +32,10 @@ void main() {
       final gymId = await notifier.submit();
 
       expect(gymId, isNull);
-      expect(container.read(createGymControllerProvider).errorMessage, contains('tüm alanları'));
+      // Genel bir banner yerine hangi alanın eksik olduğu ayrı ayrı
+      // gösteriliyor (bkz. task #89).
+      expect(container.read(createGymControllerProvider).nameError, contains('Salon adı'));
+      expect(container.read(createGymControllerProvider).errorMessage, isNull);
     });
   });
 }

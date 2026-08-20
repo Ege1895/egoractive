@@ -16,18 +16,28 @@ class PanelStackView extends ConsumerWidget {
         if (didPop) return;
         ref.read(panelStackControllerProvider.notifier).handleSystemBack();
       },
-      child: Stack(
-        children: [
-          for (final panel in stack)
-            Visibility(
-              key: ObjectKey(panel),
-              visible: identical(panel, stack.last),
-              maintainState: true,
-              maintainAnimation: true,
-              maintainSize: false,
-              child: panel,
-            ),
-        ],
+      // Tüm panellerde ortak: bir inputfield'a odaklanmışken ekranın boş bir
+      // yerine dokununca klavye kapanmalı. Önceden bazı panellerde (ör.
+      // GymSetupPanel) bu yerelde ayrıca uygulanmıştı, çoğunda hiç yoktu —
+      // burada merkezi olarak uygulanınca her panel için garanti edilir.
+      // `onTap` bir üst seviyede olduğu için alttaki buton/InkWell'lerin
+      // kendi tap'lerini yakalamasını engellemez.
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+        child: Stack(
+          children: [
+            for (final panel in stack)
+              Visibility(
+                key: ObjectKey(panel),
+                visible: identical(panel, stack.last),
+                maintainState: true,
+                maintainAnimation: true,
+                maintainSize: false,
+                child: panel,
+              ),
+          ],
+        ),
       ),
     );
   }

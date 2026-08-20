@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_color_scheme.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../domain/measurement_metric.dart';
@@ -15,11 +17,12 @@ const _lane = 84.0;
 
 /// Egoractive'in imza görsel öğesi — silüet üzerindeki tıklanabilir
 /// ölçüm noktaları (nokta-küme motifi, logodaki "o" harfinden geliyor).
-class MeasurementAvatar extends StatelessWidget {
+class MeasurementAvatar extends ConsumerWidget {
   const MeasurementAvatar({
     required this.points,
     required this.selected,
     required this.onSelect,
+    this.gender,
     super.key,
   });
 
@@ -27,9 +30,19 @@ class MeasurementAvatar extends StatelessWidget {
   final MeasurementMetric selected;
   final ValueChanged<MeasurementMetric> onSelect;
 
+  /// `users/{uid}.gender` ham değeri ('erkek' | 'kadin' | null). Bilinmiyorsa
+  /// kadın silüeti gösterilir (önceki sabit davranışla aynı varsayılan).
+  final String? gender;
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.appColors;
+    final asset = gender == 'erkek'
+        ? 'assets/images/silhouette-erkek.png'
+        : 'assets/images/silhouette-kadin.png';
+    final addMetricLabel = ref.watch(
+      rcTextProvider(RemoteConfigKeys.measurementsAddMetricLabel),
+    );
 
     return SizedBox(
       width: _boxWidth,
@@ -43,11 +56,22 @@ class MeasurementAvatar extends StatelessWidget {
             height: _imgHeight,
             child: Opacity(
               opacity: 0.92,
-              child: Image.asset('assets/images/silhouette-kadin.png', fit: BoxFit.contain),
+              child: Image.asset(asset, fit: BoxFit.contain),
             ),
           ),
-          for (final point in points.values)
-            ..._buildPointLayer(context, point: point, active: point.metric == selected, colors: colors),
+          // avatarLayout TÜM metrikler için sabit bir konum tanımlar —
+          // henüz hiç ölçülmemiş bir metrik için de bir dokunma hedefi
+          // çizilir (ilk ölçümü eklemek üzere), sadece etiketi farklıdır.
+          for (final entry in avatarLayout.entries)
+            ..._buildPointLayer(
+              context,
+              metric: entry.key,
+              layout: entry.value,
+              point: points[entry.key],
+              active: entry.key == selected,
+              colors: colors,
+              addMetricLabel: addMetricLabel,
+            ),
         ],
       ),
     );
@@ -55,14 +79,20 @@ class MeasurementAvatar extends StatelessWidget {
 
   List<Widget> _buildPointLayer(
     BuildContext context, {
-    required MeasurementPoint point,
+    required MeasurementMetric metric,
+    required ({double fx, double fy, AvatarSide side}) layout,
+    required MeasurementPoint? point,
     required bool active,
     required AppColorScheme colors,
+    required String addMetricLabel,
   }) {
-    final x = _imgX + point.fx * _imgWidth;
-    final y = _imgY + point.fy * _imgHeight;
-    final isLeft = point.side == AvatarSide.left;
+    final x = _imgX + layout.fx * _imgWidth;
+    final y = _imgY + layout.fy * _imgHeight;
+    final isLeft = layout.side == AvatarSide.left;
     final typography = context.appTypography;
+    final label = point == null
+        ? addMetricLabel.replaceAll('{metric}', metric.label)
+        : '${metric.label} ${point.value}';
 
     return [
       Positioned(
@@ -70,23 +100,30 @@ class MeasurementAvatar extends StatelessWidget {
         left: isLeft ? _lane : null,
         right: isLeft ? null : _lane,
         width: isLeft ? (_boxWidth - x - 16 - _lane) : (x - 16 - _lane),
-        child: Container(height: 1, color: active ? colors.primary.withValues(alpha: 0.7) : colors.outlineStrong),
+        child: Container(
+          height: 1,
+          color: active
+              ? colors.primary.withValues(alpha: 0.7)
+              : colors.outlineStrong,
+        ),
       ),
       Positioned(
         top: y - 14,
         left: isLeft ? 0 : null,
         right: isLeft ? null : 0,
         child: GestureDetector(
-          onTap: () => onSelect(point.metric),
+          onTap: () => onSelect(metric),
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
             decoration: BoxDecoration(
               color: active ? colors.primary : colors.surfaceRaised,
               borderRadius: BorderRadius.circular(999),
-              border: Border.all(color: active ? colors.primary : colors.outlineStrong),
+              border: Border.all(
+                color: active ? colors.primary : colors.outlineStrong,
+              ),
             ),
             child: Text(
-              '${point.metric.label} ${point.value}',
+              label,
               style: typography.dataSmall.copyWith(
                 fontSize: 13,
                 color: active ? colors.onPrimary : colors.onSurfaceVariant,
@@ -101,7 +138,7 @@ class MeasurementAvatar extends StatelessWidget {
         width: 44,
         height: 44,
         child: GestureDetector(
-          onTap: () => onSelect(point.metric),
+          onTap: () => onSelect(metric),
           child: Center(
             child: Stack(
               alignment: Alignment.center,
@@ -111,8 +148,12 @@ class MeasurementAvatar extends StatelessWidget {
                   height: active ? 32 : 20,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: active ? colors.primaryContainer : Colors.transparent,
-                    border: Border.all(color: active ? colors.primary : colors.outlineStrong),
+                    color: active
+                        ? colors.primaryContainer
+                        : Colors.transparent,
+                    border: Border.all(
+                      color: active ? colors.primary : colors.outlineStrong,
+                    ),
                   ),
                 ),
                 Container(

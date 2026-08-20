@@ -4,13 +4,6 @@ part 'studio_package.freezed.dart';
 
 enum PackageSessionType { solo, group }
 
-extension PackageSessionTypeLabel on PackageSessionType {
-  String get label => switch (this) {
-        PackageSessionType.solo => 'Birebir',
-        PackageSessionType.group => 'Grup',
-      };
-}
-
 @freezed
 class StudioPackage with _$StudioPackage {
   const factory StudioPackage({
@@ -25,5 +18,6 @@ class StudioPackage with _$StudioPackage {
 
   const StudioPackage._();
 
-  int get pricePerSession => sessionCount == 0 ? 0 : (priceTl / sessionCount).round();
+  int get pricePerSession =>
+      sessionCount == 0 ? 0 : (priceTl / sessionCount).round();
 }

@@ -53,6 +53,32 @@ export const requestCustomToken = onCall(async (request) => {
   }
 
   const uid = snapshot.docs[0].id;
-  const token = await getAuth().createCustomToken(uid);
+  const userData = snapshot.docs[0].data();
+  const role = typeof userData.role === "string" ? userData.role : undefined;
+  const gymId = typeof userData.gymId === "string" ? userData.gymId : null;
+  const claims = role ? { role, gymId } : undefined;
+
+  // İlk giriş için (Firebase Auth hesabı henüz yok — F2-9 lazy account
+  // creation) `onUserRoleAssigned` trigger'ı `setCustomUserClaims`'i hesap
+  // olmadan çağırmış olabilir ve kalıcı olarak başarısız olmuştur (Eventarc
+  // yeniden dener ama anlık değil). Custom token'a claim'leri doğrudan
+  // gömmek, ilk oturumun ID token'ında role/gymId'nin beklemeden hazır
+  // olmasını garanti eder.
+  const token = await getAuth().createCustomToken(uid, claims);
+
+  // Hesap zaten varsa (dönen kullanıcı) claim'leri burada da tazeleriz ki
+  // rol/salon değişikliği bir sonraki girişte yansısın. Hesap ilk kez bu
+  // girişle oluşacaksa (lazy creation client'ta signInWithCustomToken ile
+  // gerçekleşir) bu çağrı `auth/user-not-found` ile başarısız olur — token'a
+  // zaten gömülü olan claim'ler o oturum için yeterlidir, retry'lı trigger
+  // kalıcı claim'i sonradan tamamlar.
+  if (claims) {
+    try {
+      await getAuth().setCustomUserClaims(uid, claims);
+    } catch (error) {
+      if ((error as { code?: string }).code !== "auth/user-not-found") throw error;
+    }
+  }
+
   return { token };
 });

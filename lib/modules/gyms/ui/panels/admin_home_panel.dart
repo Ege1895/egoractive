@@ -2,11 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/app_spacing.dart';
+import '../../../../core/panels/panel_stack_controller.dart';
+import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/progress_ring.dart';
+import '../../../notifications/ui/panels/admin_notifications_panel.dart';
+import '../../../trainers/ui/panels/admin_trainer_management_panel.dart';
 import '../../controller/admin_home_controller.dart';
 import '../../controller/gym_profile_controller.dart';
 import '../../domain/admin_home_state.dart';
+import 'gym_info_panel.dart';
 
 /// Admin 1 · Ana Sayfa (Özet Dashboard) — Ana Sayfa sekmesi kökü.
 class AdminHomePanel extends ConsumerWidget {
@@ -18,49 +24,98 @@ class AdminHomePanel extends ConsumerWidget {
     final typography = context.appTypography;
     final state = ref.watch(adminHomeControllerProvider);
     final profile = ref.watch(gymProfileControllerProvider);
+    final panelStack = ref.read(panelStackControllerProvider.notifier);
 
     return Scaffold(
       body: SafeArea(
         child: ListView(
-          padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.lg, AppSpacing.screenEdge, AppSpacing.lg),
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.screenEdge,
+            AppSpacing.lg,
+            AppSpacing.screenEdge,
+            AppSpacing.lg,
+          ),
           children: [
             Row(
               children: [
-                Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(color: colors.primaryContainer, borderRadius: BorderRadius.circular(AppSpacing.radiusInner)),
-                  alignment: Alignment.center,
-                  child: Icon(Icons.fitness_center_rounded, color: colors.onPrimaryContainer, size: 20),
-                ),
-                const SizedBox(width: AppSpacing.md),
                 Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(state.monthLabel, style: typography.caption.copyWith(color: colors.onSurfaceMuted)),
-                      Text(profile.name, style: typography.headingMedium.copyWith(color: colors.onSurface, fontSize: 19)),
-                    ],
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+                    onTap: () => panelStack.push(const GymInfoPanel()),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 44,
+                          height: 44,
+                          clipBehavior: Clip.antiAlias,
+                          decoration: BoxDecoration(
+                            color: colors.primaryContainer,
+                            borderRadius: BorderRadius.circular(
+                              AppSpacing.radiusInner,
+                            ),
+                          ),
+                          alignment: Alignment.center,
+                          child: profile.logoUrl.isEmpty
+                              ? Icon(
+                                  Icons.fitness_center_rounded,
+                                  color: colors.onPrimaryContainer,
+                                  size: 20,
+                                )
+                              : Image.network(
+                                  profile.logoUrl,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) =>
+                                      Icon(
+                                        Icons.fitness_center_rounded,
+                                        color: colors.onPrimaryContainer,
+                                        size: 20,
+                                      ),
+                                ),
+                        ),
+                        const SizedBox(width: AppSpacing.md),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              if (state.monthLabel.isNotEmpty)
+                                Text(
+                                  state.monthLabel,
+                                  style: typography.caption.copyWith(
+                                    color: colors.onSurfaceMuted,
+                                  ),
+                                ),
+                              Text(
+                                profile.name,
+                                style: typography.headingMedium.copyWith(
+                                  color: colors.onSurface,
+                                  fontSize: 19,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-                Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(color: colors.surface, shape: BoxShape.circle, border: Border.all(color: colors.outlineStrong)),
-                  child: Stack(
+                InkWell(
+                  borderRadius: BorderRadius.circular(999),
+                  onTap: () => panelStack.push(const AdminNotificationsPanel()),
+                  child: Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: colors.surface,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: colors.outlineStrong),
+                    ),
                     alignment: Alignment.center,
-                    children: [
-                      Icon(Icons.notifications_outlined, size: 18, color: colors.onSurfaceVariant),
-                      Positioned(
-                        top: 10,
-                        right: 11,
-                        child: Container(
-                          width: 8,
-                          height: 8,
-                          decoration: BoxDecoration(color: colors.warning, shape: BoxShape.circle, border: Border.all(color: colors.background, width: 2)),
-                        ),
-                      ),
-                    ],
+                    child: Icon(
+                      Icons.notifications_outlined,
+                      size: 18,
+                      color: colors.onSurfaceVariant,
+                    ),
                   ),
                 ),
               ],
@@ -83,9 +138,22 @@ class AdminHomePanel extends ConsumerWidget {
                       children: [
                         Text(
                           '%${(state.completionRatio * 100).round()}',
-                          style: typography.dataMedium.copyWith(color: colors.onSurface, fontSize: 20),
+                          style: typography.dataMedium.copyWith(
+                            color: colors.onSurface,
+                            fontSize: 20,
+                          ),
                         ),
-                        Text('tamamlanan', style: typography.caption.copyWith(color: colors.onSurfaceMuted, fontSize: 10)),
+                        Text(
+                          ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.gymsAdminHomeCompletedWord,
+                            ),
+                          ),
+                          style: typography.caption.copyWith(
+                            color: colors.onSurfaceMuted,
+                            fontSize: 10,
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -93,11 +161,33 @@ class AdminHomePanel extends ConsumerWidget {
                   Expanded(
                     child: Column(
                       children: [
-                        _StatRow(label: 'Toplam seans', value: '${state.totalSessions}', valueColor: colors.onSurface),
+                        _StatRow(
+                          label: ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.gymsAdminHomeTotalSessionsLabel,
+                            ),
+                          ),
+                          value: '${state.totalSessions}',
+                          valueColor: colors.onSurface,
+                        ),
                         const SizedBox(height: AppSpacing.sm),
-                        _StatRow(label: 'Tamamlanan', value: '${state.completedSessions}', valueColor: colors.success),
+                        _StatRow(
+                          label: ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.gymsAdminHomeCompletedLabel,
+                            ),
+                          ),
+                          value: '${state.completedSessions}',
+                          valueColor: colors.success,
+                        ),
                         const SizedBox(height: AppSpacing.sm),
-                        _StatRow(label: 'İptal', value: '${state.cancelledSessions}', valueColor: colors.error),
+                        _StatRow(
+                          label: ref.watch(
+                            rcTextProvider(RemoteConfigKeys.commonIptalLabel),
+                          ),
+                          value: '${state.cancelledSessions}',
+                          valueColor: colors.error,
+                        ),
                       ],
                     ),
                   ),
@@ -108,16 +198,52 @@ class AdminHomePanel extends ConsumerWidget {
             Row(
               children: [
                 Expanded(
-                  child: _MetricTile(label: 'Tahmini ciro', value: state.estimatedRevenue, note: state.revenueChangeLabel, noteColor: colors.success),
+                  child: _MetricTile(
+                    label: ref.watch(
+                      rcTextProvider(
+                        RemoteConfigKeys.gymsAdminHomeEstimatedRevenueLabel,
+                      ),
+                    ),
+                    value: '₺${state.estimatedRevenueTl}',
+                    note: ref.watch(
+                      rcTextProvider(
+                        RemoteConfigKeys.gymsAdminHomeThisMonthNote,
+                      ),
+                    ),
+                    noteColor: colors.onSurfaceMuted,
+                  ),
                 ),
                 const SizedBox(width: AppSpacing.sm),
                 Expanded(
-                  child: _MetricTile(label: 'Gider', value: state.expenses, note: 'Prim dahil', noteColor: colors.onSurfaceMuted),
+                  child: _MetricTile(
+                    label: ref.watch(
+                      rcTextProvider(
+                        RemoteConfigKeys.gymsAdminHomeExpenseLabel,
+                      ),
+                    ),
+                    value: '₺${state.expensesTl}',
+                    note: ref.watch(
+                      rcTextProvider(
+                        RemoteConfigKeys.gymsAdminHomeThisMonthNote,
+                      ),
+                    ),
+                    noteColor: colors.onSurfaceMuted,
+                  ),
                 ),
               ],
             ),
             const SizedBox(height: AppSpacing.xl),
-            Text('ANTRENÖR PERFORMANSI', style: typography.caption.copyWith(color: colors.onSurfaceMuted, letterSpacing: 1.2)),
+            Text(
+              ref.watch(
+                rcTextProvider(
+                  RemoteConfigKeys.gymsAdminHomeTrainerPerformanceSection,
+                ),
+              ),
+              style: typography.caption.copyWith(
+                color: colors.onSurfaceMuted,
+                letterSpacing: 1.2,
+              ),
+            ),
             const SizedBox(height: AppSpacing.sm),
             Container(
               padding: const EdgeInsets.all(AppSpacing.lg),
@@ -126,31 +252,113 @@ class AdminHomePanel extends ConsumerWidget {
                 borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
                 border: Border.all(color: colors.outline),
               ),
-              child: Column(
-                children: [
-                  for (var i = 0; i < state.trainerPerformance.length; i++) ...[
-                    _TrainerPerformanceRow(performance: state.trainerPerformance[i]),
-                    if (i < state.trainerPerformance.length - 1) const SizedBox(height: AppSpacing.md),
-                  ],
-                ],
-              ),
+              child: state.trainerPerformance.isEmpty
+                  ? Column(
+                      children: [
+                        Text(
+                          ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.gymsAdminHomeNoTrainersMessage,
+                            ),
+                          ),
+                          style: typography.bodyMedium.copyWith(
+                            color: colors.onSurfaceMuted,
+                          ),
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+                        AppButton(
+                          label: ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.gymsAdminHomeAddTrainerButton,
+                            ),
+                          ),
+                          variant: AppButtonVariant.secondary,
+                          onPressed: () => panelStack.push(
+                            const AdminTrainerManagementPanel(),
+                          ),
+                        ),
+                      ],
+                    )
+                  : Column(
+                      children: [
+                        for (
+                          var i = 0;
+                          i < state.trainerPerformance.length;
+                          i++
+                        ) ...[
+                          _TrainerPerformanceRow(
+                            performance: state.trainerPerformance[i],
+                          ),
+                          if (i < state.trainerPerformance.length - 1)
+                            const SizedBox(height: AppSpacing.md),
+                        ],
+                      ],
+                    ),
             ),
             const SizedBox(height: AppSpacing.xl),
-            Text('ÖDEME VAKTİ YAKLAŞAN', style: typography.caption.copyWith(color: colors.onWarningContainer, letterSpacing: 1.2)),
+            Text(
+              ref.watch(
+                rcTextProvider(
+                  RemoteConfigKeys.gymsAdminHomeUpcomingPaymentsSection,
+                ),
+              ),
+              style: typography.caption.copyWith(
+                color: colors.primary,
+                letterSpacing: 1.2,
+              ),
+            ),
             const SizedBox(height: AppSpacing.sm),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+              padding: const EdgeInsets.all(AppSpacing.lg),
               decoration: BoxDecoration(
                 color: colors.surface,
                 borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
-                border: Border.all(color: colors.warning.withValues(alpha: 0.25)),
+                border: Border.all(
+                  color: colors.primary.withValues(alpha: 0.25),
+                ),
               ),
-              child: Column(
-                children: [
-                  for (var i = 0; i < state.duePayments.length; i++)
-                    _DuePaymentRow(payment: state.duePayments[i], showDivider: i < state.duePayments.length - 1),
-                ],
-              ),
+              child: state.duePaymentMemberCount == 0
+                  ? Text(
+                      ref.watch(
+                        rcTextProvider(
+                          RemoteConfigKeys
+                              .gymsAdminHomeNoPendingPaymentsMessage,
+                        ),
+                      ),
+                      style: typography.bodyMedium.copyWith(
+                        color: colors.onSurfaceMuted,
+                      ),
+                    )
+                  : Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            ref
+                                .watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys
+                                        .gymsAdminHomeDuePaymentMembersTemplate,
+                                  ),
+                                )
+                                .replaceAll(
+                                  '{count}',
+                                  '${state.duePaymentMemberCount}',
+                                ),
+                            style: typography.bodyLarge.copyWith(
+                              color: colors.onSurface,
+                              fontSize: 15,
+                            ),
+                          ),
+                        ),
+                        Text(
+                          '₺${state.duePaymentTotalTl}',
+                          style: typography.headingSmall.copyWith(
+                            color: colors.primary,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ],
+                    ),
             ),
             const SizedBox(height: AppSpacing.lg),
             Container(
@@ -166,10 +374,30 @@ class AdminHomePanel extends ConsumerWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Bekleyen geri bildirim', style: typography.headingSmall.copyWith(color: colors.onSurface, fontSize: 16)),
                         Text(
-                          'Son ${state.recentFeedbackDays} günde ${state.pendingFeedbackCount} yeni değerlendirme',
-                          style: typography.bodyMedium.copyWith(color: colors.onSurfaceMuted, fontSize: 13),
+                          ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.gymsSettingsNavFeedback,
+                            ),
+                          ),
+                          style: typography.headingSmall.copyWith(
+                            color: colors.onSurface,
+                            fontSize: 16,
+                          ),
+                        ),
+                        Text(
+                          ref
+                              .watch(
+                                rcTextProvider(
+                                  RemoteConfigKeys
+                                      .gymsAdminHomeTotalFeedbackTemplate,
+                                ),
+                              )
+                              .replaceAll('{count}', '${state.feedbackCount}'),
+                          style: typography.bodyMedium.copyWith(
+                            color: colors.onSurfaceMuted,
+                            fontSize: 13,
+                          ),
                         ),
                       ],
                     ),
@@ -177,9 +405,18 @@ class AdminHomePanel extends ConsumerWidget {
                   Container(
                     width: 36,
                     height: 36,
-                    decoration: BoxDecoration(color: colors.primary, shape: BoxShape.circle),
+                    decoration: BoxDecoration(
+                      color: colors.primary,
+                      shape: BoxShape.circle,
+                    ),
                     alignment: Alignment.center,
-                    child: Text('${state.pendingFeedbackCount}', style: typography.headingSmall.copyWith(fontSize: 16, color: colors.onPrimary)),
+                    child: Text(
+                      '${state.feedbackCount}',
+                      style: typography.headingSmall.copyWith(
+                        fontSize: 16,
+                        color: colors.onPrimary,
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -192,7 +429,11 @@ class AdminHomePanel extends ConsumerWidget {
 }
 
 class _StatRow extends StatelessWidget {
-  const _StatRow({required this.label, required this.value, required this.valueColor});
+  const _StatRow({
+    required this.label,
+    required this.value,
+    required this.valueColor,
+  });
 
   final String label;
   final String value;
@@ -205,16 +446,33 @@ class _StatRow extends StatelessWidget {
     return Row(
       children: [
         Expanded(
-          child: Text(label, style: typography.bodyMedium.copyWith(color: colors.onSurfaceVariant, fontSize: 14)),
+          child: Text(
+            label,
+            style: typography.bodyMedium.copyWith(
+              color: colors.onSurfaceVariant,
+              fontSize: 14,
+            ),
+          ),
         ),
-        Text(value, style: typography.headingSmall.copyWith(color: valueColor, fontSize: 15)),
+        Text(
+          value,
+          style: typography.headingSmall.copyWith(
+            color: valueColor,
+            fontSize: 15,
+          ),
+        ),
       ],
     );
   }
 }
 
 class _MetricTile extends StatelessWidget {
-  const _MetricTile({required this.label, required this.value, required this.note, required this.noteColor});
+  const _MetricTile({
+    required this.label,
+    required this.value,
+    required this.note,
+    required this.noteColor,
+  });
 
   final String label;
   final String value;
@@ -235,9 +493,24 @@ class _MetricTile extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: typography.caption.copyWith(color: colors.onSurfaceMuted, fontSize: 12)),
-          Text(value, style: typography.dataMedium.copyWith(color: colors.onSurface, fontSize: 21)),
-          Text(note, style: typography.caption.copyWith(color: noteColor, fontSize: 12)),
+          Text(
+            label,
+            style: typography.caption.copyWith(
+              color: colors.onSurfaceMuted,
+              fontSize: 12,
+            ),
+          ),
+          Text(
+            value,
+            style: typography.dataMedium.copyWith(
+              color: colors.onSurface,
+              fontSize: 21,
+            ),
+          ),
+          Text(
+            note,
+            style: typography.caption.copyWith(color: noteColor, fontSize: 12),
+          ),
         ],
       ),
     );
@@ -259,9 +532,21 @@ class _TrainerPerformanceRow extends StatelessWidget {
         Row(
           children: [
             Expanded(
-              child: Text(performance.name, style: typography.bodyLarge.copyWith(color: colors.onSurface, fontSize: 14)),
+              child: Text(
+                performance.name,
+                style: typography.bodyLarge.copyWith(
+                  color: colors.onSurface,
+                  fontSize: 14,
+                ),
+              ),
             ),
-            Text('${performance.sessionCount} seans', style: typography.headingSmall.copyWith(color: colors.onSurfaceVariant, fontSize: 14)),
+            Text(
+              '${performance.sessionCount} seans',
+              style: typography.headingSmall.copyWith(
+                color: colors.onSurfaceVariant,
+                fontSize: 14,
+              ),
+            ),
           ],
         ),
         const SizedBox(height: AppSpacing.xs),
@@ -275,37 +560,6 @@ class _TrainerPerformanceRow extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-}
-
-class _DuePaymentRow extends StatelessWidget {
-  const _DuePaymentRow({required this.payment, required this.showDivider});
-
-  final DuePayment payment;
-  final bool showDivider;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = context.appColors;
-    final typography = context.appTypography;
-    return Container(
-      constraints: const BoxConstraints(minHeight: 56),
-      decoration: BoxDecoration(border: showDivider ? Border(bottom: BorderSide(color: colors.outline)) : null),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(payment.memberName, style: typography.bodyLarge.copyWith(color: colors.onSurface, fontSize: 15)),
-                Text(payment.dueDate, style: typography.caption.copyWith(color: colors.onSurfaceMuted)),
-              ],
-            ),
-          ),
-          Text(payment.amount, style: typography.headingSmall.copyWith(color: colors.onWarningContainer, fontSize: 16)),
-        ],
-      ),
     );
   }
 }

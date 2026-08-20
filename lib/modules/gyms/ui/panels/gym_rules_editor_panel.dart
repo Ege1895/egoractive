@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
+import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../controller/gym_rules_controller.dart';
@@ -17,11 +18,15 @@ class GymRulesEditorPanel extends BasePanel {
   const GymRulesEditorPanel({super.key});
 
   @override
-  ConsumerState<GymRulesEditorPanel> createState() => _GymRulesEditorPanelState();
+  ConsumerState<GymRulesEditorPanel> createState() =>
+      _GymRulesEditorPanelState();
 }
 
 class _GymRulesEditorPanelState extends BasePanelState<GymRulesEditorPanel> {
   late final QuillController _controller;
+  final _editorFocusNode = FocusNode();
+  bool _isSaving = false;
+  String? _errorMessage;
 
   @override
   void initState() {
@@ -30,6 +35,33 @@ class _GymRulesEditorPanelState extends BasePanelState<GymRulesEditorPanel> {
       document: Document.fromJson(ref.read(gymRulesControllerProvider).delta),
       selection: const TextSelection.collapsed(offset: 0),
     );
+  }
+
+  /// Önceki sürüm yazma işlemini `await` etmeden paneli kapatıyordu — kayıt
+  /// arka planda başarısız olsa bile kullanıcı "kaydedildi" sanıyordu. Artık
+  /// yazma tamamlanana kadar bekleniyor, hata olursa panelde kalınıp
+  /// gösteriliyor.
+  Future<void> _save() async {
+    setState(() {
+      _isSaving = true;
+      _errorMessage = null;
+    });
+    try {
+      await ref
+          .read(gymRulesControllerProvider.notifier)
+          .saveRules(_controller.document.toDelta().toJson());
+      if (mounted) ref.read(panelStackControllerProvider.notifier).pop();
+    } catch (_) {
+      if (mounted) {
+        setState(
+          () => _errorMessage = ref.read(
+            rcTextProvider(RemoteConfigKeys.gymsRulesEditorSaveFailedError),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isSaving = false);
+    }
   }
 
   @override
@@ -43,27 +75,64 @@ class _GymRulesEditorPanelState extends BasePanelState<GymRulesEditorPanel> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.md, AppSpacing.screenEdge, 0),
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.screenEdge,
+                AppSpacing.md,
+                AppSpacing.screenEdge,
+                0,
+              ),
               child: Row(
                 children: [
-                  Expanded(child: Text('Kuralları düzenle', style: typography.headingSmall.copyWith(color: colors.onSurface, fontSize: 18))),
+                  Expanded(
+                    child: Text(
+                      ref.watch(
+                        rcTextProvider(
+                          RemoteConfigKeys.gymsEditStudioRulesTitle,
+                        ),
+                      ),
+                      style: typography.headingSmall.copyWith(
+                        color: colors.onSurface,
+                        fontSize: 18,
+                      ),
+                    ),
+                  ),
                   GestureDetector(
-                    onTap: () => ref.read(panelStackControllerProvider.notifier).pop(),
-                    child: Text('Vazgeç', style: typography.bodyLarge.copyWith(color: colors.onSurfaceMuted, fontSize: 15)),
+                    onTap: () =>
+                        ref.read(panelStackControllerProvider.notifier).pop(),
+                    child: Text(
+                      ref.watch(rcTextProvider(RemoteConfigKeys.commonVazgec)),
+                      style: typography.bodyLarge.copyWith(
+                        color: colors.onSurfaceMuted,
+                        fontSize: 15,
+                      ),
+                    ),
                   ),
                 ],
               ),
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.md, AppSpacing.screenEdge, 0),
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.screenEdge,
+                AppSpacing.md,
+                AppSpacing.screenEdge,
+                0,
+              ),
               child: Text(
-                'Kalın/italik gibi biçimlendirme için araç çubuğunu, emoji için klavyenizin emoji tuşunu kullanabilirsiniz.',
-                style: typography.caption.copyWith(color: colors.onSurfaceMuted, height: 1.4),
+                ref.watch(
+                  rcTextProvider(RemoteConfigKeys.gymsRulesEditorToolbarHint),
+                ),
+                style: typography.caption.copyWith(
+                  color: colors.onSurfaceMuted,
+                  height: 1.4,
+                ),
               ),
             ),
             const SizedBox(height: AppSpacing.md),
             Container(
-              margin: const EdgeInsets.symmetric(horizontal: AppSpacing.screenEdge),
+              margin: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.screenEdge,
+              ),
+              clipBehavior: Clip.antiAlias,
               decoration: BoxDecoration(
                 color: colors.surfaceRaised,
                 borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
@@ -98,29 +167,105 @@ class _GymRulesEditorPanelState extends BasePanelState<GymRulesEditorPanel> {
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(AppSpacing.screenEdge),
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(AppSpacing.lg),
-                  decoration: BoxDecoration(
-                    color: colors.surface,
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
-                    border: Border.all(color: colors.primary.withValues(alpha: 0.4)),
-                  ),
-                  child: QuillEditor.basic(
-                    controller: _controller,
-                    config: const QuillEditorConfig(expands: true, padding: EdgeInsets.zero),
+                child: GestureDetector(
+                  behavior: HitTestBehavior.translucent,
+                  onTapDown: (_) => _editorFocusNode.requestFocus(),
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(AppSpacing.lg),
+                    decoration: BoxDecoration(
+                      color: colors.surface,
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusCard,
+                      ),
+                      border: Border.all(
+                        color: colors.primary.withValues(alpha: 0.4),
+                      ),
+                    ),
+                    child: QuillEditor.basic(
+                      controller: _controller,
+                      focusNode: _editorFocusNode,
+                      config: QuillEditorConfig(
+                        expands: true,
+                        padding: EdgeInsets.zero,
+                        // Panel'in üstündeki global "dışarı tıklayınca
+                        // klavyeyi kapat" GestureDetector'ı (bkz.
+                        // panel_stack_view.dart) tap-up anında unfocus()
+                        // çağırıyor; Quill kendi odağını daha geç istediği
+                        // için buna yenik düşüyordu — odak burada tap-down
+                        // anında elle isteniyor (standart TextField'ın aynı
+                        // yarışı kazandığı yöntemle aynı).
+                        contextMenuBuilder: (context, rawEditorState) {
+                          final selection =
+                              rawEditorState.textEditingValue.selection;
+                          final buttonItems =
+                              EditableText.getEditableButtonItems(
+                                clipboardStatus: ClipboardStatus.pasteable,
+                                onCopy: () => rawEditorState.copySelection(
+                                  SelectionChangedCause.toolbar,
+                                ),
+                                onCut: selection.isCollapsed
+                                    ? null
+                                    : () => rawEditorState.cutSelection(
+                                        SelectionChangedCause.toolbar,
+                                      ),
+                                onPaste: () => rawEditorState.pasteText(
+                                  SelectionChangedCause.toolbar,
+                                ),
+                                onSelectAll: () => rawEditorState.selectAll(
+                                  SelectionChangedCause.toolbar,
+                                ),
+                                onLookUp: null,
+                                onSearchWeb: null,
+                                onShare: null,
+                                onLiveTextInput: null,
+                              );
+                          return TextFieldTapRegion(
+                            child: AdaptiveTextSelectionToolbar.buttonItems(
+                              anchors: rawEditorState.contextMenuAnchors,
+                              buttonItems: buttonItems,
+                            ),
+                          );
+                        },
+                      ),
+                    ),
                   ),
                 ),
               ),
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, 0, AppSpacing.screenEdge, AppSpacing.lg),
-              child: AppButton(
-                label: 'Kaydet',
-                onPressed: () {
-                  ref.read(gymRulesControllerProvider.notifier).saveRules(_controller.document.toDelta().toJson());
-                  ref.read(panelStackControllerProvider.notifier).pop();
-                },
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.screenEdge,
+                0,
+                AppSpacing.screenEdge,
+                AppSpacing.lg,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (_errorMessage != null) ...[
+                    Text(
+                      _errorMessage!,
+                      style: typography.bodyMedium.copyWith(
+                        color: colors.error,
+                        fontSize: 13,
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                  ],
+                  AppButton(
+                    label: _isSaving
+                        ? ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.gymsGymInfoSavingLabel,
+                            ),
+                          )
+                        : ref.watch(
+                            rcTextProvider(RemoteConfigKeys.commonKaydet),
+                          ),
+                    onPressed: _isSaving ? null : _save,
+                  ),
+                ],
               ),
             ),
           ],
@@ -132,6 +277,7 @@ class _GymRulesEditorPanelState extends BasePanelState<GymRulesEditorPanel> {
   @override
   void dispose() {
     _controller.dispose();
+    _editorFocusNode.dispose();
     super.dispose();
   }
 }

@@ -19,6 +19,8 @@ class AdminCalendarRepositoryImpl implements AdminCalendarRepository {
 }
 
 @riverpod
-AdminCalendarRepository adminCalendarRepository(AdminCalendarRepositoryRef ref) {
+AdminCalendarRepository adminCalendarRepository(
+  AdminCalendarRepositoryRef ref,
+) {
   return AdminCalendarRepositoryImpl(ref.watch(adminCalendarServiceProvider));
 }

@@ -6,7 +6,8 @@ import '../service/send_notification_service.dart';
 
 part 'send_notification_controller.g.dart';
 
-const _rateLimitedMessage = 'Saatlik bildirim gönderme limitine ulaştın, biraz sonra tekrar dene.';
+const _rateLimitedMessage =
+    'Saatlik bildirim gönderme limitine ulaştın, biraz sonra tekrar dene.';
 const _genericErrorMessage = 'Bildirim gönderilemedi, tekrar dener misin?';
 
 /// F6-4 — `sendManualNotification` Cloud Function'ını çağırır.
@@ -15,23 +16,44 @@ class SendNotificationController extends _$SendNotificationController {
   @override
   SendNotificationForm build() => const SendNotificationForm();
 
-  void setTargetType(NotificationTargetType type) => state = state.copyWith(targetType: type);
+  void setTargetType(NotificationTargetType type) =>
+      state = state.copyWith(targetType: type);
 
-  void selectMember(String id, String name) => state = state.copyWith(targetMemberId: id, targetMemberName: name);
+  /// Zaten seçili bir üyeye tekrar dokunulursa seçim kaldırılır — bir ya da
+  /// birden fazla üye seçip aynı bildirimi hepsine gönderebilmek için.
+  void toggleMember(String id, String name) {
+    final updated = Map<String, String>.from(state.targetMembers);
+    if (updated.containsKey(id)) {
+      updated.remove(id);
+    } else {
+      updated[id] = name;
+    }
+    state = state.copyWith(targetMembers: updated);
+  }
 
   void updateTitle(String value) => state = state.copyWith(title: value);
 
   void updateMessage(String value) => state = state.copyWith(message: value);
 
   Future<void> send() async {
-    if (state.title.trim().isEmpty || state.message.trim().isEmpty || state.isSending) return;
-    if (state.targetType == NotificationTargetType.singleMember && state.targetMemberId == null) return;
+    if (state.title.trim().isEmpty ||
+        state.message.trim().isEmpty ||
+        state.isSending) {
+      return;
+    }
+    if (state.targetType == NotificationTargetType.selectedMembers &&
+        state.targetMembers.isEmpty) {
+      state = state.copyWith(errorMessage: 'Önce en az bir üye seç.');
+      return;
+    }
 
     state = state.copyWith(isSending: true, errorMessage: null);
     try {
-      await ref.read(sendNotificationServiceProvider).send(
+      await ref
+          .read(sendNotificationServiceProvider)
+          .send(
             targetType: state.targetType,
-            targetMemberId: state.targetMemberId,
+            targetMemberIds: state.targetMembers.keys.toList(),
             title: state.title.trim(),
             message: state.message.trim(),
           );
@@ -39,7 +61,9 @@ class SendNotificationController extends _$SendNotificationController {
     } on SendNotificationException catch (e) {
       state = state.copyWith(
         isSending: false,
-        errorMessage: e.reason == SendNotificationErrorReason.rateLimited ? _rateLimitedMessage : _genericErrorMessage,
+        errorMessage: e.reason == SendNotificationErrorReason.rateLimited
+            ? _rateLimitedMessage
+            : _genericErrorMessage,
       );
     }
   }

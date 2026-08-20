@@ -4,16 +4,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
+import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/subscription/subscription_write_gate.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../shared/utils/thousands_input_formatter.dart';
+import '../../../../shared/utils/tr_date_formatter.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_text_field.dart';
+import '../../../../shared/widgets/native_date_picker.dart';
 import '../../controller/expenses_controller.dart';
-
-const _monthAbbrevToNumber = {
-  'Oca': 1, 'Şub': 2, 'Mar': 3, 'Nis': 4, 'May': 5, 'Haz': 6,
-  'Tem': 7, 'Ağu': 8, 'Eyl': 9, 'Eki': 10, 'Kas': 11, 'Ara': 12,
-};
+import '../../domain/expense_category.dart';
 
 /// Admin 15 · Gider Ekle — kategori, tutar, tarih, tekrar. Kategori listesi
 /// Remote Config'ten (`cfg_expense_categories`) okunur — yeni bir kategori
@@ -28,16 +28,26 @@ class AddExpensePanel extends BasePanel {
 class _AddExpensePanelState extends BasePanelState<AddExpensePanel> {
   final _amountController = TextEditingController();
   final _titleController = TextEditingController();
-  final _dateController = TextEditingController(text: '18 Tem 2026');
+  final _titleScrollController = ScrollController();
+  DateTime _date = DateTime.now();
   String? _category;
   bool _recurring = false;
+  bool _isSaving = false;
+  String? _amountError;
+  String? _titleError;
+  String? _errorMessage;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
     final typography = context.appTypography;
-    final categories = ref.watch(expenseCategoriesProvider).valueOrNull ?? const [];
+    final categories =
+        ref.watch(expenseCategoriesProvider).valueOrNull ?? const [];
     _category ??= categories.isEmpty ? null : categories.first.id;
+    final selectedMatches = categories.where((c) => c.id == _category);
+    final selectedLabel = selectedMatches.isEmpty
+        ? null
+        : selectedMatches.first.label;
 
     return Scaffold(
       body: SafeArea(
@@ -45,58 +55,251 @@ class _AddExpensePanelState extends BasePanelState<AddExpensePanel> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.md, AppSpacing.screenEdge, 0),
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.screenEdge,
+                AppSpacing.md,
+                AppSpacing.screenEdge,
+                0,
+              ),
               child: Row(
                 children: [
-                  Expanded(child: Text('Gider ekle', style: typography.headingSmall.copyWith(color: colors.onSurface, fontSize: 18))),
+                  Expanded(
+                    child: Text(
+                      ref.watch(
+                        rcTextProvider(RemoteConfigKeys.expensesAddTitle),
+                      ),
+                      style: typography.headingSmall.copyWith(
+                        color: colors.onSurface,
+                        fontSize: 18,
+                      ),
+                    ),
+                  ),
                   GestureDetector(
-                    onTap: () => ref.read(panelStackControllerProvider.notifier).pop(),
-                    child: Text('Vazgeç', style: typography.bodyLarge.copyWith(color: colors.onSurfaceMuted, fontSize: 15)),
+                    onTap: () =>
+                        ref.read(panelStackControllerProvider.notifier).pop(),
+                    child: Text(
+                      ref.watch(rcTextProvider(RemoteConfigKeys.commonVazgec)),
+                      style: typography.bodyLarge.copyWith(
+                        color: colors.onSurfaceMuted,
+                        fontSize: 15,
+                      ),
+                    ),
                   ),
                 ],
               ),
             ),
             Expanded(
               child: ListView(
-                padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.lg, AppSpacing.screenEdge, AppSpacing.lg),
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.screenEdge,
+                  AppSpacing.lg,
+                  AppSpacing.screenEdge,
+                  AppSpacing.lg,
+                ),
                 children: [
                   Container(
                     padding: const EdgeInsets.all(AppSpacing.lg),
-                    decoration: BoxDecoration(color: colors.surface, borderRadius: BorderRadius.circular(AppSpacing.radiusCard), border: Border.all(color: colors.outline)),
-                    child: AppTextField(label: 'Tutar (₺)', controller: _amountController, keyboardType: TextInputType.number, hint: '8400'),
+                    decoration: BoxDecoration(
+                      color: colors.surface,
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusCard,
+                      ),
+                      border: Border.all(color: colors.outline),
+                    ),
+                    child: AppTextField(
+                      label: ref.watch(
+                        rcTextProvider(
+                          RemoteConfigKeys.expensesAmountFieldLabel,
+                        ),
+                      ),
+                      controller: _amountController,
+                      keyboardType: TextInputType.number,
+                      inputFormatters: [ThousandsInputFormatter()],
+                      hint: ref.watch(
+                        rcTextProvider(
+                          RemoteConfigKeys.expensesAmountFieldHint,
+                        ),
+                      ),
+                      errorText: _amountError,
+                      onChanged: (_) {
+                        if (_amountError != null) {
+                          setState(() => _amountError = null);
+                        }
+                      },
+                    ),
                   ),
                   const SizedBox(height: AppSpacing.lg),
-                  Text('Kategori', style: typography.bodyMedium.copyWith(color: colors.onSurfaceMuted, fontSize: 13)),
+                  Text(
+                    ref.watch(
+                      rcTextProvider(
+                        RemoteConfigKeys.expensesCategoryFieldLabel,
+                      ),
+                    ),
+                    style: typography.bodyMedium.copyWith(
+                      color: colors.onSurfaceMuted,
+                      fontSize: 13,
+                    ),
+                  ),
                   const SizedBox(height: AppSpacing.sm),
-                  Wrap(
-                    spacing: AppSpacing.sm,
-                    runSpacing: AppSpacing.sm,
-                    children: [
-                      for (final category in categories)
-                        _CategoryChip(
-                          label: category.label,
-                          selected: _category == category.id,
-                          onTap: () => setState(() => _category = category.id),
+                  InkWell(
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+                    onTap: categories.isEmpty
+                        ? null
+                        : () => _showCategoryPicker(context, categories),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.lg,
+                        vertical: AppSpacing.md,
+                      ),
+                      decoration: BoxDecoration(
+                        color: colors.surfaceRaised,
+                        borderRadius: BorderRadius.circular(
+                          AppSpacing.radiusInner,
                         ),
-                    ],
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              selectedLabel ??
+                                  ref.watch(
+                                    rcTextProvider(
+                                      RemoteConfigKeys
+                                          .expensesCategoryPickerTitle,
+                                    ),
+                                  ),
+                              style: typography.bodyLarge.copyWith(
+                                color: selectedLabel == null
+                                    ? colors.onSurfaceMuted
+                                    : colors.onSurface,
+                              ),
+                            ),
+                          ),
+                          Icon(
+                            Icons.chevron_right,
+                            color: colors.onSurfaceMuted,
+                            size: 18,
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                   const SizedBox(height: AppSpacing.lg),
                   Container(
                     padding: const EdgeInsets.all(AppSpacing.lg),
-                    decoration: BoxDecoration(color: colors.surface, borderRadius: BorderRadius.circular(AppSpacing.radiusCard), border: Border.all(color: colors.outline)),
+                    decoration: BoxDecoration(
+                      color: colors.surface,
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusCard,
+                      ),
+                      border: Border.all(color: colors.outline),
+                    ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        AppTextField(label: 'Açıklama', controller: _titleController, hint: 'Reformer yay değişimi'),
+                        Scrollbar(
+                          controller: _titleScrollController,
+                          thumbVisibility: true,
+                          interactive: true,
+                          thickness: 4,
+                          radius: const Radius.circular(4),
+                          child: AppTextField(
+                            label: ref.watch(
+                              rcTextProvider(
+                                RemoteConfigKeys.expensesDescriptionFieldLabel,
+                              ),
+                            ),
+                            controller: _titleController,
+                            scrollController: _titleScrollController,
+                            minLines: 1,
+                            maxLines: 5,
+                            hint: ref.watch(
+                              rcTextProvider(
+                                RemoteConfigKeys.expensesDescriptionFieldHint,
+                              ),
+                            ),
+                            errorText: _titleError,
+                            onChanged: (_) {
+                              if (_titleError != null) {
+                                setState(() => _titleError = null);
+                              }
+                            },
+                          ),
+                        ),
                         const SizedBox(height: AppSpacing.md),
-                        AppTextField(label: 'Tarih', controller: _dateController),
+                        InkWell(
+                          borderRadius: BorderRadius.circular(
+                            AppSpacing.radiusInner,
+                          ),
+                          onTap: () => showNativeDatePicker(
+                            context: context,
+                            initial: _date,
+                            firstDate: DateTime(DateTime.now().year - 5),
+                            lastDate: DateTime(DateTime.now().year + 1),
+                            onSelected: (date) => setState(() => _date = date),
+                          ),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: AppSpacing.lg,
+                              vertical: AppSpacing.md,
+                            ),
+                            decoration: BoxDecoration(
+                              color: colors.surfaceRaised,
+                              borderRadius: BorderRadius.circular(
+                                AppSpacing.radiusInner,
+                              ),
+                            ),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        ref.watch(
+                                          rcTextProvider(
+                                            RemoteConfigKeys
+                                                .expensesDateFieldLabel,
+                                          ),
+                                        ),
+                                        style: typography.caption.copyWith(
+                                          color: colors.onSurfaceMuted,
+                                        ),
+                                      ),
+                                      Text(
+                                        formatTrDate(_date),
+                                        style: typography.bodyLarge.copyWith(
+                                          color: colors.onSurface,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Icon(
+                                  Icons.chevron_right,
+                                  color: colors.onSurfaceMuted,
+                                  size: 18,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   ),
                   const SizedBox(height: AppSpacing.lg),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-                    decoration: BoxDecoration(color: colors.surface, borderRadius: BorderRadius.circular(AppSpacing.radiusCard), border: Border.all(color: colors.outline)),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.lg,
+                    ),
+                    decoration: BoxDecoration(
+                      color: colors.surface,
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusCard,
+                      ),
+                      border: Border.all(color: colors.outline),
+                    ),
                     child: Container(
                       constraints: const BoxConstraints(minHeight: 66),
                       child: Row(
@@ -105,21 +308,59 @@ class _AddExpensePanelState extends BasePanelState<AddExpensePanel> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('Her ay tekrar et', style: typography.bodyLarge.copyWith(color: colors.onSurface, fontSize: 15)),
-                                Text('Kira ve fatura gibi sabit giderler için', style: typography.caption.copyWith(color: colors.onSurfaceMuted)),
+                                Text(
+                                  ref.watch(
+                                    rcTextProvider(
+                                      RemoteConfigKeys
+                                          .expensesRecurringToggleLabel,
+                                    ),
+                                  ),
+                                  style: typography.bodyLarge.copyWith(
+                                    color: colors.onSurface,
+                                    fontSize: 15,
+                                  ),
+                                ),
+                                Text(
+                                  ref.watch(
+                                    rcTextProvider(
+                                      RemoteConfigKeys
+                                          .expensesRecurringToggleDescription,
+                                    ),
+                                  ),
+                                  style: typography.caption.copyWith(
+                                    color: colors.onSurfaceMuted,
+                                  ),
+                                ),
                               ],
                             ),
                           ),
                           GestureDetector(
-                            onTap: () => setState(() => _recurring = !_recurring),
+                            onTap: () =>
+                                setState(() => _recurring = !_recurring),
                             child: AnimatedContainer(
                               duration: const Duration(milliseconds: 150),
                               width: 52,
                               height: 32,
                               padding: const EdgeInsets.all(3),
-                              decoration: BoxDecoration(color: _recurring ? colors.primary : colors.surfaceRaised, borderRadius: BorderRadius.circular(AppSpacing.radiusPill)),
-                              alignment: _recurring ? Alignment.centerRight : Alignment.centerLeft,
-                              child: Container(width: 26, height: 26, decoration: BoxDecoration(color: colors.onSurface, shape: BoxShape.circle)),
+                              decoration: BoxDecoration(
+                                color: _recurring
+                                    ? colors.primary
+                                    : colors.surfaceRaised,
+                                borderRadius: BorderRadius.circular(
+                                  AppSpacing.radiusPill,
+                                ),
+                              ),
+                              alignment: _recurring
+                                  ? Alignment.centerRight
+                                  : Alignment.centerLeft,
+                              child: Container(
+                                width: 26,
+                                height: 26,
+                                decoration: BoxDecoration(
+                                  color: colors.onSurface,
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
                             ),
                           ),
                         ],
@@ -128,34 +369,122 @@ class _AddExpensePanelState extends BasePanelState<AddExpensePanel> {
                   ),
                   const SizedBox(height: AppSpacing.sm),
                   Text(
-                    'Antrenör primleri seans onaylarından otomatik hesaplanır; buraya elle girilmez.',
-                    style: typography.caption.copyWith(color: colors.onSurfaceMuted),
+                    ref.watch(
+                      rcTextProvider(
+                        RemoteConfigKeys.expensesTrainerCommissionNote,
+                      ),
+                    ),
+                    style: typography.caption.copyWith(
+                      color: colors.onSurfaceMuted,
+                    ),
                   ),
                 ],
               ),
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.md, AppSpacing.screenEdge, AppSpacing.lg),
-              child: AppButton(
-                label: 'Gideri kaydet',
-                onPressed: () async {
-                  final amount = int.tryParse(_amountController.text) ?? 0;
-                  final title = _titleController.text.trim();
-                  final category = _category;
-                  final date = _parseDate(_dateController.text);
-                  if (amount <= 0 || title.isEmpty || category == null || date == null) return;
-                  if (!await ensureSubscriptionAllowsWrite(context, ref)) return;
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.screenEdge,
+                AppSpacing.md,
+                AppSpacing.screenEdge,
+                AppSpacing.lg,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (_errorMessage != null) ...[
+                    Text(
+                      _errorMessage!,
+                      style: typography.bodyMedium.copyWith(
+                        color: colors.error,
+                        fontSize: 13,
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                  ],
+                  AppButton(
+                    label: _isSaving
+                        ? ref.watch(
+                            rcTextProvider(RemoteConfigKeys.membersSavingLabel),
+                          )
+                        : ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.expensesSubmitButton,
+                            ),
+                          ),
+                    onPressed: _isSaving
+                        ? null
+                        : () async {
+                            final amount =
+                                int.tryParse(
+                                  _amountController.text.replaceAll('.', ''),
+                                ) ??
+                                0;
+                            final title = _titleController.text.trim();
+                            final category = _category;
+                            var hasError = false;
+                            if (amount <= 0) {
+                              setState(
+                                () => _amountError = ref.read(
+                                  rcTextProvider(
+                                    RemoteConfigKeys.expensesAmountInvalidError,
+                                  ),
+                                ),
+                              );
+                              hasError = true;
+                            }
+                            if (title.isEmpty) {
+                              setState(
+                                () => _titleError = ref.read(
+                                  rcTextProvider(
+                                    RemoteConfigKeys
+                                        .expensesDescriptionRequiredError,
+                                  ),
+                                ),
+                              );
+                              hasError = true;
+                            }
+                            if (hasError) return;
+                            if (!await ensureSubscriptionAllowsWrite(
+                              context,
+                              ref,
+                            )) {
+                              return;
+                            }
 
-                  await ref.read(expensesControllerProvider.notifier).addExpense(
-                        category: category,
-                        title: title,
-                        date: date,
-                        amountTl: amount,
-                        recurring: _recurring,
-                      );
-                  if (!mounted) return;
-                  ref.read(panelStackControllerProvider.notifier).pop();
-                },
+                            setState(() {
+                              _isSaving = true;
+                              _errorMessage = null;
+                            });
+                            try {
+                              await ref
+                                  .read(expensesControllerProvider.notifier)
+                                  .addExpense(
+                                    category: category!,
+                                    title: title,
+                                    date: _date,
+                                    amountTl: amount,
+                                    recurring: _recurring,
+                                  );
+                              if (mounted) {
+                                ref
+                                    .read(panelStackControllerProvider.notifier)
+                                    .pop();
+                              }
+                            } catch (_) {
+                              if (mounted) {
+                                setState(() {
+                                  _isSaving = false;
+                                  _errorMessage = ref.read(
+                                    rcTextProvider(
+                                      RemoteConfigKeys.expensesSaveFailedError,
+                                    ),
+                                  );
+                                });
+                              }
+                            }
+                          },
+                  ),
+                ],
               ),
             ),
           ],
@@ -164,50 +493,76 @@ class _AddExpensePanelState extends BasePanelState<AddExpensePanel> {
     );
   }
 
-  /// "18 Tem 2026" formatını ayrıştırır — geçersizse null.
-  DateTime? _parseDate(String text) {
-    final parts = text.trim().split(RegExp(r'\s+'));
-    if (parts.length != 3) return null;
-    final day = int.tryParse(parts[0]);
-    final month = _monthAbbrevToNumber[parts[1]];
-    final year = int.tryParse(parts[2]);
-    if (day == null || month == null || year == null) return null;
-    return DateTime(year, month, day);
+  void _showCategoryPicker(
+    BuildContext context,
+    List<ExpenseCategoryOption> categories,
+  ) {
+    final colors = context.appColors;
+    final typography = context.appTypography;
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: colors.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      builder: (sheetContext) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  ref.read(
+                    rcTextProvider(
+                      RemoteConfigKeys.expensesCategoryPickerTitle,
+                    ),
+                  ),
+                  style: typography.headingMedium.copyWith(
+                    color: colors.onSurface,
+                    fontSize: 20,
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.md),
+                for (final category in categories)
+                  InkWell(
+                    onTap: () {
+                      setState(() => _category = category.id);
+                      Navigator.of(sheetContext).pop();
+                    },
+                    child: Container(
+                      constraints: const BoxConstraints(minHeight: 52),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              category.label,
+                              style: typography.bodyLarge.copyWith(
+                                color: colors.onSurface,
+                                fontSize: 15,
+                              ),
+                            ),
+                          ),
+                          if (category.id == _category)
+                            Icon(Icons.check, size: 18, color: colors.primary),
+                        ],
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   @override
   void dispose() {
     _amountController.dispose();
     _titleController.dispose();
-    _dateController.dispose();
+    _titleScrollController.dispose();
     super.dispose();
-  }
-}
-
-class _CategoryChip extends StatelessWidget {
-  const _CategoryChip({required this.label, required this.selected, required this.onTap});
-
-  final String label;
-  final bool selected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = context.appColors;
-    return Material(
-      color: selected ? colors.primary : colors.surfaceRaised,
-      borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 13),
-          constraints: const BoxConstraints(minHeight: 34),
-          alignment: Alignment.center,
-          decoration: BoxDecoration(borderRadius: BorderRadius.circular(AppSpacing.radiusPill), border: Border.all(color: selected ? colors.primary : colors.outlineStrong)),
-          child: Text(label, style: context.appTypography.headingSmall.copyWith(fontSize: 14, color: selected ? colors.onPrimary : colors.onSurfaceVariant)),
-        ),
-      ),
-    );
   }
 }

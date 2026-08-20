@@ -16,5 +16,6 @@ class AdminMemberListState with _$AdminMemberListState {
     @Default(false) bool hasMore,
     @Default(false) bool isSearching,
     List<AdminMemberSummary>? searchResults,
+    String? errorMessage,
   }) = _AdminMemberListState;
 }

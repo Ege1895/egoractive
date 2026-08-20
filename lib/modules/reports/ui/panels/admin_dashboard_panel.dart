@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
+import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_back_button.dart';
 import '../../controller/dashboard_report_controller.dart';
@@ -21,7 +22,8 @@ class AdminDashboardPanel extends BasePanel {
   const AdminDashboardPanel({super.key});
 
   @override
-  ConsumerState<AdminDashboardPanel> createState() => _AdminDashboardPanelState();
+  ConsumerState<AdminDashboardPanel> createState() =>
+      _AdminDashboardPanelState();
 }
 
 class _AdminDashboardPanelState extends BasePanelState<AdminDashboardPanel> {
@@ -33,6 +35,8 @@ class _AdminDashboardPanelState extends BasePanelState<AdminDashboardPanel> {
     final controller = ref.watch(dashboardReportControllerProvider.notifier);
     final isSummaryLoading = controller.isSummaryLoading;
     final isTrainerPerformanceLoading = controller.isTrainerPerformanceLoading;
+    final hasSummaryError = controller.hasSummaryError;
+    final hasTrainerPerformanceError = controller.hasTrainerPerformanceError;
 
     return Scaffold(
       body: SafeArea(
@@ -40,44 +44,159 @@ class _AdminDashboardPanelState extends BasePanelState<AdminDashboardPanel> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.md, AppSpacing.screenEdge, 0),
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.screenEdge,
+                AppSpacing.md,
+                AppSpacing.screenEdge,
+                0,
+              ),
               child: Row(
                 children: [
-                  AppBackButton(onTap: () => ref.read(panelStackControllerProvider.notifier).pop()),
+                  AppBackButton(
+                    onTap: () =>
+                        ref.read(panelStackControllerProvider.notifier).pop(),
+                  ),
                   const SizedBox(width: AppSpacing.md),
-                  Text('Raporlar', style: typography.headingSmall.copyWith(color: colors.onSurface, fontSize: 18)),
+                  Text(
+                    ref.watch(
+                      rcTextProvider(RemoteConfigKeys.gymsSettingsNavReports),
+                    ),
+                    style: typography.headingSmall.copyWith(
+                      color: colors.onSurface,
+                      fontSize: 18,
+                    ),
+                  ),
                 ],
               ),
             ),
             Expanded(
               child: isSummaryLoading
-                  ? Center(child: CircularProgressIndicator(color: colors.primary))
+                  ? Center(
+                      child: CircularProgressIndicator(color: colors.primary),
+                    )
+                  : hasSummaryError
+                  ? Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(AppSpacing.screenEdge),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              ref.watch(
+                                rcTextProvider(
+                                  RemoteConfigKeys.reportsSummaryLoadError,
+                                ),
+                              ),
+                              textAlign: TextAlign.center,
+                              style: typography.bodyMedium.copyWith(
+                                color: colors.onSurfaceVariant,
+                              ),
+                            ),
+                            const SizedBox(height: AppSpacing.md),
+                            TextButton(
+                              onPressed: controller.retry,
+                              child: Text(
+                                ref.watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys.authRetryButton,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
                   : ListView(
-                      padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.md, AppSpacing.screenEdge, AppSpacing.lg),
+                      padding: const EdgeInsets.fromLTRB(
+                        AppSpacing.screenEdge,
+                        AppSpacing.md,
+                        AppSpacing.screenEdge,
+                        AppSpacing.lg,
+                      ),
                       children: [
-                        Text(report.monthLabel, style: typography.bodyMedium.copyWith(color: colors.onSurfaceMuted, fontSize: 13)),
+                        Text(
+                          report.monthLabel,
+                          style: typography.bodyMedium.copyWith(
+                            color: colors.onSurfaceMuted,
+                            fontSize: 13,
+                          ),
+                        ),
                         const SizedBox(height: AppSpacing.md),
                         Row(
                           children: [
-                            Expanded(child: _MetricCard(label: 'Toplam ders', value: '${report.totalSessions}', color: colors.onSurface)),
+                            Expanded(
+                              child: _MetricCard(
+                                label: ref.watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys.reportsTotalSessionsLabel,
+                                  ),
+                                ),
+                                value: '${report.totalSessions}',
+                                color: colors.onSurface,
+                              ),
+                            ),
                             const SizedBox(width: AppSpacing.sm),
-                            Expanded(child: _MetricCard(label: 'Tamamlanan', value: '${report.completedSessions}', color: colors.primary)),
+                            Expanded(
+                              child: _MetricCard(
+                                label: ref.watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys
+                                        .gymsAdminHomeCompletedLabel,
+                                  ),
+                                ),
+                                value: '${report.completedSessions}',
+                                color: colors.primary,
+                              ),
+                            ),
                             const SizedBox(width: AppSpacing.sm),
-                            Expanded(child: _MetricCard(label: 'İptal', value: '${report.cancelledSessions}', color: colors.error)),
+                            Expanded(
+                              child: _MetricCard(
+                                label: ref.watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys.commonIptalLabel,
+                                  ),
+                                ),
+                                value: '${report.cancelledSessions}',
+                                color: colors.error,
+                              ),
+                            ),
                           ],
                         ),
                         const SizedBox(height: AppSpacing.lg),
                         Container(
                           padding: const EdgeInsets.all(AppSpacing.lg),
-                          decoration: BoxDecoration(color: colors.surface, borderRadius: BorderRadius.circular(AppSpacing.radiusCard), border: Border.all(color: colors.outline)),
+                          decoration: BoxDecoration(
+                            color: colors.surface,
+                            borderRadius: BorderRadius.circular(
+                              AppSpacing.radiusCard,
+                            ),
+                            border: Border.all(color: colors.outline),
+                          ),
                           child: Row(
                             children: [
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text('Tahmini ciro', style: typography.caption.copyWith(color: colors.onSurfaceMuted)),
-                                    Text('₺${report.estimatedRevenueTl}', style: typography.headingMedium.copyWith(color: colors.onSurface, fontSize: 20)),
+                                    Text(
+                                      ref.watch(
+                                        rcTextProvider(
+                                          RemoteConfigKeys
+                                              .gymsAdminHomeEstimatedRevenueLabel,
+                                        ),
+                                      ),
+                                      style: typography.caption.copyWith(
+                                        color: colors.onSurfaceMuted,
+                                      ),
+                                    ),
+                                    Text(
+                                      '₺${report.estimatedRevenueTl}',
+                                      style: typography.headingMedium.copyWith(
+                                        color: colors.onSurface,
+                                        fontSize: 20,
+                                      ),
+                                    ),
                                   ],
                                 ),
                               ),
@@ -85,8 +204,24 @@ class _AdminDashboardPanelState extends BasePanelState<AdminDashboardPanel> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text('Gider', style: typography.caption.copyWith(color: colors.onSurfaceMuted)),
-                                    Text('₺${report.totalExpensesTl}', style: typography.headingMedium.copyWith(color: colors.onSurface, fontSize: 20)),
+                                    Text(
+                                      ref.watch(
+                                        rcTextProvider(
+                                          RemoteConfigKeys
+                                              .gymsAdminHomeExpenseLabel,
+                                        ),
+                                      ),
+                                      style: typography.caption.copyWith(
+                                        color: colors.onSurfaceMuted,
+                                      ),
+                                    ),
+                                    Text(
+                                      '₺${report.totalExpensesTl}',
+                                      style: typography.headingMedium.copyWith(
+                                        color: colors.onSurface,
+                                        fontSize: 20,
+                                      ),
+                                    ),
                                   ],
                                 ),
                               ),
@@ -94,10 +229,24 @@ class _AdminDashboardPanelState extends BasePanelState<AdminDashboardPanel> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text('Net', style: typography.caption.copyWith(color: colors.onSurfaceMuted)),
+                                    Text(
+                                      ref.watch(
+                                        rcTextProvider(
+                                          RemoteConfigKeys.reportsNetLabel,
+                                        ),
+                                      ),
+                                      style: typography.caption.copyWith(
+                                        color: colors.onSurfaceMuted,
+                                      ),
+                                    ),
                                     Text(
                                       '₺${report.netTl}',
-                                      style: typography.headingMedium.copyWith(color: report.netTl >= 0 ? colors.primary : colors.error, fontSize: 20),
+                                      style: typography.headingMedium.copyWith(
+                                        color: report.netTl >= 0
+                                            ? colors.primary
+                                            : colors.error,
+                                        fontSize: 20,
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -106,25 +255,96 @@ class _AdminDashboardPanelState extends BasePanelState<AdminDashboardPanel> {
                           ),
                         ),
                         const SizedBox(height: AppSpacing.lg),
-                        Text('ANTRENÖR PERFORMANSI', style: typography.caption.copyWith(color: colors.onSurfaceMuted, letterSpacing: 1.2)),
+                        Text(
+                          ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys
+                                  .gymsAdminHomeTrainerPerformanceSection,
+                            ),
+                          ),
+                          style: typography.caption.copyWith(
+                            color: colors.onSurfaceMuted,
+                            letterSpacing: 1.2,
+                          ),
+                        ),
                         const SizedBox(height: AppSpacing.sm),
                         Container(
-                          padding: const EdgeInsets.fromLTRB(AppSpacing.sm, AppSpacing.lg, AppSpacing.lg, AppSpacing.md),
-                          decoration: BoxDecoration(color: colors.surface, borderRadius: BorderRadius.circular(AppSpacing.radiusCard), border: Border.all(color: colors.outline)),
-                          child: isTrainerPerformanceLoading && report.trainerPerformance.isEmpty
+                          padding: const EdgeInsets.fromLTRB(
+                            AppSpacing.sm,
+                            AppSpacing.lg,
+                            AppSpacing.lg,
+                            AppSpacing.md,
+                          ),
+                          decoration: BoxDecoration(
+                            color: colors.surface,
+                            borderRadius: BorderRadius.circular(
+                              AppSpacing.radiusCard,
+                            ),
+                            border: Border.all(color: colors.outline),
+                          ),
+                          child:
+                              isTrainerPerformanceLoading &&
+                                  report.trainerPerformance.isEmpty
                               ? const Padding(
-                                  padding: EdgeInsets.symmetric(vertical: AppSpacing.lg),
-                                  child: Center(child: CircularProgressIndicator()),
+                                  padding: EdgeInsets.symmetric(
+                                    vertical: AppSpacing.lg,
+                                  ),
+                                  child: Center(
+                                    child: CircularProgressIndicator(),
+                                  ),
+                                )
+                              : hasTrainerPerformanceError
+                              ? Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: AppSpacing.lg,
+                                  ),
+                                  child: Column(
+                                    children: [
+                                      Text(
+                                        ref.watch(
+                                          rcTextProvider(
+                                            RemoteConfigKeys
+                                                .reportsTrainerPerformanceLoadError,
+                                          ),
+                                        ),
+                                        style: typography.bodyMedium.copyWith(
+                                          color: colors.onSurfaceVariant,
+                                        ),
+                                      ),
+                                      const SizedBox(height: AppSpacing.sm),
+                                      TextButton(
+                                        onPressed: controller.retry,
+                                        child: Text(
+                                          ref.watch(
+                                            rcTextProvider(
+                                              RemoteConfigKeys.authRetryButton,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 )
                               : report.trainerPerformance.isEmpty
-                                  ? Padding(
-                                      padding: const EdgeInsets.symmetric(vertical: AppSpacing.lg),
-                                      child: Text(
-                                        'Bu ay için antrenör verisi yok.',
-                                        style: typography.bodyMedium.copyWith(color: colors.onSurfaceMuted),
+                              ? Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: AppSpacing.lg,
+                                  ),
+                                  child: Text(
+                                    ref.watch(
+                                      rcTextProvider(
+                                        RemoteConfigKeys
+                                            .reportsTrainerPerformanceEmptyState,
                                       ),
-                                    )
-                                  : _TrainerPerformanceChart(trainerPerformance: report.trainerPerformance),
+                                    ),
+                                    style: typography.bodyMedium.copyWith(
+                                      color: colors.onSurfaceMuted,
+                                    ),
+                                  ),
+                                )
+                              : _TrainerPerformanceChart(
+                                  trainerPerformance: report.trainerPerformance,
+                                ),
                         ),
                       ],
                     ),
@@ -137,7 +357,11 @@ class _AdminDashboardPanelState extends BasePanelState<AdminDashboardPanel> {
 }
 
 class _MetricCard extends StatelessWidget {
-  const _MetricCard({required this.label, required this.value, required this.color});
+  const _MetricCard({
+    required this.label,
+    required this.value,
+    required this.color,
+  });
 
   final String label;
   final String value;
@@ -150,13 +374,28 @@ class _MetricCard extends StatelessWidget {
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.md),
-      decoration: BoxDecoration(color: colors.surface, borderRadius: BorderRadius.circular(AppSpacing.radiusCard), border: Border.all(color: colors.outline)),
+      decoration: BoxDecoration(
+        color: colors.surface,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
+        border: Border.all(color: colors.outline),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: typography.caption.copyWith(color: colors.onSurfaceMuted), maxLines: 1, overflow: TextOverflow.ellipsis),
+          Text(
+            label,
+            style: typography.caption.copyWith(color: colors.onSurfaceMuted),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
           const SizedBox(height: 4),
-          Text(value, style: typography.headingMedium.copyWith(color: color, fontSize: 22)),
+          Text(
+            value,
+            style: typography.headingMedium.copyWith(
+              color: color,
+              fontSize: 22,
+            ),
+          ),
         ],
       ),
     );
@@ -172,7 +411,9 @@ class _TrainerPerformanceChart extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.appColors;
     final typography = context.appTypography;
-    final maxCompleted = trainerPerformance.map((t) => t.completedSessions).fold(0, (a, b) => a > b ? a : b);
+    final maxCompleted = trainerPerformance
+        .map((t) => t.completedSessions)
+        .fold(0, (a, b) => a > b ? a : b);
     final chartMax = (maxCompleted == 0 ? 1 : maxCompleted).toDouble() * 1.25;
 
     return SizedBox(
@@ -185,21 +426,35 @@ class _TrainerPerformanceChart extends StatelessWidget {
           borderData: FlBorderData(show: false),
           barTouchData: BarTouchData(enabled: false),
           titlesData: FlTitlesData(
-            leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-            topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-            rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            leftTitles: const AxisTitles(
+              sideTitles: SideTitles(showTitles: false),
+            ),
+            topTitles: const AxisTitles(
+              sideTitles: SideTitles(showTitles: false),
+            ),
+            rightTitles: const AxisTitles(
+              sideTitles: SideTitles(showTitles: false),
+            ),
             bottomTitles: AxisTitles(
               sideTitles: SideTitles(
                 showTitles: true,
                 reservedSize: 32,
                 getTitlesWidget: (value, meta) {
                   final index = value.toInt();
-                  if (index < 0 || index >= trainerPerformance.length) return const SizedBox.shrink();
+                  if (index < 0 || index >= trainerPerformance.length) {
+                    return const SizedBox.shrink();
+                  }
                   final name = trainerPerformance[index].name;
                   final shortName = name.split(' ').first;
                   return Padding(
                     padding: const EdgeInsets.only(top: AppSpacing.xs),
-                    child: Text(shortName, style: typography.caption.copyWith(color: colors.onSurfaceMuted, fontSize: 11)),
+                    child: Text(
+                      shortName,
+                      style: typography.caption.copyWith(
+                        color: colors.onSurfaceMuted,
+                        fontSize: 11,
+                      ),
+                    ),
                   );
                 },
               ),

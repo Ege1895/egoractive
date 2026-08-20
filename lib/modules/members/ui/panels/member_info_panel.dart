@@ -1,14 +1,19 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
+import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/subscription/subscription_write_gate.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/utils/phone_number_formatter.dart';
+import '../../../../shared/utils/tr_date_formatter.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_text_field.dart';
+import '../../../../shared/widgets/native_date_picker.dart';
 import '../../../trainers/controller/admin_trainers_controller.dart';
 import '../../../trainers/domain/admin_trainer_summary.dart';
 import '../../controller/member_registration_controller.dart';
@@ -35,22 +40,52 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
   late final TextEditingController _lastNameController;
   late final TextEditingController _phoneController;
   late final TextEditingController _noteController;
+  final _noteScrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
-    final form = ref.read(newMemberControllerProvider);
     if (widget.existing != null) {
       final parts = widget.existing!.name.split(' ');
       _firstNameController = TextEditingController(text: parts.first);
-      _lastNameController = TextEditingController(text: parts.skip(1).join(' '));
-      _phoneController = TextEditingController(text: widget.existing!.phone);
+      _lastNameController = TextEditingController(
+        text: parts.skip(1).join(' '),
+      );
+      final phoneDigits = _digitsOnly(widget.existing!.phone);
+      _phoneController = TextEditingController();
       _noteController = TextEditingController();
+      // Kaydet, NewMemberController'ın form state'ini okuyor — telefon
+      // alanına hiç dokunulmasa bile geçerli bir değer olsun diye mevcut
+      // üyenin numarası buraya da yazılıyor (aksi halde phoneDigits boş
+      // kalır ve validasyon "geçersiz numara" hatası verir).
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        if (!mounted) return;
+        final notifier = ref.read(newMemberControllerProvider.notifier);
+        notifier.reset();
+        notifier.updatePhoneDigits(phoneDigits);
+        // `AdminMemberSummary` (widget.existing) bu alanı taşımıyor —
+        // yazmadan önce gerçek değeri okumazsak her "Kaydet" yetkiyi
+        // sessizce false'a resetlerdi.
+        final doc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(widget.existing!.id)
+            .get();
+        if (!mounted) return;
+        notifier.setCanConfirmAttendance(
+          doc.data()?['canConfirmAttendance'] as bool? ?? false,
+        );
+      });
     } else {
-      _firstNameController = TextEditingController(text: form.firstName);
-      _lastNameController = TextEditingController(text: form.lastName);
-      _phoneController = TextEditingController(text: formatTrPhoneDigits(form.phoneDigits));
-      _noteController = TextEditingController(text: form.note);
+      // Yeni üye sihirbazı: bu provider panel stack'te önceki panelleri
+      // canlı tuttuğu için önceki (iptal edilmiş) bir kayıttan kalan veri
+      // sızmasın diye alanlar her zaman boş başlar (bkz. NewMemberController.reset).
+      _firstNameController = TextEditingController();
+      _lastNameController = TextEditingController();
+      _phoneController = TextEditingController();
+      _noteController = TextEditingController();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) ref.read(newMemberControllerProvider.notifier).reset();
+      });
     }
   }
 
@@ -61,7 +96,20 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
     final controller = ref.read(newMemberControllerProvider.notifier);
     final form = ref.watch(newMemberControllerProvider);
     final registrationState = ref.watch(memberRegistrationControllerProvider);
-    final registrationController = ref.read(memberRegistrationControllerProvider.notifier);
+    final registrationController = ref.read(
+      memberRegistrationControllerProvider.notifier,
+    );
+
+    // gym_setup_panel'deki telefon alanıyla aynı deneyim: gerçek kaynak
+    // form.phoneDigits, controller sadece "5XX XXX XX XX" formatlanmış
+    // gösterimi senkron tutar.
+    final formattedPhone = formatTrPhoneDigits(form.phoneDigits);
+    if (_phoneController.text != formattedPhone) {
+      _phoneController.value = TextEditingValue(
+        text: formattedPhone,
+        selection: TextSelection.collapsed(offset: formattedPhone.length),
+      );
+    }
 
     return Scaffold(
       body: SafeArea(
@@ -69,17 +117,48 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.md, AppSpacing.screenEdge, 0),
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.screenEdge,
+                AppSpacing.md,
+                AppSpacing.screenEdge,
+                0,
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(widget.isNew ? 'Yeni üye' : 'Üye bilgileri', style: typography.headingSmall.copyWith(color: colors.onSurface, fontSize: 18)),
+                      Text(
+                        widget.isNew
+                            ? ref.watch(
+                                rcTextProvider(
+                                  RemoteConfigKeys.membersInfoNewTitle,
+                                ),
+                              )
+                            : ref.watch(
+                                rcTextProvider(
+                                  RemoteConfigKeys.membersInfoEditTitle,
+                                ),
+                              ),
+                        style: typography.headingSmall.copyWith(
+                          color: colors.onSurface,
+                          fontSize: 18,
+                        ),
+                      ),
                       GestureDetector(
-                        onTap: () => ref.read(panelStackControllerProvider.notifier).pop(),
-                        child: Text('Vazgeç', style: typography.bodyLarge.copyWith(color: colors.onSurfaceMuted, fontSize: 15)),
+                        onTap: () => ref
+                            .read(panelStackControllerProvider.notifier)
+                            .pop(),
+                        child: Text(
+                          ref.watch(
+                            rcTextProvider(RemoteConfigKeys.commonVazgec),
+                          ),
+                          style: typography.bodyLarge.copyWith(
+                            color: colors.onSurfaceMuted,
+                            fontSize: 15,
+                          ),
+                        ),
                       ),
                     ],
                   ),
@@ -87,13 +166,53 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
                     const SizedBox(height: AppSpacing.md),
                     Row(
                       children: [
-                        Expanded(child: Container(height: 5, decoration: BoxDecoration(color: colors.primary, borderRadius: BorderRadius.circular(AppSpacing.radiusPill)))),
+                        Expanded(
+                          child: Container(
+                            height: 5,
+                            decoration: BoxDecoration(
+                              color: colors.primary,
+                              borderRadius: BorderRadius.circular(
+                                AppSpacing.radiusPill,
+                              ),
+                            ),
+                          ),
+                        ),
                         const SizedBox(width: AppSpacing.sm),
-                        Expanded(child: Container(height: 5, decoration: BoxDecoration(color: colors.surfaceRaised, borderRadius: BorderRadius.circular(AppSpacing.radiusPill)))),
+                        Expanded(
+                          child: Container(
+                            height: 5,
+                            decoration: BoxDecoration(
+                              color: colors.surfaceRaised,
+                              borderRadius: BorderRadius.circular(
+                                AppSpacing.radiusPill,
+                              ),
+                            ),
+                          ),
+                        ),
                         const SizedBox(width: AppSpacing.sm),
-                        Expanded(child: Container(height: 5, decoration: BoxDecoration(color: colors.surfaceRaised, borderRadius: BorderRadius.circular(AppSpacing.radiusPill)))),
+                        Expanded(
+                          child: Container(
+                            height: 5,
+                            decoration: BoxDecoration(
+                              color: colors.surfaceRaised,
+                              borderRadius: BorderRadius.circular(
+                                AppSpacing.radiusPill,
+                              ),
+                            ),
+                          ),
+                        ),
                         const SizedBox(width: AppSpacing.sm),
-                        Text('1 / 3', style: typography.headingSmall.copyWith(fontSize: 13, color: colors.onPrimaryContainer)),
+                        Text(
+                          ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.membersInfoStepIndicator1,
+                            ),
+                          ),
+                          style: typography.headingSmall.copyWith(
+                            fontSize: 13,
+                            color: colors.onPrimaryContainer,
+                          ),
+                        ),
                       ],
                     ),
                   ],
@@ -102,13 +221,20 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
             ),
             Expanded(
               child: ListView(
-                padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.lg, AppSpacing.screenEdge, AppSpacing.lg),
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.screenEdge,
+                  AppSpacing.lg,
+                  AppSpacing.screenEdge,
+                  AppSpacing.lg,
+                ),
                 children: [
                   Container(
                     padding: const EdgeInsets.all(AppSpacing.lg),
                     decoration: BoxDecoration(
                       color: colors.surface,
-                      borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusCard,
+                      ),
                       border: Border.all(color: colors.outline),
                     ),
                     child: Column(
@@ -116,57 +242,174 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
                       children: [
                         Row(
                           children: [
-                            Expanded(child: AppTextField(label: 'Ad', controller: _firstNameController, onChanged: controller.updateFirstName)),
+                            Expanded(
+                              child: AppTextField(
+                                label: ref.watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys.membersFirstNameFieldLabel,
+                                  ),
+                                ),
+                                controller: _firstNameController,
+                                errorText: registrationState.nameError,
+                                onChanged: controller.updateFirstName,
+                              ),
+                            ),
                             const SizedBox(width: AppSpacing.sm),
-                            Expanded(child: AppTextField(label: 'Soyad', controller: _lastNameController, onChanged: controller.updateLastName)),
+                            Expanded(
+                              child: AppTextField(
+                                label: ref.watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys.membersLastNameFieldLabel,
+                                  ),
+                                ),
+                                controller: _lastNameController,
+                                onChanged: controller.updateLastName,
+                              ),
+                            ),
                           ],
                         ),
                         const SizedBox(height: AppSpacing.md),
                         AppTextField(
-                          label: 'Telefon',
-                          keyboardType: TextInputType.phone,
+                          label: ref.watch(
+                            rcTextProvider(RemoteConfigKeys.commonTelefonLabel),
+                          ),
+                          hint: ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.membersInfoPhoneHint,
+                            ),
+                          ),
+                          prefixText: '+90 ',
+                          keyboardType: TextInputType.number,
                           controller: _phoneController,
-                          onChanged: (value) => controller.updatePhoneDigits(value.replaceAll(RegExp(r'[^0-9]'), '')),
+                          inputFormatters: [TrPhoneNumberInputFormatter()],
+                          errorText: registrationState.phoneError,
+                          onChanged: (value) => controller.updatePhoneDigits(
+                            value.replaceAll(RegExp(r'[^0-9]'), ''),
+                          ),
                         ),
                         const SizedBox(height: AppSpacing.xs),
-                        Text('Üye bu numarayla giriş yapar, şifre yok.', style: typography.caption.copyWith(color: colors.onSurfaceMuted)),
+                        Text(
+                          ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.membersInfoLoginHelper,
+                            ),
+                          ),
+                          style: typography.caption.copyWith(
+                            color: colors.onSurfaceMuted,
+                          ),
+                        ),
                         const SizedBox(height: AppSpacing.md),
                         Row(
                           children: [
                             Expanded(
                               child: _StepperField(
-                                label: 'Doğum yılı',
+                                label: ref.watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys.membersBirthYearFieldLabel,
+                                  ),
+                                ),
                                 value: '${form.birthYear}',
-                                suffix: '${form.age} yaş',
-                                onMinus: () => controller.updateBirthYear(form.birthYear - 1),
-                                onPlus: () => controller.updateBirthYear(form.birthYear + 1),
+                                suffix: ref
+                                    .watch(
+                                      rcTextProvider(
+                                        RemoteConfigKeys.membersInfoAgeSuffix,
+                                      ),
+                                    )
+                                    .replaceAll('{age}', '${form.age}'),
+                                onMinus: () => controller.updateBirthYear(
+                                  form.birthYear - 1,
+                                ),
+                                onPlus: () => controller.updateBirthYear(
+                                  form.birthYear + 1,
+                                ),
+                                onTapValue: () => _showNumberWheelPicker(
+                                  context: context,
+                                  title: ref.read(
+                                    rcTextProvider(
+                                      RemoteConfigKeys
+                                          .membersBirthYearFieldLabel,
+                                    ),
+                                  ),
+                                  min: 1940,
+                                  max: 2020,
+                                  initial: form.birthYear,
+                                  onSelected: controller.updateBirthYear,
+                                ),
                               ),
                             ),
                             const SizedBox(width: AppSpacing.sm),
                             Expanded(
                               child: _StepperField(
-                                label: 'Boy',
+                                label: ref.watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys.membersHeightFieldLabel,
+                                  ),
+                                ),
                                 value: '${form.heightCm}',
-                                suffix: 'cm',
-                                onMinus: () => controller.updateHeightCm(form.heightCm - 1),
-                                onPlus: () => controller.updateHeightCm(form.heightCm + 1),
+                                suffix: ref.watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys.measurementsUnitCm,
+                                  ),
+                                ),
+                                onMinus: () => controller.updateHeightCm(
+                                  form.heightCm - 1,
+                                ),
+                                onPlus: () => controller.updateHeightCm(
+                                  form.heightCm + 1,
+                                ),
+                                onTapValue: () => _showNumberWheelPicker(
+                                  context: context,
+                                  title: ref.read(
+                                    rcTextProvider(
+                                      RemoteConfigKeys
+                                          .membersInfoHeightPickerTitle,
+                                    ),
+                                  ),
+                                  min: 130,
+                                  max: 210,
+                                  initial: form.heightCm,
+                                  onSelected: controller.updateHeightCm,
+                                ),
                               ),
                             ),
                           ],
                         ),
                         const SizedBox(height: AppSpacing.md),
-                        Text('Cinsiyet (opsiyonel)', style: typography.bodyMedium.copyWith(color: colors.onSurfaceMuted, fontSize: 13)),
+                        Text(
+                          ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.membersInfoGenderLabel,
+                            ),
+                          ),
+                          style: typography.bodyMedium.copyWith(
+                            color: colors.onSurfaceMuted,
+                            fontSize: 13,
+                          ),
+                        ),
                         const SizedBox(height: AppSpacing.sm),
                         Row(
                           children: [
                             for (final gender in MemberGender.values)
                               Expanded(
                                 child: Padding(
-                                  padding: EdgeInsets.only(right: gender == MemberGender.values.last ? 0 : AppSpacing.sm),
+                                  padding: EdgeInsets.only(
+                                    right: gender == MemberGender.values.last
+                                        ? 0
+                                        : AppSpacing.sm,
+                                  ),
                                   child: _GenderChip(
-                                    label: gender.label,
+                                    label: ref.watch(
+                                      rcTextProvider(
+                                        gender == MemberGender.erkek
+                                            ? RemoteConfigKeys
+                                                  .membersInfoGenderErkekOption
+                                            : RemoteConfigKeys
+                                                  .membersInfoGenderKadinOption,
+                                      ),
+                                    ),
                                     selected: form.gender == gender,
-                                    onTap: () => controller.toggleGender(gender),
+                                    onTap: () =>
+                                        controller.toggleGender(gender),
                                   ),
                                 ),
                               ),
@@ -174,18 +417,28 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
                         ),
                         const SizedBox(height: AppSpacing.xs),
                         Text(
-                          'Ölçüm avatarı bu bilgiye göre gösterilir; üye ekranında ayrıca seçim yapılmaz.',
-                          style: typography.caption.copyWith(color: colors.onSurfaceMuted),
+                          ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.membersInfoGenderHelper,
+                            ),
+                          ),
+                          style: typography.caption.copyWith(
+                            color: colors.onSurfaceMuted,
+                          ),
                         ),
                       ],
                     ),
                   ),
                   const SizedBox(height: AppSpacing.lg),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.lg,
+                    ),
                     decoration: BoxDecoration(
                       color: colors.surface,
-                      borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusCard,
+                      ),
                       border: Border.all(color: colors.outline),
                     ),
                     child: Column(
@@ -194,82 +447,301 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
                           onTap: () => _showTrainerPicker(context, controller),
                           child: Container(
                             constraints: const BoxConstraints(minHeight: 60),
-                            decoration: BoxDecoration(border: Border(bottom: BorderSide(color: colors.outline))),
+                            decoration: BoxDecoration(
+                              border: Border(
+                                bottom: BorderSide(
+                                  color:
+                                      widget.isNew &&
+                                          registrationState.trainerError != null
+                                      ? colors.error
+                                      : colors.outline,
+                                ),
+                              ),
+                            ),
                             child: Row(
                               children: [
                                 Expanded(
-                                  child: Text('Antrenör', style: typography.bodyLarge.copyWith(color: colors.onSurfaceVariant, fontSize: 15)),
+                                  child: Text(
+                                    ref.watch(
+                                      rcTextProvider(
+                                        RemoteConfigKeys
+                                            .membersTrainerFieldLabel,
+                                      ),
+                                    ),
+                                    style: typography.bodyLarge.copyWith(
+                                      color: colors.onSurfaceVariant,
+                                      fontSize: 15,
+                                    ),
+                                  ),
                                 ),
                                 Flexible(
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Flexible(
-                                        child: Text(
-                                          form.trainerName,
-                                          style: typography.headingSmall.copyWith(color: colors.onSurface, fontSize: 15),
-                                          overflow: TextOverflow.ellipsis,
+                                  child: Align(
+                                    alignment: Alignment.centerRight,
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Flexible(
+                                          child: Text(
+                                            form.trainerName ??
+                                                ref.watch(
+                                                  rcTextProvider(
+                                                    RemoteConfigKeys
+                                                        .membersSelectTrainerButton,
+                                                  ),
+                                                ),
+                                            style: typography.headingSmall
+                                                .copyWith(
+                                                  color:
+                                                      form.trainerName == null
+                                                      ? colors.onSurfaceMuted
+                                                      : colors.onSurface,
+                                                  fontSize: 15,
+                                                ),
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
                                         ),
-                                      ),
-                                      const SizedBox(width: AppSpacing.xs),
-                                      Icon(Icons.chevron_right, color: colors.onSurfaceMuted, size: 18),
-                                    ],
+                                        const SizedBox(width: AppSpacing.xs),
+                                        Icon(
+                                          Icons.chevron_right,
+                                          color: colors.onSurfaceMuted,
+                                          size: 18,
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ],
                             ),
                           ),
                         ),
-                        Container(
-                          constraints: const BoxConstraints(minHeight: 60),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: Text('Kayıt tarihi', style: typography.bodyLarge.copyWith(color: colors.onSurfaceVariant, fontSize: 15)),
+                        if (widget.isNew &&
+                            registrationState.trainerError != null)
+                          Padding(
+                            padding: const EdgeInsets.only(top: AppSpacing.xs),
+                            child: Text(
+                              registrationState.trainerError!,
+                              style: typography.bodyMedium.copyWith(
+                                color: colors.error,
+                                fontSize: 13,
                               ),
-                              Text('3 Ağu 2026', style: typography.headingSmall.copyWith(color: colors.onSurface, fontSize: 15)),
-                            ],
+                            ),
+                          ),
+                        InkWell(
+                          onTap: widget.isNew
+                              ? () => showNativeDatePicker(
+                                  context: context,
+                                  initial: form.registeredAt,
+                                  firstDate: DateTime(DateTime.now().year - 50),
+                                  lastDate: DateTime.now(),
+                                  onSelected: controller.updateRegisteredAt,
+                                )
+                              : null,
+                          child: Container(
+                            constraints: const BoxConstraints(minHeight: 60),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    ref.watch(
+                                      rcTextProvider(
+                                        RemoteConfigKeys
+                                            .membersRegistrationDateFieldLabel,
+                                      ),
+                                    ),
+                                    style: typography.bodyLarge.copyWith(
+                                      color: colors.onSurfaceVariant,
+                                      fontSize: 15,
+                                    ),
+                                  ),
+                                ),
+                                Text(
+                                  // Mevcut üye düzenlenirken gerçek kayıt tarihi
+                                  // henüz Firestore'dan okunmuyor (ayrı kapsam).
+                                  widget.isNew
+                                      ? formatTrDate(form.registeredAt)
+                                      : '—',
+                                  style: typography.headingSmall.copyWith(
+                                    color: colors.onSurface,
+                                    fontSize: 15,
+                                  ),
+                                ),
+                                if (widget.isNew) ...[
+                                  const SizedBox(width: AppSpacing.xs),
+                                  Icon(
+                                    Icons.chevron_right,
+                                    color: colors.onSurfaceMuted,
+                                    size: 18,
+                                  ),
+                                ],
+                              ],
+                            ),
                           ),
                         ),
                       ],
                     ),
                   ),
                   const SizedBox(height: AppSpacing.lg),
-                  AppTextField(
-                    label: 'Not (isteğe bağlı)',
-                    controller: _noteController,
-                    onChanged: controller.updateNote,
+                  Scrollbar(
+                    controller: _noteScrollController,
+                    thumbVisibility: true,
+                    interactive: true,
+                    thickness: 4,
+                    radius: const Radius.circular(4),
+                    child: AppTextField(
+                      label: ref.watch(
+                        rcTextProvider(RemoteConfigKeys.membersNoteFieldLabel),
+                      ),
+                      controller: _noteController,
+                      scrollController: _noteScrollController,
+                      minLines: 1,
+                      maxLines: 5,
+                      onChanged: controller.updateNote,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.lg),
+                  Container(
+                    padding: const EdgeInsets.all(AppSpacing.lg),
+                    decoration: BoxDecoration(
+                      color: colors.surface,
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusCard,
+                      ),
+                      border: Border.all(color: colors.outline),
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                ref.watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys
+                                        .membersInfoConfirmAttendanceLabel,
+                                  ),
+                                ),
+                                style: typography.bodyLarge.copyWith(
+                                  color: colors.onSurface,
+                                  fontSize: 15,
+                                ),
+                              ),
+                              Text(
+                                ref.watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys
+                                        .membersInfoConfirmAttendanceHelper,
+                                  ),
+                                ),
+                                style: typography.caption.copyWith(
+                                  color: colors.onSurfaceMuted,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: controller.toggleCanConfirmAttendance,
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 150),
+                            width: 52,
+                            height: 32,
+                            padding: const EdgeInsets.all(3),
+                            decoration: BoxDecoration(
+                              color: form.canConfirmAttendance
+                                  ? colors.primary
+                                  : colors.surfaceRaised,
+                              borderRadius: BorderRadius.circular(
+                                AppSpacing.radiusPill,
+                              ),
+                            ),
+                            alignment: form.canConfirmAttendance
+                                ? Alignment.centerRight
+                                : Alignment.centerLeft,
+                            child: Container(
+                              width: 26,
+                              height: 26,
+                              decoration: BoxDecoration(
+                                color: colors.onSurface,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.md, AppSpacing.screenEdge, AppSpacing.lg),
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.screenEdge,
+                AppSpacing.md,
+                AppSpacing.screenEdge,
+                AppSpacing.lg,
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  if (widget.isNew && registrationState.errorMessage != null) ...[
+                  if (registrationState.errorMessage != null) ...[
                     Text(
                       registrationState.errorMessage!,
-                      style: typography.bodyMedium.copyWith(color: colors.error, fontSize: 13),
+                      style: typography.bodyMedium.copyWith(
+                        color: colors.error,
+                        fontSize: 13,
+                      ),
                     ),
                     const SizedBox(height: AppSpacing.sm),
                   ],
                   AppButton(
                     label: widget.isNew
-                        ? (registrationState.isSubmitting ? 'Kaydediliyor…' : 'Paket seçimine geç')
-                        : 'Kaydet',
-                    onPressed: widget.isNew && registrationState.isSubmitting
+                        ? (registrationState.isSubmitting
+                              ? ref.watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys.membersSavingLabel,
+                                  ),
+                                )
+                              : ref.watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys
+                                        .membersInfoGoToPackageButton,
+                                  ),
+                                ))
+                        : (registrationState.isSubmitting
+                              ? ref.watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys.membersSavingLabel,
+                                  ),
+                                )
+                              : ref.watch(
+                                  rcTextProvider(RemoteConfigKeys.commonKaydet),
+                                )),
+                    onPressed: registrationState.isSubmitting
                         ? null
                         : () async {
-                            if (!widget.isNew) {
-                              ref.read(panelStackControllerProvider.notifier).pop();
+                            if (!await ensureSubscriptionAllowsWrite(
+                              context,
+                              ref,
+                            )) {
                               return;
                             }
-                            if (!await ensureSubscriptionAllowsWrite(context, ref)) return;
-                            final success = await registrationController.submit();
+                            if (!widget.isNew) {
+                              final success = await registrationController
+                                  .submitEdit(memberId: widget.existing!.id);
+                              if (success && mounted) {
+                                ref
+                                    .read(panelStackControllerProvider.notifier)
+                                    .pop();
+                              }
+                              return;
+                            }
+                            final success = await registrationController
+                                .submit();
                             if (success && mounted) {
-                              ref.read(panelStackControllerProvider.notifier).push(const NewMembershipPackagePanel());
+                              ref
+                                  .read(panelStackControllerProvider.notifier)
+                                  .push(const NewMembershipPackagePanel());
                             }
                           },
                   ),
@@ -282,13 +754,17 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
     );
   }
 
-  void _showTrainerPicker(BuildContext context, NewMemberController controller) {
+  void _showTrainerPicker(
+    BuildContext context,
+    NewMemberController controller,
+  ) {
     final colors = context.appColors;
-    final trainers = ref.read(adminTrainersControllerProvider);
     showModalBottomSheet<void>(
       context: context,
       backgroundColor: colors.surface,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
       builder: (sheetContext) {
         return SafeArea(
           child: Padding(
@@ -297,12 +773,59 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Antrenör seç', style: context.appTypography.headingMedium.copyWith(color: colors.onSurface, fontSize: 20)),
+                Text(
+                  ref.read(
+                    rcTextProvider(RemoteConfigKeys.membersSelectTrainerButton),
+                  ),
+                  style: context.appTypography.headingMedium.copyWith(
+                    color: colors.onSurface,
+                    fontSize: 20,
+                  ),
+                ),
                 const SizedBox(height: AppSpacing.md),
-                for (final trainer in trainers) _TrainerOption(trainer: trainer, onTap: () {
-                  controller.selectTrainer(trainer.id, trainer.name);
-                  Navigator.of(sheetContext).pop();
-                }),
+                // `ref.read` ile tek seferlik alınan liste, sheet açıldığı
+                // anda antrenörler Firestore'dan henüz gelmemişse (ilk
+                // dinlemede stream henüz ilk snapshot'ını vermemişse) hep
+                // boş kalıyordu — sheet kendi build'i yenilenmediği için
+                // veri gelse bile ekrana yansımıyordu. Consumer ile
+                // reaktif izleniyor.
+                Consumer(
+                  builder: (context, ref, _) {
+                    final trainers = ref.watch(adminTrainersControllerProvider);
+                    if (trainers.isEmpty) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: AppSpacing.lg,
+                        ),
+                        child: Text(
+                          ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.membersInfoNoTrainersMessage,
+                            ),
+                          ),
+                          style: context.appTypography.bodyMedium.copyWith(
+                            color: colors.onSurfaceMuted,
+                          ),
+                        ),
+                      );
+                    }
+                    return Column(
+                      children: [
+                        for (final trainer in trainers)
+                          _TrainerOption(
+                            trainer: trainer,
+                            onTap: () {
+                              controller.selectTrainer(
+                                trainer.id,
+                                trainer.name,
+                              );
+                              Navigator.of(sheetContext).pop();
+                            },
+                          ),
+                      ],
+                    );
+                  },
+                ),
               ],
             ),
           ),
@@ -311,24 +834,124 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
     );
   }
 
+  /// Boy/doğum yılı için +/- tek tek artırmanın yerine tam bir aralığı
+  /// hızlıca taramak üzere iOS'un native scroll wheel'iyle aynı bileşen
+  /// (CupertinoPicker) kullanılıyor — Flutter SDK'da Android'e özgü ayrı
+  /// bir "native" tekerlek bileşeni yok, bu yüzden iki platformda da aynı
+  /// alt sayfa gösteriliyor.
+  Future<void> _showNumberWheelPicker({
+    required BuildContext context,
+    required String title,
+    required int min,
+    required int max,
+    required int initial,
+    required ValueChanged<int> onSelected,
+  }) async {
+    final colors = context.appColors;
+    final values = [for (var v = min; v <= max; v++) v];
+    var selected = initial.clamp(min, max);
+    final initialIndex = values.indexOf(selected);
+
+    await showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: colors.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      builder: (sheetContext) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  title,
+                  style: context.appTypography.headingSmall.copyWith(
+                    color: colors.onSurface,
+                    fontSize: 16,
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.md),
+                SizedBox(
+                  height: 216,
+                  child: CupertinoPicker(
+                    scrollController: FixedExtentScrollController(
+                      initialItem: initialIndex < 0 ? 0 : initialIndex,
+                    ),
+                    itemExtent: 40,
+                    onSelectedItemChanged: (index) => selected = values[index],
+                    children: [
+                      for (final v in values)
+                        Center(
+                          child: Text(
+                            '$v',
+                            style: context.appTypography.dataMedium.copyWith(
+                              color: colors.onSurface,
+                              fontSize: 18,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.md),
+                AppButton(
+                  label: ref.read(
+                    rcTextProvider(
+                      RemoteConfigKeys.membersInfoPickerConfirmButton,
+                    ),
+                  ),
+                  onPressed: () {
+                    onSelected(selected);
+                    Navigator.of(sheetContext).pop();
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  String _digitsOnly(String raw) {
+    final digits = raw.replaceAll(RegExp(r'[^0-9]'), '');
+    final withoutCountryCode = digits.startsWith('90') && digits.length > 10
+        ? digits.substring(2)
+        : digits;
+    return withoutCountryCode.length > 10
+        ? withoutCountryCode.substring(withoutCountryCode.length - 10)
+        : withoutCountryCode;
+  }
+
   @override
   void dispose() {
     _firstNameController.dispose();
     _lastNameController.dispose();
     _phoneController.dispose();
     _noteController.dispose();
+    _noteScrollController.dispose();
     super.dispose();
   }
 }
 
 class _StepperField extends StatelessWidget {
-  const _StepperField({required this.label, required this.value, required this.suffix, required this.onMinus, required this.onPlus});
+  const _StepperField({
+    required this.label,
+    required this.value,
+    required this.suffix,
+    required this.onMinus,
+    required this.onPlus,
+    required this.onTapValue,
+  });
 
   final String label;
   final String value;
   final String suffix;
   final VoidCallback onMinus;
   final VoidCallback onPlus;
+  final VoidCallback onTapValue;
 
   @override
   Widget build(BuildContext context) {
@@ -337,31 +960,72 @@ class _StepperField extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: typography.bodyMedium.copyWith(color: colors.onSurfaceMuted, fontSize: 13)),
+        Text(
+          label,
+          style: typography.bodyMedium.copyWith(
+            color: colors.onSurfaceMuted,
+            fontSize: 13,
+          ),
+        ),
         const SizedBox(height: AppSpacing.xs),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
           constraints: const BoxConstraints(minHeight: 48),
-          decoration: BoxDecoration(color: colors.surfaceRaised, borderRadius: BorderRadius.circular(AppSpacing.radiusInner)),
+          decoration: BoxDecoration(
+            color: colors.surfaceRaised,
+            borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+          ),
           child: Row(
             children: [
-              GestureDetector(onTap: onMinus, child: Icon(Icons.remove_circle_outline, color: colors.onSurfaceVariant, size: 20)),
-              Expanded(
-                child: Text(value, textAlign: TextAlign.center, style: typography.dataMedium.copyWith(color: colors.onSurface, fontSize: 16)),
+              GestureDetector(
+                onTap: onMinus,
+                child: Icon(
+                  Icons.remove_circle_outline,
+                  color: colors.onSurfaceVariant,
+                  size: 20,
+                ),
               ),
-              GestureDetector(onTap: onPlus, child: Icon(Icons.add_circle_outline, color: colors.onSurfaceVariant, size: 20)),
+              Expanded(
+                child: GestureDetector(
+                  onTap: onTapValue,
+                  behavior: HitTestBehavior.opaque,
+                  child: Text(
+                    value,
+                    textAlign: TextAlign.center,
+                    style: typography.dataMedium.copyWith(
+                      color: colors.onSurface,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+              ),
+              GestureDetector(
+                onTap: onPlus,
+                child: Icon(
+                  Icons.add_circle_outline,
+                  color: colors.onSurfaceVariant,
+                  size: 20,
+                ),
+              ),
             ],
           ),
         ),
         const SizedBox(height: AppSpacing.xs),
-        Text(suffix, style: typography.caption.copyWith(color: colors.onPrimaryContainer)),
+        Text(
+          suffix,
+          style: typography.caption.copyWith(color: colors.onPrimaryContainer),
+        ),
       ],
     );
   }
 }
 
 class _GenderChip extends StatelessWidget {
-  const _GenderChip({required this.label, required this.selected, required this.onTap});
+  const _GenderChip({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
 
   final String label;
   final bool selected;
@@ -386,12 +1050,35 @@ class _GenderChip extends StatelessWidget {
               Container(
                 width: 18,
                 height: 18,
-                decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: selected ? colors.primary : colors.outlineStrong, width: 2)),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: selected ? colors.primary : colors.outlineStrong,
+                    width: 2,
+                  ),
+                ),
                 alignment: Alignment.center,
-                child: selected ? Container(width: 8, height: 8, decoration: BoxDecoration(shape: BoxShape.circle, color: colors.primary)) : null,
+                child: selected
+                    ? Container(
+                        width: 8,
+                        height: 8,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: colors.primary,
+                        ),
+                      )
+                    : null,
               ),
               const SizedBox(width: AppSpacing.sm),
-              Text(label, style: typography.headingSmall.copyWith(fontSize: 15, color: selected ? colors.onPrimaryContainer : colors.onSurface)),
+              Text(
+                label,
+                style: typography.headingSmall.copyWith(
+                  fontSize: 15,
+                  color: selected
+                      ? colors.onPrimaryContainer
+                      : colors.onSurface,
+                ),
+              ),
             ],
           ),
         ),
@@ -419,12 +1106,27 @@ class _TrainerOption extends StatelessWidget {
             Container(
               width: 36,
               height: 36,
-              decoration: BoxDecoration(color: colors.primaryContainer, shape: BoxShape.circle),
+              decoration: BoxDecoration(
+                color: colors.primaryContainer,
+                shape: BoxShape.circle,
+              ),
               alignment: Alignment.center,
-              child: Text(trainer.initials, style: typography.headingSmall.copyWith(color: colors.onPrimaryContainer, fontSize: 13)),
+              child: Text(
+                trainer.initials,
+                style: typography.headingSmall.copyWith(
+                  color: colors.onPrimaryContainer,
+                  fontSize: 13,
+                ),
+              ),
             ),
             const SizedBox(width: AppSpacing.md),
-            Text(trainer.name, style: typography.bodyLarge.copyWith(color: colors.onSurface, fontSize: 15)),
+            Text(
+              trainer.name,
+              style: typography.bodyLarge.copyWith(
+                color: colors.onSurface,
+                fontSize: 15,
+              ),
+            ),
           ],
         ),
       ),

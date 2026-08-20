@@ -15,10 +15,16 @@ class MeasurementsState with _$MeasurementsState {
     required Map<MeasurementMetric, MeasurementSeries> series,
     @Default(MeasurementsViewMode.avatar) MeasurementsViewMode viewMode,
     @Default(MeasurementMetric.bel) MeasurementMetric selectedMetric,
+
     /// Avatar ekranında görüntülenen kayıt tarihi. `null` = en son kayıt.
     DateTime? selectedDate,
+
     /// Geçmişe dönük tarih seçmek için — en yeniden en eskiye sıralı,
     /// gerçek veri yoksa boş.
     @Default(<DateTime>[]) List<DateTime> recordedDates,
+
+    /// `users/{uid}.gender` alanının ham değeri ('erkek' | 'kadin' | null) —
+    /// avatar silüetinin hangi görseli kullanacağını belirler.
+    String? gender,
   }) = _MeasurementsState;
 }

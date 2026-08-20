@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
+import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_back_button.dart';
 import '../../controller/admin_feedback_controller.dart';
@@ -14,10 +15,12 @@ class AdminFeedbackListPanel extends BasePanel {
   const AdminFeedbackListPanel({super.key});
 
   @override
-  ConsumerState<AdminFeedbackListPanel> createState() => _AdminFeedbackListPanelState();
+  ConsumerState<AdminFeedbackListPanel> createState() =>
+      _AdminFeedbackListPanelState();
 }
 
-class _AdminFeedbackListPanelState extends BasePanelState<AdminFeedbackListPanel> {
+class _AdminFeedbackListPanelState
+    extends BasePanelState<AdminFeedbackListPanel> {
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
@@ -30,22 +33,51 @@ class _AdminFeedbackListPanelState extends BasePanelState<AdminFeedbackListPanel
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.md, AppSpacing.screenEdge, 0),
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.screenEdge,
+                AppSpacing.md,
+                AppSpacing.screenEdge,
+                0,
+              ),
               child: Row(
                 children: [
-                  AppBackButton(onTap: () => ref.read(panelStackControllerProvider.notifier).pop()),
+                  AppBackButton(
+                    onTap: () =>
+                        ref.read(panelStackControllerProvider.notifier).pop(),
+                  ),
                   const SizedBox(width: AppSpacing.md),
-                  Expanded(child: Text('Geri bildirimler', style: typography.headingLarge.copyWith(color: colors.onSurface, fontSize: 24))),
+                  Expanded(
+                    child: Text(
+                      ref.watch(
+                        rcTextProvider(RemoteConfigKeys.feedbackAdminListTitle),
+                      ),
+                      style: typography.headingLarge.copyWith(
+                        color: colors.onSurface,
+                        fontSize: 24,
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
             Expanded(
               child: ListView(
-                padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.md, AppSpacing.screenEdge, AppSpacing.lg),
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.screenEdge,
+                  AppSpacing.md,
+                  AppSpacing.screenEdge,
+                  AppSpacing.lg,
+                ),
                 children: [
                   Container(
                     padding: const EdgeInsets.all(AppSpacing.xl),
-                    decoration: BoxDecoration(color: colors.surface, borderRadius: BorderRadius.circular(AppSpacing.radiusCard), border: Border.all(color: colors.outline)),
+                    decoration: BoxDecoration(
+                      color: colors.surface,
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusCard,
+                      ),
+                      border: Border.all(color: colors.outline),
+                    ),
                     child: Row(
                       children: [
                         SizedBox(
@@ -53,10 +85,30 @@ class _AdminFeedbackListPanelState extends BasePanelState<AdminFeedbackListPanel
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(summary.average.toStringAsFixed(1).replaceAll('.', ','), style: typography.dataLarge.copyWith(color: colors.onSurface, fontSize: 38)),
                               Text(
-                                '${summary.totalCount} değerlendirme',
-                                style: typography.caption.copyWith(color: colors.onSurfaceMuted),
+                                summary.average
+                                    .toStringAsFixed(1)
+                                    .replaceAll('.', ','),
+                                style: typography.dataLarge.copyWith(
+                                  color: colors.onSurface,
+                                  fontSize: 38,
+                                ),
+                              ),
+                              Text(
+                                ref
+                                    .watch(
+                                      rcTextProvider(
+                                        RemoteConfigKeys
+                                            .feedbackTotalReviewsCaption,
+                                      ),
+                                    )
+                                    .replaceAll(
+                                      '{count}',
+                                      '${summary.totalCount}',
+                                    ),
+                                style: typography.caption.copyWith(
+                                  color: colors.onSurfaceMuted,
+                                ),
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ],
@@ -66,7 +118,12 @@ class _AdminFeedbackListPanelState extends BasePanelState<AdminFeedbackListPanel
                         Expanded(
                           child: Column(
                             children: [
-                              for (var star = 5; star >= 1; star--) _RatingBar(star: star, count: summary.starCounts[star] ?? 0, total: summary.totalCount),
+                              for (var star = 5; star >= 1; star--)
+                                _RatingBar(
+                                  star: star,
+                                  count: summary.starCounts[star] ?? 0,
+                                  total: summary.totalCount,
+                                ),
                             ],
                           ),
                         ),
@@ -74,7 +131,8 @@ class _AdminFeedbackListPanelState extends BasePanelState<AdminFeedbackListPanel
                     ),
                   ),
                   const SizedBox(height: AppSpacing.lg),
-                  for (final entry in summary.entries) _FeedbackCard(entry: entry),
+                  for (final entry in summary.entries)
+                    _FeedbackCard(entry: entry),
                 ],
               ),
             ),
@@ -86,7 +144,11 @@ class _AdminFeedbackListPanelState extends BasePanelState<AdminFeedbackListPanel
 }
 
 class _RatingBar extends StatelessWidget {
-  const _RatingBar({required this.star, required this.count, required this.total});
+  const _RatingBar({
+    required this.star,
+    required this.count,
+    required this.total,
+  });
 
   final int star;
   final int count;
@@ -101,16 +163,40 @@ class _RatingBar extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 3),
       child: Row(
         children: [
-          SizedBox(width: 10, child: Text('$star', style: typography.headingSmall.copyWith(fontSize: 11, color: colors.onSurfaceMuted))),
+          SizedBox(
+            width: 10,
+            child: Text(
+              '$star',
+              style: typography.headingSmall.copyWith(
+                fontSize: 11,
+                color: colors.onSurfaceMuted,
+              ),
+            ),
+          ),
           const SizedBox(width: AppSpacing.sm),
           Expanded(
             child: ClipRRect(
               borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
-              child: LinearProgressIndicator(value: ratio, minHeight: 6, backgroundColor: colors.surfaceRaised, valueColor: AlwaysStoppedAnimation(colors.primary)),
+              child: LinearProgressIndicator(
+                value: ratio,
+                minHeight: 6,
+                backgroundColor: colors.surfaceRaised,
+                valueColor: AlwaysStoppedAnimation(colors.primary),
+              ),
             ),
           ),
           const SizedBox(width: AppSpacing.sm),
-          SizedBox(width: 20, child: Text('$count', textAlign: TextAlign.right, style: typography.headingSmall.copyWith(fontSize: 11, color: colors.onSurfaceMuted))),
+          SizedBox(
+            width: 20,
+            child: Text(
+              '$count',
+              textAlign: TextAlign.right,
+              style: typography.headingSmall.copyWith(
+                fontSize: 11,
+                color: colors.onSurfaceMuted,
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -129,7 +215,11 @@ class _FeedbackCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.md),
       padding: const EdgeInsets.all(AppSpacing.lg),
-      decoration: BoxDecoration(color: colors.surface, borderRadius: BorderRadius.circular(AppSpacing.radiusCard), border: Border.all(color: colors.outline)),
+      decoration: BoxDecoration(
+        color: colors.surface,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
+        border: Border.all(color: colors.outline),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -138,17 +228,37 @@ class _FeedbackCard extends StatelessWidget {
               Container(
                 width: 40,
                 height: 40,
-                decoration: BoxDecoration(color: colors.primaryContainer, shape: BoxShape.circle),
+                decoration: BoxDecoration(
+                  color: colors.primaryContainer,
+                  shape: BoxShape.circle,
+                ),
                 alignment: Alignment.center,
-                child: Text(entry.initials, style: typography.headingSmall.copyWith(color: colors.onPrimaryContainer, fontSize: 14)),
+                child: Text(
+                  entry.initials,
+                  style: typography.headingSmall.copyWith(
+                    color: colors.onPrimaryContainer,
+                    fontSize: 14,
+                  ),
+                ),
               ),
               const SizedBox(width: AppSpacing.md),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(entry.memberName, style: typography.headingSmall.copyWith(color: colors.onSurface, fontSize: 15)),
-                    Text(entry.meta, style: typography.caption.copyWith(color: colors.onSurfaceMuted)),
+                    Text(
+                      entry.memberName,
+                      style: typography.headingSmall.copyWith(
+                        color: colors.onSurface,
+                        fontSize: 15,
+                      ),
+                    ),
+                    Text(
+                      entry.meta,
+                      style: typography.caption.copyWith(
+                        color: colors.onSurfaceMuted,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -162,7 +272,12 @@ class _FeedbackCard extends StatelessWidget {
                         child: Container(
                           width: 12,
                           height: 12,
-                          decoration: BoxDecoration(color: i < entry.stars ? colors.primary : colors.surfaceRaised, borderRadius: BorderRadius.circular(4)),
+                          decoration: BoxDecoration(
+                            color: i < entry.stars
+                                ? colors.primary
+                                : colors.surfaceRaised,
+                            borderRadius: BorderRadius.circular(4),
+                          ),
                         ),
                       ),
                     ),
@@ -171,7 +286,14 @@ class _FeedbackCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: AppSpacing.sm),
-          Text(entry.comment, style: typography.bodyLarge.copyWith(color: colors.onSurfaceVariant, fontSize: 15, height: 1.5)),
+          Text(
+            entry.comment,
+            style: typography.bodyLarge.copyWith(
+              color: colors.onSurfaceVariant,
+              fontSize: 15,
+              height: 1.5,
+            ),
+          ),
         ],
       ),
     );

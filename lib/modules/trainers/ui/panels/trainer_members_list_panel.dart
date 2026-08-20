@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
+import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../controller/trainer_members_controller.dart';
 import '../../domain/trainer_member_summary.dart';
@@ -16,10 +17,12 @@ class TrainerMembersListPanel extends ConsumerStatefulWidget {
   const TrainerMembersListPanel({super.key});
 
   @override
-  ConsumerState<TrainerMembersListPanel> createState() => _TrainerMembersListPanelState();
+  ConsumerState<TrainerMembersListPanel> createState() =>
+      _TrainerMembersListPanelState();
 }
 
-class _TrainerMembersListPanelState extends ConsumerState<TrainerMembersListPanel> {
+class _TrainerMembersListPanelState
+    extends ConsumerState<TrainerMembersListPanel> {
   _MemberFilter _filter = _MemberFilter.all;
   final _searchController = TextEditingController();
   String _query = '';
@@ -29,7 +32,13 @@ class _TrainerMembersListPanelState extends ConsumerState<TrainerMembersListPane
     final colors = context.appColors;
     final typography = context.appTypography;
     final members = ref.watch(trainerMembersControllerProvider);
-    final filtered = members.where(_matchesFilter).where(_matchesQuery).toList();
+    final filtered = members
+        .where(_matchesFilter)
+        .where(_matchesQuery)
+        .toList();
+    final memberCountText = ref
+        .watch(rcTextProvider(RemoteConfigKeys.trainersMemberCountSuffix))
+        .replaceAll('{count}', '${members.length}');
 
     return Scaffold(
       body: SafeArea(
@@ -37,38 +46,77 @@ class _TrainerMembersListPanelState extends ConsumerState<TrainerMembersListPane
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.lg, AppSpacing.screenEdge, 0),
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.screenEdge,
+                AppSpacing.lg,
+                AppSpacing.screenEdge,
+                0,
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('Üyelerim', style: typography.headingLarge.copyWith(color: colors.onSurface)),
-                      Text('${members.length} üye', style: typography.headingSmall.copyWith(color: colors.onSurfaceMuted, fontSize: 15)),
+                      Text(
+                        ref.watch(
+                          rcTextProvider(
+                            RemoteConfigKeys.trainersMembersListTitle,
+                          ),
+                        ),
+                        style: typography.headingLarge.copyWith(
+                          color: colors.onSurface,
+                        ),
+                      ),
+                      Text(
+                        memberCountText,
+                        style: typography.headingSmall.copyWith(
+                          color: colors.onSurfaceMuted,
+                          fontSize: 15,
+                        ),
+                      ),
                     ],
                   ),
                   const SizedBox(height: AppSpacing.md),
                   Container(
                     constraints: const BoxConstraints(minHeight: 44),
-                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.md,
+                    ),
                     decoration: BoxDecoration(
                       color: colors.surface,
                       border: Border.all(color: colors.outline),
-                      borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusInner,
+                      ),
                     ),
                     child: Row(
                       children: [
-                        Icon(Icons.search, size: 18, color: colors.onSurfaceMuted),
+                        Icon(
+                          Icons.search,
+                          size: 18,
+                          color: colors.onSurfaceMuted,
+                        ),
                         const SizedBox(width: AppSpacing.sm),
                         Expanded(
                           child: TextField(
                             controller: _searchController,
-                            onChanged: (value) => setState(() => _query = value),
-                            style: typography.bodyLarge.copyWith(color: colors.onSurface, fontSize: 15),
+                            onChanged: (value) =>
+                                setState(() => _query = value),
+                            style: typography.bodyLarge.copyWith(
+                              color: colors.onSurface,
+                              fontSize: 15,
+                            ),
                             decoration: InputDecoration(
-                              hintText: 'Üye ara',
-                              hintStyle: typography.bodyLarge.copyWith(color: colors.onSurfaceMuted, fontSize: 15),
+                              hintText: ref.watch(
+                                rcTextProvider(
+                                  RemoteConfigKeys.trainersMembersSearchHint,
+                                ),
+                              ),
+                              hintStyle: typography.bodyLarge.copyWith(
+                                color: colors.onSurfaceMuted,
+                                fontSize: 15,
+                              ),
                               border: InputBorder.none,
                               isDense: true,
                             ),
@@ -83,18 +131,36 @@ class _TrainerMembersListPanelState extends ConsumerState<TrainerMembersListPane
                     child: ListView(
                       scrollDirection: Axis.horizontal,
                       children: [
-                        _FilterChip(label: 'Tümü', selected: _filter == _MemberFilter.all, onTap: () => setState(() => _filter = _MemberFilter.all)),
-                        const SizedBox(width: AppSpacing.sm),
                         _FilterChip(
-                          label: 'Paketi bitiyor',
-                          selected: _filter == _MemberFilter.endingSoon,
-                          onTap: () => setState(() => _filter = _MemberFilter.endingSoon),
+                          label: ref.watch(
+                            rcTextProvider(RemoteConfigKeys.commonTumuFilter),
+                          ),
+                          selected: _filter == _MemberFilter.all,
+                          onTap: () =>
+                              setState(() => _filter = _MemberFilter.all),
                         ),
                         const SizedBox(width: AppSpacing.sm),
                         _FilterChip(
-                          label: 'Paketi yok',
+                          label: ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.trainersMembersFilterExpiring,
+                            ),
+                          ),
+                          selected: _filter == _MemberFilter.endingSoon,
+                          onTap: () => setState(
+                            () => _filter = _MemberFilter.endingSoon,
+                          ),
+                        ),
+                        const SizedBox(width: AppSpacing.sm),
+                        _FilterChip(
+                          label: ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.commonPaketiYokFilter,
+                            ),
+                          ),
                           selected: _filter == _MemberFilter.noPackage,
-                          onTap: () => setState(() => _filter = _MemberFilter.noPackage),
+                          onTap: () =>
+                              setState(() => _filter = _MemberFilter.noPackage),
                         ),
                       ],
                     ),
@@ -106,14 +172,26 @@ class _TrainerMembersListPanelState extends ConsumerState<TrainerMembersListPane
               child: filtered.isEmpty
                   ? Center(
                       child: Text(
-                        'Bu filtreye uyan üye yok.',
-                        style: typography.bodyMedium.copyWith(color: colors.onSurfaceMuted),
+                        ref.watch(
+                          rcTextProvider(
+                            RemoteConfigKeys.membersListEmptyState,
+                          ),
+                        ),
+                        style: typography.bodyMedium.copyWith(
+                          color: colors.onSurfaceMuted,
+                        ),
                       ),
                     )
                   : ListView(
-                      padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.md, AppSpacing.screenEdge, AppSpacing.lg),
+                      padding: const EdgeInsets.fromLTRB(
+                        AppSpacing.screenEdge,
+                        AppSpacing.md,
+                        AppSpacing.screenEdge,
+                        AppSpacing.lg,
+                      ),
                       children: [
-                        for (final member in filtered) _MemberRow(member: member),
+                        for (final member in filtered)
+                          _MemberRow(member: member),
                       ],
                     ),
             ),
@@ -126,7 +204,8 @@ class _TrainerMembersListPanelState extends ConsumerState<TrainerMembersListPane
   bool _matchesFilter(TrainerMemberSummary member) {
     return switch (_filter) {
       _MemberFilter.all => true,
-      _MemberFilter.endingSoon => member.remainingSessions > 0 && member.remainingSessions <= 2,
+      _MemberFilter.endingSoon =>
+        member.remainingSessions > 0 && member.remainingSessions <= 2,
       _MemberFilter.noPackage => member.remainingSessions == 0,
     };
   }
@@ -144,7 +223,11 @@ class _TrainerMembersListPanelState extends ConsumerState<TrainerMembersListPane
 }
 
 class _FilterChip extends StatelessWidget {
-  const _FilterChip({required this.label, required this.selected, required this.onTap});
+  const _FilterChip({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
 
   final String label;
   final bool selected;
@@ -160,12 +243,17 @@ class _FilterChip extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.md,
+            vertical: AppSpacing.sm,
+          ),
           constraints: const BoxConstraints(minHeight: 34),
           alignment: Alignment.center,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
-            border: Border.all(color: selected ? colors.primary : colors.outlineStrong),
+            border: Border.all(
+              color: selected ? colors.primary : colors.outlineStrong,
+            ),
           ),
           child: Text(
             label,
@@ -191,11 +279,15 @@ class _MemberRow extends ConsumerWidget {
     final typography = context.appTypography;
     final leftColor = member.remainingSessions == 0
         ? colors.error
-        : (member.remainingSessions <= 2 ? colors.onWarningContainer : colors.onSurface);
+        : (member.remainingSessions <= 2
+              ? colors.onWarningContainer
+              : colors.onSurface);
 
     return InkWell(
       borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
-      onTap: () => ref.read(panelStackControllerProvider.notifier).push(TrainerMemberDetailPanel(memberId: member.id)),
+      onTap: () => ref
+          .read(panelStackControllerProvider.notifier)
+          .push(TrainerMemberDetailPanel(memberId: member.id)),
       child: Container(
         margin: const EdgeInsets.only(bottom: AppSpacing.sm),
         padding: const EdgeInsets.all(AppSpacing.md),
@@ -209,25 +301,62 @@ class _MemberRow extends ConsumerWidget {
             Container(
               width: 44,
               height: 44,
-              decoration: BoxDecoration(color: colors.primaryContainer, shape: BoxShape.circle),
+              decoration: BoxDecoration(
+                color: colors.primaryContainer,
+                shape: BoxShape.circle,
+              ),
               alignment: Alignment.center,
-              child: Text(member.initials, style: typography.headingSmall.copyWith(color: colors.onPrimaryContainer, fontSize: 15)),
+              child: Text(
+                member.initials,
+                style: typography.headingSmall.copyWith(
+                  color: colors.onPrimaryContainer,
+                  fontSize: 15,
+                ),
+              ),
             ),
             const SizedBox(width: AppSpacing.md),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(member.name, style: typography.headingSmall.copyWith(color: colors.onSurface, fontSize: 16)),
-                  Text(member.packageName, style: typography.bodyMedium.copyWith(color: colors.onSurfaceMuted, fontSize: 13)),
+                  Text(
+                    member.name,
+                    style: typography.headingSmall.copyWith(
+                      color: colors.onSurface,
+                      fontSize: 16,
+                    ),
+                  ),
+                  Text(
+                    member.packageName,
+                    style: typography.bodyMedium.copyWith(
+                      color: colors.onSurfaceMuted,
+                      fontSize: 13,
+                    ),
+                  ),
                 ],
               ),
             ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Text('${member.remainingSessions}', style: typography.headingSmall.copyWith(color: leftColor, fontSize: 16)),
-                Text('kalan ders', style: typography.caption.copyWith(color: colors.onSurfaceMuted, fontSize: 11)),
+                Text(
+                  '${member.remainingSessions}',
+                  style: typography.headingSmall.copyWith(
+                    color: leftColor,
+                    fontSize: 16,
+                  ),
+                ),
+                Text(
+                  ref.watch(
+                    rcTextProvider(
+                      RemoteConfigKeys.trainersMembersRemainingSessionsSuffix,
+                    ),
+                  ),
+                  style: typography.caption.copyWith(
+                    color: colors.onSurfaceMuted,
+                    fontSize: 11,
+                  ),
+                ),
               ],
             ),
           ],

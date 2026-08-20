@@ -15,9 +15,15 @@ class SubscriptionState with _$SubscriptionState {
     DateTime? expiresAt,
     String? productId,
     @Default(false) bool isPurchasing,
+
     /// Satın alma akışı başlatılan ürün — mağaza penceresi açıkken hangi
     /// plan kartının "bekleniyor" durumunda gösterileceğini belirler.
     String? pendingProductId,
+
+    /// Satın alma hatası (network, mağaza reddi, doğrulama başarısızlığı).
+    /// Kullanıcı kendi isteğiyle iptal ederse (`PurchaseStatus.canceled`)
+    /// bu alan boş kalır — o zaten kendi kararı, hata değil.
+    String? purchaseErrorMessage,
   }) = _SubscriptionState;
 }
 

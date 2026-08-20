@@ -279,7 +279,7 @@ class _TrainerPerformanceForGymProviderElement
 }
 
 String _$dashboardReportControllerHash() =>
-    r'aeafb27936893fb470c22c4874c1306287fc6984';
+    r'c30ebaa18475fabf34e8117c47ed5f4ab2df76bb';
 
 /// F5-1 — Admin dashboard: aylık seans/ciro/gider özeti + antrenör
 /// performansı. Aktif salon bilinmiyorsa (test ortamı vb.) boş rapor

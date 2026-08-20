@@ -148,7 +148,7 @@ class _EventsForGymProviderElement
 }
 
 String _$gymEventsControllerHash() =>
-    r'388c9883ae35aa8c628bd28f5cd7aefdd808a8f5';
+    r'f6fbeb3525cf428e9e106f1ec1d62c3cc4ea8206';
 
 /// F4-3 — salonun ileri tarihli, gerçek zamanlı etkinlikleri.
 ///

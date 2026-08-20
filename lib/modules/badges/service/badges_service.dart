@@ -14,8 +14,7 @@ class BadgesService {
 
   final RemoteConfigService _remoteConfig;
 
-  List<BadgeItem> buildBadges(List<String> earnedIds) {
-    final locale = _remoteConfig.currentLocale;
+  List<BadgeItem> buildBadges(List<String> earnedIds, String locale) {
     return _remoteConfig.badgeCriteria.map((criterion) {
       final id = criterion['id'] as String? ?? '';
       return BadgeItem(
@@ -28,8 +27,13 @@ class BadgesService {
   }
 
   Stream<List<String>> earnedBadgeIds(String uid) {
-    return FirebaseFirestore.instance.collection('users').doc(uid).snapshots().map(
-          (doc) => List<String>.from(doc.data()?['badges'] as List? ?? const []),
+    return FirebaseFirestore.instance
+        .collection('users')
+        .doc(uid)
+        .snapshots()
+        .map(
+          (doc) =>
+              List<String>.from(doc.data()?['badges'] as List? ?? const []),
         );
   }
 }

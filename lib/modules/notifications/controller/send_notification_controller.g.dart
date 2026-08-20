@@ -7,7 +7,7 @@ part of 'send_notification_controller.dart';
 // **************************************************************************
 
 String _$sendNotificationControllerHash() =>
-    r'c5ecefc746718964ddaab6f6ada8ffb134b65d5c';
+    r'0aca52680997ad615cb0fa815e18c3fd6936bdea';
 
 /// F6-4 — `sendManualNotification` Cloud Function'ını çağırır.
 ///

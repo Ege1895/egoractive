@@ -4,27 +4,37 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
+import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_back_button.dart';
 import '../../../../shared/widgets/app_button.dart';
-import '../../controller/admin_permissions_controller.dart';
-import '../../domain/admin_permissions.dart';
+import '../../../trainers/controller/admin_trainers_controller.dart';
+import '../../../trainers/domain/admin_trainer_summary.dart';
+import 'trainer_permissions_edit_panel.dart';
 
-/// Admin 18 · Yetki Ayarları — hatırlatma süresi + üç toggle.
+/// Admin 18a · Yetki Ayarları — önce bir ya da birden fazla antrenör
+/// seçilir, "Yetkilendir" ile o antrenör(ler)e özel ayar ekranı açılır.
+/// O ekrandaki "Kaydet" buraya geri döner.
 class AdminPermissionsPanel extends BasePanel {
   const AdminPermissionsPanel({super.key});
 
   @override
-  ConsumerState<AdminPermissionsPanel> createState() => _AdminPermissionsPanelState();
+  ConsumerState<AdminPermissionsPanel> createState() =>
+      _AdminPermissionsPanelState();
 }
 
-class _AdminPermissionsPanelState extends BasePanelState<AdminPermissionsPanel> {
+class _AdminPermissionsPanelState
+    extends BasePanelState<AdminPermissionsPanel> {
+  final Set<String> _selectedIds = {};
+
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
     final typography = context.appTypography;
-    final permissions = ref.watch(adminPermissionsControllerProvider);
-    final controller = ref.read(adminPermissionsControllerProvider.notifier);
+    final trainers = ref.watch(adminTrainersControllerProvider);
+    final selectedTrainers = trainers
+        .where((t) => _selectedIds.contains(t.id))
+        .toList();
 
     return Scaffold(
       body: SafeArea(
@@ -32,163 +42,321 @@ class _AdminPermissionsPanelState extends BasePanelState<AdminPermissionsPanel> 
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.md, AppSpacing.screenEdge, 0),
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.screenEdge,
+                AppSpacing.md,
+                AppSpacing.screenEdge,
+                0,
+              ),
               child: Row(
                 children: [
-                  AppBackButton(onTap: () => ref.read(panelStackControllerProvider.notifier).pop()),
+                  AppBackButton(
+                    onTap: () =>
+                        ref.read(panelStackControllerProvider.notifier).pop(),
+                  ),
                   const SizedBox(width: AppSpacing.md),
-                  Text('Yetki ayarları', style: typography.headingSmall.copyWith(color: colors.onSurface, fontSize: 18)),
+                  Text(
+                    ref.watch(
+                      rcTextProvider(RemoteConfigKeys.gymsPermissionsTitle),
+                    ),
+                    style: typography.headingSmall.copyWith(
+                      color: colors.onSurface,
+                      fontSize: 18,
+                    ),
+                  ),
                 ],
               ),
             ),
             Expanded(
               child: ListView(
-                padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.lg, AppSpacing.screenEdge, AppSpacing.lg),
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.screenEdge,
+                  AppSpacing.lg,
+                  AppSpacing.screenEdge,
+                  AppSpacing.lg,
+                ),
                 children: [
-                  Container(
-                    padding: const EdgeInsets.all(AppSpacing.lg),
-                    decoration: BoxDecoration(color: colors.surface, borderRadius: BorderRadius.circular(AppSpacing.radiusCard), border: Border.all(color: colors.outline)),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('Seans bitimi eğitmene ne zaman hatırlatılsın?', style: typography.headingSmall.copyWith(color: colors.onSurface, fontSize: 16)),
-                        const SizedBox(height: AppSpacing.xs),
-                        Text('Bildirim seans bitiminden sonra gider', style: typography.bodyMedium.copyWith(color: colors.onSurfaceMuted, fontSize: 13)),
-                        const SizedBox(height: AppSpacing.md),
-                        Row(
-                          children: [
-                            for (final delay in TrainerReminderDelay.values)
-                              Expanded(
-                                child: Padding(
-                                  padding: EdgeInsets.only(right: delay == TrainerReminderDelay.values.last ? 0 : AppSpacing.sm),
-                                  child: _DelayChip(
-                                    label: delay.label,
-                                    selected: permissions.trainerReminderDelay == delay,
-                                    onTap: () => controller.setReminderDelay(delay),
-                                  ),
-                                ),
-                              ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.lg),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-                    decoration: BoxDecoration(color: colors.surface, borderRadius: BorderRadius.circular(AppSpacing.radiusCard), border: Border.all(color: colors.outline)),
-                    child: Column(
-                      children: [
-                        _PermissionToggle(
-                          title: 'Online Rezervasyon',
-                          note: 'Üyeler Keşfet üzerinden grup derslerine katılabilir',
-                          value: permissions.onlineBookingEnabled,
-                          onTap: controller.toggleOnlineBooking,
-                          showDivider: true,
-                        ),
-                        _PermissionToggle(
-                          title: 'Paket süresi bitince seans oluşturulabilsin mi?',
-                          note: 'Kapalıysa paketi bitmiş üyeye yeni seans planlanamaz',
-                          value: permissions.allowSessionsAfterPackageExpiry,
-                          onTap: controller.toggleAllowSessionsAfterExpiry,
-                          showDivider: true,
-                        ),
-                        _PermissionToggle(
-                          title: 'Üye seans iptal edebilir',
-                          note: 'Kapalıysa iptal yalnızca antrenör/yönetici yapabilir',
-                          value: permissions.memberCanCancelSession,
-                          onTap: controller.toggleMemberCanCancel,
-                          showDivider: false,
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.sm),
                   Text(
-                    'Bu ayarlar tüm antrenör ve üyeleri etkiler; kaydettiğinizde uygulama yeniden başlatılmadan geçerli olur.',
-                    style: typography.caption.copyWith(color: colors.onSurfaceMuted),
+                    ref.watch(
+                      rcTextProvider(
+                        RemoteConfigKeys.gymsPermissionsTrainerQuestion,
+                      ),
+                    ),
+                    style: typography.headingSmall.copyWith(
+                      color: colors.onSurface,
+                      fontSize: 16,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.xs),
+                  Text(
+                    ref.watch(
+                      rcTextProvider(
+                        RemoteConfigKeys.gymsPermissionsTrainerHelper,
+                      ),
+                    ),
+                    style: typography.bodyMedium.copyWith(
+                      color: colors.onSurfaceMuted,
+                      fontSize: 13,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  InkWell(
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
+                    onTap: () => _showTrainerPicker(context),
+                    child: Container(
+                      padding: const EdgeInsets.all(AppSpacing.md),
+                      decoration: BoxDecoration(
+                        color: colors.surface,
+                        borderRadius: BorderRadius.circular(
+                          AppSpacing.radiusInner,
+                        ),
+                        border: Border.all(color: colors.outline),
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              color: colors.primaryContainer,
+                              shape: BoxShape.circle,
+                            ),
+                            alignment: Alignment.center,
+                            child: Text(
+                              selectedTrainers.isEmpty
+                                  ? '?'
+                                  : '${selectedTrainers.length}',
+                              style: typography.headingSmall.copyWith(
+                                color: colors.onPrimaryContainer,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: AppSpacing.md),
+                          Expanded(
+                            child: Text(
+                              selectedTrainers.isEmpty
+                                  ? ref.watch(
+                                      rcTextProvider(
+                                        RemoteConfigKeys
+                                            .membersSelectTrainerButton,
+                                      ),
+                                    )
+                                  : selectedTrainers
+                                        .map((t) => t.name)
+                                        .join(', '),
+                              overflow: TextOverflow.ellipsis,
+                              style: typography.headingSmall.copyWith(
+                                color: colors.onSurface,
+                                fontSize: 15,
+                              ),
+                            ),
+                          ),
+                          Text(
+                            ref.watch(
+                              rcTextProvider(RemoteConfigKeys.commonDegistir),
+                            ),
+                            style: typography.headingSmall.copyWith(
+                              color: colors.onPrimaryContainer,
+                              fontSize: 13,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ],
               ),
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.md, AppSpacing.screenEdge, AppSpacing.lg),
-              child: AppButton(label: 'Kaydet', onPressed: () => ref.read(panelStackControllerProvider.notifier).pop()),
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.screenEdge,
+                AppSpacing.md,
+                AppSpacing.screenEdge,
+                AppSpacing.lg,
+              ),
+              child: AppButton(
+                label: ref.watch(
+                  rcTextProvider(
+                    RemoteConfigKeys.gymsPermissionsAuthorizeButton,
+                  ),
+                ),
+                onPressed: selectedTrainers.isEmpty
+                    ? null
+                    : () => ref
+                          .read(panelStackControllerProvider.notifier)
+                          .push(
+                            TrainerPermissionsEditPanel(
+                              trainers: selectedTrainers,
+                            ),
+                          ),
+              ),
             ),
           ],
         ),
       ),
     );
   }
+
+  void _showTrainerPicker(BuildContext context) {
+    final colors = context.appColors;
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: colors.surface,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      builder: (sheetContext) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  ProviderScope.containerOf(context).read(
+                    rcTextProvider(RemoteConfigKeys.membersSelectTrainerButton),
+                  ),
+                  style: context.appTypography.headingMedium.copyWith(
+                    color: colors.onSurface,
+                    fontSize: 20,
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.md),
+                Flexible(
+                  child: Consumer(
+                    builder: (context, ref, _) {
+                      final trainers = ref.watch(
+                        adminTrainersControllerProvider,
+                      );
+                      if (trainers.isEmpty) {
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(
+                            vertical: AppSpacing.lg,
+                          ),
+                          child: Text(
+                            ref.watch(
+                              rcTextProvider(
+                                RemoteConfigKeys.gymsAdminHomeNoTrainersMessage,
+                              ),
+                            ),
+                            style: context.appTypography.bodyMedium.copyWith(
+                              color: colors.onSurfaceMuted,
+                            ),
+                          ),
+                        );
+                      }
+                      return StatefulBuilder(
+                        builder: (context, setSheetState) {
+                          return ListView(
+                            shrinkWrap: true,
+                            children: [
+                              for (final trainer in trainers)
+                                _TrainerOption(
+                                  trainer: trainer,
+                                  selected: _selectedIds.contains(trainer.id),
+                                  onTap: () {
+                                    setSheetState(() {
+                                      setState(() {
+                                        if (_selectedIds.contains(trainer.id)) {
+                                          _selectedIds.remove(trainer.id);
+                                        } else {
+                                          _selectedIds.add(trainer.id);
+                                        }
+                                      });
+                                    });
+                                  },
+                                ),
+                            ],
+                          );
+                        },
+                      );
+                    },
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.md),
+                AppButton(
+                  label: ProviderScope.containerOf(context).read(
+                    rcTextProvider(RemoteConfigKeys.gymsPermissionsDoneButton),
+                  ),
+                  onPressed: () => Navigator.of(sheetContext).pop(),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
 }
 
-class _DelayChip extends StatelessWidget {
-  const _DelayChip({required this.label, required this.selected, required this.onTap});
+class _TrainerOption extends StatelessWidget {
+  const _TrainerOption({
+    required this.trainer,
+    required this.selected,
+    required this.onTap,
+  });
 
-  final String label;
+  final AdminTrainerSummary trainer;
   final bool selected;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
-    return Material(
-      color: selected ? colors.primary : colors.surfaceRaised,
-      borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
-        child: Container(
-          constraints: const BoxConstraints(minHeight: 48),
-          alignment: Alignment.center,
-          child: Text(label, style: context.appTypography.headingSmall.copyWith(fontSize: 14, color: selected ? colors.onPrimary : colors.onSurfaceVariant)),
-        ),
-      ),
-    );
-  }
-}
-
-class _PermissionToggle extends StatelessWidget {
-  const _PermissionToggle({required this.title, required this.note, required this.value, required this.onTap, required this.showDivider});
-
-  final String title;
-  final String note;
-  final bool value;
-  final VoidCallback onTap;
-  final bool showDivider;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = context.appColors;
     final typography = context.appTypography;
-    return Container(
-      constraints: const BoxConstraints(minHeight: 72),
-      decoration: BoxDecoration(border: showDivider ? Border(bottom: BorderSide(color: colors.outline)) : null),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(title, style: typography.bodyLarge.copyWith(color: colors.onSurface, fontSize: 15)),
-                Text(note, style: typography.caption.copyWith(color: colors.onSurfaceMuted, height: 1.4)),
-              ],
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        constraints: const BoxConstraints(minHeight: 56),
+        child: Row(
+          children: [
+            Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                color: colors.primaryContainer,
+                shape: BoxShape.circle,
+              ),
+              alignment: Alignment.center,
+              child: Text(
+                trainer.initials,
+                style: typography.headingSmall.copyWith(
+                  color: colors.onPrimaryContainer,
+                  fontSize: 13,
+                ),
+              ),
             ),
-          ),
-          const SizedBox(width: AppSpacing.md),
-          GestureDetector(
-            onTap: onTap,
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 150),
-              width: 52,
-              height: 32,
-              padding: const EdgeInsets.all(3),
-              decoration: BoxDecoration(color: value ? colors.primary : colors.surfaceRaised, borderRadius: BorderRadius.circular(AppSpacing.radiusPill)),
-              alignment: value ? Alignment.centerRight : Alignment.centerLeft,
-              child: Container(width: 26, height: 26, decoration: BoxDecoration(color: colors.onSurface, shape: BoxShape.circle)),
+            const SizedBox(width: AppSpacing.md),
+            Expanded(
+              child: Text(
+                trainer.name,
+                style: typography.bodyLarge.copyWith(
+                  color: colors.onSurface,
+                  fontSize: 15,
+                ),
+              ),
             ),
-          ),
-        ],
+            Container(
+              width: 22,
+              height: 22,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: selected ? colors.primary : Colors.transparent,
+                border: Border.all(
+                  color: selected ? colors.primary : colors.outlineStrong,
+                  width: 2,
+                ),
+              ),
+              alignment: Alignment.center,
+              child: selected
+                  ? Icon(Icons.check, size: 14, color: colors.onPrimary)
+                  : null,
+            ),
+          ],
+        ),
       ),
     );
   }

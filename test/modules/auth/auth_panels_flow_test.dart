@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:egoractive/core/remote_config/remote_config_service.dart';
 import 'package:egoractive/main.dart';
 import 'package:egoractive/modules/auth/repository/auth_repository.dart';
 
@@ -9,10 +10,41 @@ import 'package:egoractive/modules/auth/repository/auth_repository.dart';
 /// panel geçişlerini test eder, Firebase entegrasyonunu değil.
 class _FakeAuthRepository implements AuthRepository {
   @override
-  Future<void> login(String phoneDigits) => Future<void>.delayed(const Duration(seconds: 2));
+  Future<void> login(String phoneDigits) =>
+      Future<void>.delayed(const Duration(seconds: 2));
 
   @override
-  Future<void> deleteAccount() => Future<void>.delayed(const Duration(seconds: 2));
+  Future<void> deleteAccount() =>
+      Future<void>.delayed(const Duration(seconds: 2));
+
+  @override
+  Future<void> signOut() async {}
+}
+
+/// Gerçek Firebase Remote Config'e dokunmayan sahte servis — bu dosya panel
+/// geçişlerini test eder, Firebase entegrasyonunu değil. `rcTextProvider`,
+/// Firebase.initializeApp hiç çağrılmamış test ortamında `getString`'i
+/// yakalayıp boş döner (bkz. remote_config_service.dart); testin beklediği
+/// sabit metinleri döndürmek için `_tr`/`_en` eki fark etmeksizin taban
+/// anahtara göre çözüyoruz.
+class _FakeRemoteConfigService extends RemoteConfigService {
+  const _FakeRemoteConfigService();
+
+  static const _values = <String, String>{
+    'lbl_auth_splash_title': 'Egoractive',
+    'lbl_auth_onboarding_role_title': 'Hoş geldin',
+    'lbl_auth_onboarding_role_member_title': 'Üyeyim',
+    'lbl_auth_onboarding_role_go_to_login_button': 'Girişe geç',
+    'lbl_auth_phone_login_title': 'Telefonunla giriş yap',
+    'lbl_auth_login_button': 'Giriş yap',
+    'lbl_auth_login_waiting_heading': 'Seni tanıyoruz…',
+    'lbl_auth_login_waiting_body': '+90 {phone} numarası stüdyoda aranıyor.',
+    'lbl_auth_login_waiting_cancel_button': 'İptal',
+  };
+
+  @override
+  String getString(String key) =>
+      _values[key.replaceFirst(RegExp(r'_(tr|en)$'), '')] ?? '';
 }
 
 /// Splash'ın mock oturum kontrolü süresi geçip [OnboardingRolePanel]'e
@@ -40,7 +72,12 @@ void main() {
     (tester) async {
       await tester.pumpWidget(
         ProviderScope(
-          overrides: [authRepositoryProvider.overrideWith((ref) => _FakeAuthRepository())],
+          overrides: [
+            authRepositoryProvider.overrideWith((ref) => _FakeAuthRepository()),
+            remoteConfigServiceProvider.overrideWithValue(
+              const _FakeRemoteConfigService(),
+            ),
+          ],
           child: const EgoractiveApp(),
         ),
       );
@@ -60,7 +97,10 @@ void main() {
       // durmaz — tek kare basıp geçişin gerçekleştiğini doğruluyoruz.
       await tester.pump();
       expect(find.text('Seni tanıyoruz…'), findsOneWidget);
-      expect(find.text('+90 532 418 76 05 numarası stüdyoda aranıyor.'), findsOneWidget);
+      expect(
+        find.text('+90 532 418 76 05 numarası stüdyoda aranıyor.'),
+        findsOneWidget,
+      );
 
       // Fake login isteği (2sn) hâlâ sürerken iptal edilebiliyor.
       await tester.tap(find.text('İptal'));
@@ -79,7 +119,12 @@ void main() {
     (tester) async {
       await tester.pumpWidget(
         ProviderScope(
-          overrides: [authRepositoryProvider.overrideWith((ref) => _FakeAuthRepository())],
+          overrides: [
+            authRepositoryProvider.overrideWith((ref) => _FakeAuthRepository()),
+            remoteConfigServiceProvider.overrideWithValue(
+              const _FakeRemoteConfigService(),
+            ),
+          ],
           child: const EgoractiveApp(),
         ),
       );
@@ -101,8 +146,19 @@ void main() {
     },
   );
 
-  testWidgets('Splash cannot be reached again via back after replaceRoot', (tester) async {
-    await tester.pumpWidget(const ProviderScope(child: EgoractiveApp()));
+  testWidgets('Splash cannot be reached again via back after replaceRoot', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          remoteConfigServiceProvider.overrideWithValue(
+            const _FakeRemoteConfigService(),
+          ),
+        ],
+        child: const EgoractiveApp(),
+      ),
+    );
     await _navigateToPhoneLogin(tester);
 
     // Sistem geri tuşu, PhoneLoginPanel'i pop edip bir önceki panele

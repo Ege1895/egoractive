@@ -26,6 +26,9 @@ mixin _$MemberPackage {
   String get trainerName => throw _privateConstructorUsedError;
   String get trainerSpecialty => throw _privateConstructorUsedError;
   String get trainerInitials => throw _privateConstructorUsedError;
+  int get dueAmountTl => throw _privateConstructorUsedError;
+  List<MembershipInstallment> get installments =>
+      throw _privateConstructorUsedError;
 
   /// Create a copy of MemberPackage
   /// with the given fields replaced by the non-null parameter values.
@@ -51,6 +54,8 @@ abstract class $MemberPackageCopyWith<$Res> {
     String trainerName,
     String trainerSpecialty,
     String trainerInitials,
+    int dueAmountTl,
+    List<MembershipInstallment> installments,
   });
 }
 
@@ -78,6 +83,8 @@ class _$MemberPackageCopyWithImpl<$Res, $Val extends MemberPackage>
     Object? trainerName = null,
     Object? trainerSpecialty = null,
     Object? trainerInitials = null,
+    Object? dueAmountTl = null,
+    Object? installments = null,
   }) {
     return _then(
       _value.copyWith(
@@ -117,6 +124,14 @@ class _$MemberPackageCopyWithImpl<$Res, $Val extends MemberPackage>
                 ? _value.trainerInitials
                 : trainerInitials // ignore: cast_nullable_to_non_nullable
                       as String,
+            dueAmountTl: null == dueAmountTl
+                ? _value.dueAmountTl
+                : dueAmountTl // ignore: cast_nullable_to_non_nullable
+                      as int,
+            installments: null == installments
+                ? _value.installments
+                : installments // ignore: cast_nullable_to_non_nullable
+                      as List<MembershipInstallment>,
           )
           as $Val,
     );
@@ -142,6 +157,8 @@ abstract class _$$MemberPackageImplCopyWith<$Res>
     String trainerName,
     String trainerSpecialty,
     String trainerInitials,
+    int dueAmountTl,
+    List<MembershipInstallment> installments,
   });
 }
 
@@ -168,6 +185,8 @@ class __$$MemberPackageImplCopyWithImpl<$Res>
     Object? trainerName = null,
     Object? trainerSpecialty = null,
     Object? trainerInitials = null,
+    Object? dueAmountTl = null,
+    Object? installments = null,
   }) {
     return _then(
       _$MemberPackageImpl(
@@ -207,6 +226,14 @@ class __$$MemberPackageImplCopyWithImpl<$Res>
             ? _value.trainerInitials
             : trainerInitials // ignore: cast_nullable_to_non_nullable
                   as String,
+        dueAmountTl: null == dueAmountTl
+            ? _value.dueAmountTl
+            : dueAmountTl // ignore: cast_nullable_to_non_nullable
+                  as int,
+        installments: null == installments
+            ? _value._installments
+            : installments // ignore: cast_nullable_to_non_nullable
+                  as List<MembershipInstallment>,
       ),
     );
   }
@@ -214,7 +241,7 @@ class __$$MemberPackageImplCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$MemberPackageImpl implements _MemberPackage {
+class _$MemberPackageImpl extends _MemberPackage {
   const _$MemberPackageImpl({
     required this.name,
     required this.remainingSessions,
@@ -225,7 +252,11 @@ class _$MemberPackageImpl implements _MemberPackage {
     required this.trainerName,
     required this.trainerSpecialty,
     required this.trainerInitials,
-  });
+    this.dueAmountTl = 0,
+    final List<MembershipInstallment> installments =
+        const <MembershipInstallment>[],
+  }) : _installments = installments,
+       super._();
 
   @override
   final String name;
@@ -245,10 +276,21 @@ class _$MemberPackageImpl implements _MemberPackage {
   final String trainerSpecialty;
   @override
   final String trainerInitials;
+  @override
+  @JsonKey()
+  final int dueAmountTl;
+  final List<MembershipInstallment> _installments;
+  @override
+  @JsonKey()
+  List<MembershipInstallment> get installments {
+    if (_installments is EqualUnmodifiableListView) return _installments;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_installments);
+  }
 
   @override
   String toString() {
-    return 'MemberPackage(name: $name, remainingSessions: $remainingSessions, totalSessions: $totalSessions, makeupSessions: $makeupSessions, startDate: $startDate, endDate: $endDate, trainerName: $trainerName, trainerSpecialty: $trainerSpecialty, trainerInitials: $trainerInitials)';
+    return 'MemberPackage(name: $name, remainingSessions: $remainingSessions, totalSessions: $totalSessions, makeupSessions: $makeupSessions, startDate: $startDate, endDate: $endDate, trainerName: $trainerName, trainerSpecialty: $trainerSpecialty, trainerInitials: $trainerInitials, dueAmountTl: $dueAmountTl, installments: $installments)';
   }
 
   @override
@@ -271,7 +313,13 @@ class _$MemberPackageImpl implements _MemberPackage {
             (identical(other.trainerSpecialty, trainerSpecialty) ||
                 other.trainerSpecialty == trainerSpecialty) &&
             (identical(other.trainerInitials, trainerInitials) ||
-                other.trainerInitials == trainerInitials));
+                other.trainerInitials == trainerInitials) &&
+            (identical(other.dueAmountTl, dueAmountTl) ||
+                other.dueAmountTl == dueAmountTl) &&
+            const DeepCollectionEquality().equals(
+              other._installments,
+              _installments,
+            ));
   }
 
   @override
@@ -286,6 +334,8 @@ class _$MemberPackageImpl implements _MemberPackage {
     trainerName,
     trainerSpecialty,
     trainerInitials,
+    dueAmountTl,
+    const DeepCollectionEquality().hash(_installments),
   );
 
   /// Create a copy of MemberPackage
@@ -297,7 +347,7 @@ class _$MemberPackageImpl implements _MemberPackage {
       __$$MemberPackageImplCopyWithImpl<_$MemberPackageImpl>(this, _$identity);
 }
 
-abstract class _MemberPackage implements MemberPackage {
+abstract class _MemberPackage extends MemberPackage {
   const factory _MemberPackage({
     required final String name,
     required final int remainingSessions,
@@ -308,7 +358,10 @@ abstract class _MemberPackage implements MemberPackage {
     required final String trainerName,
     required final String trainerSpecialty,
     required final String trainerInitials,
+    final int dueAmountTl,
+    final List<MembershipInstallment> installments,
   }) = _$MemberPackageImpl;
+  const _MemberPackage._() : super._();
 
   @override
   String get name;
@@ -328,6 +381,10 @@ abstract class _MemberPackage implements MemberPackage {
   String get trainerSpecialty;
   @override
   String get trainerInitials;
+  @override
+  int get dueAmountTl;
+  @override
+  List<MembershipInstallment> get installments;
 
   /// Create a copy of MemberPackage
   /// with the given fields replaced by the non-null parameter values.

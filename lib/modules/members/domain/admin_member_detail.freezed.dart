@@ -32,6 +32,14 @@ mixin _$AdminMemberDetail {
   Map<TrainerMetric, TrainerMetricSeries> get seriesByMetric =>
       throw _privateConstructorUsedError;
   TrainerMetric get selectedMetric => throw _privateConstructorUsedError;
+  bool get isLoading => throw _privateConstructorUsedError;
+  bool get notFound => throw _privateConstructorUsedError;
+
+  /// Aktif `memberPackages` dokümanının id'si — taksit güncellemesi
+  /// yazılırken hangi dokümanın patch'leneceğini bilmek için gerekli.
+  String? get packageDocId => throw _privateConstructorUsedError;
+  List<MembershipInstallment> get installments =>
+      throw _privateConstructorUsedError;
 
   /// Create a copy of AdminMemberDetail
   /// with the given fields replaced by the non-null parameter values.
@@ -62,6 +70,10 @@ abstract class $AdminMemberDetailCopyWith<$Res> {
     List<SessionHistoryEntry> history,
     Map<TrainerMetric, TrainerMetricSeries> seriesByMetric,
     TrainerMetric selectedMetric,
+    bool isLoading,
+    bool notFound,
+    String? packageDocId,
+    List<MembershipInstallment> installments,
   });
 }
 
@@ -94,6 +106,10 @@ class _$AdminMemberDetailCopyWithImpl<$Res, $Val extends AdminMemberDetail>
     Object? history = null,
     Object? seriesByMetric = null,
     Object? selectedMetric = null,
+    Object? isLoading = null,
+    Object? notFound = null,
+    Object? packageDocId = freezed,
+    Object? installments = null,
   }) {
     return _then(
       _value.copyWith(
@@ -153,6 +169,22 @@ class _$AdminMemberDetailCopyWithImpl<$Res, $Val extends AdminMemberDetail>
                 ? _value.selectedMetric
                 : selectedMetric // ignore: cast_nullable_to_non_nullable
                       as TrainerMetric,
+            isLoading: null == isLoading
+                ? _value.isLoading
+                : isLoading // ignore: cast_nullable_to_non_nullable
+                      as bool,
+            notFound: null == notFound
+                ? _value.notFound
+                : notFound // ignore: cast_nullable_to_non_nullable
+                      as bool,
+            packageDocId: freezed == packageDocId
+                ? _value.packageDocId
+                : packageDocId // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            installments: null == installments
+                ? _value.installments
+                : installments // ignore: cast_nullable_to_non_nullable
+                      as List<MembershipInstallment>,
           )
           as $Val,
     );
@@ -183,6 +215,10 @@ abstract class _$$AdminMemberDetailImplCopyWith<$Res>
     List<SessionHistoryEntry> history,
     Map<TrainerMetric, TrainerMetricSeries> seriesByMetric,
     TrainerMetric selectedMetric,
+    bool isLoading,
+    bool notFound,
+    String? packageDocId,
+    List<MembershipInstallment> installments,
   });
 }
 
@@ -214,6 +250,10 @@ class __$$AdminMemberDetailImplCopyWithImpl<$Res>
     Object? history = null,
     Object? seriesByMetric = null,
     Object? selectedMetric = null,
+    Object? isLoading = null,
+    Object? notFound = null,
+    Object? packageDocId = freezed,
+    Object? installments = null,
   }) {
     return _then(
       _$AdminMemberDetailImpl(
@@ -273,6 +313,22 @@ class __$$AdminMemberDetailImplCopyWithImpl<$Res>
             ? _value.selectedMetric
             : selectedMetric // ignore: cast_nullable_to_non_nullable
                   as TrainerMetric,
+        isLoading: null == isLoading
+            ? _value.isLoading
+            : isLoading // ignore: cast_nullable_to_non_nullable
+                  as bool,
+        notFound: null == notFound
+            ? _value.notFound
+            : notFound // ignore: cast_nullable_to_non_nullable
+                  as bool,
+        packageDocId: freezed == packageDocId
+            ? _value.packageDocId
+            : packageDocId // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        installments: null == installments
+            ? _value._installments
+            : installments // ignore: cast_nullable_to_non_nullable
+                  as List<MembershipInstallment>,
       ),
     );
   }
@@ -296,8 +352,14 @@ class _$AdminMemberDetailImpl extends _AdminMemberDetail {
     required final List<SessionHistoryEntry> history,
     required final Map<TrainerMetric, TrainerMetricSeries> seriesByMetric,
     this.selectedMetric = TrainerMetric.kilo,
+    this.isLoading = false,
+    this.notFound = false,
+    this.packageDocId,
+    final List<MembershipInstallment> installments =
+        const <MembershipInstallment>[],
   }) : _history = history,
        _seriesByMetric = seriesByMetric,
+       _installments = installments,
        super._();
 
   @override
@@ -341,10 +403,29 @@ class _$AdminMemberDetailImpl extends _AdminMemberDetail {
   @override
   @JsonKey()
   final TrainerMetric selectedMetric;
+  @override
+  @JsonKey()
+  final bool isLoading;
+  @override
+  @JsonKey()
+  final bool notFound;
+
+  /// Aktif `memberPackages` dokümanının id'si — taksit güncellemesi
+  /// yazılırken hangi dokümanın patch'leneceğini bilmek için gerekli.
+  @override
+  final String? packageDocId;
+  final List<MembershipInstallment> _installments;
+  @override
+  @JsonKey()
+  List<MembershipInstallment> get installments {
+    if (_installments is EqualUnmodifiableListView) return _installments;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_installments);
+  }
 
   @override
   String toString() {
-    return 'AdminMemberDetail(id: $id, initials: $initials, name: $name, phone: $phone, trainerName: $trainerName, remainingSessions: $remainingSessions, makeupSessions: $makeupSessions, packageEndDate: $packageEndDate, paymentTotalTl: $paymentTotalTl, paymentPaidTl: $paymentPaidTl, lastPaymentDate: $lastPaymentDate, history: $history, seriesByMetric: $seriesByMetric, selectedMetric: $selectedMetric)';
+    return 'AdminMemberDetail(id: $id, initials: $initials, name: $name, phone: $phone, trainerName: $trainerName, remainingSessions: $remainingSessions, makeupSessions: $makeupSessions, packageEndDate: $packageEndDate, paymentTotalTl: $paymentTotalTl, paymentPaidTl: $paymentPaidTl, lastPaymentDate: $lastPaymentDate, history: $history, seriesByMetric: $seriesByMetric, selectedMetric: $selectedMetric, isLoading: $isLoading, notFound: $notFound, packageDocId: $packageDocId, installments: $installments)';
   }
 
   @override
@@ -377,7 +458,17 @@ class _$AdminMemberDetailImpl extends _AdminMemberDetail {
               _seriesByMetric,
             ) &&
             (identical(other.selectedMetric, selectedMetric) ||
-                other.selectedMetric == selectedMetric));
+                other.selectedMetric == selectedMetric) &&
+            (identical(other.isLoading, isLoading) ||
+                other.isLoading == isLoading) &&
+            (identical(other.notFound, notFound) ||
+                other.notFound == notFound) &&
+            (identical(other.packageDocId, packageDocId) ||
+                other.packageDocId == packageDocId) &&
+            const DeepCollectionEquality().equals(
+              other._installments,
+              _installments,
+            ));
   }
 
   @override
@@ -397,6 +488,10 @@ class _$AdminMemberDetailImpl extends _AdminMemberDetail {
     const DeepCollectionEquality().hash(_history),
     const DeepCollectionEquality().hash(_seriesByMetric),
     selectedMetric,
+    isLoading,
+    notFound,
+    packageDocId,
+    const DeepCollectionEquality().hash(_installments),
   );
 
   /// Create a copy of AdminMemberDetail
@@ -427,6 +522,10 @@ abstract class _AdminMemberDetail extends AdminMemberDetail {
     required final List<SessionHistoryEntry> history,
     required final Map<TrainerMetric, TrainerMetricSeries> seriesByMetric,
     final TrainerMetric selectedMetric,
+    final bool isLoading,
+    final bool notFound,
+    final String? packageDocId,
+    final List<MembershipInstallment> installments,
   }) = _$AdminMemberDetailImpl;
   const _AdminMemberDetail._() : super._();
 
@@ -458,6 +557,17 @@ abstract class _AdminMemberDetail extends AdminMemberDetail {
   Map<TrainerMetric, TrainerMetricSeries> get seriesByMetric;
   @override
   TrainerMetric get selectedMetric;
+  @override
+  bool get isLoading;
+  @override
+  bool get notFound;
+
+  /// Aktif `memberPackages` dokümanının id'si — taksit güncellemesi
+  /// yazılırken hangi dokümanın patch'leneceğini bilmek için gerekli.
+  @override
+  String? get packageDocId;
+  @override
+  List<MembershipInstallment> get installments;
 
   /// Create a copy of AdminMemberDetail
   /// with the given fields replaced by the non-null parameter values.

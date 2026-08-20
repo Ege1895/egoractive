@@ -31,6 +31,10 @@ mixin _$MeasurementsState {
   /// gerçek veri yoksa boş.
   List<DateTime> get recordedDates => throw _privateConstructorUsedError;
 
+  /// `users/{uid}.gender` alanının ham değeri ('erkek' | 'kadin' | null) —
+  /// avatar silüetinin hangi görseli kullanacağını belirler.
+  String? get gender => throw _privateConstructorUsedError;
+
   /// Create a copy of MeasurementsState
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -52,6 +56,7 @@ abstract class $MeasurementsStateCopyWith<$Res> {
     MeasurementMetric selectedMetric,
     DateTime? selectedDate,
     List<DateTime> recordedDates,
+    String? gender,
   });
 }
 
@@ -76,6 +81,7 @@ class _$MeasurementsStateCopyWithImpl<$Res, $Val extends MeasurementsState>
     Object? selectedMetric = null,
     Object? selectedDate = freezed,
     Object? recordedDates = null,
+    Object? gender = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -103,6 +109,10 @@ class _$MeasurementsStateCopyWithImpl<$Res, $Val extends MeasurementsState>
                 ? _value.recordedDates
                 : recordedDates // ignore: cast_nullable_to_non_nullable
                       as List<DateTime>,
+            gender: freezed == gender
+                ? _value.gender
+                : gender // ignore: cast_nullable_to_non_nullable
+                      as String?,
           )
           as $Val,
     );
@@ -125,6 +135,7 @@ abstract class _$$MeasurementsStateImplCopyWith<$Res>
     MeasurementMetric selectedMetric,
     DateTime? selectedDate,
     List<DateTime> recordedDates,
+    String? gender,
   });
 }
 
@@ -148,6 +159,7 @@ class __$$MeasurementsStateImplCopyWithImpl<$Res>
     Object? selectedMetric = null,
     Object? selectedDate = freezed,
     Object? recordedDates = null,
+    Object? gender = freezed,
   }) {
     return _then(
       _$MeasurementsStateImpl(
@@ -175,6 +187,10 @@ class __$$MeasurementsStateImplCopyWithImpl<$Res>
             ? _value._recordedDates
             : recordedDates // ignore: cast_nullable_to_non_nullable
                   as List<DateTime>,
+        gender: freezed == gender
+            ? _value.gender
+            : gender // ignore: cast_nullable_to_non_nullable
+                  as String?,
       ),
     );
   }
@@ -190,6 +206,7 @@ class _$MeasurementsStateImpl implements _MeasurementsState {
     this.selectedMetric = MeasurementMetric.bel,
     this.selectedDate,
     final List<DateTime> recordedDates = const <DateTime>[],
+    this.gender,
   }) : _points = points,
        _series = series,
        _recordedDates = recordedDates;
@@ -235,9 +252,14 @@ class _$MeasurementsStateImpl implements _MeasurementsState {
     return EqualUnmodifiableListView(_recordedDates);
   }
 
+  /// `users/{uid}.gender` alanının ham değeri ('erkek' | 'kadin' | null) —
+  /// avatar silüetinin hangi görseli kullanacağını belirler.
+  @override
+  final String? gender;
+
   @override
   String toString() {
-    return 'MeasurementsState(points: $points, series: $series, viewMode: $viewMode, selectedMetric: $selectedMetric, selectedDate: $selectedDate, recordedDates: $recordedDates)';
+    return 'MeasurementsState(points: $points, series: $series, viewMode: $viewMode, selectedMetric: $selectedMetric, selectedDate: $selectedDate, recordedDates: $recordedDates, gender: $gender)';
   }
 
   @override
@@ -256,7 +278,8 @@ class _$MeasurementsStateImpl implements _MeasurementsState {
             const DeepCollectionEquality().equals(
               other._recordedDates,
               _recordedDates,
-            ));
+            ) &&
+            (identical(other.gender, gender) || other.gender == gender));
   }
 
   @override
@@ -268,6 +291,7 @@ class _$MeasurementsStateImpl implements _MeasurementsState {
     selectedMetric,
     selectedDate,
     const DeepCollectionEquality().hash(_recordedDates),
+    gender,
   );
 
   /// Create a copy of MeasurementsState
@@ -290,6 +314,7 @@ abstract class _MeasurementsState implements MeasurementsState {
     final MeasurementMetric selectedMetric,
     final DateTime? selectedDate,
     final List<DateTime> recordedDates,
+    final String? gender,
   }) = _$MeasurementsStateImpl;
 
   @override
@@ -309,6 +334,11 @@ abstract class _MeasurementsState implements MeasurementsState {
   /// gerçek veri yoksa boş.
   @override
   List<DateTime> get recordedDates;
+
+  /// `users/{uid}.gender` alanının ham değeri ('erkek' | 'kadin' | null) —
+  /// avatar silüetinin hangi görseli kullanacağını belirler.
+  @override
+  String? get gender;
 
   /// Create a copy of MeasurementsState
   /// with the given fields replaced by the non-null parameter values.

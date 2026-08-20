@@ -4,13 +4,6 @@ part 'new_member_form.freezed.dart';
 
 enum MemberGender { erkek, kadin }
 
-extension MemberGenderLabel on MemberGender {
-  String get label => switch (this) {
-        MemberGender.erkek => 'Erkek',
-        MemberGender.kadin => 'Kadın',
-      };
-}
-
 @freezed
 class NewMemberForm with _$NewMemberForm {
   const factory NewMemberForm({
@@ -20,9 +13,14 @@ class NewMemberForm with _$NewMemberForm {
     required int birthYear,
     required int heightCm,
     MemberGender? gender,
-    required String trainerId,
-    required String trainerName,
+    String? trainerId,
+    String? trainerName,
     required String note,
+    required DateTime registeredAt,
+
+    /// Üyenin ana ekranında sıradaki dersi için "Gelicem"/"Gelmeyeceğim"
+    /// bildirimi yapabilme yetkisi — admin açıkça açmadıkça kapalı gelir.
+    @Default(false) bool canConfirmAttendance,
   }) = _NewMemberForm;
 
   const NewMemberForm._();

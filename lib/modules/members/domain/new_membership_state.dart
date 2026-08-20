@@ -1,5 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
+import '../../../shared/domain/membership_installment.dart';
 import '../../packages/domain/studio_package.dart';
 
 part 'new_membership_state.freezed.dart';
@@ -11,15 +12,20 @@ class NewMembershipState with _$NewMembershipState {
     required DateTime startDate,
     required DateTime endDate,
     required int makeupSessions,
-    required int paidAmount,
-    String? otherAmountDraft,
+    required int totalAmountTl,
+    required List<MembershipInstallment> installments,
+    @Default(false) bool isSaving,
+    String? errorMessage,
   }) = _NewMembershipState;
 
   const NewMembershipState._();
 
-  int get totalAmount => selectedPackage?.priceTl ?? 0;
+  int get paidAmountTl => installments
+      .where((i) => i.paid)
+      .fold(0, (total, i) => total + i.amountTl);
 
-  int get dueAmount => (totalAmount - paidAmount).clamp(0, totalAmount);
+  int get dueAmountTl => (totalAmountTl - paidAmountTl).clamp(0, totalAmountTl);
 
-  bool get isFullyPaid => dueAmount == 0 && totalAmount > 0;
+  bool get isFullyPaid =>
+      installments.isNotEmpty && installments.every((i) => i.paid);
 }

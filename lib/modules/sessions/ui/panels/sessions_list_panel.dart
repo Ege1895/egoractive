@@ -2,14 +2,25 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/app_spacing.dart';
+import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../controller/sessions_controller.dart';
 import '../../domain/session.dart';
 import '../../domain/sessions_state.dart';
 
 const _monthAbbrev = {
-  1: 'Oca', 2: 'Şub', 3: 'Mar', 4: 'Nis', 5: 'May', 6: 'Haz',
-  7: 'Tem', 8: 'Ağu', 9: 'Eyl', 10: 'Eki', 11: 'Kas', 12: 'Ara',
+  1: 'Oca',
+  2: 'Şub',
+  3: 'Mar',
+  4: 'Nis',
+  5: 'May',
+  6: 'Haz',
+  7: 'Tem',
+  8: 'Ağu',
+  9: 'Eyl',
+  10: 'Eki',
+  11: 'Kas',
+  12: 'Ara',
 };
 const _dayNames = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Pzr'];
 
@@ -22,7 +33,7 @@ class SessionsListPanel extends ConsumerStatefulWidget {
 }
 
 class _SessionsListPanelState extends ConsumerState<SessionsListPanel> {
-  DateTime _selectedDay = DateTime(2026, 8, 3);
+  DateTime _selectedDay = DateTime.now();
 
   @override
   Widget build(BuildContext context) {
@@ -37,33 +48,59 @@ class _SessionsListPanelState extends ConsumerState<SessionsListPanel> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.lg, AppSpacing.screenEdge, 0),
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.screenEdge,
+                AppSpacing.lg,
+                AppSpacing.screenEdge,
+                0,
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Derslerim', style: typography.headingLarge.copyWith(color: colors.onSurface)),
+                  Text(
+                    ref.watch(
+                      rcTextProvider(RemoteConfigKeys.sessionsListTitle),
+                    ),
+                    style: typography.headingLarge.copyWith(
+                      color: colors.onSurface,
+                    ),
+                  ),
                   const SizedBox(height: AppSpacing.md),
                   Container(
                     padding: const EdgeInsets.all(4),
                     decoration: BoxDecoration(
                       color: colors.surface,
                       border: Border.all(color: colors.outline),
-                      borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusInner,
+                      ),
                     ),
                     child: Row(
                       children: [
                         Expanded(
                           child: _ToggleTab(
-                            label: 'Liste',
+                            label: ref.watch(
+                              rcTextProvider(
+                                RemoteConfigKeys.sessionsListViewToggle,
+                              ),
+                            ),
                             selected: state.viewMode == SessionsViewMode.list,
-                            onTap: () => controller.setViewMode(SessionsViewMode.list),
+                            onTap: () =>
+                                controller.setViewMode(SessionsViewMode.list),
                           ),
                         ),
                         Expanded(
                           child: _ToggleTab(
-                            label: 'Takvim',
-                            selected: state.viewMode == SessionsViewMode.calendar,
-                            onTap: () => controller.setViewMode(SessionsViewMode.calendar),
+                            label: ref.watch(
+                              rcTextProvider(
+                                RemoteConfigKeys.sessionsCalendarViewToggle,
+                              ),
+                            ),
+                            selected:
+                                state.viewMode == SessionsViewMode.calendar,
+                            onTap: () => controller.setViewMode(
+                              SessionsViewMode.calendar,
+                            ),
                           ),
                         ),
                       ],
@@ -74,7 +111,10 @@ class _SessionsListPanelState extends ConsumerState<SessionsListPanel> {
             ),
             Expanded(
               child: state.viewMode == SessionsViewMode.list
-                  ? _SessionsListView(upcoming: state.upcoming, past: state.past)
+                  ? _SessionsListView(
+                      upcoming: state.upcoming,
+                      past: state.past,
+                    )
                   : _SessionsCalendarView(
                       selectedDay: _selectedDay,
                       sessions: [...state.upcoming, ...state.past],
@@ -89,7 +129,11 @@ class _SessionsListPanelState extends ConsumerState<SessionsListPanel> {
 }
 
 class _ToggleTab extends StatelessWidget {
-  const _ToggleTab({required this.label, required this.selected, required this.onTap});
+  const _ToggleTab({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
 
   final String label;
   final bool selected;
@@ -120,14 +164,14 @@ class _ToggleTab extends StatelessWidget {
   }
 }
 
-class _SessionsListView extends StatelessWidget {
+class _SessionsListView extends ConsumerWidget {
   const _SessionsListView({required this.upcoming, required this.past});
 
   final List<Session> upcoming;
   final List<Session> past;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.appColors;
     final typography = context.appTypography;
 
@@ -136,7 +180,7 @@ class _SessionsListView extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.screenEdge),
           child: Text(
-            'Henüz dersin yok — antrenörün seninle bir ders planladığında burada görünecek.',
+            ref.watch(rcTextProvider(RemoteConfigKeys.sessionsListEmptyState)),
             textAlign: TextAlign.center,
             style: typography.bodyMedium.copyWith(color: colors.onSurfaceMuted),
           ),
@@ -145,38 +189,73 @@ class _SessionsListView extends StatelessWidget {
     }
 
     return ListView(
-      padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.md, AppSpacing.screenEdge, AppSpacing.lg),
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.screenEdge,
+        AppSpacing.md,
+        AppSpacing.screenEdge,
+        AppSpacing.lg,
+      ),
       children: [
         if (upcoming.isNotEmpty) ...[
-          Text('YAKLAŞAN', style: typography.caption.copyWith(color: colors.onSurfaceMuted, letterSpacing: 1.2)),
+          Text(
+            ref.watch(rcTextProvider(RemoteConfigKeys.sessionsUpcomingSection)),
+            style: typography.caption.copyWith(
+              color: colors.onSurfaceMuted,
+              letterSpacing: 1.2,
+            ),
+          ),
           const SizedBox(height: AppSpacing.sm),
           for (final session in upcoming) _SessionRow(session: session),
           const SizedBox(height: AppSpacing.lg),
         ],
         if (past.isNotEmpty) ...[
-          Text('GEÇMİŞ', style: typography.caption.copyWith(color: colors.onSurfaceMuted, letterSpacing: 1.2)),
+          Text(
+            ref.watch(rcTextProvider(RemoteConfigKeys.sessionsPastSection)),
+            style: typography.caption.copyWith(
+              color: colors.onSurfaceMuted,
+              letterSpacing: 1.2,
+            ),
+          ),
           const SizedBox(height: AppSpacing.sm),
-          for (final session in past) _SessionRow(session: session, faded: true),
+          for (final session in past)
+            _SessionRow(session: session, faded: true),
         ],
       ],
     );
   }
 }
 
-class _SessionRow extends StatelessWidget {
+class _SessionRow extends ConsumerWidget {
   const _SessionRow({required this.session, this.faded = false});
 
   final Session session;
   final bool faded;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.appColors;
     final typography = context.appTypography;
     final (chipLabel, chipBg, chipFg) = switch (session.status) {
-      SessionStatus.planned => ('Planlandı', colors.outline, colors.onSurfaceVariant),
-      SessionStatus.completed => ('Tamamlandı', colors.successContainer, colors.onSuccessContainer),
-      SessionStatus.cancelled => ('İptal', colors.errorContainer, colors.onErrorContainer),
+      SessionStatus.planned => (
+        ref.watch(rcTextProvider(RemoteConfigKeys.sessionsFilterScheduled)),
+        colors.outline,
+        colors.onSurfaceVariant,
+      ),
+      SessionStatus.completed => (
+        ref.watch(rcTextProvider(RemoteConfigKeys.commonTamamlandi)),
+        colors.successContainer,
+        colors.onSuccessContainer,
+      ),
+      SessionStatus.absent => (
+        ref.watch(rcTextProvider(RemoteConfigKeys.trainersHomeNoShowLabel)),
+        colors.warningContainer,
+        colors.onWarningContainer,
+      ),
+      SessionStatus.cancelled => (
+        ref.watch(rcTextProvider(RemoteConfigKeys.commonIptalLabel)),
+        colors.errorContainer,
+        colors.onErrorContainer,
+      ),
     };
 
     return Opacity(
@@ -200,8 +279,20 @@ class _SessionRow extends StatelessWidget {
               ),
               child: Column(
                 children: [
-                  Text(session.day, style: typography.dataMedium.copyWith(color: colors.onSurface, fontSize: 20)),
-                  Text(session.month, style: typography.caption.copyWith(color: colors.onSurfaceMuted, fontSize: 11)),
+                  Text(
+                    session.day,
+                    style: typography.dataMedium.copyWith(
+                      color: colors.onSurface,
+                      fontSize: 20,
+                    ),
+                  ),
+                  Text(
+                    session.month,
+                    style: typography.caption.copyWith(
+                      color: colors.onSurfaceMuted,
+                      fontSize: 11,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -210,15 +301,36 @@ class _SessionRow extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(session.title, style: typography.headingSmall.copyWith(color: colors.onSurface, fontSize: 16)),
-                  Text(session.meta, style: typography.bodyMedium.copyWith(color: colors.onSurfaceVariant, fontSize: 13)),
+                  Text(
+                    session.title,
+                    style: typography.headingSmall.copyWith(
+                      color: colors.onSurface,
+                      fontSize: 16,
+                    ),
+                  ),
+                  Text(
+                    session.meta,
+                    style: typography.bodyMedium.copyWith(
+                      color: colors.onSurfaceVariant,
+                      fontSize: 13,
+                    ),
+                  ),
                 ],
               ),
             ),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 6),
-              decoration: BoxDecoration(color: chipBg, borderRadius: BorderRadius.circular(AppSpacing.radiusPill)),
-              child: Text(chipLabel, style: typography.caption.copyWith(color: chipFg, fontSize: 12)),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.sm,
+                vertical: 6,
+              ),
+              decoration: BoxDecoration(
+                color: chipBg,
+                borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
+              ),
+              child: Text(
+                chipLabel,
+                style: typography.caption.copyWith(color: chipFg, fontSize: 12),
+              ),
             ),
           ],
         ),
@@ -227,15 +339,19 @@ class _SessionRow extends StatelessWidget {
   }
 }
 
-class _SessionsCalendarView extends StatelessWidget {
-  const _SessionsCalendarView({required this.selectedDay, required this.sessions, required this.onSelectDay});
+class _SessionsCalendarView extends ConsumerWidget {
+  const _SessionsCalendarView({
+    required this.selectedDay,
+    required this.sessions,
+    required this.onSelectDay,
+  });
 
   final DateTime selectedDay;
   final List<Session> sessions;
   final ValueChanged<DateTime> onSelectDay;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.appColors;
     final typography = context.appTypography;
     final month = DateTime(selectedDay.year, selectedDay.month);
@@ -252,7 +368,12 @@ class _SessionsCalendarView extends StatelessWidget {
     final daySessions = sessionsByDay[selectedDay.day] ?? const <Session>[];
 
     return ListView(
-      padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.md, AppSpacing.screenEdge, AppSpacing.lg),
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.screenEdge,
+        AppSpacing.md,
+        AppSpacing.screenEdge,
+        AppSpacing.lg,
+      ),
       children: [
         Container(
           padding: const EdgeInsets.all(AppSpacing.md),
@@ -265,7 +386,10 @@ class _SessionsCalendarView extends StatelessWidget {
             children: [
               Text(
                 '${_monthAbbrev[month.month]} ${month.year}',
-                style: typography.headingSmall.copyWith(color: colors.onSurface, fontSize: 17),
+                style: typography.headingSmall.copyWith(
+                  color: colors.onSurface,
+                  fontSize: 17,
+                ),
               ),
               const SizedBox(height: AppSpacing.sm),
               Row(
@@ -275,7 +399,10 @@ class _SessionsCalendarView extends StatelessWidget {
                       child: Text(
                         name,
                         textAlign: TextAlign.center,
-                        style: typography.caption.copyWith(color: colors.onSurfaceMuted, fontSize: 11),
+                        style: typography.caption.copyWith(
+                          color: colors.onSurfaceMuted,
+                          fontSize: 11,
+                        ),
                       ),
                     ),
                 ],
@@ -292,7 +419,9 @@ class _SessionsCalendarView extends StatelessWidget {
                 ),
                 itemBuilder: (context, index) {
                   final dayNum = index - leadingBlanks + 1;
-                  if (dayNum < 1 || dayNum > daysInMonth) return const SizedBox.shrink();
+                  if (dayNum < 1 || dayNum > daysInMonth) {
+                    return const SizedBox.shrink();
+                  }
                   final date = DateTime(month.year, month.month, dayNum);
                   final isSelected = date.day == selectedDay.day;
                   final count = sessionsByDay[dayNum]?.length ?? 0;
@@ -301,9 +430,15 @@ class _SessionsCalendarView extends StatelessWidget {
                     onTap: () => onSelectDay(date),
                     child: Container(
                       decoration: BoxDecoration(
-                        color: isSelected ? colors.primaryContainer : Colors.transparent,
+                        color: isSelected
+                            ? colors.primaryContainer
+                            : Colors.transparent,
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: isSelected ? colors.primary : Colors.transparent),
+                        border: Border.all(
+                          color: isSelected
+                              ? colors.primary
+                              : Colors.transparent,
+                        ),
                       ),
                       alignment: Alignment.center,
                       child: Column(
@@ -313,20 +448,29 @@ class _SessionsCalendarView extends StatelessWidget {
                             '$dayNum',
                             style: typography.headingSmall.copyWith(
                               fontSize: 14,
-                              color: isSelected ? colors.onPrimaryContainer : colors.onSurface,
+                              color: isSelected
+                                  ? colors.onPrimaryContainer
+                                  : colors.onSurface,
                             ),
                           ),
                           if (count > 0)
                             Container(
                               margin: const EdgeInsets.only(top: 2),
-                              padding: const EdgeInsets.symmetric(horizontal: 4),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 4,
+                              ),
                               decoration: BoxDecoration(
                                 color: colors.primaryContainer,
-                                borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
+                                borderRadius: BorderRadius.circular(
+                                  AppSpacing.radiusPill,
+                                ),
                               ),
                               child: Text(
                                 '$count',
-                                style: typography.caption.copyWith(color: colors.onPrimaryContainer, fontSize: 9),
+                                style: typography.caption.copyWith(
+                                  color: colors.onPrimaryContainer,
+                                  fontSize: 9,
+                                ),
                               ),
                             ),
                         ],
@@ -341,12 +485,17 @@ class _SessionsCalendarView extends StatelessWidget {
         const SizedBox(height: AppSpacing.lg),
         Text(
           '${selectedDay.day} ${_monthAbbrev[selectedDay.month]}',
-          style: typography.caption.copyWith(color: colors.onSurfaceMuted, letterSpacing: 1.2),
+          style: typography.caption.copyWith(
+            color: colors.onSurfaceMuted,
+            letterSpacing: 1.2,
+          ),
         ),
         const SizedBox(height: AppSpacing.sm),
         if (daySessions.isEmpty)
           Text(
-            'Bu günde dersin yok.',
+            ref.watch(
+              rcTextProvider(RemoteConfigKeys.sessionsListCalendarEmptyDay),
+            ),
             style: typography.bodyMedium.copyWith(color: colors.onSurfaceMuted),
           )
         else

@@ -38,15 +38,28 @@ class ThemeController extends _$ThemeController {
       return;
     }
 
-    yield* FirebaseFirestore.instance.collection('gyms').doc(gymId).snapshots().map((snapshot) {
-      final hex = snapshot.data()?['themeColors']?['primary'] as String?;
-      final color = _parseHexColor(hex);
-      return color == null ? AppColorScheme.defaultScheme() : AppColorScheme.withAccent(color);
-    });
+    yield* FirebaseFirestore.instance
+        .collection('gyms')
+        .doc(gymId)
+        .snapshots()
+        .map((snapshot) {
+          final hex = snapshot.data()?['themeColors']?['primary'] as String?;
+          final color = _parseHexColor(hex);
+          return color == null
+              ? AppColorScheme.defaultScheme()
+              : AppColorScheme.withAccent(color);
+        });
   }
 
   void setAccentColor(Color primary) {
     state = AsyncData(AppColorScheme.withAccent(primary));
+  }
+
+  /// [GymSetupPanel] (salon oluşturma) her açıldığında çağırır — kullanıcı
+  /// bir palet rengi seçip sonra vazgeçtiğinde/salon kaydı başarısız
+  /// olduğunda global önizlemenin varsayılana geri dönmesini garanti eder.
+  void resetToDefault() {
+    state = AsyncData(AppColorScheme.defaultScheme());
   }
 }
 
@@ -56,6 +69,9 @@ Color? _parseHexColor(String? hex) {
   if (hex == null) return null;
   final cleaned = hex.replaceAll('#', '');
   if (cleaned.length != 6 && cleaned.length != 8) return null;
-  final value = int.tryParse(cleaned.length == 6 ? 'FF$cleaned' : cleaned, radix: 16);
+  final value = int.tryParse(
+    cleaned.length == 6 ? 'FF$cleaned' : cleaned,
+    radix: 16,
+  );
   return value == null ? null : Color(value);
 }

@@ -10,7 +10,10 @@ part 'studio_packages_controller.g.dart';
 /// `gyms/{gymId}` bilinmediği (henüz gerçek bir salon yoksa) çağrılmaz —
 /// bu durumda [StudioPackagesController] mock repository'e düşer.
 @riverpod
-Stream<List<StudioPackage>> _packagesForGym(_PackagesForGymRef ref, String gymId) {
+Stream<List<StudioPackage>> _packagesForGym(
+  _PackagesForGymRef ref,
+  String gymId,
+) {
   return FirebaseFirestore.instance
       .collection('gyms')
       .doc(gymId)
@@ -24,7 +27,9 @@ StudioPackage _toPackage(QueryDocumentSnapshot<Map<String, dynamic>> doc) {
   return StudioPackage(
     id: doc.id,
     name: (data['name'] as String?) ?? '',
-    sessionType: (data['sessionType'] as String?) == 'group' ? PackageSessionType.group : PackageSessionType.solo,
+    sessionType: (data['sessionType'] as String?) == 'group'
+        ? PackageSessionType.group
+        : PackageSessionType.solo,
     sessionCount: (data['sessionCount'] as num?)?.toInt() ?? 0,
     validityDays: (data['validityDays'] as num?)?.toInt() ?? 0,
     priceTl: (data['priceTl'] as num?)?.toInt() ?? 0,
@@ -51,7 +56,12 @@ Map<String, dynamic> _toFirestoreMap(StudioPackage package) {
 class StudioPackagesController extends _$StudioPackagesController {
   @override
   List<StudioPackage> build() {
-    final gymId = ref.watch(activeGymIdProvider).valueOrNull;
+    final gymIdAsync = ref.watch(activeGymIdProvider);
+    // activeGymIdProvider ilk izlendiğinde henüz sonuçlanmamış olabilir —
+    // bu durum "gerçekten salon yok" ile aynı değil; o ana kadar mock'a
+    // düşülürse admin bir an sahte paketleri gerçekmiş gibi görür.
+    if (gymIdAsync.isLoading) return const [];
+    final gymId = gymIdAsync.valueOrNull;
     if (gymId == null) {
       return ref.watch(studioPackagesRepositoryProvider).loadPackages();
     }
@@ -60,7 +70,9 @@ class StudioPackagesController extends _$StudioPackagesController {
 
   Future<void> addOrUpdate(StudioPackage package) async {
     final gymId = ref.read(activeGymIdProvider).valueOrNull;
-    if (gymId == null) return;
+    if (gymId == null) {
+      throw StateError('Aktif salon bulunamadı, paket kaydedilemedi.');
+    }
     await FirebaseFirestore.instance
         .collection('gyms')
         .doc(gymId)
@@ -72,7 +84,9 @@ class StudioPackagesController extends _$StudioPackagesController {
   Future<void> toggleActiveForSale(String id) async {
     final gymId = ref.read(activeGymIdProvider).valueOrNull;
     final matches = state.where((p) => p.id == id);
-    if (gymId == null || matches.isEmpty) return;
+    if (gymId == null || matches.isEmpty) {
+      throw StateError('Aktif salon bulunamadı, paket güncellenemedi.');
+    }
     final package = matches.first;
     await FirebaseFirestore.instance
         .collection('gyms')
@@ -84,7 +98,14 @@ class StudioPackagesController extends _$StudioPackagesController {
 
   Future<void> deletePackage(String id) async {
     final gymId = ref.read(activeGymIdProvider).valueOrNull;
-    if (gymId == null) return;
-    await FirebaseFirestore.instance.collection('gyms').doc(gymId).collection('packages').doc(id).delete();
+    if (gymId == null) {
+      throw StateError('Aktif salon bulunamadı, paket silinemedi.');
+    }
+    await FirebaseFirestore.instance
+        .collection('gyms')
+        .doc(gymId)
+        .collection('packages')
+        .doc(id)
+        .delete();
   }
 }

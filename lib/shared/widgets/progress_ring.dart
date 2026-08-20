@@ -11,12 +11,14 @@ class ProgressRing extends StatelessWidget {
     required this.size,
     required this.progress,
     required this.child,
+    this.strokeWidth = 3,
     super.key,
   });
 
   final double size;
   final double progress;
   final Widget child;
+  final double strokeWidth;
 
   @override
   Widget build(BuildContext context) {
@@ -29,12 +31,12 @@ class ProgressRing extends StatelessWidget {
         children: [
           CircularProgressIndicator(
             value: 1,
-            strokeWidth: 3,
+            strokeWidth: strokeWidth,
             valueColor: AlwaysStoppedAnimation(colors.outline),
           ),
           CircularProgressIndicator(
             value: progress.clamp(0, 1),
-            strokeWidth: 3,
+            strokeWidth: strokeWidth,
             valueColor: AlwaysStoppedAnimation(colors.primary),
           ),
           child,

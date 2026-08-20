@@ -40,10 +40,11 @@ function chunk<T>(items: T[], size: number): T[][] {
 }
 
 /**
- * F6-4 — admin, tek bir üyeye ya da tüm salona başlık+metin gönderir.
- * `SendNotificationPanel` (client) bu callable'ı çağırır. Hedef üyenin/
- * salonun çağıranın kendi salonuna ait olduğu custom claim (`gymId`) ile
- * doğrulanır — başka bir salona bildirim gönderilemez.
+ * F6-4 — admin, bir ya da birden fazla seçili üyeye ya da tüm salona
+ * başlık+metin gönderir. `SendNotificationPanel` (client) bu callable'ı
+ * çağırır. Hedef üyelerin/salonun çağıranın kendi salonuna ait olduğu
+ * custom claim (`gymId`) ile doğrulanır — başka bir salona bildirim
+ * gönderilemez.
  */
 export const sendManualNotification = onCall(async (request) => {
   const uid = request.auth?.uid;
@@ -56,16 +57,19 @@ export const sendManualNotification = onCall(async (request) => {
   const targetType = request.data?.targetType;
   const title = typeof request.data?.title === "string" ? request.data.title.trim() : "";
   const message = typeof request.data?.message === "string" ? request.data.message.trim() : "";
-  const targetMemberId = typeof request.data?.targetMemberId === "string" ? request.data.targetMemberId : undefined;
+  const targetMemberIdsRaw = request.data?.targetMemberIds;
+  const targetMemberIds = Array.isArray(targetMemberIdsRaw)
+    ? targetMemberIdsRaw.filter((id): id is string => typeof id === "string" && id.length > 0)
+    : [];
 
-  if (targetType !== "singleMember" && targetType !== "wholeGym") {
-    throw new HttpsError("invalid-argument", "targetType 'singleMember' veya 'wholeGym' olmalı.");
+  if (targetType !== "selectedMembers" && targetType !== "wholeGym") {
+    throw new HttpsError("invalid-argument", "targetType 'selectedMembers' veya 'wholeGym' olmalı.");
   }
   if (!title || !message) {
     throw new HttpsError("invalid-argument", "Başlık ve mesaj gerekli.");
   }
-  if (targetType === "singleMember" && !targetMemberId) {
-    throw new HttpsError("invalid-argument", "targetMemberId gerekli.");
+  if (targetType === "selectedMembers" && targetMemberIds.length === 0) {
+    throw new HttpsError("invalid-argument", "En az bir targetMemberId gerekli.");
   }
 
   let hourlyLimit = DEFAULT_HOURLY_LIMIT;
@@ -83,13 +87,13 @@ export const sendManualNotification = onCall(async (request) => {
   const db = getFirestore();
   let fcmTokens: string[];
 
-  if (targetType === "singleMember") {
-    const memberSnapshot = await db.doc(userDoc(targetMemberId as string)).get();
-    const memberData = memberSnapshot.data();
-    if (!memberData || memberData.gymId !== gymId) {
+  if (targetType === "selectedMembers") {
+    const memberDocs = await Promise.all(targetMemberIds.map((id) => db.doc(userDoc(id)).get()));
+    const validMembers = memberDocs.filter((doc) => doc.exists && doc.data()?.gymId === gymId);
+    if (validMembers.length === 0) {
       throw new HttpsError("not-found", "Üye bulunamadı.");
     }
-    fcmTokens = (memberData.fcmTokens as string[] | undefined) ?? [];
+    fcmTokens = validMembers.flatMap((doc) => (doc.data()?.fcmTokens as string[] | undefined) ?? []);
   } else {
     const membersSnapshot = await db.collection(usersCollection()).where("gymId", "==", gymId).where("role", "==", "member").get();
     fcmTokens = membersSnapshot.docs.flatMap((doc) => (doc.data().fcmTokens as string[] | undefined) ?? []);

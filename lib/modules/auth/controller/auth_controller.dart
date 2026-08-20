@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../core/locale/locale_controller.dart';
 import '../../../core/remote_config/remote_config_service.dart';
 import '../domain/auth_login_exception.dart';
 import '../domain/auth_state.dart';
@@ -13,30 +16,51 @@ class AuthController extends _$AuthController {
   AuthState build() => const AuthState();
 
   /// Native numeric klavyeden gelen ham metni 10 haneye kırpıp state'e yazar.
+  /// Numara düzenlenince önceki giriş hatası temizlenir — kullanıcı numarayı
+  /// düzeltmeye başladığında eski "bulunamadı" mesajı ekranda asılı kalmasın.
   void setPhoneDigits(String rawInput) {
     final digits = rawInput.replaceAll(RegExp(r'[^0-9]'), '');
-    state = state.copyWith(phoneDigits: digits.length > 10 ? digits.substring(0, 10) : digits);
+    state = state.copyWith(
+      phoneDigits: digits.length > 10 ? digits.substring(0, 10) : digits,
+      loginErrorMessage: null,
+      loginErrorReason: null,
+    );
   }
 
   Future<void> requestLogin() async {
     if (!state.isPhoneComplete || state.isRequestingLogin) return;
-    state = state.copyWith(isRequestingLogin: true, loginErrorMessage: null);
+    state = state.copyWith(
+      isRequestingLogin: true,
+      loginErrorMessage: null,
+      loginErrorReason: null,
+    );
     try {
       await ref.read(authRepositoryProvider).login(state.phoneDigits);
       state = state.copyWith(isRequestingLogin: false);
     } on AuthLoginException catch (e) {
-      state = state.copyWith(isRequestingLogin: false, loginErrorMessage: _messageFor(e.reason));
+      state = state.copyWith(
+        isRequestingLogin: false,
+        loginErrorMessage: _messageFor(e.reason),
+        loginErrorReason: e.reason,
+      );
     }
   }
 
   void toggleDeleteAcknowledged() {
-    state = state.copyWith(deleteAccountAcknowledged: !state.deleteAccountAcknowledged);
+    state = state.copyWith(
+      deleteAccountAcknowledged: !state.deleteAccountAcknowledged,
+    );
   }
 
   /// Başarılıysa `true` döner (çağıran taraf login ekranına yönlendirir).
   Future<bool> deleteAccount() async {
-    if (!state.deleteAccountAcknowledged || state.isDeletingAccount) return false;
-    state = state.copyWith(isDeletingAccount: true, deleteAccountErrorMessage: null);
+    if (!state.deleteAccountAcknowledged || state.isDeletingAccount) {
+      return false;
+    }
+    state = state.copyWith(
+      isDeletingAccount: true,
+      deleteAccountErrorMessage: null,
+    );
     try {
       await ref.read(authRepositoryProvider).deleteAccount();
       state = state.copyWith(isDeletingAccount: false);
@@ -44,34 +68,35 @@ class AuthController extends _$AuthController {
     } catch (_) {
       state = state.copyWith(
         isDeletingAccount: false,
-        deleteAccountErrorMessage: ref.read(remoteConfigServiceProvider).getText(
+        deleteAccountErrorMessage: ref
+            .read(remoteConfigServiceProvider)
+            .getText(
               RemoteConfigKeys.authDeleteAccountErrorGeneric,
+              ref.read(localeControllerProvider),
             ),
       );
       return false;
     }
   }
 
-  void selectAvatar(int index) {
-    state = state.copyWith(selectedAvatarIndex: index);
-  }
-
-  void toggleSessionReminder() {
-    state = state.copyWith(sessionReminderEnabled: !state.sessionReminderEnabled);
-  }
-
-  /// Oturumu kapatır — F1-11'de gerçek `FirebaseAuth.signOut()` çağıracak.
+  /// Oturumu kapatır. UI hemen giriş ekranına döndüğü için local state
+  /// senkron sıfırlanıyor; gerçek `FirebaseAuth.signOut()` arkada
+  /// tamamlanıyor — aksi halde (önceki sürümde olduğu gibi) Auth oturumu
+  /// canlı kalır ve uygulama yeniden açıldığında aynı hesaba otomatik
+  /// giriş yapılır.
   void logout() {
     state = const AuthState();
+    unawaited(ref.read(authRepositoryProvider).signOut().catchError((_) {}));
   }
 
   String _messageFor(AuthLoginErrorReason reason) {
     final rc = ref.read(remoteConfigServiceProvider);
     final key = switch (reason) {
       AuthLoginErrorReason.notFound => RemoteConfigKeys.authLoginErrorNotFound,
-      AuthLoginErrorReason.rateLimited => RemoteConfigKeys.authLoginErrorRateLimited,
+      AuthLoginErrorReason.rateLimited =>
+        RemoteConfigKeys.authLoginErrorRateLimited,
       AuthLoginErrorReason.generic => RemoteConfigKeys.authLoginErrorGeneric,
     };
-    return rc.getText(key);
+    return rc.getText(key, ref.read(localeControllerProvider));
   }
 }

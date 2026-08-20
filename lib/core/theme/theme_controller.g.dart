@@ -29,7 +29,7 @@ final activeGymIdProvider = AutoDisposeFutureProvider<String?>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef ActiveGymIdRef = AutoDisposeFutureProviderRef<String?>;
-String _$themeControllerHash() => r'4669109880f6aa01142a33911d910793b6c24215';
+String _$themeControllerHash() => r'13b5647efae87b1bf549a926bd83fde667e7f951';
 
 /// Salon bazlı dinamik tema (CLAUDE.md §2.4). Aktif salon biliniyorsa
 /// `gyms/{gymId}` dokümanındaki `themeColors.primary` alanını canlı dinler

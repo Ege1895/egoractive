@@ -2,8 +2,6 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'create_group_session_form.freezed.dart';
 
-const groupSessionDayLabels = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'];
-
 @freezed
 class CreateGroupSessionForm with _$CreateGroupSessionForm {
   const factory CreateGroupSessionForm({
@@ -15,5 +13,9 @@ class CreateGroupSessionForm with _$CreateGroupSessionForm {
     required int capacityMax,
     required bool onlineBookingEnabled,
     required String studioName,
+    @Default(false) bool isSubmitting,
+    String? titleError,
+    String? daysError,
+    String? errorMessage,
   }) = _CreateGroupSessionForm;
 }

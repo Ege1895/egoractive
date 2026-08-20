@@ -12,8 +12,13 @@ Future<DashboardSummary> _summaryForGym(_SummaryForGymRef ref, String gymId) {
 }
 
 @riverpod
-Future<List<TrainerPerformance>> _trainerPerformanceForGym(_TrainerPerformanceForGymRef ref, String gymId) {
-  return ref.watch(dashboardReportRepositoryProvider).loadTrainerPerformance(gymId);
+Future<List<TrainerPerformance>> _trainerPerformanceForGym(
+  _TrainerPerformanceForGymRef ref,
+  String gymId,
+) {
+  return ref
+      .watch(dashboardReportRepositoryProvider)
+      .loadTrainerPerformance(gymId);
 }
 
 /// F5-1 — Admin dashboard: aylık seans/ciro/gider özeti + antrenör
@@ -33,8 +38,12 @@ class DashboardReportController extends _$DashboardReportController {
     final gymId = ref.watch(activeGymIdProvider).valueOrNull;
     if (gymId == null) return DashboardReport.empty;
 
-    final summary = ref.watch(_summaryForGymProvider(gymId)).valueOrNull ?? DashboardSummary.empty;
-    final trainerPerformance = ref.watch(_trainerPerformanceForGymProvider(gymId)).valueOrNull ?? const [];
+    final summary =
+        ref.watch(_summaryForGymProvider(gymId)).valueOrNull ??
+        DashboardSummary.empty;
+    final trainerPerformance =
+        ref.watch(_trainerPerformanceForGymProvider(gymId)).valueOrNull ??
+        const [];
     return DashboardReport.from(summary, trainerPerformance);
   }
 
@@ -48,5 +57,28 @@ class DashboardReportController extends _$DashboardReportController {
     final gymId = ref.watch(activeGymIdProvider).valueOrNull;
     if (gymId == null) return false;
     return ref.watch(_trainerPerformanceForGymProvider(gymId)).isLoading;
+  }
+
+  /// Sorgu hatası (index eksikliği, izin, network) `valueOrNull` ile
+  /// sessizce boş/sıfır veriye düşüyordu — admin gerçekten "bu ay veri yok"
+  /// ile "rapor yüklenemedi" arasındaki farkı göremiyordu. Panel bu iki
+  /// getter ile ayırt edip bir hata mesajı gösterebiliyor.
+  bool get hasSummaryError {
+    final gymId = ref.watch(activeGymIdProvider).valueOrNull;
+    if (gymId == null) return false;
+    return ref.watch(_summaryForGymProvider(gymId)).hasError;
+  }
+
+  bool get hasTrainerPerformanceError {
+    final gymId = ref.watch(activeGymIdProvider).valueOrNull;
+    if (gymId == null) return false;
+    return ref.watch(_trainerPerformanceForGymProvider(gymId)).hasError;
+  }
+
+  void retry() {
+    final gymId = ref.read(activeGymIdProvider).valueOrNull;
+    if (gymId == null) return;
+    ref.invalidate(_summaryForGymProvider(gymId));
+    ref.invalidate(_trainerPerformanceForGymProvider(gymId));
   }
 }

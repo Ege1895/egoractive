@@ -23,9 +23,14 @@ mixin _$NewMemberForm {
   int get birthYear => throw _privateConstructorUsedError;
   int get heightCm => throw _privateConstructorUsedError;
   MemberGender? get gender => throw _privateConstructorUsedError;
-  String get trainerId => throw _privateConstructorUsedError;
-  String get trainerName => throw _privateConstructorUsedError;
+  String? get trainerId => throw _privateConstructorUsedError;
+  String? get trainerName => throw _privateConstructorUsedError;
   String get note => throw _privateConstructorUsedError;
+  DateTime get registeredAt => throw _privateConstructorUsedError;
+
+  /// Üyenin ana ekranında sıradaki dersi için "Gelicem"/"Gelmeyeceğim"
+  /// bildirimi yapabilme yetkisi — admin açıkça açmadıkça kapalı gelir.
+  bool get canConfirmAttendance => throw _privateConstructorUsedError;
 
   /// Create a copy of NewMemberForm
   /// with the given fields replaced by the non-null parameter values.
@@ -48,9 +53,11 @@ abstract class $NewMemberFormCopyWith<$Res> {
     int birthYear,
     int heightCm,
     MemberGender? gender,
-    String trainerId,
-    String trainerName,
+    String? trainerId,
+    String? trainerName,
     String note,
+    DateTime registeredAt,
+    bool canConfirmAttendance,
   });
 }
 
@@ -75,9 +82,11 @@ class _$NewMemberFormCopyWithImpl<$Res, $Val extends NewMemberForm>
     Object? birthYear = null,
     Object? heightCm = null,
     Object? gender = freezed,
-    Object? trainerId = null,
-    Object? trainerName = null,
+    Object? trainerId = freezed,
+    Object? trainerName = freezed,
     Object? note = null,
+    Object? registeredAt = null,
+    Object? canConfirmAttendance = null,
   }) {
     return _then(
       _value.copyWith(
@@ -105,18 +114,26 @@ class _$NewMemberFormCopyWithImpl<$Res, $Val extends NewMemberForm>
                 ? _value.gender
                 : gender // ignore: cast_nullable_to_non_nullable
                       as MemberGender?,
-            trainerId: null == trainerId
+            trainerId: freezed == trainerId
                 ? _value.trainerId
                 : trainerId // ignore: cast_nullable_to_non_nullable
-                      as String,
-            trainerName: null == trainerName
+                      as String?,
+            trainerName: freezed == trainerName
                 ? _value.trainerName
                 : trainerName // ignore: cast_nullable_to_non_nullable
-                      as String,
+                      as String?,
             note: null == note
                 ? _value.note
                 : note // ignore: cast_nullable_to_non_nullable
                       as String,
+            registeredAt: null == registeredAt
+                ? _value.registeredAt
+                : registeredAt // ignore: cast_nullable_to_non_nullable
+                      as DateTime,
+            canConfirmAttendance: null == canConfirmAttendance
+                ? _value.canConfirmAttendance
+                : canConfirmAttendance // ignore: cast_nullable_to_non_nullable
+                      as bool,
           )
           as $Val,
     );
@@ -139,9 +156,11 @@ abstract class _$$NewMemberFormImplCopyWith<$Res>
     int birthYear,
     int heightCm,
     MemberGender? gender,
-    String trainerId,
-    String trainerName,
+    String? trainerId,
+    String? trainerName,
     String note,
+    DateTime registeredAt,
+    bool canConfirmAttendance,
   });
 }
 
@@ -165,9 +184,11 @@ class __$$NewMemberFormImplCopyWithImpl<$Res>
     Object? birthYear = null,
     Object? heightCm = null,
     Object? gender = freezed,
-    Object? trainerId = null,
-    Object? trainerName = null,
+    Object? trainerId = freezed,
+    Object? trainerName = freezed,
     Object? note = null,
+    Object? registeredAt = null,
+    Object? canConfirmAttendance = null,
   }) {
     return _then(
       _$NewMemberFormImpl(
@@ -195,18 +216,26 @@ class __$$NewMemberFormImplCopyWithImpl<$Res>
             ? _value.gender
             : gender // ignore: cast_nullable_to_non_nullable
                   as MemberGender?,
-        trainerId: null == trainerId
+        trainerId: freezed == trainerId
             ? _value.trainerId
             : trainerId // ignore: cast_nullable_to_non_nullable
-                  as String,
-        trainerName: null == trainerName
+                  as String?,
+        trainerName: freezed == trainerName
             ? _value.trainerName
             : trainerName // ignore: cast_nullable_to_non_nullable
-                  as String,
+                  as String?,
         note: null == note
             ? _value.note
             : note // ignore: cast_nullable_to_non_nullable
                   as String,
+        registeredAt: null == registeredAt
+            ? _value.registeredAt
+            : registeredAt // ignore: cast_nullable_to_non_nullable
+                  as DateTime,
+        canConfirmAttendance: null == canConfirmAttendance
+            ? _value.canConfirmAttendance
+            : canConfirmAttendance // ignore: cast_nullable_to_non_nullable
+                  as bool,
       ),
     );
   }
@@ -222,9 +251,11 @@ class _$NewMemberFormImpl extends _NewMemberForm {
     required this.birthYear,
     required this.heightCm,
     this.gender,
-    required this.trainerId,
-    required this.trainerName,
+    this.trainerId,
+    this.trainerName,
     required this.note,
+    required this.registeredAt,
+    this.canConfirmAttendance = false,
   }) : super._();
 
   @override
@@ -240,15 +271,23 @@ class _$NewMemberFormImpl extends _NewMemberForm {
   @override
   final MemberGender? gender;
   @override
-  final String trainerId;
+  final String? trainerId;
   @override
-  final String trainerName;
+  final String? trainerName;
   @override
   final String note;
+  @override
+  final DateTime registeredAt;
+
+  /// Üyenin ana ekranında sıradaki dersi için "Gelicem"/"Gelmeyeceğim"
+  /// bildirimi yapabilme yetkisi — admin açıkça açmadıkça kapalı gelir.
+  @override
+  @JsonKey()
+  final bool canConfirmAttendance;
 
   @override
   String toString() {
-    return 'NewMemberForm(firstName: $firstName, lastName: $lastName, phoneDigits: $phoneDigits, birthYear: $birthYear, heightCm: $heightCm, gender: $gender, trainerId: $trainerId, trainerName: $trainerName, note: $note)';
+    return 'NewMemberForm(firstName: $firstName, lastName: $lastName, phoneDigits: $phoneDigits, birthYear: $birthYear, heightCm: $heightCm, gender: $gender, trainerId: $trainerId, trainerName: $trainerName, note: $note, registeredAt: $registeredAt, canConfirmAttendance: $canConfirmAttendance)';
   }
 
   @override
@@ -271,7 +310,11 @@ class _$NewMemberFormImpl extends _NewMemberForm {
                 other.trainerId == trainerId) &&
             (identical(other.trainerName, trainerName) ||
                 other.trainerName == trainerName) &&
-            (identical(other.note, note) || other.note == note));
+            (identical(other.note, note) || other.note == note) &&
+            (identical(other.registeredAt, registeredAt) ||
+                other.registeredAt == registeredAt) &&
+            (identical(other.canConfirmAttendance, canConfirmAttendance) ||
+                other.canConfirmAttendance == canConfirmAttendance));
   }
 
   @override
@@ -286,6 +329,8 @@ class _$NewMemberFormImpl extends _NewMemberForm {
     trainerId,
     trainerName,
     note,
+    registeredAt,
+    canConfirmAttendance,
   );
 
   /// Create a copy of NewMemberForm
@@ -305,9 +350,11 @@ abstract class _NewMemberForm extends NewMemberForm {
     required final int birthYear,
     required final int heightCm,
     final MemberGender? gender,
-    required final String trainerId,
-    required final String trainerName,
+    final String? trainerId,
+    final String? trainerName,
     required final String note,
+    required final DateTime registeredAt,
+    final bool canConfirmAttendance,
   }) = _$NewMemberFormImpl;
   const _NewMemberForm._() : super._();
 
@@ -324,11 +371,18 @@ abstract class _NewMemberForm extends NewMemberForm {
   @override
   MemberGender? get gender;
   @override
-  String get trainerId;
+  String? get trainerId;
   @override
-  String get trainerName;
+  String? get trainerName;
   @override
   String get note;
+  @override
+  DateTime get registeredAt;
+
+  /// Üyenin ana ekranında sıradaki dersi için "Gelicem"/"Gelmeyeceğim"
+  /// bildirimi yapabilme yetkisi — admin açıkça açmadıkça kapalı gelir.
+  @override
+  bool get canConfirmAttendance;
 
   /// Create a copy of NewMemberForm
   /// with the given fields replaced by the non-null parameter values.

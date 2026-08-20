@@ -1,5 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
+import 'auth_login_exception.dart';
+
 part 'auth_state.freezed.dart';
 
 @freezed
@@ -8,11 +10,14 @@ class AuthState with _$AuthState {
     @Default('') String phoneDigits,
     @Default(false) bool isRequestingLogin,
     String? loginErrorMessage,
+
+    /// Hatanın telefon alanına mı (notFound) yoksa genele mi (rate limit,
+    /// network) ait olduğunu ayırt eder — [PhoneLoginPanel] buna göre
+    /// hatayı field-seviyeli mi yoksa genel bir satır olarak mı gösterir.
+    AuthLoginErrorReason? loginErrorReason,
     @Default(false) bool deleteAccountAcknowledged,
     @Default(false) bool isDeletingAccount,
     String? deleteAccountErrorMessage,
-    @Default(0) int selectedAvatarIndex,
-    @Default(true) bool sessionReminderEnabled,
   }) = _AuthState;
 
   const AuthState._();

@@ -3,13 +3,43 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
+import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../../../shared/mock/trainer_mock_data.dart';
 import '../../../sessions/ui/panels/session_completion_panel.dart';
 import '../../../sessions/ui/panels/trainer_notifications_panel.dart';
 import '../../controller/trainer_home_controller.dart';
+import '../../controller/trainer_profile_controller.dart';
 import '../../domain/pending_confirmation.dart';
 import '../../domain/schedule_slot.dart';
+
+const _weekdayNames = {
+  1: 'Pazartesi',
+  2: 'Salı',
+  3: 'Çarşamba',
+  4: 'Perşembe',
+  5: 'Cuma',
+  6: 'Cumartesi',
+  7: 'Pazar',
+};
+const _monthNames = {
+  1: 'Ocak',
+  2: 'Şubat',
+  3: 'Mart',
+  4: 'Nisan',
+  5: 'Mayıs',
+  6: 'Haziran',
+  7: 'Temmuz',
+  8: 'Ağustos',
+  9: 'Eylül',
+  10: 'Ekim',
+  11: 'Kasım',
+  12: 'Aralık',
+};
+
+String _todayLabel() {
+  final now = DateTime.now();
+  return '${_weekdayNames[now.weekday]}, ${now.day} ${_monthNames[now.month]}';
+}
 
 /// Antrenör 1 · Ana Sayfa (Ana Sayfa sekmesi kökü) — bugünkü program +
 /// bekleyen "tamamlandı mı?" onayları.
@@ -23,11 +53,17 @@ class TrainerHomePanel extends ConsumerWidget {
     final state = ref.watch(trainerHomeControllerProvider);
     final controller = ref.read(trainerHomeControllerProvider.notifier);
     final panelStack = ref.read(panelStackControllerProvider.notifier);
+    final profile = ref.watch(trainerProfileControllerProvider);
 
     return Scaffold(
       body: SafeArea(
         child: ListView(
-          padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.lg, AppSpacing.screenEdge, AppSpacing.lg),
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.screenEdge,
+            AppSpacing.lg,
+            AppSpacing.screenEdge,
+            AppSpacing.lg,
+          ),
           children: [
             Row(
               children: [
@@ -40,8 +76,11 @@ class TrainerHomePanel extends ConsumerWidget {
                   ),
                   alignment: Alignment.center,
                   child: Text(
-                    TrainerMockData.trainerInitials,
-                    style: typography.headingSmall.copyWith(color: colors.onPrimaryContainer, fontSize: 16),
+                    profile.initials,
+                    style: typography.headingSmall.copyWith(
+                      color: colors.onPrimaryContainer,
+                      fontSize: 16,
+                    ),
                   ),
                 ),
                 const SizedBox(width: AppSpacing.md),
@@ -49,17 +88,41 @@ class TrainerHomePanel extends ConsumerWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Pazartesi, 3 Ağustos', style: typography.caption.copyWith(color: colors.onSurfaceMuted)),
                       Text(
-                        'İyi çalışmalar ${TrainerMockData.trainerName.split(' ').first}',
-                        style: typography.headingMedium.copyWith(color: colors.onSurface),
+                        _todayLabel(),
+                        style: typography.caption.copyWith(
+                          color: colors.onSurfaceMuted,
+                        ),
+                      ),
+                      Text(
+                        profile.name.trim().isEmpty
+                            ? ref.watch(
+                                rcTextProvider(
+                                  RemoteConfigKeys.trainersHomeGreeting,
+                                ),
+                              )
+                            : ref
+                                  .watch(
+                                    rcTextProvider(
+                                      RemoteConfigKeys
+                                          .trainersHomeGreetingWithName,
+                                    ),
+                                  )
+                                  .replaceAll(
+                                    '{name}',
+                                    profile.name.trim().split(' ').first,
+                                  ),
+                        style: typography.headingMedium.copyWith(
+                          color: colors.onSurface,
+                        ),
                       ),
                     ],
                   ),
                 ),
                 InkWell(
                   borderRadius: BorderRadius.circular(999),
-                  onTap: () => panelStack.push(const TrainerNotificationsPanel()),
+                  onTap: () =>
+                      panelStack.push(const TrainerNotificationsPanel()),
                   child: Container(
                     width: 44,
                     height: 44,
@@ -71,7 +134,11 @@ class TrainerHomePanel extends ConsumerWidget {
                     child: Stack(
                       alignment: Alignment.center,
                       children: [
-                        Icon(Icons.notifications_outlined, size: 18, color: colors.onSurfaceVariant),
+                        Icon(
+                          Icons.notifications_outlined,
+                          size: 18,
+                          color: colors.onSurfaceVariant,
+                        ),
                         if (state.pendingConfirmations.isNotEmpty)
                           Positioned(
                             top: 10,
@@ -82,7 +149,10 @@ class TrainerHomePanel extends ConsumerWidget {
                               decoration: BoxDecoration(
                                 color: colors.warning,
                                 shape: BoxShape.circle,
-                                border: Border.all(color: colors.background, width: 2),
+                                border: Border.all(
+                                  color: colors.background,
+                                  width: 2,
+                                ),
                               ),
                             ),
                           ),
@@ -95,20 +165,66 @@ class TrainerHomePanel extends ConsumerWidget {
             const SizedBox(height: AppSpacing.lg),
             Row(
               children: [
-                Expanded(child: _StatTile(label: 'Bugünkü seans', value: '${state.todaySessionCount}', valueColor: colors.onSurface)),
+                Expanded(
+                  child: _StatTile(
+                    label: ref.watch(
+                      rcTextProvider(
+                        RemoteConfigKeys.trainersHomeTodaySessionsLabel,
+                      ),
+                    ),
+                    value: '${state.todaySessionCount}',
+                    valueColor: colors.onSurface,
+                  ),
+                ),
                 const SizedBox(width: AppSpacing.sm),
-                Expanded(child: _StatTile(label: 'Tamamlanan', value: '${state.completedCount}', valueColor: colors.success)),
+                Expanded(
+                  child: _StatTile(
+                    label: ref.watch(
+                      rcTextProvider(
+                        RemoteConfigKeys.trainersHomeCompletedLabel,
+                      ),
+                    ),
+                    value: '${state.completedCount}',
+                    valueColor: colors.success,
+                  ),
+                ),
                 const SizedBox(width: AppSpacing.sm),
-                Expanded(child: _StatTile(label: 'Boş saat', value: '${state.freeSlotCount}', valueColor: colors.onSurface)),
+                Expanded(
+                  child: _StatTile(
+                    label: ref.watch(
+                      rcTextProvider(
+                        RemoteConfigKeys.trainersHomeFreeSlotLabel,
+                      ),
+                    ),
+                    value: '${state.freeSlotCount}',
+                    valueColor: colors.onSurface,
+                  ),
+                ),
               ],
             ),
             if (state.pendingConfirmations.isNotEmpty) ...[
               const SizedBox(height: AppSpacing.xl),
-              Text('ONAYINIZI BEKLİYOR', style: typography.caption.copyWith(color: colors.onWarningContainer, letterSpacing: 1.2)),
+              Text(
+                ref.watch(
+                  rcTextProvider(
+                    RemoteConfigKeys.trainersHomeAwaitingApprovalSection,
+                  ),
+                ),
+                style: typography.caption.copyWith(
+                  color: colors.onWarningContainer,
+                  letterSpacing: 1.2,
+                ),
+              ),
               const SizedBox(height: AppSpacing.sm),
               for (final pending in state.pendingConfirmations)
                 _PendingCard(
                   pending: pending,
+                  doneLabel: ref.watch(
+                    rcTextProvider(RemoteConfigKeys.commonTamamlandi),
+                  ),
+                  absentLabel: ref.watch(
+                    rcTextProvider(RemoteConfigKeys.trainersHomeNoShowLabel),
+                  ),
                   onTap: () => panelStack.push(
                     SessionCompletionPanel(
                       time: pending.time,
@@ -120,12 +236,28 @@ class TrainerHomePanel extends ConsumerWidget {
                       memberId: pending.memberId,
                     ),
                   ),
-                  onDone: () => controller.markCompleted(pending.id),
-                  onAbsent: () => controller.markAbsent(pending.id),
+                  onDone: () => _handleCompletionAction(
+                    context,
+                    () => controller.markCompleted(pending.id),
+                  ),
+                  onAbsent: () => _handleCompletionAction(
+                    context,
+                    () => controller.markAbsent(pending.id),
+                  ),
                 ),
             ],
             const SizedBox(height: AppSpacing.xl),
-            Text('BUGÜNKÜ PROGRAMINIZ', style: typography.caption.copyWith(color: colors.onSurfaceMuted, letterSpacing: 1.2)),
+            Text(
+              ref.watch(
+                rcTextProvider(
+                  RemoteConfigKeys.trainersHomeTodayScheduleSection,
+                ),
+              ),
+              style: typography.caption.copyWith(
+                color: colors.onSurfaceMuted,
+                letterSpacing: 1.2,
+              ),
+            ),
             const SizedBox(height: AppSpacing.sm),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
@@ -137,7 +269,10 @@ class TrainerHomePanel extends ConsumerWidget {
               child: Column(
                 children: [
                   for (var i = 0; i < state.todaySchedule.length; i++)
-                    _ScheduleRow(slot: state.todaySchedule[i], showDivider: i < state.todaySchedule.length - 1),
+                    _ScheduleRow(
+                      slot: state.todaySchedule[i],
+                      showDivider: i < state.todaySchedule.length - 1,
+                    ),
                 ],
               ),
             ),
@@ -148,8 +283,35 @@ class TrainerHomePanel extends ConsumerWidget {
   }
 }
 
+/// Hızlı onay/işaretleme aksiyonları (kart üzerindeki "Tamamlandı"/"Gelmedi"
+/// ikonları) fire-and-forget çağrılıyordu — yazma başarısız olursa antrenöre
+/// hiçbir geri bildirim verilmiyordu. Artık hata olursa kısa bir snackbar
+/// gösteriyoruz; başarılıysa kart zaten Firestore stream'i sayesinde
+/// kendiliğinden listeden düşer.
+Future<void> _handleCompletionAction(
+  BuildContext context,
+  Future<void> Function() action,
+) async {
+  try {
+    await action();
+  } catch (_) {
+    if (context.mounted) {
+      final message = ProviderScope.containerOf(context).read(
+        rcTextProvider(RemoteConfigKeys.trainersHomeConfirmationSaveError),
+      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(message)));
+    }
+  }
+}
+
 class _StatTile extends StatelessWidget {
-  const _StatTile({required this.label, required this.value, required this.valueColor});
+  const _StatTile({
+    required this.label,
+    required this.value,
+    required this.valueColor,
+  });
 
   final String label;
   final String value;
@@ -169,8 +331,20 @@ class _StatTile extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: typography.caption.copyWith(color: colors.onSurfaceMuted, fontSize: 12)),
-          Text(value, style: typography.dataMedium.copyWith(color: valueColor, fontSize: 26)),
+          Text(
+            label,
+            style: typography.caption.copyWith(
+              color: colors.onSurfaceMuted,
+              fontSize: 12,
+            ),
+          ),
+          Text(
+            value,
+            style: typography.dataMedium.copyWith(
+              color: valueColor,
+              fontSize: 26,
+            ),
+          ),
         ],
       ),
     );
@@ -178,9 +352,18 @@ class _StatTile extends StatelessWidget {
 }
 
 class _PendingCard extends StatelessWidget {
-  const _PendingCard({required this.pending, required this.onTap, required this.onDone, required this.onAbsent});
+  const _PendingCard({
+    required this.pending,
+    required this.doneLabel,
+    required this.absentLabel,
+    required this.onTap,
+    required this.onDone,
+    required this.onAbsent,
+  });
 
   final PendingConfirmation pending;
+  final String doneLabel;
+  final String absentLabel;
   final VoidCallback onTap;
   final VoidCallback onDone;
   final VoidCallback onAbsent;
@@ -208,17 +391,38 @@ class _PendingCard extends StatelessWidget {
                 Container(
                   width: 40,
                   height: 40,
-                  decoration: BoxDecoration(color: colors.surface, shape: BoxShape.circle),
+                  decoration: BoxDecoration(
+                    color: colors.surface,
+                    shape: BoxShape.circle,
+                  ),
                   alignment: Alignment.center,
-                  child: Text(pending.memberInitials, style: typography.headingSmall.copyWith(color: colors.onSurfaceVariant, fontSize: 14)),
+                  child: Text(
+                    pending.memberInitials,
+                    style: typography.headingSmall.copyWith(
+                      color: colors.onSurfaceVariant,
+                      fontSize: 14,
+                    ),
+                  ),
                 ),
                 const SizedBox(width: AppSpacing.md),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(pending.memberName, style: typography.headingSmall.copyWith(color: colors.onSurface, fontSize: 16)),
-                      Text('${pending.time} ${pending.meta}', style: typography.bodyMedium.copyWith(color: colors.onSurfaceVariant, fontSize: 13)),
+                      Text(
+                        pending.memberName,
+                        style: typography.headingSmall.copyWith(
+                          color: colors.onSurface,
+                          fontSize: 16,
+                        ),
+                      ),
+                      Text(
+                        '${pending.time} ${pending.meta}',
+                        style: typography.bodyMedium.copyWith(
+                          color: colors.onSurfaceVariant,
+                          fontSize: 13,
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -233,11 +437,19 @@ class _PendingCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
                     child: InkWell(
                       onTap: onDone,
-                      borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusInner,
+                      ),
                       child: Container(
                         constraints: const BoxConstraints(minHeight: 44),
                         alignment: Alignment.center,
-                        child: Text('Tamamlandı', style: typography.headingSmall.copyWith(fontSize: 15, color: colors.onPrimary)),
+                        child: Text(
+                          doneLabel,
+                          style: typography.headingSmall.copyWith(
+                            fontSize: 15,
+                            color: colors.onPrimary,
+                          ),
+                        ),
                       ),
                     ),
                   ),
@@ -249,11 +461,19 @@ class _PendingCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
                     child: InkWell(
                       onTap: onAbsent,
-                      borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusInner,
+                      ),
                       child: Container(
                         constraints: const BoxConstraints(minHeight: 44),
                         alignment: Alignment.center,
-                        child: Text('Gelmedi', style: typography.headingSmall.copyWith(fontSize: 15, color: colors.onSurfaceVariant)),
+                        child: Text(
+                          absentLabel,
+                          style: typography.headingSmall.copyWith(
+                            fontSize: 15,
+                            color: colors.onSurfaceVariant,
+                          ),
+                        ),
                       ),
                     ),
                   ),
@@ -267,42 +487,116 @@ class _PendingCard extends StatelessWidget {
   }
 }
 
-class _ScheduleRow extends StatelessWidget {
+class _ScheduleRow extends ConsumerWidget {
   const _ScheduleRow({required this.slot, required this.showDivider});
 
   final ScheduleSlot slot;
   final bool showDivider;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.appColors;
     final typography = context.appTypography;
-    final (timeColor, barColor, nameColor, stateLabel, stateColor) = switch (slot.state) {
-      ScheduleSlotState.completed => (colors.onSurfaceMuted, colors.success, colors.onSurfaceMuted, 'Tamamlandı', colors.success),
-      ScheduleSlotState.current => (colors.primary, colors.primary, colors.onSurface, 'Şimdi', colors.primary),
-      ScheduleSlotState.cancelled => (colors.onSurfaceMuted, colors.error, colors.onSurfaceMuted, 'İptal', colors.error),
-      ScheduleSlotState.planned => (colors.onSurface, colors.outlineStrong, colors.onSurface, 'Planlandı', colors.onSurfaceVariant),
+    final (
+      timeColor,
+      barColor,
+      nameColor,
+      stateLabel,
+      stateColor,
+    ) = switch (slot.state) {
+      ScheduleSlotState.completed => (
+        colors.onSurfaceMuted,
+        colors.success,
+        colors.onSurfaceMuted,
+        ref.watch(rcTextProvider(RemoteConfigKeys.commonTamamlandi)),
+        colors.success,
+      ),
+      ScheduleSlotState.current => (
+        colors.primary,
+        colors.primary,
+        colors.onSurface,
+        ref.watch(rcTextProvider(RemoteConfigKeys.sessionsStatusNow)),
+        colors.primary,
+      ),
+      ScheduleSlotState.absent => (
+        colors.onSurfaceMuted,
+        colors.warning,
+        colors.onSurfaceMuted,
+        ref.watch(rcTextProvider(RemoteConfigKeys.trainersHomeNoShowLabel)),
+        colors.warning,
+      ),
+      ScheduleSlotState.cancelled => (
+        colors.onSurfaceMuted,
+        colors.error,
+        colors.onSurfaceMuted,
+        ref.watch(rcTextProvider(RemoteConfigKeys.commonIptalLabel)),
+        colors.error,
+      ),
+      ScheduleSlotState.planned => (
+        colors.onSurface,
+        colors.outlineStrong,
+        colors.onSurface,
+        ref.watch(rcTextProvider(RemoteConfigKeys.sessionsFilterScheduled)),
+        colors.onSurfaceVariant,
+      ),
     };
 
     return Container(
       constraints: const BoxConstraints(minHeight: 64),
-      decoration: BoxDecoration(border: showDivider ? Border(bottom: BorderSide(color: colors.outline)) : null),
+      decoration: BoxDecoration(
+        border: showDivider
+            ? Border(bottom: BorderSide(color: colors.outline))
+            : null,
+      ),
       child: Row(
         children: [
-          SizedBox(width: 46, child: Text(slot.time, style: typography.headingSmall.copyWith(color: timeColor, fontSize: 15))),
+          SizedBox(
+            width: 46,
+            child: Text(
+              slot.time,
+              style: typography.headingSmall.copyWith(
+                color: timeColor,
+                fontSize: 15,
+              ),
+            ),
+          ),
           const SizedBox(width: AppSpacing.md),
-          Container(width: 2, height: 34, decoration: BoxDecoration(color: barColor, borderRadius: BorderRadius.circular(99))),
+          Container(
+            width: 2,
+            height: 34,
+            decoration: BoxDecoration(
+              color: barColor,
+              borderRadius: BorderRadius.circular(99),
+            ),
+          ),
           const SizedBox(width: AppSpacing.md),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(slot.name, style: typography.headingSmall.copyWith(color: nameColor, fontSize: 15)),
-                Text(slot.meta, style: typography.caption.copyWith(color: colors.onSurfaceMuted)),
+                Text(
+                  slot.name,
+                  style: typography.headingSmall.copyWith(
+                    color: nameColor,
+                    fontSize: 15,
+                  ),
+                ),
+                Text(
+                  slot.meta,
+                  style: typography.caption.copyWith(
+                    color: colors.onSurfaceMuted,
+                  ),
+                ),
               ],
             ),
           ),
-          Text(stateLabel, style: typography.caption.copyWith(color: stateColor, fontWeight: FontWeight.w600)),
+          Text(
+            stateLabel,
+            style: typography.caption.copyWith(
+              color: stateColor,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
         ],
       ),
     );

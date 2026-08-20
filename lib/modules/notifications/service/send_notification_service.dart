@@ -14,15 +14,19 @@ class SendNotificationService {
 
   Future<int> send({
     required NotificationTargetType targetType,
-    String? targetMemberId,
+    List<String> targetMemberIds = const [],
     required String title,
     required String message,
   }) async {
     try {
-      final callable = FirebaseFunctions.instance.httpsCallable('sendManualNotification');
+      final callable = FirebaseFunctions.instance.httpsCallable(
+        'sendManualNotification',
+      );
       final result = await callable.call<Map<String, dynamic>>({
-        'targetType': targetType == NotificationTargetType.singleMember ? 'singleMember' : 'wholeGym',
-        'targetMemberId': ?targetMemberId,
+        'targetType': targetType == NotificationTargetType.selectedMembers
+            ? 'selectedMembers'
+            : 'wholeGym',
+        if (targetMemberIds.isNotEmpty) 'targetMemberIds': targetMemberIds,
         'title': title,
         'message': message,
       });
@@ -30,7 +34,9 @@ class SendNotificationService {
     } on FirebaseFunctionsException catch (e) {
       throw SendNotificationException(_reasonForCode(e.code));
     } catch (_) {
-      throw const SendNotificationException(SendNotificationErrorReason.generic);
+      throw const SendNotificationException(
+        SendNotificationErrorReason.generic,
+      );
     }
   }
 
@@ -45,4 +51,6 @@ class SendNotificationService {
 }
 
 @riverpod
-SendNotificationService sendNotificationService(SendNotificationServiceRef ref) => const SendNotificationService();
+SendNotificationService sendNotificationService(
+  SendNotificationServiceRef ref,
+) => const SendNotificationService();

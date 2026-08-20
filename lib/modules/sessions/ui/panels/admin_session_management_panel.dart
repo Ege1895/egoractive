@@ -4,19 +4,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
+import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_back_button.dart';
 import '../../../../shared/widgets/app_button.dart';
+import '../../../../shared/widgets/native_date_picker.dart';
 import '../../controller/admin_calendar_controller.dart';
 import '../../domain/admin_calendar_state.dart';
+import '../../service/session_completion_service.dart';
 import '../../service/sessions_write_service.dart';
 import '../widgets/create_session_sheet.dart';
-
-const _monthAbbrev = {
-  1: 'Ocak', 2: 'Şubat', 3: 'Mart', 4: 'Nisan', 5: 'Mayıs', 6: 'Haziran',
-  7: 'Temmuz', 8: 'Ağustos', 9: 'Eylül', 10: 'Ekim', 11: 'Kasım', 12: 'Aralık',
-};
-const _weekdayNames = {1: 'Pazartesi', 2: 'Salı', 3: 'Çarşamba', 4: 'Perşembe', 5: 'Cuma', 6: 'Cumartesi', 7: 'Pazar'};
 
 enum _SessionFilter { all, planned, completed, cancelled }
 
@@ -26,10 +23,12 @@ class AdminSessionManagementPanel extends BasePanel {
   const AdminSessionManagementPanel({super.key});
 
   @override
-  ConsumerState<AdminSessionManagementPanel> createState() => _AdminSessionManagementPanelState();
+  ConsumerState<AdminSessionManagementPanel> createState() =>
+      _AdminSessionManagementPanelState();
 }
 
-class _AdminSessionManagementPanelState extends BasePanelState<AdminSessionManagementPanel> {
+class _AdminSessionManagementPanelState
+    extends BasePanelState<AdminSessionManagementPanel> {
   DateTime _date = DateTime.now();
   _SessionFilter _filter = _SessionFilter.all;
 
@@ -38,7 +37,11 @@ class _AdminSessionManagementPanelState extends BasePanelState<AdminSessionManag
     final colors = context.appColors;
     final typography = context.appTypography;
     final calendarState = ref.watch(adminCalendarControllerProvider);
-    final sessions = (calendarState.slotsByDayOfMonth[_date.day] ?? const <AdminSessionSlot>[]).where(_matchesFilter).toList();
+    final sessions =
+        (calendarState.slotsByDayOfMonth[_date.day] ??
+                const <AdminSessionSlot>[])
+            .where(_matchesFilter)
+            .toList();
 
     return Scaffold(
       body: SafeArea(
@@ -46,26 +49,64 @@ class _AdminSessionManagementPanelState extends BasePanelState<AdminSessionManag
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.md, AppSpacing.screenEdge, 0),
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.screenEdge,
+                AppSpacing.md,
+                AppSpacing.screenEdge,
+                0,
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
                     children: [
-                      AppBackButton(onTap: () => ref.read(panelStackControllerProvider.notifier).pop()),
+                      AppBackButton(
+                        onTap: () => ref
+                            .read(panelStackControllerProvider.notifier)
+                            .pop(),
+                      ),
                       const SizedBox(width: AppSpacing.md),
-                      Expanded(child: Text('Seanslar', style: typography.headingSmall.copyWith(color: colors.onSurface, fontSize: 22))),
+                      Expanded(
+                        child: Text(
+                          ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.sessionsManagementTitle,
+                            ),
+                          ),
+                          style: typography.headingSmall.copyWith(
+                            color: colors.onSurface,
+                            fontSize: 22,
+                          ),
+                        ),
+                      ),
                       Material(
                         color: colors.primary,
-                        borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+                        borderRadius: BorderRadius.circular(
+                          AppSpacing.radiusInner,
+                        ),
                         child: InkWell(
-                          borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
-                          onTap: () => showCreateSessionSheet(context, ref, _date),
+                          borderRadius: BorderRadius.circular(
+                            AppSpacing.radiusInner,
+                          ),
+                          onTap: () =>
+                              showCreateSessionSheet(context, ref, _date),
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: AppSpacing.md,
+                            ),
                             constraints: const BoxConstraints(minHeight: 40),
                             alignment: Alignment.center,
-                            child: Text('+ Seans', style: typography.headingSmall.copyWith(fontSize: 14, color: colors.onPrimary)),
+                            child: Text(
+                              ref.watch(
+                                rcTextProvider(
+                                  RemoteConfigKeys.commonAddSeansButton,
+                                ),
+                              ),
+                              style: typography.headingSmall.copyWith(
+                                fontSize: 14,
+                                color: colors.onPrimary,
+                              ),
+                            ),
                           ),
                         ),
                       ),
@@ -73,20 +114,52 @@ class _AdminSessionManagementPanelState extends BasePanelState<AdminSessionManag
                   ),
                   const SizedBox(height: AppSpacing.md),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.md,
+                    ),
                     constraints: const BoxConstraints(minHeight: 44),
-                    decoration: BoxDecoration(color: colors.surface, borderRadius: BorderRadius.circular(AppSpacing.radiusInner), border: Border.all(color: colors.outline)),
+                    decoration: BoxDecoration(
+                      color: colors.surface,
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusInner,
+                      ),
+                      border: Border.all(color: colors.outline),
+                    ),
                     child: Row(
                       children: [
                         Expanded(
-                          child: Text(
-                            '${_date.day} ${_monthAbbrev[_date.month]} ${_weekdayNames[_date.weekday]}',
-                            style: typography.bodyMedium.copyWith(color: colors.onSurfaceVariant, fontSize: 14),
+                          child: GestureDetector(
+                            behavior: HitTestBehavior.opaque,
+                            onTap: () => showNativeDatePicker(
+                              context: context,
+                              initial: _date,
+                              firstDate: DateTime(2020),
+                              lastDate: DateTime(2100),
+                              onSelected: (d) => setState(() => _date = d),
+                            ),
+                            child: Text(
+                              '${_date.day} ${_monthName(_date.month)} ${_weekdayName(_date.weekday)}',
+                              style: typography.bodyMedium.copyWith(
+                                color: colors.onSurfaceVariant,
+                                fontSize: 14,
+                              ),
+                            ),
                           ),
                         ),
-                        _ArrowButton(icon: Icons.chevron_left, onTap: () => setState(() => _date = _date.subtract(const Duration(days: 1)))),
+                        _ArrowButton(
+                          icon: Icons.chevron_left,
+                          onTap: () => setState(
+                            () =>
+                                _date = _date.subtract(const Duration(days: 1)),
+                          ),
+                        ),
                         const SizedBox(width: AppSpacing.sm),
-                        _ArrowButton(icon: Icons.chevron_right, onTap: () => setState(() => _date = _date.add(const Duration(days: 1)))),
+                        _ArrowButton(
+                          icon: Icons.chevron_right,
+                          onTap: () => setState(
+                            () => _date = _date.add(const Duration(days: 1)),
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -96,13 +169,45 @@ class _AdminSessionManagementPanelState extends BasePanelState<AdminSessionManag
                     child: ListView(
                       scrollDirection: Axis.horizontal,
                       children: [
-                        _FilterChip(label: 'Tümü', selected: _filter == _SessionFilter.all, onTap: () => setState(() => _filter = _SessionFilter.all)),
+                        _FilterChip(
+                          label: ref.watch(
+                            rcTextProvider(RemoteConfigKeys.commonTumuFilter),
+                          ),
+                          selected: _filter == _SessionFilter.all,
+                          onTap: () =>
+                              setState(() => _filter = _SessionFilter.all),
+                        ),
                         const SizedBox(width: AppSpacing.sm),
-                        _FilterChip(label: 'Planlandı', selected: _filter == _SessionFilter.planned, onTap: () => setState(() => _filter = _SessionFilter.planned)),
+                        _FilterChip(
+                          label: ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.sessionsFilterScheduled,
+                            ),
+                          ),
+                          selected: _filter == _SessionFilter.planned,
+                          onTap: () =>
+                              setState(() => _filter = _SessionFilter.planned),
+                        ),
                         const SizedBox(width: AppSpacing.sm),
-                        _FilterChip(label: 'Tamamlandı', selected: _filter == _SessionFilter.completed, onTap: () => setState(() => _filter = _SessionFilter.completed)),
+                        _FilterChip(
+                          label: ref.watch(
+                            rcTextProvider(RemoteConfigKeys.commonTamamlandi),
+                          ),
+                          selected: _filter == _SessionFilter.completed,
+                          onTap: () => setState(
+                            () => _filter = _SessionFilter.completed,
+                          ),
+                        ),
                         const SizedBox(width: AppSpacing.sm),
-                        _FilterChip(label: 'İptal', selected: _filter == _SessionFilter.cancelled, onTap: () => setState(() => _filter = _SessionFilter.cancelled)),
+                        _FilterChip(
+                          label: ref.watch(
+                            rcTextProvider(RemoteConfigKeys.commonIptalLabel),
+                          ),
+                          selected: _filter == _SessionFilter.cancelled,
+                          onTap: () => setState(
+                            () => _filter = _SessionFilter.cancelled,
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -111,11 +216,31 @@ class _AdminSessionManagementPanelState extends BasePanelState<AdminSessionManag
             ),
             Expanded(
               child: sessions.isEmpty
-                  ? Center(child: Text('Bu güne uyan seans yok.', style: typography.bodyMedium.copyWith(color: colors.onSurfaceMuted)))
+                  ? Center(
+                      child: Text(
+                        ref.watch(
+                          rcTextProvider(
+                            RemoteConfigKeys.sessionsManagementEmptyState,
+                          ),
+                        ),
+                        style: typography.bodyMedium.copyWith(
+                          color: colors.onSurfaceMuted,
+                        ),
+                      ),
+                    )
                   : ListView(
-                      padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.md, AppSpacing.screenEdge, AppSpacing.lg),
+                      padding: const EdgeInsets.fromLTRB(
+                        AppSpacing.screenEdge,
+                        AppSpacing.md,
+                        AppSpacing.screenEdge,
+                        AppSpacing.lg,
+                      ),
                       children: [
-                        for (final session in sessions) _SessionCard(slot: session, onTap: () => _showActionSheet(context, session)),
+                        for (final session in sessions)
+                          _SessionCard(
+                            slot: session,
+                            onTap: () => _showActionSheet(context, session),
+                          ),
                       ],
                     ),
             ),
@@ -127,14 +252,56 @@ class _AdminSessionManagementPanelState extends BasePanelState<AdminSessionManag
 
   DateTime _slotStartTime(AdminSessionSlot slot) {
     final parts = slot.time.split(':');
-    return DateTime(_date.year, _date.month, _date.day, int.parse(parts[0]), int.parse(parts[1]));
+    return DateTime(
+      _date.year,
+      _date.month,
+      _date.day,
+      int.parse(parts[0]),
+      int.parse(parts[1]),
+    );
   }
+
+  String _monthName(int month) {
+    final names = ref
+        .watch(rcTextProvider(RemoteConfigKeys.commonMonthNamesLong))
+        .split(',');
+    return month >= 1 && month <= names.length ? names[month - 1] : '';
+  }
+
+  String _weekdayName(int weekday) {
+    final names = ref
+        .watch(rcTextProvider(RemoteConfigKeys.commonWeekdayNamesLong))
+        .split(',');
+    return weekday >= 1 && weekday <= names.length ? names[weekday - 1] : '';
+  }
+
+  String _statusLabelFor(AdminSessionState state) => switch (state) {
+    AdminSessionState.completed => ref.read(
+      rcTextProvider(RemoteConfigKeys.commonTamamlandi),
+    ),
+    AdminSessionState.absent => ref.read(
+      rcTextProvider(RemoteConfigKeys.trainersHomeNoShowLabel),
+    ),
+    AdminSessionState.current => ref.read(
+      rcTextProvider(RemoteConfigKeys.sessionsStatusNow),
+    ),
+    AdminSessionState.cancelled => ref.read(
+      rcTextProvider(RemoteConfigKeys.commonIptalLabel),
+    ),
+    AdminSessionState.planned => ref.read(
+      rcTextProvider(RemoteConfigKeys.sessionsFilterScheduled),
+    ),
+  };
 
   bool _matchesFilter(AdminSessionSlot slot) {
     return switch (_filter) {
       _SessionFilter.all => true,
-      _SessionFilter.planned => slot.state == AdminSessionState.planned || slot.state == AdminSessionState.current,
-      _SessionFilter.completed => slot.state == AdminSessionState.completed,
+      _SessionFilter.planned =>
+        slot.state == AdminSessionState.planned ||
+            slot.state == AdminSessionState.current,
+      _SessionFilter.completed =>
+        slot.state == AdminSessionState.completed ||
+            slot.state == AdminSessionState.absent,
       _SessionFilter.cancelled => slot.state == AdminSessionState.cancelled,
     };
   }
@@ -142,56 +309,272 @@ class _AdminSessionManagementPanelState extends BasePanelState<AdminSessionManag
   void _showActionSheet(BuildContext context, AdminSessionSlot slot) {
     final colors = context.appColors;
     final typography = context.appTypography;
+    var isCancelling = false;
+    String? cancelError;
+    var isSettingAttendance = false;
+    String? attendanceError;
     showModalBottomSheet<void>(
       context: context,
       backgroundColor: colors.surface,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
       builder: (sheetContext) {
-        return Padding(
-          padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.lg, AppSpacing.screenEdge, AppSpacing.xxl),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('${slot.time} · ${slot.title}', style: typography.headingLarge.copyWith(color: colors.onSurface, fontSize: 20)),
-              const SizedBox(height: AppSpacing.xs),
-              Text(slot.meta, style: typography.bodyMedium.copyWith(color: colors.onSurfaceMuted)),
-              const SizedBox(height: AppSpacing.lg),
-              AppButton(
-                label: 'Seansı ertele',
-                variant: AppButtonVariant.secondary,
-                onPressed: () async {
-                  Navigator.of(sheetContext).pop();
-                  await showRescheduleSessionSheet(context, ref, sessionId: slot.id, currentStart: _slotStartTime(slot));
-                },
+        // Önceki sürüm sheet'i yazma tamamlanmadan kapatıyordu — iptal gibi
+        // geri alınamaz bir aksiyon için false-success riski taşıyordu.
+        // StatefulBuilder, yazma bitene kadar sheet'i açık tutup hata
+        // olursa göstermeyi sağlıyor.
+        return StatefulBuilder(
+          builder: (sheetContext, setLocalState) {
+            return Padding(
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.screenEdge,
+                AppSpacing.lg,
+                AppSpacing.screenEdge,
+                AppSpacing.xxl,
               ),
-              const SizedBox(height: AppSpacing.sm),
-              AppButton(label: 'Antrenörü değiştir', variant: AppButtonVariant.secondary, onPressed: () => Navigator.of(sheetContext).pop()),
-              const SizedBox(height: AppSpacing.sm),
-              Material(
-                color: colors.errorContainer,
-                borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
-                child: InkWell(
-                  onTap: () async {
-                    Navigator.of(sheetContext).pop();
-                    await ref.read(sessionsWriteServiceProvider).cancelSession(slot.id);
-                  },
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
-                  child: Container(
-                    width: double.infinity,
-                    constraints: const BoxConstraints(minHeight: AppSpacing.primaryActionHeight),
-                    alignment: Alignment.center,
-                    child: Text('Seansı iptal et', style: typography.headingSmall.copyWith(fontSize: 15, color: colors.onErrorContainer)),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '${slot.time} · ${slot.title}',
+                    style: typography.headingLarge.copyWith(
+                      color: colors.onSurface,
+                      fontSize: 20,
+                    ),
                   ),
-                ),
+                  const SizedBox(height: AppSpacing.xs),
+                  Text(
+                    slot.meta,
+                    style: typography.bodyMedium.copyWith(
+                      color: colors.onSurfaceMuted,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.lg),
+                  if (slot.state != AdminSessionState.cancelled) ...[
+                    if (slot.state == AdminSessionState.completed ||
+                        slot.state == AdminSessionState.absent) ...[
+                      Text(
+                        ProviderScope.containerOf(sheetContext)
+                            .read(
+                              rcTextProvider(
+                                RemoteConfigKeys
+                                    .sessionsManagementAttendanceCurrentStatus,
+                              ),
+                            )
+                            .replaceAll(
+                              '{status}',
+                              _statusLabelFor(slot.state),
+                            ),
+                        style: typography.bodyMedium.copyWith(
+                          color: colors.onSurfaceMuted,
+                          fontSize: 13,
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.sm),
+                    ],
+                    if (attendanceError != null) ...[
+                      Text(
+                        attendanceError!,
+                        style: typography.bodyMedium.copyWith(
+                          color: colors.error,
+                          fontSize: 13,
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.sm),
+                    ],
+                    AppButton(
+                      label: ProviderScope.containerOf(sheetContext).read(
+                        rcTextProvider(
+                          RemoteConfigKeys
+                              .sessionsManagementMarkCompletedAction,
+                        ),
+                      ),
+                      variant: AppButtonVariant.secondary,
+                      onPressed: isSettingAttendance
+                          ? null
+                          : () async {
+                              setLocalState(() {
+                                isSettingAttendance = true;
+                                attendanceError = null;
+                              });
+                              try {
+                                await ref
+                                    .read(sessionCompletionServiceProvider)
+                                    .setAttendance(
+                                      sessionId: slot.id,
+                                      memberId: slot.memberId,
+                                      attended: true,
+                                    );
+                                if (sheetContext.mounted) {
+                                  Navigator.of(sheetContext).pop();
+                                }
+                              } catch (_) {
+                                setLocalState(() {
+                                  isSettingAttendance = false;
+                                  attendanceError =
+                                      ProviderScope.containerOf(
+                                        sheetContext,
+                                      ).read(
+                                        rcTextProvider(
+                                          RemoteConfigKeys
+                                              .sessionsManagementAttendanceError,
+                                        ),
+                                      );
+                                });
+                              }
+                            },
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                    AppButton(
+                      label: ProviderScope.containerOf(sheetContext).read(
+                        rcTextProvider(
+                          RemoteConfigKeys.sessionsManagementMarkAbsentAction,
+                        ),
+                      ),
+                      variant: AppButtonVariant.secondary,
+                      onPressed: isSettingAttendance
+                          ? null
+                          : () async {
+                              setLocalState(() {
+                                isSettingAttendance = true;
+                                attendanceError = null;
+                              });
+                              try {
+                                await ref
+                                    .read(sessionCompletionServiceProvider)
+                                    .setAttendance(
+                                      sessionId: slot.id,
+                                      memberId: slot.memberId,
+                                      attended: false,
+                                    );
+                                if (sheetContext.mounted) {
+                                  Navigator.of(sheetContext).pop();
+                                }
+                              } catch (_) {
+                                setLocalState(() {
+                                  isSettingAttendance = false;
+                                  attendanceError =
+                                      ProviderScope.containerOf(
+                                        sheetContext,
+                                      ).read(
+                                        rcTextProvider(
+                                          RemoteConfigKeys
+                                              .sessionsManagementAttendanceError,
+                                        ),
+                                      );
+                                });
+                              }
+                            },
+                    ),
+                    const SizedBox(height: AppSpacing.lg),
+                  ],
+                  AppButton(
+                    label: ProviderScope.containerOf(
+                      sheetContext,
+                    ).read(rcTextProvider(RemoteConfigKeys.commonSeansiErtele)),
+                    variant: AppButtonVariant.secondary,
+                    onPressed: () async {
+                      Navigator.of(sheetContext).pop();
+                      await showRescheduleSessionSheet(
+                        context,
+                        ref,
+                        sessionId: slot.id,
+                        currentStart: _slotStartTime(slot),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                  if (cancelError != null) ...[
+                    Text(
+                      cancelError!,
+                      style: typography.bodyMedium.copyWith(
+                        color: colors.error,
+                        fontSize: 13,
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                  ],
+                  Material(
+                    color: colors.errorContainer,
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+                    child: InkWell(
+                      onTap: isCancelling
+                          ? null
+                          : () async {
+                              setLocalState(() {
+                                isCancelling = true;
+                                cancelError = null;
+                              });
+                              try {
+                                await ref
+                                    .read(sessionsWriteServiceProvider)
+                                    .cancelSession(slot.id);
+                                if (sheetContext.mounted) {
+                                  Navigator.of(sheetContext).pop();
+                                }
+                              } catch (_) {
+                                setLocalState(() {
+                                  isCancelling = false;
+                                  cancelError =
+                                      ProviderScope.containerOf(
+                                        sheetContext,
+                                      ).read(
+                                        rcTextProvider(
+                                          RemoteConfigKeys
+                                              .sessionsManagementCancelError,
+                                        ),
+                                      );
+                                });
+                              }
+                            },
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusInner,
+                      ),
+                      child: Container(
+                        width: double.infinity,
+                        constraints: const BoxConstraints(
+                          minHeight: AppSpacing.primaryActionHeight,
+                        ),
+                        alignment: Alignment.center,
+                        child: Text(
+                          isCancelling
+                              ? ProviderScope.containerOf(sheetContext).read(
+                                  rcTextProvider(
+                                    RemoteConfigKeys
+                                        .sessionsManagementCancellingLabel,
+                                  ),
+                                )
+                              : ProviderScope.containerOf(sheetContext).read(
+                                  rcTextProvider(
+                                    RemoteConfigKeys
+                                        .sessionsCancelSessionAction,
+                                  ),
+                                ),
+                          style: typography.headingSmall.copyWith(
+                            fontSize: 15,
+                            color: colors.onErrorContainer,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                  Text(
+                    ProviderScope.containerOf(sheetContext).read(
+                      rcTextProvider(
+                        RemoteConfigKeys.sessionsManagementAdminCancelNote,
+                      ),
+                    ),
+                    style: typography.caption.copyWith(
+                      color: colors.onSurfaceMuted,
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: AppSpacing.sm),
-              Text(
-                'Yönetici olarak tarih kısıtı olmadan iptal ve erteleme yapabilirsiniz.',
-                style: typography.caption.copyWith(color: colors.onSurfaceMuted),
-              ),
-            ],
-          ),
+            );
+          },
         );
       },
     );
@@ -213,14 +596,23 @@ class _ArrowButton extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
-        child: Container(width: 32, height: 32, alignment: Alignment.center, child: Icon(icon, color: colors.onSurfaceVariant, size: 16)),
+        child: Container(
+          width: 32,
+          height: 32,
+          alignment: Alignment.center,
+          child: Icon(icon, color: colors.onSurfaceVariant, size: 16),
+        ),
       ),
     );
   }
 }
 
 class _FilterChip extends StatelessWidget {
-  const _FilterChip({required this.label, required this.selected, required this.onTap});
+  const _FilterChip({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
 
   final String label;
   final bool selected;
@@ -236,60 +628,139 @@ class _FilterChip extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.md,
+            vertical: AppSpacing.sm,
+          ),
           constraints: const BoxConstraints(minHeight: 34),
           alignment: Alignment.center,
-          decoration: BoxDecoration(borderRadius: BorderRadius.circular(AppSpacing.radiusPill), border: Border.all(color: selected ? colors.primary : colors.outlineStrong)),
-          child: Text(label, style: context.appTypography.headingSmall.copyWith(fontSize: 14, color: selected ? colors.onPrimary : colors.onSurfaceVariant)),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
+            border: Border.all(
+              color: selected ? colors.primary : colors.outlineStrong,
+            ),
+          ),
+          child: Text(
+            label,
+            style: context.appTypography.headingSmall.copyWith(
+              fontSize: 14,
+              color: selected ? colors.onPrimary : colors.onSurfaceVariant,
+            ),
+          ),
         ),
       ),
     );
   }
 }
 
-class _SessionCard extends StatelessWidget {
+class _SessionCard extends ConsumerWidget {
   const _SessionCard({required this.slot, required this.onTap});
 
   final AdminSessionSlot slot;
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.appColors;
     final typography = context.appTypography;
     final (chipLabel, chipBg, chipFg, border) = switch (slot.state) {
-      AdminSessionState.completed => ('Tamamlandı', colors.successContainer, colors.onSuccessContainer, colors.outline),
-      AdminSessionState.current => ('Şimdi', colors.primaryContainer, colors.onPrimaryContainer, colors.primary.withValues(alpha: 0.4)),
-      AdminSessionState.cancelled => ('İptal', colors.errorContainer, colors.onErrorContainer, colors.error.withValues(alpha: 0.3)),
-      AdminSessionState.planned => ('Planlandı', colors.surfaceRaised, colors.onSurfaceVariant, colors.outline),
+      AdminSessionState.completed => (
+        ref.watch(rcTextProvider(RemoteConfigKeys.commonTamamlandi)),
+        colors.successContainer,
+        colors.onSuccessContainer,
+        colors.outline,
+      ),
+      AdminSessionState.absent => (
+        ref.watch(rcTextProvider(RemoteConfigKeys.trainersHomeNoShowLabel)),
+        colors.warningContainer,
+        colors.onWarningContainer,
+        colors.warning.withValues(alpha: 0.3),
+      ),
+      AdminSessionState.current => (
+        ref.watch(rcTextProvider(RemoteConfigKeys.sessionsStatusNow)),
+        colors.primaryContainer,
+        colors.onPrimaryContainer,
+        colors.primary.withValues(alpha: 0.4),
+      ),
+      AdminSessionState.cancelled => (
+        ref.watch(rcTextProvider(RemoteConfigKeys.commonIptalLabel)),
+        colors.errorContainer,
+        colors.onErrorContainer,
+        colors.error.withValues(alpha: 0.3),
+      ),
+      AdminSessionState.planned => (
+        ref.watch(rcTextProvider(RemoteConfigKeys.sessionsFilterScheduled)),
+        colors.surfaceRaised,
+        colors.onSurfaceVariant,
+        colors.outline,
+      ),
     };
 
-    return InkWell(
-      borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
-      onTap: onTap,
-      child: Container(
-        margin: const EdgeInsets.only(bottom: AppSpacing.md),
-        padding: const EdgeInsets.all(AppSpacing.md),
-        decoration: BoxDecoration(color: colors.surface, borderRadius: BorderRadius.circular(AppSpacing.radiusCard), border: Border.all(color: border)),
-        child: Row(
-          children: [
-            SizedBox(width: 46, child: Text(slot.time, style: typography.headingSmall.copyWith(color: colors.onSurface, fontSize: 15))),
-            const SizedBox(width: AppSpacing.sm),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(slot.title, style: typography.headingSmall.copyWith(color: colors.onSurface, fontSize: 16)),
-                  Text(slot.meta, style: typography.bodyMedium.copyWith(color: colors.onSurfaceMuted, fontSize: 13)),
-                ],
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.md),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.all(AppSpacing.md),
+          decoration: BoxDecoration(
+            color: colors.surface,
+            borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
+            border: Border.all(color: border),
+          ),
+          child: Row(
+            children: [
+              SizedBox(
+                width: 46,
+                child: Text(
+                  slot.time,
+                  style: typography.headingSmall.copyWith(
+                    color: colors.onSurface,
+                    fontSize: 15,
+                  ),
+                ),
               ),
-            ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 6),
-              decoration: BoxDecoration(color: chipBg, borderRadius: BorderRadius.circular(AppSpacing.radiusPill)),
-              child: Text(chipLabel, style: typography.caption.copyWith(color: chipFg, fontSize: 12)),
-            ),
-          ],
+              const SizedBox(width: AppSpacing.sm),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      slot.title,
+                      style: typography.headingSmall.copyWith(
+                        color: colors.onSurface,
+                        fontSize: 16,
+                      ),
+                    ),
+                    Text(
+                      slot.meta,
+                      style: typography.bodyMedium.copyWith(
+                        color: colors.onSurfaceMuted,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.sm,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: chipBg,
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
+                ),
+                child: Text(
+                  chipLabel,
+                  style: typography.caption.copyWith(
+                    color: chipFg,
+                    fontSize: 12,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -1,11 +1,14 @@
 import 'dart:io';
 import 'dart:ui' show Color;
 
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/painting.dart' show FileImage;
 import 'package:image_picker/image_picker.dart';
 import 'package:palette_generator/palette_generator.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../core/theme/theme_controller.dart';
+import '../../../shared/utils/gym_logo_image.dart';
 import '../domain/gym_profile.dart';
 import '../service/create_gym_service.dart';
 import 'gym_profile_controller.dart';
@@ -18,6 +21,10 @@ class CreateGymState {
     this.logoFile,
     this.isSubmitting = false,
     this.errorMessage,
+    this.nameError,
+    this.cityError,
+    this.addressError,
+    this.phoneError,
     this.isExtractingPalette = false,
     this.logoPalette = const [],
     this.selectedPaletteColor,
@@ -25,7 +32,14 @@ class CreateGymState {
 
   final XFile? logoFile;
   final bool isSubmitting;
+
+  /// Alana bağlanamayan hatalar (network, sunucu) için — field-seviyeli
+  /// hatalar aşağıdaki ayrı alanlarda tutulur.
   final String? errorMessage;
+  final String? nameError;
+  final String? cityError;
+  final String? addressError;
+  final String? phoneError;
 
   /// Logo seçildikten sonra `palette_generator` ile renk çıkarımı sürüyor mu.
   final bool isExtractingPalette;
@@ -43,6 +57,11 @@ class CreateGymState {
     bool? isSubmitting,
     String? errorMessage,
     bool clearError = false,
+    String? nameError,
+    String? cityError,
+    String? addressError,
+    String? phoneError,
+    bool clearFieldErrors = false,
     bool? isExtractingPalette,
     List<Color>? logoPalette,
     Color? selectedPaletteColor,
@@ -52,10 +71,17 @@ class CreateGymState {
       logoFile: logoFile ?? this.logoFile,
       isSubmitting: isSubmitting ?? this.isSubmitting,
       errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
+      nameError: clearFieldErrors ? null : (nameError ?? this.nameError),
+      cityError: clearFieldErrors ? null : (cityError ?? this.cityError),
+      addressError: clearFieldErrors
+          ? null
+          : (addressError ?? this.addressError),
+      phoneError: clearFieldErrors ? null : (phoneError ?? this.phoneError),
       isExtractingPalette: isExtractingPalette ?? this.isExtractingPalette,
       logoPalette: logoPalette ?? this.logoPalette,
-      selectedPaletteColor:
-          clearSelectedPaletteColor ? null : (selectedPaletteColor ?? this.selectedPaletteColor),
+      selectedPaletteColor: clearSelectedPaletteColor
+          ? null
+          : (selectedPaletteColor ?? this.selectedPaletteColor),
     );
   }
 }
@@ -69,9 +95,22 @@ class CreateGymController extends _$CreateGymController {
   @override
   CreateGymState build() => const CreateGymState();
 
+  /// [GymSetupPanel] her açıldığında çağırır — bkz. [GymProfileController.reset].
+  /// Global tema önizlemesini de varsayılana döndürür: önceki bir denemede
+  /// palet rengi seçilip salon kaydı başarısız olduysa (ya da kullanıcı
+  /// vazgeçtiyse), bu ekrana her dönüşte yanlış/geçici bir vurgu rengi asılı
+  /// kalmasın.
+  void reset() {
+    state = const CreateGymState();
+    ref.read(themeControllerProvider.notifier).resetToDefault();
+  }
+
   Future<void> pickLogo() async {
     try {
-      final file = await ImagePicker().pickImage(source: ImageSource.gallery, imageQuality: 85);
+      final file = await ImagePicker().pickImage(
+        source: ImageSource.gallery,
+        imageQuality: 85,
+      );
       if (file == null) return;
       state = state.copyWith(
         logoFile: file,
@@ -85,7 +124,13 @@ class CreateGymController extends _$CreateGymController {
     }
   }
 
-  void selectPaletteColor(Color color) => state = state.copyWith(selectedPaletteColor: color);
+  /// Seçimi hem yerel state'e hem de global [ThemeController]'a yazar ki
+  /// buton/vurgu renkleri ekranda anında (canlı önizleme) değişsin — aynı
+  /// [GymThemeController.selectTheme] hazır tema seçiminde yaptığı gibi.
+  void selectPaletteColor(Color color) {
+    state = state.copyWith(selectedPaletteColor: color);
+    ref.read(themeControllerProvider.notifier).setAccentColor(color);
+  }
 
   /// Logodaki baskın/canlı renkleri çıkarıp öneri listesine koyar. Çıkarım
   /// başarısız olursa (bozuk dosya, format desteklenmiyor vb.) sessizce
@@ -98,15 +143,7 @@ class CreateGymController extends _$CreateGymController {
         FileImage(File(file.path)),
         maximumColorCount: 12,
       );
-      final candidates = <Color?>[
-        generator.dominantColor?.color,
-        generator.vibrantColor?.color,
-        generator.lightVibrantColor?.color,
-        generator.darkVibrantColor?.color,
-        generator.mutedColor?.color,
-      ].whereType<Color>().toList();
-
-      final palette = _dedupeSimilarColors(candidates).take(5).toList();
+      final palette = extractGymPaletteColors(generator);
       state = state.copyWith(
         isExtractingPalette: false,
         logoPalette: palette,
@@ -117,68 +154,91 @@ class CreateGymController extends _$CreateGymController {
     }
   }
 
-  /// Palette_generator'ın döndürdüğü roller (dominant/vibrant/muted vb.)
-  /// çoğu logoda birbirine çok yakın renkler verir — göz zar zor ayırt
-  /// edebileceği neredeyse aynı iki rengi ayrı seçenek olarak göstermemek
-  /// için kaba bir RGB mesafe eşiğiyle eleniyor.
-  List<Color> _dedupeSimilarColors(List<Color> colors) {
-    const threshold = 24;
-    final result = <Color>[];
-    for (final color in colors) {
-      final isSimilar = result.any((kept) {
-        final dr = (kept.r - color.r).abs() * 255;
-        final dg = (kept.g - color.g).abs() * 255;
-        final db = (kept.b - color.b).abs() * 255;
-        return dr < threshold && dg < threshold && db < threshold;
-      });
-      if (!isSimilar) result.add(color);
-    }
-    return result;
-  }
-
-  /// Zorunlu alan eksikse `null` döner ve [errorMessage]'ı doldurur;
-  /// başarılıysa oluşturulan `gymId`'yi döner. Logo opsiyoneldir.
+  /// Zorunlu alan eksikse ilgili alanın hatasını doldurup `null` döner —
+  /// önceki sürüm tüm hataları ("zaten kayıtlı" dahil) tek bir genel
+  /// banner'da gösteriyordu, kullanıcı hangi alanın sorunlu olduğunu
+  /// görmeden alanlara tek tek bakmak zorunda kalıyordu. Başarılıysa
+  /// oluşturulan `gymId`'yi döner. Logo opsiyoneldir.
   Future<String?> submit() async {
     if (state.isSubmitting) return null;
 
     final profile = ref.read(gymProfileControllerProvider);
-    final validationError = _validate(profile);
-    if (validationError != null) {
-      state = state.copyWith(errorMessage: validationError);
-      return null;
-    }
+    if (!_validate(profile)) return null;
 
-    state = state.copyWith(isSubmitting: true, clearError: true);
+    state = state.copyWith(
+      isSubmitting: true,
+      clearError: true,
+      clearFieldErrors: true,
+    );
     try {
       final themeColor =
-          state.selectedPaletteColor ?? ref.read(gymThemeControllerProvider.notifier).activeTheme.primary;
-      final gymId = await ref.read(createGymServiceProvider).createGym(
+          state.selectedPaletteColor ??
+          ref.read(gymThemeControllerProvider.notifier).activeTheme.primary;
+      final gymId = await ref
+          .read(createGymServiceProvider)
+          .createGym(
             profile: profile,
             themeColor: themeColor,
             logoFile: state.logoFile,
           );
       state = state.copyWith(isSubmitting: false);
       return gymId;
+    } on FirebaseFunctionsException catch (e) {
+      state = state.copyWith(
+        isSubmitting: false,
+        phoneError: e.code == 'already-exists'
+            ? 'Bu numarayla kayıtlı bir hesap zaten var. Giriş yapmayı dene.'
+            : null,
+        errorMessage: e.code == 'already-exists'
+            ? null
+            : 'Salon oluşturulamadı. Bağlantını kontrol edip tekrar dene.',
+      );
+      return null;
     } catch (_) {
       state = state.copyWith(
         isSubmitting: false,
-        errorMessage: 'Salon oluşturulamadı. Bağlantını kontrol edip tekrar dene.',
+        errorMessage:
+            'Salon oluşturulamadı. Bağlantını kontrol edip tekrar dene.',
       );
       return null;
     }
   }
 
-  String? _validate(GymProfile profile) {
-    if (profile.name.trim().isEmpty || profile.city.trim().isEmpty || profile.address.trim().isEmpty) {
-      return 'Lütfen tüm alanları doldur.';
-    }
+  /// Her boş/geçersiz alan için ayrı bir hata mesajı yazar, geçerliyse
+  /// `true` döner.
+  bool _validate(GymProfile profile) {
+    final nameError = profile.name.trim().isEmpty ? 'Salon adı gerekli.' : null;
+    final cityError = profile.city.trim().isEmpty ? 'Şehir gerekli.' : null;
+    final addressError = profile.address.trim().isEmpty
+        ? 'Adres gerekli.'
+        : null;
     // profile.phone GymProfileController.updatePhone'da zaten sadece rakam
     // tutuluyor — bu numarayla admin girişi yapılacağı için 10 haneli
     // geçerli bir TR cep telefonu olmalı (AuthState.isPhoneComplete ile
     // aynı kural).
-    if (profile.phone.length != 10) {
-      return 'Lütfen geçerli bir cep telefonu numarası gir.';
+    final phoneError = profile.phone.length != 10
+        ? 'Geçerli bir cep telefonu numarası gir.'
+        : null;
+
+    if (nameError == null &&
+        cityError == null &&
+        addressError == null &&
+        phoneError == null) {
+      return true;
     }
-    return null;
+    // copyWith'in `x ?? this.x` deseni "null geç" ile "hiç geçme"yi ayırt
+    // edemediği için (biri geçersizken diğeri artık geçerli olan alanın
+    // eski hatası temizlenemez), burada state doğrudan kuruluyor.
+    state = CreateGymState(
+      logoFile: state.logoFile,
+      isExtractingPalette: state.isExtractingPalette,
+      logoPalette: state.logoPalette,
+      selectedPaletteColor: state.selectedPaletteColor,
+      nameError: nameError,
+      cityError: cityError,
+      addressError: addressError,
+      phoneError: phoneError,
+    );
+    return false;
   }
 }

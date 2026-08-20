@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
+import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_back_button.dart';
 import '../../../../shared/widgets/app_button.dart';
@@ -15,10 +16,12 @@ class AttendanceConfirmPanel extends BasePanel {
   const AttendanceConfirmPanel({super.key});
 
   @override
-  ConsumerState<AttendanceConfirmPanel> createState() => _AttendanceConfirmPanelState();
+  ConsumerState<AttendanceConfirmPanel> createState() =>
+      _AttendanceConfirmPanelState();
 }
 
-class _AttendanceConfirmPanelState extends BasePanelState<AttendanceConfirmPanel> {
+class _AttendanceConfirmPanelState
+    extends BasePanelState<AttendanceConfirmPanel> {
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
@@ -33,12 +36,28 @@ class _AttendanceConfirmPanelState extends BasePanelState<AttendanceConfirmPanel
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.md, AppSpacing.screenEdge, 0),
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.screenEdge,
+                AppSpacing.md,
+                AppSpacing.screenEdge,
+                0,
+              ),
               child: Row(
                 children: [
-                  AppBackButton(onTap: () => ref.read(panelStackControllerProvider.notifier).pop()),
+                  AppBackButton(
+                    onTap: () =>
+                        ref.read(panelStackControllerProvider.notifier).pop(),
+                  ),
                   const SizedBox(width: AppSpacing.md),
-                  Text('Ders onayı', style: typography.headingSmall.copyWith(color: colors.onSurface, fontSize: 18)),
+                  Text(
+                    ref.watch(
+                      rcTextProvider(RemoteConfigKeys.sessionsConfirmTitle),
+                    ),
+                    style: typography.headingSmall.copyWith(
+                      color: colors.onSurface,
+                      fontSize: 18,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -58,45 +77,111 @@ class _AttendanceConfirmPanelState extends BasePanelState<AttendanceConfirmPanel
                       padding: const EdgeInsets.all(AppSpacing.xl),
                       decoration: BoxDecoration(
                         color: colors.surface,
-                        borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
+                        borderRadius: BorderRadius.circular(
+                          AppSpacing.radiusCard,
+                        ),
                         border: Border.all(color: colors.outline),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "Yarın ${_hourFromTitle(session.title)}'daki dersine gelecek misin?",
-                            style: typography.headingMedium.copyWith(color: colors.onSurface, fontSize: 26),
+                            ref
+                                .watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys.sessionsConfirmQuestion,
+                                  ),
+                                )
+                                .replaceAll(
+                                  '{hour}',
+                                  _hourFromTitle(session.title),
+                                ),
+                            style: typography.headingMedium.copyWith(
+                              color: colors.onSurface,
+                              fontSize: 26,
+                            ),
                           ),
                           const SizedBox(height: AppSpacing.sm),
                           Text(
-                            'Berk Aydın seni bekliyor. Cevabını dersten 2 saat öncesine kadar değiştirebilirsin.',
-                            style: typography.bodyMedium.copyWith(color: colors.onSurfaceVariant),
+                            session.meta.isEmpty
+                                ? ref.watch(
+                                    rcTextProvider(
+                                      RemoteConfigKeys
+                                          .sessionsConfirmChangeHint,
+                                    ),
+                                  )
+                                : ref
+                                      .watch(
+                                        rcTextProvider(
+                                          RemoteConfigKeys
+                                              .sessionsConfirmWaitingHint,
+                                        ),
+                                      )
+                                      .replaceAll('{meta}', session.meta),
+                            style: typography.bodyMedium.copyWith(
+                              color: colors.onSurfaceVariant,
+                            ),
                           ),
                           const SizedBox(height: AppSpacing.lg),
                           Container(
                             padding: const EdgeInsets.all(AppSpacing.md),
                             decoration: BoxDecoration(
                               color: colors.surfaceRaised,
-                              borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+                              borderRadius: BorderRadius.circular(
+                                AppSpacing.radiusInner,
+                              ),
                             ),
                             child: Row(
                               children: [
                                 Column(
                                   children: [
-                                    Text(session.day, style: typography.dataMedium.copyWith(color: colors.onSurface, fontSize: 24)),
-                                    Text(session.month, style: typography.caption.copyWith(color: colors.onSurfaceMuted)),
+                                    Text(
+                                      session.day,
+                                      style: typography.dataMedium.copyWith(
+                                        color: colors.onSurface,
+                                        fontSize: 24,
+                                      ),
+                                    ),
+                                    Text(
+                                      session.month,
+                                      style: typography.caption.copyWith(
+                                        color: colors.onSurfaceMuted,
+                                      ),
+                                    ),
                                   ],
                                 ),
-                                Container(width: 1, height: 38, margin: const EdgeInsets.symmetric(horizontal: AppSpacing.md), color: colors.outlineStrong),
+                                Container(
+                                  width: 1,
+                                  height: 38,
+                                  margin: const EdgeInsets.symmetric(
+                                    horizontal: AppSpacing.md,
+                                  ),
+                                  color: colors.outlineStrong,
+                                ),
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-                                      Text(session.title, style: typography.headingSmall.copyWith(color: colors.onSurface)),
                                       Text(
-                                        '${session.meta} · Kalan dersinden 1 düşer',
-                                        style: typography.bodyMedium.copyWith(color: colors.onSurfaceVariant, fontSize: 13),
+                                        session.title,
+                                        style: typography.headingSmall.copyWith(
+                                          color: colors.onSurface,
+                                        ),
+                                      ),
+                                      Text(
+                                        ref
+                                            .watch(
+                                              rcTextProvider(
+                                                RemoteConfigKeys
+                                                    .sessionsConfirmSessionSummary,
+                                              ),
+                                            )
+                                            .replaceAll('{meta}', session.meta),
+                                        style: typography.bodyMedium.copyWith(
+                                          color: colors.onSurfaceVariant,
+                                          fontSize: 13,
+                                        ),
                                       ),
                                     ],
                                   ),
@@ -108,11 +193,40 @@ class _AttendanceConfirmPanelState extends BasePanelState<AttendanceConfirmPanel
                       ),
                     ),
                     const SizedBox(height: AppSpacing.lg),
-                    if (state.attendanceAnswer == AttendanceAnswer.pending) ...[
-                      AppButton(label: 'Gelicem', onPressed: () => controller.confirmAttendance(true)),
+                    if (state.attendanceErrorMessage != null) ...[
+                      Text(
+                        state.attendanceErrorMessage!,
+                        style: typography.bodyMedium.copyWith(
+                          color: colors.error,
+                          fontSize: 13,
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.sm),
+                    ],
+                    if (!state.canConfirmAttendance) ...[
+                      Text(
+                        ref.watch(
+                          rcTextProvider(
+                            RemoteConfigKeys.sessionsConfirmNoPermission,
+                          ),
+                        ),
+                        style: typography.bodyMedium.copyWith(
+                          color: colors.onSurfaceMuted,
+                        ),
+                      ),
+                    ] else if (state.attendanceAnswer ==
+                        AttendanceAnswer.pending) ...[
+                      AppButton(
+                        label: ref.watch(
+                          rcTextProvider(RemoteConfigKeys.commonGelicem),
+                        ),
+                        onPressed: () => controller.confirmAttendance(true),
+                      ),
                       const SizedBox(height: AppSpacing.sm),
                       AppButton(
-                        label: 'Gelmeyeceğim',
+                        label: ref.watch(
+                          rcTextProvider(RemoteConfigKeys.commonGelmeyecegim),
+                        ),
                         variant: AppButtonVariant.secondary,
                         onPressed: () => controller.confirmAttendance(false),
                       ),
@@ -121,13 +235,20 @@ class _AttendanceConfirmPanelState extends BasePanelState<AttendanceConfirmPanel
                         width: double.infinity,
                         padding: const EdgeInsets.all(AppSpacing.lg),
                         decoration: BoxDecoration(
-                          color: state.attendanceAnswer == AttendanceAnswer.coming
+                          color:
+                              state.attendanceAnswer == AttendanceAnswer.coming
                               ? colors.successContainer
                               : colors.warningContainer,
-                          borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
+                          borderRadius: BorderRadius.circular(
+                            AppSpacing.radiusCard,
+                          ),
                           border: Border.all(
-                            color: (state.attendanceAnswer == AttendanceAnswer.coming ? colors.success : colors.warning)
-                                .withValues(alpha: 0.32),
+                            color:
+                                (state.attendanceAnswer ==
+                                            AttendanceAnswer.coming
+                                        ? colors.success
+                                        : colors.warning)
+                                    .withValues(alpha: 0.32),
                           ),
                         ),
                         child: Row(
@@ -137,13 +258,23 @@ class _AttendanceConfirmPanelState extends BasePanelState<AttendanceConfirmPanel
                               width: 26,
                               height: 26,
                               decoration: BoxDecoration(
-                                color: state.attendanceAnswer == AttendanceAnswer.coming ? colors.success : colors.warning,
+                                color:
+                                    state.attendanceAnswer ==
+                                        AttendanceAnswer.coming
+                                    ? colors.success
+                                    : colors.warning,
                                 shape: BoxShape.circle,
                               ),
                               alignment: Alignment.center,
                               child: Text(
-                                state.attendanceAnswer == AttendanceAnswer.coming ? '✓' : '–',
-                                style: typography.headingSmall.copyWith(color: colors.background, fontSize: 14),
+                                state.attendanceAnswer ==
+                                        AttendanceAnswer.coming
+                                    ? '✓'
+                                    : '–',
+                                style: typography.headingSmall.copyWith(
+                                  color: colors.background,
+                                  fontSize: 14,
+                                ),
                               ),
                             ),
                             const SizedBox(width: AppSpacing.md),
@@ -152,11 +283,24 @@ class _AttendanceConfirmPanelState extends BasePanelState<AttendanceConfirmPanel
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    state.attendanceAnswer == AttendanceAnswer.coming
-                                        ? 'Geleceğini bildirdin'
-                                        : 'Gelmeyeceğini bildirdin',
+                                    state.attendanceAnswer ==
+                                            AttendanceAnswer.coming
+                                        ? ref.watch(
+                                            rcTextProvider(
+                                              RemoteConfigKeys
+                                                  .sessionsConfirmAttendingAnswerText,
+                                            ),
+                                          )
+                                        : ref.watch(
+                                            rcTextProvider(
+                                              RemoteConfigKeys
+                                                  .sessionsConfirmNotAttendingAnswerText,
+                                            ),
+                                          ),
                                     style: typography.headingSmall.copyWith(
-                                      color: state.attendanceAnswer == AttendanceAnswer.coming
+                                      color:
+                                          state.attendanceAnswer ==
+                                              AttendanceAnswer.coming
                                           ? colors.onSuccessContainer
                                           : colors.onWarningContainer,
                                       fontSize: 16,
@@ -164,10 +308,35 @@ class _AttendanceConfirmPanelState extends BasePanelState<AttendanceConfirmPanel
                                   ),
                                   const SizedBox(height: AppSpacing.xs),
                                   Text(
-                                    state.attendanceAnswer == AttendanceAnswer.coming
-                                        ? "Berk Aydın'ın programında yerin ayrıldı. 4 Ağustos 16:30'a kadar değiştirebilirsin."
-                                        : "Ders kalan dersinden düşmedi, antrenörüne iletildi. 4 Ağustos 16:30'a kadar değiştirebilirsin.",
-                                    style: typography.bodyMedium.copyWith(color: colors.onSurfaceVariant),
+                                    state.attendanceAnswer ==
+                                            AttendanceAnswer.coming
+                                        ? (session.meta.isEmpty
+                                              ? ref.watch(
+                                                  rcTextProvider(
+                                                    RemoteConfigKeys
+                                                        .sessionsConfirmComingNote,
+                                                  ),
+                                                )
+                                              : ref
+                                                    .watch(
+                                                      rcTextProvider(
+                                                        RemoteConfigKeys
+                                                            .sessionsConfirmComingNoteWithMeta,
+                                                      ),
+                                                    )
+                                                    .replaceAll(
+                                                      '{meta}',
+                                                      session.meta,
+                                                    ))
+                                        : ref.watch(
+                                            rcTextProvider(
+                                              RemoteConfigKeys
+                                                  .sessionsConfirmNotComingNote,
+                                            ),
+                                          ),
+                                    style: typography.bodyMedium.copyWith(
+                                      color: colors.onSurfaceVariant,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -177,7 +346,11 @@ class _AttendanceConfirmPanelState extends BasePanelState<AttendanceConfirmPanel
                       ),
                       const SizedBox(height: AppSpacing.md),
                       AppButton(
-                        label: 'Cevabımı değiştir',
+                        label: ref.watch(
+                          rcTextProvider(
+                            RemoteConfigKeys.sessionsConfirmChangeAnswerButton,
+                          ),
+                        ),
                         variant: AppButtonVariant.secondary,
                         onPressed: controller.resetAttendance,
                       ),

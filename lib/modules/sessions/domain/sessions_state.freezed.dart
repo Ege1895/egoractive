@@ -358,6 +358,11 @@ mixin _$SessionsState {
   PaymentWarning? get paymentWarning => throw _privateConstructorUsedError;
   SessionsViewMode get viewMode => throw _privateConstructorUsedError;
   AttendanceAnswer get attendanceAnswer => throw _privateConstructorUsedError;
+  String? get attendanceErrorMessage => throw _privateConstructorUsedError;
+
+  /// Admin `MemberInfoPanel`'den açtıysa `true` — kapalıyken üye ana
+  /// ekranında "Gelicem"/"Gelmeyeceğim" bildirimi yapamaz.
+  bool get canConfirmAttendance => throw _privateConstructorUsedError;
 
   /// Create a copy of SessionsState
   /// with the given fields replaced by the non-null parameter values.
@@ -381,6 +386,8 @@ abstract class $SessionsStateCopyWith<$Res> {
     PaymentWarning? paymentWarning,
     SessionsViewMode viewMode,
     AttendanceAnswer attendanceAnswer,
+    String? attendanceErrorMessage,
+    bool canConfirmAttendance,
   });
 
   $SessionCopyWith<$Res> get nextSession;
@@ -409,6 +416,8 @@ class _$SessionsStateCopyWithImpl<$Res, $Val extends SessionsState>
     Object? paymentWarning = freezed,
     Object? viewMode = null,
     Object? attendanceAnswer = null,
+    Object? attendanceErrorMessage = freezed,
+    Object? canConfirmAttendance = null,
   }) {
     return _then(
       _value.copyWith(
@@ -440,6 +449,14 @@ class _$SessionsStateCopyWithImpl<$Res, $Val extends SessionsState>
                 ? _value.attendanceAnswer
                 : attendanceAnswer // ignore: cast_nullable_to_non_nullable
                       as AttendanceAnswer,
+            attendanceErrorMessage: freezed == attendanceErrorMessage
+                ? _value.attendanceErrorMessage
+                : attendanceErrorMessage // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            canConfirmAttendance: null == canConfirmAttendance
+                ? _value.canConfirmAttendance
+                : canConfirmAttendance // ignore: cast_nullable_to_non_nullable
+                      as bool,
           )
           as $Val,
     );
@@ -487,6 +504,8 @@ abstract class _$$SessionsStateImplCopyWith<$Res>
     PaymentWarning? paymentWarning,
     SessionsViewMode viewMode,
     AttendanceAnswer attendanceAnswer,
+    String? attendanceErrorMessage,
+    bool canConfirmAttendance,
   });
 
   @override
@@ -516,6 +535,8 @@ class __$$SessionsStateImplCopyWithImpl<$Res>
     Object? paymentWarning = freezed,
     Object? viewMode = null,
     Object? attendanceAnswer = null,
+    Object? attendanceErrorMessage = freezed,
+    Object? canConfirmAttendance = null,
   }) {
     return _then(
       _$SessionsStateImpl(
@@ -547,6 +568,14 @@ class __$$SessionsStateImplCopyWithImpl<$Res>
             ? _value.attendanceAnswer
             : attendanceAnswer // ignore: cast_nullable_to_non_nullable
                   as AttendanceAnswer,
+        attendanceErrorMessage: freezed == attendanceErrorMessage
+            ? _value.attendanceErrorMessage
+            : attendanceErrorMessage // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        canConfirmAttendance: null == canConfirmAttendance
+            ? _value.canConfirmAttendance
+            : canConfirmAttendance // ignore: cast_nullable_to_non_nullable
+                  as bool,
       ),
     );
   }
@@ -563,6 +592,8 @@ class _$SessionsStateImpl implements _SessionsState {
     required this.paymentWarning,
     this.viewMode = SessionsViewMode.list,
     this.attendanceAnswer = AttendanceAnswer.pending,
+    this.attendanceErrorMessage,
+    this.canConfirmAttendance = false,
   }) : _upcoming = upcoming,
        _past = past,
        _week = week;
@@ -601,10 +632,18 @@ class _$SessionsStateImpl implements _SessionsState {
   @override
   @JsonKey()
   final AttendanceAnswer attendanceAnswer;
+  @override
+  final String? attendanceErrorMessage;
+
+  /// Admin `MemberInfoPanel`'den açtıysa `true` — kapalıyken üye ana
+  /// ekranında "Gelicem"/"Gelmeyeceğim" bildirimi yapamaz.
+  @override
+  @JsonKey()
+  final bool canConfirmAttendance;
 
   @override
   String toString() {
-    return 'SessionsState(nextSession: $nextSession, upcoming: $upcoming, past: $past, week: $week, paymentWarning: $paymentWarning, viewMode: $viewMode, attendanceAnswer: $attendanceAnswer)';
+    return 'SessionsState(nextSession: $nextSession, upcoming: $upcoming, past: $past, week: $week, paymentWarning: $paymentWarning, viewMode: $viewMode, attendanceAnswer: $attendanceAnswer, attendanceErrorMessage: $attendanceErrorMessage, canConfirmAttendance: $canConfirmAttendance)';
   }
 
   @override
@@ -622,7 +661,11 @@ class _$SessionsStateImpl implements _SessionsState {
             (identical(other.viewMode, viewMode) ||
                 other.viewMode == viewMode) &&
             (identical(other.attendanceAnswer, attendanceAnswer) ||
-                other.attendanceAnswer == attendanceAnswer));
+                other.attendanceAnswer == attendanceAnswer) &&
+            (identical(other.attendanceErrorMessage, attendanceErrorMessage) ||
+                other.attendanceErrorMessage == attendanceErrorMessage) &&
+            (identical(other.canConfirmAttendance, canConfirmAttendance) ||
+                other.canConfirmAttendance == canConfirmAttendance));
   }
 
   @override
@@ -635,6 +678,8 @@ class _$SessionsStateImpl implements _SessionsState {
     paymentWarning,
     viewMode,
     attendanceAnswer,
+    attendanceErrorMessage,
+    canConfirmAttendance,
   );
 
   /// Create a copy of SessionsState
@@ -655,6 +700,8 @@ abstract class _SessionsState implements SessionsState {
     required final PaymentWarning? paymentWarning,
     final SessionsViewMode viewMode,
     final AttendanceAnswer attendanceAnswer,
+    final String? attendanceErrorMessage,
+    final bool canConfirmAttendance,
   }) = _$SessionsStateImpl;
 
   @override
@@ -671,6 +718,13 @@ abstract class _SessionsState implements SessionsState {
   SessionsViewMode get viewMode;
   @override
   AttendanceAnswer get attendanceAnswer;
+  @override
+  String? get attendanceErrorMessage;
+
+  /// Admin `MemberInfoPanel`'den açtıysa `true` — kapalıyken üye ana
+  /// ekranında "Gelicem"/"Gelmeyeceğim" bildirimi yapamaz.
+  @override
+  bool get canConfirmAttendance;
 
   /// Create a copy of SessionsState
   /// with the given fields replaced by the non-null parameter values.
