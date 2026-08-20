@@ -246,6 +246,11 @@ class _SessionRow extends ConsumerWidget {
         colors.successContainer,
         colors.onSuccessContainer,
       ),
+      SessionStatus.absent => (
+        ref.watch(rcTextProvider(RemoteConfigKeys.trainersHomeNoShowLabel)),
+        colors.warningContainer,
+        colors.onWarningContainer,
+      ),
       SessionStatus.cancelled => (
         ref.watch(rcTextProvider(RemoteConfigKeys.commonIptalLabel)),
         colors.errorContainer,

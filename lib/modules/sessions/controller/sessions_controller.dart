@@ -132,9 +132,11 @@ Stream<(List<Session>, List<Session>)> _sessionsForMember(
 
 Session _toSession(String id, Map<String, dynamic> data, DateTime startTime) {
   final statusStr = data['status'] as String? ?? 'planned';
+  final attended = data['attended'] as bool?;
   final status = switch (statusStr) {
     'cancelled' => SessionStatus.cancelled,
-    'completed' => SessionStatus.completed,
+    'completed' =>
+      attended == false ? SessionStatus.absent : SessionStatus.completed,
     _ => SessionStatus.planned,
   };
   final confirmationStr = data['memberConfirmation'] as String?;

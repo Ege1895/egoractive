@@ -504,6 +504,7 @@ class _SlotRow extends StatelessWidget {
     final typography = context.appTypography;
     final accent = switch (slot.state) {
       ScheduleSlotState.completed => colors.success,
+      ScheduleSlotState.absent => colors.warning,
       ScheduleSlotState.cancelled => colors.error,
       ScheduleSlotState.current => colors.primary,
       ScheduleSlotState.planned => colors.onSurfaceVariant,

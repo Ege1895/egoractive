@@ -78,13 +78,16 @@ class _SessionCompletionPanelState
 
   Future<void> _markAbsent() async {
     final sessionId = widget.sessionId;
+    final memberId = widget.memberId;
     setState(() {
       _isSubmitting = true;
       _errorMessage = null;
     });
     try {
-      if (sessionId != null) {
-        await ref.read(sessionCompletionServiceProvider).markAbsent(sessionId);
+      if (sessionId != null && memberId != null) {
+        await ref
+            .read(sessionCompletionServiceProvider)
+            .markAbsent(sessionId: sessionId, memberId: memberId);
       }
       if (mounted) setState(() => _answer = _CompletionAnswer.absent);
     } catch (_) {

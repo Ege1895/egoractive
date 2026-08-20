@@ -2,7 +2,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'session.freezed.dart';
 
-enum SessionStatus { planned, completed, cancelled }
+enum SessionStatus { planned, completed, absent, cancelled }
 
 enum AttendanceAnswer { pending, coming, notComing }
 

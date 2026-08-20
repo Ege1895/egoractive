@@ -518,6 +518,13 @@ class _ScheduleRow extends ConsumerWidget {
         ref.watch(rcTextProvider(RemoteConfigKeys.sessionsStatusNow)),
         colors.primary,
       ),
+      ScheduleSlotState.absent => (
+        colors.onSurfaceMuted,
+        colors.warning,
+        colors.onSurfaceMuted,
+        ref.watch(rcTextProvider(RemoteConfigKeys.trainersHomeNoShowLabel)),
+        colors.warning,
+      ),
       ScheduleSlotState.cancelled => (
         colors.onSurfaceMuted,
         colors.error,

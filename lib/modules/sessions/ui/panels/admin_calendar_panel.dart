@@ -416,6 +416,11 @@ class AdminCalendarPanel extends ConsumerWidget {
         colors.successContainer,
         colors.onSuccessContainer,
       ),
+      AdminSessionState.absent => (
+        ref.read(rcTextProvider(RemoteConfigKeys.trainersHomeNoShowLabel)),
+        colors.warningContainer,
+        colors.onWarningContainer,
+      ),
       AdminSessionState.current => (
         ref.read(rcTextProvider(RemoteConfigKeys.sessionsStatusNow)),
         colors.primaryContainer,

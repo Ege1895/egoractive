@@ -2,7 +2,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'schedule_slot.freezed.dart';
 
-enum ScheduleSlotState { planned, current, completed, cancelled }
+enum ScheduleSlotState { planned, current, completed, absent, cancelled }
 
 @freezed
 class ScheduleSlot with _$ScheduleSlot {

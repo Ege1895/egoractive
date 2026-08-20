@@ -4,7 +4,7 @@ import '../../expenses/domain/expense_state.dart';
 
 part 'admin_calendar_state.freezed.dart';
 
-enum AdminSessionState { planned, current, completed, cancelled }
+enum AdminSessionState { planned, current, completed, absent, cancelled }
 
 @freezed
 class AdminSessionSlot with _$AdminSessionSlot {

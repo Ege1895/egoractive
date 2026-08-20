@@ -280,7 +280,9 @@ class _AdminSessionManagementPanelState
       _SessionFilter.planned =>
         slot.state == AdminSessionState.planned ||
             slot.state == AdminSessionState.current,
-      _SessionFilter.completed => slot.state == AdminSessionState.completed,
+      _SessionFilter.completed =>
+        slot.state == AdminSessionState.completed ||
+            slot.state == AdminSessionState.absent,
       _SessionFilter.cancelled => slot.state == AdminSessionState.cancelled,
     };
   }
@@ -528,6 +530,12 @@ class _SessionCard extends ConsumerWidget {
         colors.successContainer,
         colors.onSuccessContainer,
         colors.outline,
+      ),
+      AdminSessionState.absent => (
+        ref.watch(rcTextProvider(RemoteConfigKeys.trainersHomeNoShowLabel)),
+        colors.warningContainer,
+        colors.onWarningContainer,
+        colors.warning.withValues(alpha: 0.3),
       ),
       AdminSessionState.current => (
         ref.watch(rcTextProvider(RemoteConfigKeys.sessionsStatusNow)),

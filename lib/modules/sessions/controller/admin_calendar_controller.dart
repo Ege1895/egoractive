@@ -86,9 +86,13 @@ AdminSessionSlot _toAdminSlot(QueryDocumentSnapshot<Map<String, dynamic>> doc) {
   final startTime = (data['startTime'] as Timestamp).toDate();
   final statusStr = data['status'] as String? ?? 'planned';
   final now = DateTime.now();
+  final attended = data['attended'] as bool?;
   final state = switch (statusStr) {
     'cancelled' => AdminSessionState.cancelled,
-    'completed' => AdminSessionState.completed,
+    'completed' =>
+      attended == false
+          ? AdminSessionState.absent
+          : AdminSessionState.completed,
     _ =>
       now.isAfter(startTime) &&
               now.isBefore(startTime.add(const Duration(hours: 1)))

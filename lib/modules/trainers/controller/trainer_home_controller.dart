@@ -32,10 +32,14 @@ ScheduleSlot _toScheduleSlot(QueryDocumentSnapshot<Map<String, dynamic>> doc) {
   final data = doc.data();
   final startTime = (data['startTime'] as Timestamp).toDate();
   final statusStr = data['status'] as String? ?? 'planned';
+  final attended = data['attended'] as bool?;
   final now = DateTime.now();
   final state = switch (statusStr) {
     'cancelled' => ScheduleSlotState.cancelled,
-    'completed' => ScheduleSlotState.completed,
+    'completed' =>
+      attended == false
+          ? ScheduleSlotState.absent
+          : ScheduleSlotState.completed,
     _ =>
       now.isAfter(startTime) &&
               now.isBefore(startTime.add(const Duration(hours: 1)))
@@ -159,6 +163,10 @@ class TrainerHomeController extends _$TrainerHomeController {
   }
 
   Future<void> markAbsent(String pendingId) async {
-    await ref.read(sessionCompletionServiceProvider).markAbsent(pendingId);
+    final matches = state.pendingConfirmations.where((p) => p.id == pendingId);
+    if (matches.isEmpty) return;
+    await ref
+        .read(sessionCompletionServiceProvider)
+        .markAbsent(sessionId: pendingId, memberId: matches.first.memberId);
   }
 }
