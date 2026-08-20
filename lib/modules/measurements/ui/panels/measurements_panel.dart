@@ -447,6 +447,7 @@ class _AvatarViewState extends ConsumerState<_AvatarView> {
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Icon(
                           Icons.edit_outlined,
@@ -474,6 +475,7 @@ class _AvatarViewState extends ConsumerState<_AvatarView> {
                             ),
                             decoration: InputDecoration(
                               isDense: true,
+                              isCollapsed: true,
                               border: InputBorder.none,
                               contentPadding: const EdgeInsets.symmetric(
                                 vertical: AppSpacing.sm,
