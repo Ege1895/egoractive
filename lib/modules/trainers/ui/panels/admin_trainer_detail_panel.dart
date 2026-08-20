@@ -9,9 +9,11 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/utils/phone_number_formatter.dart';
 import '../../../../shared/widgets/app_back_button.dart';
 import '../../controller/admin_trainer_detail_controller.dart';
+import '../../controller/admin_trainers_controller.dart';
 import '../../controller/trainer_report_controller.dart';
 import '../../domain/admin_trainer_detail_stats.dart';
 import '../../domain/admin_trainer_summary.dart';
+import 'admin_trainer_management_panel.dart' show showTrainerFormSheet;
 
 /// Admin 4 · Antrenör Detayı — [AdminTrainerManagementPanel]'deki listeden
 /// bir antrenöre dokununca açılır, tüm zamanlı ve bu ayki seans
@@ -32,7 +34,16 @@ class _AdminTrainerDetailPanelState
   Widget build(BuildContext context) {
     final colors = context.appColors;
     final typography = context.appTypography;
-    final trainer = widget.trainer;
+    // Liste (`AdminTrainersController`) Firestore'u canlı izliyor —
+    // `widget.trainer` sadece bu panele push edildiği andaki durağan bir
+    // kopya, `Düzenle` sonrası güncel kalması için burada listeden aranıyor
+    // (bulunamazsa, ör. mock/salon-yok durumunda, orijinal kopyaya düşülür).
+    final trainer = ref
+        .watch(adminTrainersControllerProvider)
+        .firstWhere(
+          (t) => t.id == widget.trainer.id,
+          orElse: () => widget.trainer,
+        );
     final stats =
         ref.watch(adminTrainerDetailStatsProvider(trainer.id)).valueOrNull ??
         AdminTrainerDetailStats.empty;
@@ -60,13 +71,41 @@ class _AdminTrainerDetailPanelState
                         ref.read(panelStackControllerProvider.notifier).pop(),
                   ),
                   const SizedBox(width: AppSpacing.md),
-                  Text(
-                    ref.watch(
-                      rcTextProvider(RemoteConfigKeys.trainersDetailTitle),
+                  Expanded(
+                    child: Text(
+                      ref.watch(
+                        rcTextProvider(RemoteConfigKeys.trainersDetailTitle),
+                      ),
+                      style: typography.headingSmall.copyWith(
+                        color: colors.onSurface,
+                        fontSize: 18,
+                      ),
                     ),
-                    style: typography.headingSmall.copyWith(
-                      color: colors.onSurface,
-                      fontSize: 18,
+                  ),
+                  Material(
+                    color: colors.surfaceRaised,
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusInner,
+                      ),
+                      onTap: () => showTrainerFormSheet(context, existing: trainer),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.md,
+                        ),
+                        constraints: const BoxConstraints(minHeight: 40),
+                        alignment: Alignment.center,
+                        child: Text(
+                          ref.watch(
+                            rcTextProvider(RemoteConfigKeys.commonDuzenle),
+                          ),
+                          style: typography.headingSmall.copyWith(
+                            fontSize: 14,
+                            color: colors.onSurfaceVariant,
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                 ],

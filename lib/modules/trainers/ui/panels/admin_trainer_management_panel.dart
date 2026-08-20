@@ -124,17 +124,25 @@ class _AdminTrainerManagementPanelState
   }
 
   void _showAddTrainerSheet(BuildContext context, WidgetRef ref) {
-    final colors = context.appColors;
-    showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: colors.surface,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
-      ),
-      builder: (sheetContext) => const _AddTrainerSheet(),
-    );
+    showTrainerFormSheet(context);
   }
+}
+
+/// Antrenör ekle (`admin_trainer_management_panel.dart`) ve düzenle
+/// (`admin_trainer_detail_panel.dart`) aynı formu paylaşır — `existing`
+/// verilirse alanlar önceki değerlerle dolu açılır ve kaydedince
+/// `updateTrainer` çağrılır.
+void showTrainerFormSheet(BuildContext context, {AdminTrainerSummary? existing}) {
+  final colors = context.appColors;
+  showModalBottomSheet<void>(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: colors.surface,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+    ),
+    builder: (sheetContext) => _TrainerFormSheet(existing: existing),
+  );
 }
 
 class _TrainerRow extends StatelessWidget {
@@ -222,20 +230,35 @@ class _TrainerRow extends StatelessWidget {
   }
 }
 
-class _AddTrainerSheet extends ConsumerStatefulWidget {
-  const _AddTrainerSheet();
+class _TrainerFormSheet extends ConsumerStatefulWidget {
+  const _TrainerFormSheet({this.existing});
+
+  final AdminTrainerSummary? existing;
 
   @override
-  ConsumerState<_AddTrainerSheet> createState() => _AddTrainerSheetState();
+  ConsumerState<_TrainerFormSheet> createState() => _TrainerFormSheetState();
 }
 
-class _AddTrainerSheetState extends ConsumerState<_AddTrainerSheet> {
-  final _nameController = TextEditingController();
-  final _phoneController = TextEditingController();
-  final Set<String> _selectedSpecialties = {};
+class _TrainerFormSheetState extends ConsumerState<_TrainerFormSheet> {
+  late final _nameController = TextEditingController(
+    text: widget.existing?.name ?? '',
+  );
+  late final _phoneController = TextEditingController(
+    text: widget.existing == null
+        ? ''
+        : widget.existing!.phone.replaceAll(RegExp(r'[^0-9]'), '').replaceFirst(
+            RegExp(r'^90'),
+            '',
+          ),
+  );
+  late final Set<String> _selectedSpecialties = {
+    ...?widget.existing?.specialties,
+  };
   bool _isSaving = false;
   String? _nameError;
   String? _errorMessage;
+
+  bool get _isEditing => widget.existing != null;
 
   Future<void> _submit() async {
     final name = _nameController.text.trim();
@@ -251,22 +274,35 @@ class _AddTrainerSheetState extends ConsumerState<_AddTrainerSheet> {
       _errorMessage = null;
     });
     final phoneDigits = _phoneController.text.replaceAll(RegExp(r'[^0-9]'), '');
+    final specialties = _selectedSpecialties.isEmpty
+        ? ['Fonksiyonel']
+        : _selectedSpecialties.toList();
     try {
-      await ref
-          .read(adminTrainersControllerProvider.notifier)
-          .addTrainer(
-            name: name,
-            phoneNumber: phoneDigits.isEmpty ? '' : '+90$phoneDigits',
-            specialties: _selectedSpecialties.isEmpty
-                ? ['Fonksiyonel']
-                : _selectedSpecialties.toList(),
-          );
+      final notifier = ref.read(adminTrainersControllerProvider.notifier);
+      if (_isEditing) {
+        await notifier.updateTrainer(
+          id: widget.existing!.id,
+          name: name,
+          phoneNumber: phoneDigits.isEmpty ? '' : '+90$phoneDigits',
+          specialties: specialties,
+        );
+      } else {
+        await notifier.addTrainer(
+          name: name,
+          phoneNumber: phoneDigits.isEmpty ? '' : '+90$phoneDigits',
+          specialties: specialties,
+        );
+      }
     } catch (_) {
       if (mounted) {
         setState(() {
           _isSaving = false;
           _errorMessage = ref.read(
-            rcTextProvider(RemoteConfigKeys.trainersAddTrainerError),
+            rcTextProvider(
+              _isEditing
+                  ? RemoteConfigKeys.trainersEditTrainerError
+                  : RemoteConfigKeys.trainersAddTrainerError,
+            ),
           );
         });
       }
@@ -304,7 +340,11 @@ class _AddTrainerSheetState extends ConsumerState<_AddTrainerSheet> {
           const SizedBox(height: AppSpacing.lg),
           Text(
             ref.watch(
-              rcTextProvider(RemoteConfigKeys.trainersAddTrainerFormTitle),
+              rcTextProvider(
+                _isEditing
+                    ? RemoteConfigKeys.trainersEditTrainerFormTitle
+                    : RemoteConfigKeys.trainersAddTrainerFormTitle,
+              ),
             ),
             style: typography.headingLarge.copyWith(
               color: colors.onSurface,
@@ -376,12 +416,16 @@ class _AddTrainerSheetState extends ConsumerState<_AddTrainerSheet> {
             label: _isSaving
                 ? ref.watch(
                     rcTextProvider(
-                      RemoteConfigKeys.trainersAddTrainerSavingLabel,
+                      _isEditing
+                          ? RemoteConfigKeys.gymsGymInfoSavingLabel
+                          : RemoteConfigKeys.trainersAddTrainerSavingLabel,
                     ),
                   )
                 : ref.watch(
                     rcTextProvider(
-                      RemoteConfigKeys.trainersAddTrainerSubmitButton,
+                      _isEditing
+                          ? RemoteConfigKeys.commonKaydet
+                          : RemoteConfigKeys.trainersAddTrainerSubmitButton,
                     ),
                   ),
             onPressed: _isSaving ? null : _submit,

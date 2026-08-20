@@ -80,4 +80,17 @@ class AdminTrainersController extends _$AdminTrainersController {
       'specialties': specialties,
     });
   }
+
+  Future<void> updateTrainer({
+    required String id,
+    required String name,
+    required String phoneNumber,
+    required List<String> specialties,
+  }) async {
+    await FirebaseFirestore.instance.collection('users').doc(id).update({
+      'name': name,
+      'phoneNumber': phoneNumber,
+      'specialties': specialties,
+    });
+  }
 }
