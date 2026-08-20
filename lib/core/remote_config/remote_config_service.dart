@@ -24,6 +24,11 @@ abstract final class RemoteConfigKeys {
   /// Grup dersi oluşturma ekranındaki kontenjan stepper'ının üst sınırı.
   static const groupSessionCapacityMax = 'cfg_group_session_capacity_max';
 
+  /// Üye anasayfasındaki taksit listesinde bir taksitin son ödeme tarihine
+  /// kaç gün kala (veya geçmişse) "Ödeme yaklaşıyor" olarak kırmızı
+  /// gösterileceği.
+  static const installmentDueSoonDays = 'cfg_installment_due_soon_days';
+
   /// F4-2 — grup dersine katılım/ayrılma başlangıca kaç saat kalana kadar
   /// açık (sonrasında UI'da kilitli görünür).
   static const groupSessionLockHoursBefore =
@@ -603,9 +608,10 @@ class RemoteConfigService {
 ''';
 
   static const Map<String, Object> _defaults = {
-    RemoteConfigKeys.sessionReminderMinutesBefore: 60,
+    RemoteConfigKeys.sessionReminderMinutesBefore: 120,
     RemoteConfigKeys.defaultGroupSessionCapacity: 6,
     RemoteConfigKeys.groupSessionCapacityMax: 20,
+    RemoteConfigKeys.installmentDueSoonDays: 3,
     RemoteConfigKeys.groupSessionLockHoursBefore: 24,
     RemoteConfigKeys.cancellationDeadlineHours: 24,
     RemoteConfigKeys.defaultTrainerReminderDelayMinutes: 30,
@@ -1358,6 +1364,9 @@ class RemoteConfigService {
 
   int get groupSessionCapacityMax =>
       getInt(RemoteConfigKeys.groupSessionCapacityMax);
+
+  int get installmentDueSoonDays =>
+      getInt(RemoteConfigKeys.installmentDueSoonDays);
 
   /// Grup dersine katılım/ayrılma başlangıca kaç saat kalana kadar açık.
   int get groupSessionLockHoursBefore =>
