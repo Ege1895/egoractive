@@ -992,6 +992,14 @@ abstract final class RemoteConfigKeys {
       'lbl_sessions_member_home_installment_unpaid_label';
   static const sessionsCompletionConfirmError =
       'lbl_sessions_completion_confirm_error';
+  static const sessionsManagementMarkCompletedAction =
+      'lbl_sessions_management_mark_completed_action';
+  static const sessionsManagementMarkAbsentAction =
+      'lbl_sessions_management_mark_absent_action';
+  static const sessionsManagementAttendanceCurrentStatus =
+      'lbl_sessions_management_attendance_current_status';
+  static const sessionsManagementAttendanceError =
+      'lbl_sessions_management_attendance_error';
   static const sessionsCompletionQuestion = 'lbl_sessions_completion_question';
   static const sessionsCompletionSummary = 'lbl_sessions_completion_summary';
   static const sessionsCompletionTimeLimitNote =
@@ -1909,6 +1917,12 @@ class RemoteConfigService {
     'lbl_sessions_member_home_installment_unpaid_label_tr': 'Ödenmedi',
     'lbl_sessions_completion_confirm_error_tr':
         'Onay kaydedilemedi, bağlantını kontrol edip tekrar dene.',
+    'lbl_sessions_management_mark_completed_action_tr':
+        'Tamamlandı olarak işaretle',
+    'lbl_sessions_management_mark_absent_action_tr': 'Gelmedi olarak işaretle',
+    'lbl_sessions_management_attendance_current_status_tr': 'Şu an: {status}',
+    'lbl_sessions_management_attendance_error_tr':
+        'Kaydedilemedi, bağlantını kontrol edip tekrar dene.',
     'lbl_sessions_completion_question_tr':
         '{time} {name} seansını tamamladınız mı?',
     'lbl_sessions_completion_summary_tr':
@@ -2661,6 +2675,12 @@ class RemoteConfigService {
     'lbl_sessions_member_home_installment_unpaid_label_en': 'Unpaid',
     'lbl_sessions_completion_confirm_error_en':
         'Could not save the confirmation, check your connection and try again.',
+    'lbl_sessions_management_mark_completed_action_en': 'Mark as completed',
+    'lbl_sessions_management_mark_absent_action_en': 'Mark as no-show',
+    'lbl_sessions_management_attendance_current_status_en':
+        'Currently: {status}',
+    'lbl_sessions_management_attendance_error_en':
+        'Could not save, check your connection and try again.',
     'lbl_sessions_completion_question_en':
         'Did you complete {name}\'s {time} class?',
     'lbl_sessions_completion_summary_en':

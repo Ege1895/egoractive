@@ -22,6 +22,7 @@ mixin _$AdminSessionSlot {
   String get title => throw _privateConstructorUsedError;
   String get meta => throw _privateConstructorUsedError;
   AdminSessionState get state => throw _privateConstructorUsedError;
+  String get memberId => throw _privateConstructorUsedError;
 
   /// Create a copy of AdminSessionSlot
   /// with the given fields replaced by the non-null parameter values.
@@ -43,6 +44,7 @@ abstract class $AdminSessionSlotCopyWith<$Res> {
     String title,
     String meta,
     AdminSessionState state,
+    String memberId,
   });
 }
 
@@ -66,6 +68,7 @@ class _$AdminSessionSlotCopyWithImpl<$Res, $Val extends AdminSessionSlot>
     Object? title = null,
     Object? meta = null,
     Object? state = null,
+    Object? memberId = null,
   }) {
     return _then(
       _value.copyWith(
@@ -89,6 +92,10 @@ class _$AdminSessionSlotCopyWithImpl<$Res, $Val extends AdminSessionSlot>
                 ? _value.state
                 : state // ignore: cast_nullable_to_non_nullable
                       as AdminSessionState,
+            memberId: null == memberId
+                ? _value.memberId
+                : memberId // ignore: cast_nullable_to_non_nullable
+                      as String,
           )
           as $Val,
     );
@@ -110,6 +117,7 @@ abstract class _$$AdminSessionSlotImplCopyWith<$Res>
     String title,
     String meta,
     AdminSessionState state,
+    String memberId,
   });
 }
 
@@ -132,6 +140,7 @@ class __$$AdminSessionSlotImplCopyWithImpl<$Res>
     Object? title = null,
     Object? meta = null,
     Object? state = null,
+    Object? memberId = null,
   }) {
     return _then(
       _$AdminSessionSlotImpl(
@@ -155,6 +164,10 @@ class __$$AdminSessionSlotImplCopyWithImpl<$Res>
             ? _value.state
             : state // ignore: cast_nullable_to_non_nullable
                   as AdminSessionState,
+        memberId: null == memberId
+            ? _value.memberId
+            : memberId // ignore: cast_nullable_to_non_nullable
+                  as String,
       ),
     );
   }
@@ -169,6 +182,7 @@ class _$AdminSessionSlotImpl implements _AdminSessionSlot {
     required this.title,
     required this.meta,
     required this.state,
+    this.memberId = '',
   });
 
   @override
@@ -181,10 +195,13 @@ class _$AdminSessionSlotImpl implements _AdminSessionSlot {
   final String meta;
   @override
   final AdminSessionState state;
+  @override
+  @JsonKey()
+  final String memberId;
 
   @override
   String toString() {
-    return 'AdminSessionSlot(id: $id, time: $time, title: $title, meta: $meta, state: $state)';
+    return 'AdminSessionSlot(id: $id, time: $time, title: $title, meta: $meta, state: $state, memberId: $memberId)';
   }
 
   @override
@@ -196,11 +213,14 @@ class _$AdminSessionSlotImpl implements _AdminSessionSlot {
             (identical(other.time, time) || other.time == time) &&
             (identical(other.title, title) || other.title == title) &&
             (identical(other.meta, meta) || other.meta == meta) &&
-            (identical(other.state, state) || other.state == state));
+            (identical(other.state, state) || other.state == state) &&
+            (identical(other.memberId, memberId) ||
+                other.memberId == memberId));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, id, time, title, meta, state);
+  int get hashCode =>
+      Object.hash(runtimeType, id, time, title, meta, state, memberId);
 
   /// Create a copy of AdminSessionSlot
   /// with the given fields replaced by the non-null parameter values.
@@ -221,6 +241,7 @@ abstract class _AdminSessionSlot implements AdminSessionSlot {
     required final String title,
     required final String meta,
     required final AdminSessionState state,
+    final String memberId,
   }) = _$AdminSessionSlotImpl;
 
   @override
@@ -233,6 +254,8 @@ abstract class _AdminSessionSlot implements AdminSessionSlot {
   String get meta;
   @override
   AdminSessionState get state;
+  @override
+  String get memberId;
 
   /// Create a copy of AdminSessionSlot
   /// with the given fields replaced by the non-null parameter values.

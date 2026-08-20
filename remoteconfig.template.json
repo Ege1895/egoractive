@@ -7850,6 +7850,54 @@
         "value": "{type} · {days} days"
       },
       "valueType": "STRING"
+    },
+    "lbl_sessions_management_mark_completed_action_tr": {
+      "defaultValue": {
+        "value": "Tamamlandı olarak işaretle"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_management_mark_completed_action_en": {
+      "defaultValue": {
+        "value": "Mark as completed"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_management_mark_absent_action_tr": {
+      "defaultValue": {
+        "value": "Gelmedi olarak işaretle"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_management_mark_absent_action_en": {
+      "defaultValue": {
+        "value": "Mark as no-show"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_management_attendance_current_status_tr": {
+      "defaultValue": {
+        "value": "Şu an: {status}"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_management_attendance_current_status_en": {
+      "defaultValue": {
+        "value": "Currently: {status}"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_management_attendance_error_tr": {
+      "defaultValue": {
+        "value": "Kaydedilemedi, bağlantını kontrol edip tekrar dene."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_management_attendance_error_en": {
+      "defaultValue": {
+        "value": "Could not save, check your connection and try again."
+      },
+      "valueType": "STRING"
     }
   }
 }

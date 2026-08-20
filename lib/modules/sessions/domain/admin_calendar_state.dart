@@ -14,6 +14,7 @@ class AdminSessionSlot with _$AdminSessionSlot {
     required String title,
     required String meta,
     required AdminSessionState state,
+    @Default('') String memberId,
   }) = _AdminSessionSlot;
 }
 

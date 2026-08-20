@@ -106,6 +106,7 @@ AdminSessionSlot _toAdminSlot(QueryDocumentSnapshot<Map<String, dynamic>> doc) {
     title: (data['memberName'] as String?) ?? '',
     meta: '${(data['trainerName'] as String?) ?? ''} · Birebir',
     state: state,
+    memberId: (data['memberId'] as String?) ?? '',
   );
 }
 

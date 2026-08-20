@@ -11,6 +11,7 @@ import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/native_date_picker.dart';
 import '../../controller/admin_calendar_controller.dart';
 import '../../domain/admin_calendar_state.dart';
+import '../../service/session_completion_service.dart';
 import '../../service/sessions_write_service.dart';
 import '../widgets/create_session_sheet.dart';
 
@@ -274,6 +275,24 @@ class _AdminSessionManagementPanelState
     return weekday >= 1 && weekday <= names.length ? names[weekday - 1] : '';
   }
 
+  String _statusLabelFor(AdminSessionState state) => switch (state) {
+    AdminSessionState.completed => ref.read(
+      rcTextProvider(RemoteConfigKeys.commonTamamlandi),
+    ),
+    AdminSessionState.absent => ref.read(
+      rcTextProvider(RemoteConfigKeys.trainersHomeNoShowLabel),
+    ),
+    AdminSessionState.current => ref.read(
+      rcTextProvider(RemoteConfigKeys.sessionsStatusNow),
+    ),
+    AdminSessionState.cancelled => ref.read(
+      rcTextProvider(RemoteConfigKeys.commonIptalLabel),
+    ),
+    AdminSessionState.planned => ref.read(
+      rcTextProvider(RemoteConfigKeys.sessionsFilterScheduled),
+    ),
+  };
+
   bool _matchesFilter(AdminSessionSlot slot) {
     return switch (_filter) {
       _SessionFilter.all => true,
@@ -292,6 +311,8 @@ class _AdminSessionManagementPanelState
     final typography = context.appTypography;
     var isCancelling = false;
     String? cancelError;
+    var isSettingAttendance = false;
+    String? attendanceError;
     showModalBottomSheet<void>(
       context: context,
       backgroundColor: colors.surface,
@@ -331,6 +352,124 @@ class _AdminSessionManagementPanelState
                     ),
                   ),
                   const SizedBox(height: AppSpacing.lg),
+                  if (slot.state != AdminSessionState.cancelled) ...[
+                    if (slot.state == AdminSessionState.completed ||
+                        slot.state == AdminSessionState.absent) ...[
+                      Text(
+                        ProviderScope.containerOf(sheetContext)
+                            .read(
+                              rcTextProvider(
+                                RemoteConfigKeys
+                                    .sessionsManagementAttendanceCurrentStatus,
+                              ),
+                            )
+                            .replaceAll(
+                              '{status}',
+                              _statusLabelFor(slot.state),
+                            ),
+                        style: typography.bodyMedium.copyWith(
+                          color: colors.onSurfaceMuted,
+                          fontSize: 13,
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.sm),
+                    ],
+                    if (attendanceError != null) ...[
+                      Text(
+                        attendanceError!,
+                        style: typography.bodyMedium.copyWith(
+                          color: colors.error,
+                          fontSize: 13,
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.sm),
+                    ],
+                    AppButton(
+                      label: ProviderScope.containerOf(sheetContext).read(
+                        rcTextProvider(
+                          RemoteConfigKeys
+                              .sessionsManagementMarkCompletedAction,
+                        ),
+                      ),
+                      variant: AppButtonVariant.secondary,
+                      onPressed: isSettingAttendance
+                          ? null
+                          : () async {
+                              setLocalState(() {
+                                isSettingAttendance = true;
+                                attendanceError = null;
+                              });
+                              try {
+                                await ref
+                                    .read(sessionCompletionServiceProvider)
+                                    .setAttendance(
+                                      sessionId: slot.id,
+                                      memberId: slot.memberId,
+                                      attended: true,
+                                    );
+                                if (sheetContext.mounted) {
+                                  Navigator.of(sheetContext).pop();
+                                }
+                              } catch (_) {
+                                setLocalState(() {
+                                  isSettingAttendance = false;
+                                  attendanceError =
+                                      ProviderScope.containerOf(
+                                        sheetContext,
+                                      ).read(
+                                        rcTextProvider(
+                                          RemoteConfigKeys
+                                              .sessionsManagementAttendanceError,
+                                        ),
+                                      );
+                                });
+                              }
+                            },
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                    AppButton(
+                      label: ProviderScope.containerOf(sheetContext).read(
+                        rcTextProvider(
+                          RemoteConfigKeys.sessionsManagementMarkAbsentAction,
+                        ),
+                      ),
+                      variant: AppButtonVariant.secondary,
+                      onPressed: isSettingAttendance
+                          ? null
+                          : () async {
+                              setLocalState(() {
+                                isSettingAttendance = true;
+                                attendanceError = null;
+                              });
+                              try {
+                                await ref
+                                    .read(sessionCompletionServiceProvider)
+                                    .setAttendance(
+                                      sessionId: slot.id,
+                                      memberId: slot.memberId,
+                                      attended: false,
+                                    );
+                                if (sheetContext.mounted) {
+                                  Navigator.of(sheetContext).pop();
+                                }
+                              } catch (_) {
+                                setLocalState(() {
+                                  isSettingAttendance = false;
+                                  attendanceError =
+                                      ProviderScope.containerOf(
+                                        sheetContext,
+                                      ).read(
+                                        rcTextProvider(
+                                          RemoteConfigKeys
+                                              .sessionsManagementAttendanceError,
+                                        ),
+                                      );
+                                });
+                              }
+                            },
+                    ),
+                    const SizedBox(height: AppSpacing.lg),
+                  ],
                   AppButton(
                     label: ProviderScope.containerOf(
                       sheetContext,
