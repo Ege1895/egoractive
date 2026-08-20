@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/base_panel.dart';
+import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/progress_ring.dart';
 import '../../controller/package_controller.dart';
@@ -33,7 +34,9 @@ class _PackagePanelState extends BasePanelState<PackagePanel> {
           ),
           children: [
             Text(
-              'Paketim',
+              ref.watch(
+                rcTextProvider(RemoteConfigKeys.packagesMemberPackageTitle),
+              ),
               style: typography.headingLarge.copyWith(color: colors.onSurface),
             ),
             const SizedBox(height: AppSpacing.lg),
@@ -63,7 +66,11 @@ class _PackagePanelState extends BasePanelState<PackagePanel> {
                               ),
                             ),
                             Text(
-                              'kalan',
+                              ref.watch(
+                                rcTextProvider(
+                                  RemoteConfigKeys.packagesRemainingWord,
+                                ),
+                              ),
                               style: typography.caption.copyWith(
                                 color: colors.onSurfaceMuted,
                                 fontSize: 11,
@@ -86,7 +93,21 @@ class _PackagePanelState extends BasePanelState<PackagePanel> {
                             ),
                             const SizedBox(height: AppSpacing.xs),
                             Text(
-                              '${pkg.remainingSessions} dersin kaldı. Telafi hakkın: ${pkg.makeupSessions} seans.',
+                              ref
+                                  .watch(
+                                    rcTextProvider(
+                                      RemoteConfigKeys
+                                          .packagesRemainingWithMakeupCaption,
+                                    ),
+                                  )
+                                  .replaceAll(
+                                    '{remaining}',
+                                    '${pkg.remainingSessions}',
+                                  )
+                                  .replaceAll(
+                                    '{makeup}',
+                                    '${pkg.makeupSessions}',
+                                  ),
                               style: typography.bodyMedium.copyWith(
                                 color: colors.onSurfaceVariant,
                               ),
@@ -101,13 +122,20 @@ class _PackagePanelState extends BasePanelState<PackagePanel> {
                     children: [
                       Expanded(
                         child: _InfoTile(
-                          label: 'Başlangıç',
+                          label: ref.watch(
+                            rcTextProvider(RemoteConfigKeys.packagesStartLabel),
+                          ),
                           value: pkg.startDate,
                         ),
                       ),
                       const SizedBox(width: AppSpacing.sm),
                       Expanded(
-                        child: _InfoTile(label: 'Bitiş', value: pkg.endDate),
+                        child: _InfoTile(
+                          label: ref.watch(
+                            rcTextProvider(RemoteConfigKeys.commonBitisLabel),
+                          ),
+                          value: pkg.endDate,
+                        ),
                       ),
                     ],
                   ),
@@ -149,7 +177,17 @@ class _PackagePanelState extends BasePanelState<PackagePanel> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Son ${pkg.remainingSessions} dersin kaldı',
+                          ref
+                              .watch(
+                                rcTextProvider(
+                                  RemoteConfigKeys
+                                      .packagesLowSessionsWarningTitle,
+                                ),
+                              )
+                              .replaceAll(
+                                '{remaining}',
+                                '${pkg.remainingSessions}',
+                              ),
                           style: typography.headingSmall.copyWith(
                             color: colors.onWarningContainer,
                             fontSize: 16,
@@ -157,7 +195,14 @@ class _PackagePanelState extends BasePanelState<PackagePanel> {
                         ),
                         const SizedBox(height: AppSpacing.xs),
                         Text(
-                          'Paket bitmeden yenilemek istersen antrenörün ${pkg.trainerName} ile konuşabilirsin.',
+                          ref
+                              .watch(
+                                rcTextProvider(
+                                  RemoteConfigKeys
+                                      .packagesRenewWithTrainerCaption,
+                                ),
+                              )
+                              .replaceAll('{trainer}', pkg.trainerName),
                           style: typography.bodyMedium.copyWith(
                             color: colors.onSurfaceVariant,
                           ),
@@ -183,7 +228,11 @@ class _PackagePanelState extends BasePanelState<PackagePanel> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Antrenörün',
+                          ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.packagesTrainerOwnerLabel,
+                            ),
+                          ),
                           style: typography.headingSmall.copyWith(
                             color: colors.onSurface,
                             fontSize: 16,

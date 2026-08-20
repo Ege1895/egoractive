@@ -27,6 +27,8 @@ class _FakeRemoteConfigService extends RemoteConfigService {
 
   static const _values = <String, String>{
     'lbl_sessions_calendar_view_toggle': 'Takvim',
+    'lbl_measurements_chart_toggle_label': 'Grafik',
+    'lbl_group_sessions_discover_tab_events': 'Etkinlikler',
   };
 
   @override

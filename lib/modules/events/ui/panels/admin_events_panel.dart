@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
+import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_back_button.dart';
 import '../../controller/gym_events_controller.dart';
@@ -31,23 +32,57 @@ class _AdminEventsPanelState extends BasePanelState<AdminEventsPanel> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.md, AppSpacing.screenEdge, 0),
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.screenEdge,
+                AppSpacing.md,
+                AppSpacing.screenEdge,
+                0,
+              ),
               child: Row(
                 children: [
-                  AppBackButton(onTap: () => ref.read(panelStackControllerProvider.notifier).pop()),
+                  AppBackButton(
+                    onTap: () =>
+                        ref.read(panelStackControllerProvider.notifier).pop(),
+                  ),
                   const SizedBox(width: AppSpacing.md),
-                  Expanded(child: Text('Etkinlikler', style: typography.headingSmall.copyWith(color: colors.onSurface, fontSize: 18))),
+                  Expanded(
+                    child: Text(
+                      ref.watch(
+                        rcTextProvider(RemoteConfigKeys.eventsAdminListTitle),
+                      ),
+                      style: typography.headingSmall.copyWith(
+                        color: colors.onSurface,
+                        fontSize: 18,
+                      ),
+                    ),
+                  ),
                   Material(
                     color: colors.primary,
                     borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
                     child: InkWell(
-                      borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
-                      onTap: () => ref.read(panelStackControllerProvider.notifier).push(const CreateEventPanel()),
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusInner,
+                      ),
+                      onTap: () => ref
+                          .read(panelStackControllerProvider.notifier)
+                          .push(const CreateEventPanel()),
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.md,
+                        ),
                         constraints: const BoxConstraints(minHeight: 40),
                         alignment: Alignment.center,
-                        child: Text('+ Etkinlik', style: typography.headingSmall.copyWith(fontSize: 14, color: colors.onPrimary)),
+                        child: Text(
+                          ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.eventsAddEventButton,
+                            ),
+                          ),
+                          style: typography.headingSmall.copyWith(
+                            fontSize: 14,
+                            color: colors.onPrimary,
+                          ),
+                        ),
                       ),
                     ),
                   ),
@@ -56,7 +91,12 @@ class _AdminEventsPanelState extends BasePanelState<AdminEventsPanel> {
             ),
             Expanded(
               child: ListView(
-                padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.md, AppSpacing.screenEdge, AppSpacing.lg),
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.screenEdge,
+                  AppSpacing.md,
+                  AppSpacing.screenEdge,
+                  AppSpacing.lg,
+                ),
                 children: [
                   for (final event in events) _EventCard(event: event),
                 ],
@@ -69,20 +109,24 @@ class _AdminEventsPanelState extends BasePanelState<AdminEventsPanel> {
   }
 }
 
-class _EventCard extends StatelessWidget {
+class _EventCard extends ConsumerWidget {
   const _EventCard({required this.event});
 
   final GymEvent event;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.appColors;
     final typography = context.appTypography;
 
     return Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.md),
       padding: const EdgeInsets.all(AppSpacing.lg),
-      decoration: BoxDecoration(color: colors.surface, borderRadius: BorderRadius.circular(AppSpacing.radiusCard), border: Border.all(color: colors.outline)),
+      decoration: BoxDecoration(
+        color: colors.surface,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
+        border: Border.all(color: colors.outline),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -92,11 +136,26 @@ class _EventCard extends StatelessWidget {
               Container(
                 width: 52,
                 padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
-                decoration: BoxDecoration(color: colors.surfaceRaised, borderRadius: BorderRadius.circular(AppSpacing.radiusInner)),
+                decoration: BoxDecoration(
+                  color: colors.surfaceRaised,
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+                ),
                 child: Column(
                   children: [
-                    Text(event.day, style: typography.dataMedium.copyWith(color: colors.onSurface, fontSize: 20)),
-                    Text(event.month, style: typography.caption.copyWith(color: colors.onSurfaceMuted, fontSize: 11)),
+                    Text(
+                      event.day,
+                      style: typography.dataMedium.copyWith(
+                        color: colors.onSurface,
+                        fontSize: 20,
+                      ),
+                    ),
+                    Text(
+                      event.month,
+                      style: typography.caption.copyWith(
+                        color: colors.onSurfaceMuted,
+                        fontSize: 11,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -105,8 +164,20 @@ class _EventCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(event.name, style: typography.headingSmall.copyWith(color: colors.onSurface, fontSize: 17)),
-                    Text(event.meta, style: typography.bodyMedium.copyWith(color: colors.onSurfaceMuted, fontSize: 13)),
+                    Text(
+                      event.name,
+                      style: typography.headingSmall.copyWith(
+                        color: colors.onSurface,
+                        fontSize: 17,
+                      ),
+                    ),
+                    Text(
+                      event.meta,
+                      style: typography.bodyMedium.copyWith(
+                        color: colors.onSurfaceMuted,
+                        fontSize: 13,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -117,12 +188,36 @@ class _EventCard extends StatelessWidget {
             children: [
               Expanded(
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
-                  decoration: BoxDecoration(color: colors.surfaceRaised, borderRadius: BorderRadius.circular(AppSpacing.radiusInner)),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.md,
+                    vertical: AppSpacing.sm,
+                  ),
+                  decoration: BoxDecoration(
+                    color: colors.surfaceRaised,
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+                  ),
                   child: Row(
                     children: [
-                      Expanded(child: Text('Katılan', style: typography.caption.copyWith(color: colors.onSurfaceMuted, fontSize: 12))),
-                      Text('${event.joined}', style: typography.headingSmall.copyWith(color: colors.onSurface, fontSize: 15)),
+                      Expanded(
+                        child: Text(
+                          ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.eventsAttendingLabel,
+                            ),
+                          ),
+                          style: typography.caption.copyWith(
+                            color: colors.onSurfaceMuted,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ),
+                      Text(
+                        '${event.joined}',
+                        style: typography.headingSmall.copyWith(
+                          color: colors.onSurface,
+                          fontSize: 15,
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -130,12 +225,36 @@ class _EventCard extends StatelessWidget {
               const SizedBox(width: AppSpacing.sm),
               Expanded(
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
-                  decoration: BoxDecoration(color: colors.surfaceRaised, borderRadius: BorderRadius.circular(AppSpacing.radiusInner)),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.md,
+                    vertical: AppSpacing.sm,
+                  ),
+                  decoration: BoxDecoration(
+                    color: colors.surfaceRaised,
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+                  ),
                   child: Row(
                     children: [
-                      Expanded(child: Text('Kontenjan', style: typography.caption.copyWith(color: colors.onSurfaceMuted, fontSize: 12))),
-                      Text(event.capacityLabel, style: typography.headingSmall.copyWith(color: colors.onSurfaceVariant, fontSize: 15)),
+                      Expanded(
+                        child: Text(
+                          ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.eventsCapacityLabel,
+                            ),
+                          ),
+                          style: typography.caption.copyWith(
+                            color: colors.onSurfaceMuted,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ),
+                      Text(
+                        event.capacityLabel,
+                        style: typography.headingSmall.copyWith(
+                          color: colors.onSurfaceVariant,
+                          fontSize: 15,
+                        ),
+                      ),
                     ],
                   ),
                 ),

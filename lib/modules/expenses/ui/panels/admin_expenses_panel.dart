@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
+import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/utils/thousands_input_formatter.dart';
 import '../../controller/expenses_controller.dart';
@@ -42,7 +43,9 @@ class AdminExpensesPanel extends ConsumerWidget {
                 children: [
                   Expanded(
                     child: Text(
-                      'Giderler',
+                      ref.watch(
+                        rcTextProvider(RemoteConfigKeys.expensesListTitle),
+                      ),
                       style: typography.headingLarge.copyWith(
                         color: colors.onSurface,
                       ),
@@ -65,7 +68,11 @@ class AdminExpensesPanel extends ConsumerWidget {
                         constraints: const BoxConstraints(minHeight: 40),
                         alignment: Alignment.center,
                         child: Text(
-                          '+ Gider',
+                          ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.expensesAddExpenseButton,
+                            ),
+                          ),
                           style: typography.headingSmall.copyWith(
                             fontSize: 14,
                             color: colors.onPrimary,
@@ -99,7 +106,13 @@ class AdminExpensesPanel extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          '${state.monthLabel} toplam gider',
+                          ref
+                              .watch(
+                                rcTextProvider(
+                                  RemoteConfigKeys.expensesMonthlyTotalLabel,
+                                ),
+                              )
+                              .replaceAll('{month}', state.monthLabel),
                           style: typography.bodyMedium.copyWith(
                             color: colors.onSurfaceMuted,
                             fontSize: 13,
@@ -115,7 +128,13 @@ class AdminExpensesPanel extends ConsumerWidget {
                         ),
                         const SizedBox(height: AppSpacing.xs),
                         Text(
-                          'Ciroya oranı ${state.revenueRatioLabel}',
+                          ref
+                              .watch(
+                                rcTextProvider(
+                                  RemoteConfigKeys.expensesRevenueRatioLabel,
+                                ),
+                              )
+                              .replaceAll('{ratio}', state.revenueRatioLabel),
                           style: typography.bodyMedium.copyWith(
                             color: colors.onSurfaceVariant,
                             fontSize: 13,
@@ -126,7 +145,11 @@ class AdminExpensesPanel extends ConsumerWidget {
                   ),
                   const SizedBox(height: AppSpacing.lg),
                   Text(
-                    'KATEGORİLER',
+                    ref.watch(
+                      rcTextProvider(
+                        RemoteConfigKeys.expensesCategoriesSectionHeader,
+                      ),
+                    ),
                     style: typography.caption.copyWith(
                       color: colors.onSurfaceMuted,
                       letterSpacing: 1.2,
@@ -163,7 +186,11 @@ class AdminExpensesPanel extends ConsumerWidget {
                   ),
                   const SizedBox(height: AppSpacing.lg),
                   Text(
-                    'SON KAYITLAR',
+                    ref.watch(
+                      rcTextProvider(
+                        RemoteConfigKeys.expensesRecentEntriesSectionHeader,
+                      ),
+                    ),
                     style: typography.caption.copyWith(
                       color: colors.onSurfaceMuted,
                       letterSpacing: 1.2,

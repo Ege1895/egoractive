@@ -256,6 +256,11 @@ abstract final class RemoteConfigKeys {
   static const eventsDescriptionFieldLabel =
       'lbl_events_description_field_label';
   static const eventsCreateSubmitButton = 'lbl_events_create_submit_button';
+  static const eventsDateFieldHint = 'lbl_events_date_field_hint';
+  static const eventsTimeFieldHint = 'lbl_events_time_field_hint';
+  static const eventsNameRequiredError = 'lbl_events_name_required_error';
+  static const eventsDateFormatError = 'lbl_events_date_format_error';
+  static const eventsCreateFailedError = 'lbl_events_create_failed_error';
   static const expensesListTitle = 'lbl_expenses_list_title';
   static const expensesAddExpenseButton = 'lbl_expenses_add_expense_button';
   static const expensesCategoriesSectionHeader =
@@ -273,16 +278,64 @@ abstract final class RemoteConfigKeys {
       'lbl_expenses_description_field_label';
   static const expensesDateFieldLabel = 'lbl_expenses_date_field_label';
   static const expensesSubmitButton = 'lbl_expenses_submit_button';
+  static const expensesAmountFieldHint = 'lbl_expenses_amount_field_hint';
+  static const expensesCategoryPickerTitle =
+      'lbl_expenses_category_picker_title';
+  static const expensesDescriptionFieldHint =
+      'lbl_expenses_description_field_hint';
+  static const expensesTrainerCommissionNote =
+      'lbl_expenses_trainer_commission_note';
+  static const expensesAmountInvalidError = 'lbl_expenses_amount_invalid_error';
+  static const expensesDescriptionRequiredError =
+      'lbl_expenses_description_required_error';
+  static const expensesSaveFailedError = 'lbl_expenses_save_failed_error';
+
+  /// `{month}` yer tutucusu ay adıyla değiştirilir.
+  static const expensesMonthlyTotalLabel = 'lbl_expenses_monthly_total_label';
+
+  /// `{ratio}` yer tutucusu ciro oranıyla değiştirilir.
+  static const expensesRevenueRatioLabel = 'lbl_expenses_revenue_ratio_label';
   static const feedbackAdminListTitle = 'lbl_feedback_admin_list_title';
   static const feedbackMemberFormTitle = 'lbl_feedback_member_form_title';
   static const feedbackCommentSectionHeader =
       'lbl_feedback_comment_section_header';
+
+  /// `{count}` yer tutucusu toplam değerlendirme sayısıyla değiştirilir.
+  static const feedbackTotalReviewsCaption =
+      'lbl_feedback_total_reviews_caption';
+  static const feedbackHowWasSessionTitle =
+      'lbl_feedback_how_was_session_title';
+
+  /// `{trainer}` yer tutucusu antrenör adıyla değiştirilir.
+  static const feedbackPrivacyNoteWithTrainer =
+      'lbl_feedback_privacy_note_with_trainer';
+  static const feedbackPrivacyNote = 'lbl_feedback_privacy_note';
+  static const feedbackCommentFieldHint = 'lbl_feedback_comment_field_hint';
+  static const feedbackSubmitButton = 'lbl_feedback_submit_button';
+  static const feedbackGiveStarToSubmitHint =
+      'lbl_feedback_give_star_to_submit_hint';
+  static const feedbackSentAnonymouslyHint =
+      'lbl_feedback_sent_anonymously_hint';
+  static const feedbackRatingLabel0 = 'lbl_feedback_rating_label_0';
+  static const feedbackRatingLabel1 = 'lbl_feedback_rating_label_1';
+  static const feedbackRatingLabel2 = 'lbl_feedback_rating_label_2';
+  static const feedbackRatingLabel3 = 'lbl_feedback_rating_label_3';
+  static const feedbackRatingLabel4 = 'lbl_feedback_rating_label_4';
+  static const feedbackRatingLabel5 = 'lbl_feedback_rating_label_5';
   static const groupSessionsAdminListTitle =
       'lbl_group_sessions_admin_list_title';
   static const groupSessionsAddGroupSessionButton =
       'lbl_group_sessions_add_group_session_button';
   static const groupSessionsCapacitySuffixLabel =
       'lbl_group_sessions_capacity_suffix_label';
+  static const groupSessionsCapacityFullNote =
+      'lbl_group_sessions_capacity_full_note';
+
+  /// `{remaining}` yer tutucusu kalan kontenjan sayısıyla değiştirilir.
+  static const groupSessionsCapacityLowNote =
+      'lbl_group_sessions_capacity_low_note';
+  static const groupSessionsCapacityAvailableNote =
+      'lbl_group_sessions_capacity_available_note';
   static const groupSessionsViewParticipantsLink =
       'lbl_group_sessions_view_participants_link';
   static const groupSessionsDiscoverTitle = 'lbl_group_sessions_discover_title';
@@ -309,6 +362,47 @@ abstract final class RemoteConfigKeys {
       'lbl_group_sessions_duration_field_label';
   static const groupSessionsCreateSubmitButton =
       'lbl_group_sessions_create_submit_button';
+
+  /// `{minutes}` yer tutucusu ders süresiyle değiştirilir.
+  static const groupSessionsDurationSuffix =
+      'lbl_group_sessions_duration_suffix';
+
+  /// `{max}` yer tutucusu kontenjan üst sınırıyla değiştirilir.
+  static const groupSessionsCapacityMaxNote =
+      'lbl_group_sessions_capacity_max_note';
+
+  /// `{studio}` ve `{max}` yer tutucuları stüdyo adı ve kontenjan üst
+  /// sınırıyla değiştirilir.
+  static const groupSessionsCapacityMaxNoteWithStudio =
+      'lbl_group_sessions_capacity_max_note_with_studio';
+  static const groupSessionsLocationFieldHint =
+      'lbl_group_sessions_location_field_hint';
+  static const groupSessionsLocationFieldHelper =
+      'lbl_group_sessions_location_field_helper';
+  static const groupSessionsDurationPickerTitle =
+      'lbl_group_sessions_duration_picker_title';
+  static const groupSessionsDiscoverEmptyState =
+      'lbl_group_sessions_discover_empty_state';
+  static const groupSessionsJoinFullErrorSnackbar =
+      'lbl_group_sessions_join_full_error_snackbar';
+  static const groupSessionsJoinFailedSnackbar =
+      'lbl_group_sessions_join_failed_snackbar';
+  static const groupSessionsLockedJoinButton =
+      'lbl_group_sessions_locked_join_button';
+  static const groupSessionsWaitlistJoinButton =
+      'lbl_group_sessions_waitlist_join_button';
+  static const groupSessionsJoinedLeaveButton =
+      'lbl_group_sessions_joined_leave_button';
+  static const groupSessionsJoinButton = 'lbl_group_sessions_join_button';
+
+  /// `{taken}` yer tutucusu katılımcı sayısıyla değiştirilir.
+  static const groupSessionsAttendingCountNoCapacity =
+      'lbl_group_sessions_attending_count_no_capacity';
+
+  /// `{taken}` ve `{capacity}` yer tutucuları katılımcı sayısı ve
+  /// kontenjanla değiştirilir.
+  static const groupSessionsAttendingCountWithCapacity =
+      'lbl_group_sessions_attending_count_with_capacity';
   static const gymsAdminHomeCompletedWord =
       'lbl_gyms_admin_home_completed_word';
   static const gymsAdminHomeTrainerPerformanceSection =
@@ -517,6 +611,51 @@ abstract final class RemoteConfigKeys {
   static const measurementsSelectedPointLabel =
       'lbl_measurements_selected_point_label';
   static const measurementsHistorySection = 'lbl_measurements_history_section';
+
+  /// `{name}` yer tutucusu üye adıyla değiştirilir.
+  static const measurementsMemberTitle = 'lbl_measurements_member_title';
+  static const measurementsAvatarHint = 'lbl_measurements_avatar_hint';
+  static const measurementsChartHint = 'lbl_measurements_chart_hint';
+  static const measurementsChartToggleLabel =
+      'lbl_measurements_chart_toggle_label';
+  static const measurementsAvatarToggleLabel =
+      'lbl_measurements_avatar_toggle_label';
+  static const measurementsDatePickerTitle =
+      'lbl_measurements_date_picker_title';
+  static const measurementsLatestRecordOption =
+      'lbl_measurements_latest_record_option';
+  static const measurementsShowingLatestLabel =
+      'lbl_measurements_showing_latest_label';
+
+  /// `{date}` yer tutucusu seçili tarihle değiştirilir.
+  static const measurementsShowingDateLabel =
+      'lbl_measurements_showing_date_label';
+  static const measurementsChangeDateLabel =
+      'lbl_measurements_change_date_label';
+  static const measurementsValueFieldHint = 'lbl_measurements_value_field_hint';
+  static const measurementsEmptyPointHint = 'lbl_measurements_empty_point_hint';
+  static const measurementsSaveFailedError =
+      'lbl_measurements_save_failed_error';
+
+  /// `{metric}` yer tutucusu ölçüm metriği adıyla değiştirilir.
+  static const measurementsNoDataForMetric =
+      'lbl_measurements_no_data_for_metric';
+
+  /// `{metric}` yer tutucusu ölçüm metriği adıyla değiştirilir.
+  static const measurementsMetricLatestLabel =
+      'lbl_measurements_metric_latest_label';
+  static const measurementsNoChangeLabel = 'lbl_measurements_no_change_label';
+
+  /// `{delta}` yer tutucusu 6 aylık değişim değeriyle değiştirilir.
+  static const measurementsSixMonthDeltaLabel =
+      'lbl_measurements_six_month_delta_label';
+  static const measurementsLatestMeasurementLabel =
+      'lbl_measurements_latest_measurement_label';
+  static const measurementsSwitchToAvatarCta =
+      'lbl_measurements_switch_to_avatar_cta';
+
+  /// `{metric}` yer tutucusu ölçüm metriği adıyla değiştirilir.
+  static const measurementsAddMetricLabel = 'lbl_measurements_add_metric_label';
   static const membersDetailPaymentStatusLabel =
       'lbl_members_detail_payment_status_label';
   static const membersDetailRemainingSessionsLabel =
@@ -650,6 +789,42 @@ abstract final class RemoteConfigKeys {
   static const packagesRemainingWord = 'lbl_packages_remaining_word';
   static const packagesTrainerOwnerLabel = 'lbl_packages_trainer_owner_label';
   static const packagesStartLabel = 'lbl_packages_start_label';
+  static const packagesAddTitle = 'lbl_packages_add_title';
+  static const packagesEditTitle = 'lbl_packages_edit_title';
+  static const packagesNameFieldHint = 'lbl_packages_name_field_hint';
+  static const packagesSessionCountFieldHint =
+      'lbl_packages_session_count_field_hint';
+  static const packagesValidityFieldHint = 'lbl_packages_validity_field_hint';
+
+  /// `{price}` yer tutucusu seans başı fiyatla değiştirilir.
+  static const packagesPerSessionPriceCaption =
+      'lbl_packages_per_session_price_caption';
+  static const packagesDeleteFailedError = 'lbl_packages_delete_failed_error';
+  static const packagesNameRequiredError = 'lbl_packages_name_required_error';
+  static const packagesSessionCountInvalidError =
+      'lbl_packages_session_count_invalid_error';
+  static const packagesValidityInvalidError =
+      'lbl_packages_validity_invalid_error';
+  static const packagesSaveFailedError = 'lbl_packages_save_failed_error';
+
+  /// `{remaining}` ve `{makeup}` yer tutucuları kalan ders ve telafi hakkı
+  /// sayısıyla değiştirilir.
+  static const packagesRemainingWithMakeupCaption =
+      'lbl_packages_remaining_with_makeup_caption';
+
+  /// `{remaining}` yer tutucusu kalan ders sayısıyla değiştirilir.
+  static const packagesLowSessionsWarningTitle =
+      'lbl_packages_low_sessions_warning_title';
+
+  /// `{trainer}` yer tutucusu antrenör adıyla değiştirilir.
+  static const packagesRenewWithTrainerCaption =
+      'lbl_packages_renew_with_trainer_caption';
+
+  /// `{count}` ve `{days}` yer tutucuları seans sayısı ve geçerlilik
+  /// gün sayısıyla değiştirilir.
+  static const packagesSessionCountValidityCaption =
+      'lbl_packages_session_count_validity_caption';
+  static const packagesOffSaleLabel = 'lbl_packages_off_sale_label';
   static const sessionsCalendarTitle = 'lbl_sessions_calendar_title';
   static const sessionsCalendarSlotTimeLabel =
       'lbl_sessions_calendar_slot_time_label';
@@ -848,6 +1023,9 @@ abstract final class RemoteConfigKeys {
       'lbl_trainers_management_trainer_count_suffix';
   static const trainersAddTrainerSavingLabel =
       'lbl_trainers_add_trainer_saving_label';
+  static const trainersEditTrainerFormTitle =
+      'lbl_trainers_edit_trainer_form_title';
+  static const trainersEditTrainerError = 'lbl_trainers_edit_trainer_error';
   static const trainersCalendarWeekRange = 'lbl_trainers_calendar_week_range';
   static const trainersCalendarDayEmptyMessage =
       'lbl_trainers_calendar_day_empty_message';
@@ -1129,6 +1307,13 @@ class RemoteConfigService {
     'lbl_events_time_field_label_tr': 'Saat',
     'lbl_events_description_field_label_tr': 'Açıklama',
     'lbl_events_create_submit_button_tr': 'Etkinliği oluştur',
+    'lbl_events_date_field_hint_tr': '16 Ağu 2026',
+    'lbl_events_time_field_hint_tr': '08:00',
+    'lbl_events_name_required_error_tr': 'Etkinlik adı boş bırakılamaz.',
+    'lbl_events_date_format_error_tr':
+        'Tarihi "gün ay yıl" formatında gir (örn. 16 Ağu 2026).',
+    'lbl_events_create_failed_error_tr':
+        'Etkinlik oluşturulamadı, tekrar dene.',
     'lbl_expenses_list_title_tr': 'Giderler',
     'lbl_expenses_add_expense_button_tr': '+ Gider',
     'lbl_expenses_categories_section_header_tr': 'KATEGORİLER',
@@ -1142,12 +1327,42 @@ class RemoteConfigService {
     'lbl_expenses_description_field_label_tr': 'Açıklama',
     'lbl_expenses_date_field_label_tr': 'Tarih',
     'lbl_expenses_submit_button_tr': 'Gideri kaydet',
+    'lbl_expenses_amount_field_hint_tr': '8.400',
+    'lbl_expenses_category_picker_title_tr': 'Kategori seç',
+    'lbl_expenses_description_field_hint_tr': 'Reformer yay değişimi',
+    'lbl_expenses_trainer_commission_note_tr':
+        'Antrenör primleri seans onaylarından otomatik hesaplanır; buraya elle girilmez.',
+    'lbl_expenses_amount_invalid_error_tr': 'Geçerli bir tutar gir.',
+    'lbl_expenses_description_required_error_tr': 'Açıklama boş bırakılamaz.',
+    'lbl_expenses_save_failed_error_tr': 'Gider kaydedilemedi, tekrar dene.',
+    'lbl_expenses_monthly_total_label_tr': '{month} toplam gider',
+    'lbl_expenses_revenue_ratio_label_tr': 'Ciroya oranı {ratio}',
     'lbl_feedback_admin_list_title_tr': 'Geri bildirimler',
     'lbl_feedback_member_form_title_tr': 'Geri bildirim',
     'lbl_feedback_comment_section_header_tr': 'YORUMUN (İSTEĞE BAĞLI)',
+    'lbl_feedback_total_reviews_caption_tr': '{count} değerlendirme',
+    'lbl_feedback_how_was_session_title_tr': 'Dersin nasıl geçti?',
+    'lbl_feedback_privacy_note_with_trainer_tr':
+        '{trainer} ile birebir · Yalnızca stüdyo yönetimi görür, antrenörüne isimsiz iletilir.',
+    'lbl_feedback_privacy_note_tr':
+        'Yalnızca stüdyo yönetimi görür, antrenörüne isimsiz iletilir.',
+    'lbl_feedback_comment_field_hint_tr':
+        'Isınma bölümü bu hafta çok iyiydi, esneme için 5 dakika daha olsa harika olur.',
+    'lbl_feedback_submit_button_tr': 'Gönder',
+    'lbl_feedback_give_star_to_submit_hint_tr': 'Göndermek için yıldız ver',
+    'lbl_feedback_sent_anonymously_hint_tr': 'Antrenörüne isimsiz iletilir',
+    'lbl_feedback_rating_label_0_tr': 'Puan vermek için dokun',
+    'lbl_feedback_rating_label_1_tr': 'Hiç iyi geçmedi',
+    'lbl_feedback_rating_label_2_tr': 'Beklediğim gibi değildi',
+    'lbl_feedback_rating_label_3_tr': 'Fena değildi',
+    'lbl_feedback_rating_label_4_tr': 'İyiydi',
+    'lbl_feedback_rating_label_5_tr': 'Harikaydı',
     'lbl_group_sessions_admin_list_title_tr': 'Grup dersleri',
     'lbl_group_sessions_add_group_session_button_tr': '+ Grup dersi',
     'lbl_group_sessions_capacity_suffix_label_tr': 'kontenjan',
+    'lbl_group_sessions_capacity_full_note_tr': 'Kontenjan doldu',
+    'lbl_group_sessions_capacity_low_note_tr': 'Son {remaining} yer',
+    'lbl_group_sessions_capacity_available_note_tr': 'Yer var',
     'lbl_group_sessions_view_participants_link_tr': 'Katılımcıları gör',
     'lbl_group_sessions_discover_title_tr': 'Keşfet',
     'lbl_group_sessions_discover_tab_group_sessions_tr': 'Grup dersleri',
@@ -1159,11 +1374,32 @@ class RemoteConfigService {
         'Online rezervasyona açık',
     'lbl_group_sessions_online_booking_toggle_description_tr':
         'Üyeler Keşfet\'ten katılabilir',
-    'lbl_group_sessions_default_location_label_tr': 'Stüdyo',
+    'lbl_group_sessions_default_location_label_tr': 'Ders yeri (opsiyonel)',
     'lbl_group_sessions_name_field_label_tr': 'Ders adı',
     'lbl_group_sessions_start_time_field_label_tr': 'Başlangıç saati',
     'lbl_group_sessions_duration_field_label_tr': 'Süre',
     'lbl_group_sessions_create_submit_button_tr': 'Grup dersini oluştur',
+    'lbl_group_sessions_duration_suffix_tr': '{minutes} dk',
+    'lbl_group_sessions_capacity_max_note_tr': 'Üst sınır {max} kişi',
+    'lbl_group_sessions_capacity_max_note_with_studio_tr':
+        '{studio} için üst sınır {max} kişi',
+    'lbl_group_sessions_location_field_hint_tr': 'Örn. Stüdyo 1, Ana salon',
+    'lbl_group_sessions_location_field_helper_tr':
+        'Dersin nerede yapılacağını üyelere gösterir.',
+    'lbl_group_sessions_duration_picker_title_tr': 'Süre seç',
+    'lbl_group_sessions_discover_empty_state_tr':
+        'Şu anda açık kayıt yok — yeni bir tarih eklendiğinde burada görünecek.',
+    'lbl_group_sessions_join_full_error_snackbar_tr': 'Bu ders az önce doldu.',
+    'lbl_group_sessions_join_failed_snackbar_tr':
+        'Katılım kaydedilemedi, tekrar dene.',
+    'lbl_group_sessions_locked_join_button_tr': 'Kilitli · Başlangıç yaklaştı',
+    'lbl_group_sessions_waitlist_join_button_tr': 'Yedek listesine yaz',
+    'lbl_group_sessions_joined_leave_button_tr': 'Katılıyorsun · Vazgeç',
+    'lbl_group_sessions_join_button_tr': 'Katılıyorum',
+    'lbl_group_sessions_attending_count_no_capacity_tr':
+        '{taken} kişi katılıyor',
+    'lbl_group_sessions_attending_count_with_capacity_tr':
+        '{taken} / {capacity} kişi',
     'lbl_gyms_admin_home_completed_word_tr': 'tamamlanan',
     'lbl_gyms_admin_home_trainer_performance_section_tr':
         'ANTRENÖR PERFORMANSI',
@@ -1327,6 +1563,29 @@ class RemoteConfigService {
     'lbl_measurements_title_tr': 'Ölçümlerim',
     'lbl_measurements_selected_point_label_tr': 'Seçili nokta',
     'lbl_measurements_history_section_tr': 'ÖLÇÜM GEÇMİŞİ',
+    'lbl_measurements_member_title_tr': '{name} · Ölçümleri',
+    'lbl_measurements_avatar_hint_tr': 'Noktalara dokunarak değerleri gör',
+    'lbl_measurements_chart_hint_tr': 'metrik çiplerine dokun',
+    'lbl_measurements_chart_toggle_label_tr': 'Grafik',
+    'lbl_measurements_avatar_toggle_label_tr': 'Avatar',
+    'lbl_measurements_date_picker_title_tr': 'Tarih seç',
+    'lbl_measurements_latest_record_option_tr': 'Son kayıt',
+    'lbl_measurements_showing_latest_label_tr': 'Son kayıt gösteriliyor',
+    'lbl_measurements_showing_date_label_tr': '{date} gösteriliyor',
+    'lbl_measurements_change_date_label_tr': 'Tarih değiştir',
+    'lbl_measurements_value_field_hint_tr': 'Değer gir',
+    'lbl_measurements_empty_point_hint_tr':
+        'Henüz ölçüm eklenmedi — yukarıdan bir değer gir.',
+    'lbl_measurements_save_failed_error_tr':
+        'Ölçüm kaydedilemedi, tekrar dene.',
+    'lbl_measurements_no_data_for_metric_tr': '{metric} için henüz ölçüm yok.',
+    'lbl_measurements_metric_latest_label_tr': '{metric} · son ölçüm',
+    'lbl_measurements_no_change_label_tr': 'değişim yok',
+    'lbl_measurements_six_month_delta_label_tr': '6 ayda {delta}',
+    'lbl_measurements_latest_measurement_label_tr': 'Son ölçüm',
+    'lbl_measurements_switch_to_avatar_cta_tr':
+        'Ölçüm eklemek için Avatar\'a geç',
+    'lbl_measurements_add_metric_label_tr': '{metric} ekle',
     'lbl_members_detail_payment_status_label_tr': 'Ödeme durumu',
     'lbl_members_detail_remaining_sessions_label_tr': 'Kalan ders',
     'lbl_members_detail_makeup_label_tr': 'Telafi',
@@ -1428,6 +1687,27 @@ class RemoteConfigService {
     'lbl_packages_remaining_word_tr': 'kalan',
     'lbl_packages_trainer_owner_label_tr': 'Antrenörün',
     'lbl_packages_start_label_tr': 'Başlangıç',
+    'lbl_packages_add_title_tr': 'Paket ekle',
+    'lbl_packages_edit_title_tr': 'Paketi düzenle',
+    'lbl_packages_name_field_hint_tr': 'Birebir 12 Seans',
+    'lbl_packages_session_count_field_hint_tr': 'Örn. 12',
+    'lbl_packages_validity_field_hint_tr': 'Örn. 90',
+    'lbl_packages_per_session_price_caption_tr': 'seans başı ₺{price}',
+    'lbl_packages_delete_failed_error_tr': 'Paket silinemedi, tekrar dene.',
+    'lbl_packages_name_required_error_tr': 'Paket adı boş bırakılamaz.',
+    'lbl_packages_session_count_invalid_error_tr':
+        'Geçerli bir seans sayısı gir.',
+    'lbl_packages_validity_invalid_error_tr': 'Geçerli bir gün sayısı gir.',
+    'lbl_packages_save_failed_error_tr': 'Paket kaydedilemedi, tekrar dene.',
+    'lbl_packages_remaining_with_makeup_caption_tr':
+        '{remaining} dersin kaldı. Telafi hakkın: {makeup} seans.',
+    'lbl_packages_low_sessions_warning_title_tr':
+        'Son {remaining} dersin kaldı',
+    'lbl_packages_renew_with_trainer_caption_tr':
+        'Paket bitmeden yenilemek istersen antrenörün {trainer} ile konuşabilirsin.',
+    'lbl_packages_session_count_validity_caption_tr':
+        '{count} seans · {days} gün',
+    'lbl_packages_off_sale_label_tr': 'Kapalı',
     'lbl_sessions_calendar_title_tr': 'Takvim',
     'lbl_sessions_calendar_slot_time_label_tr': 'Saat',
     'lbl_sessions_calendar_slot_status_label_tr': 'Durum',
@@ -1574,6 +1854,9 @@ class RemoteConfigService {
     'lbl_trainers_add_trainer_name_hint_tr': 'Emre Kaya',
     'lbl_trainers_management_trainer_count_suffix_tr': '{count} kişi',
     'lbl_trainers_add_trainer_saving_label_tr': 'Ekleniyor…',
+    'lbl_trainers_edit_trainer_form_title_tr': 'Antrenörü düzenle',
+    'lbl_trainers_edit_trainer_error_tr':
+        'Antrenör güncellenemedi, tekrar dene.',
     'lbl_trainers_calendar_week_range_tr':
         '{startDay} – {endDay} {month} · {week}. hafta',
     'lbl_trainers_calendar_day_empty_message_tr':
@@ -1733,6 +2016,12 @@ class RemoteConfigService {
     'lbl_events_time_field_label_en': 'Time',
     'lbl_events_description_field_label_en': 'Description',
     'lbl_events_create_submit_button_en': 'Create event',
+    'lbl_events_date_field_hint_en': 'Aug 16 2026',
+    'lbl_events_time_field_hint_en': '08:00',
+    'lbl_events_name_required_error_en': 'Event name cannot be empty.',
+    'lbl_events_date_format_error_en':
+        'Enter the date as "day month year" (e.g. 16 Ağu 2026).',
+    'lbl_events_create_failed_error_en': 'Could not create event, try again.',
     'lbl_expenses_list_title_en': 'Expenses',
     'lbl_expenses_add_expense_button_en': '+ Expense',
     'lbl_expenses_categories_section_header_en': 'CATEGORIES',
@@ -1746,12 +2035,43 @@ class RemoteConfigService {
     'lbl_expenses_description_field_label_en': 'Description',
     'lbl_expenses_date_field_label_en': 'Date',
     'lbl_expenses_submit_button_en': 'Save expense',
+    'lbl_expenses_amount_field_hint_en': '8,400',
+    'lbl_expenses_category_picker_title_en': 'Select category',
+    'lbl_expenses_description_field_hint_en': 'Reformer spring replacement',
+    'lbl_expenses_trainer_commission_note_en':
+        'Trainer commissions are calculated automatically from session approvals; they are not entered manually here.',
+    'lbl_expenses_amount_invalid_error_en': 'Enter a valid amount.',
+    'lbl_expenses_description_required_error_en':
+        'Description cannot be empty.',
+    'lbl_expenses_save_failed_error_en': 'Could not save expense, try again.',
+    'lbl_expenses_monthly_total_label_en': 'Total expenses in {month}',
+    'lbl_expenses_revenue_ratio_label_en': 'Ratio to revenue {ratio}',
     'lbl_feedback_admin_list_title_en': 'Feedback',
     'lbl_feedback_member_form_title_en': 'Feedback',
     'lbl_feedback_comment_section_header_en': 'YOUR COMMENT (OPTIONAL)',
+    'lbl_feedback_total_reviews_caption_en': '{count} reviews',
+    'lbl_feedback_how_was_session_title_en': 'How was your session?',
+    'lbl_feedback_privacy_note_with_trainer_en':
+        'One-on-one with {trainer} · Only studio management sees this, it is shared with your trainer anonymously.',
+    'lbl_feedback_privacy_note_en':
+        'Only studio management sees this, it is shared with your trainer anonymously.',
+    'lbl_feedback_comment_field_hint_en':
+        'The warm-up was really good this week, five more minutes of stretching would be great.',
+    'lbl_feedback_submit_button_en': 'Submit',
+    'lbl_feedback_give_star_to_submit_hint_en': 'Give a rating to submit',
+    'lbl_feedback_sent_anonymously_hint_en': 'Sent to your trainer anonymously',
+    'lbl_feedback_rating_label_0_en': 'Tap to rate',
+    'lbl_feedback_rating_label_1_en': 'Not good at all',
+    'lbl_feedback_rating_label_2_en': 'Not what I expected',
+    'lbl_feedback_rating_label_3_en': 'Not bad',
+    'lbl_feedback_rating_label_4_en': 'Good',
+    'lbl_feedback_rating_label_5_en': 'Great',
     'lbl_group_sessions_admin_list_title_en': 'Group Sessions',
     'lbl_group_sessions_add_group_session_button_en': '+ Group Session',
     'lbl_group_sessions_capacity_suffix_label_en': 'capacity',
+    'lbl_group_sessions_capacity_full_note_en': 'Fully booked',
+    'lbl_group_sessions_capacity_low_note_en': '{remaining} spots left',
+    'lbl_group_sessions_capacity_available_note_en': 'Spots available',
     'lbl_group_sessions_view_participants_link_en': 'View participants',
     'lbl_group_sessions_discover_title_en': 'Discover',
     'lbl_group_sessions_discover_tab_group_sessions_en': 'Group Sessions',
@@ -1763,11 +2083,33 @@ class RemoteConfigService {
         'Open for online booking',
     'lbl_group_sessions_online_booking_toggle_description_en':
         'Members can join from Discover',
-    'lbl_group_sessions_default_location_label_en': 'Studio',
+    'lbl_group_sessions_default_location_label_en':
+        'Session location (optional)',
     'lbl_group_sessions_name_field_label_en': 'Session name',
     'lbl_group_sessions_start_time_field_label_en': 'Start time',
     'lbl_group_sessions_duration_field_label_en': 'Duration',
     'lbl_group_sessions_create_submit_button_en': 'Create group session',
+    'lbl_group_sessions_duration_suffix_en': '{minutes} min',
+    'lbl_group_sessions_capacity_max_note_en': 'Limit is {max} people',
+    'lbl_group_sessions_capacity_max_note_with_studio_en':
+        'Limit for {studio} is {max} people',
+    'lbl_group_sessions_location_field_hint_en': 'E.g. Studio 1, Main hall',
+    'lbl_group_sessions_location_field_helper_en':
+        'Shows members where the session takes place.',
+    'lbl_group_sessions_duration_picker_title_en': 'Select duration',
+    'lbl_group_sessions_discover_empty_state_en':
+        'No open sign-ups right now — new dates will show up here.',
+    'lbl_group_sessions_join_full_error_snackbar_en':
+        'This session just filled up.',
+    'lbl_group_sessions_join_failed_snackbar_en':
+        'Could not save your response, try again.',
+    'lbl_group_sessions_locked_join_button_en': 'Locked · Starting soon',
+    'lbl_group_sessions_waitlist_join_button_en': 'Join waitlist',
+    'lbl_group_sessions_joined_leave_button_en': 'Joined · Leave',
+    'lbl_group_sessions_join_button_en': 'Join',
+    'lbl_group_sessions_attending_count_no_capacity_en': '{taken} attending',
+    'lbl_group_sessions_attending_count_with_capacity_en':
+        '{taken} / {capacity}',
     'lbl_gyms_admin_home_completed_word_en': 'completed',
     'lbl_gyms_admin_home_trainer_performance_section_en': 'TRAINER PERFORMANCE',
     'lbl_gyms_admin_home_upcoming_payments_section_en': 'PAYMENT DUE SOON',
@@ -1930,6 +2272,30 @@ class RemoteConfigService {
     'lbl_measurements_title_en': 'My Measurements',
     'lbl_measurements_selected_point_label_en': 'Selected point',
     'lbl_measurements_history_section_en': 'MEASUREMENT HISTORY',
+    'lbl_measurements_member_title_en': '{name} · Measurements',
+    'lbl_measurements_avatar_hint_en': 'Tap points to see values',
+    'lbl_measurements_chart_hint_en': 'tap metric chips',
+    'lbl_measurements_chart_toggle_label_en': 'Chart',
+    'lbl_measurements_avatar_toggle_label_en': 'Avatar',
+    'lbl_measurements_date_picker_title_en': 'Select date',
+    'lbl_measurements_latest_record_option_en': 'Latest record',
+    'lbl_measurements_showing_latest_label_en': 'Showing latest record',
+    'lbl_measurements_showing_date_label_en': 'Showing {date}',
+    'lbl_measurements_change_date_label_en': 'Change date',
+    'lbl_measurements_value_field_hint_en': 'Enter value',
+    'lbl_measurements_empty_point_hint_en':
+        'No measurement yet — enter a value above.',
+    'lbl_measurements_save_failed_error_en':
+        'Could not save measurement, try again.',
+    'lbl_measurements_no_data_for_metric_en':
+        'No measurements yet for {metric}.',
+    'lbl_measurements_metric_latest_label_en': '{metric} · latest measurement',
+    'lbl_measurements_no_change_label_en': 'no change',
+    'lbl_measurements_six_month_delta_label_en': 'over 6 months {delta}',
+    'lbl_measurements_latest_measurement_label_en': 'Latest measurement',
+    'lbl_measurements_switch_to_avatar_cta_en':
+        'Switch to Avatar to add a measurement',
+    'lbl_measurements_add_metric_label_en': 'Add {metric}',
     'lbl_members_detail_payment_status_label_en': 'Payment status',
     'lbl_members_detail_remaining_sessions_label_en': 'Remaining sessions',
     'lbl_members_detail_makeup_label_en': 'Makeup',
@@ -2033,6 +2399,27 @@ class RemoteConfigService {
     'lbl_packages_remaining_word_en': 'remaining',
     'lbl_packages_trainer_owner_label_en': 'Your trainer',
     'lbl_packages_start_label_en': 'Start',
+    'lbl_packages_add_title_en': 'Add package',
+    'lbl_packages_edit_title_en': 'Edit package',
+    'lbl_packages_name_field_hint_en': 'One-on-one 12 Sessions',
+    'lbl_packages_session_count_field_hint_en': 'E.g. 12',
+    'lbl_packages_validity_field_hint_en': 'E.g. 90',
+    'lbl_packages_per_session_price_caption_en': '₺{price} per session',
+    'lbl_packages_delete_failed_error_en':
+        'Could not delete package, try again.',
+    'lbl_packages_name_required_error_en': 'Package name cannot be empty.',
+    'lbl_packages_session_count_invalid_error_en':
+        'Enter a valid session count.',
+    'lbl_packages_validity_invalid_error_en': 'Enter a valid number of days.',
+    'lbl_packages_save_failed_error_en': 'Could not save package, try again.',
+    'lbl_packages_remaining_with_makeup_caption_en':
+        '{remaining} sessions left. Make-up sessions available: {makeup}.',
+    'lbl_packages_low_sessions_warning_title_en': '{remaining} sessions left',
+    'lbl_packages_renew_with_trainer_caption_en':
+        'If you want to renew before your package ends, you can talk to your trainer {trainer}.',
+    'lbl_packages_session_count_validity_caption_en':
+        '{count} sessions · {days} days',
+    'lbl_packages_off_sale_label_en': 'Off',
     'lbl_sessions_calendar_title_en': 'Calendar',
     'lbl_sessions_calendar_slot_time_label_en': 'Time',
     'lbl_sessions_calendar_slot_status_label_en': 'Status',
@@ -2184,6 +2571,9 @@ class RemoteConfigService {
     'lbl_trainers_add_trainer_name_hint_en': 'John Smith',
     'lbl_trainers_management_trainer_count_suffix_en': '{count} people',
     'lbl_trainers_add_trainer_saving_label_en': 'Adding…',
+    'lbl_trainers_edit_trainer_form_title_en': 'Edit trainer',
+    'lbl_trainers_edit_trainer_error_en':
+        'Could not update trainer, try again.',
     'lbl_trainers_calendar_week_range_en':
         '{startDay} – {endDay} {month} · Week {week}',
     'lbl_trainers_calendar_day_empty_message_en':

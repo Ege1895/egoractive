@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
+import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_back_button.dart';
 import '../../../../shared/widgets/trend_bar_chart.dart';
@@ -55,8 +56,10 @@ class _MeasurementsPanelState extends BasePanelState<MeasurementsPanel> {
     final controller = ref.read(measurementsControllerProvider.notifier);
     final isAvatar = state.viewMode == MeasurementsViewMode.avatar;
     final title = widget.memberName != null
-        ? '${widget.memberName} · Ölçümleri'
-        : 'Ölçümlerim';
+        ? ref
+              .watch(rcTextProvider(RemoteConfigKeys.measurementsMemberTitle))
+              .replaceAll('{name}', widget.memberName!)
+        : ref.watch(rcTextProvider(RemoteConfigKeys.measurementsTitle));
 
     return Scaffold(
       body: SafeArea(
@@ -92,8 +95,16 @@ class _MeasurementsPanelState extends BasePanelState<MeasurementsPanel> {
                         ),
                         Text(
                           isAvatar
-                              ? 'Noktalara dokunarak değerleri gör'
-                              : 'metrik çiplerine dokun',
+                              ? ref.watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys.measurementsAvatarHint,
+                                  ),
+                                )
+                              : ref.watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys.measurementsChartHint,
+                                  ),
+                                ),
                           style: typography.caption.copyWith(
                             color: colors.onSurfaceMuted,
                           ),
@@ -102,7 +113,17 @@ class _MeasurementsPanelState extends BasePanelState<MeasurementsPanel> {
                     ),
                   ),
                   _ViewToggleChip(
-                    label: isAvatar ? 'Grafik' : 'Avatar',
+                    label: isAvatar
+                        ? ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.measurementsChartToggleLabel,
+                            ),
+                          )
+                        : ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.measurementsAvatarToggleLabel,
+                            ),
+                          ),
                     onTap: () => controller.setViewMode(
                       isAvatar
                           ? MeasurementsViewMode.chart
@@ -202,7 +223,9 @@ void _showDatePicker(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Tarih seç',
+                ref.read(
+                  rcTextProvider(RemoteConfigKeys.measurementsDatePickerTitle),
+                ),
                 style: typography.headingMedium.copyWith(
                   color: colors.onSurface,
                   fontSize: 20,
@@ -210,7 +233,11 @@ void _showDatePicker(
               ),
               const SizedBox(height: AppSpacing.md),
               _DateOption(
-                label: 'Son kayıt',
+                label: ref.read(
+                  rcTextProvider(
+                    RemoteConfigKeys.measurementsLatestRecordOption,
+                  ),
+                ),
                 selected: selected == null,
                 onTap: () {
                   ref
@@ -308,7 +335,11 @@ class _AvatarViewState extends ConsumerState<_AvatarView> {
       });
     } catch (_) {
       if (mounted) {
-        setState(() => _errorMessage = 'Ölçüm kaydedilemedi, tekrar dene.');
+        setState(
+          () => _errorMessage = ref.read(
+            rcTextProvider(RemoteConfigKeys.measurementsSaveFailedError),
+          ),
+        );
       }
     } finally {
       if (mounted) setState(() => _isSaving = false);
@@ -371,8 +402,23 @@ class _AvatarViewState extends ConsumerState<_AvatarView> {
                     Expanded(
                       child: Text(
                         isLatest
-                            ? 'Son kayıt gösteriliyor'
-                            : '${_formatDate(state.selectedDate!)} gösteriliyor',
+                            ? ref.watch(
+                                rcTextProvider(
+                                  RemoteConfigKeys
+                                      .measurementsShowingLatestLabel,
+                                ),
+                              )
+                            : ref
+                                  .watch(
+                                    rcTextProvider(
+                                      RemoteConfigKeys
+                                          .measurementsShowingDateLabel,
+                                    ),
+                                  )
+                                  .replaceAll(
+                                    '{date}',
+                                    _formatDate(state.selectedDate!),
+                                  ),
                         style: typography.bodyMedium.copyWith(
                           color: colors.onSurfaceVariant,
                           fontSize: 13,
@@ -380,7 +426,11 @@ class _AvatarViewState extends ConsumerState<_AvatarView> {
                       ),
                     ),
                     Text(
-                      'Tarih değiştir',
+                      ref.watch(
+                        rcTextProvider(
+                          RemoteConfigKeys.measurementsChangeDateLabel,
+                        ),
+                      ),
                       style: typography.headingSmall.copyWith(
                         color: colors.primary,
                         fontSize: 13,
@@ -419,7 +469,11 @@ class _AvatarViewState extends ConsumerState<_AvatarView> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Seçili nokta',
+                          ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.measurementsSelectedPointLabel,
+                            ),
+                          ),
                           style: typography.caption.copyWith(
                             color: colors.onSurfaceMuted,
                           ),
@@ -480,12 +534,17 @@ class _AvatarViewState extends ConsumerState<_AvatarView> {
                               contentPadding: const EdgeInsets.symmetric(
                                 vertical: AppSpacing.sm,
                               ),
-                              hintText: 'Değer gir',
+                              hintText: ref.watch(
+                                rcTextProvider(
+                                  RemoteConfigKeys.measurementsValueFieldHint,
+                                ),
+                              ),
                               hintStyle: typography.bodyMedium.copyWith(
                                 color: colors.onSurfaceMuted,
                                 fontSize: 14,
                               ),
-                              suffixText: ' cm',
+                              suffixText:
+                                  ' ${ref.watch(rcTextProvider(RemoteConfigKeys.measurementsUnitCm))}',
                               suffixStyle: typography.bodyMedium.copyWith(
                                 color: colors.onSurfaceMuted,
                                 fontSize: 15,
@@ -540,7 +599,9 @@ class _AvatarViewState extends ConsumerState<_AvatarView> {
                 )
               else
                 Text(
-                  'Henüz ölçüm eklenmedi — yukarıdan bir değer gir.',
+                  ref.watch(
+                    rcTextProvider(RemoteConfigKeys.measurementsEmptyPointHint),
+                  ),
                   style: typography.caption.copyWith(
                     color: colors.onSurfaceMuted,
                   ),
@@ -569,7 +630,15 @@ class _AvatarViewState extends ConsumerState<_AvatarView> {
                     ),
                     alignment: Alignment.center,
                     child: Text(
-                      _isSaving ? 'Kaydediliyor…' : 'Kaydet',
+                      _isSaving
+                          ? ref.watch(
+                              rcTextProvider(
+                                RemoteConfigKeys.membersSavingLabel,
+                              ),
+                            )
+                          : ref.watch(
+                              rcTextProvider(RemoteConfigKeys.commonKaydet),
+                            ),
                       style: typography.headingSmall.copyWith(
                         fontSize: 15,
                         color: colors.onPrimary,
@@ -639,7 +708,13 @@ class _ChartView extends ConsumerWidget {
               border: Border.all(color: colors.outline),
             ),
             child: Text(
-              '${state.selectedMetric.label} için henüz ölçüm yok.',
+              ref
+                  .watch(
+                    rcTextProvider(
+                      RemoteConfigKeys.measurementsNoDataForMetric,
+                    ),
+                  )
+                  .replaceAll('{metric}', state.selectedMetric.label),
               style: typography.bodyMedium.copyWith(
                 color: colors.onSurfaceMuted,
               ),
@@ -671,7 +746,14 @@ class _ChartView extends ConsumerWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              '${series.metric.label} · son ölçüm',
+                              ref
+                                  .watch(
+                                    rcTextProvider(
+                                      RemoteConfigKeys
+                                          .measurementsMetricLatestLabel,
+                                    ),
+                                  )
+                                  .replaceAll('{metric}', series.metric.label),
                               style: typography.caption.copyWith(
                                 color: colors.onSurfaceMuted,
                               ),
@@ -687,7 +769,8 @@ class _ChartView extends ConsumerWidget {
                                 ),
                                 children: [
                                   TextSpan(
-                                    text: ' cm',
+                                    text:
+                                        ' ${ref.watch(rcTextProvider(RemoteConfigKeys.measurementsUnitCm))}',
                                     style: typography.bodyMedium.copyWith(
                                       color: colors.onSurfaceMuted,
                                       fontSize: 17,
@@ -718,8 +801,13 @@ class _ChartView extends ConsumerWidget {
                               ),
                               child: Text(
                                 diff == 0
-                                    ? 'değişim yok'
-                                    : '${diff < 0 ? '−' : '+'}${diff.abs().toStringAsFixed(1).replaceAll('.', ',')} cm',
+                                    ? ref.watch(
+                                        rcTextProvider(
+                                          RemoteConfigKeys
+                                              .measurementsNoChangeLabel,
+                                        ),
+                                      )
+                                    : '${diff < 0 ? '−' : '+'}${diff.abs().toStringAsFixed(1).replaceAll('.', ',')} ${ref.watch(rcTextProvider(RemoteConfigKeys.measurementsUnitCm))}',
                                 style: typography.caption.copyWith(
                                   fontSize: 12,
                                   color: diff == 0
@@ -732,7 +820,17 @@ class _ChartView extends ConsumerWidget {
                             ),
                             const SizedBox(height: AppSpacing.xs),
                             Text(
-                              '6 ayda ${series.totalDeltaLabel}',
+                              ref
+                                  .watch(
+                                    rcTextProvider(
+                                      RemoteConfigKeys
+                                          .measurementsSixMonthDeltaLabel,
+                                    ),
+                                  )
+                                  .replaceAll(
+                                    '{delta}',
+                                    series.totalDeltaLabel,
+                                  ),
                               style: typography.caption.copyWith(
                                 color: colors.onSurfaceMuted,
                               ),
@@ -755,7 +853,9 @@ class _ChartView extends ConsumerWidget {
           ),
           const SizedBox(height: AppSpacing.lg),
           Text(
-            'ÖLÇÜM GEÇMİŞİ',
+            ref.watch(
+              rcTextProvider(RemoteConfigKeys.measurementsHistorySection),
+            ),
             style: typography.caption.copyWith(
               color: colors.onSurfaceMuted,
               letterSpacing: 1.2,
@@ -778,7 +878,12 @@ class _ChartView extends ConsumerWidget {
                 )
                   _HistoryRow(
                     date: i == series.values.length - 1
-                        ? 'Son ölçüm'
+                        ? ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys
+                                  .measurementsLatestMeasurementLabel,
+                            ),
+                          )
                         : series.months[i],
                     value: series.values[i],
                     delta: i == 0
@@ -804,7 +909,11 @@ class _ChartView extends ConsumerWidget {
               ),
               alignment: Alignment.center,
               child: Text(
-                'Ölçüm eklemek için Avatar\'a geç',
+                ref.watch(
+                  rcTextProvider(
+                    RemoteConfigKeys.measurementsSwitchToAvatarCta,
+                  ),
+                ),
                 style: typography.headingSmall.copyWith(
                   fontSize: 15,
                   color: colors.onSurfaceVariant,
@@ -860,7 +969,7 @@ class _MetricChip extends StatelessWidget {
   }
 }
 
-class _HistoryRow extends StatelessWidget {
+class _HistoryRow extends ConsumerWidget {
   const _HistoryRow({
     required this.date,
     required this.value,
@@ -874,13 +983,13 @@ class _HistoryRow extends StatelessWidget {
   final bool showDivider;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.appColors;
     final typography = context.appTypography;
     final deltaLabel = delta == null
         ? '—'
         : delta == 0
-        ? 'değişim yok'
+        ? ref.watch(rcTextProvider(RemoteConfigKeys.measurementsNoChangeLabel))
         : '${delta! < 0 ? '−' : '+'}${delta!.abs().toStringAsFixed(1).replaceAll('.', ',')}';
     final deltaColor = delta == null || delta == 0
         ? colors.onSurfaceMuted
@@ -906,7 +1015,7 @@ class _HistoryRow extends StatelessWidget {
           Row(
             children: [
               Text(
-                '${value.toStringAsFixed(1).replaceAll('.', ',')} cm',
+                '${value.toStringAsFixed(1).replaceAll('.', ',')} ${ref.watch(rcTextProvider(RemoteConfigKeys.measurementsUnitCm))}',
                 style: typography.headingSmall.copyWith(
                   color: colors.onSurface,
                   fontSize: 16,

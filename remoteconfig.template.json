@@ -4,179 +4,179 @@
       "defaultValue": {
         "value": "120"
       },
-      "description": "Ders/seans onay bildiriminin kaç dakika önce gönderileceği.",
+      "description": "Ders/seans onay bildiriminin ka\u00e7 dakika \u00f6nce g\u00f6nderilece\u011fi.",
       "valueType": "NUMBER"
     },
     "cfg_default_group_session_capacity": {
       "defaultValue": {
         "value": "6"
       },
-      "description": "Grup dersi oluştururken varsayılan kontenjan.",
+      "description": "Grup dersi olu\u015ftururken varsay\u0131lan kontenjan.",
       "valueType": "NUMBER"
     },
     "cfg_group_session_capacity_max": {
       "defaultValue": {
         "value": "20"
       },
-      "description": "Grup dersi oluşturma ekranındaki kontenjan stepper'ının üst sınırı.",
+      "description": "Grup dersi olu\u015fturma ekran\u0131ndaki kontenjan stepper'\u0131n\u0131n \u00fcst s\u0131n\u0131r\u0131.",
       "valueType": "NUMBER"
     },
     "cfg_installment_due_soon_days": {
       "defaultValue": {
         "value": "3"
       },
-      "description": "Üye anasayfasındaki taksit listesinde bir taksitin son ödeme tarihine kaç gün kala (veya geçmişse) kırmızı 'Ödeme yaklaşıyor' gösterileceği.",
+      "description": "\u00dcye anasayfas\u0131ndaki taksit listesinde bir taksitin son \u00f6deme tarihine ka\u00e7 g\u00fcn kala (veya ge\u00e7mi\u015fse) k\u0131rm\u0131z\u0131 '\u00d6deme yakla\u015f\u0131yor' g\u00f6sterilece\u011fi.",
       "valueType": "NUMBER"
     },
     "cfg_group_session_lock_hours_before": {
       "defaultValue": {
         "value": "24"
       },
-      "description": "F4-2 — grup dersine katılım/ayrılma başlangıca kaç saat kalana kadar açık.",
+      "description": "F4-2 \u2014 grup dersine kat\u0131l\u0131m/ayr\u0131lma ba\u015flang\u0131ca ka\u00e7 saat kalana kadar a\u00e7\u0131k.",
       "valueType": "NUMBER"
     },
     "cfg_cancellation_deadline_hours": {
       "defaultValue": {
         "value": "24"
       },
-      "description": "Üye/antrenör seansı en fazla kaç saat öncesine kadar iptal edebilir. firestore.rules'taki sabitle senkron tutulmalı.",
+      "description": "\u00dcye/antren\u00f6r seans\u0131 en fazla ka\u00e7 saat \u00f6ncesine kadar iptal edebilir. firestore.rules'taki sabitle senkron tutulmal\u0131.",
       "valueType": "NUMBER"
     },
     "cfg_default_trainer_reminder_delay_minutes": {
       "defaultValue": {
         "value": "30"
       },
-      "description": "F3-6 — Yetki Ayarları'nda bir salon override yazmadıysa antrenör hatırlatma süresi (dakika).",
+      "description": "F3-6 \u2014 Yetki Ayarlar\u0131'nda bir salon override yazmad\u0131ysa antren\u00f6r hat\u0131rlatma s\u00fcresi (dakika).",
       "valueType": "NUMBER"
     },
     "cfg_default_online_booking_enabled": {
       "defaultValue": {
         "value": "true"
       },
-      "description": "F3-6 — bir salon override yazmadıysa online rezervasyon varsayılanı.",
+      "description": "F3-6 \u2014 bir salon override yazmad\u0131ysa online rezervasyon varsay\u0131lan\u0131.",
       "valueType": "BOOLEAN"
     },
     "cfg_default_allow_sessions_after_package_expiry": {
       "defaultValue": {
         "value": "false"
       },
-      "description": "F3-6 — bir salon override yazmadıysa paket süresi bitince seans oluşturulabilsin mi varsayılanı.",
+      "description": "F3-6 \u2014 bir salon override yazmad\u0131ysa paket s\u00fcresi bitince seans olu\u015fturulabilsin mi varsay\u0131lan\u0131.",
       "valueType": "BOOLEAN"
     },
     "cfg_default_member_can_cancel_session": {
       "defaultValue": {
         "value": "true"
       },
-      "description": "F3-6 — bir salon override yazmadıysa üye kendi seansını iptal edebilsin mi varsayılanı.",
+      "description": "F3-6 \u2014 bir salon override yazmad\u0131ysa \u00fcye kendi seans\u0131n\u0131 iptal edebilsin mi varsay\u0131lan\u0131.",
       "valueType": "BOOLEAN"
     },
     "cfg_feedback_reminder_day_of_month": {
       "defaultValue": {
         "value": "-1"
       },
-      "description": "Aylık geri bildirim hatırlatmasının gönderileceği gün. -1 = ayın son günü.",
+      "description": "Ayl\u0131k geri bildirim hat\u0131rlatmas\u0131n\u0131n g\u00f6nderilece\u011fi g\u00fcn. -1 = ay\u0131n son g\u00fcn\u00fc.",
       "valueType": "NUMBER"
     },
     "cfg_weekly_report_day_of_week": {
       "defaultValue": {
         "value": "1"
       },
-      "description": "F5-2 — haftalık salon/muhasebe/antrenör raporlarının gönderileceği gün. ISO hafta günü: 1=Pazartesi ... 7=Pazar. Yalnızca Cloud Functions tarafından okunur.",
+      "description": "F5-2 \u2014 haftal\u0131k salon/muhasebe/antren\u00f6r raporlar\u0131n\u0131n g\u00f6nderilece\u011fi g\u00fcn. ISO hafta g\u00fcn\u00fc: 1=Pazartesi ... 7=Pazar. Yaln\u0131zca Cloud Functions taraf\u0131ndan okunur.",
       "valueType": "NUMBER"
     },
     "cfg_weekly_report_hour": {
       "defaultValue": {
         "value": "6"
       },
-      "description": "F5-2 — haftalık raporların gönderileceği saat (İstanbul yerel saati, 0-23). Yalnızca Cloud Functions tarafından okunur.",
+      "description": "F5-2 \u2014 haftal\u0131k raporlar\u0131n g\u00f6nderilece\u011fi saat (\u0130stanbul yerel saati, 0-23). Yaln\u0131zca Cloud Functions taraf\u0131ndan okunur.",
       "valueType": "NUMBER"
     },
     "cfg_manual_notification_hourly_limit": {
       "defaultValue": {
         "value": "10"
       },
-      "description": "F6-4 — bir admin'in saatte en fazla kaç manuel bildirim gönderebileceği (kötüye kullanımı önlemek için). Yalnızca Cloud Functions tarafından okunur.",
+      "description": "F6-4 \u2014 bir admin'in saatte en fazla ka\u00e7 manuel bildirim g\u00f6nderebilece\u011fi (k\u00f6t\u00fcye kullan\u0131m\u0131 \u00f6nlemek i\u00e7in). Yaln\u0131zca Cloud Functions taraf\u0131ndan okunur.",
       "valueType": "NUMBER"
     },
     "cfg_free_version_ads_enabled": {
       "defaultValue": {
         "value": "true"
       },
-      "description": "Ücretsiz sürümde reklam gösterilsin mi.",
+      "description": "\u00dccretsiz s\u00fcr\u00fcmde reklam g\u00f6sterilsin mi.",
       "valueType": "BOOLEAN"
     },
     "cfg_trial_duration_days": {
       "defaultValue": {
         "value": "14"
       },
-      "description": "F6-3 — yeni bir salona trialStartedAt'ten itibaren tanınan ücretsiz deneme süresi (gün).",
+      "description": "F6-3 \u2014 yeni bir salona trialStartedAt'ten itibaren tan\u0131nan \u00fccretsiz deneme s\u00fcresi (g\u00fcn).",
       "valueType": "NUMBER"
     },
     "cfg_feature_flags": {
       "defaultValue": {
         "value": "{\"group_sessions_enabled\": true}"
       },
-      "description": "F5-5 — feature flag'lerin tutulduğu JSON obje. Anahtarlar lib/core/remote_config/feature_flags.dart'taki FeatureFlags getter'larıyla eşleşir.",
+      "description": "F5-5 \u2014 feature flag'lerin tutuldu\u011fu JSON obje. Anahtarlar lib/core/remote_config/feature_flags.dart'taki FeatureFlags getter'lar\u0131yla e\u015fle\u015fir.",
       "valueType": "JSON"
     },
     "cfg_badge_criteria": {
       "defaultValue": {
-        "value": "[{\"id\": \"first_session\", \"title_tr\": \"İlk dersin\", \"title_en\": \"Your first session\", \"note_tr\": \"İlk dersini tamamla\", \"note_en\": \"Complete your first session\", \"type\": \"sessionsCompleted\", \"threshold\": 1}, {\"id\": \"sessions_5\", \"title_tr\": \"5 ders tamam\", \"title_en\": \"5 sessions done\", \"note_tr\": \"5 ders tamamla\", \"note_en\": \"Complete 5 sessions\", \"type\": \"sessionsCompleted\", \"threshold\": 5}, {\"id\": \"sessions_20\", \"title_tr\": \"20 ders tamam\", \"title_en\": \"20 sessions done\", \"note_tr\": \"20 ders tamamla\", \"note_en\": \"Complete 20 sessions\", \"type\": \"sessionsCompleted\", \"threshold\": 20}, {\"id\": \"group_session_join\", \"title_tr\": \"Grup dersi\", \"title_en\": \"Group class\", \"note_tr\": \"Bir grup dersine katıl\", \"note_en\": \"Join a group class\", \"type\": \"groupSessionJoins\", \"threshold\": 1}, {\"id\": \"event_join\", \"title_tr\": \"Etkinlik\", \"title_en\": \"Event\", \"note_tr\": \"Bir etkinliğe katıl\", \"note_en\": \"Join an event\", \"type\": \"eventJoins\", \"threshold\": 1}, {\"id\": \"membership_6_months\", \"title_tr\": \"6 ay üyelik\", \"title_en\": \"6-month membership\", \"note_tr\": \"6 ay üyeliğini sürdür\", \"note_en\": \"Keep your membership for 6 months\", \"type\": \"membershipMonths\", \"threshold\": 6}]"
+        "value": "[{\"id\": \"first_session\", \"title_tr\": \"\u0130lk dersin\", \"title_en\": \"Your first session\", \"note_tr\": \"\u0130lk dersini tamamla\", \"note_en\": \"Complete your first session\", \"type\": \"sessionsCompleted\", \"threshold\": 1}, {\"id\": \"sessions_5\", \"title_tr\": \"5 ders tamam\", \"title_en\": \"5 sessions done\", \"note_tr\": \"5 ders tamamla\", \"note_en\": \"Complete 5 sessions\", \"type\": \"sessionsCompleted\", \"threshold\": 5}, {\"id\": \"sessions_20\", \"title_tr\": \"20 ders tamam\", \"title_en\": \"20 sessions done\", \"note_tr\": \"20 ders tamamla\", \"note_en\": \"Complete 20 sessions\", \"type\": \"sessionsCompleted\", \"threshold\": 20}, {\"id\": \"group_session_join\", \"title_tr\": \"Grup dersi\", \"title_en\": \"Group class\", \"note_tr\": \"Bir grup dersine kat\u0131l\", \"note_en\": \"Join a group class\", \"type\": \"groupSessionJoins\", \"threshold\": 1}, {\"id\": \"event_join\", \"title_tr\": \"Etkinlik\", \"title_en\": \"Event\", \"note_tr\": \"Bir etkinli\u011fe kat\u0131l\", \"note_en\": \"Join an event\", \"type\": \"eventJoins\", \"threshold\": 1}, {\"id\": \"membership_6_months\", \"title_tr\": \"6 ay \u00fcyelik\", \"title_en\": \"6-month membership\", \"note_tr\": \"6 ay \u00fcyeli\u011fini s\u00fcrd\u00fcr\", \"note_en\": \"Keep your membership for 6 months\", \"type\": \"membershipMonths\", \"threshold\": 6}]"
       },
-      "description": "F4-4 — rozet kriterleri: id/title_tr/title_en/note_tr/note_en/type/threshold listesi. type: sessionsCompleted | groupSessionJoins | eventJoins | membershipMonths. Client cihaz diline göre title_*/note_* çözer.",
+      "description": "F4-4 \u2014 rozet kriterleri: id/title_tr/title_en/note_tr/note_en/type/threshold listesi. type: sessionsCompleted | groupSessionJoins | eventJoins | membershipMonths. Client cihaz diline g\u00f6re title_*/note_* \u00e7\u00f6zer.",
       "valueType": "JSON"
     },
     "cfg_expense_categories": {
       "defaultValue": {
-        "value": "[{\"id\": \"rent\", \"label_tr\": \"Kira\", \"label_en\": \"Rent\"}, {\"id\": \"utility\", \"label_tr\": \"Fatura\", \"label_en\": \"Utility\"}, {\"id\": \"equipment\", \"label_tr\": \"Ekipman\", \"label_en\": \"Equipment\"}, {\"id\": \"commission\", \"label_tr\": \"Prim\", \"label_en\": \"Commission\"}, {\"id\": \"marketing\", \"label_tr\": \"Pazarlama\", \"label_en\": \"Marketing\"}, {\"id\": \"other\", \"label_tr\": \"Diğer\", \"label_en\": \"Other\"}]"
+        "value": "[{\"id\": \"rent\", \"label_tr\": \"Kira\", \"label_en\": \"Rent\"}, {\"id\": \"utility\", \"label_tr\": \"Fatura\", \"label_en\": \"Utility\"}, {\"id\": \"equipment\", \"label_tr\": \"Ekipman\", \"label_en\": \"Equipment\"}, {\"id\": \"commission\", \"label_tr\": \"Prim\", \"label_en\": \"Commission\"}, {\"id\": \"marketing\", \"label_tr\": \"Pazarlama\", \"label_en\": \"Marketing\"}, {\"id\": \"other\", \"label_tr\": \"Di\u011fer\", \"label_en\": \"Other\"}]"
       },
-      "description": "F5-3 — gider kategorileri: id/label_tr/label_en listesi. Firestore'a id yazılır (dilden bağımsız), ekranda cihaz diline göre label_tr/label_en gösterilir. Yeni bir kategori eklemek için kod değişikliği gerekmiyor.",
+      "description": "F5-3 \u2014 gider kategorileri: id/label_tr/label_en listesi. Firestore'a id yaz\u0131l\u0131r (dilden ba\u011f\u0131ms\u0131z), ekranda cihaz diline g\u00f6re label_tr/label_en g\u00f6sterilir. Yeni bir kategori eklemek i\u00e7in kod de\u011fi\u015fikli\u011fi gerekmiyor.",
       "valueType": "JSON"
     },
     "lbl_notif_session_reminder_title_tr": {
       "defaultValue": {
-        "value": "⏰ Bugün {time}'de dersin var!"
+        "value": "\u23f0 Bug\u00fcn {time}'de dersin var!"
       },
-      "description": "F3-4 — sessionReminderCheck push başlığı (Admin SDK'dan da okunur). {time} yer tutucusu fonksiyon tarafında değiştirilir.",
+      "description": "F3-4 \u2014 sessionReminderCheck push ba\u015fl\u0131\u011f\u0131 (Admin SDK'dan da okunur). {time} yer tutucusu fonksiyon taraf\u0131nda de\u011fi\u015ftirilir.",
       "valueType": "STRING"
     },
     "lbl_notif_session_reminder_title_en": {
       "defaultValue": {
-        "value": "⏰ Your session is at {time} today!"
+        "value": "\u23f0 Your session is at {time} today!"
       },
       "valueType": "STRING"
     },
     "lbl_notif_session_reminder_body_tr": {
       "defaultValue": {
-        "value": "{trainerName} seni bekliyor. Gelip gelmeyeceğini onaylamak için dokun 👇"
+        "value": "{trainerName} seni bekliyor. Gelip gelmeyece\u011fini onaylamak i\u00e7in dokun \ud83d\udc47"
       },
-      "description": "{trainerName} yer tutucusu fonksiyon tarafında değiştirilir.",
+      "description": "{trainerName} yer tutucusu fonksiyon taraf\u0131nda de\u011fi\u015ftirilir.",
       "valueType": "STRING"
     },
     "lbl_notif_session_reminder_body_en": {
       "defaultValue": {
-        "value": "{trainerName} is waiting for you. Tap to confirm you're coming 👇"
+        "value": "{trainerName} is waiting for you. Tap to confirm you're coming \ud83d\udc47"
       },
       "valueType": "STRING"
     },
     "lbl_notif_session_completion_title_tr": {
       "defaultValue": {
-        "value": "✅ Dersini onaylar mısın?"
+        "value": "\u2705 Dersini onaylar m\u0131s\u0131n?"
       },
-      "description": "F3-5 — sessionCompletionCheck push başlığı (antrenöre gider, Admin SDK'dan da okunur).",
+      "description": "F3-5 \u2014 sessionCompletionCheck push ba\u015fl\u0131\u011f\u0131 (antren\u00f6re gider, Admin SDK'dan da okunur).",
       "valueType": "STRING"
     },
     "lbl_notif_session_completion_title_en": {
       "defaultValue": {
-        "value": "✅ Can you confirm your session?"
+        "value": "\u2705 Can you confirm your session?"
       },
       "valueType": "STRING"
     },
     "lbl_notif_session_completion_body_tr": {
       "defaultValue": {
-        "value": "{memberName} ile dersin bitti. Tamamlandı mı, yoksa üye gelmedi mi?"
+        "value": "{memberName} ile dersin bitti. Tamamland\u0131 m\u0131, yoksa \u00fcye gelmedi mi?"
       },
-      "description": "{memberName} yer tutucusu fonksiyon tarafında değiştirilir.",
+      "description": "{memberName} yer tutucusu fonksiyon taraf\u0131nda de\u011fi\u015ftirilir.",
       "valueType": "STRING"
     },
     "lbl_notif_session_completion_body_en": {
@@ -187,20 +187,20 @@
     },
     "lbl_notif_feedback_reminder_title_tr": {
       "defaultValue": {
-        "value": "💬 Bu ay nasıl geçti?"
+        "value": "\ud83d\udcac Bu ay nas\u0131l ge\u00e7ti?"
       },
-      "description": "F5-4 — feedbackReminderCheck push başlığı (Admin SDK'dan da okunur).",
+      "description": "F5-4 \u2014 feedbackReminderCheck push ba\u015fl\u0131\u011f\u0131 (Admin SDK'dan da okunur).",
       "valueType": "STRING"
     },
     "lbl_notif_feedback_reminder_title_en": {
       "defaultValue": {
-        "value": "💬 How was your month?"
+        "value": "\ud83d\udcac How was your month?"
       },
       "valueType": "STRING"
     },
     "lbl_notif_feedback_reminder_body_tr": {
       "defaultValue": {
-        "value": "Deneyimini bizimle paylaşır mısın? 1 dakikanı alır."
+        "value": "Deneyimini bizimle payla\u015f\u0131r m\u0131s\u0131n? 1 dakikan\u0131 al\u0131r."
       },
       "valueType": "STRING"
     },
@@ -212,7 +212,7 @@
     },
     "lbl_common_vazgec_tr": {
       "defaultValue": {
-        "value": "Vazgeç"
+        "value": "Vazge\u00e7"
       },
       "valueType": "STRING"
     },
@@ -236,7 +236,7 @@
     },
     "lbl_common_duzenle_tr": {
       "defaultValue": {
-        "value": "Düzenle"
+        "value": "D\u00fczenle"
       },
       "valueType": "STRING"
     },
@@ -260,7 +260,7 @@
     },
     "lbl_common_degistir_tr": {
       "defaultValue": {
-        "value": "Değiştir"
+        "value": "De\u011fi\u015ftir"
       },
       "valueType": "STRING"
     },
@@ -272,7 +272,7 @@
     },
     "lbl_common_cikis_yap_tr": {
       "defaultValue": {
-        "value": "Çıkış yap"
+        "value": "\u00c7\u0131k\u0131\u015f yap"
       },
       "valueType": "STRING"
     },
@@ -284,7 +284,7 @@
     },
     "lbl_common_hesabimi_sil_tr": {
       "defaultValue": {
-        "value": "Hesabımı sil"
+        "value": "Hesab\u0131m\u0131 sil"
       },
       "valueType": "STRING"
     },
@@ -296,7 +296,7 @@
     },
     "lbl_common_studyo_kurallari_nav_tr": {
       "defaultValue": {
-        "value": "Stüdyo kuralları"
+        "value": "St\u00fcdyo kurallar\u0131"
       },
       "valueType": "STRING"
     },
@@ -308,7 +308,7 @@
     },
     "lbl_common_seansi_ertele_tr": {
       "defaultValue": {
-        "value": "Seansı ertele"
+        "value": "Seans\u0131 ertele"
       },
       "valueType": "STRING"
     },
@@ -332,7 +332,7 @@
     },
     "lbl_common_gelmeyecegim_tr": {
       "defaultValue": {
-        "value": "Gelmeyeceğim"
+        "value": "Gelmeyece\u011fim"
       },
       "valueType": "STRING"
     },
@@ -380,7 +380,7 @@
     },
     "lbl_common_tumu_filter_tr": {
       "defaultValue": {
-        "value": "Tümü"
+        "value": "T\u00fcm\u00fc"
       },
       "valueType": "STRING"
     },
@@ -392,7 +392,7 @@
     },
     "lbl_common_tamamlandi_tr": {
       "defaultValue": {
-        "value": "Tamamlandı"
+        "value": "Tamamland\u0131"
       },
       "valueType": "STRING"
     },
@@ -404,7 +404,7 @@
     },
     "lbl_common_iptal_label_tr": {
       "defaultValue": {
-        "value": "İptal"
+        "value": "\u0130ptal"
       },
       "valueType": "STRING"
     },
@@ -440,7 +440,7 @@
     },
     "lbl_common_seans_sayisi_label_tr": {
       "defaultValue": {
-        "value": "Seans sayısı"
+        "value": "Seans say\u0131s\u0131"
       },
       "valueType": "STRING"
     },
@@ -464,19 +464,19 @@
     },
     "lbl_common_olcum_6_ay_section_header_tr": {
       "defaultValue": {
-        "value": "ÖLÇÜM · 6 AY"
+        "value": "\u00d6L\u00c7\u00dcM \u00b7 6 AY"
       },
       "valueType": "STRING"
     },
     "lbl_common_olcum_6_ay_section_header_en": {
       "defaultValue": {
-        "value": "MEASUREMENT · 6 MO"
+        "value": "MEASUREMENT \u00b7 6 MO"
       },
       "valueType": "STRING"
     },
     "lbl_common_ders_gecmisi_section_header_tr": {
       "defaultValue": {
-        "value": "DERS GEÇMİŞİ"
+        "value": "DERS GE\u00c7M\u0130\u015e\u0130"
       },
       "valueType": "STRING"
     },
@@ -488,7 +488,7 @@
     },
     "lbl_common_uye_detayi_title_tr": {
       "defaultValue": {
-        "value": "Üye detayı"
+        "value": "\u00dcye detay\u0131"
       },
       "valueType": "STRING"
     },
@@ -500,7 +500,7 @@
     },
     "lbl_common_bu_gunde_seans_yok_tr": {
       "defaultValue": {
-        "value": "Bu günde seans yok."
+        "value": "Bu g\u00fcnde seans yok."
       },
       "valueType": "STRING"
     },
@@ -512,7 +512,7 @@
     },
     "lbl_common_bitis_label_tr": {
       "defaultValue": {
-        "value": "Bitiş"
+        "value": "Biti\u015f"
       },
       "valueType": "STRING"
     },
@@ -526,7 +526,7 @@
       "defaultValue": {
         "value": "Tamam"
       },
-      "description": "Native tarih seçicideki (iOS) onay butonu.",
+      "description": "Native tarih se\u00e7icideki (iOS) onay butonu.",
       "valueType": "STRING"
     },
     "lbl_common_tamam_button_en": {
@@ -537,9 +537,9 @@
     },
     "lbl_common_henuz_veri_yok_tr": {
       "defaultValue": {
-        "value": "Henüz veri yok"
+        "value": "Hen\u00fcz veri yok"
       },
-      "description": "TrendBarChart boş veri durumu metni.",
+      "description": "TrendBarChart bo\u015f veri durumu metni.",
       "valueType": "STRING"
     },
     "lbl_common_henuz_veri_yok_en": {
@@ -552,7 +552,7 @@
       "defaultValue": {
         "value": "Dil"
       },
-      "description": "Üye/antrenör profil ve admin ayarlar ekranlarındaki dil değiştirme satırının etiketi.",
+      "description": "\u00dcye/antren\u00f6r profil ve admin ayarlar ekranlar\u0131ndaki dil de\u011fi\u015ftirme sat\u0131r\u0131n\u0131n etiketi.",
       "valueType": "STRING"
     },
     "lbl_common_language_nav_label_en": {
@@ -563,9 +563,9 @@
     },
     "lbl_language_select_title_tr": {
       "defaultValue": {
-        "value": "Dil seç"
+        "value": "Dil se\u00e7"
       },
-      "description": "Dil seçim ekranının başlığı.",
+      "description": "Dil se\u00e7im ekran\u0131n\u0131n ba\u015fl\u0131\u011f\u0131.",
       "valueType": "STRING"
     },
     "lbl_language_select_title_en": {
@@ -576,13 +576,13 @@
     },
     "lbl_language_select_turkish_option_tr": {
       "defaultValue": {
-        "value": "Türkçe"
+        "value": "T\u00fcrk\u00e7e"
       },
       "valueType": "STRING"
     },
     "lbl_language_select_turkish_option_en": {
       "defaultValue": {
-        "value": "Türkçe"
+        "value": "T\u00fcrk\u00e7e"
       },
       "valueType": "STRING"
     },
@@ -612,7 +612,7 @@
     },
     "lbl_shell_member_tab_olcumlerim_tr": {
       "defaultValue": {
-        "value": "Ölçümlerim"
+        "value": "\u00d6l\u00e7\u00fcmlerim"
       },
       "valueType": "STRING"
     },
@@ -624,7 +624,7 @@
     },
     "lbl_shell_member_tab_kesfet_tr": {
       "defaultValue": {
-        "value": "Keşfet"
+        "value": "Ke\u015ffet"
       },
       "valueType": "STRING"
     },
@@ -648,7 +648,7 @@
     },
     "lbl_shell_trainer_tab_uyelerim_tr": {
       "defaultValue": {
-        "value": "Üyelerim"
+        "value": "\u00dcyelerim"
       },
       "valueType": "STRING"
     },
@@ -672,7 +672,7 @@
     },
     "lbl_shell_admin_tab_uyeler_tr": {
       "defaultValue": {
-        "value": "Üyeler"
+        "value": "\u00dcyeler"
       },
       "valueType": "STRING"
     },
@@ -720,7 +720,7 @@
     },
     "lbl_shell_role_picker_member_button_tr": {
       "defaultValue": {
-        "value": "Üye"
+        "value": "\u00dcye"
       },
       "valueType": "STRING"
     },
@@ -732,7 +732,7 @@
     },
     "lbl_shell_role_picker_trainer_button_tr": {
       "defaultValue": {
-        "value": "Antrenör"
+        "value": "Antren\u00f6r"
       },
       "valueType": "STRING"
     },
@@ -756,13 +756,13 @@
     },
     "lbl_shell_role_picker_gym_setup_button_tr": {
       "defaultValue": {
-        "value": "Admin · Salon Kurulumu (ilk kurulum)"
+        "value": "Admin \u00b7 Salon Kurulumu (ilk kurulum)"
       },
       "valueType": "STRING"
     },
     "lbl_shell_role_picker_gym_setup_button_en": {
       "defaultValue": {
-        "value": "Admin · Gym Setup (first-time setup)"
+        "value": "Admin \u00b7 Gym Setup (first-time setup)"
       },
       "valueType": "STRING"
     },
@@ -780,7 +780,7 @@
     },
     "lbl_auth_phone_number_label_tr": {
       "defaultValue": {
-        "value": "Telefon numarası"
+        "value": "Telefon numaras\u0131"
       },
       "valueType": "STRING"
     },
@@ -792,7 +792,7 @@
     },
     "lbl_auth_login_button_tr": {
       "defaultValue": {
-        "value": "Giriş yap"
+        "value": "Giri\u015f yap"
       },
       "valueType": "STRING"
     },
@@ -804,7 +804,7 @@
     },
     "lbl_auth_select_avatar_label_tr": {
       "defaultValue": {
-        "value": "Avatarını seç"
+        "value": "Avatar\u0131n\u0131 se\u00e7"
       },
       "valueType": "STRING"
     },
@@ -840,7 +840,7 @@
     },
     "lbl_auth_session_reminders_toggle_title_tr": {
       "defaultValue": {
-        "value": "Ders hatırlatmaları"
+        "value": "Ders hat\u0131rlatmalar\u0131"
       },
       "valueType": "STRING"
     },
@@ -852,7 +852,7 @@
     },
     "lbl_auth_session_reminders_toggle_description_tr": {
       "defaultValue": {
-        "value": "Dersinden 2 saat önce bildirim"
+        "value": "Dersinden 2 saat \u00f6nce bildirim"
       },
       "valueType": "STRING"
     },
@@ -876,7 +876,7 @@
     },
     "lbl_auth_login_error_not_found_tr": {
       "defaultValue": {
-        "value": "Bu numarayla kayıtlı bir hesap bulunamadı. Stüdyo yönetimi seni eklemeli."
+        "value": "Bu numarayla kay\u0131tl\u0131 bir hesap bulunamad\u0131. St\u00fcdyo y\u00f6netimi seni eklemeli."
       },
       "valueType": "STRING"
     },
@@ -888,7 +888,7 @@
     },
     "lbl_auth_login_error_rate_limited_tr": {
       "defaultValue": {
-        "value": "Çok fazla deneme yapıldı. Bir dakika sonra tekrar dene."
+        "value": "\u00c7ok fazla deneme yap\u0131ld\u0131. Bir dakika sonra tekrar dene."
       },
       "valueType": "STRING"
     },
@@ -900,7 +900,7 @@
     },
     "lbl_auth_login_error_generic_tr": {
       "defaultValue": {
-        "value": "Giriş yapılamadı. Bağlantını kontrol edip tekrar dene."
+        "value": "Giri\u015f yap\u0131lamad\u0131. Ba\u011flant\u0131n\u0131 kontrol edip tekrar dene."
       },
       "valueType": "STRING"
     },
@@ -924,7 +924,7 @@
     },
     "lbl_auth_delete_account_error_generic_tr": {
       "defaultValue": {
-        "value": "Hesap silinemedi. Bağlantını kontrol edip tekrar dene."
+        "value": "Hesap silinemedi. Ba\u011flant\u0131n\u0131 kontrol edip tekrar dene."
       },
       "valueType": "STRING"
     },
@@ -936,7 +936,7 @@
     },
     "lbl_auth_delete_account_item_remaining_sessions_tr": {
       "defaultValue": {
-        "value": "Kalan {count} dersin ve telafi hakkın"
+        "value": "Kalan {count} dersin ve telafi hakk\u0131n"
       },
       "valueType": "STRING"
     },
@@ -948,7 +948,7 @@
     },
     "lbl_auth_delete_account_item_measurements_badges_tr": {
       "defaultValue": {
-        "value": "Ölçüm geçmişin ve rozetlerin"
+        "value": "\u00d6l\u00e7\u00fcm ge\u00e7mi\u015fin ve rozetlerin"
       },
       "valueType": "STRING"
     },
@@ -960,7 +960,7 @@
     },
     "lbl_auth_delete_account_item_feedback_tr": {
       "defaultValue": {
-        "value": "Stüdyona bıraktığın geri bildirimler"
+        "value": "St\u00fcdyona b\u0131rakt\u0131\u011f\u0131n geri bildirimler"
       },
       "valueType": "STRING"
     },
@@ -972,7 +972,7 @@
     },
     "lbl_auth_delete_account_confirm_heading_tr": {
       "defaultValue": {
-        "value": "Hesabını silmek geri alınamaz"
+        "value": "Hesab\u0131n\u0131 silmek geri al\u0131namaz"
       },
       "valueType": "STRING"
     },
@@ -984,7 +984,7 @@
     },
     "lbl_auth_delete_account_confirm_body_tr": {
       "defaultValue": {
-        "value": "Silme işlemi 24 saat içinde tamamlanır ve iptal edilemez. Kalan {count} dersin ve ölçüm geçmişin de silinir."
+        "value": "Silme i\u015flemi 24 saat i\u00e7inde tamamlan\u0131r ve iptal edilemez. Kalan {count} dersin ve \u00f6l\u00e7\u00fcm ge\u00e7mi\u015fin de silinir."
       },
       "valueType": "STRING"
     },
@@ -996,7 +996,7 @@
     },
     "lbl_auth_delete_account_acknowledge_label_tr": {
       "defaultValue": {
-        "value": "Anladım, hesabım ve tüm verilerim silinsin."
+        "value": "Anlad\u0131m, hesab\u0131m ve t\u00fcm verilerim silinsin."
       },
       "valueType": "STRING"
     },
@@ -1008,31 +1008,31 @@
     },
     "lbl_auth_delete_account_in_progress_button_tr": {
       "defaultValue": {
-        "value": "Siliniyor…"
+        "value": "Siliniyor\u2026"
       },
       "valueType": "STRING"
     },
     "lbl_auth_delete_account_in_progress_button_en": {
       "defaultValue": {
-        "value": "Deleting…"
+        "value": "Deleting\u2026"
       },
       "valueType": "STRING"
     },
     "lbl_auth_login_waiting_heading_tr": {
       "defaultValue": {
-        "value": "Seni tanıyoruz…"
+        "value": "Seni tan\u0131yoruz\u2026"
       },
       "valueType": "STRING"
     },
     "lbl_auth_login_waiting_heading_en": {
       "defaultValue": {
-        "value": "Getting to know you…"
+        "value": "Getting to know you\u2026"
       },
       "valueType": "STRING"
     },
     "lbl_auth_login_waiting_body_tr": {
       "defaultValue": {
-        "value": "+90 {phone} numarası stüdyoda aranıyor."
+        "value": "+90 {phone} numaras\u0131 st\u00fcdyoda aran\u0131yor."
       },
       "valueType": "STRING"
     },
@@ -1044,7 +1044,7 @@
     },
     "lbl_auth_login_waiting_hint_tr": {
       "defaultValue": {
-        "value": "30 saniyeden uzun sürerse bağlantını kontrol edip tekrar dene."
+        "value": "30 saniyeden uzun s\u00fcrerse ba\u011flant\u0131n\u0131 kontrol edip tekrar dene."
       },
       "valueType": "STRING"
     },
@@ -1056,7 +1056,7 @@
     },
     "lbl_auth_login_waiting_cancel_button_tr": {
       "defaultValue": {
-        "value": "İptal"
+        "value": "\u0130ptal"
       },
       "valueType": "STRING"
     },
@@ -1080,7 +1080,7 @@
     },
     "lbl_auth_onboarding_role_title_tr": {
       "defaultValue": {
-        "value": "Hoş geldin"
+        "value": "Ho\u015f geldin"
       },
       "valueType": "STRING"
     },
@@ -1092,7 +1092,7 @@
     },
     "lbl_auth_onboarding_role_subtitle_tr": {
       "defaultValue": {
-        "value": "Devam etmek için rolünü seç."
+        "value": "Devam etmek i\u00e7in rol\u00fcn\u00fc se\u00e7."
       },
       "valueType": "STRING"
     },
@@ -1104,7 +1104,7 @@
     },
     "lbl_auth_onboarding_role_trainer_title_tr": {
       "defaultValue": {
-        "value": "Antrenörüm"
+        "value": "Antren\u00f6r\u00fcm"
       },
       "valueType": "STRING"
     },
@@ -1116,7 +1116,7 @@
     },
     "lbl_auth_onboarding_role_trainer_note_tr": {
       "defaultValue": {
-        "value": "Bir stüdyoda ders veriyorum"
+        "value": "Bir st\u00fcdyoda ders veriyorum"
       },
       "valueType": "STRING"
     },
@@ -1128,7 +1128,7 @@
     },
     "lbl_auth_onboarding_role_member_title_tr": {
       "defaultValue": {
-        "value": "Üyeyim"
+        "value": "\u00dcyeyim"
       },
       "valueType": "STRING"
     },
@@ -1140,7 +1140,7 @@
     },
     "lbl_auth_onboarding_role_member_note_tr": {
       "defaultValue": {
-        "value": "Bir salona/stüdyoya kayıtlıyım"
+        "value": "Bir salona/st\u00fcdyoya kay\u0131tl\u0131y\u0131m"
       },
       "valueType": "STRING"
     },
@@ -1152,7 +1152,7 @@
     },
     "lbl_auth_onboarding_role_hint_trainer_tr": {
       "defaultValue": {
-        "value": "Sonraki adımda bir salona bağlı mı olduğunu soracağız."
+        "value": "Sonraki ad\u0131mda bir salona ba\u011fl\u0131 m\u0131 oldu\u011funu soraca\u011f\u0131z."
       },
       "valueType": "STRING"
     },
@@ -1164,7 +1164,7 @@
     },
     "lbl_auth_onboarding_role_hint_member_tr": {
       "defaultValue": {
-        "value": "Stüdyona kayıtlı telefon numaranla giriş yapacaksın."
+        "value": "St\u00fcdyona kay\u0131tl\u0131 telefon numaranla giri\u015f yapacaks\u0131n."
       },
       "valueType": "STRING"
     },
@@ -1188,7 +1188,7 @@
     },
     "lbl_auth_onboarding_role_go_to_login_button_tr": {
       "defaultValue": {
-        "value": "Girişe geç"
+        "value": "Giri\u015fe ge\u00e7"
       },
       "valueType": "STRING"
     },
@@ -1200,7 +1200,7 @@
     },
     "lbl_auth_trainer_path_title_tr": {
       "defaultValue": {
-        "value": "Bir salona bağlı mısın?"
+        "value": "Bir salona ba\u011fl\u0131 m\u0131s\u0131n?"
       },
       "valueType": "STRING"
     },
@@ -1212,7 +1212,7 @@
     },
     "lbl_auth_trainer_path_subtitle_tr": {
       "defaultValue": {
-        "value": "Zaten çalıştığın bir stüdyo varsa oraya bağlan; yoksa kendi salonunu sen oluştur."
+        "value": "Zaten \u00e7al\u0131\u015ft\u0131\u011f\u0131n bir st\u00fcdyo varsa oraya ba\u011flan; yoksa kendi salonunu sen olu\u015ftur."
       },
       "valueType": "STRING"
     },
@@ -1224,7 +1224,7 @@
     },
     "lbl_auth_trainer_path_linked_title_tr": {
       "defaultValue": {
-        "value": "Bir salona bağlı çalışıyorum"
+        "value": "Bir salona ba\u011fl\u0131 \u00e7al\u0131\u015f\u0131yorum"
       },
       "valueType": "STRING"
     },
@@ -1236,7 +1236,7 @@
     },
     "lbl_auth_trainer_path_linked_note_tr": {
       "defaultValue": {
-        "value": "Salon yönetimi beni zaten sisteme eklemiş olmalı"
+        "value": "Salon y\u00f6netimi beni zaten sisteme eklemi\u015f olmal\u0131"
       },
       "valueType": "STRING"
     },
@@ -1248,7 +1248,7 @@
     },
     "lbl_auth_trainer_path_new_gym_title_tr": {
       "defaultValue": {
-        "value": "Yeni bir salon açmak istiyorum"
+        "value": "Yeni bir salon a\u00e7mak istiyorum"
       },
       "valueType": "STRING"
     },
@@ -1260,7 +1260,7 @@
     },
     "lbl_auth_trainer_path_new_gym_note_tr": {
       "defaultValue": {
-        "value": "Kendi stüdyomu/salonumu ilk kez kaydediyorum"
+        "value": "Kendi st\u00fcdyomu/salonumu ilk kez kaydediyorum"
       },
       "valueType": "STRING"
     },
@@ -1272,7 +1272,7 @@
     },
     "lbl_auth_trainer_path_hint_linked_tr": {
       "defaultValue": {
-        "value": "Numaran sistemde yoksa salon yönetiminden seni eklemesini isteyebilirsin."
+        "value": "Numaran sistemde yoksa salon y\u00f6netiminden seni eklemesini isteyebilirsin."
       },
       "valueType": "STRING"
     },
@@ -1284,7 +1284,7 @@
     },
     "lbl_auth_trainer_path_hint_new_gym_tr": {
       "defaultValue": {
-        "value": "Salon bilgilerini girdikten sonra yönetici olarak giriş yapacaksın."
+        "value": "Salon bilgilerini girdikten sonra y\u00f6netici olarak giri\u015f yapacaks\u0131n."
       },
       "valueType": "STRING"
     },
@@ -1296,7 +1296,7 @@
     },
     "lbl_auth_trainer_path_create_gym_button_tr": {
       "defaultValue": {
-        "value": "Salon oluşturmaya geç"
+        "value": "Salon olu\u015fturmaya ge\u00e7"
       },
       "valueType": "STRING"
     },
@@ -1308,7 +1308,7 @@
     },
     "lbl_auth_phone_login_title_tr": {
       "defaultValue": {
-        "value": "Telefonunla giriş yap"
+        "value": "Telefonunla giri\u015f yap"
       },
       "valueType": "STRING"
     },
@@ -1320,7 +1320,7 @@
     },
     "lbl_auth_phone_login_subtitle_tr": {
       "defaultValue": {
-        "value": "Stüdyona kayıtlı numaranı gir; şifre yok, tek dokunuşla girersin."
+        "value": "St\u00fcdyona kay\u0131tl\u0131 numaran\u0131 gir; \u015fifre yok, tek dokunu\u015fla girersin."
       },
       "valueType": "STRING"
     },
@@ -1332,7 +1332,7 @@
     },
     "lbl_auth_phone_login_hint_tr": {
       "defaultValue": {
-        "value": "Numaran kayıtlı değilse stüdyo yönetimi seni eklemeli."
+        "value": "Numaran kay\u0131tl\u0131 de\u011filse st\u00fcdyo y\u00f6netimi seni eklemeli."
       },
       "valueType": "STRING"
     },
@@ -1344,19 +1344,19 @@
     },
     "lbl_auth_profile_member_caption_tr": {
       "defaultValue": {
-        "value": "+90 {phone} · Üye"
+        "value": "+90 {phone} \u00b7 \u00dcye"
       },
       "valueType": "STRING"
     },
     "lbl_auth_profile_member_caption_en": {
       "defaultValue": {
-        "value": "+90 {phone} · Member"
+        "value": "+90 {phone} \u00b7 Member"
       },
       "valueType": "STRING"
     },
     "lbl_auth_profile_session_reminder_description_tr": {
       "defaultValue": {
-        "value": "Dersinden {minutes} dakika önce bildirim"
+        "value": "Dersinden {minutes} dakika \u00f6nce bildirim"
       },
       "valueType": "STRING"
     },
@@ -1380,7 +1380,7 @@
     },
     "lbl_auth_splash_tagline_tr": {
       "defaultValue": {
-        "value": "Spor salonu yönetimi"
+        "value": "Spor salonu y\u00f6netimi"
       },
       "valueType": "STRING"
     },
@@ -1440,7 +1440,7 @@
     },
     "lbl_events_attending_label_tr": {
       "defaultValue": {
-        "value": "Katılan"
+        "value": "Kat\u0131lan"
       },
       "valueType": "STRING"
     },
@@ -1464,7 +1464,7 @@
     },
     "lbl_events_create_title_tr": {
       "defaultValue": {
-        "value": "Etkinlik oluştur"
+        "value": "Etkinlik olu\u015ftur"
       },
       "valueType": "STRING"
     },
@@ -1476,7 +1476,7 @@
     },
     "lbl_events_capacity_empty_means_unlimited_helper_tr": {
       "defaultValue": {
-        "value": "Boş bırakırsanız sınırsız olur"
+        "value": "Bo\u015f b\u0131rak\u0131rsan\u0131z s\u0131n\u0131rs\u0131z olur"
       },
       "valueType": "STRING"
     },
@@ -1488,7 +1488,7 @@
     },
     "lbl_events_name_field_label_tr": {
       "defaultValue": {
-        "value": "Etkinlik adı"
+        "value": "Etkinlik ad\u0131"
       },
       "valueType": "STRING"
     },
@@ -1536,7 +1536,7 @@
     },
     "lbl_events_description_field_label_tr": {
       "defaultValue": {
-        "value": "Açıklama"
+        "value": "A\u00e7\u0131klama"
       },
       "valueType": "STRING"
     },
@@ -1548,7 +1548,7 @@
     },
     "lbl_events_create_submit_button_tr": {
       "defaultValue": {
-        "value": "Etkinliği oluştur"
+        "value": "Etkinli\u011fi olu\u015ftur"
       },
       "valueType": "STRING"
     },
@@ -1584,7 +1584,7 @@
     },
     "lbl_expenses_categories_section_header_tr": {
       "defaultValue": {
-        "value": "KATEGORİLER"
+        "value": "KATEGOR\u0130LER"
       },
       "valueType": "STRING"
     },
@@ -1644,7 +1644,7 @@
     },
     "lbl_expenses_recurring_toggle_description_tr": {
       "defaultValue": {
-        "value": "Kira ve fatura gibi sabit giderler için"
+        "value": "Kira ve fatura gibi sabit giderler i\u00e7in"
       },
       "valueType": "STRING"
     },
@@ -1656,19 +1656,19 @@
     },
     "lbl_expenses_amount_field_label_tr": {
       "defaultValue": {
-        "value": "Tutar (₺)"
+        "value": "Tutar (\u20ba)"
       },
       "valueType": "STRING"
     },
     "lbl_expenses_amount_field_label_en": {
       "defaultValue": {
-        "value": "Amount (₺)"
+        "value": "Amount (\u20ba)"
       },
       "valueType": "STRING"
     },
     "lbl_expenses_description_field_label_tr": {
       "defaultValue": {
-        "value": "Açıklama"
+        "value": "A\u00e7\u0131klama"
       },
       "valueType": "STRING"
     },
@@ -1728,7 +1728,7 @@
     },
     "lbl_feedback_comment_section_header_tr": {
       "defaultValue": {
-        "value": "YORUMUN (İSTEĞE BAĞLI)"
+        "value": "YORUMUN (\u0130STE\u011eE BA\u011eLI)"
       },
       "valueType": "STRING"
     },
@@ -1774,9 +1774,47 @@
       },
       "valueType": "STRING"
     },
+    "lbl_group_sessions_capacity_full_note_tr": {
+      "description": "Grup dersi kart\u0131nda kontenjan doldu\u011funda g\u00f6sterilen not.",
+      "defaultValue": {
+        "value": "Kontenjan doldu"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_capacity_full_note_en": {
+      "defaultValue": {
+        "value": "Fully booked"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_capacity_low_note_tr": {
+      "description": "{remaining} yer tutucusu kalan kontenjan say\u0131s\u0131yla de\u011fi\u015ftirilir.",
+      "defaultValue": {
+        "value": "Son {remaining} yer"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_capacity_low_note_en": {
+      "defaultValue": {
+        "value": "{remaining} spots left"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_capacity_available_note_tr": {
+      "defaultValue": {
+        "value": "Yer var"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_capacity_available_note_en": {
+      "defaultValue": {
+        "value": "Spots available"
+      },
+      "valueType": "STRING"
+    },
     "lbl_group_sessions_view_participants_link_tr": {
       "defaultValue": {
-        "value": "Katılımcıları gör"
+        "value": "Kat\u0131l\u0131mc\u0131lar\u0131 g\u00f6r"
       },
       "valueType": "STRING"
     },
@@ -1788,7 +1826,7 @@
     },
     "lbl_group_sessions_discover_title_tr": {
       "defaultValue": {
-        "value": "Keşfet"
+        "value": "Ke\u015ffet"
       },
       "valueType": "STRING"
     },
@@ -1824,7 +1862,7 @@
     },
     "lbl_group_sessions_create_title_tr": {
       "defaultValue": {
-        "value": "Grup dersi oluştur"
+        "value": "Grup dersi olu\u015ftur"
       },
       "valueType": "STRING"
     },
@@ -1836,7 +1874,7 @@
     },
     "lbl_group_sessions_days_field_label_tr": {
       "defaultValue": {
-        "value": "Günler"
+        "value": "G\u00fcnler"
       },
       "valueType": "STRING"
     },
@@ -1860,7 +1898,7 @@
     },
     "lbl_group_sessions_online_booking_toggle_label_tr": {
       "defaultValue": {
-        "value": "Online rezervasyona açık"
+        "value": "Online rezervasyona a\u00e7\u0131k"
       },
       "valueType": "STRING"
     },
@@ -1872,7 +1910,7 @@
     },
     "lbl_group_sessions_online_booking_toggle_description_tr": {
       "defaultValue": {
-        "value": "Üyeler Keşfet'ten katılabilir"
+        "value": "\u00dcyeler Ke\u015ffet'ten kat\u0131labilir"
       },
       "valueType": "STRING"
     },
@@ -1884,7 +1922,7 @@
     },
     "lbl_group_sessions_default_location_label_tr": {
       "defaultValue": {
-        "value": "Stüdyo"
+        "value": "Ders yeri (opsiyonel)"
       },
       "valueType": "STRING"
     },
@@ -1896,7 +1934,7 @@
     },
     "lbl_group_sessions_name_field_label_tr": {
       "defaultValue": {
-        "value": "Ders adı"
+        "value": "Ders ad\u0131"
       },
       "valueType": "STRING"
     },
@@ -1908,7 +1946,7 @@
     },
     "lbl_group_sessions_start_time_field_label_tr": {
       "defaultValue": {
-        "value": "Başlangıç saati"
+        "value": "Ba\u015flang\u0131\u00e7 saati"
       },
       "valueType": "STRING"
     },
@@ -1920,7 +1958,7 @@
     },
     "lbl_group_sessions_duration_field_label_tr": {
       "defaultValue": {
-        "value": "Süre"
+        "value": "S\u00fcre"
       },
       "valueType": "STRING"
     },
@@ -1932,13 +1970,199 @@
     },
     "lbl_group_sessions_create_submit_button_tr": {
       "defaultValue": {
-        "value": "Grup dersini oluştur"
+        "value": "Grup dersini olu\u015ftur"
       },
       "valueType": "STRING"
     },
     "lbl_group_sessions_create_submit_button_en": {
       "defaultValue": {
         "value": "Create group session"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_duration_suffix_tr": {
+      "description": "{minutes} yer tutucusu ders s\u00fcresiyle de\u011fi\u015ftirilir.",
+      "defaultValue": {
+        "value": "{minutes} dk"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_duration_suffix_en": {
+      "defaultValue": {
+        "value": "{minutes} min"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_capacity_max_note_tr": {
+      "description": "{max} yer tutucusu kontenjan \u00fcst s\u0131n\u0131r\u0131yla de\u011fi\u015ftirilir.",
+      "defaultValue": {
+        "value": "\u00dcst s\u0131n\u0131r {max} ki\u015fi"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_capacity_max_note_en": {
+      "defaultValue": {
+        "value": "Limit is {max} people"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_capacity_max_note_with_studio_tr": {
+      "description": "{studio} ve {max} yer tutucular\u0131 st\u00fcdyo ad\u0131 ve kontenjan \u00fcst s\u0131n\u0131r\u0131yla de\u011fi\u015ftirilir.",
+      "defaultValue": {
+        "value": "{studio} i\u00e7in \u00fcst s\u0131n\u0131r {max} ki\u015fi"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_capacity_max_note_with_studio_en": {
+      "defaultValue": {
+        "value": "Limit for {studio} is {max} people"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_location_field_hint_tr": {
+      "defaultValue": {
+        "value": "\u00d6rn. St\u00fcdyo 1, Ana salon"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_location_field_hint_en": {
+      "defaultValue": {
+        "value": "E.g. Studio 1, Main hall"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_location_field_helper_tr": {
+      "defaultValue": {
+        "value": "Dersin nerede yap\u0131laca\u011f\u0131n\u0131 \u00fcyelere g\u00f6sterir."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_location_field_helper_en": {
+      "defaultValue": {
+        "value": "Shows members where the session takes place."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_duration_picker_title_tr": {
+      "defaultValue": {
+        "value": "S\u00fcre se\u00e7"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_duration_picker_title_en": {
+      "defaultValue": {
+        "value": "Select duration"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_discover_empty_state_tr": {
+      "description": "Ke\u015ffet ekran\u0131nda hi\u00e7 a\u00e7\u0131k kay\u0131t olmad\u0131\u011f\u0131nda g\u00f6sterilir.",
+      "defaultValue": {
+        "value": "\u015eu anda a\u00e7\u0131k kay\u0131t yok \u2014 yeni bir tarih eklendi\u011finde burada g\u00f6r\u00fcnecek."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_discover_empty_state_en": {
+      "defaultValue": {
+        "value": "No open sign-ups right now \u2014 new dates will show up here."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_join_full_error_snackbar_tr": {
+      "defaultValue": {
+        "value": "Bu ders az \u00f6nce doldu."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_join_full_error_snackbar_en": {
+      "defaultValue": {
+        "value": "This session just filled up."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_join_failed_snackbar_tr": {
+      "defaultValue": {
+        "value": "Kat\u0131l\u0131m kaydedilemedi, tekrar dene."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_join_failed_snackbar_en": {
+      "defaultValue": {
+        "value": "Could not save your response, try again."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_locked_join_button_tr": {
+      "defaultValue": {
+        "value": "Kilitli \u00b7 Ba\u015flang\u0131\u00e7 yakla\u015ft\u0131"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_locked_join_button_en": {
+      "defaultValue": {
+        "value": "Locked \u00b7 Starting soon"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_waitlist_join_button_tr": {
+      "defaultValue": {
+        "value": "Yedek listesine yaz"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_waitlist_join_button_en": {
+      "defaultValue": {
+        "value": "Join waitlist"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_joined_leave_button_tr": {
+      "defaultValue": {
+        "value": "Kat\u0131l\u0131yorsun \u00b7 Vazge\u00e7"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_joined_leave_button_en": {
+      "defaultValue": {
+        "value": "Joined \u00b7 Leave"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_join_button_tr": {
+      "defaultValue": {
+        "value": "Kat\u0131l\u0131yorum"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_join_button_en": {
+      "defaultValue": {
+        "value": "Join"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_attending_count_no_capacity_tr": {
+      "description": "{taken} yer tutucusu kat\u0131l\u0131mc\u0131 say\u0131s\u0131yla de\u011fi\u015ftirilir.",
+      "defaultValue": {
+        "value": "{taken} ki\u015fi kat\u0131l\u0131yor"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_attending_count_no_capacity_en": {
+      "defaultValue": {
+        "value": "{taken} attending"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_attending_count_with_capacity_tr": {
+      "description": "{taken} ve {capacity} yer tutucular\u0131 kat\u0131l\u0131mc\u0131 say\u0131s\u0131 ve kontenjanla de\u011fi\u015ftirilir.",
+      "defaultValue": {
+        "value": "{taken} / {capacity} ki\u015fi"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_attending_count_with_capacity_en": {
+      "defaultValue": {
+        "value": "{taken} / {capacity}"
       },
       "valueType": "STRING"
     },
@@ -1956,7 +2180,7 @@
     },
     "lbl_gyms_admin_home_trainer_performance_section_tr": {
       "defaultValue": {
-        "value": "ANTRENÖR PERFORMANSI"
+        "value": "ANTREN\u00d6R PERFORMANSI"
       },
       "valueType": "STRING"
     },
@@ -1968,7 +2192,7 @@
     },
     "lbl_gyms_admin_home_upcoming_payments_section_tr": {
       "defaultValue": {
-        "value": "ÖDEME VAKTİ YAKLAŞAN"
+        "value": "\u00d6DEME VAKT\u0130 YAKLA\u015eAN"
       },
       "valueType": "STRING"
     },
@@ -2040,7 +2264,7 @@
     },
     "lbl_gyms_permissions_title_tr": {
       "defaultValue": {
-        "value": "Yetki ayarları"
+        "value": "Yetki ayarlar\u0131"
       },
       "valueType": "STRING"
     },
@@ -2052,7 +2276,7 @@
     },
     "lbl_gyms_permissions_reminder_dropdown_label_tr": {
       "defaultValue": {
-        "value": "Seans bitimi eğitmene ne zaman hatırlatılsın?"
+        "value": "Seans bitimi e\u011fitmene ne zaman hat\u0131rlat\u0131ls\u0131n?"
       },
       "valueType": "STRING"
     },
@@ -2100,7 +2324,7 @@
     },
     "lbl_gyms_settings_nav_trainer_management_tr": {
       "defaultValue": {
-        "value": "Antrenör yönetimi"
+        "value": "Antren\u00f6r y\u00f6netimi"
       },
       "valueType": "STRING"
     },
@@ -2112,7 +2336,7 @@
     },
     "lbl_gyms_settings_nav_studio_packages_tr": {
       "defaultValue": {
-        "value": "Stüdyo paketleri"
+        "value": "St\u00fcdyo paketleri"
       },
       "valueType": "STRING"
     },
@@ -2124,7 +2348,7 @@
     },
     "lbl_gyms_settings_nav_session_management_tr": {
       "defaultValue": {
-        "value": "Ders / seans yönetimi"
+        "value": "Ders / seans y\u00f6netimi"
       },
       "valueType": "STRING"
     },
@@ -2160,7 +2384,7 @@
     },
     "lbl_gyms_settings_nav_permissions_tr": {
       "defaultValue": {
-        "value": "Yetki ayarları"
+        "value": "Yetki ayarlar\u0131"
       },
       "valueType": "STRING"
     },
@@ -2184,7 +2408,7 @@
     },
     "lbl_gyms_settings_nav_send_notification_tr": {
       "defaultValue": {
-        "value": "Bildirim gönder"
+        "value": "Bildirim g\u00f6nder"
       },
       "valueType": "STRING"
     },
@@ -2220,19 +2444,19 @@
     },
     "lbl_gyms_gym_info_logo_helper_tr": {
       "defaultValue": {
-        "value": "Kare, en az 512×512 px PNG yükleyin."
+        "value": "Kare, en az 512\u00d7512 px PNG y\u00fckleyin."
       },
       "valueType": "STRING"
     },
     "lbl_gyms_gym_info_logo_helper_en": {
       "defaultValue": {
-        "value": "Upload a square PNG, at least 512×512 px."
+        "value": "Upload a square PNG, at least 512\u00d7512 px."
       },
       "valueType": "STRING"
     },
     "lbl_gyms_gym_info_change_logo_button_tr": {
       "defaultValue": {
-        "value": "Logoyu değiştir"
+        "value": "Logoyu de\u011fi\u015ftir"
       },
       "valueType": "STRING"
     },
@@ -2244,7 +2468,7 @@
     },
     "lbl_gyms_gym_info_theme_color_section_tr": {
       "defaultValue": {
-        "value": "TEMA RENGİ"
+        "value": "TEMA RENG\u0130"
       },
       "valueType": "STRING"
     },
@@ -2256,7 +2480,7 @@
     },
     "lbl_gyms_gym_info_preview_label_tr": {
       "defaultValue": {
-        "value": "Önizleme"
+        "value": "\u00d6nizleme"
       },
       "valueType": "STRING"
     },
@@ -2280,19 +2504,19 @@
     },
     "lbl_gyms_gym_info_see_all_themes_link_tr": {
       "defaultValue": {
-        "value": "Tüm temaları gör ›"
+        "value": "T\u00fcm temalar\u0131 g\u00f6r \u203a"
       },
       "valueType": "STRING"
     },
     "lbl_gyms_gym_info_see_all_themes_link_en": {
       "defaultValue": {
-        "value": "See all themes ›"
+        "value": "See all themes \u203a"
       },
       "valueType": "STRING"
     },
     "lbl_gyms_gym_info_name_field_label_tr": {
       "defaultValue": {
-        "value": "Salon adı"
+        "value": "Salon ad\u0131"
       },
       "valueType": "STRING"
     },
@@ -2328,7 +2552,7 @@
     },
     "lbl_gyms_gym_setup_title_tr": {
       "defaultValue": {
-        "value": "Salonunu tanımla"
+        "value": "Salonunu tan\u0131mla"
       },
       "valueType": "STRING"
     },
@@ -2352,7 +2576,7 @@
     },
     "lbl_gyms_gym_setup_choose_logo_button_tr": {
       "defaultValue": {
-        "value": "Logo seç"
+        "value": "Logo se\u00e7"
       },
       "valueType": "STRING"
     },
@@ -2376,7 +2600,7 @@
     },
     "lbl_gyms_gym_setup_city_field_label_tr": {
       "defaultValue": {
-        "value": "Şehir"
+        "value": "\u015eehir"
       },
       "valueType": "STRING"
     },
@@ -2388,7 +2612,7 @@
     },
     "lbl_gyms_gym_setup_submit_button_tr": {
       "defaultValue": {
-        "value": "Salonu oluştur ve girişi tamamla"
+        "value": "Salonu olu\u015ftur ve giri\u015fi tamamla"
       },
       "valueType": "STRING"
     },
@@ -2412,7 +2636,7 @@
     },
     "lbl_gyms_themes_member_preview_section_tr": {
       "defaultValue": {
-        "value": "ÜYE EKRANI ÖNİZLEMESİ"
+        "value": "\u00dcYE EKRANI \u00d6N\u0130ZLEMES\u0130"
       },
       "valueType": "STRING"
     },
@@ -2424,7 +2648,7 @@
     },
     "lbl_gyms_themes_show_logo_silhouette_toggle_label_tr": {
       "defaultValue": {
-        "value": "Logo silüetini arka planda göster"
+        "value": "Logo sil\u00fcetini arka planda g\u00f6ster"
       },
       "valueType": "STRING"
     },
@@ -2436,7 +2660,7 @@
     },
     "lbl_gyms_themes_show_logo_silhouette_toggle_description_tr": {
       "defaultValue": {
-        "value": "Üye ve antrenör ekranlarında %25 opaklıkla"
+        "value": "\u00dcye ve antren\u00f6r ekranlar\u0131nda %25 opakl\u0131kla"
       },
       "valueType": "STRING"
     },
@@ -2448,7 +2672,7 @@
     },
     "lbl_gyms_themes_apply_to_all_button_tr": {
       "defaultValue": {
-        "value": "Temayı tüm üyelere uygula"
+        "value": "Temay\u0131 t\u00fcm \u00fcyelere uygula"
       },
       "valueType": "STRING"
     },
@@ -2496,7 +2720,7 @@
     },
     "lbl_gyms_add_theme_color_helper_tr": {
       "defaultValue": {
-        "value": "Paletten seçin ya da kendi HEX kodunuzu yazın."
+        "value": "Paletten se\u00e7in ya da kendi HEX kodunuzu yaz\u0131n."
       },
       "valueType": "STRING"
     },
@@ -2508,7 +2732,7 @@
     },
     "lbl_gyms_add_theme_use_logo_question_tr": {
       "defaultValue": {
-        "value": "Salon logosu kullanılsın mı?"
+        "value": "Salon logosu kullan\u0131ls\u0131n m\u0131?"
       },
       "valueType": "STRING"
     },
@@ -2520,7 +2744,7 @@
     },
     "lbl_gyms_add_theme_preview_section_tr": {
       "defaultValue": {
-        "value": "ÖNİZLEME"
+        "value": "\u00d6N\u0130ZLEME"
       },
       "valueType": "STRING"
     },
@@ -2544,7 +2768,7 @@
     },
     "lbl_gyms_add_theme_flat_background_option_tr": {
       "defaultValue": {
-        "value": "Hayır, düz zemin"
+        "value": "Hay\u0131r, d\u00fcz zemin"
       },
       "valueType": "STRING"
     },
@@ -2556,7 +2780,7 @@
     },
     "lbl_gyms_add_theme_submit_button_tr": {
       "defaultValue": {
-        "value": "Temayı kaydet ve uygula"
+        "value": "Temay\u0131 kaydet ve uygula"
       },
       "valueType": "STRING"
     },
@@ -2568,7 +2792,7 @@
     },
     "lbl_gyms_add_theme_name_field_label_tr": {
       "defaultValue": {
-        "value": "Tema adı"
+        "value": "Tema ad\u0131"
       },
       "valueType": "STRING"
     },
@@ -2580,7 +2804,7 @@
     },
     "lbl_gyms_studio_rules_title_tr": {
       "defaultValue": {
-        "value": "Stüdyo kuralları"
+        "value": "St\u00fcdyo kurallar\u0131"
       },
       "valueType": "STRING"
     },
@@ -2592,7 +2816,7 @@
     },
     "lbl_gyms_edit_studio_rules_title_tr": {
       "defaultValue": {
-        "value": "Kuralları düzenle"
+        "value": "Kurallar\u0131 d\u00fczenle"
       },
       "valueType": "STRING"
     },
@@ -2640,7 +2864,7 @@
     },
     "lbl_gyms_admin_home_no_trainers_message_tr": {
       "defaultValue": {
-        "value": "Henüz antrenör yok."
+        "value": "Hen\u00fcz antren\u00f6r yok."
       },
       "valueType": "STRING"
     },
@@ -2652,7 +2876,7 @@
     },
     "lbl_gyms_admin_home_add_trainer_button_tr": {
       "defaultValue": {
-        "value": "+ Antrenör ekle"
+        "value": "+ Antren\u00f6r ekle"
       },
       "valueType": "STRING"
     },
@@ -2664,7 +2888,7 @@
     },
     "lbl_gyms_admin_home_no_pending_payments_message_tr": {
       "defaultValue": {
-        "value": "Bekleyen ödeme yok."
+        "value": "Bekleyen \u00f6deme yok."
       },
       "valueType": "STRING"
     },
@@ -2676,7 +2900,7 @@
     },
     "lbl_gyms_admin_home_due_payment_members_template_tr": {
       "defaultValue": {
-        "value": "{count} üyenin ödemesi bekleniyor"
+        "value": "{count} \u00fcyenin \u00f6demesi bekleniyor"
       },
       "valueType": "STRING"
     },
@@ -2688,7 +2912,7 @@
     },
     "lbl_gyms_admin_home_total_feedback_template_tr": {
       "defaultValue": {
-        "value": "Toplam {count} değerlendirme"
+        "value": "Toplam {count} de\u011ferlendirme"
       },
       "valueType": "STRING"
     },
@@ -2700,7 +2924,7 @@
     },
     "lbl_gyms_permissions_trainer_question_tr": {
       "defaultValue": {
-        "value": "Hangi antrenöre yetkilendirme yapmak istiyorsun?"
+        "value": "Hangi antren\u00f6re yetkilendirme yapmak istiyorsun?"
       },
       "valueType": "STRING"
     },
@@ -2712,7 +2936,7 @@
     },
     "lbl_gyms_permissions_trainer_helper_tr": {
       "defaultValue": {
-        "value": "Bir ya da birden fazla antrenör seçebilirsin; aynı ayarlar hepsine uygulanır."
+        "value": "Bir ya da birden fazla antren\u00f6r se\u00e7ebilirsin; ayn\u0131 ayarlar hepsine uygulan\u0131r."
       },
       "valueType": "STRING"
     },
@@ -2748,31 +2972,31 @@
     },
     "lbl_gyms_gym_info_uploading_label_tr": {
       "defaultValue": {
-        "value": "Yükleniyor…"
+        "value": "Y\u00fckleniyor\u2026"
       },
       "valueType": "STRING"
     },
     "lbl_gyms_gym_info_uploading_label_en": {
       "defaultValue": {
-        "value": "Uploading…"
+        "value": "Uploading\u2026"
       },
       "valueType": "STRING"
     },
     "lbl_gyms_gym_info_palette_extracting_label_tr": {
       "defaultValue": {
-        "value": "Logodan renkler çıkarılıyor…"
+        "value": "Logodan renkler \u00e7\u0131kar\u0131l\u0131yor\u2026"
       },
       "valueType": "STRING"
     },
     "lbl_gyms_gym_info_palette_extracting_label_en": {
       "defaultValue": {
-        "value": "Extracting colors from logo…"
+        "value": "Extracting colors from logo\u2026"
       },
       "valueType": "STRING"
     },
     "lbl_gyms_gym_info_theme_color_note_tr": {
       "defaultValue": {
-        "value": "Seçtiğiniz renk üyelerin uygulamasında da birincil renk olur; koyu zemin ve durum renkleri değişmez."
+        "value": "Se\u00e7ti\u011finiz renk \u00fcyelerin uygulamas\u0131nda da birincil renk olur; koyu zemin ve durum renkleri de\u011fi\u015fmez."
       },
       "valueType": "STRING"
     },
@@ -2796,7 +3020,7 @@
     },
     "lbl_gyms_gym_info_report_emails_description_tr": {
       "defaultValue": {
-        "value": "Haftalık salon ve muhasebe özeti bu adreslere e-posta ile gönderilir."
+        "value": "Haftal\u0131k salon ve muhasebe \u00f6zeti bu adreslere e-posta ile g\u00f6nderilir."
       },
       "valueType": "STRING"
     },
@@ -2808,7 +3032,7 @@
     },
     "lbl_gyms_gym_info_gym_report_email_label_tr": {
       "defaultValue": {
-        "value": "Salon raporu e-postası"
+        "value": "Salon raporu e-postas\u0131"
       },
       "valueType": "STRING"
     },
@@ -2820,7 +3044,7 @@
     },
     "lbl_gyms_gym_info_gym_report_email_hint_tr": {
       "defaultValue": {
-        "value": "admin@stüdyo.com"
+        "value": "admin@st\u00fcdyo.com"
       },
       "valueType": "STRING"
     },
@@ -2832,7 +3056,7 @@
     },
     "lbl_gyms_gym_info_accounting_report_email_label_tr": {
       "defaultValue": {
-        "value": "Muhasebe raporu e-postası"
+        "value": "Muhasebe raporu e-postas\u0131"
       },
       "valueType": "STRING"
     },
@@ -2844,7 +3068,7 @@
     },
     "lbl_gyms_gym_info_accounting_report_email_hint_tr": {
       "defaultValue": {
-        "value": "muhasebe@stüdyo.com"
+        "value": "muhasebe@st\u00fcdyo.com"
       },
       "valueType": "STRING"
     },
@@ -2856,19 +3080,19 @@
     },
     "lbl_gyms_gym_info_saving_label_tr": {
       "defaultValue": {
-        "value": "Kaydediliyor…"
+        "value": "Kaydediliyor\u2026"
       },
       "valueType": "STRING"
     },
     "lbl_gyms_gym_info_saving_label_en": {
       "defaultValue": {
-        "value": "Saving…"
+        "value": "Saving\u2026"
       },
       "valueType": "STRING"
     },
     "lbl_gyms_gym_info_save_report_emails_button_tr": {
       "defaultValue": {
-        "value": "Rapor e-postalarını kaydet"
+        "value": "Rapor e-postalar\u0131n\u0131 kaydet"
       },
       "valueType": "STRING"
     },
@@ -2880,7 +3104,7 @@
     },
     "lbl_gyms_gym_info_logo_upload_failed_error_tr": {
       "defaultValue": {
-        "value": "Logo yüklenemedi, tekrar dene."
+        "value": "Logo y\u00fcklenemedi, tekrar dene."
       },
       "valueType": "STRING"
     },
@@ -2892,7 +3116,7 @@
     },
     "lbl_gyms_gym_info_name_required_error_tr": {
       "defaultValue": {
-        "value": "Salon adı boş olamaz."
+        "value": "Salon ad\u0131 bo\u015f olamaz."
       },
       "valueType": "STRING"
     },
@@ -2904,7 +3128,7 @@
     },
     "lbl_gyms_gym_info_address_required_error_tr": {
       "defaultValue": {
-        "value": "Adres boş olamaz."
+        "value": "Adres bo\u015f olamaz."
       },
       "valueType": "STRING"
     },
@@ -2916,7 +3140,7 @@
     },
     "lbl_gyms_gym_info_phone_required_error_tr": {
       "defaultValue": {
-        "value": "Telefon boş olamaz."
+        "value": "Telefon bo\u015f olamaz."
       },
       "valueType": "STRING"
     },
@@ -2952,7 +3176,7 @@
     },
     "lbl_gyms_gym_info_logo_color_theme_note_tr": {
       "defaultValue": {
-        "value": "Logonuzdan çıkarıldı"
+        "value": "Logonuzdan \u00e7\u0131kar\u0131ld\u0131"
       },
       "valueType": "STRING"
     },
@@ -2964,7 +3188,7 @@
     },
     "lbl_gyms_gym_setup_headline_tr": {
       "defaultValue": {
-        "value": "Bu adımı tamamlayınca yönetici hesabınız aktifleşir ve uygulamaya girersiniz."
+        "value": "Bu ad\u0131m\u0131 tamamlay\u0131nca y\u00f6netici hesab\u0131n\u0131z aktifle\u015fir ve uygulamaya girersiniz."
       },
       "valueType": "STRING"
     },
@@ -2976,7 +3200,7 @@
     },
     "lbl_gyms_gym_setup_phone_field_label_tr": {
       "defaultValue": {
-        "value": "Telefon numaran (giriş için)"
+        "value": "Telefon numaran (giri\u015f i\u00e7in)"
       },
       "valueType": "STRING"
     },
@@ -3000,7 +3224,7 @@
     },
     "lbl_gyms_gym_setup_phone_helper_note_tr": {
       "defaultValue": {
-        "value": "Salon kaydı tamamlanınca bu numarayla admin olarak giriş yapacaksın."
+        "value": "Salon kayd\u0131 tamamlan\u0131nca bu numarayla admin olarak giri\u015f yapacaks\u0131n."
       },
       "valueType": "STRING"
     },
@@ -3024,19 +3248,19 @@
     },
     "lbl_gyms_gym_setup_logo_description_tr": {
       "defaultValue": {
-        "value": "Kare PNG, en az 512×512. Eklersen üyelerin ve antrenörlerin her ekranında arka planda %25 opaklıkla silüet olarak görünür — sonradan Salon Bilgileri panelinden de ekleyebilirsin."
+        "value": "Kare PNG, en az 512\u00d7512. Eklersen \u00fcyelerin ve antren\u00f6rlerin her ekran\u0131nda arka planda %25 opakl\u0131kla sil\u00fcet olarak g\u00f6r\u00fcn\u00fcr \u2014 sonradan Salon Bilgileri panelinden de ekleyebilirsin."
       },
       "valueType": "STRING"
     },
     "lbl_gyms_gym_setup_logo_description_en": {
       "defaultValue": {
-        "value": "Square PNG, at least 512×512. If you add one, it appears as a 25%-opacity silhouette in the background on every screen for members and trainers — you can also add it later from the Gym Info panel."
+        "value": "Square PNG, at least 512\u00d7512. If you add one, it appears as a 25%-opacity silhouette in the background on every screen for members and trainers \u2014 you can also add it later from the Gym Info panel."
       },
       "valueType": "STRING"
     },
     "lbl_gyms_gym_setup_logo_color_hint_note_tr": {
       "defaultValue": {
-        "value": "Logo eklersen aşağıdaki tema rengi seçeneklerini logona göre öneririz."
+        "value": "Logo eklersen a\u015fa\u011f\u0131daki tema rengi se\u00e7eneklerini logona g\u00f6re \u00f6neririz."
       },
       "valueType": "STRING"
     },
@@ -3048,7 +3272,7 @@
     },
     "lbl_gyms_gym_setup_suggested_colors_label_tr": {
       "defaultValue": {
-        "value": "Logona göre önerilen renkler"
+        "value": "Logona g\u00f6re \u00f6nerilen renkler"
       },
       "valueType": "STRING"
     },
@@ -3060,7 +3284,7 @@
     },
     "lbl_gyms_gym_setup_change_later_note_tr": {
       "defaultValue": {
-        "value": "Sonradan Temalar panelinden değiştirebilirsiniz."
+        "value": "Sonradan Temalar panelinden de\u011fi\u015ftirebilirsiniz."
       },
       "valueType": "STRING"
     },
@@ -3072,19 +3296,19 @@
     },
     "lbl_gyms_gym_setup_submitting_label_tr": {
       "defaultValue": {
-        "value": "Oluşturuluyor…"
+        "value": "Olu\u015fturuluyor\u2026"
       },
       "valueType": "STRING"
     },
     "lbl_gyms_gym_setup_submitting_label_en": {
       "defaultValue": {
-        "value": "Creating…"
+        "value": "Creating\u2026"
       },
       "valueType": "STRING"
     },
     "lbl_gyms_gym_setup_success_banner_tr": {
       "defaultValue": {
-        "value": "Salonun oluşturuldu! Şimdi az önce girdiğin numarayla giriş yap."
+        "value": "Salonun olu\u015fturuldu! \u015eimdi az \u00f6nce girdi\u011fin numarayla giri\u015f yap."
       },
       "valueType": "STRING"
     },
@@ -3096,7 +3320,7 @@
     },
     "lbl_gyms_add_theme_name_field_hint_tr": {
       "defaultValue": {
-        "value": "Vira İmza"
+        "value": "Vira \u0130mza"
       },
       "valueType": "STRING"
     },
@@ -3108,7 +3332,7 @@
     },
     "lbl_gyms_add_theme_invalid_hex_error_tr": {
       "defaultValue": {
-        "value": "Geçerli bir HEX kod gir (ör. 05A6FA)."
+        "value": "Ge\u00e7erli bir HEX kod gir (\u00f6r. 05A6FA)."
       },
       "valueType": "STRING"
     },
@@ -3132,7 +3356,7 @@
     },
     "lbl_gyms_theme_preview_next_session_label_tr": {
       "defaultValue": {
-        "value": "Sıradaki ders 3 Ağustos 18:30"
+        "value": "S\u0131radaki ders 3 A\u011fustos 18:30"
       },
       "valueType": "STRING"
     },
@@ -3156,7 +3380,7 @@
     },
     "lbl_gyms_add_theme_custom_color_note_tr": {
       "defaultValue": {
-        "value": "Özel renk"
+        "value": "\u00d6zel renk"
       },
       "valueType": "STRING"
     },
@@ -3168,7 +3392,7 @@
     },
     "lbl_gyms_rules_editor_toolbar_hint_tr": {
       "defaultValue": {
-        "value": "Kalın/italik gibi biçimlendirme için araç çubuğunu, emoji için klavyenizin emoji tuşunu kullanabilirsiniz."
+        "value": "Kal\u0131n/italik gibi bi\u00e7imlendirme i\u00e7in ara\u00e7 \u00e7ubu\u011funu, emoji i\u00e7in klavyenizin emoji tu\u015funu kullanabilirsiniz."
       },
       "valueType": "STRING"
     },
@@ -3180,7 +3404,7 @@
     },
     "lbl_gyms_rules_editor_save_failed_error_tr": {
       "defaultValue": {
-        "value": "Kurallar kaydedilemedi, bağlantını kontrol edip tekrar dene."
+        "value": "Kurallar kaydedilemedi, ba\u011flant\u0131n\u0131 kontrol edip tekrar dene."
       },
       "valueType": "STRING"
     },
@@ -3192,7 +3416,7 @@
     },
     "lbl_gyms_rules_view_last_updated_template_tr": {
       "defaultValue": {
-        "value": "Son güncelleme {date}"
+        "value": "Son g\u00fcncelleme {date}"
       },
       "valueType": "STRING"
     },
@@ -3204,13 +3428,13 @@
     },
     "lbl_gyms_themes_description_tr": {
       "defaultValue": {
-        "value": "Seçtiğiniz tema salonunuzdaki tüm üye ve antrenörlerin uygulamasında görünür. Koyu zemin ve durum renkleri sabit kalır, değişen tek şey vurgu rengi."
+        "value": "Se\u00e7ti\u011finiz tema salonunuzdaki t\u00fcm \u00fcye ve antren\u00f6rlerin uygulamas\u0131nda g\u00f6r\u00fcn\u00fcr. Koyu zemin ve durum renkleri sabit kal\u0131r, de\u011fi\u015fen tek \u015fey vurgu rengi."
       },
       "valueType": "STRING"
     },
     "lbl_gyms_themes_description_en": {
       "defaultValue": {
-        "value": "The theme you choose appears in the app for all your gym's members and trainers. The dark background and status colors stay fixed — only the accent color changes."
+        "value": "The theme you choose appears in the app for all your gym's members and trainers. The dark background and status colors stay fixed \u2014 only the accent color changes."
       },
       "valueType": "STRING"
     },
@@ -3228,7 +3452,7 @@
     },
     "lbl_gyms_trainer_permissions_reminder_question_tr": {
       "defaultValue": {
-        "value": "Seans bitimi eğitmene ne zaman hatırlatılsın?"
+        "value": "Seans bitimi e\u011fitmene ne zaman hat\u0131rlat\u0131ls\u0131n?"
       },
       "valueType": "STRING"
     },
@@ -3264,7 +3488,7 @@
     },
     "lbl_gyms_trainer_permissions_online_booking_note_tr": {
       "defaultValue": {
-        "value": "Üyeler Keşfet üzerinden grup derslerine katılabilir"
+        "value": "\u00dcyeler Ke\u015ffet \u00fczerinden grup derslerine kat\u0131labilir"
       },
       "valueType": "STRING"
     },
@@ -3276,7 +3500,7 @@
     },
     "lbl_gyms_trainer_permissions_allow_after_expiry_title_tr": {
       "defaultValue": {
-        "value": "Paket süresi bitince seans oluşturulabilsin mi?"
+        "value": "Paket s\u00fcresi bitince seans olu\u015fturulabilsin mi?"
       },
       "valueType": "STRING"
     },
@@ -3288,7 +3512,7 @@
     },
     "lbl_gyms_trainer_permissions_allow_after_expiry_note_tr": {
       "defaultValue": {
-        "value": "Kapalıysa paketi bitmiş üyeye yeni seans planlanamaz"
+        "value": "Kapal\u0131ysa paketi bitmi\u015f \u00fcyeye yeni seans planlanamaz"
       },
       "valueType": "STRING"
     },
@@ -3300,7 +3524,7 @@
     },
     "lbl_gyms_trainer_permissions_member_cancel_title_tr": {
       "defaultValue": {
-        "value": "Üye seans iptal edebilir"
+        "value": "\u00dcye seans iptal edebilir"
       },
       "valueType": "STRING"
     },
@@ -3312,7 +3536,7 @@
     },
     "lbl_gyms_trainer_permissions_member_cancel_note_tr": {
       "defaultValue": {
-        "value": "Kapalıysa iptal yalnızca antrenör/yönetici yapabilir"
+        "value": "Kapal\u0131ysa iptal yaln\u0131zca antren\u00f6r/y\u00f6netici yapabilir"
       },
       "valueType": "STRING"
     },
@@ -3324,7 +3548,7 @@
     },
     "lbl_gyms_trainer_permissions_auto_save_note_tr": {
       "defaultValue": {
-        "value": "Her değişiklik anında kaydedilir."
+        "value": "Her de\u011fi\u015fiklik an\u0131nda kaydedilir."
       },
       "valueType": "STRING"
     },
@@ -3336,7 +3560,7 @@
     },
     "lbl_gyms_trainer_permissions_save_failed_error_tr": {
       "defaultValue": {
-        "value": "Ayar kaydedilemedi, bağlantını kontrol edip tekrar dene."
+        "value": "Ayar kaydedilemedi, ba\u011flant\u0131n\u0131 kontrol edip tekrar dene."
       },
       "valueType": "STRING"
     },
@@ -3348,7 +3572,7 @@
     },
     "lbl_measurements_add_title_tr": {
       "defaultValue": {
-        "value": "Yeni ölçüm"
+        "value": "Yeni \u00f6l\u00e7\u00fcm"
       },
       "valueType": "STRING"
     },
@@ -3360,7 +3584,7 @@
     },
     "lbl_measurements_measurement_date_label_tr": {
       "defaultValue": {
-        "value": "Ölçüm tarihi"
+        "value": "\u00d6l\u00e7\u00fcm tarihi"
       },
       "valueType": "STRING"
     },
@@ -3372,7 +3596,7 @@
     },
     "lbl_measurements_measurements_section_tr": {
       "defaultValue": {
-        "value": "ÖLÇÜLER"
+        "value": "\u00d6L\u00c7\u00dcLER"
       },
       "valueType": "STRING"
     },
@@ -3396,7 +3620,7 @@
     },
     "lbl_measurements_title_tr": {
       "defaultValue": {
-        "value": "Ölçümlerim"
+        "value": "\u00d6l\u00e7\u00fcmlerim"
       },
       "valueType": "STRING"
     },
@@ -3408,7 +3632,7 @@
     },
     "lbl_measurements_selected_point_label_tr": {
       "defaultValue": {
-        "value": "Seçili nokta"
+        "value": "Se\u00e7ili nokta"
       },
       "valueType": "STRING"
     },
@@ -3420,7 +3644,7 @@
     },
     "lbl_measurements_history_section_tr": {
       "defaultValue": {
-        "value": "ÖLÇÜM GEÇMİŞİ"
+        "value": "\u00d6L\u00c7\u00dcM GE\u00c7M\u0130\u015e\u0130"
       },
       "valueType": "STRING"
     },
@@ -3432,7 +3656,7 @@
     },
     "lbl_members_detail_payment_status_label_tr": {
       "defaultValue": {
-        "value": "Ödeme durumu"
+        "value": "\u00d6deme durumu"
       },
       "valueType": "STRING"
     },
@@ -3480,7 +3704,7 @@
     },
     "lbl_members_detail_paid_label_tr": {
       "defaultValue": {
-        "value": "Ödendi"
+        "value": "\u00d6dendi"
       },
       "valueType": "STRING"
     },
@@ -3504,7 +3728,7 @@
     },
     "lbl_members_list_title_tr": {
       "defaultValue": {
-        "value": "Üyeler"
+        "value": "\u00dcyeler"
       },
       "valueType": "STRING"
     },
@@ -3516,7 +3740,7 @@
     },
     "lbl_members_add_member_button_tr": {
       "defaultValue": {
-        "value": "+ Üye ekle"
+        "value": "+ \u00dcye ekle"
       },
       "valueType": "STRING"
     },
@@ -3528,7 +3752,7 @@
     },
     "lbl_members_list_empty_state_tr": {
       "defaultValue": {
-        "value": "Bu filtreye uyan üye yok."
+        "value": "Bu filtreye uyan \u00fcye yok."
       },
       "valueType": "STRING"
     },
@@ -3576,7 +3800,7 @@
     },
     "lbl_members_info_login_helper_tr": {
       "defaultValue": {
-        "value": "Üye bu numarayla giriş yapar, şifre yok."
+        "value": "\u00dcye bu numarayla giri\u015f yapar, \u015fifre yok."
       },
       "valueType": "STRING"
     },
@@ -3600,7 +3824,7 @@
     },
     "lbl_members_trainer_field_label_tr": {
       "defaultValue": {
-        "value": "Antrenör"
+        "value": "Antren\u00f6r"
       },
       "valueType": "STRING"
     },
@@ -3612,7 +3836,7 @@
     },
     "lbl_members_registration_date_field_label_tr": {
       "defaultValue": {
-        "value": "Kayıt tarihi"
+        "value": "Kay\u0131t tarihi"
       },
       "valueType": "STRING"
     },
@@ -3624,7 +3848,7 @@
     },
     "lbl_members_select_trainer_button_tr": {
       "defaultValue": {
-        "value": "Antrenör seç"
+        "value": "Antren\u00f6r se\u00e7"
       },
       "valueType": "STRING"
     },
@@ -3660,7 +3884,7 @@
     },
     "lbl_members_birth_year_field_label_tr": {
       "defaultValue": {
-        "value": "Doğum yılı"
+        "value": "Do\u011fum y\u0131l\u0131"
       },
       "valueType": "STRING"
     },
@@ -3684,7 +3908,7 @@
     },
     "lbl_members_note_field_label_tr": {
       "defaultValue": {
-        "value": "Not (isteğe bağlı)"
+        "value": "Not (iste\u011fe ba\u011fl\u0131)"
       },
       "valueType": "STRING"
     },
@@ -3696,7 +3920,7 @@
     },
     "lbl_members_payment_title_tr": {
       "defaultValue": {
-        "value": "Ödeme bilgisi"
+        "value": "\u00d6deme bilgisi"
       },
       "valueType": "STRING"
     },
@@ -3732,7 +3956,7 @@
     },
     "lbl_members_payment_paid_label_tr": {
       "defaultValue": {
-        "value": "Ödendi"
+        "value": "\u00d6dendi"
       },
       "valueType": "STRING"
     },
@@ -3744,7 +3968,7 @@
     },
     "lbl_members_payment_remaining_label_tr": {
       "defaultValue": {
-        "value": "Kalan ödeme"
+        "value": "Kalan \u00f6deme"
       },
       "valueType": "STRING"
     },
@@ -3756,7 +3980,7 @@
     },
     "lbl_members_payment_auto_calculated_helper_tr": {
       "defaultValue": {
-        "value": "Otomatik hesaplanır"
+        "value": "Otomatik hesaplan\u0131r"
       },
       "valueType": "STRING"
     },
@@ -3768,7 +3992,7 @@
     },
     "lbl_members_payment_due_date_field_label_tr": {
       "defaultValue": {
-        "value": "Son ödeme tarihi"
+        "value": "Son \u00f6deme tarihi"
       },
       "valueType": "STRING"
     },
@@ -3780,7 +4004,7 @@
     },
     "lbl_members_payment_enter_amount_helper_tr": {
       "defaultValue": {
-        "value": "Ödenen tutarı gir"
+        "value": "\u00d6denen tutar\u0131 gir"
       },
       "valueType": "STRING"
     },
@@ -3792,7 +4016,7 @@
     },
     "lbl_members_payment_full_option_tr": {
       "defaultValue": {
-        "value": "Tam ödendi"
+        "value": "Tam \u00f6dendi"
       },
       "valueType": "STRING"
     },
@@ -3804,7 +4028,7 @@
     },
     "lbl_members_payment_half_option_tr": {
       "defaultValue": {
-        "value": "Yarısı"
+        "value": "Yar\u0131s\u0131"
       },
       "valueType": "STRING"
     },
@@ -3816,7 +4040,7 @@
     },
     "lbl_members_payment_other_option_tr": {
       "defaultValue": {
-        "value": "Diğer"
+        "value": "Di\u011fer"
       },
       "valueType": "STRING"
     },
@@ -3828,7 +4052,7 @@
     },
     "lbl_members_new_membership_title_tr": {
       "defaultValue": {
-        "value": "Yeni üyelik"
+        "value": "Yeni \u00fcyelik"
       },
       "valueType": "STRING"
     },
@@ -3852,7 +4076,7 @@
     },
     "lbl_members_package_select_section_tr": {
       "defaultValue": {
-        "value": "PAKET SEÇ"
+        "value": "PAKET SE\u00c7"
       },
       "valueType": "STRING"
     },
@@ -3864,7 +4088,7 @@
     },
     "lbl_members_makeup_session_count_label_tr": {
       "defaultValue": {
-        "value": "Telafi seans sayısı"
+        "value": "Telafi seans say\u0131s\u0131"
       },
       "valueType": "STRING"
     },
@@ -3876,7 +4100,7 @@
     },
     "lbl_members_makeup_session_helper_tr": {
       "defaultValue": {
-        "value": "Paket bitince kullanılabilir"
+        "value": "Paket bitince kullan\u0131labilir"
       },
       "valueType": "STRING"
     },
@@ -3888,7 +4112,7 @@
     },
     "lbl_members_start_date_field_label_tr": {
       "defaultValue": {
-        "value": "Başlangıç tarihi"
+        "value": "Ba\u015flang\u0131\u00e7 tarihi"
       },
       "valueType": "STRING"
     },
@@ -3900,7 +4124,7 @@
     },
     "lbl_members_end_date_field_label_tr": {
       "defaultValue": {
-        "value": "Bitiş tarihi"
+        "value": "Biti\u015f tarihi"
       },
       "valueType": "STRING"
     },
@@ -3912,7 +4136,7 @@
     },
     "lbl_members_go_to_payment_button_tr": {
       "defaultValue": {
-        "value": "Ödeme bilgisine geç"
+        "value": "\u00d6deme bilgisine ge\u00e7"
       },
       "valueType": "STRING"
     },
@@ -3924,7 +4148,7 @@
     },
     "lbl_members_detail_not_found_tr": {
       "defaultValue": {
-        "value": "Üye bulunamadı."
+        "value": "\u00dcye bulunamad\u0131."
       },
       "valueType": "STRING"
     },
@@ -3936,7 +4160,7 @@
     },
     "lbl_members_detail_last_payment_label_tr": {
       "defaultValue": {
-        "value": "Son ödeme {date}"
+        "value": "Son \u00f6deme {date}"
       },
       "valueType": "STRING"
     },
@@ -3948,7 +4172,7 @@
     },
     "lbl_members_detail_view_measurements_button_tr": {
       "defaultValue": {
-        "value": "Ölçüm ekranını gör"
+        "value": "\u00d6l\u00e7\u00fcm ekran\u0131n\u0131 g\u00f6r"
       },
       "valueType": "STRING"
     },
@@ -3960,19 +4184,19 @@
     },
     "lbl_members_detail_phone_trainer_line_tr": {
       "defaultValue": {
-        "value": "{phone} · Antrenör: {trainerName}"
+        "value": "{phone} \u00b7 Antren\u00f6r: {trainerName}"
       },
       "valueType": "STRING"
     },
     "lbl_members_detail_phone_trainer_line_en": {
       "defaultValue": {
-        "value": "{phone} · Trainer: {trainerName}"
+        "value": "{phone} \u00b7 Trainer: {trainerName}"
       },
       "valueType": "STRING"
     },
     "lbl_members_list_search_hint_tr": {
       "defaultValue": {
-        "value": "İsim ara"
+        "value": "\u0130sim ara"
       },
       "valueType": "STRING"
     },
@@ -3984,7 +4208,7 @@
     },
     "lbl_members_list_load_error_tr": {
       "defaultValue": {
-        "value": "Liste yüklenemedi."
+        "value": "Liste y\u00fcklenemedi."
       },
       "valueType": "STRING"
     },
@@ -3996,7 +4220,7 @@
     },
     "lbl_members_edit_payment_title_tr": {
       "defaultValue": {
-        "value": "Ödeme bilgileri"
+        "value": "\u00d6deme bilgileri"
       },
       "valueType": "STRING"
     },
@@ -4008,7 +4232,7 @@
     },
     "lbl_members_payment_installment_count_label_tr": {
       "defaultValue": {
-        "value": "Taksit sayısı"
+        "value": "Taksit say\u0131s\u0131"
       },
       "valueType": "STRING"
     },
@@ -4020,7 +4244,7 @@
     },
     "lbl_members_edit_payment_save_error_tr": {
       "defaultValue": {
-        "value": "Kaydedilemedi, bağlantını kontrol edip tekrar dene."
+        "value": "Kaydedilemedi, ba\u011flant\u0131n\u0131 kontrol edip tekrar dene."
       },
       "valueType": "STRING"
     },
@@ -4032,7 +4256,7 @@
     },
     "lbl_members_payment_installment_note_tr": {
       "defaultValue": {
-        "value": "Üye kendi ekranında yalnızca taksitlerin ödenip ödenmediğini görür; tutarlar üyeye gösterilmez."
+        "value": "\u00dcye kendi ekran\u0131nda yaln\u0131zca taksitlerin \u00f6denip \u00f6denmedi\u011fini g\u00f6r\u00fcr; tutarlar \u00fcyeye g\u00f6sterilmez."
       },
       "valueType": "STRING"
     },
@@ -4044,19 +4268,19 @@
     },
     "lbl_members_saving_label_tr": {
       "defaultValue": {
-        "value": "Kaydediliyor…"
+        "value": "Kaydediliyor\u2026"
       },
       "valueType": "STRING"
     },
     "lbl_members_saving_label_en": {
       "defaultValue": {
-        "value": "Saving…"
+        "value": "Saving\u2026"
       },
       "valueType": "STRING"
     },
     "lbl_members_info_new_title_tr": {
       "defaultValue": {
-        "value": "Yeni üye"
+        "value": "Yeni \u00fcye"
       },
       "valueType": "STRING"
     },
@@ -4068,7 +4292,7 @@
     },
     "lbl_members_info_edit_title_tr": {
       "defaultValue": {
-        "value": "Üye bilgileri"
+        "value": "\u00dcye bilgileri"
       },
       "valueType": "STRING"
     },
@@ -4092,7 +4316,7 @@
     },
     "lbl_members_info_age_suffix_tr": {
       "defaultValue": {
-        "value": "{age} yaş"
+        "value": "{age} ya\u015f"
       },
       "valueType": "STRING"
     },
@@ -4128,7 +4352,7 @@
     },
     "lbl_members_info_gender_helper_tr": {
       "defaultValue": {
-        "value": "Ölçüm avatarı bu bilgiye göre gösterilir; üye ekranında ayrıca seçim yapılmaz."
+        "value": "\u00d6l\u00e7\u00fcm avatar\u0131 bu bilgiye g\u00f6re g\u00f6sterilir; \u00fcye ekran\u0131nda ayr\u0131ca se\u00e7im yap\u0131lmaz."
       },
       "valueType": "STRING"
     },
@@ -4140,7 +4364,7 @@
     },
     "lbl_members_info_confirm_attendance_label_tr": {
       "defaultValue": {
-        "value": "Ders onayı gönderebilsin"
+        "value": "Ders onay\u0131 g\u00f6nderebilsin"
       },
       "valueType": "STRING"
     },
@@ -4152,7 +4376,7 @@
     },
     "lbl_members_info_confirm_attendance_helper_tr": {
       "defaultValue": {
-        "value": "Üye ana ekranından sıradaki dersi için \"Gelicem\"/\"Gelmeyeceğim\" bildirebilir."
+        "value": "\u00dcye ana ekran\u0131ndan s\u0131radaki dersi i\u00e7in \"Gelicem\"/\"Gelmeyece\u011fim\" bildirebilir."
       },
       "valueType": "STRING"
     },
@@ -4164,7 +4388,7 @@
     },
     "lbl_members_info_go_to_package_button_tr": {
       "defaultValue": {
-        "value": "Paket seçimine geç"
+        "value": "Paket se\u00e7imine ge\u00e7"
       },
       "valueType": "STRING"
     },
@@ -4176,7 +4400,7 @@
     },
     "lbl_members_info_no_trainers_message_tr": {
       "defaultValue": {
-        "value": "Henüz antrenör yok."
+        "value": "Hen\u00fcz antren\u00f6r yok."
       },
       "valueType": "STRING"
     },
@@ -4188,7 +4412,7 @@
     },
     "lbl_members_info_picker_confirm_button_tr": {
       "defaultValue": {
-        "value": "Seç"
+        "value": "Se\u00e7"
       },
       "valueType": "STRING"
     },
@@ -4200,7 +4424,7 @@
     },
     "lbl_members_new_membership_trainer_label_tr": {
       "defaultValue": {
-        "value": "Antrenör: {trainerName}"
+        "value": "Antren\u00f6r: {trainerName}"
       },
       "valueType": "STRING"
     },
@@ -4212,7 +4436,7 @@
     },
     "lbl_members_new_membership_autofill_note_tr": {
       "defaultValue": {
-        "value": "Bitiş tarihi ve seans sayısı seçtiğiniz pakete göre dolar; isterseniz elle değiştirebilirsiniz."
+        "value": "Biti\u015f tarihi ve seans say\u0131s\u0131 se\u00e7ti\u011finiz pakete g\u00f6re dolar; isterseniz elle de\u011fi\u015ftirebilirsiniz."
       },
       "valueType": "STRING"
     },
@@ -4236,7 +4460,7 @@
     },
     "lbl_members_installment_paid_toggle_label_tr": {
       "defaultValue": {
-        "value": "Ödendi mi?"
+        "value": "\u00d6dendi mi?"
       },
       "valueType": "STRING"
     },
@@ -4248,7 +4472,7 @@
     },
     "lbl_notifications_title_tr": {
       "defaultValue": {
-        "value": "Bildirim gönder"
+        "value": "Bildirim g\u00f6nder"
       },
       "valueType": "STRING"
     },
@@ -4272,7 +4496,7 @@
     },
     "lbl_notifications_target_single_member_option_tr": {
       "defaultValue": {
-        "value": "Tek üye"
+        "value": "Tek \u00fcye"
       },
       "valueType": "STRING"
     },
@@ -4284,7 +4508,7 @@
     },
     "lbl_notifications_target_whole_gym_option_tr": {
       "defaultValue": {
-        "value": "Tüm salon"
+        "value": "T\u00fcm salon"
       },
       "valueType": "STRING"
     },
@@ -4296,7 +4520,7 @@
     },
     "lbl_notifications_preview_label_tr": {
       "defaultValue": {
-        "value": "Önizleme"
+        "value": "\u00d6nizleme"
       },
       "valueType": "STRING"
     },
@@ -4308,7 +4532,7 @@
     },
     "lbl_notifications_select_member_button_tr": {
       "defaultValue": {
-        "value": "Üye seç"
+        "value": "\u00dcye se\u00e7"
       },
       "valueType": "STRING"
     },
@@ -4320,7 +4544,7 @@
     },
     "lbl_notifications_title_field_label_tr": {
       "defaultValue": {
-        "value": "Başlık"
+        "value": "Ba\u015fl\u0131k"
       },
       "valueType": "STRING"
     },
@@ -4380,7 +4604,7 @@
     },
     "lbl_packages_edit_on_sale_toggle_label_tr": {
       "defaultValue": {
-        "value": "Satışta"
+        "value": "Sat\u0131\u015fta"
       },
       "valueType": "STRING"
     },
@@ -4390,9 +4614,34 @@
       },
       "valueType": "STRING"
     },
+    "lbl_packages_off_sale_label_tr": {
+      "defaultValue": {
+        "value": "Kapal\u0131"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_packages_off_sale_label_en": {
+      "defaultValue": {
+        "value": "Off"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_packages_session_count_validity_caption_tr": {
+      "description": "{count} ve {days} yer tutucular\u0131 seans say\u0131s\u0131 ve ge\u00e7erlilik g\u00fcn say\u0131s\u0131yla de\u011fi\u015ftirilir.",
+      "defaultValue": {
+        "value": "{count} seans \u00b7 {days} g\u00fcn"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_packages_session_count_validity_caption_en": {
+      "defaultValue": {
+        "value": "{count} sessions \u00b7 {days} days"
+      },
+      "valueType": "STRING"
+    },
     "lbl_packages_edit_on_sale_toggle_description_tr": {
       "defaultValue": {
-        "value": "Kapalıysa yeni üyeliklerde görünmez"
+        "value": "Kapal\u0131ysa yeni \u00fcyeliklerde g\u00f6r\u00fcnmez"
       },
       "valueType": "STRING"
     },
@@ -4416,7 +4665,7 @@
     },
     "lbl_packages_edit_name_field_label_tr": {
       "defaultValue": {
-        "value": "Paket adı"
+        "value": "Paket ad\u0131"
       },
       "valueType": "STRING"
     },
@@ -4428,7 +4677,7 @@
     },
     "lbl_packages_edit_validity_days_field_label_tr": {
       "defaultValue": {
-        "value": "Geçerlilik (gün)"
+        "value": "Ge\u00e7erlilik (g\u00fcn)"
       },
       "valueType": "STRING"
     },
@@ -4440,13 +4689,146 @@
     },
     "lbl_packages_edit_price_field_label_tr": {
       "defaultValue": {
-        "value": "Fiyat (₺)"
+        "value": "Fiyat (\u20ba)"
       },
       "valueType": "STRING"
     },
     "lbl_packages_edit_price_field_label_en": {
       "defaultValue": {
-        "value": "Price (₺)"
+        "value": "Price (\u20ba)"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_packages_add_title_tr": {
+      "defaultValue": {
+        "value": "Paket ekle"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_packages_add_title_en": {
+      "defaultValue": {
+        "value": "Add package"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_packages_edit_title_tr": {
+      "defaultValue": {
+        "value": "Paketi d\u00fczenle"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_packages_edit_title_en": {
+      "defaultValue": {
+        "value": "Edit package"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_packages_name_field_hint_tr": {
+      "defaultValue": {
+        "value": "Birebir 12 Seans"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_packages_name_field_hint_en": {
+      "defaultValue": {
+        "value": "One-on-one 12 Sessions"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_packages_session_count_field_hint_tr": {
+      "defaultValue": {
+        "value": "\u00d6rn. 12"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_packages_session_count_field_hint_en": {
+      "defaultValue": {
+        "value": "E.g. 12"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_packages_validity_field_hint_tr": {
+      "defaultValue": {
+        "value": "\u00d6rn. 90"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_packages_validity_field_hint_en": {
+      "defaultValue": {
+        "value": "E.g. 90"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_packages_per_session_price_caption_tr": {
+      "description": "{price} yer tutucusu seans ba\u015f\u0131 fiyatla de\u011fi\u015ftirilir.",
+      "defaultValue": {
+        "value": "seans ba\u015f\u0131 \u20ba{price}"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_packages_per_session_price_caption_en": {
+      "defaultValue": {
+        "value": "\u20ba{price} per session"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_packages_delete_failed_error_tr": {
+      "defaultValue": {
+        "value": "Paket silinemedi, tekrar dene."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_packages_delete_failed_error_en": {
+      "defaultValue": {
+        "value": "Could not delete package, try again."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_packages_name_required_error_tr": {
+      "defaultValue": {
+        "value": "Paket ad\u0131 bo\u015f b\u0131rak\u0131lamaz."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_packages_name_required_error_en": {
+      "defaultValue": {
+        "value": "Package name cannot be empty."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_packages_session_count_invalid_error_tr": {
+      "defaultValue": {
+        "value": "Ge\u00e7erli bir seans say\u0131s\u0131 gir."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_packages_session_count_invalid_error_en": {
+      "defaultValue": {
+        "value": "Enter a valid session count."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_packages_validity_invalid_error_tr": {
+      "defaultValue": {
+        "value": "Ge\u00e7erli bir g\u00fcn say\u0131s\u0131 gir."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_packages_validity_invalid_error_en": {
+      "defaultValue": {
+        "value": "Enter a valid number of days."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_packages_save_failed_error_tr": {
+      "defaultValue": {
+        "value": "Paket kaydedilemedi, tekrar dene."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_packages_save_failed_error_en": {
+      "defaultValue": {
+        "value": "Could not save package, try again."
       },
       "valueType": "STRING"
     },
@@ -4476,7 +4858,7 @@
     },
     "lbl_packages_trainer_owner_label_tr": {
       "defaultValue": {
-        "value": "Antrenörün"
+        "value": "Antren\u00f6r\u00fcn"
       },
       "valueType": "STRING"
     },
@@ -4488,13 +4870,52 @@
     },
     "lbl_packages_start_label_tr": {
       "defaultValue": {
-        "value": "Başlangıç"
+        "value": "Ba\u015flang\u0131\u00e7"
       },
       "valueType": "STRING"
     },
     "lbl_packages_start_label_en": {
       "defaultValue": {
         "value": "Start"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_packages_remaining_with_makeup_caption_tr": {
+      "description": "{remaining} ve {makeup} yer tutucular\u0131 kalan/telafi ders say\u0131s\u0131yla de\u011fi\u015ftirilir.",
+      "defaultValue": {
+        "value": "{remaining} dersin kald\u0131. Telafi hakk\u0131n: {makeup} seans."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_packages_remaining_with_makeup_caption_en": {
+      "defaultValue": {
+        "value": "{remaining} sessions left. Make-up sessions available: {makeup}."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_packages_low_sessions_warning_title_tr": {
+      "description": "{remaining} yer tutucusu kalan ders say\u0131s\u0131yla de\u011fi\u015ftirilir.",
+      "defaultValue": {
+        "value": "Son {remaining} dersin kald\u0131"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_packages_low_sessions_warning_title_en": {
+      "defaultValue": {
+        "value": "{remaining} sessions left"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_packages_renew_with_trainer_caption_tr": {
+      "description": "{trainer} yer tutucusu antren\u00f6r ad\u0131yla de\u011fi\u015ftirilir.",
+      "defaultValue": {
+        "value": "Paket bitmeden yenilemek istersen antren\u00f6r\u00fcn {trainer} ile konu\u015fabilirsin."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_packages_renew_with_trainer_caption_en": {
+      "defaultValue": {
+        "value": "If you want to renew before your package ends, you can talk to your trainer {trainer}."
       },
       "valueType": "STRING"
     },
@@ -4536,7 +4957,7 @@
     },
     "lbl_sessions_attendance_answer_label_tr": {
       "defaultValue": {
-        "value": "Cevabı"
+        "value": "Cevab\u0131"
       },
       "valueType": "STRING"
     },
@@ -4560,7 +4981,7 @@
     },
     "lbl_sessions_attendance_member_note_label_tr": {
       "defaultValue": {
-        "value": "Üyenin notu"
+        "value": "\u00dcyenin notu"
       },
       "valueType": "STRING"
     },
@@ -4572,7 +4993,7 @@
     },
     "lbl_sessions_attendance_back_to_calendar_button_tr": {
       "defaultValue": {
-        "value": "Takvime dön"
+        "value": "Takvime d\u00f6n"
       },
       "valueType": "STRING"
     },
@@ -4596,7 +5017,7 @@
     },
     "lbl_sessions_management_empty_state_tr": {
       "defaultValue": {
-        "value": "Bu güne uyan seans yok."
+        "value": "Bu g\u00fcne uyan seans yok."
       },
       "valueType": "STRING"
     },
@@ -4608,7 +5029,7 @@
     },
     "lbl_sessions_filter_scheduled_tr": {
       "defaultValue": {
-        "value": "Planlandı"
+        "value": "Planland\u0131"
       },
       "valueType": "STRING"
     },
@@ -4620,7 +5041,7 @@
     },
     "lbl_sessions_change_trainer_action_tr": {
       "defaultValue": {
-        "value": "Antrenörü değiştir"
+        "value": "Antren\u00f6r\u00fc de\u011fi\u015ftir"
       },
       "valueType": "STRING"
     },
@@ -4632,7 +5053,7 @@
     },
     "lbl_sessions_cancel_session_action_tr": {
       "defaultValue": {
-        "value": "Seansı iptal et"
+        "value": "Seans\u0131 iptal et"
       },
       "valueType": "STRING"
     },
@@ -4644,7 +5065,7 @@
     },
     "lbl_sessions_confirm_title_tr": {
       "defaultValue": {
-        "value": "Ders onayı"
+        "value": "Ders onay\u0131"
       },
       "valueType": "STRING"
     },
@@ -4656,7 +5077,7 @@
     },
     "lbl_sessions_confirm_attending_answer_text_tr": {
       "defaultValue": {
-        "value": "Geleceğini bildirdin"
+        "value": "Gelece\u011fini bildirdin"
       },
       "valueType": "STRING"
     },
@@ -4668,7 +5089,7 @@
     },
     "lbl_sessions_confirm_not_attending_answer_text_tr": {
       "defaultValue": {
-        "value": "Gelmeyeceğini bildirdin"
+        "value": "Gelmeyece\u011fini bildirdin"
       },
       "valueType": "STRING"
     },
@@ -4680,7 +5101,7 @@
     },
     "lbl_sessions_confirm_change_answer_button_tr": {
       "defaultValue": {
-        "value": "Cevabımı değiştir"
+        "value": "Cevab\u0131m\u0131 de\u011fi\u015ftir"
       },
       "valueType": "STRING"
     },
@@ -4704,7 +5125,7 @@
     },
     "lbl_sessions_member_home_see_package_button_tr": {
       "defaultValue": {
-        "value": "Paketimi gör"
+        "value": "Paketimi g\u00f6r"
       },
       "valueType": "STRING"
     },
@@ -4728,7 +5149,7 @@
     },
     "lbl_sessions_completion_title_tr": {
       "defaultValue": {
-        "value": "Seans onayı"
+        "value": "Seans onay\u0131"
       },
       "valueType": "STRING"
     },
@@ -4740,7 +5161,7 @@
     },
     "lbl_sessions_completion_member_no_show_option_tr": {
       "defaultValue": {
-        "value": "Üye gelmedi"
+        "value": "\u00dcye gelmedi"
       },
       "valueType": "STRING"
     },
@@ -4800,7 +5221,7 @@
     },
     "lbl_sessions_upcoming_section_tr": {
       "defaultValue": {
-        "value": "YAKLAŞAN"
+        "value": "YAKLA\u015eAN"
       },
       "valueType": "STRING"
     },
@@ -4812,7 +5233,7 @@
     },
     "lbl_sessions_past_section_tr": {
       "defaultValue": {
-        "value": "GEÇMİŞ"
+        "value": "GE\u00c7M\u0130\u015e"
       },
       "valueType": "STRING"
     },
@@ -4824,7 +5245,7 @@
     },
     "lbl_sessions_calendar_no_expenses_state_tr": {
       "defaultValue": {
-        "value": "Bu günde gider yok."
+        "value": "Bu g\u00fcnde gider yok."
       },
       "valueType": "STRING"
     },
@@ -4836,7 +5257,7 @@
     },
     "lbl_sessions_status_now_tr": {
       "defaultValue": {
-        "value": "Şimdi"
+        "value": "\u015eimdi"
       },
       "valueType": "STRING"
     },
@@ -4848,19 +5269,19 @@
     },
     "lbl_sessions_management_cancelling_label_tr": {
       "defaultValue": {
-        "value": "İptal ediliyor…"
+        "value": "\u0130ptal ediliyor\u2026"
       },
       "valueType": "STRING"
     },
     "lbl_sessions_management_cancelling_label_en": {
       "defaultValue": {
-        "value": "Cancelling…"
+        "value": "Cancelling\u2026"
       },
       "valueType": "STRING"
     },
     "lbl_sessions_management_admin_cancel_note_tr": {
       "defaultValue": {
-        "value": "Yönetici olarak tarih kısıtı olmadan iptal ve erteleme yapabilirsiniz."
+        "value": "Y\u00f6netici olarak tarih k\u0131s\u0131t\u0131 olmadan iptal ve erteleme yapabilirsiniz."
       },
       "valueType": "STRING"
     },
@@ -4884,7 +5305,7 @@
     },
     "lbl_sessions_confirm_change_hint_tr": {
       "defaultValue": {
-        "value": "Cevabını dersten 2 saat öncesine kadar değiştirebilirsin."
+        "value": "Cevab\u0131n\u0131 dersten 2 saat \u00f6ncesine kadar de\u011fi\u015ftirebilirsin."
       },
       "valueType": "STRING"
     },
@@ -4896,7 +5317,7 @@
     },
     "lbl_sessions_confirm_waiting_hint_tr": {
       "defaultValue": {
-        "value": "{meta} seni bekliyor. Cevabını dersten 2 saat öncesine kadar değiştirebilirsin."
+        "value": "{meta} seni bekliyor. Cevab\u0131n\u0131 dersten 2 saat \u00f6ncesine kadar de\u011fi\u015ftirebilirsin."
       },
       "valueType": "STRING"
     },
@@ -4908,19 +5329,19 @@
     },
     "lbl_sessions_confirm_session_summary_tr": {
       "defaultValue": {
-        "value": "{meta} · Kalan dersinden 1 düşer"
+        "value": "{meta} \u00b7 Kalan dersinden 1 d\u00fc\u015fer"
       },
       "valueType": "STRING"
     },
     "lbl_sessions_confirm_session_summary_en": {
       "defaultValue": {
-        "value": "{meta} · Deducts 1 from your remaining sessions"
+        "value": "{meta} \u00b7 Deducts 1 from your remaining sessions"
       },
       "valueType": "STRING"
     },
     "lbl_sessions_confirm_no_permission_tr": {
       "defaultValue": {
-        "value": "Bu ders için geleceğini/gelmeyeceğini bildirme yetkin yok. Antrenörünle iletişime geç."
+        "value": "Bu ders i\u00e7in gelece\u011fini/gelmeyece\u011fini bildirme yetkin yok. Antren\u00f6r\u00fcnle ileti\u015fime ge\u00e7."
       },
       "valueType": "STRING"
     },
@@ -4932,7 +5353,7 @@
     },
     "lbl_sessions_confirm_coming_note_tr": {
       "defaultValue": {
-        "value": "Programda yerin ayrıldı. Dersten 2 saat öncesine kadar değiştirebilirsin."
+        "value": "Programda yerin ayr\u0131ld\u0131. Dersten 2 saat \u00f6ncesine kadar de\u011fi\u015ftirebilirsin."
       },
       "valueType": "STRING"
     },
@@ -4944,7 +5365,7 @@
     },
     "lbl_sessions_confirm_not_coming_note_tr": {
       "defaultValue": {
-        "value": "Ders kalan dersinden düşmedi, antrenörüne iletildi. Dersten 2 saat öncesine kadar değiştirebilirsin."
+        "value": "Ders kalan dersinden d\u00fc\u015fmedi, antren\u00f6r\u00fcne iletildi. Dersten 2 saat \u00f6ncesine kadar de\u011fi\u015ftirebilirsin."
       },
       "valueType": "STRING"
     },
@@ -4980,7 +5401,7 @@
     },
     "lbl_sessions_member_home_next_session_section_tr": {
       "defaultValue": {
-        "value": "SIRADAKİ DERSİN"
+        "value": "SIRADAK\u0130 DERS\u0130N"
       },
       "valueType": "STRING"
     },
@@ -4992,7 +5413,7 @@
     },
     "lbl_sessions_member_home_installments_section_tr": {
       "defaultValue": {
-        "value": "TAKSİTLER"
+        "value": "TAKS\u0130TLER"
       },
       "valueType": "STRING"
     },
@@ -5016,7 +5437,7 @@
     },
     "lbl_sessions_member_home_installment_due_date_label_tr": {
       "defaultValue": {
-        "value": "Son ödeme {date}"
+        "value": "Son \u00f6deme {date}"
       },
       "valueType": "STRING"
     },
@@ -5028,7 +5449,7 @@
     },
     "lbl_sessions_member_home_installment_due_soon_label_tr": {
       "defaultValue": {
-        "value": "Ödeme yaklaşıyor"
+        "value": "\u00d6deme yakla\u015f\u0131yor"
       },
       "valueType": "STRING"
     },
@@ -5040,7 +5461,7 @@
     },
     "lbl_sessions_member_home_installment_unpaid_label_tr": {
       "defaultValue": {
-        "value": "Ödenmedi"
+        "value": "\u00d6denmedi"
       },
       "valueType": "STRING"
     },
@@ -5052,7 +5473,7 @@
     },
     "lbl_sessions_completion_confirm_error_tr": {
       "defaultValue": {
-        "value": "Onay kaydedilemedi, bağlantını kontrol edip tekrar dene."
+        "value": "Onay kaydedilemedi, ba\u011flant\u0131n\u0131 kontrol edip tekrar dene."
       },
       "valueType": "STRING"
     },
@@ -5064,7 +5485,7 @@
     },
     "lbl_sessions_completion_question_tr": {
       "defaultValue": {
-        "value": "{time} {name} seansını tamamladınız mı?"
+        "value": "{time} {name} seans\u0131n\u0131 tamamlad\u0131n\u0131z m\u0131?"
       },
       "valueType": "STRING"
     },
@@ -5076,7 +5497,7 @@
     },
     "lbl_sessions_completion_time_limit_note_tr": {
       "defaultValue": {
-        "value": "Onayı 24 saat içinde verebilirsiniz, sonrasında yönetici onayı gerekir."
+        "value": "Onay\u0131 24 saat i\u00e7inde verebilirsiniz, sonras\u0131nda y\u00f6netici onay\u0131 gerekir."
       },
       "valueType": "STRING"
     },
@@ -5088,7 +5509,7 @@
     },
     "lbl_sessions_completion_done_marked_tr": {
       "defaultValue": {
-        "value": "Ders tamamlandı işaretlendi"
+        "value": "Ders tamamland\u0131 i\u015faretlendi"
       },
       "valueType": "STRING"
     },
@@ -5100,7 +5521,7 @@
     },
     "lbl_sessions_completion_absent_marked_tr": {
       "defaultValue": {
-        "value": "Üye gelmedi olarak işaretlendi"
+        "value": "\u00dcye gelmedi olarak i\u015faretlendi"
       },
       "valueType": "STRING"
     },
@@ -5112,7 +5533,7 @@
     },
     "lbl_sessions_list_empty_state_tr": {
       "defaultValue": {
-        "value": "Henüz dersin yok — antrenörün seninle bir ders planladığında burada görünecek."
+        "value": "Hen\u00fcz dersin yok \u2014 antren\u00f6r\u00fcn seninle bir ders planlad\u0131\u011f\u0131nda burada g\u00f6r\u00fcnecek."
       },
       "valueType": "STRING"
     },
@@ -5124,7 +5545,7 @@
     },
     "lbl_sessions_list_calendar_empty_day_tr": {
       "defaultValue": {
-        "value": "Bu günde dersin yok."
+        "value": "Bu g\u00fcnde dersin yok."
       },
       "valueType": "STRING"
     },
@@ -5136,7 +5557,7 @@
     },
     "lbl_sessions_trainer_notifications_empty_state_tr": {
       "defaultValue": {
-        "value": "Henüz bildirim yok."
+        "value": "Hen\u00fcz bildirim yok."
       },
       "valueType": "STRING"
     },
@@ -5148,7 +5569,7 @@
     },
     "lbl_sessions_create_trainer_busy_error_tr": {
       "defaultValue": {
-        "value": "{name} bu saatte dolu, başka bir saat seç."
+        "value": "{name} bu saatte dolu, ba\u015fka bir saat se\u00e7."
       },
       "valueType": "STRING"
     },
@@ -5172,7 +5593,7 @@
     },
     "lbl_sessions_create_no_active_gym_error_tr": {
       "defaultValue": {
-        "value": "Aktif salon bulunamadı."
+        "value": "Aktif salon bulunamad\u0131."
       },
       "valueType": "STRING"
     },
@@ -5184,7 +5605,7 @@
     },
     "lbl_sessions_create_skipped_days_snackbar_tr": {
       "defaultValue": {
-        "value": "Şu günler için antrenör dolu, atlandı: {days}."
+        "value": "\u015eu g\u00fcnler i\u00e7in antren\u00f6r dolu, atland\u0131: {days}."
       },
       "valueType": "STRING"
     },
@@ -5208,7 +5629,7 @@
     },
     "lbl_sessions_create_select_placeholder_tr": {
       "defaultValue": {
-        "value": "Seç"
+        "value": "Se\u00e7"
       },
       "valueType": "STRING"
     },
@@ -5220,19 +5641,19 @@
     },
     "lbl_sessions_create_member_summary_tr": {
       "defaultValue": {
-        "value": "{name} · {count} seans"
+        "value": "{name} \u00b7 {count} seans"
       },
       "valueType": "STRING"
     },
     "lbl_sessions_create_member_summary_en": {
       "defaultValue": {
-        "value": "{name} · {count} sessions"
+        "value": "{name} \u00b7 {count} sessions"
       },
       "valueType": "STRING"
     },
     "lbl_sessions_create_pick_member_title_tr": {
       "defaultValue": {
-        "value": "Üye seç"
+        "value": "\u00dcye se\u00e7"
       },
       "valueType": "STRING"
     },
@@ -5256,7 +5677,7 @@
     },
     "lbl_sessions_create_pick_trainer_title_tr": {
       "defaultValue": {
-        "value": "Antrenör seç"
+        "value": "Antren\u00f6r se\u00e7"
       },
       "valueType": "STRING"
     },
@@ -5280,7 +5701,7 @@
     },
     "lbl_sessions_create_repeat_days_selected_tr": {
       "defaultValue": {
-        "value": "{count} gün seçildi"
+        "value": "{count} g\u00fcn se\u00e7ildi"
       },
       "valueType": "STRING"
     },
@@ -5292,7 +5713,7 @@
     },
     "lbl_sessions_create_submit_button_tr": {
       "defaultValue": {
-        "value": "Oluştur"
+        "value": "Olu\u015ftur"
       },
       "valueType": "STRING"
     },
@@ -5304,7 +5725,7 @@
     },
     "lbl_sessions_repeat_calendar_exhausted_error_tr": {
       "defaultValue": {
-        "value": "Kalan seans tükendi."
+        "value": "Kalan seans t\u00fckendi."
       },
       "valueType": "STRING"
     },
@@ -5316,7 +5737,7 @@
     },
     "lbl_sessions_repeat_calendar_subtitle_tr": {
       "defaultValue": {
-        "value": "Lütfen tekrarlanacak günleri seçiniz."
+        "value": "L\u00fctfen tekrarlanacak g\u00fcnleri se\u00e7iniz."
       },
       "valueType": "STRING"
     },
@@ -5340,7 +5761,7 @@
     },
     "lbl_trainers_management_title_tr": {
       "defaultValue": {
-        "value": "Antrenörler"
+        "value": "Antren\u00f6rler"
       },
       "valueType": "STRING"
     },
@@ -5352,7 +5773,7 @@
     },
     "lbl_trainers_add_trainer_button_tr": {
       "defaultValue": {
-        "value": "+ Antrenör ekle"
+        "value": "+ Antren\u00f6r ekle"
       },
       "valueType": "STRING"
     },
@@ -5364,7 +5785,7 @@
     },
     "lbl_trainers_specialty_field_label_tr": {
       "defaultValue": {
-        "value": "Uzmanlık"
+        "value": "Uzmanl\u0131k"
       },
       "valueType": "STRING"
     },
@@ -5376,7 +5797,7 @@
     },
     "lbl_trainers_add_trainer_form_title_tr": {
       "defaultValue": {
-        "value": "Antrenör ekle"
+        "value": "Antren\u00f6r ekle"
       },
       "valueType": "STRING"
     },
@@ -5400,7 +5821,7 @@
     },
     "lbl_trainers_add_trainer_submit_button_tr": {
       "defaultValue": {
-        "value": "Antrenörü ekle"
+        "value": "Antren\u00f6r\u00fc ekle"
       },
       "valueType": "STRING"
     },
@@ -5412,7 +5833,7 @@
     },
     "lbl_trainers_home_awaiting_approval_section_tr": {
       "defaultValue": {
-        "value": "ONAYINIZI BEKLİYOR"
+        "value": "ONAYINIZI BEKL\u0130YOR"
       },
       "valueType": "STRING"
     },
@@ -5424,7 +5845,7 @@
     },
     "lbl_trainers_home_today_schedule_section_tr": {
       "defaultValue": {
-        "value": "BUGÜNKÜ PROGRAMINIZ"
+        "value": "BUG\u00dcNK\u00dc PROGRAMINIZ"
       },
       "valueType": "STRING"
     },
@@ -5448,7 +5869,7 @@
     },
     "lbl_trainers_home_today_sessions_label_tr": {
       "defaultValue": {
-        "value": "Bugünkü seans"
+        "value": "Bug\u00fcnk\u00fc seans"
       },
       "valueType": "STRING"
     },
@@ -5472,7 +5893,7 @@
     },
     "lbl_trainers_home_free_slot_label_tr": {
       "defaultValue": {
-        "value": "Boş saat"
+        "value": "Bo\u015f saat"
       },
       "valueType": "STRING"
     },
@@ -5484,7 +5905,7 @@
     },
     "lbl_trainers_member_detail_create_session_button_tr": {
       "defaultValue": {
-        "value": "Seans oluştur"
+        "value": "Seans olu\u015ftur"
       },
       "valueType": "STRING"
     },
@@ -5496,7 +5917,7 @@
     },
     "lbl_trainers_member_detail_add_measurement_button_tr": {
       "defaultValue": {
-        "value": "Ölçüm ekle"
+        "value": "\u00d6l\u00e7\u00fcm ekle"
       },
       "valueType": "STRING"
     },
@@ -5520,7 +5941,7 @@
     },
     "lbl_trainers_member_detail_package_end_label_tr": {
       "defaultValue": {
-        "value": "Paket bitişi"
+        "value": "Paket biti\u015fi"
       },
       "valueType": "STRING"
     },
@@ -5568,7 +5989,7 @@
     },
     "lbl_trainers_calendar_mark_completed_action_tr": {
       "defaultValue": {
-        "value": "Tamamlandı işaretle"
+        "value": "Tamamland\u0131 i\u015faretle"
       },
       "valueType": "STRING"
     },
@@ -5580,7 +6001,7 @@
     },
     "lbl_trainers_members_list_title_tr": {
       "defaultValue": {
-        "value": "Üyelerim"
+        "value": "\u00dcyelerim"
       },
       "valueType": "STRING"
     },
@@ -5628,7 +6049,7 @@
     },
     "lbl_trainers_report_earned_commission_label_tr": {
       "defaultValue": {
-        "value": "Kazanılan prim"
+        "value": "Kazan\u0131lan prim"
       },
       "valueType": "STRING"
     },
@@ -5652,7 +6073,7 @@
     },
     "lbl_trainers_report_start_date_field_label_tr": {
       "defaultValue": {
-        "value": "Başlangıç t."
+        "value": "Ba\u015flang\u0131\u00e7 t."
       },
       "valueType": "STRING"
     },
@@ -5664,7 +6085,7 @@
     },
     "lbl_trainers_report_end_date_field_label_tr": {
       "defaultValue": {
-        "value": "Bitiş t."
+        "value": "Biti\u015f t."
       },
       "valueType": "STRING"
     },
@@ -5700,20 +6121,20 @@
     },
     "lbl_trainers_profile_footer_text_tr": {
       "defaultValue": {
-        "value": "Egoractive · Egora Games · Sürüm 1.0"
+        "value": "Egoractive \u00b7 Egora Games \u00b7 S\u00fcr\u00fcm 1.0"
       },
       "valueType": "STRING"
     },
     "lbl_trainers_profile_footer_text_en": {
       "defaultValue": {
-        "value": "Egoractive · Egora Games · Version 1.0"
+        "value": "Egoractive \u00b7 Egora Games \u00b7 Version 1.0"
       },
       "valueType": "STRING"
     },
     "lbl_trainers_detail_title_tr": {
-      "description": "Admin > antrenör detayı ekranı başlığı",
+      "description": "Admin > antren\u00f6r detay\u0131 ekran\u0131 ba\u015fl\u0131\u011f\u0131",
       "defaultValue": {
-        "value": "Antrenör detayı"
+        "value": "Antren\u00f6r detay\u0131"
       },
       "valueType": "STRING"
     },
@@ -5724,9 +6145,9 @@
       "valueType": "STRING"
     },
     "lbl_trainers_member_count_suffix_tr": {
-      "description": "Antrenöre bağlı üye sayısı, {count} yer tutucu",
+      "description": "Antren\u00f6re ba\u011fl\u0131 \u00fcye say\u0131s\u0131, {count} yer tutucu",
       "defaultValue": {
-        "value": "{count} üye"
+        "value": "{count} \u00fcye"
       },
       "valueType": "STRING"
     },
@@ -5738,7 +6159,7 @@
     },
     "lbl_trainers_detail_all_time_section_tr": {
       "defaultValue": {
-        "value": "TÜM ZAMANLAR"
+        "value": "T\u00dcM ZAMANLAR"
       },
       "valueType": "STRING"
     },
@@ -5774,7 +6195,7 @@
     },
     "lbl_trainers_detail_month_load_error_tr": {
       "defaultValue": {
-        "value": "Bu ayın verileri yüklenemedi."
+        "value": "Bu ay\u0131n verileri y\u00fcklenemedi."
       },
       "valueType": "STRING"
     },
@@ -5786,7 +6207,7 @@
     },
     "lbl_trainers_add_trainer_name_required_error_tr": {
       "defaultValue": {
-        "value": "Ad soyad boş olamaz."
+        "value": "Ad soyad bo\u015f olamaz."
       },
       "valueType": "STRING"
     },
@@ -5798,7 +6219,7 @@
     },
     "lbl_trainers_add_trainer_error_tr": {
       "defaultValue": {
-        "value": "Antrenör eklenemedi, tekrar dene."
+        "value": "Antren\u00f6r eklenemedi, tekrar dene."
       },
       "valueType": "STRING"
     },
@@ -5809,7 +6230,7 @@
       "valueType": "STRING"
     },
     "lbl_trainers_add_trainer_name_hint_tr": {
-      "description": "Antrenör ekle formundaki Ad soyad alanının örnek metni",
+      "description": "Antren\u00f6r ekle formundaki Ad soyad alan\u0131n\u0131n \u00f6rnek metni",
       "defaultValue": {
         "value": "Emre Kaya"
       },
@@ -5822,9 +6243,9 @@
       "valueType": "STRING"
     },
     "lbl_trainers_management_trainer_count_suffix_tr": {
-      "description": "Antrenör yönetimi başlığındaki toplam antrenör sayısı, {count} yer tutucu",
+      "description": "Antren\u00f6r y\u00f6netimi ba\u015fl\u0131\u011f\u0131ndaki toplam antren\u00f6r say\u0131s\u0131, {count} yer tutucu",
       "defaultValue": {
-        "value": "{count} kişi"
+        "value": "{count} ki\u015fi"
       },
       "valueType": "STRING"
     },
@@ -5836,45 +6257,69 @@
     },
     "lbl_trainers_add_trainer_saving_label_tr": {
       "defaultValue": {
-        "value": "Ekleniyor…"
+        "value": "Ekleniyor\u2026"
       },
       "valueType": "STRING"
     },
     "lbl_trainers_add_trainer_saving_label_en": {
       "defaultValue": {
-        "value": "Adding…"
+        "value": "Adding\u2026"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_edit_trainer_form_title_tr": {
+      "defaultValue": {
+        "value": "Antren\u00f6r\u00fc d\u00fczenle"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_edit_trainer_form_title_en": {
+      "defaultValue": {
+        "value": "Edit trainer"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_edit_trainer_error_tr": {
+      "defaultValue": {
+        "value": "Antren\u00f6r g\u00fcncellenemedi, tekrar dene."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_edit_trainer_error_en": {
+      "defaultValue": {
+        "value": "Could not update trainer, try again."
       },
       "valueType": "STRING"
     },
     "lbl_trainers_calendar_week_range_tr": {
-      "description": "Antrenör takvimi hafta görünümü başlığı, {startDay}/{endDay}/{month}/{week} yer tutucuları",
+      "description": "Antren\u00f6r takvimi hafta g\u00f6r\u00fcn\u00fcm\u00fc ba\u015fl\u0131\u011f\u0131, {startDay}/{endDay}/{month}/{week} yer tutucular\u0131",
       "defaultValue": {
-        "value": "{startDay} – {endDay} {month} · {week}. hafta"
+        "value": "{startDay} \u2013 {endDay} {month} \u00b7 {week}. hafta"
       },
       "valueType": "STRING"
     },
     "lbl_trainers_calendar_week_range_en": {
       "defaultValue": {
-        "value": "{startDay} – {endDay} {month} · Week {week}"
+        "value": "{startDay} \u2013 {endDay} {month} \u00b7 Week {week}"
       },
       "valueType": "STRING"
     },
     "lbl_trainers_calendar_day_empty_message_tr": {
       "defaultValue": {
-        "value": "Seans yok — bu güne seans ekleyebilirsiniz"
+        "value": "Seans yok \u2014 bu g\u00fcne seans ekleyebilirsiniz"
       },
       "valueType": "STRING"
     },
     "lbl_trainers_calendar_day_empty_message_en": {
       "defaultValue": {
-        "value": "No sessions — you can add a session to this day"
+        "value": "No sessions \u2014 you can add a session to this day"
       },
       "valueType": "STRING"
     },
     "lbl_trainers_home_greeting_tr": {
-      "description": "Antrenör anasayfa karşılaması, isim bilinmediğinde",
+      "description": "Antren\u00f6r anasayfa kar\u015f\u0131lamas\u0131, isim bilinmedi\u011finde",
       "defaultValue": {
-        "value": "İyi çalışmalar"
+        "value": "\u0130yi \u00e7al\u0131\u015fmalar"
       },
       "valueType": "STRING"
     },
@@ -5885,9 +6330,9 @@
       "valueType": "STRING"
     },
     "lbl_trainers_home_greeting_with_name_tr": {
-      "description": "Antrenör anasayfa karşılaması, {name} yer tutucu",
+      "description": "Antren\u00f6r anasayfa kar\u015f\u0131lamas\u0131, {name} yer tutucu",
       "defaultValue": {
-        "value": "İyi çalışmalar {name}"
+        "value": "\u0130yi \u00e7al\u0131\u015fmalar {name}"
       },
       "valueType": "STRING"
     },
@@ -5899,7 +6344,7 @@
     },
     "lbl_trainers_home_confirmation_save_error_tr": {
       "defaultValue": {
-        "value": "Onay kaydedilemedi, bağlantını kontrol edip tekrar dene."
+        "value": "Onay kaydedilemedi, ba\u011flant\u0131n\u0131 kontrol edip tekrar dene."
       },
       "valueType": "STRING"
     },
@@ -5911,7 +6356,7 @@
     },
     "lbl_trainers_members_search_hint_tr": {
       "defaultValue": {
-        "value": "Üye ara"
+        "value": "\u00dcye ara"
       },
       "valueType": "STRING"
     },
@@ -5922,28 +6367,28 @@
       "valueType": "STRING"
     },
     "lbl_trainers_profile_specialty_role_tr": {
-      "description": "Antrenör profili uzmanlık + rol satırı, {specialty} yer tutucu",
+      "description": "Antren\u00f6r profili uzmanl\u0131k + rol sat\u0131r\u0131, {specialty} yer tutucu",
       "defaultValue": {
-        "value": "{specialty} · Antrenör"
+        "value": "{specialty} \u00b7 Antren\u00f6r"
       },
       "valueType": "STRING"
     },
     "lbl_trainers_profile_specialty_role_en": {
       "defaultValue": {
-        "value": "{specialty} · Trainer"
+        "value": "{specialty} \u00b7 Trainer"
       },
       "valueType": "STRING"
     },
     "lbl_trainers_report_completed_summary_tr": {
-      "description": "Antrenör rapor ekranı özet satırı, {count}/{rate} yer tutucuları",
+      "description": "Antren\u00f6r rapor ekran\u0131 \u00f6zet sat\u0131r\u0131, {count}/{rate} yer tutucular\u0131",
       "defaultValue": {
-        "value": "{count} tamamlanan seans · seans başı {rate}"
+        "value": "{count} tamamlanan seans \u00b7 seans ba\u015f\u0131 {rate}"
       },
       "valueType": "STRING"
     },
     "lbl_trainers_report_completed_summary_en": {
       "defaultValue": {
-        "value": "{count} completed sessions · {rate} per session"
+        "value": "{count} completed sessions \u00b7 {rate} per session"
       },
       "valueType": "STRING"
     },
@@ -5961,25 +6406,25 @@
     },
     "lbl_subscription_trial_banner_title_tr": {
       "defaultValue": {
-        "value": "Deneme süreniz {days} gün sonra doluyor"
+        "value": "Deneme s\u00fcreniz {days} g\u00fcn sonra doluyor"
       },
       "valueType": "STRING"
     },
     "lbl_subscription_trial_banner_body_tr": {
       "defaultValue": {
-        "value": "{date} tarihine kadar tüm özellikler açık. Bir plan seçerseniz stüdyonuz kesintisiz çalışmaya devam eder."
+        "value": "{date} tarihine kadar t\u00fcm \u00f6zellikler a\u00e7\u0131k. Bir plan se\u00e7erseniz st\u00fcdyonuz kesintisiz \u00e7al\u0131\u015fmaya devam eder."
       },
       "valueType": "STRING"
     },
     "lbl_subscription_trial_progress_tr": {
       "defaultValue": {
-        "value": "{total} günlük denemenin {current}. günündesiniz"
+        "value": "{total} g\u00fcnl\u00fck denemenin {current}. g\u00fcn\u00fcndesiniz"
       },
       "valueType": "STRING"
     },
     "lbl_subscription_expired_banner_title_tr": {
       "defaultValue": {
-        "value": "Aboneliğiniz {date} tarihinde sona erdi"
+        "value": "Aboneli\u011finiz {date} tarihinde sona erdi"
       },
       "valueType": "STRING"
     },
@@ -5991,7 +6436,7 @@
     },
     "lbl_subscription_expired_banner_body_tr": {
       "defaultValue": {
-        "value": "Verileriniz güvende ve eksiksiz duruyor. Bir plan seçtiğiniz anda her şey kaldığı yerden devam eder."
+        "value": "Verileriniz g\u00fcvende ve eksiksiz duruyor. Bir plan se\u00e7ti\u011finiz anda her \u015fey kald\u0131\u011f\u0131 yerden devam eder."
       },
       "valueType": "STRING"
     },
@@ -6003,7 +6448,7 @@
     },
     "lbl_subscription_restricted_title_tr": {
       "defaultValue": {
-        "value": "Şu an kısıtlı"
+        "value": "\u015eu an k\u0131s\u0131tl\u0131"
       },
       "valueType": "STRING"
     },
@@ -6015,7 +6460,7 @@
     },
     "lbl_subscription_restricted_note_tr": {
       "defaultValue": {
-        "value": "Takvim, üye listesi ve raporları görüntülemeye devam edebilirsiniz."
+        "value": "Takvim, \u00fcye listesi ve raporlar\u0131 g\u00f6r\u00fcnt\u00fclemeye devam edebilirsiniz."
       },
       "valueType": "STRING"
     },
@@ -6027,7 +6472,7 @@
     },
     "lbl_subscription_active_plan_label_tr": {
       "defaultValue": {
-        "value": "Mevcut planınız"
+        "value": "Mevcut plan\u0131n\u0131z"
       },
       "valueType": "STRING"
     },
@@ -6063,7 +6508,7 @@
     },
     "lbl_subscription_started_label_tr": {
       "defaultValue": {
-        "value": "Başlangıç"
+        "value": "Ba\u015flang\u0131\u00e7"
       },
       "valueType": "STRING"
     },
@@ -6075,7 +6520,7 @@
     },
     "lbl_subscription_active_note_tr": {
       "defaultValue": {
-        "value": "Aboneliğiniz {period} kendini yeniler. Plan değişikliği, duraklatma ve iptal uygulama içinde değil, {store} abonelik ayarlarında yapılır."
+        "value": "Aboneli\u011finiz {period} kendini yeniler. Plan de\u011fi\u015fikli\u011fi, duraklatma ve iptal uygulama i\u00e7inde de\u011fil, {store} abonelik ayarlar\u0131nda yap\u0131l\u0131r."
       },
       "valueType": "STRING"
     },
@@ -6087,7 +6532,7 @@
     },
     "lbl_subscription_store_row_title_tr": {
       "defaultValue": {
-        "value": "{store} üzerinden"
+        "value": "{store} \u00fczerinden"
       },
       "valueType": "STRING"
     },
@@ -6099,7 +6544,7 @@
     },
     "lbl_subscription_store_row_subtitle_tr": {
       "defaultValue": {
-        "value": "Ödeme ve faturalar {storeAccount} hesabınızda"
+        "value": "\u00d6deme ve faturalar {storeAccount} hesab\u0131n\u0131zda"
       },
       "valueType": "STRING"
     },
@@ -6111,7 +6556,7 @@
     },
     "lbl_subscription_manage_cta_tr": {
       "defaultValue": {
-        "value": "Aboneliği yönet"
+        "value": "Aboneli\u011fi y\u00f6net"
       },
       "valueType": "STRING"
     },
@@ -6123,7 +6568,7 @@
     },
     "lbl_subscription_manage_caption_tr": {
       "defaultValue": {
-        "value": "{store} abonelik ayarları açılır"
+        "value": "{store} abonelik ayarlar\u0131 a\u00e7\u0131l\u0131r"
       },
       "valueType": "STRING"
     },
@@ -6135,7 +6580,7 @@
     },
     "lbl_subscription_store_note_tr": {
       "defaultValue": {
-        "value": "Satın alma uygulama içinde yapılmaz. Devam ettiğinizde {store} açılır; ödeme, iptal ve faturalar {storeAccount} hesabınız üzerinden yürür. Dönem bitiminden 24 saat önce iptal edilmezse abonelik kendini yeniler."
+        "value": "Sat\u0131n alma uygulama i\u00e7inde yap\u0131lmaz. Devam etti\u011finizde {store} a\u00e7\u0131l\u0131r; \u00f6deme, iptal ve faturalar {storeAccount} hesab\u0131n\u0131z \u00fczerinden y\u00fcr\u00fcr. D\u00f6nem bitiminden 24 saat \u00f6nce iptal edilmezse abonelik kendini yeniler."
       },
       "valueType": "STRING"
     },
@@ -6147,7 +6592,7 @@
     },
     "lbl_subscription_store_note_expired_tr": {
       "defaultValue": {
-        "value": "Satın alma uygulama içinde yapılmaz. Devam ettiğinizde {store} açılır; ödeme, iptal ve faturalar {storeAccount} hesabınız üzerinden yürür."
+        "value": "Sat\u0131n alma uygulama i\u00e7inde yap\u0131lmaz. Devam etti\u011finizde {store} a\u00e7\u0131l\u0131r; \u00f6deme, iptal ve faturalar {storeAccount} hesab\u0131n\u0131z \u00fczerinden y\u00fcr\u00fcr."
       },
       "valueType": "STRING"
     },
@@ -6171,7 +6616,7 @@
     },
     "lbl_subscription_purchase_cta_expired_tr": {
       "defaultValue": {
-        "value": "{plan} planı {store}'da başlat"
+        "value": "{plan} plan\u0131 {store}'da ba\u015flat"
       },
       "valueType": "STRING"
     },
@@ -6183,19 +6628,19 @@
     },
     "lbl_subscription_purchase_caption_tr": {
       "defaultValue": {
-        "value": "{store}'da açılır · Satın almayı geri yükle"
+        "value": "{store}'da a\u00e7\u0131l\u0131r \u00b7 Sat\u0131n almay\u0131 geri y\u00fckle"
       },
       "valueType": "STRING"
     },
     "lbl_subscription_purchase_caption_en": {
       "defaultValue": {
-        "value": "Opens in {store} · Restore purchase"
+        "value": "Opens in {store} \u00b7 Restore purchase"
       },
       "valueType": "STRING"
     },
     "lbl_subscription_pending_banner_title_tr": {
       "defaultValue": {
-        "value": "{store}'a yönlendirildiniz"
+        "value": "{store}'a y\u00f6nlendirildiniz"
       },
       "valueType": "STRING"
     },
@@ -6207,7 +6652,7 @@
     },
     "lbl_subscription_pending_banner_body_tr": {
       "defaultValue": {
-        "value": "Satın almayı mağaza penceresinde tamamlayın; sonucu bu ekrana biz yansıtacağız."
+        "value": "Sat\u0131n almay\u0131 ma\u011faza penceresinde tamamlay\u0131n; sonucu bu ekrana biz yans\u0131taca\u011f\u0131z."
       },
       "valueType": "STRING"
     },
@@ -6219,7 +6664,7 @@
     },
     "lbl_subscription_pending_pill_tr": {
       "defaultValue": {
-        "value": "{store}'da açıldı"
+        "value": "{store}'da a\u00e7\u0131ld\u0131"
       },
       "valueType": "STRING"
     },
@@ -6231,19 +6676,19 @@
     },
     "lbl_subscription_pending_cta_tr": {
       "defaultValue": {
-        "value": "{store} bekleniyor…"
+        "value": "{store} bekleniyor\u2026"
       },
       "valueType": "STRING"
     },
     "lbl_subscription_pending_cta_en": {
       "defaultValue": {
-        "value": "Waiting for {store}…"
+        "value": "Waiting for {store}\u2026"
       },
       "valueType": "STRING"
     },
     "lbl_subscription_pending_caption_tr": {
       "defaultValue": {
-        "value": "Mağaza penceresi kapanınca güncellenir"
+        "value": "Ma\u011faza penceresi kapan\u0131nca g\u00fcncellenir"
       },
       "valueType": "STRING"
     },
@@ -6255,7 +6700,7 @@
     },
     "lbl_subscription_pending_note_tr": {
       "defaultValue": {
-        "value": "Mağaza penceresini kapatır ya da iptal ederseniz bu ekrana geri dönersiniz; plan seçiminiz korunur."
+        "value": "Ma\u011faza penceresini kapat\u0131r ya da iptal ederseniz bu ekrana geri d\u00f6nersiniz; plan se\u00e7iminiz korunur."
       },
       "valueType": "STRING"
     },
@@ -6267,7 +6712,7 @@
     },
     "lbl_subscription_yearly_badge_tr": {
       "defaultValue": {
-        "value": "En avantajlı"
+        "value": "En avantajl\u0131"
       },
       "valueType": "STRING"
     },
@@ -6291,7 +6736,7 @@
     },
     "lbl_subscription_monthly_sub_tr": {
       "defaultValue": {
-        "value": "aylık"
+        "value": "ayl\u0131k"
       },
       "valueType": "STRING"
     },
@@ -6303,16 +6748,16 @@
     },
     "cfg_subscription_included_features": {
       "defaultValue": {
-        "value": "[{\"label_tr\": \"Sınırsız üye ve antrenör hesabı\", \"label_en\": \"Unlimited member and trainer accounts\"}, {\"label_tr\": \"Seans takvimi, onay ve telafi takibi\", \"label_en\": \"Session calendar, confirmation and makeup tracking\"}, {\"label_tr\": \"Ölçüm takibi ve üye raporları\", \"label_en\": \"Measurement tracking and member reports\"}, {\"label_tr\": \"Salon teması, kurallar ve bildirimler\", \"label_en\": \"Gym theme, rules and notifications\"}]"
+        "value": "[{\"label_tr\": \"S\u0131n\u0131rs\u0131z \u00fcye ve antren\u00f6r hesab\u0131\", \"label_en\": \"Unlimited member and trainer accounts\"}, {\"label_tr\": \"Seans takvimi, onay ve telafi takibi\", \"label_en\": \"Session calendar, confirmation and makeup tracking\"}, {\"label_tr\": \"\u00d6l\u00e7\u00fcm takibi ve \u00fcye raporlar\u0131\", \"label_en\": \"Measurement tracking and member reports\"}, {\"label_tr\": \"Salon temas\u0131, kurallar ve bildirimler\", \"label_en\": \"Gym theme, rules and notifications\"}]"
       },
-      "description": "F6-1 — abonelikte dahil olan özellikler listesi.",
+      "description": "F6-1 \u2014 abonelikte dahil olan \u00f6zellikler listesi.",
       "valueType": "STRING"
     },
     "cfg_subscription_restricted_operations": {
       "defaultValue": {
-        "value": "[{\"label_tr\": \"Yeni üye ve üyelik ekleme\", \"label_en\": \"Adding new members and memberships\"}, {\"label_tr\": \"Seans ve grup dersi oluşturma\", \"label_en\": \"Creating sessions and group classes\"}, {\"label_tr\": \"Üyelere bildirim gönderme\", \"label_en\": \"Sending notifications to members\"}]"
+        "value": "[{\"label_tr\": \"Yeni \u00fcye ve \u00fcyelik ekleme\", \"label_en\": \"Adding new members and memberships\"}, {\"label_tr\": \"Seans ve grup dersi olu\u015fturma\", \"label_en\": \"Creating sessions and group classes\"}, {\"label_tr\": \"\u00dcyelere bildirim g\u00f6nderme\", \"label_en\": \"Sending notifications to members\"}]"
       },
-      "description": "F6-1 — abonelik süresi dolduğunda kısıtlanan işlemler listesi.",
+      "description": "F6-1 \u2014 abonelik s\u00fcresi doldu\u011funda k\u0131s\u0131tlanan i\u015flemler listesi.",
       "valueType": "STRING"
     },
     "lbl_subscription_trial_banner_title_en": {
@@ -6335,13 +6780,589 @@
     },
     "lbl_subscription_no_products_tr": {
       "defaultValue": {
-        "value": "Şu an satın alınabilir bir abonelik ürünü bulunamadı."
+        "value": "\u015eu an sat\u0131n al\u0131nabilir bir abonelik \u00fcr\u00fcn\u00fc bulunamad\u0131."
       },
       "valueType": "STRING"
     },
     "lbl_subscription_no_products_en": {
       "defaultValue": {
         "value": "No purchasable subscription product is available right now."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_measurements_member_title_tr": {
+      "defaultValue": {
+        "value": "{name} \u00b7 \u00d6l\u00e7\u00fcmleri"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_measurements_member_title_en": {
+      "defaultValue": {
+        "value": "{name} \u00b7 Measurements"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_measurements_avatar_hint_tr": {
+      "defaultValue": {
+        "value": "Noktalara dokunarak de\u011ferleri g\u00f6r"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_measurements_avatar_hint_en": {
+      "defaultValue": {
+        "value": "Tap points to see values"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_measurements_chart_hint_tr": {
+      "defaultValue": {
+        "value": "metrik \u00e7iplerine dokun"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_measurements_chart_hint_en": {
+      "defaultValue": {
+        "value": "tap metric chips"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_measurements_chart_toggle_label_tr": {
+      "defaultValue": {
+        "value": "Grafik"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_measurements_chart_toggle_label_en": {
+      "defaultValue": {
+        "value": "Chart"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_measurements_avatar_toggle_label_tr": {
+      "defaultValue": {
+        "value": "Avatar"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_measurements_avatar_toggle_label_en": {
+      "defaultValue": {
+        "value": "Avatar"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_measurements_date_picker_title_tr": {
+      "defaultValue": {
+        "value": "Tarih se\u00e7"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_measurements_date_picker_title_en": {
+      "defaultValue": {
+        "value": "Select date"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_measurements_latest_record_option_tr": {
+      "defaultValue": {
+        "value": "Son kay\u0131t"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_measurements_latest_record_option_en": {
+      "defaultValue": {
+        "value": "Latest record"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_measurements_showing_latest_label_tr": {
+      "defaultValue": {
+        "value": "Son kay\u0131t g\u00f6steriliyor"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_measurements_showing_latest_label_en": {
+      "defaultValue": {
+        "value": "Showing latest record"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_measurements_showing_date_label_tr": {
+      "defaultValue": {
+        "value": "{date} g\u00f6steriliyor"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_measurements_showing_date_label_en": {
+      "defaultValue": {
+        "value": "Showing {date}"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_measurements_change_date_label_tr": {
+      "defaultValue": {
+        "value": "Tarih de\u011fi\u015ftir"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_measurements_change_date_label_en": {
+      "defaultValue": {
+        "value": "Change date"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_measurements_value_field_hint_tr": {
+      "defaultValue": {
+        "value": "De\u011fer gir"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_measurements_value_field_hint_en": {
+      "defaultValue": {
+        "value": "Enter value"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_measurements_empty_point_hint_tr": {
+      "defaultValue": {
+        "value": "Hen\u00fcz \u00f6l\u00e7\u00fcm eklenmedi \u2014 yukar\u0131dan bir de\u011fer gir."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_measurements_empty_point_hint_en": {
+      "defaultValue": {
+        "value": "No measurement yet \u2014 enter a value above."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_measurements_save_failed_error_tr": {
+      "defaultValue": {
+        "value": "\u00d6l\u00e7\u00fcm kaydedilemedi, tekrar dene."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_measurements_save_failed_error_en": {
+      "defaultValue": {
+        "value": "Could not save measurement, try again."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_measurements_no_data_for_metric_tr": {
+      "defaultValue": {
+        "value": "{metric} i\u00e7in hen\u00fcz \u00f6l\u00e7\u00fcm yok."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_measurements_no_data_for_metric_en": {
+      "defaultValue": {
+        "value": "No measurements yet for {metric}."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_measurements_metric_latest_label_tr": {
+      "defaultValue": {
+        "value": "{metric} \u00b7 son \u00f6l\u00e7\u00fcm"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_measurements_metric_latest_label_en": {
+      "defaultValue": {
+        "value": "{metric} \u00b7 latest measurement"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_measurements_no_change_label_tr": {
+      "defaultValue": {
+        "value": "de\u011fi\u015fim yok"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_measurements_no_change_label_en": {
+      "defaultValue": {
+        "value": "no change"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_measurements_six_month_delta_label_tr": {
+      "defaultValue": {
+        "value": "6 ayda {delta}"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_measurements_six_month_delta_label_en": {
+      "defaultValue": {
+        "value": "over 6 months {delta}"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_measurements_latest_measurement_label_tr": {
+      "defaultValue": {
+        "value": "Son \u00f6l\u00e7\u00fcm"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_measurements_latest_measurement_label_en": {
+      "defaultValue": {
+        "value": "Latest measurement"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_measurements_switch_to_avatar_cta_tr": {
+      "defaultValue": {
+        "value": "\u00d6l\u00e7\u00fcm eklemek i\u00e7in Avatar'a ge\u00e7"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_measurements_switch_to_avatar_cta_en": {
+      "defaultValue": {
+        "value": "Switch to Avatar to add a measurement"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_measurements_add_metric_label_tr": {
+      "defaultValue": {
+        "value": "{metric} ekle"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_measurements_add_metric_label_en": {
+      "defaultValue": {
+        "value": "Add {metric}"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_events_date_field_hint_tr": {
+      "defaultValue": {
+        "value": "16 A\u011fu 2026"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_events_date_field_hint_en": {
+      "defaultValue": {
+        "value": "Aug 16 2026"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_events_time_field_hint_tr": {
+      "defaultValue": {
+        "value": "08:00"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_events_time_field_hint_en": {
+      "defaultValue": {
+        "value": "08:00"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_events_name_required_error_tr": {
+      "defaultValue": {
+        "value": "Etkinlik ad\u0131 bo\u015f b\u0131rak\u0131lamaz."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_events_name_required_error_en": {
+      "defaultValue": {
+        "value": "Event name cannot be empty."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_events_date_format_error_tr": {
+      "defaultValue": {
+        "value": "Tarihi \"g\u00fcn ay y\u0131l\" format\u0131nda gir (\u00f6rn. 16 A\u011fu 2026)."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_events_date_format_error_en": {
+      "defaultValue": {
+        "value": "Enter the date as \"day month year\" (e.g. 16 A\u011fu 2026)."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_events_create_failed_error_tr": {
+      "defaultValue": {
+        "value": "Etkinlik olu\u015fturulamad\u0131, tekrar dene."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_events_create_failed_error_en": {
+      "defaultValue": {
+        "value": "Could not create event, try again."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_expenses_amount_field_hint_tr": {
+      "defaultValue": {
+        "value": "8.400"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_expenses_amount_field_hint_en": {
+      "defaultValue": {
+        "value": "8,400"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_expenses_category_picker_title_tr": {
+      "defaultValue": {
+        "value": "Kategori se\u00e7"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_expenses_category_picker_title_en": {
+      "defaultValue": {
+        "value": "Select category"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_expenses_description_field_hint_tr": {
+      "defaultValue": {
+        "value": "Reformer yay de\u011fi\u015fimi"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_expenses_description_field_hint_en": {
+      "defaultValue": {
+        "value": "Reformer spring replacement"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_expenses_trainer_commission_note_tr": {
+      "defaultValue": {
+        "value": "Antren\u00f6r primleri seans onaylar\u0131ndan otomatik hesaplan\u0131r; buraya elle girilmez."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_expenses_trainer_commission_note_en": {
+      "defaultValue": {
+        "value": "Trainer commissions are calculated automatically from session approvals; they are not entered manually here."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_expenses_amount_invalid_error_tr": {
+      "defaultValue": {
+        "value": "Ge\u00e7erli bir tutar gir."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_expenses_amount_invalid_error_en": {
+      "defaultValue": {
+        "value": "Enter a valid amount."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_expenses_description_required_error_tr": {
+      "defaultValue": {
+        "value": "A\u00e7\u0131klama bo\u015f b\u0131rak\u0131lamaz."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_expenses_description_required_error_en": {
+      "defaultValue": {
+        "value": "Description cannot be empty."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_expenses_save_failed_error_tr": {
+      "defaultValue": {
+        "value": "Gider kaydedilemedi, tekrar dene."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_expenses_save_failed_error_en": {
+      "defaultValue": {
+        "value": "Could not save expense, try again."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_expenses_monthly_total_label_tr": {
+      "defaultValue": {
+        "value": "{month} toplam gider"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_expenses_monthly_total_label_en": {
+      "defaultValue": {
+        "value": "Total expenses in {month}"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_expenses_revenue_ratio_label_tr": {
+      "defaultValue": {
+        "value": "Ciroya oran\u0131 {ratio}"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_expenses_revenue_ratio_label_en": {
+      "defaultValue": {
+        "value": "Ratio to revenue {ratio}"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_feedback_total_reviews_caption_tr": {
+      "defaultValue": {
+        "value": "{count} de\u011ferlendirme"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_feedback_total_reviews_caption_en": {
+      "defaultValue": {
+        "value": "{count} reviews"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_feedback_how_was_session_title_tr": {
+      "defaultValue": {
+        "value": "Dersin nas\u0131l ge\u00e7ti?"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_feedback_how_was_session_title_en": {
+      "defaultValue": {
+        "value": "How was your session?"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_feedback_privacy_note_with_trainer_tr": {
+      "defaultValue": {
+        "value": "{trainer} ile birebir \u00b7 Yaln\u0131zca st\u00fcdyo y\u00f6netimi g\u00f6r\u00fcr, antren\u00f6r\u00fcne isimsiz iletilir."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_feedback_privacy_note_with_trainer_en": {
+      "defaultValue": {
+        "value": "One-on-one with {trainer} \u00b7 Only studio management sees this, it is shared with your trainer anonymously."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_feedback_privacy_note_tr": {
+      "defaultValue": {
+        "value": "Yaln\u0131zca st\u00fcdyo y\u00f6netimi g\u00f6r\u00fcr, antren\u00f6r\u00fcne isimsiz iletilir."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_feedback_privacy_note_en": {
+      "defaultValue": {
+        "value": "Only studio management sees this, it is shared with your trainer anonymously."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_feedback_comment_field_hint_tr": {
+      "defaultValue": {
+        "value": "Is\u0131nma b\u00f6l\u00fcm\u00fc bu hafta \u00e7ok iyiydi, esneme i\u00e7in 5 dakika daha olsa harika olur."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_feedback_comment_field_hint_en": {
+      "defaultValue": {
+        "value": "The warm-up was really good this week, five more minutes of stretching would be great."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_feedback_submit_button_tr": {
+      "defaultValue": {
+        "value": "G\u00f6nder"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_feedback_submit_button_en": {
+      "defaultValue": {
+        "value": "Submit"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_feedback_give_star_to_submit_hint_tr": {
+      "defaultValue": {
+        "value": "G\u00f6ndermek i\u00e7in y\u0131ld\u0131z ver"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_feedback_give_star_to_submit_hint_en": {
+      "defaultValue": {
+        "value": "Give a rating to submit"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_feedback_sent_anonymously_hint_tr": {
+      "defaultValue": {
+        "value": "Antren\u00f6r\u00fcne isimsiz iletilir"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_feedback_sent_anonymously_hint_en": {
+      "defaultValue": {
+        "value": "Sent to your trainer anonymously"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_feedback_rating_label_0_tr": {
+      "defaultValue": {
+        "value": "Puan vermek i\u00e7in dokun"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_feedback_rating_label_0_en": {
+      "defaultValue": {
+        "value": "Tap to rate"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_feedback_rating_label_1_tr": {
+      "defaultValue": {
+        "value": "Hi\u00e7 iyi ge\u00e7medi"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_feedback_rating_label_1_en": {
+      "defaultValue": {
+        "value": "Not good at all"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_feedback_rating_label_2_tr": {
+      "defaultValue": {
+        "value": "Bekledi\u011fim gibi de\u011fildi"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_feedback_rating_label_2_en": {
+      "defaultValue": {
+        "value": "Not what I expected"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_feedback_rating_label_3_tr": {
+      "defaultValue": {
+        "value": "Fena de\u011fildi"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_feedback_rating_label_3_en": {
+      "defaultValue": {
+        "value": "Not bad"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_feedback_rating_label_4_tr": {
+      "defaultValue": {
+        "value": "\u0130yiydi"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_feedback_rating_label_4_en": {
+      "defaultValue": {
+        "value": "Good"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_feedback_rating_label_5_tr": {
+      "defaultValue": {
+        "value": "Harikayd\u0131"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_feedback_rating_label_5_en": {
+      "defaultValue": {
+        "value": "Great"
       },
       "valueType": "STRING"
     }

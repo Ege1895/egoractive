@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
+import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/subscription/subscription_write_gate.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/utils/thousands_input_formatter.dart';
@@ -64,7 +65,9 @@ class _AddExpensePanelState extends BasePanelState<AddExpensePanel> {
                 children: [
                   Expanded(
                     child: Text(
-                      'Gider ekle',
+                      ref.watch(
+                        rcTextProvider(RemoteConfigKeys.expensesAddTitle),
+                      ),
                       style: typography.headingSmall.copyWith(
                         color: colors.onSurface,
                         fontSize: 18,
@@ -75,7 +78,7 @@ class _AddExpensePanelState extends BasePanelState<AddExpensePanel> {
                     onTap: () =>
                         ref.read(panelStackControllerProvider.notifier).pop(),
                     child: Text(
-                      'Vazgeç',
+                      ref.watch(rcTextProvider(RemoteConfigKeys.commonVazgec)),
                       style: typography.bodyLarge.copyWith(
                         color: colors.onSurfaceMuted,
                         fontSize: 15,
@@ -104,11 +107,19 @@ class _AddExpensePanelState extends BasePanelState<AddExpensePanel> {
                       border: Border.all(color: colors.outline),
                     ),
                     child: AppTextField(
-                      label: 'Tutar (₺)',
+                      label: ref.watch(
+                        rcTextProvider(
+                          RemoteConfigKeys.expensesAmountFieldLabel,
+                        ),
+                      ),
                       controller: _amountController,
                       keyboardType: TextInputType.number,
                       inputFormatters: [ThousandsInputFormatter()],
-                      hint: '8.400',
+                      hint: ref.watch(
+                        rcTextProvider(
+                          RemoteConfigKeys.expensesAmountFieldHint,
+                        ),
+                      ),
                       errorText: _amountError,
                       onChanged: (_) {
                         if (_amountError != null) {
@@ -119,7 +130,11 @@ class _AddExpensePanelState extends BasePanelState<AddExpensePanel> {
                   ),
                   const SizedBox(height: AppSpacing.lg),
                   Text(
-                    'Kategori',
+                    ref.watch(
+                      rcTextProvider(
+                        RemoteConfigKeys.expensesCategoryFieldLabel,
+                      ),
+                    ),
                     style: typography.bodyMedium.copyWith(
                       color: colors.onSurfaceMuted,
                       fontSize: 13,
@@ -146,7 +161,13 @@ class _AddExpensePanelState extends BasePanelState<AddExpensePanel> {
                         children: [
                           Expanded(
                             child: Text(
-                              selectedLabel ?? 'Kategori seç',
+                              selectedLabel ??
+                                  ref.watch(
+                                    rcTextProvider(
+                                      RemoteConfigKeys
+                                          .expensesCategoryPickerTitle,
+                                    ),
+                                  ),
                               style: typography.bodyLarge.copyWith(
                                 color: selectedLabel == null
                                     ? colors.onSurfaceMuted
@@ -183,12 +204,20 @@ class _AddExpensePanelState extends BasePanelState<AddExpensePanel> {
                           thickness: 4,
                           radius: const Radius.circular(4),
                           child: AppTextField(
-                            label: 'Açıklama',
+                            label: ref.watch(
+                              rcTextProvider(
+                                RemoteConfigKeys.expensesDescriptionFieldLabel,
+                              ),
+                            ),
                             controller: _titleController,
                             scrollController: _titleScrollController,
                             minLines: 1,
                             maxLines: 5,
-                            hint: 'Reformer yay değişimi',
+                            hint: ref.watch(
+                              rcTextProvider(
+                                RemoteConfigKeys.expensesDescriptionFieldHint,
+                              ),
+                            ),
                             errorText: _titleError,
                             onChanged: (_) {
                               if (_titleError != null) {
@@ -228,7 +257,12 @@ class _AddExpensePanelState extends BasePanelState<AddExpensePanel> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        'Tarih',
+                                        ref.watch(
+                                          rcTextProvider(
+                                            RemoteConfigKeys
+                                                .expensesDateFieldLabel,
+                                          ),
+                                        ),
                                         style: typography.caption.copyWith(
                                           color: colors.onSurfaceMuted,
                                         ),
@@ -275,14 +309,24 @@ class _AddExpensePanelState extends BasePanelState<AddExpensePanel> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'Her ay tekrar et',
+                                  ref.watch(
+                                    rcTextProvider(
+                                      RemoteConfigKeys
+                                          .expensesRecurringToggleLabel,
+                                    ),
+                                  ),
                                   style: typography.bodyLarge.copyWith(
                                     color: colors.onSurface,
                                     fontSize: 15,
                                   ),
                                 ),
                                 Text(
-                                  'Kira ve fatura gibi sabit giderler için',
+                                  ref.watch(
+                                    rcTextProvider(
+                                      RemoteConfigKeys
+                                          .expensesRecurringToggleDescription,
+                                    ),
+                                  ),
                                   style: typography.caption.copyWith(
                                     color: colors.onSurfaceMuted,
                                   ),
@@ -325,7 +369,11 @@ class _AddExpensePanelState extends BasePanelState<AddExpensePanel> {
                   ),
                   const SizedBox(height: AppSpacing.sm),
                   Text(
-                    'Antrenör primleri seans onaylarından otomatik hesaplanır; buraya elle girilmez.',
+                    ref.watch(
+                      rcTextProvider(
+                        RemoteConfigKeys.expensesTrainerCommissionNote,
+                      ),
+                    ),
                     style: typography.caption.copyWith(
                       color: colors.onSurfaceMuted,
                     ),
@@ -354,7 +402,15 @@ class _AddExpensePanelState extends BasePanelState<AddExpensePanel> {
                     const SizedBox(height: AppSpacing.sm),
                   ],
                   AppButton(
-                    label: _isSaving ? 'Kaydediliyor…' : 'Gideri kaydet',
+                    label: _isSaving
+                        ? ref.watch(
+                            rcTextProvider(RemoteConfigKeys.membersSavingLabel),
+                          )
+                        : ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.expensesSubmitButton,
+                            ),
+                          ),
                     onPressed: _isSaving
                         ? null
                         : () async {
@@ -368,13 +424,22 @@ class _AddExpensePanelState extends BasePanelState<AddExpensePanel> {
                             var hasError = false;
                             if (amount <= 0) {
                               setState(
-                                () => _amountError = 'Geçerli bir tutar gir.',
+                                () => _amountError = ref.read(
+                                  rcTextProvider(
+                                    RemoteConfigKeys.expensesAmountInvalidError,
+                                  ),
+                                ),
                               );
                               hasError = true;
                             }
                             if (title.isEmpty) {
                               setState(
-                                () => _titleError = 'Açıklama boş bırakılamaz.',
+                                () => _titleError = ref.read(
+                                  rcTextProvider(
+                                    RemoteConfigKeys
+                                        .expensesDescriptionRequiredError,
+                                  ),
+                                ),
                               );
                               hasError = true;
                             }
@@ -409,8 +474,11 @@ class _AddExpensePanelState extends BasePanelState<AddExpensePanel> {
                               if (mounted) {
                                 setState(() {
                                   _isSaving = false;
-                                  _errorMessage =
-                                      'Gider kaydedilemedi, tekrar dene.';
+                                  _errorMessage = ref.read(
+                                    rcTextProvider(
+                                      RemoteConfigKeys.expensesSaveFailedError,
+                                    ),
+                                  );
                                 });
                               }
                             }
@@ -446,7 +514,11 @@ class _AddExpensePanelState extends BasePanelState<AddExpensePanel> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Kategori seç',
+                  ref.read(
+                    rcTextProvider(
+                      RemoteConfigKeys.expensesCategoryPickerTitle,
+                    ),
+                  ),
                   style: typography.headingMedium.copyWith(
                     color: colors.onSurface,
                     fontSize: 20,

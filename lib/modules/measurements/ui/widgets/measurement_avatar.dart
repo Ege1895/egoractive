@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_color_scheme.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../domain/measurement_metric.dart';
@@ -15,7 +17,7 @@ const _lane = 84.0;
 
 /// Egoractive'in imza görsel öğesi — silüet üzerindeki tıklanabilir
 /// ölçüm noktaları (nokta-küme motifi, logodaki "o" harfinden geliyor).
-class MeasurementAvatar extends StatelessWidget {
+class MeasurementAvatar extends ConsumerWidget {
   const MeasurementAvatar({
     required this.points,
     required this.selected,
@@ -33,11 +35,14 @@ class MeasurementAvatar extends StatelessWidget {
   final String? gender;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.appColors;
     final asset = gender == 'erkek'
         ? 'assets/images/silhouette-erkek.png'
         : 'assets/images/silhouette-kadin.png';
+    final addMetricLabel = ref.watch(
+      rcTextProvider(RemoteConfigKeys.measurementsAddMetricLabel),
+    );
 
     return SizedBox(
       width: _boxWidth,
@@ -65,6 +70,7 @@ class MeasurementAvatar extends StatelessWidget {
               point: points[entry.key],
               active: entry.key == selected,
               colors: colors,
+              addMetricLabel: addMetricLabel,
             ),
         ],
       ),
@@ -78,13 +84,14 @@ class MeasurementAvatar extends StatelessWidget {
     required MeasurementPoint? point,
     required bool active,
     required AppColorScheme colors,
+    required String addMetricLabel,
   }) {
     final x = _imgX + layout.fx * _imgWidth;
     final y = _imgY + layout.fy * _imgHeight;
     final isLeft = layout.side == AvatarSide.left;
     final typography = context.appTypography;
     final label = point == null
-        ? '${metric.label} ekle'
+        ? addMetricLabel.replaceAll('{metric}', metric.label)
         : '${metric.label} ${point.value}';
 
     return [

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
+import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/subscription/subscription_write_gate.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_button.dart';
@@ -63,7 +64,11 @@ class _CreateGroupSessionPanelState
                 children: [
                   Expanded(
                     child: Text(
-                      'Grup dersi oluştur',
+                      ref.watch(
+                        rcTextProvider(
+                          RemoteConfigKeys.groupSessionsCreateTitle,
+                        ),
+                      ),
                       style: typography.headingSmall.copyWith(
                         color: colors.onSurface,
                         fontSize: 18,
@@ -74,7 +79,7 @@ class _CreateGroupSessionPanelState
                   GestureDetector(
                     onTap: () => panelStack.pop(),
                     child: Text(
-                      'Vazgeç',
+                      ref.watch(rcTextProvider(RemoteConfigKeys.commonVazgec)),
                       style: typography.bodyLarge.copyWith(
                         color: colors.onSurfaceMuted,
                         fontSize: 15,
@@ -106,7 +111,11 @@ class _CreateGroupSessionPanelState
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         AppTextField(
-                          label: 'Ders adı',
+                          label: ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.groupSessionsNameFieldLabel,
+                            ),
+                          ),
                           controller: _titleController,
                           errorText: form.titleError,
                           onChanged: controller.setTitle,
@@ -116,7 +125,12 @@ class _CreateGroupSessionPanelState
                           children: [
                             Expanded(
                               child: _InfoField(
-                                label: 'Başlangıç saati',
+                                label: ref.watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys
+                                        .groupSessionsStartTimeFieldLabel,
+                                  ),
+                                ),
                                 value: form.startTime,
                                 onTap: () =>
                                     _pickStartTime(context, controller, form),
@@ -125,8 +139,23 @@ class _CreateGroupSessionPanelState
                             const SizedBox(width: AppSpacing.sm),
                             Expanded(
                               child: _InfoField(
-                                label: 'Süre',
-                                value: '${form.durationMinutes} dk',
+                                label: ref.watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys
+                                        .groupSessionsDurationFieldLabel,
+                                  ),
+                                ),
+                                value: ref
+                                    .watch(
+                                      rcTextProvider(
+                                        RemoteConfigKeys
+                                            .groupSessionsDurationSuffix,
+                                      ),
+                                    )
+                                    .replaceAll(
+                                      '{minutes}',
+                                      '${form.durationMinutes}',
+                                    ),
                                 onTap: () => _pickDuration(
                                   context,
                                   controller,
@@ -138,7 +167,11 @@ class _CreateGroupSessionPanelState
                         ),
                         const SizedBox(height: AppSpacing.md),
                         Text(
-                          'Günler',
+                          ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.groupSessionsDaysFieldLabel,
+                            ),
+                          ),
                           style: typography.bodyMedium.copyWith(
                             color: colors.onSurfaceMuted,
                             fontSize: 13,
@@ -202,7 +235,12 @@ class _CreateGroupSessionPanelState
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'Kontenjan',
+                                    ref.watch(
+                                      rcTextProvider(
+                                        RemoteConfigKeys
+                                            .groupSessionsCapacityFieldLabel,
+                                      ),
+                                    ),
                                     style: typography.headingSmall.copyWith(
                                       color: colors.onSurface,
                                       fontSize: 16,
@@ -210,8 +248,32 @@ class _CreateGroupSessionPanelState
                                   ),
                                   Text(
                                     form.studioName.trim().isEmpty
-                                        ? 'Üst sınır ${form.capacityMax} kişi'
-                                        : '${form.studioName} için üst sınır ${form.capacityMax} kişi',
+                                        ? ref
+                                              .watch(
+                                                rcTextProvider(
+                                                  RemoteConfigKeys
+                                                      .groupSessionsCapacityMaxNote,
+                                                ),
+                                              )
+                                              .replaceAll(
+                                                '{max}',
+                                                '${form.capacityMax}',
+                                              )
+                                        : ref
+                                              .watch(
+                                                rcTextProvider(
+                                                  RemoteConfigKeys
+                                                      .groupSessionsCapacityMaxNoteWithStudio,
+                                                ),
+                                              )
+                                              .replaceAll(
+                                                '{studio}',
+                                                form.studioName,
+                                              )
+                                              .replaceAll(
+                                                '{max}',
+                                                '${form.capacityMax}',
+                                              ),
                                     style: typography.bodyMedium.copyWith(
                                       color: colors.onSurfaceMuted,
                                       fontSize: 13,
@@ -292,14 +354,24 @@ class _CreateGroupSessionPanelState
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      'Online rezervasyona açık',
+                                      ref.watch(
+                                        rcTextProvider(
+                                          RemoteConfigKeys
+                                              .groupSessionsOnlineBookingToggleLabel,
+                                        ),
+                                      ),
                                       style: typography.bodyLarge.copyWith(
                                         color: colors.onSurface,
                                         fontSize: 15,
                                       ),
                                     ),
                                     Text(
-                                      "Üyeler Keşfet'ten katılabilir",
+                                      ref.watch(
+                                        rcTextProvider(
+                                          RemoteConfigKeys
+                                              .groupSessionsOnlineBookingToggleDescription,
+                                        ),
+                                      ),
                                       style: typography.caption.copyWith(
                                         color: colors.onSurfaceMuted,
                                       ),
@@ -340,14 +412,27 @@ class _CreateGroupSessionPanelState
                         ),
                         const SizedBox(height: AppSpacing.md),
                         AppTextField(
-                          label: 'Ders yeri (opsiyonel)',
-                          hint: 'Örn. Stüdyo 1, Ana salon',
+                          label: ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys
+                                  .groupSessionsDefaultLocationLabel,
+                            ),
+                          ),
+                          hint: ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.groupSessionsLocationFieldHint,
+                            ),
+                          ),
                           controller: _studioNameController,
                           onChanged: controller.setStudioName,
                         ),
                         const SizedBox(height: AppSpacing.xs),
                         Text(
-                          'Dersin nerede yapılacağını üyelere gösterir.',
+                          ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.groupSessionsLocationFieldHelper,
+                            ),
+                          ),
                           style: typography.caption.copyWith(
                             color: colors.onSurfaceMuted,
                             fontSize: 12,
@@ -381,8 +466,16 @@ class _CreateGroupSessionPanelState
                   ],
                   AppButton(
                     label: form.isSubmitting
-                        ? 'Oluşturuluyor…'
-                        : 'Grup dersini oluştur',
+                        ? ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.gymsGymSetupSubmittingLabel,
+                            ),
+                          )
+                        : ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.groupSessionsCreateSubmitButton,
+                            ),
+                          ),
                     onPressed: form.isSubmitting
                         ? null
                         : () async {
@@ -440,6 +533,10 @@ Future<void> _pickDuration(
 ) {
   final colors = context.appColors;
   final typography = context.appTypography;
+  final container = ProviderScope.containerOf(context);
+  final durationSuffix = container.read(
+    rcTextProvider(RemoteConfigKeys.groupSessionsDurationSuffix),
+  );
   return showModalBottomSheet<void>(
     context: context,
     backgroundColor: colors.surface,
@@ -455,7 +552,11 @@ Future<void> _pickDuration(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Süre seç',
+                container.read(
+                  rcTextProvider(
+                    RemoteConfigKeys.groupSessionsDurationPickerTitle,
+                  ),
+                ),
                 style: typography.headingMedium.copyWith(
                   color: colors.onSurface,
                   fontSize: 20,
@@ -474,7 +575,7 @@ Future<void> _pickDuration(
                       children: [
                         Expanded(
                           child: Text(
-                            '$minutes dk',
+                            durationSuffix.replaceAll('{minutes}', '$minutes'),
                             style: typography.bodyLarge.copyWith(
                               color: colors.onSurface,
                               fontSize: 15,

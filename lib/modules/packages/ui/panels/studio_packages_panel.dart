@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
+import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_back_button.dart';
 import '../../controller/studio_packages_controller.dart';
@@ -15,7 +16,8 @@ class StudioPackagesPanel extends BasePanel {
   const StudioPackagesPanel({super.key});
 
   @override
-  ConsumerState<StudioPackagesPanel> createState() => _StudioPackagesPanelState();
+  ConsumerState<StudioPackagesPanel> createState() =>
+      _StudioPackagesPanelState();
 }
 
 class _StudioPackagesPanelState extends BasePanelState<StudioPackagesPanel> {
@@ -31,23 +33,57 @@ class _StudioPackagesPanelState extends BasePanelState<StudioPackagesPanel> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.md, AppSpacing.screenEdge, 0),
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.screenEdge,
+                AppSpacing.md,
+                AppSpacing.screenEdge,
+                0,
+              ),
               child: Row(
                 children: [
-                  AppBackButton(onTap: () => ref.read(panelStackControllerProvider.notifier).pop()),
+                  AppBackButton(
+                    onTap: () =>
+                        ref.read(panelStackControllerProvider.notifier).pop(),
+                  ),
                   const SizedBox(width: AppSpacing.md),
-                  Expanded(child: Text('Paketler', style: typography.headingSmall.copyWith(color: colors.onSurface, fontSize: 18))),
+                  Expanded(
+                    child: Text(
+                      ref.watch(
+                        rcTextProvider(RemoteConfigKeys.packagesListTitle),
+                      ),
+                      style: typography.headingSmall.copyWith(
+                        color: colors.onSurface,
+                        fontSize: 18,
+                      ),
+                    ),
+                  ),
                   Material(
                     color: colors.primary,
                     borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
                     child: InkWell(
-                      borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
-                      onTap: () => ref.read(panelStackControllerProvider.notifier).push(const EditStudioPackagePanel()),
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusInner,
+                      ),
+                      onTap: () => ref
+                          .read(panelStackControllerProvider.notifier)
+                          .push(const EditStudioPackagePanel()),
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.md,
+                        ),
                         constraints: const BoxConstraints(minHeight: 40),
                         alignment: Alignment.center,
-                        child: Text('+ Paket ekle', style: typography.headingSmall.copyWith(fontSize: 14, color: colors.onPrimary)),
+                        child: Text(
+                          ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.packagesAddPackageButton,
+                            ),
+                          ),
+                          style: typography.headingSmall.copyWith(
+                            fontSize: 14,
+                            color: colors.onPrimary,
+                          ),
+                        ),
                       ),
                     ),
                   ),
@@ -56,9 +92,15 @@ class _StudioPackagesPanelState extends BasePanelState<StudioPackagesPanel> {
             ),
             Expanded(
               child: ListView(
-                padding: const EdgeInsets.fromLTRB(AppSpacing.screenEdge, AppSpacing.md, AppSpacing.screenEdge, AppSpacing.lg),
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.screenEdge,
+                  AppSpacing.md,
+                  AppSpacing.screenEdge,
+                  AppSpacing.lg,
+                ),
                 children: [
-                  for (final package in packages) _PackageCard(package: package),
+                  for (final package in packages)
+                    _PackageCard(package: package),
                 ],
               ),
             ),
@@ -80,7 +122,9 @@ class _PackageCard extends ConsumerWidget {
     final typography = context.appTypography;
     final isSolo = package.sessionType == PackageSessionType.solo;
     final typeBg = isSolo ? colors.primaryContainer : colors.successContainer;
-    final typeFg = isSolo ? colors.onPrimaryContainer : colors.onSuccessContainer;
+    final typeFg = isSolo
+        ? colors.onPrimaryContainer
+        : colors.onSuccessContainer;
 
     return Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.md),
@@ -100,20 +144,57 @@ class _PackageCard extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(package.name, style: typography.headingSmall.copyWith(color: colors.onSurface, fontSize: 17)),
+                    Text(
+                      package.name,
+                      style: typography.headingSmall.copyWith(
+                        color: colors.onSurface,
+                        fontSize: 17,
+                      ),
+                    ),
                     const SizedBox(height: AppSpacing.xs),
                     Row(
                       children: [
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 5),
-                          decoration: BoxDecoration(color: typeBg, borderRadius: BorderRadius.circular(AppSpacing.radiusPill)),
-                          child: Text(package.sessionType.label, style: typography.caption.copyWith(color: typeFg, fontSize: 11, fontWeight: FontWeight.w600)),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: AppSpacing.sm,
+                            vertical: 5,
+                          ),
+                          decoration: BoxDecoration(
+                            color: typeBg,
+                            borderRadius: BorderRadius.circular(
+                              AppSpacing.radiusPill,
+                            ),
+                          ),
+                          child: Text(
+                            package.sessionType.label,
+                            style: typography.caption.copyWith(
+                              color: typeFg,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
                         ),
                         const SizedBox(width: AppSpacing.sm),
                         Expanded(
                           child: Text(
-                            '${package.sessionCount} seans · ${package.validityDays} gün',
-                            style: typography.caption.copyWith(color: colors.onSurfaceMuted),
+                            ref
+                                .watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys
+                                        .packagesSessionCountValidityCaption,
+                                  ),
+                                )
+                                .replaceAll(
+                                  '{count}',
+                                  '${package.sessionCount}',
+                                )
+                                .replaceAll(
+                                  '{days}',
+                                  '${package.validityDays}',
+                                ),
+                            style: typography.caption.copyWith(
+                              color: colors.onSurfaceMuted,
+                            ),
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
@@ -122,7 +203,13 @@ class _PackageCard extends ConsumerWidget {
                   ],
                 ),
               ),
-              Text('₺${package.priceTl}', style: typography.dataMedium.copyWith(color: colors.onSurface, fontSize: 20)),
+              Text(
+                '₺${package.priceTl}',
+                style: typography.dataMedium.copyWith(
+                  color: colors.onSurface,
+                  fontSize: 20,
+                ),
+              ),
             ],
           ),
           const SizedBox(height: AppSpacing.md),
@@ -134,11 +221,21 @@ class _PackageCard extends ConsumerWidget {
                   borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
                   child: InkWell(
                     borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
-                    onTap: () => ref.read(panelStackControllerProvider.notifier).push(EditStudioPackagePanel(existing: package)),
+                    onTap: () => ref
+                        .read(panelStackControllerProvider.notifier)
+                        .push(EditStudioPackagePanel(existing: package)),
                     child: Container(
                       constraints: const BoxConstraints(minHeight: 44),
                       alignment: Alignment.center,
-                      child: Text('Düzenle', style: typography.headingSmall.copyWith(fontSize: 14, color: colors.onSurfaceVariant)),
+                      child: Text(
+                        ref.watch(
+                          rcTextProvider(RemoteConfigKeys.commonDuzenle),
+                        ),
+                        style: typography.headingSmall.copyWith(
+                          fontSize: 14,
+                          color: colors.onSurfaceVariant,
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -147,11 +244,25 @@ class _PackageCard extends ConsumerWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
                 constraints: const BoxConstraints(minHeight: 44),
-                decoration: BoxDecoration(color: colors.surfaceRaised.withValues(alpha: 0.6), borderRadius: BorderRadius.circular(AppSpacing.radiusInner)),
+                decoration: BoxDecoration(
+                  color: colors.surfaceRaised.withValues(alpha: 0.6),
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+                ),
                 alignment: Alignment.center,
                 child: Text(
-                  package.activeForSale ? 'Satışta' : 'Kapalı',
-                  style: typography.headingSmall.copyWith(fontSize: 14, color: colors.onSurfaceMuted),
+                  package.activeForSale
+                      ? ref.watch(
+                          rcTextProvider(
+                            RemoteConfigKeys.packagesEditOnSaleToggleLabel,
+                          ),
+                        )
+                      : ref.watch(
+                          rcTextProvider(RemoteConfigKeys.packagesOffSaleLabel),
+                        ),
+                  style: typography.headingSmall.copyWith(
+                    fontSize: 14,
+                    color: colors.onSurfaceMuted,
+                  ),
                 ),
               ),
             ],

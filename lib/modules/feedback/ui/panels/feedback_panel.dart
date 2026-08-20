@@ -4,19 +4,20 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
+import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_back_button.dart';
 import '../../../../shared/widgets/app_loading_indicator.dart';
 import '../../../packages/controller/package_controller.dart';
 import '../../controller/feedback_controller.dart';
 
-const _ratingLabels = [
-  'Puan vermek için dokun',
-  'Hiç iyi geçmedi',
-  'Beklediğim gibi değildi',
-  'Fena değildi',
-  'İyiydi',
-  'Harikaydı',
+const _ratingLabelKeys = [
+  RemoteConfigKeys.feedbackRatingLabel0,
+  RemoteConfigKeys.feedbackRatingLabel1,
+  RemoteConfigKeys.feedbackRatingLabel2,
+  RemoteConfigKeys.feedbackRatingLabel3,
+  RemoteConfigKeys.feedbackRatingLabel4,
+  RemoteConfigKeys.feedbackRatingLabel5,
 ];
 const _maxCommentLength = 500;
 
@@ -72,7 +73,9 @@ class _FeedbackPanelState extends BasePanelState<FeedbackPanel> {
                   ),
                   const SizedBox(width: AppSpacing.md),
                   Text(
-                    'Geri bildirim',
+                    ref.watch(
+                      rcTextProvider(RemoteConfigKeys.feedbackMemberFormTitle),
+                    ),
                     style: typography.headingSmall.copyWith(
                       color: colors.onSurface,
                       fontSize: 18,
@@ -93,7 +96,11 @@ class _FeedbackPanelState extends BasePanelState<FeedbackPanel> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Dersin nasıl geçti?',
+                      ref.watch(
+                        rcTextProvider(
+                          RemoteConfigKeys.feedbackHowWasSessionTitle,
+                        ),
+                      ),
                       style: typography.headingMedium.copyWith(
                         color: colors.onSurface,
                         fontSize: 26,
@@ -102,8 +109,19 @@ class _FeedbackPanelState extends BasePanelState<FeedbackPanel> {
                     const SizedBox(height: AppSpacing.sm),
                     Text(
                       hasTrainer
-                          ? '$trainerName ile birebir · Yalnızca stüdyo yönetimi görür, antrenörüne isimsiz iletilir.'
-                          : 'Yalnızca stüdyo yönetimi görür, antrenörüne isimsiz iletilir.',
+                          ? ref
+                                .watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys
+                                        .feedbackPrivacyNoteWithTrainer,
+                                  ),
+                                )
+                                .replaceAll('{trainer}', trainerName)
+                          : ref.watch(
+                              rcTextProvider(
+                                RemoteConfigKeys.feedbackPrivacyNote,
+                              ),
+                            ),
                       style: typography.bodyMedium.copyWith(
                         color: colors.onSurfaceVariant,
                       ),
@@ -138,7 +156,9 @@ class _FeedbackPanelState extends BasePanelState<FeedbackPanel> {
                           ),
                           const SizedBox(height: AppSpacing.md),
                           Text(
-                            _ratingLabels[state.rating],
+                            ref.watch(
+                              rcTextProvider(_ratingLabelKeys[state.rating]),
+                            ),
                             style: typography.headingSmall.copyWith(
                               fontSize: 16,
                               color: state.rating == 0
@@ -151,7 +171,11 @@ class _FeedbackPanelState extends BasePanelState<FeedbackPanel> {
                     ),
                     const SizedBox(height: AppSpacing.lg),
                     Text(
-                      'YORUMUN (İSTEĞE BAĞLI)',
+                      ref.watch(
+                        rcTextProvider(
+                          RemoteConfigKeys.feedbackCommentSectionHeader,
+                        ),
+                      ),
                       style: typography.caption.copyWith(
                         color: colors.onSurfaceMuted,
                         letterSpacing: 1.2,
@@ -185,8 +209,11 @@ class _FeedbackPanelState extends BasePanelState<FeedbackPanel> {
                               border: InputBorder.none,
                               counterText: '',
                               contentPadding: EdgeInsets.zero,
-                              hintText:
-                                  'Isınma bölümü bu hafta çok iyiydi, esneme için 5 dakika daha olsa harika olur.',
+                              hintText: ref.watch(
+                                rcTextProvider(
+                                  RemoteConfigKeys.feedbackCommentFieldHint,
+                                ),
+                              ),
                               hintStyle: typography.bodyLarge.copyWith(
                                 color: colors.onSurfaceMuted,
                                 fontSize: 15,
@@ -251,7 +278,11 @@ class _FeedbackPanelState extends BasePanelState<FeedbackPanel> {
                         child: state.isSubmitting
                             ? const AppLoadingIndicator(size: 22)
                             : Text(
-                                'Gönder',
+                                ref.watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys.feedbackSubmitButton,
+                                  ),
+                                ),
                                 style: typography.headingSmall.copyWith(
                                   fontSize: 17,
                                   color: state.rating == 0
@@ -265,8 +296,16 @@ class _FeedbackPanelState extends BasePanelState<FeedbackPanel> {
                   const SizedBox(height: AppSpacing.sm),
                   Text(
                     state.rating == 0
-                        ? 'Göndermek için yıldız ver'
-                        : 'Antrenörüne isimsiz iletilir',
+                        ? ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.feedbackGiveStarToSubmitHint,
+                            ),
+                          )
+                        : ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.feedbackSentAnonymouslyHint,
+                            ),
+                          ),
                     style: typography.caption.copyWith(
                       color: colors.onSurfaceMuted,
                     ),

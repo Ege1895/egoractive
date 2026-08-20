@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
+import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_back_button.dart';
 import '../../controller/admin_group_sessions_controller.dart';
@@ -48,7 +49,11 @@ class _AdminGroupSessionsPanelState
                   const SizedBox(width: AppSpacing.md),
                   Expanded(
                     child: Text(
-                      'Grup dersleri',
+                      ref.watch(
+                        rcTextProvider(
+                          RemoteConfigKeys.groupSessionsAdminListTitle,
+                        ),
+                      ),
                       style: typography.headingSmall.copyWith(
                         color: colors.onSurface,
                         fontSize: 18,
@@ -72,7 +77,12 @@ class _AdminGroupSessionsPanelState
                         constraints: const BoxConstraints(minHeight: 40),
                         alignment: Alignment.center,
                         child: Text(
-                          '+ Grup dersi',
+                          ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys
+                                  .groupSessionsAddGroupSessionButton,
+                            ),
+                          ),
                           style: typography.headingSmall.copyWith(
                             fontSize: 14,
                             color: colors.onPrimary,
@@ -104,25 +114,43 @@ class _AdminGroupSessionsPanelState
   }
 }
 
-class _GroupCard extends StatelessWidget {
+class _GroupCard extends ConsumerWidget {
   const _GroupCard({required this.group});
 
   final AdminGroupSession group;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.appColors;
     final typography = context.appTypography;
     final ratio = group.capacity == 0 ? 0.0 : group.taken / group.capacity;
     final (capFg, barColor, note) = group.isFull
-        ? (colors.error, colors.error, 'Kontenjan doldu')
+        ? (
+            colors.error,
+            colors.error,
+            ref.watch(
+              rcTextProvider(RemoteConfigKeys.groupSessionsCapacityFullNote),
+            ),
+          )
         : group.remaining <= 2
         ? (
             colors.onWarningContainer,
             colors.warning,
-            'Son ${group.remaining} yer',
+            ref
+                .watch(
+                  rcTextProvider(RemoteConfigKeys.groupSessionsCapacityLowNote),
+                )
+                .replaceAll('{remaining}', '${group.remaining}'),
           )
-        : (colors.onSurfaceMuted, colors.primary, 'Yer var');
+        : (
+            colors.onSurfaceMuted,
+            colors.primary,
+            ref.watch(
+              rcTextProvider(
+                RemoteConfigKeys.groupSessionsCapacityAvailableNote,
+              ),
+            ),
+          );
 
     return Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.md),
@@ -170,7 +198,11 @@ class _GroupCard extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    'kontenjan',
+                    ref.watch(
+                      rcTextProvider(
+                        RemoteConfigKeys.groupSessionsCapacitySuffixLabel,
+                      ),
+                    ),
                     style: typography.caption.copyWith(
                       color: colors.onSurfaceMuted,
                       fontSize: 11,

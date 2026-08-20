@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
+import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/subscription/subscription_write_gate.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_button.dart';
@@ -83,7 +84,13 @@ class _EditStudioPackagePanelState
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    widget.isNew ? 'Paket ekle' : 'Paketi düzenle',
+                    ref.watch(
+                      rcTextProvider(
+                        widget.isNew
+                            ? RemoteConfigKeys.packagesAddTitle
+                            : RemoteConfigKeys.packagesEditTitle,
+                      ),
+                    ),
                     style: typography.headingSmall.copyWith(
                       color: colors.onSurface,
                       fontSize: 18,
@@ -93,7 +100,7 @@ class _EditStudioPackagePanelState
                     onTap: () =>
                         ref.read(panelStackControllerProvider.notifier).pop(),
                     child: Text(
-                      'Vazgeç',
+                      ref.watch(rcTextProvider(RemoteConfigKeys.commonVazgec)),
                       style: typography.bodyLarge.copyWith(
                         color: colors.onSurfaceMuted,
                         fontSize: 15,
@@ -125,9 +132,17 @@ class _EditStudioPackagePanelState
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         AppTextField(
-                          label: 'Paket adı',
+                          label: ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.packagesEditNameFieldLabel,
+                            ),
+                          ),
                           controller: _nameController,
-                          hint: 'Birebir 12 Seans',
+                          hint: ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.packagesNameFieldHint,
+                            ),
+                          ),
                           errorText: _nameError,
                           onChanged: (_) {
                             if (_nameError != null) {
@@ -137,7 +152,12 @@ class _EditStudioPackagePanelState
                         ),
                         const SizedBox(height: AppSpacing.md),
                         Text(
-                          'Ders tipi',
+                          ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys
+                                  .packagesEditSessionTypeFieldLabel,
+                            ),
+                          ),
                           style: typography.bodyMedium.copyWith(
                             color: colors.onSurfaceMuted,
                             fontSize: 13,
@@ -170,8 +190,17 @@ class _EditStudioPackagePanelState
                           children: [
                             Expanded(
                               child: AppTextField(
-                                label: 'Seans sayısı',
-                                hint: 'Örn. 12',
+                                label: ref.watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys.commonSeansSayisiLabel,
+                                  ),
+                                ),
+                                hint: ref.watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys
+                                        .packagesSessionCountFieldHint,
+                                  ),
+                                ),
                                 controller: _sessionCountController,
                                 keyboardType: TextInputType.number,
                                 errorText: _sessionCountError,
@@ -182,8 +211,17 @@ class _EditStudioPackagePanelState
                             const SizedBox(width: AppSpacing.sm),
                             Expanded(
                               child: AppTextField(
-                                label: 'Geçerlilik (gün)',
-                                hint: 'Örn. 90',
+                                label: ref.watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys
+                                        .packagesEditValidityDaysFieldLabel,
+                                  ),
+                                ),
+                                hint: ref.watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys.packagesValidityFieldHint,
+                                  ),
+                                ),
                                 controller: _validityController,
                                 keyboardType: TextInputType.number,
                                 errorText: _validityError,
@@ -195,14 +233,25 @@ class _EditStudioPackagePanelState
                         ),
                         const SizedBox(height: AppSpacing.md),
                         AppTextField(
-                          label: 'Fiyat (₺)',
+                          label: ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.packagesEditPriceFieldLabel,
+                            ),
+                          ),
                           controller: _priceController,
                           keyboardType: TextInputType.number,
                           onChanged: (_) => setState(() {}),
                         ),
                         const SizedBox(height: AppSpacing.xs),
                         Text(
-                          'seans başı ₺$perSession',
+                          ref
+                              .watch(
+                                rcTextProvider(
+                                  RemoteConfigKeys
+                                      .packagesPerSessionPriceCaption,
+                                ),
+                              )
+                              .replaceAll('{price}', '$perSession'),
                           style: typography.caption.copyWith(
                             color: colors.onSurfaceMuted,
                           ),
@@ -238,14 +287,24 @@ class _EditStudioPackagePanelState
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      'Satışta',
+                                      ref.watch(
+                                        rcTextProvider(
+                                          RemoteConfigKeys
+                                              .packagesEditOnSaleToggleLabel,
+                                        ),
+                                      ),
                                       style: typography.bodyLarge.copyWith(
                                         color: colors.onSurface,
                                         fontSize: 15,
                                       ),
                                     ),
                                     Text(
-                                      'Kapalıysa yeni üyeliklerde görünmez',
+                                      ref.watch(
+                                        rcTextProvider(
+                                          RemoteConfigKeys
+                                              .packagesEditOnSaleToggleDescription,
+                                        ),
+                                      ),
                                       style: typography.caption.copyWith(
                                         color: colors.onSurfaceMuted,
                                       ),
@@ -311,8 +370,12 @@ class _EditStudioPackagePanelState
                                       if (mounted) {
                                         setState(() {
                                           _isDeleting = false;
-                                          _errorMessage =
-                                              'Paket silinemedi, tekrar dene.';
+                                          _errorMessage = ref.read(
+                                            rcTextProvider(
+                                              RemoteConfigKeys
+                                                  .packagesDeleteFailedError,
+                                            ),
+                                          );
                                         });
                                       }
                                     }
@@ -324,7 +387,19 @@ class _EditStudioPackagePanelState
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
-                                    _isDeleting ? 'Siliniyor…' : 'Paketi sil',
+                                    _isDeleting
+                                        ? ref.watch(
+                                            rcTextProvider(
+                                              RemoteConfigKeys
+                                                  .authDeleteAccountInProgressButton,
+                                            ),
+                                          )
+                                        : ref.watch(
+                                            rcTextProvider(
+                                              RemoteConfigKeys
+                                                  .packagesDeletePackageButton,
+                                            ),
+                                          ),
                                     style: typography.bodyLarge.copyWith(
                                       color: colors.error,
                                       fontSize: 15,
@@ -366,7 +441,13 @@ class _EditStudioPackagePanelState
                     const SizedBox(height: AppSpacing.sm),
                   ],
                   AppButton(
-                    label: _isSaving ? 'Kaydediliyor…' : 'Kaydet',
+                    label: _isSaving
+                        ? ref.watch(
+                            rcTextProvider(RemoteConfigKeys.membersSavingLabel),
+                          )
+                        : ref.watch(
+                            rcTextProvider(RemoteConfigKeys.commonKaydet),
+                          ),
                     onPressed: _isSaving
                         ? null
                         : () async {
@@ -378,15 +459,30 @@ class _EditStudioPackagePanelState
                               _validityController.text.trim(),
                             );
                             final nameError = name.isEmpty
-                                ? 'Paket adı boş bırakılamaz.'
+                                ? ref.read(
+                                    rcTextProvider(
+                                      RemoteConfigKeys
+                                          .packagesNameRequiredError,
+                                    ),
+                                  )
                                 : null;
                             final sessionCountError =
                                 sessionCount == null || sessionCount <= 0
-                                ? 'Geçerli bir seans sayısı gir.'
+                                ? ref.read(
+                                    rcTextProvider(
+                                      RemoteConfigKeys
+                                          .packagesSessionCountInvalidError,
+                                    ),
+                                  )
                                 : null;
                             final validityError =
                                 validityDays == null || validityDays <= 0
-                                ? 'Geçerli bir gün sayısı gir.'
+                                ? ref.read(
+                                    rcTextProvider(
+                                      RemoteConfigKeys
+                                          .packagesValidityInvalidError,
+                                    ),
+                                  )
                                 : null;
                             if (nameError != null ||
                                 sessionCountError != null ||
@@ -433,8 +529,11 @@ class _EditStudioPackagePanelState
                               if (mounted) {
                                 setState(() {
                                   _isSaving = false;
-                                  _errorMessage =
-                                      'Paket kaydedilemedi, tekrar dene.';
+                                  _errorMessage = ref.read(
+                                    rcTextProvider(
+                                      RemoteConfigKeys.packagesSaveFailedError,
+                                    ),
+                                  );
                                 });
                               }
                             }

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
+import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/subscription/subscription_write_gate.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/theme/theme_controller.dart';
@@ -67,7 +68,9 @@ class _CreateEventPanelState extends BasePanelState<CreateEventPanel> {
                 children: [
                   Expanded(
                     child: Text(
-                      'Etkinlik oluştur',
+                      ref.watch(
+                        rcTextProvider(RemoteConfigKeys.eventsCreateTitle),
+                      ),
                       style: typography.headingSmall.copyWith(
                         color: colors.onSurface,
                         fontSize: 18,
@@ -78,7 +81,7 @@ class _CreateEventPanelState extends BasePanelState<CreateEventPanel> {
                     onTap: () =>
                         ref.read(panelStackControllerProvider.notifier).pop(),
                     child: Text(
-                      'Vazgeç',
+                      ref.watch(rcTextProvider(RemoteConfigKeys.commonVazgec)),
                       style: typography.bodyLarge.copyWith(
                         color: colors.onSurfaceMuted,
                         fontSize: 15,
@@ -110,7 +113,11 @@ class _CreateEventPanelState extends BasePanelState<CreateEventPanel> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         AppTextField(
-                          label: 'Etkinlik adı',
+                          label: ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.eventsNameFieldLabel,
+                            ),
+                          ),
                           controller: _nameController,
                           errorText: _nameError,
                           onChanged: (_) {
@@ -121,7 +128,11 @@ class _CreateEventPanelState extends BasePanelState<CreateEventPanel> {
                         ),
                         const SizedBox(height: AppSpacing.md),
                         AppTextField(
-                          label: 'Lokasyon',
+                          label: ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.eventsLocationFieldLabel,
+                            ),
+                          ),
                           controller: _locationController,
                         ),
                         const SizedBox(height: AppSpacing.md),
@@ -130,9 +141,17 @@ class _CreateEventPanelState extends BasePanelState<CreateEventPanel> {
                           children: [
                             Expanded(
                               child: AppTextField(
-                                label: 'Tarih',
+                                label: ref.watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys.eventsDateFieldLabel,
+                                  ),
+                                ),
                                 controller: _dateController,
-                                hint: '16 Ağu 2026',
+                                hint: ref.watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys.eventsDateFieldHint,
+                                  ),
+                                ),
                                 errorText: _dateError,
                                 onChanged: (_) {
                                   if (_dateError != null) {
@@ -144,17 +163,29 @@ class _CreateEventPanelState extends BasePanelState<CreateEventPanel> {
                             const SizedBox(width: AppSpacing.sm),
                             Expanded(
                               child: AppTextField(
-                                label: 'Saat',
+                                label: ref.watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys.eventsTimeFieldLabel,
+                                  ),
+                                ),
                                 controller: _timeController,
                                 keyboardType: TextInputType.datetime,
-                                hint: '08:00',
+                                hint: ref.watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys.eventsTimeFieldHint,
+                                  ),
+                                ),
                               ),
                             ),
                           ],
                         ),
                         const SizedBox(height: AppSpacing.md),
                         AppTextField(
-                          label: 'Açıklama',
+                          label: ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.eventsDescriptionFieldLabel,
+                            ),
+                          ),
                           controller: _descriptionController,
                         ),
                       ],
@@ -177,14 +208,23 @@ class _CreateEventPanelState extends BasePanelState<CreateEventPanel> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Kontenjan',
+                                ref.watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys.eventsCapacityLabel,
+                                  ),
+                                ),
                                 style: typography.headingSmall.copyWith(
                                   color: colors.onSurface,
                                   fontSize: 16,
                                 ),
                               ),
                               Text(
-                                'Boş bırakırsanız sınırsız olur',
+                                ref.watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys
+                                        .eventsCapacityEmptyMeansUnlimitedHelper,
+                                  ),
+                                ),
                                 style: typography.bodyMedium.copyWith(
                                   color: colors.onSurfaceMuted,
                                   fontSize: 13,
@@ -245,7 +285,17 @@ class _CreateEventPanelState extends BasePanelState<CreateEventPanel> {
                     const SizedBox(height: AppSpacing.sm),
                   ],
                   AppButton(
-                    label: _isSaving ? 'Oluşturuluyor…' : 'Etkinliği oluştur',
+                    label: _isSaving
+                        ? ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.gymsGymSetupSubmittingLabel,
+                            ),
+                          )
+                        : ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.eventsCreateSubmitButton,
+                            ),
+                          ),
                     onPressed: _isSaving
                         ? null
                         : () async {
@@ -257,15 +307,21 @@ class _CreateEventPanelState extends BasePanelState<CreateEventPanel> {
                             var hasError = false;
                             if (name.isEmpty) {
                               setState(
-                                () => _nameError =
-                                    'Etkinlik adı boş bırakılamaz.',
+                                () => _nameError = ref.read(
+                                  rcTextProvider(
+                                    RemoteConfigKeys.eventsNameRequiredError,
+                                  ),
+                                ),
                               );
                               hasError = true;
                             }
                             if (dateTime == null) {
                               setState(
-                                () => _dateError =
-                                    'Tarihi "gün ay yıl" formatında gir (örn. 16 Ağu 2026).',
+                                () => _dateError = ref.read(
+                                  rcTextProvider(
+                                    RemoteConfigKeys.eventsDateFormatError,
+                                  ),
+                                ),
                               );
                               hasError = true;
                             }
@@ -288,7 +344,12 @@ class _CreateEventPanelState extends BasePanelState<CreateEventPanel> {
                               if (gymId == null) {
                                 setState(() {
                                   _isSaving = false;
-                                  _errorMessage = 'Aktif bir salon bulunamadı.';
+                                  _errorMessage = ref.read(
+                                    rcTextProvider(
+                                      RemoteConfigKeys
+                                          .sessionsCreateNoActiveGymError,
+                                    ),
+                                  );
                                 });
                                 return;
                               }
@@ -312,8 +373,11 @@ class _CreateEventPanelState extends BasePanelState<CreateEventPanel> {
                               if (mounted) {
                                 setState(() {
                                   _isSaving = false;
-                                  _errorMessage =
-                                      'Etkinlik oluşturulamadı, tekrar dene.';
+                                  _errorMessage = ref.read(
+                                    rcTextProvider(
+                                      RemoteConfigKeys.eventsCreateFailedError,
+                                    ),
+                                  );
                                 });
                               }
                             }
