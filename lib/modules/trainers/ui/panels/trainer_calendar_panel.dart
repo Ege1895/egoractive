@@ -238,59 +238,73 @@ class _TrainerCalendarPanelState extends BasePanelState<TrainerCalendarPanel> {
                 ],
               ),
               const SizedBox(height: AppSpacing.lg),
-              Row(
-                children: [
-                  Expanded(
-                    child: AppButton(
-                      label: markCompletedLabel,
-                      onPressed: () async {
-                        Navigator.of(sheetContext).pop();
-                        // slot.id/memberId sadece gerçek Firestore
-                        // verisinden geliyorsa dolu (bkz. #114) — mock
-                        // fallback'te boş kalıp eski (yazma yapmayan)
-                        // önizleme davranışına düşer.
-                        var remainingBefore = 0;
-                        if (slot.memberId.isNotEmpty) {
-                          final memberDoc = await FirebaseFirestore.instance
-                              .collection('users')
-                              .doc(slot.memberId)
-                              .get();
-                          remainingBefore =
-                              (memberDoc.data()?['remainingSessions'] as num?)
-                                  ?.toInt() ??
-                              0;
-                        }
-                        if (!context.mounted) return;
-                        ref
-                            .read(panelStackControllerProvider.notifier)
-                            .push(
-                              SessionCompletionPanel(
-                                time: slot.time,
-                                memberInitials: _initialsOf(slot.name),
-                                memberName: slot.name,
-                                meta: slot.meta,
-                                remainingBefore: remainingBefore,
-                                sessionId: slot.memberId.isEmpty
-                                    ? null
-                                    : slot.id,
-                                memberId: slot.memberId.isEmpty
-                                    ? null
-                                    : slot.memberId,
-                              ),
-                            );
-                      },
+              // Zaten tamamlanmış/iptal edilmiş bir seansta "Dersi onayla"
+              // butonu gösterilmeye devam ediyordu — dokununca
+              // isCompletingOwnSession() kuralı (status == 'planned' şartı)
+              // PERMISSION_DENIED ile reddediyor, kullanıcıya anlamsız bir
+              // hata olarak görünüyordu. Sadece henüz onaylanmamış
+              // (planned/current) seanslarda gösteriliyor artık.
+              if (slot.state == ScheduleSlotState.planned ||
+                  slot.state == ScheduleSlotState.current)
+                Row(
+                  children: [
+                    Expanded(
+                      child: AppButton(
+                        label: markCompletedLabel,
+                        onPressed: () async {
+                          Navigator.of(sheetContext).pop();
+                          // slot.id/memberId sadece gerçek Firestore
+                          // verisinden geliyorsa dolu (bkz. #114) — mock
+                          // fallback'te boş kalıp eski (yazma yapmayan)
+                          // önizleme davranışına düşer.
+                          var remainingBefore = 0;
+                          if (slot.memberId.isNotEmpty) {
+                            final memberDoc = await FirebaseFirestore.instance
+                                .collection('users')
+                                .doc(slot.memberId)
+                                .get();
+                            remainingBefore =
+                                (memberDoc.data()?['remainingSessions'] as num?)
+                                    ?.toInt() ??
+                                0;
+                          }
+                          if (!context.mounted) return;
+                          ref
+                              .read(panelStackControllerProvider.notifier)
+                              .push(
+                                SessionCompletionPanel(
+                                  time: slot.time,
+                                  memberInitials: _initialsOf(slot.name),
+                                  memberName: slot.name,
+                                  meta: slot.meta,
+                                  remainingBefore: remainingBefore,
+                                  sessionId: slot.memberId.isEmpty
+                                      ? null
+                                      : slot.id,
+                                  memberId: slot.memberId.isEmpty
+                                      ? null
+                                      : slot.memberId,
+                                ),
+                              );
+                        },
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: AppSpacing.sm),
-                  Expanded(
-                    child: AppButton(
-                      label: closeLabel,
-                      variant: AppButtonVariant.secondary,
-                      onPressed: () => Navigator.of(sheetContext).pop(),
+                    const SizedBox(width: AppSpacing.sm),
+                    Expanded(
+                      child: AppButton(
+                        label: closeLabel,
+                        variant: AppButtonVariant.secondary,
+                        onPressed: () => Navigator.of(sheetContext).pop(),
+                      ),
                     ),
-                  ),
-                ],
-              ),
+                  ],
+                )
+              else
+                AppButton(
+                  label: closeLabel,
+                  variant: AppButtonVariant.secondary,
+                  onPressed: () => Navigator.of(sheetContext).pop(),
+                ),
             ],
           ),
         );

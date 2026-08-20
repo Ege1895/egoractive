@@ -63,15 +63,12 @@ class _SessionCompletionPanelState
             .markCompleted(sessionId: sessionId, memberId: memberId);
       }
       if (mounted) setState(() => _answer = _CompletionAnswer.done);
-    } catch (error) {
-      // TEMP TEŞHİS — kaldırılacak: gerçek Firestore hatasını (ör.
-      // permission-denied kodu/mesajı) ekranda göstererek teşhis ediyoruz —
-      // kullanıcı konsola erişemeden (canlı build) hatayı bildirebilsin diye.
-      debugPrint('SessionCompletionPanel._markCompleted hata: $error');
+    } catch (_) {
       if (mounted) {
         setState(
-          () => _errorMessage =
-              '${ref.read(rcTextProvider(RemoteConfigKeys.sessionsCompletionConfirmError))}\n[DEBUG] $error',
+          () => _errorMessage = ref.read(
+            rcTextProvider(RemoteConfigKeys.sessionsCompletionConfirmError),
+          ),
         );
       }
     } finally {
@@ -90,12 +87,12 @@ class _SessionCompletionPanelState
         await ref.read(sessionCompletionServiceProvider).markAbsent(sessionId);
       }
       if (mounted) setState(() => _answer = _CompletionAnswer.absent);
-    } catch (error) {
-      debugPrint('SessionCompletionPanel._markAbsent hata: $error');
+    } catch (_) {
       if (mounted) {
         setState(
-          () => _errorMessage =
-              '${ref.read(rcTextProvider(RemoteConfigKeys.sessionsCompletionConfirmError))}\n[DEBUG] $error',
+          () => _errorMessage = ref.read(
+            rcTextProvider(RemoteConfigKeys.sessionsCompletionConfirmError),
+          ),
         );
       }
     } finally {
