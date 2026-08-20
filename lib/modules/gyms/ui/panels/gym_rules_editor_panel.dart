@@ -132,6 +132,7 @@ class _GymRulesEditorPanelState extends BasePanelState<GymRulesEditorPanel> {
               margin: const EdgeInsets.symmetric(
                 horizontal: AppSpacing.screenEdge,
               ),
+              clipBehavior: Clip.antiAlias,
               decoration: BoxDecoration(
                 color: colors.surfaceRaised,
                 borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
