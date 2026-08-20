@@ -420,8 +420,7 @@ abstract final class RemoteConfigKeys {
   static const gymsGymInfoUploadingLabel = 'lbl_gyms_gym_info_uploading_label';
   static const gymsGymInfoPaletteExtractingLabel =
       'lbl_gyms_gym_info_palette_extracting_label';
-  static const gymsGymInfoThemeColorNote =
-      'lbl_gyms_gym_info_theme_color_note';
+  static const gymsGymInfoThemeColorNote = 'lbl_gyms_gym_info_theme_color_note';
   static const gymsGymInfoReportEmailsSection =
       'lbl_gyms_gym_info_report_emails_section';
   static const gymsGymInfoReportEmailsDescription =
@@ -469,10 +468,8 @@ abstract final class RemoteConfigKeys {
       'lbl_gyms_gym_setup_change_later_note';
   static const gymsGymSetupSubmittingLabel =
       'lbl_gyms_gym_setup_submitting_label';
-  static const gymsGymSetupSuccessBanner =
-      'lbl_gyms_gym_setup_success_banner';
-  static const gymsAddThemeNameFieldHint =
-      'lbl_gyms_add_theme_name_field_hint';
+  static const gymsGymSetupSuccessBanner = 'lbl_gyms_gym_setup_success_banner';
+  static const gymsAddThemeNameFieldHint = 'lbl_gyms_add_theme_name_field_hint';
   static const gymsAddThemeInvalidHexError =
       'lbl_gyms_add_theme_invalid_hex_error';
   static const gymsThemePreviewRemainingSessionsLabel =
@@ -654,6 +651,92 @@ abstract final class RemoteConfigKeys {
   static const sessionsCalendarViewToggle = 'lbl_sessions_calendar_view_toggle';
   static const sessionsUpcomingSection = 'lbl_sessions_upcoming_section';
   static const sessionsPastSection = 'lbl_sessions_past_section';
+  static const sessionsCalendarNoExpensesState =
+      'lbl_sessions_calendar_no_expenses_state';
+  static const sessionsStatusNow = 'lbl_sessions_status_now';
+  static const sessionsManagementCancellingLabel =
+      'lbl_sessions_management_cancelling_label';
+  static const sessionsManagementAdminCancelNote =
+      'lbl_sessions_management_admin_cancel_note';
+  static const sessionsManagementCancelError =
+      'lbl_sessions_management_cancel_error';
+  static const sessionsConfirmQuestion = 'lbl_sessions_confirm_question';
+  static const sessionsConfirmChangeHint = 'lbl_sessions_confirm_change_hint';
+  static const sessionsConfirmWaitingHint = 'lbl_sessions_confirm_waiting_hint';
+  static const sessionsConfirmSessionSummary =
+      'lbl_sessions_confirm_session_summary';
+  static const sessionsConfirmNoPermission =
+      'lbl_sessions_confirm_no_permission';
+  static const sessionsConfirmComingNote = 'lbl_sessions_confirm_coming_note';
+  static const sessionsConfirmComingNoteWithMeta =
+      'lbl_sessions_confirm_coming_note_with_meta';
+  static const sessionsConfirmNotComingNote =
+      'lbl_sessions_confirm_not_coming_note';
+  static const sessionsMemberHomeGreeting = 'lbl_sessions_member_home_greeting';
+  static const sessionsMemberHomeRemainingSessionsLabel =
+      'lbl_sessions_member_home_remaining_sessions_label';
+  static const sessionsMemberHomePackageValidUntil =
+      'lbl_sessions_member_home_package_valid_until';
+  static const sessionsMemberHomeNextSessionSection =
+      'lbl_sessions_member_home_next_session_section';
+  static const sessionsMemberHomeInstallmentsSection =
+      'lbl_sessions_member_home_installments_section';
+  static const sessionsMemberHomeInstallmentIndexLabel =
+      'lbl_sessions_member_home_installment_index_label';
+  static const sessionsMemberHomeInstallmentDueDateLabel =
+      'lbl_sessions_member_home_installment_due_date_label';
+  static const sessionsMemberHomeInstallmentDueSoonLabel =
+      'lbl_sessions_member_home_installment_due_soon_label';
+  static const sessionsMemberHomeInstallmentUnpaidLabel =
+      'lbl_sessions_member_home_installment_unpaid_label';
+  static const sessionsCompletionConfirmError =
+      'lbl_sessions_completion_confirm_error';
+  static const sessionsCompletionQuestion = 'lbl_sessions_completion_question';
+  static const sessionsCompletionSummary = 'lbl_sessions_completion_summary';
+  static const sessionsCompletionTimeLimitNote =
+      'lbl_sessions_completion_time_limit_note';
+  static const sessionsCompletionDoneMarked =
+      'lbl_sessions_completion_done_marked';
+  static const sessionsCompletionAbsentMarked =
+      'lbl_sessions_completion_absent_marked';
+  static const sessionsCompletionDoneSummary =
+      'lbl_sessions_completion_done_summary';
+  static const sessionsCompletionAbsentSummary =
+      'lbl_sessions_completion_absent_summary';
+  static const sessionsListEmptyState = 'lbl_sessions_list_empty_state';
+  static const sessionsListCalendarEmptyDay =
+      'lbl_sessions_list_calendar_empty_day';
+  static const sessionsTrainerNotificationsEmptyState =
+      'lbl_sessions_trainer_notifications_empty_state';
+  static const sessionsCreateTrainerBusyError =
+      'lbl_sessions_create_trainer_busy_error';
+  static const sessionsCreateRescheduleError =
+      'lbl_sessions_create_reschedule_error';
+  static const sessionsCreateNoActiveGymError =
+      'lbl_sessions_create_no_active_gym_error';
+  static const sessionsCreateSkippedDaysSnackbar =
+      'lbl_sessions_create_skipped_days_snackbar';
+  static const sessionsCreateTitle = 'lbl_sessions_create_title';
+  static const sessionsCreateSelectPlaceholder =
+      'lbl_sessions_create_select_placeholder';
+  static const sessionsCreateMemberSummary =
+      'lbl_sessions_create_member_summary';
+  static const sessionsCreatePickMemberTitle =
+      'lbl_sessions_create_pick_member_title';
+  static const sessionsCreateMemberSessionsSuffix =
+      'lbl_sessions_create_member_sessions_suffix';
+  static const sessionsCreatePickTrainerTitle =
+      'lbl_sessions_create_pick_trainer_title';
+  static const sessionsCreateRepeatLabel = 'lbl_sessions_create_repeat_label';
+  static const sessionsCreateRepeatDaysSelected =
+      'lbl_sessions_create_repeat_days_selected';
+  static const sessionsCreateSubmitButton = 'lbl_sessions_create_submit_button';
+  static const sessionsRepeatCalendarExhaustedError =
+      'lbl_sessions_repeat_calendar_exhausted_error';
+  static const sessionsRepeatCalendarSubtitle =
+      'lbl_sessions_repeat_calendar_subtitle';
+  static const sessionsRepeatCalendarRemainingLabel =
+      'lbl_sessions_repeat_calendar_remaining_label';
   static const trainersManagementTitle = 'lbl_trainers_management_title';
   static const trainersAddTrainerButton = 'lbl_trainers_add_trainer_button';
   static const trainersSpecialtyFieldLabel =
@@ -1071,8 +1154,7 @@ class RemoteConfigService {
     'lbl_gyms_admin_home_this_month_note_tr': 'Bu ay',
     'lbl_gyms_admin_home_no_trainers_message_tr': 'Henüz antrenör yok.',
     'lbl_gyms_admin_home_add_trainer_button_tr': '+ Antrenör ekle',
-    'lbl_gyms_admin_home_no_pending_payments_message_tr':
-        'Bekleyen ödeme yok.',
+    'lbl_gyms_admin_home_no_pending_payments_message_tr': 'Bekleyen ödeme yok.',
     'lbl_gyms_admin_home_due_payment_members_template_tr':
         '{count} üyenin ödemesi bekleniyor',
     'lbl_gyms_admin_home_total_feedback_template_tr':
@@ -1095,8 +1177,7 @@ class RemoteConfigService {
     'lbl_gyms_gym_info_gym_report_email_hint_tr': 'admin@stüdyo.com',
     'lbl_gyms_gym_info_accounting_report_email_label_tr':
         'Muhasebe raporu e-postası',
-    'lbl_gyms_gym_info_accounting_report_email_hint_tr':
-        'muhasebe@stüdyo.com',
+    'lbl_gyms_gym_info_accounting_report_email_hint_tr': 'muhasebe@stüdyo.com',
     'lbl_gyms_gym_info_saving_label_tr': 'Kaydediliyor…',
     'lbl_gyms_gym_info_save_report_emails_button_tr':
         'Rapor e-postalarını kaydet',
@@ -1262,6 +1343,81 @@ class RemoteConfigService {
     'lbl_sessions_calendar_view_toggle_tr': 'Takvim',
     'lbl_sessions_upcoming_section_tr': 'YAKLAŞAN',
     'lbl_sessions_past_section_tr': 'GEÇMİŞ',
+    'lbl_sessions_calendar_no_expenses_state_tr': 'Bu günde gider yok.',
+    'lbl_sessions_status_now_tr': 'Şimdi',
+    'lbl_sessions_management_cancelling_label_tr': 'İptal ediliyor…',
+    'lbl_sessions_management_admin_cancel_note_tr':
+        'Yönetici olarak tarih kısıtı olmadan iptal ve erteleme yapabilirsiniz.',
+    'lbl_sessions_management_cancel_error_tr':
+        'Seans iptal edilemedi, tekrar dene.',
+    'lbl_sessions_confirm_question_tr':
+        "Yarın {hour}'daki dersine gelecek misin?",
+    'lbl_sessions_confirm_change_hint_tr':
+        'Cevabını dersten 2 saat öncesine kadar değiştirebilirsin.',
+    'lbl_sessions_confirm_waiting_hint_tr':
+        '{meta} seni bekliyor. Cevabını dersten 2 saat öncesine kadar değiştirebilirsin.',
+    'lbl_sessions_confirm_session_summary_tr':
+        '{meta} · Kalan dersinden 1 düşer',
+    'lbl_sessions_confirm_no_permission_tr':
+        'Bu ders için geleceğini/gelmeyeceğini bildirme yetkin yok. Antrenörünle iletişime geç.',
+    'lbl_sessions_confirm_coming_note_tr':
+        'Programda yerin ayrıldı. Dersten 2 saat öncesine kadar değiştirebilirsin.',
+    'lbl_sessions_confirm_coming_note_with_meta_tr':
+        "{meta}'ın programında yerin ayrıldı. Dersten 2 saat öncesine kadar değiştirebilirsin.",
+    'lbl_sessions_confirm_not_coming_note_tr':
+        'Ders kalan dersinden düşmedi, antrenörüne iletildi. Dersten 2 saat öncesine kadar değiştirebilirsin.',
+    'lbl_sessions_member_home_greeting_tr': 'Merhaba{name}',
+    'lbl_sessions_member_home_remaining_sessions_label_tr':
+        'Kalan dersin: {count}',
+    'lbl_sessions_member_home_package_valid_until_tr':
+        "{name} paketi · {date}'e kadar geçerli",
+    'lbl_sessions_member_home_next_session_section_tr': 'SIRADAKİ DERSİN',
+    'lbl_sessions_member_home_installments_section_tr': 'TAKSİTLER',
+    'lbl_sessions_member_home_installment_index_label_tr': '{index}. Taksit',
+    'lbl_sessions_member_home_installment_due_date_label_tr':
+        'Son ödeme {date}',
+    'lbl_sessions_member_home_installment_due_soon_label_tr':
+        'Ödeme yaklaşıyor',
+    'lbl_sessions_member_home_installment_unpaid_label_tr': 'Ödenmedi',
+    'lbl_sessions_completion_confirm_error_tr':
+        'Onay kaydedilemedi, bağlantını kontrol edip tekrar dene.',
+    'lbl_sessions_completion_question_tr':
+        '{time} {name} seansını tamamladınız mı?',
+    'lbl_sessions_completion_summary_tr':
+        "Onaylarsanız kalan dersi {before}'dan {after}'e düşer",
+    'lbl_sessions_completion_time_limit_note_tr':
+        'Onayı 24 saat içinde verebilirsiniz, sonrasında yönetici onayı gerekir.',
+    'lbl_sessions_completion_done_marked_tr': 'Ders tamamlandı işaretlendi',
+    'lbl_sessions_completion_absent_marked_tr':
+        'Üye gelmedi olarak işaretlendi',
+    'lbl_sessions_completion_done_summary_tr':
+        "{name}'ın kalan dersi {after}'e düştü.",
+    'lbl_sessions_completion_absent_summary_tr':
+        "{name}'ın kalan dersi düşmedi, yöneticiye iletildi.",
+    'lbl_sessions_list_empty_state_tr':
+        'Henüz dersin yok — antrenörün seninle bir ders planladığında burada görünecek.',
+    'lbl_sessions_list_calendar_empty_day_tr': 'Bu günde dersin yok.',
+    'lbl_sessions_trainer_notifications_empty_state_tr': 'Henüz bildirim yok.',
+    'lbl_sessions_create_trainer_busy_error_tr':
+        '{name} bu saatte dolu, başka bir saat seç.',
+    'lbl_sessions_create_reschedule_error_tr':
+        'Seans ertelenemedi, tekrar dene.',
+    'lbl_sessions_create_no_active_gym_error_tr': 'Aktif salon bulunamadı.',
+    'lbl_sessions_create_skipped_days_snackbar_tr':
+        'Şu günler için antrenör dolu, atlandı: {days}.',
+    'lbl_sessions_create_title_tr': 'Yeni seans',
+    'lbl_sessions_create_select_placeholder_tr': 'Seç',
+    'lbl_sessions_create_member_summary_tr': '{name} · {count} seans',
+    'lbl_sessions_create_pick_member_title_tr': 'Üye seç',
+    'lbl_sessions_create_member_sessions_suffix_tr': '{count} seans',
+    'lbl_sessions_create_pick_trainer_title_tr': 'Antrenör seç',
+    'lbl_sessions_create_repeat_label_tr': 'Tekrarla',
+    'lbl_sessions_create_repeat_days_selected_tr': '{count} gün seçildi',
+    'lbl_sessions_create_submit_button_tr': 'Oluştur',
+    'lbl_sessions_repeat_calendar_exhausted_error_tr': 'Kalan seans tükendi.',
+    'lbl_sessions_repeat_calendar_subtitle_tr':
+        'Lütfen tekrarlanacak günleri seçiniz.',
+    'lbl_sessions_repeat_calendar_remaining_label_tr': 'Kalan seans',
     'lbl_trainers_management_title_tr': 'Antrenörler',
     'lbl_trainers_add_trainer_button_tr': '+ Antrenör ekle',
     'lbl_trainers_specialty_field_label_tr': 'Uzmanlık',
@@ -1545,8 +1701,7 @@ class RemoteConfigService {
         'No pending payments.',
     'lbl_gyms_admin_home_due_payment_members_template_en':
         '{count} members have pending payments',
-    'lbl_gyms_admin_home_total_feedback_template_en':
-        '{count} reviews total',
+    'lbl_gyms_admin_home_total_feedback_template_en': '{count} reviews total',
     'lbl_gyms_permissions_trainer_question_en':
         'Which trainer do you want to authorize?',
     'lbl_gyms_permissions_trainer_helper_en':
@@ -1616,8 +1771,7 @@ class RemoteConfigService {
         'When should the trainer be reminded after the session ends?',
     'lbl_gyms_trainer_permissions_reminder_note_en':
         'The notification is sent after the session ends',
-    'lbl_gyms_trainer_permissions_online_booking_title_en':
-        'Online Booking',
+    'lbl_gyms_trainer_permissions_online_booking_title_en': 'Online Booking',
     'lbl_gyms_trainer_permissions_online_booking_note_en':
         'Members can join group sessions via Discover',
     'lbl_gyms_trainer_permissions_allow_after_expiry_title_en':
@@ -1732,6 +1886,81 @@ class RemoteConfigService {
     'lbl_sessions_calendar_view_toggle_en': 'Calendar',
     'lbl_sessions_upcoming_section_en': 'UPCOMING',
     'lbl_sessions_past_section_en': 'PAST',
+    'lbl_sessions_calendar_no_expenses_state_en': 'No expenses on this day.',
+    'lbl_sessions_status_now_en': 'Now',
+    'lbl_sessions_management_cancelling_label_en': 'Cancelling…',
+    'lbl_sessions_management_admin_cancel_note_en':
+        'As an admin you can cancel or reschedule without a time restriction.',
+    'lbl_sessions_management_cancel_error_en':
+        'Could not cancel the session, please try again.',
+    'lbl_sessions_confirm_question_en':
+        'Will you attend your class tomorrow at {hour}?',
+    'lbl_sessions_confirm_change_hint_en':
+        'You can change your answer up to 2 hours before the class.',
+    'lbl_sessions_confirm_waiting_hint_en':
+        '{meta} is waiting for you. You can change your answer up to 2 hours before the class.',
+    'lbl_sessions_confirm_session_summary_en':
+        '{meta} · Deducts 1 from your remaining sessions',
+    'lbl_sessions_confirm_no_permission_en':
+        "You don't have permission to confirm attendance for this class. Contact your trainer.",
+    'lbl_sessions_confirm_coming_note_en':
+        'Your spot has been reserved. You can change your answer up to 2 hours before the class.',
+    'lbl_sessions_confirm_coming_note_with_meta_en':
+        "Your spot in {meta}'s schedule has been reserved. You can change your answer up to 2 hours before the class.",
+    'lbl_sessions_confirm_not_coming_note_en':
+        'Your remaining sessions were not deducted, your trainer has been notified. You can change your answer up to 2 hours before the class.',
+    'lbl_sessions_member_home_greeting_en': 'Hi{name}',
+    'lbl_sessions_member_home_remaining_sessions_label_en':
+        'Remaining sessions: {count}',
+    'lbl_sessions_member_home_package_valid_until_en':
+        '{name} package · valid until {date}',
+    'lbl_sessions_member_home_next_session_section_en': 'NEXT CLASS',
+    'lbl_sessions_member_home_installments_section_en': 'INSTALLMENTS',
+    'lbl_sessions_member_home_installment_index_label_en':
+        'Installment {index}',
+    'lbl_sessions_member_home_installment_due_date_label_en': 'Due {date}',
+    'lbl_sessions_member_home_installment_due_soon_label_en': 'Due soon',
+    'lbl_sessions_member_home_installment_unpaid_label_en': 'Unpaid',
+    'lbl_sessions_completion_confirm_error_en':
+        'Could not save the confirmation, check your connection and try again.',
+    'lbl_sessions_completion_question_en':
+        'Did you complete {name}\'s {time} class?',
+    'lbl_sessions_completion_summary_en':
+        "If confirmed, remaining sessions drop from {before} to {after}",
+    'lbl_sessions_completion_time_limit_note_en':
+        'You can confirm within 24 hours, after that admin approval is required.',
+    'lbl_sessions_completion_done_marked_en': 'Marked as completed',
+    'lbl_sessions_completion_absent_marked_en': 'Marked as no-show',
+    'lbl_sessions_completion_done_summary_en':
+        "{name}'s remaining sessions dropped to {after}.",
+    'lbl_sessions_completion_absent_summary_en':
+        "{name}'s remaining sessions were not deducted, forwarded to the admin.",
+    'lbl_sessions_list_empty_state_en':
+        "You don't have any classes yet — they'll show up here once your trainer schedules one with you.",
+    'lbl_sessions_list_calendar_empty_day_en': 'No classes on this day.',
+    'lbl_sessions_trainer_notifications_empty_state_en':
+        'No notifications yet.',
+    'lbl_sessions_create_trainer_busy_error_en':
+        '{name} is busy at this time, pick another time.',
+    'lbl_sessions_create_reschedule_error_en':
+        'Could not reschedule the session, please try again.',
+    'lbl_sessions_create_no_active_gym_error_en': 'No active gym found.',
+    'lbl_sessions_create_skipped_days_snackbar_en':
+        'Skipped, trainer busy on: {days}.',
+    'lbl_sessions_create_title_en': 'New session',
+    'lbl_sessions_create_select_placeholder_en': 'Select',
+    'lbl_sessions_create_member_summary_en': '{name} · {count} sessions',
+    'lbl_sessions_create_pick_member_title_en': 'Select member',
+    'lbl_sessions_create_member_sessions_suffix_en': '{count} sessions',
+    'lbl_sessions_create_pick_trainer_title_en': 'Select trainer',
+    'lbl_sessions_create_repeat_label_en': 'Repeat',
+    'lbl_sessions_create_repeat_days_selected_en': '{count} days selected',
+    'lbl_sessions_create_submit_button_en': 'Create',
+    'lbl_sessions_repeat_calendar_exhausted_error_en':
+        'No remaining sessions left.',
+    'lbl_sessions_repeat_calendar_subtitle_en':
+        'Please select the days to repeat.',
+    'lbl_sessions_repeat_calendar_remaining_label_en': 'Remaining sessions',
     'lbl_trainers_management_title_en': 'Trainers',
     'lbl_trainers_add_trainer_button_en': '+ Add trainer',
     'lbl_trainers_specialty_field_label_en': 'Specialty',

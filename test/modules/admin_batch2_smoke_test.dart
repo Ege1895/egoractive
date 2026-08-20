@@ -3,6 +3,7 @@ import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:egoractive/core/remote_config/remote_config_service.dart';
 import 'package:egoractive/core/theme/app_color_scheme.dart';
 import 'package:egoractive/core/theme/app_theme.dart';
 import 'package:egoractive/core/theme/app_typography.dart';
@@ -88,6 +89,30 @@ class _FixedAdminMemberDetailController extends AdminMemberDetailController {
   AdminMemberDetail build(String memberId) => _fixedMemberDetail;
 }
 
+/// Gerçek Firebase Remote Config'e dokunmayan sahte servis — bu dosya panel
+/// geçişlerini test eder, Firebase entegrasyonunu değil. `rcTextProvider`,
+/// Firebase.initializeApp hiç çağrılmamış test ortamında `getString`'i
+/// yakalayıp boş döner (bkz. remote_config_service.dart); testin beklediği
+/// sabit metinleri döndürmek için `_tr`/`_en` eki fark etmeksizin taban
+/// anahtara göre çözüyoruz.
+class _FakeRemoteConfigService extends RemoteConfigService {
+  const _FakeRemoteConfigService();
+
+  static const _values = <String, String>{
+    'lbl_common_tamamlandi': 'Tamamlandı',
+  };
+
+  @override
+  String getString(String key) =>
+      _values[key.replaceFirst(RegExp(r'_(tr|en)$'), '')] ?? '';
+}
+
+final _sessionManagementOverrides = [
+  remoteConfigServiceProvider.overrideWithValue(
+    const _FakeRemoteConfigService(),
+  ),
+];
+
 final _adminMemberDetailOverrides = [
   adminMemberDetailControllerProvider(
     'ayse-yilmaz',
@@ -160,7 +185,12 @@ void main() {
   testWidgets(
     'AdminSessionManagementPanel filter chips render without overflow',
     (tester) async {
-      await tester.pumpWidget(_wrap(const AdminSessionManagementPanel()));
+      await tester.pumpWidget(
+        _wrap(
+          const AdminSessionManagementPanel(),
+          overrides: _sessionManagementOverrides,
+        ),
+      );
       await tester.pump();
       await tester.tap(find.text('Tamamlandı').first);
       await tester.pump();

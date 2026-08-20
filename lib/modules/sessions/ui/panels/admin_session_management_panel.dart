@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
+import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_back_button.dart';
 import '../../../../shared/widgets/app_button.dart';
@@ -90,7 +91,11 @@ class _AdminSessionManagementPanelState
                       const SizedBox(width: AppSpacing.md),
                       Expanded(
                         child: Text(
-                          'Seanslar',
+                          ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.sessionsManagementTitle,
+                            ),
+                          ),
                           style: typography.headingSmall.copyWith(
                             color: colors.onSurface,
                             fontSize: 22,
@@ -115,7 +120,11 @@ class _AdminSessionManagementPanelState
                             constraints: const BoxConstraints(minHeight: 40),
                             alignment: Alignment.center,
                             child: Text(
-                              '+ Seans',
+                              ref.watch(
+                                rcTextProvider(
+                                  RemoteConfigKeys.commonAddSeansButton,
+                                ),
+                              ),
                               style: typography.headingSmall.copyWith(
                                 fontSize: 14,
                                 color: colors.onPrimary,
@@ -184,21 +193,29 @@ class _AdminSessionManagementPanelState
                       scrollDirection: Axis.horizontal,
                       children: [
                         _FilterChip(
-                          label: 'Tümü',
+                          label: ref.watch(
+                            rcTextProvider(RemoteConfigKeys.commonTumuFilter),
+                          ),
                           selected: _filter == _SessionFilter.all,
                           onTap: () =>
                               setState(() => _filter = _SessionFilter.all),
                         ),
                         const SizedBox(width: AppSpacing.sm),
                         _FilterChip(
-                          label: 'Planlandı',
+                          label: ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.sessionsFilterScheduled,
+                            ),
+                          ),
                           selected: _filter == _SessionFilter.planned,
                           onTap: () =>
                               setState(() => _filter = _SessionFilter.planned),
                         ),
                         const SizedBox(width: AppSpacing.sm),
                         _FilterChip(
-                          label: 'Tamamlandı',
+                          label: ref.watch(
+                            rcTextProvider(RemoteConfigKeys.commonTamamlandi),
+                          ),
                           selected: _filter == _SessionFilter.completed,
                           onTap: () => setState(
                             () => _filter = _SessionFilter.completed,
@@ -206,7 +223,9 @@ class _AdminSessionManagementPanelState
                         ),
                         const SizedBox(width: AppSpacing.sm),
                         _FilterChip(
-                          label: 'İptal',
+                          label: ref.watch(
+                            rcTextProvider(RemoteConfigKeys.commonIptalLabel),
+                          ),
                           selected: _filter == _SessionFilter.cancelled,
                           onTap: () => setState(
                             () => _filter = _SessionFilter.cancelled,
@@ -222,7 +241,11 @@ class _AdminSessionManagementPanelState
               child: sessions.isEmpty
                   ? Center(
                       child: Text(
-                        'Bu güne uyan seans yok.',
+                        ref.watch(
+                          rcTextProvider(
+                            RemoteConfigKeys.sessionsManagementEmptyState,
+                          ),
+                        ),
                         style: typography.bodyMedium.copyWith(
                           color: colors.onSurfaceMuted,
                         ),
@@ -317,7 +340,9 @@ class _AdminSessionManagementPanelState
                   ),
                   const SizedBox(height: AppSpacing.lg),
                   AppButton(
-                    label: 'Seansı ertele',
+                    label: ProviderScope.containerOf(
+                      sheetContext,
+                    ).read(rcTextProvider(RemoteConfigKeys.commonSeansiErtele)),
                     variant: AppButtonVariant.secondary,
                     onPressed: () async {
                       Navigator.of(sheetContext).pop();
@@ -362,7 +387,14 @@ class _AdminSessionManagementPanelState
                                 setLocalState(() {
                                   isCancelling = false;
                                   cancelError =
-                                      'Seans iptal edilemedi, tekrar dene.';
+                                      ProviderScope.containerOf(
+                                        sheetContext,
+                                      ).read(
+                                        rcTextProvider(
+                                          RemoteConfigKeys
+                                              .sessionsManagementCancelError,
+                                        ),
+                                      );
                                 });
                               }
                             },
@@ -376,7 +408,19 @@ class _AdminSessionManagementPanelState
                         ),
                         alignment: Alignment.center,
                         child: Text(
-                          isCancelling ? 'İptal ediliyor…' : 'Seansı iptal et',
+                          isCancelling
+                              ? ProviderScope.containerOf(sheetContext).read(
+                                  rcTextProvider(
+                                    RemoteConfigKeys
+                                        .sessionsManagementCancellingLabel,
+                                  ),
+                                )
+                              : ProviderScope.containerOf(sheetContext).read(
+                                  rcTextProvider(
+                                    RemoteConfigKeys
+                                        .sessionsCancelSessionAction,
+                                  ),
+                                ),
                           style: typography.headingSmall.copyWith(
                             fontSize: 15,
                             color: colors.onErrorContainer,
@@ -387,7 +431,11 @@ class _AdminSessionManagementPanelState
                   ),
                   const SizedBox(height: AppSpacing.sm),
                   Text(
-                    'Yönetici olarak tarih kısıtı olmadan iptal ve erteleme yapabilirsiniz.',
+                    ProviderScope.containerOf(sheetContext).read(
+                      rcTextProvider(
+                        RemoteConfigKeys.sessionsManagementAdminCancelNote,
+                      ),
+                    ),
                     style: typography.caption.copyWith(
                       color: colors.onSurfaceMuted,
                     ),
@@ -474,37 +522,37 @@ class _FilterChip extends StatelessWidget {
   }
 }
 
-class _SessionCard extends StatelessWidget {
+class _SessionCard extends ConsumerWidget {
   const _SessionCard({required this.slot, required this.onTap});
 
   final AdminSessionSlot slot;
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.appColors;
     final typography = context.appTypography;
     final (chipLabel, chipBg, chipFg, border) = switch (slot.state) {
       AdminSessionState.completed => (
-        'Tamamlandı',
+        ref.watch(rcTextProvider(RemoteConfigKeys.commonTamamlandi)),
         colors.successContainer,
         colors.onSuccessContainer,
         colors.outline,
       ),
       AdminSessionState.current => (
-        'Şimdi',
+        ref.watch(rcTextProvider(RemoteConfigKeys.sessionsStatusNow)),
         colors.primaryContainer,
         colors.onPrimaryContainer,
         colors.primary.withValues(alpha: 0.4),
       ),
       AdminSessionState.cancelled => (
-        'İptal',
+        ref.watch(rcTextProvider(RemoteConfigKeys.commonIptalLabel)),
         colors.errorContainer,
         colors.onErrorContainer,
         colors.error.withValues(alpha: 0.3),
       ),
       AdminSessionState.planned => (
-        'Planlandı',
+        ref.watch(rcTextProvider(RemoteConfigKeys.sessionsFilterScheduled)),
         colors.surfaceRaised,
         colors.onSurfaceVariant,
         colors.outline,

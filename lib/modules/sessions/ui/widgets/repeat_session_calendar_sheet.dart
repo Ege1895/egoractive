@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/app_spacing.dart';
+import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
 
 const _monthNames = {
@@ -48,7 +50,7 @@ Future<List<DateTime>?> showRepeatSessionCalendarSheet(
 bool _isSameDay(DateTime a, DateTime b) =>
     a.year == b.year && a.month == b.month && a.day == b.day;
 
-class _RepeatSessionCalendarSheet extends StatefulWidget {
+class _RepeatSessionCalendarSheet extends ConsumerStatefulWidget {
   const _RepeatSessionCalendarSheet({
     required this.baseDate,
     required this.remainingSessions,
@@ -60,12 +62,12 @@ class _RepeatSessionCalendarSheet extends StatefulWidget {
   final List<DateTime> initiallySelected;
 
   @override
-  State<_RepeatSessionCalendarSheet> createState() =>
+  ConsumerState<_RepeatSessionCalendarSheet> createState() =>
       _RepeatSessionCalendarSheetState();
 }
 
 class _RepeatSessionCalendarSheetState
-    extends State<_RepeatSessionCalendarSheet> {
+    extends ConsumerState<_RepeatSessionCalendarSheet> {
   late DateTime _month;
   late List<DateTime> _selected;
   String? _errorMessage;
@@ -89,7 +91,11 @@ class _RepeatSessionCalendarSheetState
       return;
     }
     if (_remaining <= 0) {
-      setState(() => _errorMessage = 'Kalan seans tükendi.');
+      setState(
+        () => _errorMessage = ref.read(
+          rcTextProvider(RemoteConfigKeys.sessionsRepeatCalendarExhaustedError),
+        ),
+      );
       return;
     }
     setState(() {
@@ -131,7 +137,9 @@ class _RepeatSessionCalendarSheetState
           ),
           const SizedBox(height: AppSpacing.md),
           Text(
-            'Tekrarla',
+            ref.watch(
+              rcTextProvider(RemoteConfigKeys.sessionsCreateRepeatLabel),
+            ),
             style: typography.headingMedium.copyWith(
               color: colors.onSurface,
               fontSize: 20,
@@ -140,7 +148,9 @@ class _RepeatSessionCalendarSheetState
           ),
           const SizedBox(height: AppSpacing.xs),
           Text(
-            'Lütfen tekrarlanacak günleri seçiniz.',
+            ref.watch(
+              rcTextProvider(RemoteConfigKeys.sessionsRepeatCalendarSubtitle),
+            ),
             style: typography.bodyMedium.copyWith(color: colors.onSurfaceMuted),
             textAlign: TextAlign.center,
           ),
@@ -160,7 +170,11 @@ class _RepeatSessionCalendarSheetState
               children: [
                 Expanded(
                   child: Text(
-                    'Kalan seans',
+                    ref.watch(
+                      rcTextProvider(
+                        RemoteConfigKeys.sessionsRepeatCalendarRemainingLabel,
+                      ),
+                    ),
                     style: typography.bodyMedium.copyWith(
                       color: _remaining <= 0
                           ? colors.onErrorContainer
@@ -300,7 +314,11 @@ class _RepeatSessionCalendarSheetState
                 constraints: const BoxConstraints(minHeight: 52),
                 alignment: Alignment.center,
                 child: Text(
-                  'Seç',
+                  ref.watch(
+                    rcTextProvider(
+                      RemoteConfigKeys.sessionsCreateSelectPlaceholder,
+                    ),
+                  ),
                   style: typography.headingSmall.copyWith(
                     fontSize: 16,
                     color: colors.onPrimary,

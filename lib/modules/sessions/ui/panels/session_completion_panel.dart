@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
+import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_back_button.dart';
 import '../../../../shared/widgets/app_button.dart';
@@ -65,8 +66,9 @@ class _SessionCompletionPanelState
     } catch (_) {
       if (mounted) {
         setState(
-          () => _errorMessage =
-              'Onay kaydedilemedi, bağlantını kontrol edip tekrar dene.',
+          () => _errorMessage = ref.read(
+            rcTextProvider(RemoteConfigKeys.sessionsCompletionConfirmError),
+          ),
         );
       }
     } finally {
@@ -88,8 +90,9 @@ class _SessionCompletionPanelState
     } catch (_) {
       if (mounted) {
         setState(
-          () => _errorMessage =
-              'Onay kaydedilemedi, bağlantını kontrol edip tekrar dene.',
+          () => _errorMessage = ref.read(
+            rcTextProvider(RemoteConfigKeys.sessionsCompletionConfirmError),
+          ),
         );
       }
     } finally {
@@ -126,7 +129,9 @@ class _SessionCompletionPanelState
                   ),
                   const SizedBox(width: AppSpacing.md),
                   Text(
-                    'Seans onayı',
+                    ref.watch(
+                      rcTextProvider(RemoteConfigKeys.sessionsCompletionTitle),
+                    ),
                     style: typography.headingSmall.copyWith(
                       color: colors.onSurface,
                       fontSize: 18,
@@ -160,7 +165,14 @@ class _SessionCompletionPanelState
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            '${widget.time} ${widget.memberName} seansını tamamladınız mı?',
+                            ref
+                                .watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys.sessionsCompletionQuestion,
+                                  ),
+                                )
+                                .replaceAll('{time}', widget.time)
+                                .replaceAll('{name}', widget.memberName),
                             style: typography.headingMedium.copyWith(
                               color: colors.onSurface,
                               fontSize: 26,
@@ -207,7 +219,21 @@ class _SessionCompletionPanelState
                                         ),
                                       ),
                                       Text(
-                                        'Onaylarsanız kalan dersi ${widget.remainingBefore}\'dan $remainingAfter\'e düşer',
+                                        ref
+                                            .watch(
+                                              rcTextProvider(
+                                                RemoteConfigKeys
+                                                    .sessionsCompletionSummary,
+                                              ),
+                                            )
+                                            .replaceAll(
+                                              '{before}',
+                                              '${widget.remainingBefore}',
+                                            )
+                                            .replaceAll(
+                                              '{after}',
+                                              '$remainingAfter',
+                                            ),
                                         style: typography.bodyMedium.copyWith(
                                           color: colors.onSurfaceVariant,
                                           fontSize: 13,
@@ -236,18 +262,37 @@ class _SessionCompletionPanelState
                         const SizedBox(height: AppSpacing.sm),
                       ],
                       AppButton(
-                        label: _isSubmitting ? 'Kaydediliyor…' : 'Tamamlandı',
+                        label: _isSubmitting
+                            ? ref.watch(
+                                rcTextProvider(
+                                  RemoteConfigKeys.gymsGymSetupSubmittingLabel,
+                                ),
+                              )
+                            : ref.watch(
+                                rcTextProvider(
+                                  RemoteConfigKeys.commonTamamlandi,
+                                ),
+                              ),
                         onPressed: _isSubmitting ? null : _markCompleted,
                       ),
                       const SizedBox(height: AppSpacing.sm),
                       AppButton(
-                        label: 'Üye gelmedi',
+                        label: ref.watch(
+                          rcTextProvider(
+                            RemoteConfigKeys
+                                .sessionsCompletionMemberNoShowOption,
+                          ),
+                        ),
                         variant: AppButtonVariant.secondary,
                         onPressed: _isSubmitting ? null : _markAbsent,
                       ),
                       const SizedBox(height: AppSpacing.sm),
                       Text(
-                        'Onayı 24 saat içinde verebilirsiniz, sonrasında yönetici onayı gerekir.',
+                        ref.watch(
+                          rcTextProvider(
+                            RemoteConfigKeys.sessionsCompletionTimeLimitNote,
+                          ),
+                        ),
                         textAlign: TextAlign.center,
                         style: typography.caption.copyWith(
                           color: colors.onSurfaceMuted,
@@ -300,8 +345,18 @@ class _SessionCompletionPanelState
                                 children: [
                                   Text(
                                     _answer == _CompletionAnswer.done
-                                        ? 'Ders tamamlandı işaretlendi'
-                                        : 'Üye gelmedi olarak işaretlendi',
+                                        ? ref.watch(
+                                            rcTextProvider(
+                                              RemoteConfigKeys
+                                                  .sessionsCompletionDoneMarked,
+                                            ),
+                                          )
+                                        : ref.watch(
+                                            rcTextProvider(
+                                              RemoteConfigKeys
+                                                  .sessionsCompletionAbsentMarked,
+                                            ),
+                                          ),
                                     style: typography.headingSmall.copyWith(
                                       color: _answer == _CompletionAnswer.done
                                           ? colors.onSuccessContainer
@@ -312,8 +367,32 @@ class _SessionCompletionPanelState
                                   const SizedBox(height: AppSpacing.xs),
                                   Text(
                                     _answer == _CompletionAnswer.done
-                                        ? '${widget.memberName}\'ın kalan dersi $remainingAfter\'e düştü.'
-                                        : '${widget.memberName}\'ın kalan dersi düşmedi, yöneticiye iletildi.',
+                                        ? ref
+                                              .watch(
+                                                rcTextProvider(
+                                                  RemoteConfigKeys
+                                                      .sessionsCompletionDoneSummary,
+                                                ),
+                                              )
+                                              .replaceAll(
+                                                '{name}',
+                                                widget.memberName,
+                                              )
+                                              .replaceAll(
+                                                '{after}',
+                                                '$remainingAfter',
+                                              )
+                                        : ref
+                                              .watch(
+                                                rcTextProvider(
+                                                  RemoteConfigKeys
+                                                      .sessionsCompletionAbsentSummary,
+                                                ),
+                                              )
+                                              .replaceAll(
+                                                '{name}',
+                                                widget.memberName,
+                                              ),
                                     style: typography.bodyMedium.copyWith(
                                       color: colors.onSurfaceVariant,
                                     ),
@@ -334,7 +413,11 @@ class _SessionCompletionPanelState
                         // write olmadığı için yeniden gönderim tamamen
                         // engelleniyor.
                         AppButton(
-                          label: 'Bitti',
+                          label: ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.gymsPermissionsDoneButton,
+                            ),
+                          ),
                           variant: AppButtonVariant.secondary,
                           onPressed: () => ref
                               .read(panelStackControllerProvider.notifier)
@@ -342,7 +425,11 @@ class _SessionCompletionPanelState
                         ),
                       ] else
                         AppButton(
-                          label: 'Geri al',
+                          label: ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.sessionsCompletionUndoButton,
+                            ),
+                          ),
                           variant: AppButtonVariant.secondary,
                           onPressed: () => setState(
                             () => _answer = _CompletionAnswer.pending,

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
+import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../domain/trainer_notification.dart';
@@ -109,7 +110,11 @@ class _AttendanceNotificationDetailPanelState
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Cevabı',
+                          ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.sessionsAttendanceAnswerLabel,
+                            ),
+                          ),
                           style: typography.caption.copyWith(
                             color: onAnswerContainer,
                           ),
@@ -139,7 +144,12 @@ class _AttendanceNotificationDetailPanelState
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Cevap saati',
+                          ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys
+                                  .sessionsAttendanceAnswerTimeLabel,
+                            ),
+                          ),
                           style: typography.caption.copyWith(
                             color: colors.onSurfaceMuted,
                           ),
@@ -170,7 +180,11 @@ class _AttendanceNotificationDetailPanelState
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Üyenin notu',
+                      ref.watch(
+                        rcTextProvider(
+                          RemoteConfigKeys.sessionsAttendanceMemberNoteLabel,
+                        ),
+                      ),
                       style: typography.caption.copyWith(
                         color: colors.onSurfaceMuted,
                       ),
@@ -192,7 +206,11 @@ class _AttendanceNotificationDetailPanelState
               children: [
                 Expanded(
                   child: AppButton(
-                    label: 'Takvime dön',
+                    label: ref.watch(
+                      rcTextProvider(
+                        RemoteConfigKeys.sessionsAttendanceBackToCalendarButton,
+                      ),
+                    ),
                     onPressed: () =>
                         ref.read(panelStackControllerProvider.notifier).pop(),
                   ),
@@ -205,7 +223,9 @@ class _AttendanceNotificationDetailPanelState
                   // pasif gösteriliyor (implement etmek domain modeline yeni
                   // alan eklemeyi gerektiriyor, bu görev kapsamı dışında).
                   child: AppButton(
-                    label: 'Seansı ertele',
+                    label: ref.watch(
+                      rcTextProvider(RemoteConfigKeys.commonSeansiErtele),
+                    ),
                     variant: AppButtonVariant.secondary,
                     onPressed: null,
                   ),

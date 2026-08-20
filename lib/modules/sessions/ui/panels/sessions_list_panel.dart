@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/app_spacing.dart';
+import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../controller/sessions_controller.dart';
 import '../../domain/session.dart';
@@ -57,7 +58,9 @@ class _SessionsListPanelState extends ConsumerState<SessionsListPanel> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Derslerim',
+                    ref.watch(
+                      rcTextProvider(RemoteConfigKeys.sessionsListTitle),
+                    ),
                     style: typography.headingLarge.copyWith(
                       color: colors.onSurface,
                     ),
@@ -76,7 +79,11 @@ class _SessionsListPanelState extends ConsumerState<SessionsListPanel> {
                       children: [
                         Expanded(
                           child: _ToggleTab(
-                            label: 'Liste',
+                            label: ref.watch(
+                              rcTextProvider(
+                                RemoteConfigKeys.sessionsListViewToggle,
+                              ),
+                            ),
                             selected: state.viewMode == SessionsViewMode.list,
                             onTap: () =>
                                 controller.setViewMode(SessionsViewMode.list),
@@ -84,7 +91,11 @@ class _SessionsListPanelState extends ConsumerState<SessionsListPanel> {
                         ),
                         Expanded(
                           child: _ToggleTab(
-                            label: 'Takvim',
+                            label: ref.watch(
+                              rcTextProvider(
+                                RemoteConfigKeys.sessionsCalendarViewToggle,
+                              ),
+                            ),
                             selected:
                                 state.viewMode == SessionsViewMode.calendar,
                             onTap: () => controller.setViewMode(
@@ -153,14 +164,14 @@ class _ToggleTab extends StatelessWidget {
   }
 }
 
-class _SessionsListView extends StatelessWidget {
+class _SessionsListView extends ConsumerWidget {
   const _SessionsListView({required this.upcoming, required this.past});
 
   final List<Session> upcoming;
   final List<Session> past;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.appColors;
     final typography = context.appTypography;
 
@@ -169,7 +180,7 @@ class _SessionsListView extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.screenEdge),
           child: Text(
-            'Henüz dersin yok — antrenörün seninle bir ders planladığında burada görünecek.',
+            ref.watch(rcTextProvider(RemoteConfigKeys.sessionsListEmptyState)),
             textAlign: TextAlign.center,
             style: typography.bodyMedium.copyWith(color: colors.onSurfaceMuted),
           ),
@@ -187,7 +198,7 @@ class _SessionsListView extends StatelessWidget {
       children: [
         if (upcoming.isNotEmpty) ...[
           Text(
-            'YAKLAŞAN',
+            ref.watch(rcTextProvider(RemoteConfigKeys.sessionsUpcomingSection)),
             style: typography.caption.copyWith(
               color: colors.onSurfaceMuted,
               letterSpacing: 1.2,
@@ -199,7 +210,7 @@ class _SessionsListView extends StatelessWidget {
         ],
         if (past.isNotEmpty) ...[
           Text(
-            'GEÇMİŞ',
+            ref.watch(rcTextProvider(RemoteConfigKeys.sessionsPastSection)),
             style: typography.caption.copyWith(
               color: colors.onSurfaceMuted,
               letterSpacing: 1.2,
@@ -214,29 +225,29 @@ class _SessionsListView extends StatelessWidget {
   }
 }
 
-class _SessionRow extends StatelessWidget {
+class _SessionRow extends ConsumerWidget {
   const _SessionRow({required this.session, this.faded = false});
 
   final Session session;
   final bool faded;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.appColors;
     final typography = context.appTypography;
     final (chipLabel, chipBg, chipFg) = switch (session.status) {
       SessionStatus.planned => (
-        'Planlandı',
+        ref.watch(rcTextProvider(RemoteConfigKeys.sessionsFilterScheduled)),
         colors.outline,
         colors.onSurfaceVariant,
       ),
       SessionStatus.completed => (
-        'Tamamlandı',
+        ref.watch(rcTextProvider(RemoteConfigKeys.commonTamamlandi)),
         colors.successContainer,
         colors.onSuccessContainer,
       ),
       SessionStatus.cancelled => (
-        'İptal',
+        ref.watch(rcTextProvider(RemoteConfigKeys.commonIptalLabel)),
         colors.errorContainer,
         colors.onErrorContainer,
       ),
@@ -323,7 +334,7 @@ class _SessionRow extends StatelessWidget {
   }
 }
 
-class _SessionsCalendarView extends StatelessWidget {
+class _SessionsCalendarView extends ConsumerWidget {
   const _SessionsCalendarView({
     required this.selectedDay,
     required this.sessions,
@@ -335,7 +346,7 @@ class _SessionsCalendarView extends StatelessWidget {
   final ValueChanged<DateTime> onSelectDay;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.appColors;
     final typography = context.appTypography;
     final month = DateTime(selectedDay.year, selectedDay.month);
@@ -477,7 +488,9 @@ class _SessionsCalendarView extends StatelessWidget {
         const SizedBox(height: AppSpacing.sm),
         if (daySessions.isEmpty)
           Text(
-            'Bu günde dersin yok.',
+            ref.watch(
+              rcTextProvider(RemoteConfigKeys.sessionsListCalendarEmptyDay),
+            ),
             style: typography.bodyMedium.copyWith(color: colors.onSurfaceMuted),
           )
         else

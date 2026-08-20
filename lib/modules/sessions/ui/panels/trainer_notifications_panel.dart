@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
+import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_back_button.dart';
 import '../../controller/trainer_notifications_controller.dart';
@@ -48,7 +49,11 @@ class _TrainerNotificationsPanelState
                   ),
                   const SizedBox(width: AppSpacing.md),
                   Text(
-                    'Bildirimler',
+                    ref.watch(
+                      rcTextProvider(
+                        RemoteConfigKeys.sessionsTrainerNotificationsTitle,
+                      ),
+                    ),
                     style: typography.headingLarge.copyWith(
                       color: colors.onSurface,
                       fontSize: 24,
@@ -61,7 +66,12 @@ class _TrainerNotificationsPanelState
               child: notifications.isEmpty
                   ? Center(
                       child: Text(
-                        'Henüz bildirim yok.',
+                        ref.watch(
+                          rcTextProvider(
+                            RemoteConfigKeys
+                                .sessionsTrainerNotificationsEmptyState,
+                          ),
+                        ),
                         style: typography.bodyMedium.copyWith(
                           color: colors.onSurfaceMuted,
                         ),

@@ -4498,6 +4498,522 @@
       },
       "valueType": "STRING"
     },
+    "lbl_sessions_calendar_no_expenses_state_tr": {
+      "defaultValue": {
+        "value": "Bu günde gider yok."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_calendar_no_expenses_state_en": {
+      "defaultValue": {
+        "value": "No expenses on this day."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_status_now_tr": {
+      "defaultValue": {
+        "value": "Şimdi"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_status_now_en": {
+      "defaultValue": {
+        "value": "Now"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_management_cancelling_label_tr": {
+      "defaultValue": {
+        "value": "İptal ediliyor…"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_management_cancelling_label_en": {
+      "defaultValue": {
+        "value": "Cancelling…"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_management_admin_cancel_note_tr": {
+      "defaultValue": {
+        "value": "Yönetici olarak tarih kısıtı olmadan iptal ve erteleme yapabilirsiniz."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_management_admin_cancel_note_en": {
+      "defaultValue": {
+        "value": "As an admin you can cancel or reschedule without a time restriction."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_management_cancel_error_tr": {
+      "defaultValue": {
+        "value": "Seans iptal edilemedi, tekrar dene."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_management_cancel_error_en": {
+      "defaultValue": {
+        "value": "Could not cancel the session, please try again."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_confirm_change_hint_tr": {
+      "defaultValue": {
+        "value": "Cevabını dersten 2 saat öncesine kadar değiştirebilirsin."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_confirm_change_hint_en": {
+      "defaultValue": {
+        "value": "You can change your answer up to 2 hours before the class."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_confirm_waiting_hint_tr": {
+      "defaultValue": {
+        "value": "{meta} seni bekliyor. Cevabını dersten 2 saat öncesine kadar değiştirebilirsin."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_confirm_waiting_hint_en": {
+      "defaultValue": {
+        "value": "{meta} is waiting for you. You can change your answer up to 2 hours before the class."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_confirm_session_summary_tr": {
+      "defaultValue": {
+        "value": "{meta} · Kalan dersinden 1 düşer"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_confirm_session_summary_en": {
+      "defaultValue": {
+        "value": "{meta} · Deducts 1 from your remaining sessions"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_confirm_no_permission_tr": {
+      "defaultValue": {
+        "value": "Bu ders için geleceğini/gelmeyeceğini bildirme yetkin yok. Antrenörünle iletişime geç."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_confirm_no_permission_en": {
+      "defaultValue": {
+        "value": null
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_confirm_coming_note_tr": {
+      "defaultValue": {
+        "value": "Programda yerin ayrıldı. Dersten 2 saat öncesine kadar değiştirebilirsin."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_confirm_coming_note_en": {
+      "defaultValue": {
+        "value": "Your spot has been reserved. You can change your answer up to 2 hours before the class."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_confirm_not_coming_note_tr": {
+      "defaultValue": {
+        "value": "Ders kalan dersinden düşmedi, antrenörüne iletildi. Dersten 2 saat öncesine kadar değiştirebilirsin."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_confirm_not_coming_note_en": {
+      "defaultValue": {
+        "value": "Your remaining sessions were not deducted, your trainer has been notified. You can change your answer up to 2 hours before the class."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_member_home_greeting_tr": {
+      "defaultValue": {
+        "value": "Merhaba{name}"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_member_home_greeting_en": {
+      "defaultValue": {
+        "value": "Hi{name}"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_member_home_remaining_sessions_label_tr": {
+      "defaultValue": {
+        "value": "Kalan dersin: {count}"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_member_home_remaining_sessions_label_en": {
+      "defaultValue": {
+        "value": "Remaining sessions: {count}"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_member_home_next_session_section_tr": {
+      "defaultValue": {
+        "value": "SIRADAKİ DERSİN"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_member_home_next_session_section_en": {
+      "defaultValue": {
+        "value": "NEXT CLASS"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_member_home_installments_section_tr": {
+      "defaultValue": {
+        "value": "TAKSİTLER"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_member_home_installments_section_en": {
+      "defaultValue": {
+        "value": "INSTALLMENTS"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_member_home_installment_index_label_tr": {
+      "defaultValue": {
+        "value": "{index}. Taksit"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_member_home_installment_index_label_en": {
+      "defaultValue": {
+        "value": "Installment {index}"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_member_home_installment_due_date_label_tr": {
+      "defaultValue": {
+        "value": "Son ödeme {date}"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_member_home_installment_due_date_label_en": {
+      "defaultValue": {
+        "value": "Due {date}"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_member_home_installment_due_soon_label_tr": {
+      "defaultValue": {
+        "value": "Ödeme yaklaşıyor"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_member_home_installment_due_soon_label_en": {
+      "defaultValue": {
+        "value": "Due soon"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_member_home_installment_unpaid_label_tr": {
+      "defaultValue": {
+        "value": "Ödenmedi"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_member_home_installment_unpaid_label_en": {
+      "defaultValue": {
+        "value": "Unpaid"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_completion_confirm_error_tr": {
+      "defaultValue": {
+        "value": "Onay kaydedilemedi, bağlantını kontrol edip tekrar dene."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_completion_confirm_error_en": {
+      "defaultValue": {
+        "value": "Could not save the confirmation, check your connection and try again."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_completion_question_tr": {
+      "defaultValue": {
+        "value": "{time} {name} seansını tamamladınız mı?"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_completion_question_en": {
+      "defaultValue": {
+        "value": "Did you complete {name}'s {time} class?"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_completion_time_limit_note_tr": {
+      "defaultValue": {
+        "value": "Onayı 24 saat içinde verebilirsiniz, sonrasında yönetici onayı gerekir."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_completion_time_limit_note_en": {
+      "defaultValue": {
+        "value": "You can confirm within 24 hours, after that admin approval is required."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_completion_done_marked_tr": {
+      "defaultValue": {
+        "value": "Ders tamamlandı işaretlendi"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_completion_done_marked_en": {
+      "defaultValue": {
+        "value": "Marked as completed"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_completion_absent_marked_tr": {
+      "defaultValue": {
+        "value": "Üye gelmedi olarak işaretlendi"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_completion_absent_marked_en": {
+      "defaultValue": {
+        "value": "Marked as no-show"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_list_empty_state_tr": {
+      "defaultValue": {
+        "value": "Henüz dersin yok — antrenörün seninle bir ders planladığında burada görünecek."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_list_empty_state_en": {
+      "defaultValue": {
+        "value": null
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_list_calendar_empty_day_tr": {
+      "defaultValue": {
+        "value": "Bu günde dersin yok."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_list_calendar_empty_day_en": {
+      "defaultValue": {
+        "value": "No classes on this day."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_trainer_notifications_empty_state_tr": {
+      "defaultValue": {
+        "value": "Henüz bildirim yok."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_trainer_notifications_empty_state_en": {
+      "defaultValue": {
+        "value": "No notifications yet."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_create_trainer_busy_error_tr": {
+      "defaultValue": {
+        "value": "{name} bu saatte dolu, başka bir saat seç."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_create_trainer_busy_error_en": {
+      "defaultValue": {
+        "value": "{name} is busy at this time, pick another time."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_create_reschedule_error_tr": {
+      "defaultValue": {
+        "value": "Seans ertelenemedi, tekrar dene."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_create_reschedule_error_en": {
+      "defaultValue": {
+        "value": "Could not reschedule the session, please try again."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_create_no_active_gym_error_tr": {
+      "defaultValue": {
+        "value": "Aktif salon bulunamadı."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_create_no_active_gym_error_en": {
+      "defaultValue": {
+        "value": "No active gym found."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_create_skipped_days_snackbar_tr": {
+      "defaultValue": {
+        "value": "Şu günler için antrenör dolu, atlandı: {days}."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_create_skipped_days_snackbar_en": {
+      "defaultValue": {
+        "value": "Skipped, trainer busy on: {days}."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_create_title_tr": {
+      "defaultValue": {
+        "value": "Yeni seans"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_create_title_en": {
+      "defaultValue": {
+        "value": "New session"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_create_select_placeholder_tr": {
+      "defaultValue": {
+        "value": "Seç"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_create_select_placeholder_en": {
+      "defaultValue": {
+        "value": "Select"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_create_member_summary_tr": {
+      "defaultValue": {
+        "value": "{name} · {count} seans"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_create_member_summary_en": {
+      "defaultValue": {
+        "value": "{name} · {count} sessions"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_create_pick_member_title_tr": {
+      "defaultValue": {
+        "value": "Üye seç"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_create_pick_member_title_en": {
+      "defaultValue": {
+        "value": "Select member"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_create_member_sessions_suffix_tr": {
+      "defaultValue": {
+        "value": "{count} seans"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_create_member_sessions_suffix_en": {
+      "defaultValue": {
+        "value": "{count} sessions"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_create_pick_trainer_title_tr": {
+      "defaultValue": {
+        "value": "Antrenör seç"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_create_pick_trainer_title_en": {
+      "defaultValue": {
+        "value": "Select trainer"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_create_repeat_label_tr": {
+      "defaultValue": {
+        "value": "Tekrarla"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_create_repeat_label_en": {
+      "defaultValue": {
+        "value": "Repeat"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_create_repeat_days_selected_tr": {
+      "defaultValue": {
+        "value": "{count} gün seçildi"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_create_repeat_days_selected_en": {
+      "defaultValue": {
+        "value": "{count} days selected"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_create_submit_button_tr": {
+      "defaultValue": {
+        "value": "Oluştur"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_create_submit_button_en": {
+      "defaultValue": {
+        "value": "Create"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_repeat_calendar_exhausted_error_tr": {
+      "defaultValue": {
+        "value": "Kalan seans tükendi."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_repeat_calendar_exhausted_error_en": {
+      "defaultValue": {
+        "value": "No remaining sessions left."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_repeat_calendar_subtitle_tr": {
+      "defaultValue": {
+        "value": "Lütfen tekrarlanacak günleri seçiniz."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_repeat_calendar_subtitle_en": {
+      "defaultValue": {
+        "value": "Please select the days to repeat."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_repeat_calendar_remaining_label_tr": {
+      "defaultValue": {
+        "value": "Kalan seans"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_repeat_calendar_remaining_label_en": {
+      "defaultValue": {
+        "value": "Remaining sessions"
+      },
+      "valueType": "STRING"
+    },
     "lbl_trainers_management_title_tr": {
       "defaultValue": {
         "value": "Antrenörler"

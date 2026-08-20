@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:egoractive/core/remote_config/remote_config_service.dart';
 import 'package:egoractive/core/theme/app_color_scheme.dart';
 import 'package:egoractive/core/theme/app_theme.dart';
 import 'package:egoractive/core/theme/app_typography.dart';
@@ -15,8 +16,31 @@ import 'package:egoractive/modules/sessions/ui/panels/attendance_confirm_panel.d
 import 'package:egoractive/modules/sessions/ui/panels/member_home_panel.dart';
 import 'package:egoractive/modules/sessions/ui/panels/sessions_list_panel.dart';
 
+/// Gerçek Firebase Remote Config'e dokunmayan sahte servis — bu dosya panel
+/// geçişlerini test eder, Firebase entegrasyonunu değil. `rcTextProvider`,
+/// Firebase.initializeApp hiç çağrılmamış test ortamında `getString`'i
+/// yakalayıp boş döner (bkz. remote_config_service.dart); testin beklediği
+/// sabit metinleri döndürmek için `_tr`/`_en` eki fark etmeksizin taban
+/// anahtara göre çözüyoruz.
+class _FakeRemoteConfigService extends RemoteConfigService {
+  const _FakeRemoteConfigService();
+
+  static const _values = <String, String>{
+    'lbl_sessions_calendar_view_toggle': 'Takvim',
+  };
+
+  @override
+  String getString(String key) =>
+      _values[key.replaceFirst(RegExp(r'_(tr|en)$'), '')] ?? '';
+}
+
 Widget _wrap(Widget child) {
   return ProviderScope(
+    overrides: [
+      remoteConfigServiceProvider.overrideWithValue(
+        const _FakeRemoteConfigService(),
+      ),
+    ],
     child: MaterialApp(
       theme: AppTheme.build(
         colors: AppColorScheme.defaultScheme(),

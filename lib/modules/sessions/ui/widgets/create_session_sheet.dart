@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/app_spacing.dart';
+import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/subscription/subscription_write_gate.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/theme/theme_controller.dart';
@@ -76,7 +77,15 @@ Future<void> showRescheduleSessionSheet(
       Navigator.of(context, rootNavigator: true).pop();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('${e.trainerName} bu saatte dolu, başka bir saat seç.'),
+          content: Text(
+            ref
+                .read(
+                  rcTextProvider(
+                    RemoteConfigKeys.sessionsCreateTrainerBusyError,
+                  ),
+                )
+                .replaceAll('{name}', e.trainerName),
+          ),
         ),
       );
     }
@@ -85,7 +94,13 @@ Future<void> showRescheduleSessionSheet(
     if (context.mounted) {
       Navigator.of(context, rootNavigator: true).pop();
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Seans ertelenemedi, tekrar dene.')),
+        SnackBar(
+          content: Text(
+            ref.read(
+              rcTextProvider(RemoteConfigKeys.sessionsCreateRescheduleError),
+            ),
+          ),
+        ),
       );
     }
     return;
@@ -145,7 +160,9 @@ class _CreateSessionSheetState extends ConsumerState<_CreateSessionSheet> {
       if (mounted) {
         setState(() {
           _isCreating = false;
-          _errorMessage = 'Aktif salon bulunamadı.';
+          _errorMessage = ref.read(
+            rcTextProvider(RemoteConfigKeys.sessionsCreateNoActiveGymError),
+          );
         });
       }
       return;
@@ -195,7 +212,13 @@ class _CreateSessionSheetState extends ConsumerState<_CreateSessionSheet> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'Şu günler için antrenör dolu, atlandı: ${failedDays.join(', ')}.',
+            ref
+                .read(
+                  rcTextProvider(
+                    RemoteConfigKeys.sessionsCreateSkippedDaysSnackbar,
+                  ),
+                )
+                .replaceAll('{days}', failedDays.join(', ')),
           ),
           duration: const Duration(seconds: 5),
         ),
@@ -205,7 +228,9 @@ class _CreateSessionSheetState extends ConsumerState<_CreateSessionSheet> {
     }
     setState(() {
       _isCreating = false;
-      _errorMessage = '${trainer.name} bu saatte dolu, başka bir saat seç.';
+      _errorMessage = ref
+          .read(rcTextProvider(RemoteConfigKeys.sessionsCreateTrainerBusyError))
+          .replaceAll('{name}', trainer.name);
     });
   }
 
@@ -230,7 +255,7 @@ class _CreateSessionSheetState extends ConsumerState<_CreateSessionSheet> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Yeni seans',
+            ref.watch(rcTextProvider(RemoteConfigKeys.sessionsCreateTitle)),
             style: typography.headingMedium.copyWith(
               color: colors.onSurface,
               fontSize: 20,
@@ -238,15 +263,36 @@ class _CreateSessionSheetState extends ConsumerState<_CreateSessionSheet> {
           ),
           const SizedBox(height: AppSpacing.lg),
           _PickerRow(
-            label: 'Üye',
+            label: ref.watch(
+              rcTextProvider(RemoteConfigKeys.shellRolePickerMemberButton),
+            ),
             value: _member == null
-                ? 'Seç'
-                : '${_member!.name} · ${_member!.remainingSessions} seans',
+                ? ref.watch(
+                    rcTextProvider(
+                      RemoteConfigKeys.sessionsCreateSelectPlaceholder,
+                    ),
+                  )
+                : ref
+                      .watch(
+                        rcTextProvider(
+                          RemoteConfigKeys.sessionsCreateMemberSummary,
+                        ),
+                      )
+                      .replaceAll('{name}', _member!.name)
+                      .replaceAll('{count}', '${_member!.remainingSessions}'),
             onTap: () => _pickFromList<AdminMemberSummary>(
-              title: 'Üye seç',
+              title: ref.read(
+                rcTextProvider(RemoteConfigKeys.sessionsCreatePickMemberTitle),
+              ),
               items: members,
               labelOf: (m) => m.name,
-              subtitleOf: (m) => '${m.remainingSessions} seans',
+              subtitleOf: (m) => ref
+                  .read(
+                    rcTextProvider(
+                      RemoteConfigKeys.sessionsCreateMemberSessionsSuffix,
+                    ),
+                  )
+                  .replaceAll('{count}', '${m.remainingSessions}'),
               onSelected: (m) => setState(() {
                 _member = m;
                 // Kalan seans sayısı üyeye özel — üye değişince önceki
@@ -257,12 +303,26 @@ class _CreateSessionSheetState extends ConsumerState<_CreateSessionSheet> {
           ),
           const SizedBox(height: AppSpacing.sm),
           _PickerRow(
-            label: 'Antrenör',
-            value: trainer?.name ?? (trainerLocked ? '—' : 'Seç'),
+            label: ref.watch(
+              rcTextProvider(RemoteConfigKeys.membersTrainerFieldLabel),
+            ),
+            value:
+                trainer?.name ??
+                (trainerLocked
+                    ? '—'
+                    : ref.watch(
+                        rcTextProvider(
+                          RemoteConfigKeys.sessionsCreateSelectPlaceholder,
+                        ),
+                      )),
             onTap: trainerLocked
                 ? null
                 : () => _pickFromList<AdminTrainerSummary>(
-                    title: 'Antrenör seç',
+                    title: ref.read(
+                      rcTextProvider(
+                        RemoteConfigKeys.sessionsCreatePickTrainerTitle,
+                      ),
+                    ),
                     items: trainers,
                     labelOf: (t) => t.name,
                     onSelected: (t) => setState(() => _trainer = t),
@@ -270,7 +330,9 @@ class _CreateSessionSheetState extends ConsumerState<_CreateSessionSheet> {
           ),
           const SizedBox(height: AppSpacing.sm),
           _PickerRow(
-            label: 'Tarih',
+            label: ref.watch(
+              rcTextProvider(RemoteConfigKeys.eventsDateFieldLabel),
+            ),
             value: '${_date.day}.${_date.month}.${_date.year}',
             onTap: () async {
               final picked = await showDatePicker(
@@ -289,7 +351,9 @@ class _CreateSessionSheetState extends ConsumerState<_CreateSessionSheet> {
           ),
           const SizedBox(height: AppSpacing.sm),
           _PickerRow(
-            label: 'Saat',
+            label: ref.watch(
+              rcTextProvider(RemoteConfigKeys.sessionsCalendarSlotTimeLabel),
+            ),
             value: _time.format(context),
             onTap: () async {
               final picked = await showTimePicker(
@@ -301,10 +365,22 @@ class _CreateSessionSheetState extends ConsumerState<_CreateSessionSheet> {
           ),
           const SizedBox(height: AppSpacing.sm),
           _PickerRow(
-            label: 'Tekrarla',
+            label: ref.watch(
+              rcTextProvider(RemoteConfigKeys.sessionsCreateRepeatLabel),
+            ),
             value: _repeatDates.isEmpty
-                ? 'Seç'
-                : '${_repeatDates.length} gün seçildi',
+                ? ref.watch(
+                    rcTextProvider(
+                      RemoteConfigKeys.sessionsCreateSelectPlaceholder,
+                    ),
+                  )
+                : ref
+                      .watch(
+                        rcTextProvider(
+                          RemoteConfigKeys.sessionsCreateRepeatDaysSelected,
+                        ),
+                      )
+                      .replaceAll('{count}', '${_repeatDates.length}'),
             onTap: _member == null
                 ? null
                 : () async {
@@ -331,7 +407,15 @@ class _CreateSessionSheetState extends ConsumerState<_CreateSessionSheet> {
             const SizedBox(height: AppSpacing.sm),
           ],
           AppButton(
-            label: _isCreating ? 'Oluşturuluyor…' : 'Oluştur',
+            label: _isCreating
+                ? ref.watch(
+                    rcTextProvider(
+                      RemoteConfigKeys.gymsGymSetupSubmittingLabel,
+                    ),
+                  )
+                : ref.watch(
+                    rcTextProvider(RemoteConfigKeys.sessionsCreateSubmitButton),
+                  ),
             onPressed: _member == null || trainer == null || _isCreating
                 ? null
                 : _create,

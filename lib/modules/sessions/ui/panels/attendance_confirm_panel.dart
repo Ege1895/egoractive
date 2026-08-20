@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
+import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_back_button.dart';
 import '../../../../shared/widgets/app_button.dart';
@@ -49,7 +50,9 @@ class _AttendanceConfirmPanelState
                   ),
                   const SizedBox(width: AppSpacing.md),
                   Text(
-                    'Ders onayı',
+                    ref.watch(
+                      rcTextProvider(RemoteConfigKeys.sessionsConfirmTitle),
+                    ),
                     style: typography.headingSmall.copyWith(
                       color: colors.onSurface,
                       fontSize: 18,
@@ -83,7 +86,16 @@ class _AttendanceConfirmPanelState
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "Yarın ${_hourFromTitle(session.title)}'daki dersine gelecek misin?",
+                            ref
+                                .watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys.sessionsConfirmQuestion,
+                                  ),
+                                )
+                                .replaceAll(
+                                  '{hour}',
+                                  _hourFromTitle(session.title),
+                                ),
                             style: typography.headingMedium.copyWith(
                               color: colors.onSurface,
                               fontSize: 26,
@@ -92,8 +104,20 @@ class _AttendanceConfirmPanelState
                           const SizedBox(height: AppSpacing.sm),
                           Text(
                             session.meta.isEmpty
-                                ? 'Cevabını dersten 2 saat öncesine kadar değiştirebilirsin.'
-                                : '${session.meta} seni bekliyor. Cevabını dersten 2 saat öncesine kadar değiştirebilirsin.',
+                                ? ref.watch(
+                                    rcTextProvider(
+                                      RemoteConfigKeys
+                                          .sessionsConfirmChangeHint,
+                                    ),
+                                  )
+                                : ref
+                                      .watch(
+                                        rcTextProvider(
+                                          RemoteConfigKeys
+                                              .sessionsConfirmWaitingHint,
+                                        ),
+                                      )
+                                      .replaceAll('{meta}', session.meta),
                             style: typography.bodyMedium.copyWith(
                               color: colors.onSurfaceVariant,
                             ),
@@ -146,7 +170,14 @@ class _AttendanceConfirmPanelState
                                         ),
                                       ),
                                       Text(
-                                        '${session.meta} · Kalan dersinden 1 düşer',
+                                        ref
+                                            .watch(
+                                              rcTextProvider(
+                                                RemoteConfigKeys
+                                                    .sessionsConfirmSessionSummary,
+                                              ),
+                                            )
+                                            .replaceAll('{meta}', session.meta),
                                         style: typography.bodyMedium.copyWith(
                                           color: colors.onSurfaceVariant,
                                           fontSize: 13,
@@ -174,7 +205,11 @@ class _AttendanceConfirmPanelState
                     ],
                     if (!state.canConfirmAttendance) ...[
                       Text(
-                        'Bu ders için geleceğini/gelmeyeceğini bildirme yetkin yok. Antrenörünle iletişime geç.',
+                        ref.watch(
+                          rcTextProvider(
+                            RemoteConfigKeys.sessionsConfirmNoPermission,
+                          ),
+                        ),
                         style: typography.bodyMedium.copyWith(
                           color: colors.onSurfaceMuted,
                         ),
@@ -182,12 +217,16 @@ class _AttendanceConfirmPanelState
                     ] else if (state.attendanceAnswer ==
                         AttendanceAnswer.pending) ...[
                       AppButton(
-                        label: 'Gelicem',
+                        label: ref.watch(
+                          rcTextProvider(RemoteConfigKeys.commonGelicem),
+                        ),
                         onPressed: () => controller.confirmAttendance(true),
                       ),
                       const SizedBox(height: AppSpacing.sm),
                       AppButton(
-                        label: 'Gelmeyeceğim',
+                        label: ref.watch(
+                          rcTextProvider(RemoteConfigKeys.commonGelmeyecegim),
+                        ),
                         variant: AppButtonVariant.secondary,
                         onPressed: () => controller.confirmAttendance(false),
                       ),
@@ -246,8 +285,18 @@ class _AttendanceConfirmPanelState
                                   Text(
                                     state.attendanceAnswer ==
                                             AttendanceAnswer.coming
-                                        ? 'Geleceğini bildirdin'
-                                        : 'Gelmeyeceğini bildirdin',
+                                        ? ref.watch(
+                                            rcTextProvider(
+                                              RemoteConfigKeys
+                                                  .sessionsConfirmAttendingAnswerText,
+                                            ),
+                                          )
+                                        : ref.watch(
+                                            rcTextProvider(
+                                              RemoteConfigKeys
+                                                  .sessionsConfirmNotAttendingAnswerText,
+                                            ),
+                                          ),
                                     style: typography.headingSmall.copyWith(
                                       color:
                                           state.attendanceAnswer ==
@@ -262,9 +311,29 @@ class _AttendanceConfirmPanelState
                                     state.attendanceAnswer ==
                                             AttendanceAnswer.coming
                                         ? (session.meta.isEmpty
-                                              ? "Programda yerin ayrıldı. Dersten 2 saat öncesine kadar değiştirebilirsin."
-                                              : "${session.meta}'ın programında yerin ayrıldı. Dersten 2 saat öncesine kadar değiştirebilirsin.")
-                                        : "Ders kalan dersinden düşmedi, antrenörüne iletildi. Dersten 2 saat öncesine kadar değiştirebilirsin.",
+                                              ? ref.watch(
+                                                  rcTextProvider(
+                                                    RemoteConfigKeys
+                                                        .sessionsConfirmComingNote,
+                                                  ),
+                                                )
+                                              : ref
+                                                    .watch(
+                                                      rcTextProvider(
+                                                        RemoteConfigKeys
+                                                            .sessionsConfirmComingNoteWithMeta,
+                                                      ),
+                                                    )
+                                                    .replaceAll(
+                                                      '{meta}',
+                                                      session.meta,
+                                                    ))
+                                        : ref.watch(
+                                            rcTextProvider(
+                                              RemoteConfigKeys
+                                                  .sessionsConfirmNotComingNote,
+                                            ),
+                                          ),
                                     style: typography.bodyMedium.copyWith(
                                       color: colors.onSurfaceVariant,
                                     ),
@@ -277,7 +346,11 @@ class _AttendanceConfirmPanelState
                       ),
                       const SizedBox(height: AppSpacing.md),
                       AppButton(
-                        label: 'Cevabımı değiştir',
+                        label: ref.watch(
+                          rcTextProvider(
+                            RemoteConfigKeys.sessionsConfirmChangeAnswerButton,
+                          ),
+                        ),
                         variant: AppButtonVariant.secondary,
                         onPressed: controller.resetAttendance,
                       ),

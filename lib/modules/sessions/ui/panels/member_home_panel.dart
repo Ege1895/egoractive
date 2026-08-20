@@ -93,7 +93,16 @@ class MemberHomePanel extends ConsumerWidget {
                         ),
                       ),
                       Text(
-                        'Merhaba${firstName.isEmpty ? '' : ' $firstName'}',
+                        ref
+                            .watch(
+                              rcTextProvider(
+                                RemoteConfigKeys.sessionsMemberHomeGreeting,
+                              ),
+                            )
+                            .replaceAll(
+                              '{name}',
+                              firstName.isEmpty ? '' : ' $firstName',
+                            ),
                         style: typography.headingMedium.copyWith(
                           color: colors.onSurface,
                         ),
@@ -144,14 +153,32 @@ class MemberHomePanel extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Kalan dersin: ${pkg.remainingSessions}',
+                          ref
+                              .watch(
+                                rcTextProvider(
+                                  RemoteConfigKeys
+                                      .sessionsMemberHomeRemainingSessionsLabel,
+                                ),
+                              )
+                              .replaceAll(
+                                '{count}',
+                                '${pkg.remainingSessions}',
+                              ),
                           style: typography.headingSmall.copyWith(
                             color: colors.onSurface,
                           ),
                         ),
                         const SizedBox(height: AppSpacing.xs),
                         Text(
-                          '${pkg.name} paketi · ${pkg.endDate}\'e kadar geçerli',
+                          ref
+                              .watch(
+                                rcTextProvider(
+                                  RemoteConfigKeys
+                                      .sessionsMemberHomePackageValidUntil,
+                                ),
+                              )
+                              .replaceAll('{name}', pkg.name)
+                              .replaceAll('{date}', pkg.endDate),
                           style: typography.bodyMedium.copyWith(
                             color: colors.onSurfaceVariant,
                           ),
@@ -164,7 +191,11 @@ class MemberHomePanel extends ConsumerWidget {
             ),
             const SizedBox(height: AppSpacing.xl),
             Text(
-              'SIRADAKİ DERSİN',
+              ref.watch(
+                rcTextProvider(
+                  RemoteConfigKeys.sessionsMemberHomeNextSessionSection,
+                ),
+              ),
               style: typography.caption.copyWith(
                 color: colors.onSurfaceMuted,
                 letterSpacing: 1.2,
@@ -258,7 +289,11 @@ class MemberHomePanel extends ConsumerWidget {
                           children: [
                             Expanded(
                               child: _QuickActionButton(
-                                label: 'Gelicem',
+                                label: ref.watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys.commonGelicem,
+                                  ),
+                                ),
                                 filled: true,
                                 onTap: () =>
                                     sessionsController.confirmAttendance(true),
@@ -267,7 +302,11 @@ class MemberHomePanel extends ConsumerWidget {
                             const SizedBox(width: AppSpacing.sm),
                             Expanded(
                               child: _QuickActionButton(
-                                label: 'Gelmeyeceğim',
+                                label: ref.watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys.commonGelmeyecegim,
+                                  ),
+                                ),
                                 filled: false,
                                 onTap: () =>
                                     sessionsController.confirmAttendance(false),
@@ -280,8 +319,18 @@ class MemberHomePanel extends ConsumerWidget {
                           alignment: Alignment.centerLeft,
                           child: Text(
                             state.attendanceAnswer == AttendanceAnswer.coming
-                                ? 'Geleceğini bildirdin'
-                                : 'Gelmeyeceğini bildirdin',
+                                ? ref.watch(
+                                    rcTextProvider(
+                                      RemoteConfigKeys
+                                          .sessionsConfirmAttendingAnswerText,
+                                    ),
+                                  )
+                                : ref.watch(
+                                    rcTextProvider(
+                                      RemoteConfigKeys
+                                          .sessionsConfirmNotAttendingAnswerText,
+                                    ),
+                                  ),
                             style: typography.bodyMedium.copyWith(
                               color:
                                   state.attendanceAnswer ==
@@ -299,7 +348,11 @@ class MemberHomePanel extends ConsumerWidget {
             if (pkg.installments.isNotEmpty) ...[
               const SizedBox(height: AppSpacing.xl),
               Text(
-                'TAKSİTLER',
+                ref.watch(
+                  rcTextProvider(
+                    RemoteConfigKeys.sessionsMemberHomeInstallmentsSection,
+                  ),
+                ),
                 style: typography.caption.copyWith(
                   color: colors.onSurfaceMuted,
                   letterSpacing: 1.2,
@@ -332,7 +385,11 @@ class MemberHomePanel extends ConsumerWidget {
             ],
             const SizedBox(height: AppSpacing.xl),
             Text(
-              'BU HAFTA',
+              ref.watch(
+                rcTextProvider(
+                  RemoteConfigKeys.sessionsMemberHomeThisWeekSection,
+                ),
+              ),
               style: typography.caption.copyWith(
                 color: colors.onSurfaceMuted,
                 letterSpacing: 1.2,
@@ -434,7 +491,7 @@ class _QuickActionButton extends StatelessWidget {
   }
 }
 
-class _MemberInstallmentRow extends StatelessWidget {
+class _MemberInstallmentRow extends ConsumerWidget {
   const _MemberInstallmentRow({
     required this.installment,
     required this.showDivider,
@@ -449,14 +506,34 @@ class _MemberInstallmentRow extends StatelessWidget {
   final bool isDueSoon;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.appColors;
     final typography = context.appTypography;
     final (badgeLabel, badgeBg, badgeFg) = installment.paid
-        ? ('Ödendi', colors.successContainer, colors.onSuccessContainer)
+        ? (
+            ref.watch(rcTextProvider(RemoteConfigKeys.membersDetailPaidLabel)),
+            colors.successContainer,
+            colors.onSuccessContainer,
+          )
         : isDueSoon
-        ? ('Ödeme yaklaşıyor', colors.errorContainer, colors.onErrorContainer)
-        : ('Ödenmedi', colors.warningContainer, colors.onWarningContainer);
+        ? (
+            ref.watch(
+              rcTextProvider(
+                RemoteConfigKeys.sessionsMemberHomeInstallmentDueSoonLabel,
+              ),
+            ),
+            colors.errorContainer,
+            colors.onErrorContainer,
+          )
+        : (
+            ref.watch(
+              rcTextProvider(
+                RemoteConfigKeys.sessionsMemberHomeInstallmentUnpaidLabel,
+              ),
+            ),
+            colors.warningContainer,
+            colors.onWarningContainer,
+          );
     return Container(
       constraints: const BoxConstraints(minHeight: 52),
       decoration: BoxDecoration(
@@ -468,7 +545,13 @@ class _MemberInstallmentRow extends StatelessWidget {
         children: [
           Expanded(
             child: Text(
-              '${installment.index}. Taksit',
+              ref
+                  .watch(
+                    rcTextProvider(
+                      RemoteConfigKeys.sessionsMemberHomeInstallmentIndexLabel,
+                    ),
+                  )
+                  .replaceAll('{index}', '${installment.index}'),
               style: typography.bodyLarge.copyWith(
                 color: colors.onSurface,
                 fontSize: 15,
@@ -477,7 +560,14 @@ class _MemberInstallmentRow extends StatelessWidget {
           ),
           if (!installment.paid) ...[
             Text(
-              'Son ödeme ${formatTrDate(installment.dueDate)}',
+              ref
+                  .watch(
+                    rcTextProvider(
+                      RemoteConfigKeys
+                          .sessionsMemberHomeInstallmentDueDateLabel,
+                    ),
+                  )
+                  .replaceAll('{date}', formatTrDate(installment.dueDate)),
               style: typography.caption.copyWith(color: colors.onSurfaceMuted),
             ),
             const SizedBox(width: AppSpacing.sm),

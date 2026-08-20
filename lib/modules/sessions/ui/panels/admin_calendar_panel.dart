@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/app_spacing.dart';
+import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/utils/thousands_input_formatter.dart';
 import '../../../../shared/widgets/app_button.dart';
@@ -65,7 +66,9 @@ class AdminCalendarPanel extends ConsumerWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Takvim',
+                    ref.watch(
+                      rcTextProvider(RemoteConfigKeys.sessionsCalendarTitle),
+                    ),
                     style: typography.headingLarge.copyWith(
                       color: colors.onSurface,
                     ),
@@ -89,7 +92,11 @@ class AdminCalendarPanel extends ConsumerWidget {
                         constraints: const BoxConstraints(minHeight: 40),
                         alignment: Alignment.center,
                         child: Text(
-                          '+ Seans',
+                          ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.commonAddSeansButton,
+                            ),
+                          ),
                           style: typography.headingSmall.copyWith(
                             fontSize: 14,
                             color: colors.onPrimary,
@@ -301,7 +308,11 @@ class AdminCalendarPanel extends ConsumerWidget {
                       Expanded(
                         child: selectedSlots.isEmpty
                             ? Text(
-                                'Bu günde seans yok.',
+                                ref.watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys.commonBuGundeSeansYok,
+                                  ),
+                                ),
                                 style: typography.bodyMedium.copyWith(
                                   color: colors.onSurfaceMuted,
                                 ),
@@ -343,7 +354,12 @@ class AdminCalendarPanel extends ConsumerWidget {
                       Expanded(
                         child: selectedExpenses.isEmpty
                             ? Text(
-                                'Bu günde gider yok.',
+                                ref.watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys
+                                        .sessionsCalendarNoExpensesState,
+                                  ),
+                                ),
                                 style: typography.bodyMedium.copyWith(
                                   color: colors.onSurfaceMuted,
                                 ),
@@ -396,22 +412,22 @@ class AdminCalendarPanel extends ConsumerWidget {
     final typography = context.appTypography;
     final (chipLabel, chipBg, chipFg) = switch (slot.state) {
       AdminSessionState.completed => (
-        'Tamamlandı',
+        ref.read(rcTextProvider(RemoteConfigKeys.commonTamamlandi)),
         colors.successContainer,
         colors.onSuccessContainer,
       ),
       AdminSessionState.current => (
-        'Şimdi',
+        ref.read(rcTextProvider(RemoteConfigKeys.sessionsStatusNow)),
         colors.primaryContainer,
         colors.onPrimaryContainer,
       ),
       AdminSessionState.cancelled => (
-        'İptal',
+        ref.read(rcTextProvider(RemoteConfigKeys.commonIptalLabel)),
         colors.errorContainer,
         colors.onErrorContainer,
       ),
       AdminSessionState.planned => (
-        'Planlandı',
+        ref.read(rcTextProvider(RemoteConfigKeys.sessionsFilterScheduled)),
         colors.surfaceRaised,
         colors.onSurfaceVariant,
       ),
@@ -520,9 +536,20 @@ class AdminCalendarPanel extends ConsumerWidget {
                 ),
                 child: Column(
                   children: [
-                    _PopupRow(label: 'Saat', value: slot.time),
                     _PopupRow(
-                      label: 'Durum',
+                      label: ref.read(
+                        rcTextProvider(
+                          RemoteConfigKeys.sessionsCalendarSlotTimeLabel,
+                        ),
+                      ),
+                      value: slot.time,
+                    ),
+                    _PopupRow(
+                      label: ref.read(
+                        rcTextProvider(
+                          RemoteConfigKeys.sessionsCalendarSlotStatusLabel,
+                        ),
+                      ),
                       value: chipLabel,
                       showDivider: false,
                     ),
@@ -534,7 +561,9 @@ class AdminCalendarPanel extends ConsumerWidget {
                 children: [
                   Expanded(
                     child: AppButton(
-                      label: 'Seansı ertele',
+                      label: ref.read(
+                        rcTextProvider(RemoteConfigKeys.commonSeansiErtele),
+                      ),
                       onPressed: () async {
                         Navigator.of(sheetContext).pop();
                         final parts = slot.time.split(':');
@@ -557,7 +586,9 @@ class AdminCalendarPanel extends ConsumerWidget {
                   const SizedBox(width: AppSpacing.sm),
                   Expanded(
                     child: AppButton(
-                      label: 'Kapat',
+                      label: ref.read(
+                        rcTextProvider(RemoteConfigKeys.commonKapat),
+                      ),
                       variant: AppButtonVariant.secondary,
                       onPressed: () => Navigator.of(sheetContext).pop(),
                     ),
