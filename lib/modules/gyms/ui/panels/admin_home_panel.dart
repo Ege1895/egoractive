@@ -38,67 +38,72 @@ class AdminHomePanel extends ConsumerWidget {
           children: [
             Row(
               children: [
-                Expanded(
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
-                    onTap: () => panelStack.push(const GymInfoPanel()),
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 44,
-                          height: 44,
-                          clipBehavior: Clip.antiAlias,
-                          decoration: BoxDecoration(
-                            color: colors.primaryContainer,
-                            borderRadius: BorderRadius.circular(
-                              AppSpacing.radiusInner,
-                            ),
+                InkWell(
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+                  onTap: () => panelStack.push(const GymInfoPanel()),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: 44,
+                        height: 44,
+                        clipBehavior: Clip.antiAlias,
+                        decoration: BoxDecoration(
+                          color: colors.primaryContainer,
+                          borderRadius: BorderRadius.circular(
+                            AppSpacing.radiusInner,
                           ),
-                          alignment: Alignment.center,
-                          child: profile.logoUrl.isEmpty
-                              ? Icon(
-                                  Icons.fitness_center_rounded,
-                                  color: colors.onPrimaryContainer,
-                                  size: 20,
-                                )
-                              : Image.network(
-                                  profile.logoUrl,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) =>
-                                      Icon(
-                                        Icons.fitness_center_rounded,
-                                        color: colors.onPrimaryContainer,
-                                        size: 20,
-                                      ),
-                                ),
                         ),
-                        const SizedBox(width: AppSpacing.md),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              if (state.monthLabel.isNotEmpty)
-                                Text(
-                                  state.monthLabel,
-                                  style: typography.caption.copyWith(
-                                    color: colors.onSurfaceMuted,
-                                  ),
-                                ),
+                        alignment: Alignment.center,
+                        child: profile.logoUrl.isEmpty
+                            ? Icon(
+                                Icons.fitness_center_rounded,
+                                color: colors.onPrimaryContainer,
+                                size: 20,
+                              )
+                            : Image.network(
+                                profile.logoUrl,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) =>
+                                    Icon(
+                                      Icons.fitness_center_rounded,
+                                      color: colors.onPrimaryContainer,
+                                      size: 20,
+                                    ),
+                              ),
+                      ),
+                      const SizedBox(width: AppSpacing.md),
+                      ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 200),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            if (state.monthLabel.isNotEmpty)
                               Text(
-                                profile.name,
-                                style: typography.headingMedium.copyWith(
-                                  color: colors.onSurface,
-                                  fontSize: 19,
+                                state.monthLabel,
+                                overflow: TextOverflow.ellipsis,
+                                style: typography.caption.copyWith(
+                                  color: colors.onSurfaceMuted,
                                 ),
                               ),
-                            ],
-                          ),
+                            Text(
+                              profile.name,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: typography.headingMedium.copyWith(
+                                color: colors.onSurface,
+                                fontSize: 19,
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
+                const Spacer(),
                 InkWell(
                   borderRadius: BorderRadius.circular(999),
                   onTap: () => panelStack.push(const AdminNotificationsPanel()),
