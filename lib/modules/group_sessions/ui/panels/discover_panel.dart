@@ -270,19 +270,13 @@ class _DiscoverCard extends ConsumerWidget {
     final String btnLabel;
     final Color btnBg;
     final Color btnFg;
-    if (item.isLocked) {
-      btnLabel = ref.watch(
-        rcTextProvider(RemoteConfigKeys.groupSessionsLockedJoinButton),
-      );
-      btnBg = colors.surfaceRaised;
-      btnFg = colors.onSurfaceMuted;
-    } else if (item.isFull) {
+    if (item.isFull && !item.joined) {
       btnLabel = ref.watch(
         rcTextProvider(RemoteConfigKeys.groupSessionsWaitlistJoinButton),
       );
       btnBg = colors.surfaceRaised;
       btnFg = colors.onSurfaceVariant;
-    } else if (item.joined && !item.canLeaveEvent) {
+    } else if (item.joined && !item.canLeave) {
       btnLabel = ref.watch(
         rcTextProvider(RemoteConfigKeys.groupSessionsJoinedLockedButton),
       );
@@ -419,10 +413,7 @@ class _DiscoverCard extends ConsumerWidget {
             color: btnBg,
             borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
             child: InkWell(
-              onTap:
-                  (item.isLocked ||
-                      isPending ||
-                      (item.joined && !item.canLeaveEvent))
+              onTap: (isPending || (item.joined && !item.canLeave))
                   ? null
                   : onToggleJoin,
               borderRadius: BorderRadius.circular(AppSpacing.radiusInner),

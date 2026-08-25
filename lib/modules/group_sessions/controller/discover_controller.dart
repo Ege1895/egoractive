@@ -41,9 +41,9 @@ Stream<List<DiscoverItem>> _groupSessionsForGym(
   String gymId,
   String myUid,
 ) {
-  final lockHours = ref
+  final leaveLockHours = ref
       .watch(remoteConfigServiceProvider)
-      .groupSessionLockHoursBefore;
+      .groupSessionLeaveLockHoursBefore;
   final now = Timestamp.now();
   return FirebaseFirestore.instance
       .collection('groupSessions')
@@ -56,7 +56,7 @@ Stream<List<DiscoverItem>> _groupSessionsForGym(
             .where(
               (doc) => (doc.data()['onlineBookingEnabled'] as bool?) ?? true,
             )
-            .map((doc) => _toGroupSessionItem(doc, myUid, lockHours))
+            .map((doc) => _toGroupSessionItem(doc, myUid, leaveLockHours))
             .toList(),
       );
 }
@@ -64,7 +64,7 @@ Stream<List<DiscoverItem>> _groupSessionsForGym(
 DiscoverItem _toGroupSessionItem(
   QueryDocumentSnapshot<Map<String, dynamic>> doc,
   String myUid,
-  int lockHours,
+  int leaveLockHours,
 ) {
   final data = doc.data();
   final startTime = (data['startTime'] as Timestamp).toDate();
@@ -86,7 +86,7 @@ DiscoverItem _toGroupSessionItem(
     capacity: (data['capacity'] as num?)?.toInt(),
     joined: attendeeIds.contains(myUid),
     startTime: startTime,
-    lockHoursBefore: lockHours,
+    leaveLockHoursBefore: leaveLockHours,
   );
 }
 
@@ -113,10 +113,12 @@ Stream<List<DiscoverItem>> _eventsForGym(
       );
 }
 
-// Etkinlikler (DiscoverCategory.events) F4-2'deki 24 saatlik KATILIM
-// kilidine hiç tabi değil (bkz. discover_item.dart isLocked) — ama bir
-// kez katılındıktan sonra AYRILMA F4-3'teki ayrı leaveLockHours ile
-// kilitlenir (bkz. discover_item.dart canLeaveEvent).
+// F4-3 — katılım her zaman açık, ama bir kez katılındıktan sonra
+// AYRILMA burada geçirilen leaveLockHours ile kilitlenir (bkz.
+// discover_item.dart canLeave). Etkinlikler ve grup dersleri ayrı RC
+// anahtarlarından besleniyor (eventLeaveLockHoursBefore /
+// groupSessionLeaveLockHoursBefore) — farklı varsayılan saatlerle ayrı
+// ayrı ayarlanabilsin diye.
 DiscoverItem _toEventItem(
   QueryDocumentSnapshot<Map<String, dynamic>> doc,
   String myUid,
@@ -176,7 +178,7 @@ class DiscoverController extends _$DiscoverController {
     final matches = state.where((i) => i.id == id);
     if (uid == null || matches.isEmpty) return;
     final item = matches.first;
-    if (item.isLocked) return;
+    if (item.joined && !item.canLeave) return;
 
     Future<void> leave() => item.category == DiscoverCategory.groupSessions
         ? ref

@@ -28,13 +28,6 @@
       "description": "Üye anasayfasındaki taksit listesinde bir taksitin son ödeme tarihine kaç gün kala (veya geçmişse) kırmızı 'Ödeme yaklaşıyor' gösterileceği.",
       "valueType": "NUMBER"
     },
-    "cfg_group_session_lock_hours_before": {
-      "defaultValue": {
-        "value": "24"
-      },
-      "description": "F4-2 — grup dersine katılım/ayrılma başlangıca kaç saat kalana kadar açık.",
-      "valueType": "NUMBER"
-    },
     "cfg_cancellation_deadline_hours": {
       "defaultValue": {
         "value": "24"
@@ -2089,18 +2082,6 @@
     "lbl_group_sessions_join_failed_snackbar_en": {
       "defaultValue": {
         "value": "Could not save your response, try again."
-      },
-      "valueType": "STRING"
-    },
-    "lbl_group_sessions_locked_join_button_tr": {
-      "defaultValue": {
-        "value": "Kilitli · Başlangıç yaklaştı"
-      },
-      "valueType": "STRING"
-    },
-    "lbl_group_sessions_locked_join_button_en": {
-      "defaultValue": {
-        "value": "Locked · Starting soon"
       },
       "valueType": "STRING"
     },
@@ -7977,6 +7958,13 @@
         "value": "Attending"
       },
       "valueType": "STRING"
+    },
+    "cfg_group_session_leave_lock_hours_before": {
+      "defaultValue": {
+        "value": "8"
+      },
+      "description": "Grup dersinde katılım sonrası \"Katılmaktan Vazgeç\" başlangıca kaç saat kalana kadar aktif.",
+      "valueType": "NUMBER"
     }
   }
 }

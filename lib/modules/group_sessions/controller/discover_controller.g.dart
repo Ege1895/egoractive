@@ -7,7 +7,7 @@ part of 'discover_controller.dart';
 // **************************************************************************
 
 String _$groupSessionsForGymHash() =>
-    r'89bdf7835cab673a131efe83591669ed388e823a';
+    r'9d23798f2319f38ec24cee6b358a3c2e7828ad25';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -299,7 +299,7 @@ class _EventsForGymProviderElement
 }
 
 String _$discoverControllerHash() =>
-    r'5edf567cf95d0e6525f9696894ce4ea0df11886a';
+    r'08ad003b52d96fc0838b12ba5f9e1011dc20dc21';
 
 /// F4-2/F4-3 — üyenin salonunda ileri tarihli, gerçek zamanlı grup dersleri
 /// ve etkinlikler. Kontenjan katılım/ayrılma her iki kategori için de

@@ -29,12 +29,12 @@ mixin _$DiscoverItem {
   int? get capacity => throw _privateConstructorUsedError;
   bool get joined => throw _privateConstructorUsedError;
 
-  /// Gerçek başlangıç zamanı — kilit kontrolü için.
+  /// Gerçek başlangıç zamanı — vazgeçme kilidi kontrolü için.
   DateTime? get startTime => throw _privateConstructorUsedError;
-  int get lockHoursBefore => throw _privateConstructorUsedError;
 
-  /// F4-3 — sadece `events` için: bir kez katılındıktan sonra
-  /// "Katılmaktan Vazgeç" başlangıca kaç saat kalana kadar aktif.
+  /// F4-2/F4-3 — bir kez katılındıktan sonra "Katılmaktan Vazgeç"
+  /// başlangıca kaç saat kalana kadar aktif; kategoriye göre ayrı RC
+  /// anahtarından gelir (bkz. discover_controller.dart).
   int get leaveLockHoursBefore => throw _privateConstructorUsedError;
 
   /// Create a copy of DiscoverItem
@@ -62,7 +62,6 @@ abstract class $DiscoverItemCopyWith<$Res> {
     int? capacity,
     bool joined,
     DateTime? startTime,
-    int lockHoursBefore,
     int leaveLockHoursBefore,
   });
 }
@@ -92,7 +91,6 @@ class _$DiscoverItemCopyWithImpl<$Res, $Val extends DiscoverItem>
     Object? capacity = freezed,
     Object? joined = null,
     Object? startTime = freezed,
-    Object? lockHoursBefore = null,
     Object? leaveLockHoursBefore = null,
   }) {
     return _then(
@@ -137,10 +135,6 @@ class _$DiscoverItemCopyWithImpl<$Res, $Val extends DiscoverItem>
                 ? _value.startTime
                 : startTime // ignore: cast_nullable_to_non_nullable
                       as DateTime?,
-            lockHoursBefore: null == lockHoursBefore
-                ? _value.lockHoursBefore
-                : lockHoursBefore // ignore: cast_nullable_to_non_nullable
-                      as int,
             leaveLockHoursBefore: null == leaveLockHoursBefore
                 ? _value.leaveLockHoursBefore
                 : leaveLockHoursBefore // ignore: cast_nullable_to_non_nullable
@@ -171,7 +165,6 @@ abstract class _$$DiscoverItemImplCopyWith<$Res>
     int? capacity,
     bool joined,
     DateTime? startTime,
-    int lockHoursBefore,
     int leaveLockHoursBefore,
   });
 }
@@ -200,7 +193,6 @@ class __$$DiscoverItemImplCopyWithImpl<$Res>
     Object? capacity = freezed,
     Object? joined = null,
     Object? startTime = freezed,
-    Object? lockHoursBefore = null,
     Object? leaveLockHoursBefore = null,
   }) {
     return _then(
@@ -245,10 +237,6 @@ class __$$DiscoverItemImplCopyWithImpl<$Res>
             ? _value.startTime
             : startTime // ignore: cast_nullable_to_non_nullable
                   as DateTime?,
-        lockHoursBefore: null == lockHoursBefore
-            ? _value.lockHoursBefore
-            : lockHoursBefore // ignore: cast_nullable_to_non_nullable
-                  as int,
         leaveLockHoursBefore: null == leaveLockHoursBefore
             ? _value.leaveLockHoursBefore
             : leaveLockHoursBefore // ignore: cast_nullable_to_non_nullable
@@ -272,7 +260,6 @@ class _$DiscoverItemImpl extends _DiscoverItem {
     this.capacity,
     this.joined = false,
     this.startTime,
-    this.lockHoursBefore = 24,
     this.leaveLockHoursBefore = 24,
   }) : super._();
 
@@ -298,22 +285,20 @@ class _$DiscoverItemImpl extends _DiscoverItem {
   @JsonKey()
   final bool joined;
 
-  /// Gerçek başlangıç zamanı — kilit kontrolü için.
+  /// Gerçek başlangıç zamanı — vazgeçme kilidi kontrolü için.
   @override
   final DateTime? startTime;
-  @override
-  @JsonKey()
-  final int lockHoursBefore;
 
-  /// F4-3 — sadece `events` için: bir kez katılındıktan sonra
-  /// "Katılmaktan Vazgeç" başlangıca kaç saat kalana kadar aktif.
+  /// F4-2/F4-3 — bir kez katılındıktan sonra "Katılmaktan Vazgeç"
+  /// başlangıca kaç saat kalana kadar aktif; kategoriye göre ayrı RC
+  /// anahtarından gelir (bkz. discover_controller.dart).
   @override
   @JsonKey()
   final int leaveLockHoursBefore;
 
   @override
   String toString() {
-    return 'DiscoverItem(id: $id, category: $category, day: $day, month: $month, title: $title, meta: $meta, taken: $taken, capacity: $capacity, joined: $joined, startTime: $startTime, lockHoursBefore: $lockHoursBefore, leaveLockHoursBefore: $leaveLockHoursBefore)';
+    return 'DiscoverItem(id: $id, category: $category, day: $day, month: $month, title: $title, meta: $meta, taken: $taken, capacity: $capacity, joined: $joined, startTime: $startTime, leaveLockHoursBefore: $leaveLockHoursBefore)';
   }
 
   @override
@@ -334,8 +319,6 @@ class _$DiscoverItemImpl extends _DiscoverItem {
             (identical(other.joined, joined) || other.joined == joined) &&
             (identical(other.startTime, startTime) ||
                 other.startTime == startTime) &&
-            (identical(other.lockHoursBefore, lockHoursBefore) ||
-                other.lockHoursBefore == lockHoursBefore) &&
             (identical(other.leaveLockHoursBefore, leaveLockHoursBefore) ||
                 other.leaveLockHoursBefore == leaveLockHoursBefore));
   }
@@ -353,7 +336,6 @@ class _$DiscoverItemImpl extends _DiscoverItem {
     capacity,
     joined,
     startTime,
-    lockHoursBefore,
     leaveLockHoursBefore,
   );
 
@@ -378,7 +360,6 @@ abstract class _DiscoverItem extends DiscoverItem {
     final int? capacity,
     final bool joined,
     final DateTime? startTime,
-    final int lockHoursBefore,
     final int leaveLockHoursBefore,
   }) = _$DiscoverItemImpl;
   const _DiscoverItem._() : super._();
@@ -404,14 +385,13 @@ abstract class _DiscoverItem extends DiscoverItem {
   @override
   bool get joined;
 
-  /// Gerçek başlangıç zamanı — kilit kontrolü için.
+  /// Gerçek başlangıç zamanı — vazgeçme kilidi kontrolü için.
   @override
   DateTime? get startTime;
-  @override
-  int get lockHoursBefore;
 
-  /// F4-3 — sadece `events` için: bir kez katılındıktan sonra
-  /// "Katılmaktan Vazgeç" başlangıca kaç saat kalana kadar aktif.
+  /// F4-2/F4-3 — bir kez katılındıktan sonra "Katılmaktan Vazgeç"
+  /// başlangıca kaç saat kalana kadar aktif; kategoriye göre ayrı RC
+  /// anahtarından gelir (bkz. discover_controller.dart).
   @override
   int get leaveLockHoursBefore;
 
