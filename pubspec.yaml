@@ -60,6 +60,7 @@ dependencies:
   shared_preferences: ^2.3.3
   flutter_localizations:
     sdk: flutter
+  flutter_timezone: ^5.1.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

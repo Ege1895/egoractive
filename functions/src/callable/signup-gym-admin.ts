@@ -19,6 +19,27 @@ function optionalNonEmptyString(value: unknown): string | undefined {
   return value.trim();
 }
 
+const DEFAULT_TIME_ZONE = "Europe/Istanbul";
+
+/**
+ * Push bildirimlerinde (ör. seans hatırlatması) saatin salonun bulunduğu
+ * yerin saatine göre gösterilebilmesi için — uygulama artık tek ülkeye
+ * (Türkiye) özel değil, salon dünyanın herhangi bir yerinde olabilir.
+ * Client, cihazın IANA saat dilimini (`flutter_timezone`) gönderir;
+ * geçersiz/eksikse ya da tanınmayan bir IANA adıysa `DEFAULT_TIME_ZONE`'a
+ * düşülür (`Intl.DateTimeFormat` geçersiz `timeZone` ile fırlatır, bu da
+ * geçerliliği ucuza doğrulamanın bir yolu).
+ */
+function resolveTimeZone(value: unknown): string {
+  if (typeof value !== "string" || value.trim().length === 0) return DEFAULT_TIME_ZONE;
+  try {
+    Intl.DateTimeFormat(undefined, { timeZone: value });
+    return value;
+  } catch {
+    return DEFAULT_TIME_ZONE;
+  }
+}
+
 /**
  * F2-9 — yeni bir antrenör, henüz hiçbir Firebase Auth oturumu olmadan
  * "kendi salonumu oluşturuyorum" akışında bu fonksiyonu çağırır (client
@@ -39,6 +60,7 @@ export const signupGymAdmin = onCall(async (request) => {
   const address = requireNonEmptyString(data.address, "Adres");
   const themeColorHex = requireNonEmptyString(data.themeColorHex, "Tema rengi");
   const logoBase64 = optionalNonEmptyString(data.logoBase64);
+  const timeZone = resolveTimeZone(data.timeZone);
 
   let logoBuffer: Buffer | undefined;
   if (logoBase64 !== undefined) {
@@ -74,6 +96,7 @@ export const signupGymAdmin = onCall(async (request) => {
     city,
     phone: phoneNumber,
     address,
+    timeZone,
     ...(logoUrl !== undefined ? { logoUrl } : {}),
     themeColors: { primary: themeColorHex },
     subscriptionStatus: "trial",

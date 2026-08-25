@@ -35,8 +35,43 @@ function readNotificationText(
   return Object.entries(vars).reduce((text, [key, value]) => text.replaceAll(`{${key}}`, value), raw);
 }
 
-function formatTime(date: Date): string {
-  return `${date.getHours().toString().padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
+const DEFAULT_TIME_ZONE = "Europe/Istanbul";
+
+/**
+ * Cloud Functions runtime'ı UTC'de çalışır — `date.getHours()` sunucunun
+ * (UTC) saatini döner, üyenin gördüğü YEREL saati değil (ör. 19:05 yerel
+ * saat, UTC+3 farkıyla 22:05 olarak gösterilirdi). Uygulama tek ülkeye
+ * özel değil — salon dünyanın herhangi bir yerinde olabilir — bu yüzden
+ * saat, seansın gerçekleştiği SALONUN saat dilimine göre formatlanıyor
+ * (bkz. [resolveGymTimeZone]); salonun timeZone'u yoksa (eski kayıt)
+ * `DEFAULT_TIME_ZONE`'a düşülür.
+ */
+function formatTime(date: Date, timeZone: string): string {
+  return new Intl.DateTimeFormat("tr-TR", {
+    timeZone,
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
+  }).format(date);
+}
+
+/**
+ * `gyms/{gymId}.timeZone` — salon oluşturulurken cihazın IANA saat
+ * dilimi kaydedilir (bkz. `signup-gym-admin.ts`). Bu alan hiç yoksa (bu
+ * özellikten önce oluşturulmuş eski bir salon) ya da geçersizse
+ * `DEFAULT_TIME_ZONE`'a düşülür.
+ */
+async function resolveGymTimeZone(gymId: string | undefined): Promise<string> {
+  if (!gymId) return DEFAULT_TIME_ZONE;
+  const gymDoc = await getFirestore().collection("gyms").doc(gymId).get();
+  const timeZone = gymDoc.data()?.timeZone as string | undefined;
+  if (!timeZone) return DEFAULT_TIME_ZONE;
+  try {
+    Intl.DateTimeFormat(undefined, { timeZone });
+    return timeZone;
+  } catch {
+    return DEFAULT_TIME_ZONE;
+  }
 }
 
 interface SessionReminderTaskData {
@@ -66,6 +101,7 @@ export const sendSessionReminderTask = onTaskDispatched(
       startTime?: Timestamp;
       trainerName?: string;
       memberId?: string;
+      gymId?: string;
     };
 
     if (sessionData.status !== "planned") return;
@@ -93,8 +129,9 @@ export const sendSessionReminderTask = onTaskDispatched(
 
     const locale = (memberDoc.data()?.locale as string | undefined) ?? "en";
     const lang = locale === "tr" ? "tr" : "en";
+    const gymTimeZone = await resolveGymTimeZone(sessionData.gymId);
     const vars = {
-      time: sessionData.startTime ? formatTime(sessionData.startTime.toDate()) : "--:--",
+      time: sessionData.startTime ? formatTime(sessionData.startTime.toDate(), gymTimeZone) : "--:--",
       trainerName: sessionData.trainerName?.trim() || FALLBACK_TRAINER_NAME[lang],
     };
 

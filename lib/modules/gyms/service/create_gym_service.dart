@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:ui';
 
 import 'package:cloud_functions/cloud_functions.dart';
+import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -26,6 +27,16 @@ class CreateGymService {
     required Color themeColor,
     XFile? logoFile,
   }) async {
+    // Seans hatırlatma push'larının salonun bulunduğu yerin saatine göre
+    // gösterilebilmesi için (bkz. sendSessionReminderTask) — cihazın o anki
+    // IANA saat dilimi, salon kaydı burada bir kere yapılırken kaydediliyor.
+    String? timeZone;
+    try {
+      timeZone = (await FlutterTimezone.getLocalTimezone()).identifier;
+    } on Exception {
+      // Alınamazsa Cloud Functions tarafı Europe/Istanbul'a düşer.
+    }
+
     final result = await FirebaseFunctions.instance
         .httpsCallable('signupGymAdmin')
         .call<Map<String, dynamic>>({
@@ -37,6 +48,7 @@ class CreateGymService {
           'phoneNumber': '+90${profile.phone}',
           'address': profile.address,
           'themeColorHex': _toHex(themeColor),
+          if (timeZone != null) 'timeZone': timeZone,
           if (logoFile != null)
             'logoBase64': base64Encode(
               encodeGymLogoPng(await logoFile.readAsBytes()),
