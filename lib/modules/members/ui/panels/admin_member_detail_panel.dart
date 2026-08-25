@@ -10,6 +10,8 @@ import '../../../../shared/widgets/app_back_button.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/utils/phone_number_formatter.dart';
 import '../../../../shared/widgets/trend_bar_chart.dart';
+import '../../../badges/controller/badges_controller.dart';
+import '../../../badges/domain/badge_item.dart';
 import '../../../measurements/ui/panels/measurements_panel.dart';
 import '../../../trainers/domain/trainer_member_detail.dart';
 import '../../../trainers/domain/trainer_metric.dart';
@@ -494,6 +496,20 @@ class _AdminMemberDetailPanelState
                         ),
                   ),
                   const SizedBox(height: AppSpacing.lg),
+                  Text(
+                    ref.watch(
+                      rcTextProvider(
+                        RemoteConfigKeys.membersDetailBadgesSectionHeader,
+                      ),
+                    ),
+                    style: typography.caption.copyWith(
+                      color: colors.onSurfaceMuted,
+                      letterSpacing: 1.2,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                  _MemberBadgesRow(memberId: widget.memberId),
+                  const SizedBox(height: AppSpacing.lg),
                   InkWell(
                     borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
                     onTap: () => _showMetricPicker(
@@ -605,6 +621,188 @@ class _AdminMemberDetailPanelState
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _MemberBadgesRow extends ConsumerWidget {
+  const _MemberBadgesRow({required this.memberId});
+
+  final String memberId;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final colors = context.appColors;
+    final badges = ref.watch(memberBadgesProvider(memberId)).valueOrNull;
+    if (badges == null) {
+      return SizedBox(
+        height: 64,
+        child: Center(
+          child: SizedBox(
+            width: 20,
+            height: 20,
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              valueColor: AlwaysStoppedAnimation(colors.onSurfaceMuted),
+            ),
+          ),
+        ),
+      );
+    }
+    return SizedBox(
+      height: 76,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        itemCount: badges.length,
+        separatorBuilder: (context, index) =>
+            const SizedBox(width: AppSpacing.sm),
+        itemBuilder: (context, index) => _MemberBadgeCircle(
+          badge: badges[index],
+          onTap: () => _showBadgeDetail(context, ref, badges[index]),
+        ),
+      ),
+    );
+  }
+
+  void _showBadgeDetail(BuildContext context, WidgetRef ref, BadgeItem badge) {
+    final colors = context.appColors;
+    final typography = context.appTypography;
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: colors.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      builder: (sheetContext) {
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.screenEdge,
+            AppSpacing.lg,
+            AppSpacing.screenEdge,
+            AppSpacing.xxl,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  _BadgeIcon(earned: badge.earned, size: 56, iconSize: 24),
+                  const SizedBox(width: AppSpacing.md),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          badge.title,
+                          style: typography.headingSmall.copyWith(
+                            color: colors.onSurface,
+                            fontSize: 18,
+                          ),
+                        ),
+                        Text(
+                          badge.earned
+                              ? ref.read(
+                                  rcTextProvider(
+                                    RemoteConfigKeys.badgesDetailEarnedStatus,
+                                  ),
+                                )
+                              : ref.read(
+                                  rcTextProvider(
+                                    RemoteConfigKeys.badgesDetailLockedStatus,
+                                  ),
+                                ),
+                          style: typography.bodyMedium.copyWith(
+                            color: badge.earned
+                                ? colors.success
+                                : colors.onSurfaceMuted,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: AppSpacing.md),
+              Text(
+                badge.note,
+                style: typography.bodyMedium.copyWith(
+                  color: colors.onSurfaceVariant,
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _MemberBadgeCircle extends StatelessWidget {
+  const _MemberBadgeCircle({required this.badge, required this.onTap});
+
+  final BadgeItem badge;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+    final typography = context.appTypography;
+    return InkWell(
+      borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+      onTap: onTap,
+      child: SizedBox(
+        width: 60,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _BadgeIcon(earned: badge.earned),
+            const SizedBox(height: AppSpacing.xs),
+            Text(
+              badge.title,
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: typography.caption.copyWith(
+                fontSize: 10,
+                color: badge.earned ? colors.onSurface : colors.onSurfaceMuted,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _BadgeIcon extends StatelessWidget {
+  const _BadgeIcon({required this.earned, this.size = 44, this.iconSize = 18});
+
+  final bool earned;
+  final double size;
+  final double iconSize;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        color: earned ? colors.primaryContainer : colors.surfaceRaised,
+        shape: BoxShape.circle,
+        border: Border.all(
+          color: earned ? colors.primary : colors.outlineStrong,
+          width: 2,
+        ),
+      ),
+      alignment: Alignment.center,
+      child: Icon(
+        earned ? Icons.emoji_events : Icons.lock_outline,
+        size: iconSize,
+        color: earned ? colors.primary : colors.onSurfaceMuted,
       ),
     );
   }

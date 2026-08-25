@@ -30,3 +30,18 @@ class BadgesController extends _$BadgesController {
   /// düşüyordu — "hiç rozet kazanmadın" ile "yüklenemedi" ayırt edilemiyordu.
   bool get hasError => ref.watch(_badgesProvider).hasError;
 }
+
+/// Admin üye detay ekranındaki rozet bölümü — [BadgesController]'dan farklı
+/// olarak oturum açan kullanıcı değil, `memberId` ile belirtilen ÜYENİN
+/// rozetleri okunur. `earnedBadgeIds`/`buildBadges` zaten `uid` parametreli
+/// olduğu için ek bir servis/rule değişikliği gerekmiyor — firestore.rules
+/// admin'in kendi salonundaki her üyenin `users/{uid}` dokümanını zaten
+/// okuyabilmesine izin veriyor.
+@riverpod
+Stream<List<BadgeItem>> memberBadges(MemberBadgesRef ref, String memberId) {
+  final repository = ref.watch(badgesRepositoryProvider);
+  final locale = ref.watch(localeControllerProvider);
+  return repository
+      .earnedBadgeIds(memberId)
+      .map((ids) => repository.buildBadges(ids, locale));
+}

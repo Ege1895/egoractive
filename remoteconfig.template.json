@@ -114,7 +114,7 @@
     },
     "cfg_badge_criteria": {
       "defaultValue": {
-        "value": "[{\"id\": \"first_session\", \"title_tr\": \"İlk dersin\", \"title_en\": \"Your first session\", \"note_tr\": \"İlk dersini tamamla\", \"note_en\": \"Complete your first session\", \"type\": \"sessionsCompleted\", \"threshold\": 1}, {\"id\": \"sessions_5\", \"title_tr\": \"5 ders tamam\", \"title_en\": \"5 sessions done\", \"note_tr\": \"5 ders tamamla\", \"note_en\": \"Complete 5 sessions\", \"type\": \"sessionsCompleted\", \"threshold\": 5}, {\"id\": \"sessions_20\", \"title_tr\": \"20 ders tamam\", \"title_en\": \"20 sessions done\", \"note_tr\": \"20 ders tamamla\", \"note_en\": \"Complete 20 sessions\", \"type\": \"sessionsCompleted\", \"threshold\": 20}, {\"id\": \"group_session_join\", \"title_tr\": \"Grup dersi\", \"title_en\": \"Group class\", \"note_tr\": \"Bir grup dersine katıl\", \"note_en\": \"Join a group class\", \"type\": \"groupSessionJoins\", \"threshold\": 1}, {\"id\": \"event_join\", \"title_tr\": \"Etkinlik\", \"title_en\": \"Event\", \"note_tr\": \"Bir etkinliğe katıl\", \"note_en\": \"Join an event\", \"type\": \"eventJoins\", \"threshold\": 1}, {\"id\": \"membership_6_months\", \"title_tr\": \"6 ay üyelik\", \"title_en\": \"6-month membership\", \"note_tr\": \"6 ay üyeliğini sürdür\", \"note_en\": \"Keep your membership for 6 months\", \"type\": \"membershipMonths\", \"threshold\": 6}]"
+        "value": "[\n  {\"id\": \"first_session\", \"title_tr\": \"İlk dersin\", \"title_en\": \"Your first session\", \"note_tr\": \"İlk dersini tamamla\", \"note_en\": \"Complete your first session\", \"type\": \"sessionsCompleted\", \"threshold\": 1},\n  {\"id\": \"sessions_5\", \"title_tr\": \"5 ders tamam\", \"title_en\": \"5 sessions done\", \"note_tr\": \"5 ders tamamla\", \"note_en\": \"Complete 5 sessions\", \"type\": \"sessionsCompleted\", \"threshold\": 5},\n  {\"id\": \"sessions_20\", \"title_tr\": \"20 ders tamam\", \"title_en\": \"20 sessions done\", \"note_tr\": \"20 ders tamamla\", \"note_en\": \"Complete 20 sessions\", \"type\": \"sessionsCompleted\", \"threshold\": 20},\n  {\"id\": \"group_session_join\", \"title_tr\": \"Grup dersi\", \"title_en\": \"Group class\", \"note_tr\": \"Bir grup dersine katıl\", \"note_en\": \"Join a group class\", \"type\": \"groupSessionJoins\", \"threshold\": 1},\n  {\"id\": \"event_join\", \"title_tr\": \"Etkinlik\", \"title_en\": \"Event\", \"note_tr\": \"Bir etkinliğe katıl\", \"note_en\": \"Join an event\", \"type\": \"eventJoins\", \"threshold\": 1},\n  {\"id\": \"membership_6_months\", \"title_tr\": \"6 ay üyelik\", \"title_en\": \"6-month membership\", \"note_tr\": \"6 ay üyeliğini sürdür\", \"note_en\": \"Keep your membership for 6 months\", \"type\": \"membershipMonths\", \"threshold\": 6},\n  {\"id\": \"sessions_50\", \"title_tr\": \"50 ders tamam\", \"title_en\": \"50 sessions done\", \"note_tr\": \"50 ders tamamla\", \"note_en\": \"Complete 50 sessions\", \"type\": \"sessionsCompleted\", \"threshold\": 50},\n  {\"id\": \"membership_12_months\", \"title_tr\": \"1 yıl üyelik\", \"title_en\": \"1-year membership\", \"note_tr\": \"12 ay üyeliğini sürdür\", \"note_en\": \"Keep your membership for 12 months\", \"type\": \"membershipMonths\", \"threshold\": 12},\n  {\"id\": \"feedback_given\", \"title_tr\": \"Geri bildirim\", \"title_en\": \"Feedback\", \"note_tr\": \"İlk geri bildirimini gönder\", \"note_en\": \"Send your first feedback\", \"type\": \"feedbackCount\", \"threshold\": 1},\n  {\"id\": \"measurement_logged\", \"title_tr\": \"Ölçüm takibi\", \"title_en\": \"Measurement tracking\", \"note_tr\": \"İlk ölçümünü kaydet\", \"note_en\": \"Log your first measurement\", \"type\": \"measurementEntries\", \"threshold\": 1}\n]"
       },
       "description": "F4-4 — rozet kriterleri: id/title_tr/title_en/note_tr/note_en/type/threshold listesi. type: sessionsCompleted | groupSessionJoins | eventJoins | membershipMonths. Client cihaz diline göre title_*/note_* çözer.",
       "valueType": "JSON"
@@ -7913,6 +7913,42 @@
     "lbl_trainers_report_period_custom_en": {
       "defaultValue": {
         "value": "Custom"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_badges_detail_earned_status_tr": {
+      "defaultValue": {
+        "value": "Kazanıldı"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_badges_detail_earned_status_en": {
+      "defaultValue": {
+        "value": "Earned"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_badges_detail_locked_status_tr": {
+      "defaultValue": {
+        "value": "Henüz kazanılmadı"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_badges_detail_locked_status_en": {
+      "defaultValue": {
+        "value": "Not earned yet"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_detail_badges_section_header_tr": {
+      "defaultValue": {
+        "value": "ROZETLER"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_detail_badges_section_header_en": {
+      "defaultValue": {
+        "value": "BADGES"
       },
       "valueType": "STRING"
     }

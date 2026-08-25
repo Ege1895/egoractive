@@ -254,6 +254,10 @@ abstract final class RemoteConfigKeys {
 
   /// `{note}` yer tutucusu sıradaki rozetin açıklamasıyla değiştirilir.
   static const badgesNextLockedLabel = 'lbl_badges_next_locked_label';
+  static const badgesDetailEarnedStatus = 'lbl_badges_detail_earned_status';
+  static const badgesDetailLockedStatus = 'lbl_badges_detail_locked_status';
+  static const membersDetailBadgesSectionHeader =
+      'lbl_members_detail_badges_section_header';
   static const eventsAdminListTitle = 'lbl_events_admin_list_title';
   static const eventsAddEventButton = 'lbl_events_add_event_button';
   static const eventsAttendingLabel = 'lbl_events_attending_label';
@@ -1220,7 +1224,11 @@ class RemoteConfigService {
   {"id": "sessions_20", "title_tr": "20 ders tamam", "title_en": "20 sessions done", "note_tr": "20 ders tamamla", "note_en": "Complete 20 sessions", "type": "sessionsCompleted", "threshold": 20},
   {"id": "group_session_join", "title_tr": "Grup dersi", "title_en": "Group class", "note_tr": "Bir grup dersine katıl", "note_en": "Join a group class", "type": "groupSessionJoins", "threshold": 1},
   {"id": "event_join", "title_tr": "Etkinlik", "title_en": "Event", "note_tr": "Bir etkinliğe katıl", "note_en": "Join an event", "type": "eventJoins", "threshold": 1},
-  {"id": "membership_6_months", "title_tr": "6 ay üyelik", "title_en": "6-month membership", "note_tr": "6 ay üyeliğini sürdür", "note_en": "Keep your membership for 6 months", "type": "membershipMonths", "threshold": 6}
+  {"id": "membership_6_months", "title_tr": "6 ay üyelik", "title_en": "6-month membership", "note_tr": "6 ay üyeliğini sürdür", "note_en": "Keep your membership for 6 months", "type": "membershipMonths", "threshold": 6},
+  {"id": "sessions_50", "title_tr": "50 ders tamam", "title_en": "50 sessions done", "note_tr": "50 ders tamamla", "note_en": "Complete 50 sessions", "type": "sessionsCompleted", "threshold": 50},
+  {"id": "membership_12_months", "title_tr": "1 yıl üyelik", "title_en": "1-year membership", "note_tr": "12 ay üyeliğini sürdür", "note_en": "Keep your membership for 12 months", "type": "membershipMonths", "threshold": 12},
+  {"id": "feedback_given", "title_tr": "Geri bildirim", "title_en": "Feedback", "note_tr": "İlk geri bildirimini gönder", "note_en": "Send your first feedback", "type": "feedbackCount", "threshold": 1},
+  {"id": "measurement_logged", "title_tr": "Ölçüm takibi", "title_en": "Measurement tracking", "note_tr": "İlk ölçümünü kaydet", "note_en": "Log your first measurement", "type": "measurementEntries", "threshold": 1}
 ]
 ''';
 
@@ -1406,6 +1414,9 @@ class RemoteConfigService {
     'lbl_badges_load_error_tr': 'Rozetler yüklenemedi.',
     'lbl_badges_earned_count_label_tr': '{count} rozet kazandın',
     'lbl_badges_next_locked_label_tr': 'Sıradaki: {note}',
+    'lbl_badges_detail_earned_status_tr': 'Kazanıldı',
+    'lbl_badges_detail_locked_status_tr': 'Henüz kazanılmadı',
+    'lbl_members_detail_badges_section_header_tr': 'ROZETLER',
     'lbl_events_admin_list_title_tr': 'Etkinlikler',
     'lbl_events_add_event_button_tr': '+ Etkinlik',
     'lbl_events_attending_label_tr': 'Katılan',
@@ -2162,6 +2173,9 @@ class RemoteConfigService {
     'lbl_badges_load_error_en': 'Failed to load badges.',
     'lbl_badges_earned_count_label_en': 'You earned {count} badges',
     'lbl_badges_next_locked_label_en': 'Next: {note}',
+    'lbl_badges_detail_earned_status_en': 'Earned',
+    'lbl_badges_detail_locked_status_en': 'Not earned yet',
+    'lbl_members_detail_badges_section_header_en': 'BADGES',
     'lbl_events_admin_list_title_en': 'Events',
     'lbl_events_add_event_button_en': '+ Event',
     'lbl_events_attending_label_en': 'Attending',

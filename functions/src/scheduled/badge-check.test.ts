@@ -8,6 +8,8 @@ const baseMetrics: MemberMetrics = {
   groupSessionJoins: 0,
   eventJoins: 0,
   membershipMonths: 0,
+  feedbackCount: 0,
+  measurementEntries: 0,
 };
 
 const criteria = [
@@ -37,6 +39,19 @@ test("returns multiple newly-earned badges when several thresholds are met at on
 test("excludes badges already present in existingBadgeIds even if threshold is met", () => {
   const metrics = { ...baseMetrics, sessionsCompleted: 5 };
   assert.deepEqual(computeNewlyEarnedBadgeIds(criteria, metrics, ["first_session"]), ["sessions_5"]);
+});
+
+test("supports feedbackCount and measurementEntries metric types", () => {
+  const extraCriteria = [
+    ...criteria,
+    { id: "feedback_given", type: "feedbackCount" as const, threshold: 1 },
+    { id: "measurement_logged", type: "measurementEntries" as const, threshold: 1 },
+  ];
+  const metrics = { ...baseMetrics, feedbackCount: 1, measurementEntries: 2 };
+  assert.deepEqual(computeNewlyEarnedBadgeIds(extraCriteria, metrics, []), [
+    "feedback_given",
+    "measurement_logged",
+  ]);
 });
 
 test("returns empty when every eligible badge is already earned", () => {

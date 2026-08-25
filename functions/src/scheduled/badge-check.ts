@@ -7,7 +7,13 @@ import { withFailureAlerting } from "../shared/function-health";
 
 export interface BadgeCriterion {
   id: string;
-  type: "sessionsCompleted" | "groupSessionJoins" | "eventJoins" | "membershipMonths";
+  type:
+    | "sessionsCompleted"
+    | "groupSessionJoins"
+    | "eventJoins"
+    | "membershipMonths"
+    | "feedbackCount"
+    | "measurementEntries";
   threshold: number;
 }
 
@@ -16,6 +22,8 @@ export interface MemberMetrics {
   groupSessionJoins: number;
   eventJoins: number;
   membershipMonths: number;
+  feedbackCount: number;
+  measurementEntries: number;
 }
 
 function readBadgeCriteria(template: RemoteConfigTemplate): BadgeCriterion[] {
@@ -89,17 +97,22 @@ export const badgeCheck = onSchedule("every day 03:00", withFailureAlerting("bad
     const data = memberDoc.data();
     const existingBadgeIds = (data.badges as string[] | undefined) ?? [];
 
-    const [completedSessions, groupSessionJoins, eventJoins] = await Promise.all([
-      db.collection("sessions").where("memberId", "==", uid).where("status", "==", "completed").count().get(),
-      db.collection("groupSessions").where("attendeeIds", "array-contains", uid).count().get(),
-      db.collection("events").where("attendeeIds", "array-contains", uid).count().get(),
-    ]);
+    const [completedSessions, groupSessionJoins, eventJoins, feedbackCount, measurementEntries] =
+      await Promise.all([
+        db.collection("sessions").where("memberId", "==", uid).where("status", "==", "completed").count().get(),
+        db.collection("groupSessions").where("attendeeIds", "array-contains", uid).count().get(),
+        db.collection("events").where("attendeeIds", "array-contains", uid).count().get(),
+        db.collection("feedback").where("memberId", "==", uid).count().get(),
+        db.collection("measurements").doc(uid).collection("entries").count().get(),
+      ]);
 
     const metrics: MemberMetrics = {
       sessionsCompleted: completedSessions.data().count,
       groupSessionJoins: groupSessionJoins.data().count,
       eventJoins: eventJoins.data().count,
       membershipMonths: membershipMonthsSince(data.createdAt as FirebaseFirestore.Timestamp | undefined),
+      feedbackCount: feedbackCount.data().count,
+      measurementEntries: measurementEntries.data().count,
     };
 
     const newlyEarned = computeNewlyEarnedBadgeIds(criteria, metrics, existingBadgeIds);
