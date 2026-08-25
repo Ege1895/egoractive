@@ -47,14 +47,6 @@ function readNotificationText(
 export const sessionCompletionCheck = onSchedule("every 15 minutes", withFailureAlerting("sessionCompletionCheck", async () => {
   const db = getFirestore();
 
-  let template: RemoteConfigTemplate;
-  try {
-    template = await getRemoteConfig().getTemplate();
-  } catch (error) {
-    logger.warn("Remote Config okunamadı, varsayılanlar kullanılıyor.", error);
-    template = { parameters: {} } as RemoteConfigTemplate;
-  }
-
   const now = Timestamp.now();
   const dueSessions = await db
     .collection("sessions")
@@ -66,6 +58,14 @@ export const sessionCompletionCheck = onSchedule("every 15 minutes", withFailure
   if (dueSessions.empty) {
     logger.info("Onay gereken tamamlanmış seans yok.");
     return;
+  }
+
+  let template: RemoteConfigTemplate;
+  try {
+    template = await getRemoteConfig().getTemplate();
+  } catch (error) {
+    logger.warn("Remote Config okunamadı, varsayılanlar kullanılıyor.", error);
+    template = { parameters: {} } as RemoteConfigTemplate;
   }
 
   // Aynı antrenörün bu pencerede birden fazla bitmiş seansı olabilir —

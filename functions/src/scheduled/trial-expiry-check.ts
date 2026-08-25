@@ -20,7 +20,11 @@ function readIntParam(template: RemoteConfigTemplate, key: string, fallback: num
  * `subscription_write_gate.dart` aynı durumu proaktif olarak kontrol edip
  * "aboneliğini yenile" uyarısını gösterir.
  */
-export const trialExpiryCheck = onSchedule("every 60 minutes", withFailureAlerting("trialExpiryCheck", async () => {
+export const trialExpiryCheck = onSchedule("every 24 hours", withFailureAlerting("trialExpiryCheck", async () => {
+  const db = getFirestore();
+  const snapshot = await db.collection("gyms").where("subscriptionStatus", "==", "trial").get();
+  if (snapshot.empty) return;
+
   let trialDurationDays = 14;
   try {
     const template = await getRemoteConfig().getTemplate();
@@ -28,10 +32,6 @@ export const trialExpiryCheck = onSchedule("every 60 minutes", withFailureAlerti
   } catch (error) {
     logger.warn("Remote Config okunamadı, varsayılan deneme süresi (14 gün) kullanılıyor.", error);
   }
-
-  const db = getFirestore();
-  const snapshot = await db.collection("gyms").where("subscriptionStatus", "==", "trial").get();
-  if (snapshot.empty) return;
 
   const now = Date.now();
   const batch = db.batch();
