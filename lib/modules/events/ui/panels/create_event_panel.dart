@@ -27,6 +27,7 @@ class _CreateEventPanelState extends BasePanelState<CreateEventPanel> {
   final _dateController = TextEditingController();
   final _timeController = TextEditingController();
   final _descriptionController = TextEditingController();
+  final _descriptionScrollController = ScrollController();
   DateTime? _selectedDate;
   TimeOfDay? _selectedTime;
   int? _capacity;
@@ -193,13 +194,23 @@ class _CreateEventPanelState extends BasePanelState<CreateEventPanel> {
                           ],
                         ),
                         const SizedBox(height: AppSpacing.md),
-                        AppTextField(
-                          label: ref.watch(
-                            rcTextProvider(
-                              RemoteConfigKeys.eventsDescriptionFieldLabel,
+                        Scrollbar(
+                          controller: _descriptionScrollController,
+                          thumbVisibility: true,
+                          interactive: true,
+                          thickness: 4,
+                          radius: const Radius.circular(4),
+                          child: AppTextField(
+                            label: ref.watch(
+                              rcTextProvider(
+                                RemoteConfigKeys.eventsDescriptionFieldLabel,
+                              ),
                             ),
+                            controller: _descriptionController,
+                            scrollController: _descriptionScrollController,
+                            minLines: 1,
+                            maxLines: 5,
                           ),
-                          controller: _descriptionController,
                         ),
                       ],
                     ),
@@ -432,6 +443,7 @@ class _CreateEventPanelState extends BasePanelState<CreateEventPanel> {
     _dateController.dispose();
     _timeController.dispose();
     _descriptionController.dispose();
+    _descriptionScrollController.dispose();
     super.dispose();
   }
 }
