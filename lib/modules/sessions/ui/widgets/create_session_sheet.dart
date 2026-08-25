@@ -174,6 +174,7 @@ class _CreateSessionSheetState extends ConsumerState<_CreateSessionSheet> {
     final allDates = [_date, ..._repeatDates];
     final failedDays = <String>[];
     var anySucceeded = false;
+    var ranOutOfSessions = false;
     for (final date in allDates) {
       try {
         await ref
@@ -195,6 +196,12 @@ class _CreateSessionSheetState extends ConsumerState<_CreateSessionSheet> {
         anySucceeded = true;
       } on TrainerConflictException {
         failedDays.add('${date.day}.${date.month}');
+      } on InsufficientSessionsException {
+        // Bu tarihten itibaren üyenin hakkı bitti — döngünün devamı da
+        // aynı sebeple başarısız olacak, o yüzden burada kesiliyor.
+        failedDays.add('${date.day}.${date.month}');
+        ranOutOfSessions = true;
+        break;
       } catch (_) {
         failedDays.add('${date.day}.${date.month}');
       }
@@ -228,9 +235,15 @@ class _CreateSessionSheetState extends ConsumerState<_CreateSessionSheet> {
     }
     setState(() {
       _isCreating = false;
-      _errorMessage = ref
-          .read(rcTextProvider(RemoteConfigKeys.sessionsCreateTrainerBusyError))
-          .replaceAll('{name}', trainer.name);
+      _errorMessage = ranOutOfSessions
+          ? ref.read(
+              rcTextProvider(RemoteConfigKeys.sessionsRepeatCalendarExhaustedError),
+            )
+          : ref
+                .read(
+                  rcTextProvider(RemoteConfigKeys.sessionsCreateTrainerBusyError),
+                )
+                .replaceAll('{name}', trainer.name);
     });
   }
 

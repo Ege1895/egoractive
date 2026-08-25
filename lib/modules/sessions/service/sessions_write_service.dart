@@ -14,6 +14,14 @@ class TrainerConflictException implements Exception {
   final String trainerName;
 }
 
+/// Üyenin paketinde kalan seans hakkı 0 veya altındayken yeni seans
+/// oluşturulmaya çalışıldığında fırlatılır.
+class InsufficientSessionsException implements Exception {
+  const InsufficientSessionsException(this.memberName);
+
+  final String memberName;
+}
+
 /// F3-5 — seans süresi henüz stüdyo bazlı yapılandırılabilir değil, sabit
 /// 60 dakika kabul ediliyor. `endTime` bu süre üzerinden hesaplanıp
 /// kaydediliyor — F3-5'teki tamamlama hatırlatma fonksiyonu bunu kullanır.
@@ -42,18 +50,35 @@ class SessionsWriteService {
     final endTime = startTime.add(
       const Duration(minutes: sessionDefaultDurationMinutes),
     );
-    await FirebaseFirestore.instance.collection('sessions').add({
-      'gymId': gymId,
-      'trainerId': trainerId,
-      'trainerName': trainerName,
-      'memberId': memberId,
-      'memberName': memberName,
-      'startTime': Timestamp.fromDate(startTime),
-      'endTime': Timestamp.fromDate(endTime),
-      'status': 'planned',
-      'confirmationRequested': false,
-      'completionPushSent': false,
-      'createdAt': FieldValue.serverTimestamp(),
+    final firestore = FirebaseFirestore.instance;
+    final memberRef = firestore.collection('users').doc(memberId);
+    final sessionRef = firestore.collection('sessions').doc();
+
+    // Seans hakkı, seans OLUŞTURULDUĞUNDA düşülür (tamamlanma onayında
+    // değil) — üyenin kotası her zaman "rezerve edilmiş" seans sayısını
+    // yansıtmalı. Aynı transaction içinde okunup düşülüyor ki eşzamanlı
+    // iki oluşturma isteği aynı son hakkı iki kez tüketemesin.
+    await firestore.runTransaction((transaction) async {
+      final memberSnapshot = await transaction.get(memberRef);
+      final remaining =
+          (memberSnapshot.data()?['remainingSessions'] as num?)?.toInt() ?? 0;
+      if (remaining <= 0) {
+        throw InsufficientSessionsException(memberName);
+      }
+      transaction.set(sessionRef, {
+        'gymId': gymId,
+        'trainerId': trainerId,
+        'trainerName': trainerName,
+        'memberId': memberId,
+        'memberName': memberName,
+        'startTime': Timestamp.fromDate(startTime),
+        'endTime': Timestamp.fromDate(endTime),
+        'status': 'planned',
+        'confirmationRequested': false,
+        'completionPushSent': false,
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+      transaction.update(memberRef, {'remainingSessions': remaining - 1});
     });
   }
 
@@ -120,11 +145,37 @@ class SessionsWriteService {
     );
   }
 
+  /// İptal edilen seans hâlâ `planned` durumundaysa (henüz tamamlanmamışsa)
+  /// oluşturmada düşülen seans hakkı üyeye geri veriliyor — zaten
+  /// `completed` bir seans iptal edilemez ki bu durum oluşsun (bkz.
+  /// firestore.rules), ama ileride biri bunu değiştirirse çift iade
+  /// yapılmasın diye yine de kontrol ediliyor.
   Future<void> cancelSession(String sessionId) async {
-    await FirebaseFirestore.instance
-        .collection('sessions')
-        .doc(sessionId)
-        .update({'status': 'cancelled'});
+    final firestore = FirebaseFirestore.instance;
+    final sessionRef = firestore.collection('sessions').doc(sessionId);
+
+    await firestore.runTransaction((transaction) async {
+      final sessionSnapshot = await transaction.get(sessionRef);
+      final status = sessionSnapshot.data()?['status'] as String?;
+      final memberId = sessionSnapshot.data()?['memberId'] as String?;
+      final shouldRefund = status == 'planned' && memberId != null;
+
+      DocumentReference<Map<String, dynamic>>? memberRef;
+      var remaining = 0;
+      if (shouldRefund) {
+        memberRef = firestore.collection('users').doc(memberId);
+        final memberSnapshot = await transaction.get(memberRef);
+        remaining =
+            (memberSnapshot.data()?['remainingSessions'] as num?)?.toInt() ??
+            0;
+      }
+
+      transaction.update(sessionRef, {'status': 'cancelled'});
+      if (memberRef != null) {
+        transaction.update(memberRef, {'remainingSessions': remaining + 1});
+      }
+    });
+
     await _analytics.logEvent(
       AnalyticsEvent.sessionCancelled,
       parameters: {'session_id': sessionId},

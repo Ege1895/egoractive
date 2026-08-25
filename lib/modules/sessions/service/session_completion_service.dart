@@ -30,59 +30,21 @@ class SessionCompletionService {
 
   /// F3-5 + admin düzeltmesi — bir seansı "geldi"/"gelmedi" olarak
   /// setler ya da (admin için) daha önce setlenmiş bir değeri düzeltir.
-  /// `remainingSessions`, session'ın ESKİ (varsa) ve YENİ attended
-  /// değerleri arasındaki FARKA göre ayarlanır — aynı transaction içinde,
-  /// aynı üyenin başka bir seansı eşzamanlı değişirse race condition'a
-  /// karşı korumalı:
-  /// - İlk kez setleniyorsa (status henüz 'completed' değilse): attended
-  ///   true ise -1, false ise değişiklik yok (mevcut davranışla aynı).
-  /// - Zaten 'completed' bir seans DÜZELTİLİYORSA (sadece admin
-  ///   yazabilir, bkz. firestore.rules): false→true iken -1 (seans şimdi
-  ///   tüketildi), true→false iken +1 (seans geri veriliyor), değer
-  ///   değişmiyorsa dokunulmaz.
+  /// `remainingSessions` burada değişmez — seans hakkı artık OLUŞTURULDUĞU
+  /// anda düşülüyor ([SessionsWriteService.createSession]), iptalde geri
+  /// veriliyor ([SessionsWriteService.cancelSession]). Tamamlanma/no-show
+  /// durumu sadece raporlama amaçlı, kotayı etkilemiyor — üye rezervasyonu
+  /// yaptığında hakkı zaten harcanmış sayılıyor, gelip gelmemesi bunu
+  /// değiştirmiyor.
   Future<void> setAttendance({
     required String sessionId,
     required String memberId,
     required bool attended,
   }) async {
-    final firestore = FirebaseFirestore.instance;
-    final sessionRef = firestore.collection('sessions').doc(sessionId);
-    final memberRef = firestore.collection('users').doc(memberId);
-
-    await firestore.runTransaction((transaction) async {
-      // Firestore transaction kuralı: tüm read'ler tüm write'lardan önce
-      // yapılmalı — bu yüzden session VE member aynı anda, herhangi bir
-      // update'ten önce okunuyor.
-      final sessionSnapshot = await transaction.get(sessionRef);
-      final memberSnapshot = await transaction.get(memberRef);
-
-      final wasCompleted = sessionSnapshot.data()?['status'] == 'completed';
-      final wasAttended = sessionSnapshot.data()?['attended'] as bool?;
-      final remaining =
-          (memberSnapshot.data()?['remainingSessions'] as num?)?.toInt() ?? 0;
-
-      final int delta;
-      if (!wasCompleted) {
-        delta = attended ? -1 : 0;
-      } else if (wasAttended == true && !attended) {
-        delta = 1;
-      } else if (wasAttended != true && attended) {
-        delta = -1;
-      } else {
-        delta = 0;
-      }
-
-      transaction.update(sessionRef, {
-        'status': 'completed',
-        'attended': attended,
-      });
-      if (delta != 0) {
-        final newRemaining = remaining + delta;
-        transaction.update(memberRef, {
-          'remainingSessions': newRemaining < 0 ? 0 : newRemaining,
-        });
-      }
-    });
+    await FirebaseFirestore.instance
+        .collection('sessions')
+        .doc(sessionId)
+        .update({'status': 'completed', 'attended': attended});
 
     if (attended) {
       await _analytics.logEvent(

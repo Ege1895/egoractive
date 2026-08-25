@@ -2,7 +2,7 @@
   "parameters": {
     "cfg_session_reminder_minutes_before": {
       "defaultValue": {
-        "value": "120"
+        "value": "60"
       },
       "description": "Ders/seans onay bildiriminin kaç dakika önce gönderileceği.",
       "valueType": "NUMBER"
