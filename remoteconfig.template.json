@@ -2118,13 +2118,13 @@
     },
     "lbl_group_sessions_joined_leave_button_tr": {
       "defaultValue": {
-        "value": "Katılıyorsun · Vazgeç"
+        "value": "Katılmaktan Vazgeç"
       },
       "valueType": "STRING"
     },
     "lbl_group_sessions_joined_leave_button_en": {
       "defaultValue": {
-        "value": "Joined · Leave"
+        "value": "Cancel attendance"
       },
       "valueType": "STRING"
     },
@@ -7956,6 +7956,25 @@
     "lbl_members_self_info_save_error_en": {
       "defaultValue": {
         "value": "Could not save, check your connection and try again."
+      },
+      "valueType": "STRING"
+    },
+    "cfg_event_leave_lock_hours_before": {
+      "defaultValue": {
+        "value": "24"
+      },
+      "description": "Etkinlikte katılım sonrası \"Katılmaktan Vazgeç\" başlangıca kaç saat kalana kadar aktif.",
+      "valueType": "NUMBER"
+    },
+    "lbl_group_sessions_joined_locked_button_tr": {
+      "defaultValue": {
+        "value": "Katılıyorsun"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_joined_locked_button_en": {
+      "defaultValue": {
+        "value": "Attending"
       },
       "valueType": "STRING"
     }

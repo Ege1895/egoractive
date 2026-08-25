@@ -96,6 +96,9 @@ Stream<List<DiscoverItem>> _eventsForGym(
   String gymId,
   String myUid,
 ) {
+  final leaveLockHours = ref
+      .watch(remoteConfigServiceProvider)
+      .eventLeaveLockHoursBefore;
   final now = Timestamp.now();
   return FirebaseFirestore.instance
       .collection('events')
@@ -104,17 +107,20 @@ Stream<List<DiscoverItem>> _eventsForGym(
       .orderBy('dateTime')
       .snapshots()
       .map(
-        (snapshot) =>
-            snapshot.docs.map((doc) => _toEventItem(doc, myUid)).toList(),
+        (snapshot) => snapshot.docs
+            .map((doc) => _toEventItem(doc, myUid, leaveLockHours))
+            .toList(),
       );
 }
 
-// Etkinlikler (DiscoverCategory.events) F4-2'deki 24 saatlik kilide hiç
-// tabi değil (bkz. discover_item.dart isLocked) — bu yüzden burada
-// groupSessions'takinin aksine bir lockHours parametresi yok.
+// Etkinlikler (DiscoverCategory.events) F4-2'deki 24 saatlik KATILIM
+// kilidine hiç tabi değil (bkz. discover_item.dart isLocked) — ama bir
+// kez katılındıktan sonra AYRILMA F4-3'teki ayrı leaveLockHours ile
+// kilitlenir (bkz. discover_item.dart canLeaveEvent).
 DiscoverItem _toEventItem(
   QueryDocumentSnapshot<Map<String, dynamic>> doc,
   String myUid,
+  int leaveLockHours,
 ) {
   final data = doc.data();
   final dateTime = (data['dateTime'] as Timestamp).toDate();
@@ -135,6 +141,7 @@ DiscoverItem _toEventItem(
     capacity: (data['capacity'] as num?)?.toInt(),
     joined: attendeeIds.contains(myUid),
     startTime: dateTime,
+    leaveLockHoursBefore: leaveLockHours,
   );
 }
 

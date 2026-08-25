@@ -18,6 +18,7 @@ class DiscoverPanel extends ConsumerStatefulWidget {
 
 class _DiscoverPanelState extends ConsumerState<DiscoverPanel> {
   DiscoverCategory _category = DiscoverCategory.groupSessions;
+  final Set<String> _pendingIds = {};
 
   @override
   Widget build(BuildContext context) {
@@ -133,10 +134,9 @@ class _DiscoverPanelState extends ConsumerState<DiscoverPanel> {
                         for (final item in items)
                           _DiscoverCard(
                             item: item,
-                            onToggleJoin: () => _handleToggleJoin(
-                              context,
-                              () => controller.toggleJoin(item.id),
-                            ),
+                            isPending: _pendingIds.contains(item.id),
+                            onToggleJoin: () =>
+                                _onToggleJoin(item.id, controller),
                           ),
                       ],
                     ),
@@ -145,6 +145,23 @@ class _DiscoverPanelState extends ConsumerState<DiscoverPanel> {
         ),
       ),
     );
+  }
+
+  /// Firestore yazması bitene kadar (network gecikmesi dahil) düğme
+  /// gösterge olmadan öylece duruyordu — üye "hiçbir şey olmadı" sanıp
+  /// birden fazla kez dokunuyordu. `_pendingIds`, sadece dokunulan
+  /// kartın düğmesini geçici olarak devre dışı bırakıp bir spinner
+  /// gösteriyor.
+  Future<void> _onToggleJoin(
+    String itemId,
+    DiscoverController controller,
+  ) async {
+    setState(() => _pendingIds.add(itemId));
+    try {
+      await _handleToggleJoin(context, () => controller.toggleJoin(itemId));
+    } finally {
+      if (mounted) setState(() => _pendingIds.remove(itemId));
+    }
   }
 }
 
@@ -210,9 +227,14 @@ class _CategoryTab extends StatelessWidget {
 }
 
 class _DiscoverCard extends ConsumerWidget {
-  const _DiscoverCard({required this.item, required this.onToggleJoin});
+  const _DiscoverCard({
+    required this.item,
+    required this.isPending,
+    required this.onToggleJoin,
+  });
 
   final DiscoverItem item;
+  final bool isPending;
   final VoidCallback onToggleJoin;
 
   @override
@@ -260,6 +282,12 @@ class _DiscoverCard extends ConsumerWidget {
       );
       btnBg = colors.surfaceRaised;
       btnFg = colors.onSurfaceVariant;
+    } else if (item.joined && !item.canLeaveEvent) {
+      btnLabel = ref.watch(
+        rcTextProvider(RemoteConfigKeys.groupSessionsJoinedLockedButton),
+      );
+      btnBg = colors.primaryContainer;
+      btnFg = colors.onPrimaryContainer;
     } else if (item.joined) {
       btnLabel = ref.watch(
         rcTextProvider(RemoteConfigKeys.groupSessionsJoinedLeaveButton),
@@ -391,19 +419,33 @@ class _DiscoverCard extends ConsumerWidget {
             color: btnBg,
             borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
             child: InkWell(
-              onTap: item.isLocked ? null : onToggleJoin,
+              onTap:
+                  (item.isLocked ||
+                      isPending ||
+                      (item.joined && !item.canLeaveEvent))
+                  ? null
+                  : onToggleJoin,
               borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
               child: Container(
                 width: double.infinity,
                 constraints: const BoxConstraints(minHeight: 48),
                 alignment: Alignment.center,
-                child: Text(
-                  btnLabel,
-                  style: typography.headingSmall.copyWith(
-                    fontSize: 15,
-                    color: btnFg,
-                  ),
-                ),
+                child: isPending
+                    ? SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation(btnFg),
+                        ),
+                      )
+                    : Text(
+                        btnLabel,
+                        style: typography.headingSmall.copyWith(
+                          fontSize: 15,
+                          color: btnFg,
+                        ),
+                      ),
               ),
             ),
           ),

@@ -34,6 +34,12 @@ abstract final class RemoteConfigKeys {
   /// açık (sonrasında UI'da kilitli görünür).
   static const groupSessionLockHoursBefore =
       'cfg_group_session_lock_hours_before';
+
+  /// F4-3 — etkinlikte katılım her zaman açık (bkz. discover_item.dart
+  /// isLocked), ama bir kez katılınca "Katılmaktan Vazgeç" başlangıca kaç
+  /// saat kalana kadar aktif — sonrasında sadece "Katılıyorsun" gösterilir,
+  /// ayrılma seçeneği kalkar.
+  static const eventLeaveLockHoursBefore = 'cfg_event_leave_lock_hours_before';
   static const feedbackReminderDayOfMonth =
       'cfg_feedback_reminder_day_of_month';
   static const freeVersionAdsEnabled = 'cfg_free_version_ads_enabled';
@@ -398,6 +404,8 @@ abstract final class RemoteConfigKeys {
       'lbl_group_sessions_locked_join_button';
   static const groupSessionsWaitlistJoinButton =
       'lbl_group_sessions_waitlist_join_button';
+  static const groupSessionsJoinedLockedButton =
+      'lbl_group_sessions_joined_locked_button';
   static const groupSessionsJoinedLeaveButton =
       'lbl_group_sessions_joined_leave_button';
   static const groupSessionsJoinButton = 'lbl_group_sessions_join_button';
@@ -1261,6 +1269,7 @@ class RemoteConfigService {
     RemoteConfigKeys.groupSessionCapacityMax: 20,
     RemoteConfigKeys.installmentDueSoonDays: 3,
     RemoteConfigKeys.groupSessionLockHoursBefore: 24,
+    RemoteConfigKeys.eventLeaveLockHoursBefore: 24,
     RemoteConfigKeys.cancellationDeadlineHours: 24,
     RemoteConfigKeys.defaultTrainerReminderDelayMinutes: 30,
     RemoteConfigKeys.defaultOnlineBookingEnabled: true,
@@ -1508,7 +1517,8 @@ class RemoteConfigService {
         'Katılım kaydedilemedi, tekrar dene.',
     'lbl_group_sessions_locked_join_button_tr': 'Kilitli · Başlangıç yaklaştı',
     'lbl_group_sessions_waitlist_join_button_tr': 'Yedek listesine yaz',
-    'lbl_group_sessions_joined_leave_button_tr': 'Katılıyorsun · Vazgeç',
+    'lbl_group_sessions_joined_leave_button_tr': 'Katılmaktan Vazgeç',
+    'lbl_group_sessions_joined_locked_button_tr': 'Katılıyorsun',
     'lbl_group_sessions_join_button_tr': 'Katılıyorum',
     'lbl_group_sessions_attending_count_no_capacity_tr':
         '{taken} kişi katılıyor',
@@ -2273,7 +2283,8 @@ class RemoteConfigService {
         'Could not save your response, try again.',
     'lbl_group_sessions_locked_join_button_en': 'Locked · Starting soon',
     'lbl_group_sessions_waitlist_join_button_en': 'Join waitlist',
-    'lbl_group_sessions_joined_leave_button_en': 'Joined · Leave',
+    'lbl_group_sessions_joined_leave_button_en': 'Cancel attendance',
+    'lbl_group_sessions_joined_locked_button_en': 'Attending',
     'lbl_group_sessions_join_button_en': 'Join',
     'lbl_group_sessions_attending_count_no_capacity_en': '{taken} attending',
     'lbl_group_sessions_attending_count_with_capacity_en':
@@ -2939,6 +2950,10 @@ class RemoteConfigService {
   /// Grup dersine katılım/ayrılma başlangıca kaç saat kalana kadar açık.
   int get groupSessionLockHoursBefore =>
       getInt(RemoteConfigKeys.groupSessionLockHoursBefore);
+
+  /// Etkinlikte "Katılmaktan Vazgeç" başlangıca kaç saat kalana kadar aktif.
+  int get eventLeaveLockHoursBefore =>
+      getInt(RemoteConfigKeys.eventLeaveLockHoursBefore);
 
   /// Üye/antrenör seansı en fazla kaç saat öncesine kadar iptal edebilir.
   int get cancellationDeadlineHours =>

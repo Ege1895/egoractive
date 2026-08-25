@@ -165,7 +165,7 @@ class _GroupSessionsForGymProviderElement
   String get myUid => (origin as _GroupSessionsForGymProvider).myUid;
 }
 
-String _$eventsForGymHash() => r'4873549f21c61b0dcb82f792106fd06a71af1d39';
+String _$eventsForGymHash() => r'dfd6ba64c592503b6142e4dff09965573ba40c32';
 
 /// See also [_eventsForGym].
 @ProviderFor(_eventsForGym)

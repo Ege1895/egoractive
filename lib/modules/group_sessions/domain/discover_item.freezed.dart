@@ -33,6 +33,10 @@ mixin _$DiscoverItem {
   DateTime? get startTime => throw _privateConstructorUsedError;
   int get lockHoursBefore => throw _privateConstructorUsedError;
 
+  /// F4-3 — sadece `events` için: bir kez katılındıktan sonra
+  /// "Katılmaktan Vazgeç" başlangıca kaç saat kalana kadar aktif.
+  int get leaveLockHoursBefore => throw _privateConstructorUsedError;
+
   /// Create a copy of DiscoverItem
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -59,6 +63,7 @@ abstract class $DiscoverItemCopyWith<$Res> {
     bool joined,
     DateTime? startTime,
     int lockHoursBefore,
+    int leaveLockHoursBefore,
   });
 }
 
@@ -88,6 +93,7 @@ class _$DiscoverItemCopyWithImpl<$Res, $Val extends DiscoverItem>
     Object? joined = null,
     Object? startTime = freezed,
     Object? lockHoursBefore = null,
+    Object? leaveLockHoursBefore = null,
   }) {
     return _then(
       _value.copyWith(
@@ -135,6 +141,10 @@ class _$DiscoverItemCopyWithImpl<$Res, $Val extends DiscoverItem>
                 ? _value.lockHoursBefore
                 : lockHoursBefore // ignore: cast_nullable_to_non_nullable
                       as int,
+            leaveLockHoursBefore: null == leaveLockHoursBefore
+                ? _value.leaveLockHoursBefore
+                : leaveLockHoursBefore // ignore: cast_nullable_to_non_nullable
+                      as int,
           )
           as $Val,
     );
@@ -162,6 +172,7 @@ abstract class _$$DiscoverItemImplCopyWith<$Res>
     bool joined,
     DateTime? startTime,
     int lockHoursBefore,
+    int leaveLockHoursBefore,
   });
 }
 
@@ -190,6 +201,7 @@ class __$$DiscoverItemImplCopyWithImpl<$Res>
     Object? joined = null,
     Object? startTime = freezed,
     Object? lockHoursBefore = null,
+    Object? leaveLockHoursBefore = null,
   }) {
     return _then(
       _$DiscoverItemImpl(
@@ -237,6 +249,10 @@ class __$$DiscoverItemImplCopyWithImpl<$Res>
             ? _value.lockHoursBefore
             : lockHoursBefore // ignore: cast_nullable_to_non_nullable
                   as int,
+        leaveLockHoursBefore: null == leaveLockHoursBefore
+            ? _value.leaveLockHoursBefore
+            : leaveLockHoursBefore // ignore: cast_nullable_to_non_nullable
+                  as int,
       ),
     );
   }
@@ -257,6 +273,7 @@ class _$DiscoverItemImpl extends _DiscoverItem {
     this.joined = false,
     this.startTime,
     this.lockHoursBefore = 24,
+    this.leaveLockHoursBefore = 24,
   }) : super._();
 
   @override
@@ -288,9 +305,15 @@ class _$DiscoverItemImpl extends _DiscoverItem {
   @JsonKey()
   final int lockHoursBefore;
 
+  /// F4-3 — sadece `events` için: bir kez katılındıktan sonra
+  /// "Katılmaktan Vazgeç" başlangıca kaç saat kalana kadar aktif.
+  @override
+  @JsonKey()
+  final int leaveLockHoursBefore;
+
   @override
   String toString() {
-    return 'DiscoverItem(id: $id, category: $category, day: $day, month: $month, title: $title, meta: $meta, taken: $taken, capacity: $capacity, joined: $joined, startTime: $startTime, lockHoursBefore: $lockHoursBefore)';
+    return 'DiscoverItem(id: $id, category: $category, day: $day, month: $month, title: $title, meta: $meta, taken: $taken, capacity: $capacity, joined: $joined, startTime: $startTime, lockHoursBefore: $lockHoursBefore, leaveLockHoursBefore: $leaveLockHoursBefore)';
   }
 
   @override
@@ -312,7 +335,9 @@ class _$DiscoverItemImpl extends _DiscoverItem {
             (identical(other.startTime, startTime) ||
                 other.startTime == startTime) &&
             (identical(other.lockHoursBefore, lockHoursBefore) ||
-                other.lockHoursBefore == lockHoursBefore));
+                other.lockHoursBefore == lockHoursBefore) &&
+            (identical(other.leaveLockHoursBefore, leaveLockHoursBefore) ||
+                other.leaveLockHoursBefore == leaveLockHoursBefore));
   }
 
   @override
@@ -329,6 +354,7 @@ class _$DiscoverItemImpl extends _DiscoverItem {
     joined,
     startTime,
     lockHoursBefore,
+    leaveLockHoursBefore,
   );
 
   /// Create a copy of DiscoverItem
@@ -353,6 +379,7 @@ abstract class _DiscoverItem extends DiscoverItem {
     final bool joined,
     final DateTime? startTime,
     final int lockHoursBefore,
+    final int leaveLockHoursBefore,
   }) = _$DiscoverItemImpl;
   const _DiscoverItem._() : super._();
 
@@ -382,6 +409,11 @@ abstract class _DiscoverItem extends DiscoverItem {
   DateTime? get startTime;
   @override
   int get lockHoursBefore;
+
+  /// F4-3 — sadece `events` için: bir kez katılındıktan sonra
+  /// "Katılmaktan Vazgeç" başlangıca kaç saat kalana kadar aktif.
+  @override
+  int get leaveLockHoursBefore;
 
   /// Create a copy of DiscoverItem
   /// with the given fields replaced by the non-null parameter values.
