@@ -71,6 +71,26 @@ class PushNotificationService {
     }
     FirebaseMessaging.instance.onTokenRefresh.listen(_saveToken);
 
+    // init() bu haliyle main()'de, kullanıcı GİRİŞ YAPMADAN ÖNCE çağrılıyor
+    // — o anda currentUser henüz null olduğu için yukarıdaki ilk
+    // getToken()/_saveToken() denemesi sessizce no-op'a düşüyordu (bkz.
+    // _saveToken'daki uid==null erken çıkışı) ve token FCM'de sık
+    // yenilenmediği için giriş yapıldıktan sonra bir daha hiç
+    // kaydedilmiyordu — üye/antrenör push token'ı hiç Firestore'a
+    // yazılmadan kalıyordu. Şimdi her başarılı girişte (uid null'dan
+    // dolu değere geçtiğinde) token tekrar okunup kaydediliyor.
+    String? lastSavedForUid;
+    FirebaseAuth.instance.authStateChanges().listen((user) async {
+      if (user == null || user.uid == lastSavedForUid) return;
+      lastSavedForUid = user.uid;
+      try {
+        final token = await FirebaseMessaging.instance.getToken();
+        if (token != null) await _saveToken(token);
+      } on Exception {
+        // Aynı gerekçe: bildirim token'ı olmadan da giriş akışı devam etmeli.
+      }
+    });
+
     FirebaseMessaging.onMessage.listen(_showForegroundNotification);
     FirebaseMessaging.onMessageOpenedApp.listen(
       (message) => _navigateForType(container, message.data['type'] as String?),
