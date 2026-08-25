@@ -10,9 +10,9 @@ import '../../core/theme/app_theme.dart';
 
 /// Platformun kendi native tarih seçicisi: iOS'ta gün/ay/yıl scroll wheel'i
 /// (`CupertinoDatePicker`), Android'de kendi Material takvim diyaloğu
-/// (`showDatePicker`). Üye kayıt tarihi (`member_info_panel.dart`) ve üyelik
-/// başlangıç/bitiş tarihi (`new_membership_package_panel.dart`) arasında
-/// paylaşılır.
+/// (`showDatePicker`). Üye kayıt tarihi (`member_info_panel.dart`), üyelik
+/// başlangıç/bitiş tarihi (`new_membership_package_panel.dart`) ve etkinlik
+/// tarihi (`create_event_panel.dart`) arasında paylaşılır.
 Future<void> showNativeDatePicker({
   required BuildContext context,
   required DateTime initial,
@@ -71,5 +71,67 @@ Future<void> showNativeDatePicker({
     firstDate: firstDate,
     lastDate: lastDate,
   );
+  if (picked != null) onSelected(picked);
+}
+
+/// [showNativeDatePicker] ile aynı platform-native davranış, saat için:
+/// iOS'ta saat/dakika scroll wheel'i, Android'de Material saat diyaloğu.
+Future<void> showNativeTimePicker({
+  required BuildContext context,
+  required TimeOfDay initial,
+  required ValueChanged<TimeOfDay> onSelected,
+}) async {
+  if (Platform.isIOS) {
+    final colors = context.appColors;
+    final now = DateTime.now();
+    var selected = DateTime(
+      now.year,
+      now.month,
+      now.day,
+      initial.hour,
+      initial.minute,
+    );
+    await showCupertinoModalPopup<void>(
+      context: context,
+      builder: (sheetContext) {
+        return Container(
+          height: 320,
+          padding: const EdgeInsets.only(top: AppSpacing.sm),
+          color: colors.surface,
+          child: SafeArea(
+            top: false,
+            child: Column(
+              children: [
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: CupertinoButton(
+                    child: Text(
+                      ProviderScope.containerOf(sheetContext).read(
+                        rcTextProvider(RemoteConfigKeys.commonTamamButton),
+                      ),
+                    ),
+                    onPressed: () {
+                      onSelected(TimeOfDay.fromDateTime(selected));
+                      Navigator.of(sheetContext).pop();
+                    },
+                  ),
+                ),
+                Expanded(
+                  child: CupertinoDatePicker(
+                    mode: CupertinoDatePickerMode.time,
+                    initialDateTime: selected,
+                    use24hFormat: true,
+                    onDateTimeChanged: (date) => selected = date,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+    return;
+  }
+  final picked = await showTimePicker(context: context, initialTime: initial);
   if (picked != null) onSelected(picked);
 }

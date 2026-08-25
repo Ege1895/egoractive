@@ -10,22 +10,8 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../core/theme/theme_controller.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_text_field.dart';
+import '../../../../shared/widgets/native_date_picker.dart';
 import '../../service/events_write_service.dart';
-
-const _monthAbbrevToNumber = {
-  'Oca': 1,
-  'Şub': 2,
-  'Mar': 3,
-  'Nis': 4,
-  'May': 5,
-  'Haz': 6,
-  'Tem': 7,
-  'Ağu': 8,
-  'Eyl': 9,
-  'Eki': 10,
-  'Kas': 11,
-  'Ara': 12,
-};
 
 /// Admin 13 · Etkinlik Oluştur — lokasyon, tarih/saat, kontenjan.
 class CreateEventPanel extends BasePanel {
@@ -41,6 +27,8 @@ class _CreateEventPanelState extends BasePanelState<CreateEventPanel> {
   final _dateController = TextEditingController();
   final _timeController = TextEditingController();
   final _descriptionController = TextEditingController();
+  DateTime? _selectedDate;
+  TimeOfDay? _selectedTime;
   int? _capacity;
   bool _isSaving = false;
   String? _nameError;
@@ -140,39 +128,64 @@ class _CreateEventPanelState extends BasePanelState<CreateEventPanel> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Expanded(
-                              child: AppTextField(
-                                label: ref.watch(
-                                  rcTextProvider(
-                                    RemoteConfigKeys.eventsDateFieldLabel,
+                              child: GestureDetector(
+                                onTap: () => showNativeDatePicker(
+                                  context: context,
+                                  initial: _selectedDate ?? DateTime.now(),
+                                  firstDate: DateTime.now().subtract(
+                                    const Duration(days: 1),
+                                  ),
+                                  lastDate: DateTime.now().add(
+                                    const Duration(days: 365 * 2),
+                                  ),
+                                  onSelected: (date) => setState(() {
+                                    _selectedDate = date;
+                                    _dateController.text = _formatDate(date);
+                                    _dateError = null;
+                                  }),
+                                ),
+                                child: AbsorbPointer(
+                                  child: AppTextField(
+                                    label: ref.watch(
+                                      rcTextProvider(
+                                        RemoteConfigKeys.eventsDateFieldLabel,
+                                      ),
+                                    ),
+                                    controller: _dateController,
+                                    hint: ref.watch(
+                                      rcTextProvider(
+                                        RemoteConfigKeys.eventsDateFieldHint,
+                                      ),
+                                    ),
+                                    errorText: _dateError,
                                   ),
                                 ),
-                                controller: _dateController,
-                                hint: ref.watch(
-                                  rcTextProvider(
-                                    RemoteConfigKeys.eventsDateFieldHint,
-                                  ),
-                                ),
-                                errorText: _dateError,
-                                onChanged: (_) {
-                                  if (_dateError != null) {
-                                    setState(() => _dateError = null);
-                                  }
-                                },
                               ),
                             ),
                             const SizedBox(width: AppSpacing.sm),
                             Expanded(
-                              child: AppTextField(
-                                label: ref.watch(
-                                  rcTextProvider(
-                                    RemoteConfigKeys.eventsTimeFieldLabel,
-                                  ),
+                              child: GestureDetector(
+                                onTap: () => showNativeTimePicker(
+                                  context: context,
+                                  initial: _selectedTime ?? TimeOfDay.now(),
+                                  onSelected: (time) => setState(() {
+                                    _selectedTime = time;
+                                    _timeController.text = _formatTime(time);
+                                  }),
                                 ),
-                                controller: _timeController,
-                                keyboardType: TextInputType.datetime,
-                                hint: ref.watch(
-                                  rcTextProvider(
-                                    RemoteConfigKeys.eventsTimeFieldHint,
+                                child: AbsorbPointer(
+                                  child: AppTextField(
+                                    label: ref.watch(
+                                      rcTextProvider(
+                                        RemoteConfigKeys.eventsTimeFieldLabel,
+                                      ),
+                                    ),
+                                    controller: _timeController,
+                                    hint: ref.watch(
+                                      rcTextProvider(
+                                        RemoteConfigKeys.eventsTimeFieldHint,
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ),
@@ -300,10 +313,17 @@ class _CreateEventPanelState extends BasePanelState<CreateEventPanel> {
                         ? null
                         : () async {
                             final name = _nameController.text.trim();
-                            final dateTime = _parseDateTime(
-                              _dateController.text,
-                              _timeController.text,
-                            );
+                            final selectedDate = _selectedDate;
+                            final selectedTime = _selectedTime;
+                            final dateTime = selectedDate == null
+                                ? null
+                                : DateTime(
+                                    selectedDate.year,
+                                    selectedDate.month,
+                                    selectedDate.day,
+                                    selectedTime?.hour ?? 0,
+                                    selectedTime?.minute ?? 0,
+                                  );
                             var hasError = false;
                             if (name.isEmpty) {
                               setState(
@@ -392,21 +412,18 @@ class _CreateEventPanelState extends BasePanelState<CreateEventPanel> {
     );
   }
 
-  /// "16 Ağu 2026" + "08:00" formatlarını ayrıştırır — geçersizse null.
-  DateTime? _parseDateTime(String dateText, String timeText) {
-    final dateParts = dateText.trim().split(RegExp(r'\s+'));
-    if (dateParts.length != 3) return null;
-    final day = int.tryParse(dateParts[0]);
-    final month = _monthAbbrevToNumber[dateParts[1]];
-    final year = int.tryParse(dateParts[2]);
-    if (day == null || month == null || year == null) return null;
-
-    final timeParts = timeText.trim().split(':');
-    final hour = timeParts.isNotEmpty ? int.tryParse(timeParts[0]) ?? 0 : 0;
-    final minute = timeParts.length > 1 ? int.tryParse(timeParts[1]) ?? 0 : 0;
-
-    return DateTime(year, month, day, hour, minute);
+  String _formatDate(DateTime date) {
+    final names = ref
+        .read(rcTextProvider(RemoteConfigKeys.commonMonthNamesLong))
+        .split(',');
+    final month = date.month >= 1 && date.month <= names.length
+        ? names[date.month - 1]
+        : '';
+    return '${date.day} $month ${date.year}';
   }
+
+  String _formatTime(TimeOfDay time) =>
+      '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
 
   @override
   void dispose() {
