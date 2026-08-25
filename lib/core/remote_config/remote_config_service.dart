@@ -1048,6 +1048,12 @@ abstract final class RemoteConfigKeys {
       'lbl_sessions_trainer_notifications_empty_state';
   static const sessionsCreateTrainerBusyError =
       'lbl_sessions_create_trainer_busy_error';
+
+  /// Antrenör çakışması/hak yetersizliği/geçmiş tarih DIŞINDA, beklenmeyen
+  /// bir hatayla (ör. izin reddi) karşılaşıldığında — önceden bu durum da
+  /// yanlışlıkla "antrenör dolu" mesajıyla gösteriliyordu, gerçek sebebi
+  /// gizliyordu.
+  static const sessionsCreateGenericError = 'lbl_sessions_create_generic_error';
   static const sessionsCreateRescheduleError =
       'lbl_sessions_create_reschedule_error';
   static const sessionsCreateNoActiveGymError =
@@ -3035,7 +3041,7 @@ class RemoteConfigService {
     await rc.setConfigSettings(
       RemoteConfigSettings(
         fetchTimeout: const Duration(seconds: 10),
-        minimumFetchInterval: const Duration(hours: 1),
+        minimumFetchInterval: const Duration(hours: 24),
       ),
     );
     await rc.setDefaults(_defaults);

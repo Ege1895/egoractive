@@ -5579,6 +5579,18 @@
       },
       "valueType": "STRING"
     },
+    "lbl_sessions_create_generic_error_tr": {
+      "defaultValue": {
+        "value": "Seans oluşturulamadı, tekrar dene."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_create_generic_error_en": {
+      "defaultValue": {
+        "value": "Couldn't create the session, try again."
+      },
+      "valueType": "STRING"
+    },
     "lbl_sessions_create_reschedule_error_tr": {
       "defaultValue": {
         "value": "Seans ertelenemedi, tekrar dene."

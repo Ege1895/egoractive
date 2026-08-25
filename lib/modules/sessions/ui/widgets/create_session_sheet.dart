@@ -192,6 +192,8 @@ class _CreateSessionSheetState extends ConsumerState<_CreateSessionSheet> {
     var anySucceeded = false;
     var ranOutOfSessions = false;
     var hasPastDatetime = false;
+    var hasUnknownError = false;
+    var hasTrainerConflict = false;
     for (final date in allDates) {
       final startTime = DateTime(
         date.year,
@@ -219,14 +221,21 @@ class _CreateSessionSheetState extends ConsumerState<_CreateSessionSheet> {
         anySucceeded = true;
       } on TrainerConflictException {
         failedDays.add('${date.day}.${date.month}');
+        hasTrainerConflict = true;
       } on InsufficientSessionsException {
         // Bu tarihten itibaren üyenin hakkı bitti — döngünün devamı da
         // aynı sebeple başarısız olacak, o yüzden burada kesiliyor.
         failedDays.add('${date.day}.${date.month}');
         ranOutOfSessions = true;
         break;
-      } catch (_) {
+      } catch (error) {
+        // Trainer çakışması/hak yetersizliği/geçmiş tarih DIŞINDA beklenmeyen
+        // bir hata (ör. Firestore izin reddi) — önceden bu durum da
+        // sessizce "antrenör dolu" mesajına düşüyordu, gerçek sebebi
+        // gizliyordu. debugPrint ile en azından konsolda görünür kalıyor.
+        debugPrint('Seans oluşturulamadı ($date): $error');
         failedDays.add('${date.day}.${date.month}');
+        hasUnknownError = true;
       }
     }
 
@@ -264,6 +273,14 @@ class _CreateSessionSheetState extends ConsumerState<_CreateSessionSheet> {
             )
           : hasPastDatetime
           ? ref.read(rcTextProvider(RemoteConfigKeys.commonPastDatetimeError))
+          : hasTrainerConflict
+          ? ref
+                .read(
+                  rcTextProvider(RemoteConfigKeys.sessionsCreateTrainerBusyError),
+                )
+                .replaceAll('{name}', trainer.name)
+          : hasUnknownError
+          ? ref.read(rcTextProvider(RemoteConfigKeys.sessionsCreateGenericError))
           : ref
                 .read(
                   rcTextProvider(RemoteConfigKeys.sessionsCreateTrainerBusyError),
