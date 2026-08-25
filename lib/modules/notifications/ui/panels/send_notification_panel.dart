@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/app_spacing.dart';
@@ -14,6 +15,11 @@ import '../../../members/domain/admin_member_summary.dart';
 import '../../controller/send_notification_controller.dart';
 import '../../domain/send_notification_form.dart';
 
+// Android bildirim başlığı ~65 karakterden sonra kesiliyor (iOS'ta da APNs
+// payload boyutu 4KB'la sınırlı ama pratikte kilit ekranında görünen kısım
+// bu aralıkta); mesaj gövdesi için 240 karakter Android/FCM'in yaygın
+// önerdiği sınır — ikisi de gerçek push bildirim UI kısıtlarını yansıtıyor.
+const _titleMaxLength = 65;
 const _messageMaxLength = 240;
 
 /// Admin 20 · Bildirim Gönder — hedef seçici, başlık/mesaj, önizleme.
@@ -272,10 +278,31 @@ class _SendNotificationPanelState
                             scrollController: _titleScrollController,
                             minLines: 1,
                             maxLines: 5,
+                            inputFormatters: [
+                              LengthLimitingTextInputFormatter(_titleMaxLength),
+                            ],
                             onChanged: controller.updateTitle,
                           ),
                         ),
-                        const SizedBox(height: AppSpacing.md),
+                        const SizedBox(height: AppSpacing.xs),
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: Text(
+                            ref
+                                .watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys
+                                        .notificationsMessageCounterLabel,
+                                  ),
+                                )
+                                .replaceAll('{current}', '${form.title.length}')
+                                .replaceAll('{max}', '$_titleMaxLength'),
+                            style: typography.caption.copyWith(
+                              color: colors.onSurfaceMuted,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: AppSpacing.sm),
                         Scrollbar(
                           controller: _messageScrollController,
                           thumbVisibility: true,
@@ -292,6 +319,11 @@ class _SendNotificationPanelState
                             scrollController: _messageScrollController,
                             minLines: 1,
                             maxLines: 5,
+                            inputFormatters: [
+                              LengthLimitingTextInputFormatter(
+                                _messageMaxLength,
+                              ),
+                            ],
                             onChanged: controller.updateMessage,
                           ),
                         ),
