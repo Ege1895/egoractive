@@ -131,8 +131,6 @@ void main() {
       _wrap(const TrainerCalendarPanel(), overrides: _fakeRcOverrides),
     );
     await tester.pump();
-    await tester.tap(find.text('Ay'));
-    await tester.pump();
     expect(tester.takeException(), isNull);
   });
 

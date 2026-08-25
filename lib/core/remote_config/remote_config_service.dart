@@ -1087,9 +1087,6 @@ abstract final class RemoteConfigKeys {
   static const trainersMemberDetailPackageEndLabel =
       'lbl_trainers_member_detail_package_end_label';
   static const trainersCalendarTitle = 'lbl_trainers_calendar_title';
-  static const trainersCalendarWeekToggle = 'lbl_trainers_calendar_week_toggle';
-  static const trainersCalendarMonthToggle =
-      'lbl_trainers_calendar_month_toggle';
   static const trainersCalendarMarkCompletedAction =
       'lbl_trainers_calendar_mark_completed_action';
   static const trainersMembersListTitle = 'lbl_trainers_members_list_title';
@@ -1127,9 +1124,6 @@ abstract final class RemoteConfigKeys {
   static const trainersEditTrainerFormTitle =
       'lbl_trainers_edit_trainer_form_title';
   static const trainersEditTrainerError = 'lbl_trainers_edit_trainer_error';
-  static const trainersCalendarWeekRange = 'lbl_trainers_calendar_week_range';
-  static const trainersCalendarDayEmptyMessage =
-      'lbl_trainers_calendar_day_empty_message';
   static const trainersHomeGreeting = 'lbl_trainers_home_greeting';
   static const trainersHomeGreetingWithName =
       'lbl_trainers_home_greeting_with_name';
@@ -1991,8 +1985,6 @@ class RemoteConfigService {
     'lbl_trainers_member_detail_remaining_sessions_label_tr': 'Kalan ders',
     'lbl_trainers_member_detail_package_end_label_tr': 'Paket bitişi',
     'lbl_trainers_calendar_title_tr': 'Takvimim',
-    'lbl_trainers_calendar_week_toggle_tr': 'Hafta',
-    'lbl_trainers_calendar_month_toggle_tr': 'Ay',
     'lbl_trainers_calendar_mark_completed_action_tr': 'Dersi onayla',
     'lbl_trainers_members_list_title_tr': 'Üyelerim',
     'lbl_trainers_members_filter_expiring_tr': 'Paketi bitiyor',
@@ -2018,10 +2010,6 @@ class RemoteConfigService {
     'lbl_trainers_edit_trainer_form_title_tr': 'Antrenörü düzenle',
     'lbl_trainers_edit_trainer_error_tr':
         'Antrenör güncellenemedi, tekrar dene.',
-    'lbl_trainers_calendar_week_range_tr':
-        '{startDay} – {endDay} {month} · {week}. hafta',
-    'lbl_trainers_calendar_day_empty_message_tr':
-        'Seans yok — bu güne seans ekleyebilirsiniz',
     'lbl_trainers_home_greeting_tr': 'İyi çalışmalar',
     'lbl_trainers_home_greeting_with_name_tr': 'İyi çalışmalar {name}',
     'lbl_trainers_home_confirmation_save_error_tr':
@@ -2755,8 +2743,6 @@ class RemoteConfigService {
         'Remaining sessions',
     'lbl_trainers_member_detail_package_end_label_en': 'Package end date',
     'lbl_trainers_calendar_title_en': 'My Calendar',
-    'lbl_trainers_calendar_week_toggle_en': 'Week',
-    'lbl_trainers_calendar_month_toggle_en': 'Month',
     'lbl_trainers_calendar_mark_completed_action_en': 'Confirm session',
     'lbl_trainers_members_list_title_en': 'My Members',
     'lbl_trainers_members_filter_expiring_en': 'Package expiring',
@@ -2785,10 +2771,6 @@ class RemoteConfigService {
     'lbl_trainers_edit_trainer_form_title_en': 'Edit trainer',
     'lbl_trainers_edit_trainer_error_en':
         'Could not update trainer, try again.',
-    'lbl_trainers_calendar_week_range_en':
-        '{startDay} – {endDay} {month} · Week {week}',
-    'lbl_trainers_calendar_day_empty_message_en':
-        'No sessions — you can add a session to this day',
     'lbl_trainers_home_greeting_en': 'Have a great day',
     'lbl_trainers_home_greeting_with_name_en': 'Have a great day, {name}',
     'lbl_trainers_home_confirmation_save_error_en':

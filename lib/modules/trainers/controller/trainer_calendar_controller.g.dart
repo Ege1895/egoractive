@@ -209,7 +209,7 @@ final _selectedTrainerCalendarDateProvider =
 
 typedef _$SelectedTrainerCalendarDate = AutoDisposeNotifier<DateTime>;
 String _$trainerCalendarControllerHash() =>
-    r'0974fbddd0a8998ef4719a8f6e9862938c513026';
+    r'd1b887bd25324fcf95d1591a76d92d99b99db834';
 
 /// Antrenörün kendi (`trainerId == uid`) seansları gerçek zamanlı dinlenir.
 /// Oturum yoksa (test ortamı vb.) mock repository'e düşer.

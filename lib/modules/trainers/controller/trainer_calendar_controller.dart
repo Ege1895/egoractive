@@ -106,9 +106,6 @@ class TrainerCalendarController extends _$TrainerCalendarController {
     );
   }
 
-  void setViewMode(TrainerCalendarViewMode mode) =>
-      state = state.copyWith(viewMode: mode);
-
   void selectDate(DateTime date) =>
       ref.read(_selectedTrainerCalendarDateProvider.notifier).select(date);
 }

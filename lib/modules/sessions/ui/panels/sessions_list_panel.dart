@@ -384,12 +384,34 @@ class _SessionsCalendarView extends ConsumerWidget {
           ),
           child: Column(
             children: [
-              Text(
-                '${_monthAbbrev[month.month]} ${month.year}',
-                style: typography.headingSmall.copyWith(
-                  color: colors.onSurface,
-                  fontSize: 17,
-                ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    '${_monthAbbrev[month.month]} ${month.year}',
+                    style: typography.headingSmall.copyWith(
+                      color: colors.onSurface,
+                      fontSize: 17,
+                    ),
+                  ),
+                  Row(
+                    children: [
+                      _ArrowButton(
+                        icon: Icons.chevron_left,
+                        onTap: () => onSelectDay(
+                          DateTime(month.year, month.month - 1, 1),
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.sm),
+                      _ArrowButton(
+                        icon: Icons.chevron_right,
+                        onTap: () => onSelectDay(
+                          DateTime(month.year, month.month + 1, 1),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
               const SizedBox(height: AppSpacing.sm),
               Row(
@@ -425,6 +447,7 @@ class _SessionsCalendarView extends ConsumerWidget {
                   final date = DateTime(month.year, month.month, dayNum);
                   final isSelected = date.day == selectedDay.day;
                   final count = sessionsByDay[dayNum]?.length ?? 0;
+                  final hasSessions = count > 0;
                   return InkWell(
                     borderRadius: BorderRadius.circular(12),
                     onTap: () => onSelectDay(date),
@@ -441,39 +464,55 @@ class _SessionsCalendarView extends ConsumerWidget {
                         ),
                       ),
                       alignment: Alignment.center,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            '$dayNum',
-                            style: typography.headingSmall.copyWith(
-                              fontSize: 14,
-                              color: isSelected
-                                  ? colors.onPrimaryContainer
-                                  : colors.onSurface,
-                            ),
-                          ),
-                          if (count > 0)
-                            Container(
-                              margin: const EdgeInsets.only(top: 2),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 4,
-                              ),
-                              decoration: BoxDecoration(
-                                color: colors.primaryContainer,
-                                borderRadius: BorderRadius.circular(
-                                  AppSpacing.radiusPill,
+                      child: SizedBox(
+                        width: 34,
+                        height: 34,
+                        child: Stack(
+                          clipBehavior: Clip.none,
+                          alignment: Alignment.center,
+                          children: [
+                            if (hasSessions)
+                              Container(
+                                width: 34,
+                                height: 34,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: colors.primary,
+                                    width: 1.5,
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: colors.primary.withValues(
+                                        alpha: 0.55,
+                                      ),
+                                      blurRadius: 10,
+                                      spreadRadius: 1,
+                                    ),
+                                  ],
                                 ),
                               ),
-                              child: Text(
-                                '$count',
-                                style: typography.caption.copyWith(
-                                  color: colors.onPrimaryContainer,
-                                  fontSize: 9,
-                                ),
+                            Text(
+                              '$dayNum',
+                              style: typography.headingSmall.copyWith(
+                                fontSize: 14,
+                                color: isSelected
+                                    ? colors.onPrimaryContainer
+                                    : colors.onSurface,
                               ),
                             ),
-                        ],
+                            if (hasSessions)
+                              Positioned(
+                                top: -6,
+                                right: -6,
+                                child: _CalendarBadge(
+                                  count: count,
+                                  color: colors.primary,
+                                  onColor: colors.onPrimary,
+                                ),
+                              ),
+                          ],
+                        ),
                       ),
                     ),
                   );
@@ -501,6 +540,62 @@ class _SessionsCalendarView extends ConsumerWidget {
         else
           for (final session in daySessions) _SessionRow(session: session),
       ],
+    );
+  }
+}
+
+class _ArrowButton extends StatelessWidget {
+  const _ArrowButton({required this.icon, required this.onTap});
+
+  final IconData icon;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+    return Material(
+      color: colors.surfaceRaised,
+      borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+        child: Container(
+          width: 36,
+          height: 36,
+          alignment: Alignment.center,
+          child: Icon(icon, color: colors.onSurfaceVariant, size: 18),
+        ),
+      ),
+    );
+  }
+}
+
+class _CalendarBadge extends StatelessWidget {
+  const _CalendarBadge({
+    required this.count,
+    required this.color,
+    required this.onColor,
+  });
+
+  final int count;
+  final Color color;
+  final Color onColor;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 16,
+      height: 16,
+      decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+      alignment: Alignment.center,
+      child: Text(
+        '$count',
+        style: context.appTypography.caption.copyWith(
+          color: onColor,
+          fontSize: 9,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
     );
   }
 }

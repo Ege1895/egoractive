@@ -13,7 +13,6 @@ import '../../../sessions/ui/panels/session_completion_panel.dart';
 import '../../../sessions/ui/widgets/create_session_sheet.dart';
 import '../../controller/trainer_calendar_controller.dart';
 import '../../domain/schedule_slot.dart';
-import '../../domain/trainer_calendar_state.dart';
 
 const _monthNames = {
   1: 'Ocak',
@@ -31,7 +30,9 @@ const _monthNames = {
 };
 const _dayNames = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'];
 
-/// Antrenör 5 · Takvimim (Takvimim sekmesi kökü) — hafta / ay geçişi.
+/// Antrenör 5 · Takvimim (Takvimim sekmesi kökü) — admin'in aylık
+/// takvimiyle (bkz. admin_calendar_panel.dart) birebir aynı tasarım:
+/// ay ızgarası + gün altında ajanda listesi, hafta/ay geçişi yok.
 class TrainerCalendarPanel extends BasePanel {
   const TrainerCalendarPanel({super.key});
 
@@ -47,6 +48,14 @@ class _TrainerCalendarPanelState extends BasePanelState<TrainerCalendarPanel> {
     final typography = context.appTypography;
     final state = ref.watch(trainerCalendarControllerProvider);
     final controller = ref.read(trainerCalendarControllerProvider.notifier);
+    final month = DateTime(state.selectedDate.year, state.selectedDate.month);
+    final firstWeekday = month.weekday;
+    final daysInMonth = DateTime(month.year, month.month + 1, 0).day;
+    final leadingBlanks = firstWeekday - 1;
+    final totalCells = ((leadingBlanks + daysInMonth) / 7).ceil() * 7;
+    final selectedSlots =
+        state.slotsByDayOfMonth[state.selectedDate.day] ??
+        const <ScheduleSlot>[];
 
     return Scaffold(
       body: SafeArea(
@@ -60,107 +69,263 @@ class _TrainerCalendarPanelState extends BasePanelState<TrainerCalendarPanel> {
                 AppSpacing.screenEdge,
                 0,
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        ref.watch(
-                          rcTextProvider(
-                            RemoteConfigKeys.trainersCalendarTitle,
-                          ),
-                        ),
-                        style: typography.headingLarge.copyWith(
-                          color: colors.onSurface,
-                        ),
-                      ),
-                      Material(
-                        color: colors.primary,
-                        borderRadius: BorderRadius.circular(
-                          AppSpacing.radiusInner,
-                        ),
-                        child: InkWell(
-                          borderRadius: BorderRadius.circular(
-                            AppSpacing.radiusInner,
-                          ),
-                          onTap: () => showCreateSessionSheet(
-                            context,
-                            ref,
-                            state.selectedDate,
-                            lockedTrainerId: ref
-                                .read(authStateProvider)
-                                .valueOrNull
-                                ?.uid,
-                          ),
-                          child: Container(
-                            width: 44,
-                            height: 44,
-                            alignment: Alignment.center,
-                            child: Icon(Icons.add, color: colors.onPrimary),
-                          ),
-                        ),
-                      ),
-                    ],
+                  Text(
+                    ref.watch(
+                      rcTextProvider(RemoteConfigKeys.trainersCalendarTitle),
+                    ),
+                    style: typography.headingLarge.copyWith(
+                      color: colors.onSurface,
+                    ),
                   ),
-                  const SizedBox(height: AppSpacing.md),
-                  Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                      color: colors.surface,
-                      border: Border.all(color: colors.outline),
+                  Material(
+                    color: colors.primary,
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+                    child: InkWell(
                       borderRadius: BorderRadius.circular(
                         AppSpacing.radiusInner,
                       ),
-                    ),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: _ToggleTab(
-                            label: ref.watch(
-                              rcTextProvider(
-                                RemoteConfigKeys.trainersCalendarWeekToggle,
-                              ),
-                            ),
-                            selected:
-                                state.viewMode == TrainerCalendarViewMode.week,
-                            onTap: () => controller.setViewMode(
-                              TrainerCalendarViewMode.week,
+                      onTap: () => showCreateSessionSheet(
+                        context,
+                        ref,
+                        state.selectedDate,
+                        lockedTrainerId: ref
+                            .read(authStateProvider)
+                            .valueOrNull
+                            ?.uid,
+                      ),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.md,
+                        ),
+                        constraints: const BoxConstraints(minHeight: 40),
+                        alignment: Alignment.center,
+                        child: Text(
+                          ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.commonAddSeansButton,
                             ),
                           ),
-                        ),
-                        Expanded(
-                          child: _ToggleTab(
-                            label: ref.watch(
-                              rcTextProvider(
-                                RemoteConfigKeys.trainersCalendarMonthToggle,
-                              ),
-                            ),
-                            selected:
-                                state.viewMode == TrainerCalendarViewMode.month,
-                            onTap: () => controller.setViewMode(
-                              TrainerCalendarViewMode.month,
-                            ),
+                          style: typography.headingSmall.copyWith(
+                            fontSize: 14,
+                            color: colors.onPrimary,
                           ),
                         ),
-                      ],
+                      ),
                     ),
                   ),
                 ],
               ),
             ),
             Expanded(
-              child: state.viewMode == TrainerCalendarViewMode.week
-                  ? _WeekView(
-                      state: state,
-                      onSlotTap: (slot) => _showSlotDetail(context, slot),
-                    )
-                  : _MonthView(
-                      state: state,
-                      onSelectDay: controller.selectDate,
-                      onSlotTap: (slot) => _showSlotDetail(context, slot),
+              child: ListView(
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.screenEdge,
+                  AppSpacing.md,
+                  AppSpacing.screenEdge,
+                  AppSpacing.lg,
+                ),
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(AppSpacing.md),
+                    decoration: BoxDecoration(
+                      color: colors.surface,
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusCard,
+                      ),
+                      border: Border.all(color: colors.outline),
                     ),
+                    child: Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              '${_monthNames[month.month]} ${month.year}',
+                              style: typography.headingSmall.copyWith(
+                                color: colors.onSurface,
+                                fontSize: 17,
+                              ),
+                            ),
+                            Row(
+                              children: [
+                                _ArrowButton(
+                                  icon: Icons.chevron_left,
+                                  onTap: () => controller.selectDate(
+                                    DateTime(month.year, month.month - 1, 1),
+                                  ),
+                                ),
+                                const SizedBox(width: AppSpacing.sm),
+                                _ArrowButton(
+                                  icon: Icons.chevron_right,
+                                  onTap: () => controller.selectDate(
+                                    DateTime(month.year, month.month + 1, 1),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: AppSpacing.sm),
+                        Row(
+                          children: [
+                            for (final name in _dayNames)
+                              Expanded(
+                                child: Text(
+                                  name,
+                                  textAlign: TextAlign.center,
+                                  style: typography.caption.copyWith(
+                                    color: colors.onSurfaceMuted,
+                                    fontSize: 11,
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                        const SizedBox(height: AppSpacing.sm),
+                        GridView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: totalCells,
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 7,
+                                mainAxisSpacing: 5,
+                                crossAxisSpacing: 5,
+                              ),
+                          itemBuilder: (context, index) {
+                            final dayNum = index - leadingBlanks + 1;
+                            if (dayNum < 1 || dayNum > daysInMonth) {
+                              return const SizedBox.shrink();
+                            }
+                            final date = DateTime(
+                              month.year,
+                              month.month,
+                              dayNum,
+                            );
+                            final isSelected =
+                                date.day == state.selectedDate.day;
+                            final sessionCount =
+                                state.slotsByDayOfMonth[dayNum]?.length ?? 0;
+                            final hasSessions = sessionCount > 0;
+                            return InkWell(
+                              borderRadius: BorderRadius.circular(12),
+                              onTap: () => controller.selectDate(date),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: isSelected
+                                      ? colors.primaryContainer
+                                      : Colors.transparent,
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: isSelected
+                                        ? colors.primary
+                                        : Colors.transparent,
+                                  ),
+                                ),
+                                alignment: Alignment.center,
+                                child: SizedBox(
+                                  width: 34,
+                                  height: 34,
+                                  child: Stack(
+                                    clipBehavior: Clip.none,
+                                    alignment: Alignment.center,
+                                    children: [
+                                      if (hasSessions)
+                                        Container(
+                                          width: 34,
+                                          height: 34,
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            border: Border.all(
+                                              color: colors.primary,
+                                              width: 1.5,
+                                            ),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: colors.primary
+                                                    .withValues(alpha: 0.55),
+                                                blurRadius: 10,
+                                                spreadRadius: 1,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      Text(
+                                        '$dayNum',
+                                        style: typography.headingSmall.copyWith(
+                                          fontSize: 14,
+                                          color: isSelected
+                                              ? colors.onPrimaryContainer
+                                              : colors.onSurface,
+                                        ),
+                                      ),
+                                      if (hasSessions)
+                                        Positioned(
+                                          top: -6,
+                                          right: -6,
+                                          child: _CalendarBadge(
+                                            count: sessionCount,
+                                            color: colors.primary,
+                                            onColor: colors.onPrimary,
+                                          ),
+                                        ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.lg),
+                  Text(
+                    '${state.selectedDate.day} ${_monthNames[state.selectedDate.month]}',
+                    style: typography.caption.copyWith(
+                      color: colors.onSurfaceMuted,
+                      letterSpacing: 1.2,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                  if (selectedSlots.isEmpty)
+                    Text(
+                      ref.watch(
+                        rcTextProvider(RemoteConfigKeys.commonBuGundeSeansYok),
+                      ),
+                      style: typography.bodyMedium.copyWith(
+                        color: colors.onSurfaceMuted,
+                      ),
+                    )
+                  else
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.md,
+                      ),
+                      decoration: BoxDecoration(
+                        color: colors.surface,
+                        borderRadius: BorderRadius.circular(
+                          AppSpacing.radiusCard,
+                        ),
+                        border: Border.all(color: colors.outline),
+                      ),
+                      child: Column(
+                        children: [
+                          for (var i = 0; i < selectedSlots.length; i++)
+                            _AgendaRow(
+                              slot: selectedSlots[i],
+                              showDivider: i < selectedSlots.length - 1,
+                              onTap: () =>
+                                  _showSlotDetail(context, selectedSlots[i]),
+                            ),
+                        ],
+                      ),
+                    ),
+                ],
+              ),
             ),
           ],
         ),
@@ -319,412 +484,58 @@ String _initialsOf(String name) {
   return words.take(2).map((w) => w[0]).join().toUpperCase();
 }
 
-class _ToggleTab extends StatelessWidget {
-  const _ToggleTab({
-    required this.label,
-    required this.selected,
-    required this.onTap,
-  });
+class _ArrowButton extends StatelessWidget {
+  const _ArrowButton({required this.icon, required this.onTap});
 
-  final String label;
-  final bool selected;
+  final IconData icon;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
     return Material(
-      color: selected ? colors.surfaceRaised : Colors.transparent,
-      borderRadius: BorderRadius.circular(11),
+      color: colors.surfaceRaised,
+      borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(11),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
         child: Container(
-          constraints: const BoxConstraints(minHeight: 40),
+          width: 36,
+          height: 36,
           alignment: Alignment.center,
-          child: Text(
-            label,
-            style: context.appTypography.headingSmall.copyWith(
-              fontSize: 14,
-              color: selected ? colors.onSurface : colors.onSurfaceVariant,
-            ),
-          ),
+          child: Icon(icon, color: colors.onSurfaceVariant, size: 18),
         ),
       ),
     );
   }
 }
 
-class _WeekView extends ConsumerWidget {
-  const _WeekView({required this.state, required this.onSlotTap});
-
-  final TrainerCalendarState state;
-  final ValueChanged<ScheduleSlot> onSlotTap;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final colors = context.appColors;
-    final typography = context.appTypography;
-    final weekStart = state.selectedDate.subtract(
-      Duration(days: state.selectedDate.weekday - 1),
-    );
-    final days = [for (var i = 0; i < 7; i++) weekStart.add(Duration(days: i))];
-    final weekNumber =
-        ((state.selectedDate
-                    .difference(DateTime(state.selectedDate.year))
-                    .inDays) /
-                7)
-            .ceil() +
-        1;
-    final weekRangeText = ref
-        .watch(rcTextProvider(RemoteConfigKeys.trainersCalendarWeekRange))
-        .replaceAll('{startDay}', '${days.first.day}')
-        .replaceAll('{endDay}', '${days.last.day}')
-        .replaceAll('{month}', '${_monthNames[days.last.month]}')
-        .replaceAll('{week}', '$weekNumber');
-
-    return ListView(
-      padding: const EdgeInsets.fromLTRB(
-        AppSpacing.screenEdge,
-        AppSpacing.md,
-        AppSpacing.screenEdge,
-        AppSpacing.lg,
-      ),
-      children: [
-        Text(
-          weekRangeText,
-          style: typography.headingSmall.copyWith(
-            color: colors.onSurface,
-            fontSize: 15,
-          ),
-        ),
-        const SizedBox(height: AppSpacing.md),
-        for (final day in days)
-          _WeekDayCard(
-            day: day,
-            slots: state.slotsByDayOfMonth[day.day] ?? const [],
-            onSlotTap: onSlotTap,
-          ),
-      ],
-    );
-  }
-}
-
-class _WeekDayCard extends ConsumerWidget {
-  const _WeekDayCard({
-    required this.day,
-    required this.slots,
-    required this.onSlotTap,
+class _CalendarBadge extends StatelessWidget {
+  const _CalendarBadge({
+    required this.count,
+    required this.color,
+    required this.onColor,
   });
 
-  final DateTime day;
-  final List<ScheduleSlot> slots;
-  final ValueChanged<ScheduleSlot> onSlotTap;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final colors = context.appColors;
-    final typography = context.appTypography;
-    final now = DateTime.now();
-    final isToday =
-        day.year == now.year && day.month == now.month && day.day == now.day;
-
-    return Container(
-      margin: const EdgeInsets.only(bottom: AppSpacing.sm),
-      padding: const EdgeInsets.all(AppSpacing.md),
-      decoration: BoxDecoration(
-        color: colors.surface,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
-        border: Border.all(color: isToday ? colors.primary : colors.outline),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 42,
-            child: Column(
-              children: [
-                Text(
-                  '${day.day}',
-                  style: typography.headingMedium.copyWith(
-                    color: colors.onSurface,
-                    fontSize: 19,
-                  ),
-                ),
-                Text(
-                  _dayNames[day.weekday - 1],
-                  style: typography.caption.copyWith(
-                    color: colors.onSurfaceMuted,
-                    fontSize: 11,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: AppSpacing.md),
-          Expanded(
-            child: slots.isEmpty
-                ? Padding(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: AppSpacing.sm,
-                    ),
-                    child: Text(
-                      ref.watch(
-                        rcTextProvider(
-                          RemoteConfigKeys.trainersCalendarDayEmptyMessage,
-                        ),
-                      ),
-                      style: typography.bodyMedium.copyWith(
-                        color: colors.onSurfaceMuted,
-                        fontSize: 13,
-                      ),
-                    ),
-                  )
-                : Column(
-                    children: [
-                      for (final slot in slots)
-                        _SlotRow(slot: slot, onTap: () => onSlotTap(slot)),
-                    ],
-                  ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _SlotRow extends StatelessWidget {
-  const _SlotRow({required this.slot, required this.onTap});
-
-  final ScheduleSlot slot;
-  final VoidCallback onTap;
+  final int count;
+  final Color color;
+  final Color onColor;
 
   @override
   Widget build(BuildContext context) {
-    final colors = context.appColors;
-    final typography = context.appTypography;
-    final accent = switch (slot.state) {
-      ScheduleSlotState.completed => colors.success,
-      ScheduleSlotState.absent => colors.warning,
-      ScheduleSlotState.cancelled => colors.error,
-      ScheduleSlotState.current => colors.primary,
-      ScheduleSlotState.planned => colors.onSurfaceVariant,
-    };
-
-    return Padding(
-      padding: const EdgeInsets.only(bottom: AppSpacing.xs),
-      child: Material(
-        color: colors.surfaceRaised,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
-          child: Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.md,
-              vertical: AppSpacing.sm,
-            ),
-            child: Row(
-              children: [
-                Text(
-                  slot.time,
-                  style: typography.headingSmall.copyWith(
-                    color: accent,
-                    fontSize: 13,
-                  ),
-                ),
-                const SizedBox(width: AppSpacing.sm),
-                Expanded(
-                  child: Text(
-                    slot.name,
-                    style: typography.bodyMedium.copyWith(
-                      color: colors.onSurfaceVariant,
-                      fontSize: 13,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
+    return Container(
+      width: 16,
+      height: 16,
+      decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+      alignment: Alignment.center,
+      child: Text(
+        '$count',
+        style: context.appTypography.caption.copyWith(
+          color: onColor,
+          fontSize: 9,
+          fontWeight: FontWeight.bold,
         ),
       ),
-    );
-  }
-}
-
-class _MonthView extends ConsumerWidget {
-  const _MonthView({
-    required this.state,
-    required this.onSelectDay,
-    required this.onSlotTap,
-  });
-
-  final TrainerCalendarState state;
-  final ValueChanged<DateTime> onSelectDay;
-  final ValueChanged<ScheduleSlot> onSlotTap;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final colors = context.appColors;
-    final typography = context.appTypography;
-    final month = DateTime(state.selectedDate.year, state.selectedDate.month);
-    final firstWeekday = month.weekday;
-    final daysInMonth = DateTime(month.year, month.month + 1, 0).day;
-    final leadingBlanks = firstWeekday - 1;
-    final totalCells = ((leadingBlanks + daysInMonth) / 7).ceil() * 7;
-    final selectedSlots =
-        state.slotsByDayOfMonth[state.selectedDate.day] ??
-        const <ScheduleSlot>[];
-
-    return ListView(
-      padding: const EdgeInsets.fromLTRB(
-        AppSpacing.screenEdge,
-        AppSpacing.md,
-        AppSpacing.screenEdge,
-        AppSpacing.lg,
-      ),
-      children: [
-        Container(
-          padding: const EdgeInsets.all(AppSpacing.md),
-          decoration: BoxDecoration(
-            color: colors.surface,
-            borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
-            border: Border.all(color: colors.outline),
-          ),
-          child: Column(
-            children: [
-              Text(
-                '${_monthNames[month.month]} ${month.year}',
-                style: typography.headingSmall.copyWith(
-                  color: colors.onSurface,
-                  fontSize: 17,
-                ),
-              ),
-              const SizedBox(height: AppSpacing.sm),
-              Row(
-                children: [
-                  for (final name in _dayNames)
-                    Expanded(
-                      child: Text(
-                        name,
-                        textAlign: TextAlign.center,
-                        style: typography.caption.copyWith(
-                          color: colors.onSurfaceMuted,
-                          fontSize: 11,
-                        ),
-                      ),
-                    ),
-                ],
-              ),
-              const SizedBox(height: AppSpacing.sm),
-              GridView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: totalCells,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 7,
-                  mainAxisSpacing: 5,
-                  crossAxisSpacing: 5,
-                ),
-                itemBuilder: (context, index) {
-                  final dayNum = index - leadingBlanks + 1;
-                  if (dayNum < 1 || dayNum > daysInMonth) {
-                    return const SizedBox.shrink();
-                  }
-                  final date = DateTime(month.year, month.month, dayNum);
-                  final isSelected = date.day == state.selectedDate.day;
-                  final count = state.slotsByDayOfMonth[dayNum]?.length ?? 0;
-                  return InkWell(
-                    borderRadius: BorderRadius.circular(12),
-                    onTap: () => onSelectDay(date),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: isSelected
-                            ? colors.primaryContainer
-                            : Colors.transparent,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: isSelected
-                              ? colors.primary
-                              : Colors.transparent,
-                        ),
-                      ),
-                      alignment: Alignment.center,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            '$dayNum',
-                            style: typography.headingSmall.copyWith(
-                              fontSize: 14,
-                              color: isSelected
-                                  ? colors.onPrimaryContainer
-                                  : colors.onSurface,
-                            ),
-                          ),
-                          if (count > 0)
-                            Container(
-                              margin: const EdgeInsets.only(top: 2),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 4,
-                              ),
-                              decoration: BoxDecoration(
-                                color: colors.primaryContainer,
-                                borderRadius: BorderRadius.circular(
-                                  AppSpacing.radiusPill,
-                                ),
-                              ),
-                              child: Text(
-                                '$count',
-                                style: typography.caption.copyWith(
-                                  color: colors.onPrimaryContainer,
-                                  fontSize: 9,
-                                ),
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: AppSpacing.lg),
-        Text(
-          '${state.selectedDate.day} ${_monthNames[state.selectedDate.month]}',
-          style: typography.caption.copyWith(
-            color: colors.onSurfaceMuted,
-            letterSpacing: 1.2,
-          ),
-        ),
-        const SizedBox(height: AppSpacing.sm),
-        if (selectedSlots.isEmpty)
-          Text(
-            ref.watch(rcTextProvider(RemoteConfigKeys.commonBuGundeSeansYok)),
-            style: typography.bodyMedium.copyWith(color: colors.onSurfaceMuted),
-          )
-        else
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-            decoration: BoxDecoration(
-              color: colors.surface,
-              borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
-              border: Border.all(color: colors.outline),
-            ),
-            child: Column(
-              children: [
-                for (var i = 0; i < selectedSlots.length; i++)
-                  _AgendaRow(
-                    slot: selectedSlots[i],
-                    showDivider: i < selectedSlots.length - 1,
-                    onTap: () => onSlotTap(selectedSlots[i]),
-                  ),
-              ],
-            ),
-          ),
-      ],
     );
   }
 }

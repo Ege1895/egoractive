@@ -5944,30 +5944,6 @@
       },
       "valueType": "STRING"
     },
-    "lbl_trainers_calendar_week_toggle_tr": {
-      "defaultValue": {
-        "value": "Hafta"
-      },
-      "valueType": "STRING"
-    },
-    "lbl_trainers_calendar_week_toggle_en": {
-      "defaultValue": {
-        "value": "Week"
-      },
-      "valueType": "STRING"
-    },
-    "lbl_trainers_calendar_month_toggle_tr": {
-      "defaultValue": {
-        "value": "Ay"
-      },
-      "valueType": "STRING"
-    },
-    "lbl_trainers_calendar_month_toggle_en": {
-      "defaultValue": {
-        "value": "Month"
-      },
-      "valueType": "STRING"
-    },
     "lbl_trainers_calendar_mark_completed_action_tr": {
       "defaultValue": {
         "value": "Dersi onayla"
@@ -6245,31 +6221,6 @@
     "lbl_trainers_edit_trainer_error_en": {
       "defaultValue": {
         "value": "Could not update trainer, try again."
-      },
-      "valueType": "STRING"
-    },
-    "lbl_trainers_calendar_week_range_tr": {
-      "description": "Antrenör takvimi hafta görünümü başlığı, {startDay}/{endDay}/{month}/{week} yer tutucuları",
-      "defaultValue": {
-        "value": "{startDay} – {endDay} {month} · {week}. hafta"
-      },
-      "valueType": "STRING"
-    },
-    "lbl_trainers_calendar_week_range_en": {
-      "defaultValue": {
-        "value": "{startDay} – {endDay} {month} · Week {week}"
-      },
-      "valueType": "STRING"
-    },
-    "lbl_trainers_calendar_day_empty_message_tr": {
-      "defaultValue": {
-        "value": "Seans yok — bu güne seans ekleyebilirsiniz"
-      },
-      "valueType": "STRING"
-    },
-    "lbl_trainers_calendar_day_empty_message_en": {
-      "defaultValue": {
-        "value": "No sessions — you can add a session to this day"
       },
       "valueType": "STRING"
     },

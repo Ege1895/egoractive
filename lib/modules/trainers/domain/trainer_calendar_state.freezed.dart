@@ -20,7 +20,6 @@ mixin _$TrainerCalendarState {
   DateTime get selectedDate => throw _privateConstructorUsedError;
   Map<int, List<ScheduleSlot>> get slotsByDayOfMonth =>
       throw _privateConstructorUsedError;
-  TrainerCalendarViewMode get viewMode => throw _privateConstructorUsedError;
 
   /// Create a copy of TrainerCalendarState
   /// with the given fields replaced by the non-null parameter values.
@@ -39,7 +38,6 @@ abstract class $TrainerCalendarStateCopyWith<$Res> {
   $Res call({
     DateTime selectedDate,
     Map<int, List<ScheduleSlot>> slotsByDayOfMonth,
-    TrainerCalendarViewMode viewMode,
   });
 }
 
@@ -60,11 +58,7 @@ class _$TrainerCalendarStateCopyWithImpl<
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({
-    Object? selectedDate = null,
-    Object? slotsByDayOfMonth = null,
-    Object? viewMode = null,
-  }) {
+  $Res call({Object? selectedDate = null, Object? slotsByDayOfMonth = null}) {
     return _then(
       _value.copyWith(
             selectedDate: null == selectedDate
@@ -75,10 +69,6 @@ class _$TrainerCalendarStateCopyWithImpl<
                 ? _value.slotsByDayOfMonth
                 : slotsByDayOfMonth // ignore: cast_nullable_to_non_nullable
                       as Map<int, List<ScheduleSlot>>,
-            viewMode: null == viewMode
-                ? _value.viewMode
-                : viewMode // ignore: cast_nullable_to_non_nullable
-                      as TrainerCalendarViewMode,
           )
           as $Val,
     );
@@ -97,7 +87,6 @@ abstract class _$$TrainerCalendarStateImplCopyWith<$Res>
   $Res call({
     DateTime selectedDate,
     Map<int, List<ScheduleSlot>> slotsByDayOfMonth,
-    TrainerCalendarViewMode viewMode,
   });
 }
 
@@ -114,11 +103,7 @@ class __$$TrainerCalendarStateImplCopyWithImpl<$Res>
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({
-    Object? selectedDate = null,
-    Object? slotsByDayOfMonth = null,
-    Object? viewMode = null,
-  }) {
+  $Res call({Object? selectedDate = null, Object? slotsByDayOfMonth = null}) {
     return _then(
       _$TrainerCalendarStateImpl(
         selectedDate: null == selectedDate
@@ -129,10 +114,6 @@ class __$$TrainerCalendarStateImplCopyWithImpl<$Res>
             ? _value._slotsByDayOfMonth
             : slotsByDayOfMonth // ignore: cast_nullable_to_non_nullable
                   as Map<int, List<ScheduleSlot>>,
-        viewMode: null == viewMode
-            ? _value.viewMode
-            : viewMode // ignore: cast_nullable_to_non_nullable
-                  as TrainerCalendarViewMode,
       ),
     );
   }
@@ -144,7 +125,6 @@ class _$TrainerCalendarStateImpl implements _TrainerCalendarState {
   const _$TrainerCalendarStateImpl({
     required this.selectedDate,
     required final Map<int, List<ScheduleSlot>> slotsByDayOfMonth,
-    this.viewMode = TrainerCalendarViewMode.week,
   }) : _slotsByDayOfMonth = slotsByDayOfMonth;
 
   @override
@@ -159,12 +139,8 @@ class _$TrainerCalendarStateImpl implements _TrainerCalendarState {
   }
 
   @override
-  @JsonKey()
-  final TrainerCalendarViewMode viewMode;
-
-  @override
   String toString() {
-    return 'TrainerCalendarState(selectedDate: $selectedDate, slotsByDayOfMonth: $slotsByDayOfMonth, viewMode: $viewMode)';
+    return 'TrainerCalendarState(selectedDate: $selectedDate, slotsByDayOfMonth: $slotsByDayOfMonth)';
   }
 
   @override
@@ -177,9 +153,7 @@ class _$TrainerCalendarStateImpl implements _TrainerCalendarState {
             const DeepCollectionEquality().equals(
               other._slotsByDayOfMonth,
               _slotsByDayOfMonth,
-            ) &&
-            (identical(other.viewMode, viewMode) ||
-                other.viewMode == viewMode));
+            ));
   }
 
   @override
@@ -187,7 +161,6 @@ class _$TrainerCalendarStateImpl implements _TrainerCalendarState {
     runtimeType,
     selectedDate,
     const DeepCollectionEquality().hash(_slotsByDayOfMonth),
-    viewMode,
   );
 
   /// Create a copy of TrainerCalendarState
@@ -207,15 +180,12 @@ abstract class _TrainerCalendarState implements TrainerCalendarState {
   const factory _TrainerCalendarState({
     required final DateTime selectedDate,
     required final Map<int, List<ScheduleSlot>> slotsByDayOfMonth,
-    final TrainerCalendarViewMode viewMode,
   }) = _$TrainerCalendarStateImpl;
 
   @override
   DateTime get selectedDate;
   @override
   Map<int, List<ScheduleSlot>> get slotsByDayOfMonth;
-  @override
-  TrainerCalendarViewMode get viewMode;
 
   /// Create a copy of TrainerCalendarState
   /// with the given fields replaced by the non-null parameter values.
