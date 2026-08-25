@@ -688,7 +688,7 @@ class _MemberBadgesRow extends ConsumerWidget {
             children: [
               Row(
                 children: [
-                  _BadgeIcon(earned: badge.earned, size: 56, iconSize: 24),
+                  _BadgeIcon(badge: badge, size: 56, iconSize: 24),
                   const SizedBox(width: AppSpacing.md),
                   Expanded(
                     child: Column(
@@ -758,7 +758,7 @@ class _MemberBadgeCircle extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            _BadgeIcon(earned: badge.earned),
+            _BadgeIcon(badge: badge),
             const SizedBox(height: AppSpacing.xs),
             Text(
               badge.title,
@@ -778,31 +778,46 @@ class _MemberBadgeCircle extends StatelessWidget {
 }
 
 class _BadgeIcon extends StatelessWidget {
-  const _BadgeIcon({required this.earned, this.size = 44, this.iconSize = 18});
+  const _BadgeIcon({required this.badge, this.size = 44, this.iconSize = 18});
 
-  final bool earned;
+  final BadgeItem badge;
   final double size;
   final double iconSize;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
+    final earned = badge.earned;
     return Container(
       width: size,
       height: size,
       decoration: BoxDecoration(
-        color: earned ? colors.primaryContainer : colors.surfaceRaised,
         shape: BoxShape.circle,
         border: Border.all(
           color: earned ? colors.primary : colors.outlineStrong,
           width: 2,
         ),
       ),
-      alignment: Alignment.center,
-      child: Icon(
-        earned ? Icons.emoji_events : Icons.lock_outline,
-        size: iconSize,
-        color: earned ? colors.primary : colors.onSurfaceMuted,
+      child: ClipOval(
+        child: Opacity(
+          // Kazanılmamış rozet kilit ikonu yerine SOLUK gösteriliyor —
+          // kazanılan canlı/tam opaklıkta (bkz. badges_panel.dart'taki aynı
+          // desen).
+          opacity: earned ? 1 : 0.35,
+          child: Image.asset(
+            'assets/badges/${badge.id}.png',
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) => Container(
+              color: earned ? colors.primaryContainer : colors.surfaceRaised,
+              alignment: Alignment.center,
+              child: Icon(
+                earned ? Icons.emoji_events : Icons.lock_outline,
+                size: iconSize,
+                color: earned ? colors.primary : colors.onSurfaceMuted,
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }

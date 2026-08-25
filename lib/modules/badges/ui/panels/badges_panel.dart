@@ -229,20 +229,35 @@ class _BadgeTile extends StatelessWidget {
             width: 44,
             height: 44,
             decoration: BoxDecoration(
-              color: badge.earned
-                  ? colors.primaryContainer
-                  : colors.surfaceRaised,
               shape: BoxShape.circle,
               border: Border.all(
                 color: badge.earned ? colors.primary : colors.outlineStrong,
                 width: 2,
               ),
             ),
-            alignment: Alignment.center,
-            child: Icon(
-              badge.earned ? Icons.emoji_events : Icons.lock_outline,
-              size: 18,
-              color: badge.earned ? colors.primary : colors.onSurfaceMuted,
+            child: ClipOval(
+              child: Opacity(
+                // Kazanılmamış rozet kilit ikonu yerine SOLUK (düşük opaklık)
+                // gösteriliyor — kazanılan canlı/tam opaklıkta.
+                opacity: badge.earned ? 1 : 0.35,
+                child: Image.asset(
+                  'assets/badges/${badge.id}.png',
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) => Container(
+                    color: badge.earned
+                        ? colors.primaryContainer
+                        : colors.surfaceRaised,
+                    alignment: Alignment.center,
+                    child: Icon(
+                      badge.earned ? Icons.emoji_events : Icons.lock_outline,
+                      size: 18,
+                      color: badge.earned
+                          ? colors.primary
+                          : colors.onSurfaceMuted,
+                    ),
+                  ),
+                ),
+              ),
             ),
           ),
           const SizedBox(height: AppSpacing.xs),
