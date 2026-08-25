@@ -9,6 +9,7 @@ import '../../../../shared/widgets/app_button.dart';
 import '../../../expenses/domain/expense_state.dart';
 import '../../controller/admin_calendar_controller.dart';
 import '../../domain/admin_calendar_state.dart';
+import '../../service/sessions_write_service.dart';
 import '../widgets/create_session_sheet.dart';
 
 const _monthNames = {
@@ -445,162 +446,248 @@ class AdminCalendarPanel extends ConsumerWidget {
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
       builder: (sheetContext) {
-        return Padding(
-          padding: const EdgeInsets.fromLTRB(
-            AppSpacing.screenEdge,
-            AppSpacing.lg,
-            AppSpacing.screenEdge,
-            AppSpacing.xxl,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.md,
-                      vertical: AppSpacing.sm,
-                    ),
-                    decoration: BoxDecoration(
-                      color: colors.surfaceRaised,
-                      borderRadius: BorderRadius.circular(
-                        AppSpacing.radiusInner,
-                      ),
-                    ),
-                    child: Column(
-                      children: [
-                        Text(
-                          '${date.day}',
-                          style: typography.dataMedium.copyWith(
-                            color: colors.onSurface,
-                            fontSize: 20,
-                          ),
-                        ),
-                        Text(
-                          _monthNames[date.month]!.substring(0, 3),
-                          style: typography.caption.copyWith(
-                            color: colors.onSurfaceMuted,
-                            fontSize: 11,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: AppSpacing.md),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          slot.title,
-                          style: typography.headingSmall.copyWith(
-                            color: colors.onSurface,
-                            fontSize: 18,
-                          ),
-                        ),
-                        Text(
-                          slot.meta,
-                          style: typography.bodyMedium.copyWith(
-                            color: colors.onSurfaceVariant,
-                            fontSize: 13,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.sm,
-                      vertical: 6,
-                    ),
-                    decoration: BoxDecoration(
-                      color: chipBg,
-                      borderRadius: BorderRadius.circular(
-                        AppSpacing.radiusPill,
-                      ),
-                    ),
-                    child: Text(
-                      chipLabel,
-                      style: typography.caption.copyWith(
-                        color: chipFg,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: AppSpacing.lg),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-                decoration: BoxDecoration(
-                  color: colors.surfaceRaised,
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
-                ),
-                child: Column(
+        var isCancelling = false;
+        String? cancelError;
+        return StatefulBuilder(
+          builder: (sheetContext, setLocalState) => Padding(
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.screenEdge,
+              AppSpacing.lg,
+              AppSpacing.screenEdge,
+              AppSpacing.xxl,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _PopupRow(
-                      label: ref.read(
-                        rcTextProvider(
-                          RemoteConfigKeys.sessionsCalendarSlotTimeLabel,
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.md,
+                        vertical: AppSpacing.sm,
+                      ),
+                      decoration: BoxDecoration(
+                        color: colors.surfaceRaised,
+                        borderRadius: BorderRadius.circular(
+                          AppSpacing.radiusInner,
                         ),
                       ),
-                      value: slot.time,
+                      child: Column(
+                        children: [
+                          Text(
+                            '${date.day}',
+                            style: typography.dataMedium.copyWith(
+                              color: colors.onSurface,
+                              fontSize: 20,
+                            ),
+                          ),
+                          Text(
+                            _monthNames[date.month]!.substring(0, 3),
+                            style: typography.caption.copyWith(
+                              color: colors.onSurfaceMuted,
+                              fontSize: 11,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                    _PopupRow(
-                      label: ref.read(
-                        rcTextProvider(
-                          RemoteConfigKeys.sessionsCalendarSlotStatusLabel,
+                    const SizedBox(width: AppSpacing.md),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            slot.title,
+                            style: typography.headingSmall.copyWith(
+                              color: colors.onSurface,
+                              fontSize: 18,
+                            ),
+                          ),
+                          Text(
+                            slot.meta,
+                            style: typography.bodyMedium.copyWith(
+                              color: colors.onSurfaceVariant,
+                              fontSize: 13,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.sm,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: chipBg,
+                        borderRadius: BorderRadius.circular(
+                          AppSpacing.radiusPill,
                         ),
                       ),
-                      value: chipLabel,
-                      showDivider: false,
+                      child: Text(
+                        chipLabel,
+                        style: typography.caption.copyWith(
+                          color: chipFg,
+                          fontSize: 12,
+                        ),
+                      ),
                     ),
                   ],
                 ),
-              ),
-              const SizedBox(height: AppSpacing.lg),
-              Row(
-                children: [
-                  Expanded(
-                    child: AppButton(
-                      label: ref.read(
-                        rcTextProvider(RemoteConfigKeys.commonSeansiErtele),
+                const SizedBox(height: AppSpacing.lg),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.md,
+                  ),
+                  decoration: BoxDecoration(
+                    color: colors.surfaceRaised,
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+                  ),
+                  child: Column(
+                    children: [
+                      _PopupRow(
+                        label: ref.read(
+                          rcTextProvider(
+                            RemoteConfigKeys.sessionsCalendarSlotTimeLabel,
+                          ),
+                        ),
+                        value: slot.time,
                       ),
-                      onPressed: () async {
-                        Navigator.of(sheetContext).pop();
-                        final parts = slot.time.split(':');
-                        final currentStart = DateTime(
-                          date.year,
-                          date.month,
-                          date.day,
-                          int.parse(parts[0]),
-                          int.parse(parts[1]),
-                        );
-                        await showRescheduleSessionSheet(
-                          context,
-                          ref,
-                          sessionId: slot.id,
-                          currentStart: currentStart,
-                        );
-                      },
+                      _PopupRow(
+                        label: ref.read(
+                          rcTextProvider(
+                            RemoteConfigKeys.sessionsCalendarSlotStatusLabel,
+                          ),
+                        ),
+                        value: chipLabel,
+                        showDivider: false,
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.lg),
+                if (cancelError != null) ...[
+                  Text(
+                    cancelError!,
+                    style: typography.bodyMedium.copyWith(
+                      color: colors.error,
+                      fontSize: 13,
                     ),
                   ),
-                  const SizedBox(width: AppSpacing.sm),
-                  Expanded(
-                    child: AppButton(
-                      label: ref.read(
-                        rcTextProvider(RemoteConfigKeys.commonKapat),
-                      ),
-                      variant: AppButtonVariant.secondary,
-                      onPressed: () => Navigator.of(sheetContext).pop(),
-                    ),
-                  ),
+                  const SizedBox(height: AppSpacing.sm),
                 ],
-              ),
-            ],
+                Row(
+                  children: [
+                    Expanded(
+                      child: AppButton(
+                        label: ref.read(
+                          rcTextProvider(RemoteConfigKeys.commonSeansiErtele),
+                        ),
+                        onPressed: () async {
+                          Navigator.of(sheetContext).pop();
+                          final parts = slot.time.split(':');
+                          final currentStart = DateTime(
+                            date.year,
+                            date.month,
+                            date.day,
+                            int.parse(parts[0]),
+                            int.parse(parts[1]),
+                          );
+                          await showRescheduleSessionSheet(
+                            context,
+                            ref,
+                            sessionId: slot.id,
+                            currentStart: currentStart,
+                          );
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: AppSpacing.sm),
+                    Expanded(
+                      // Önceden burada sadece "Kapat" vardı — admin bir
+                      // seansı iptal etmek için Ayarlar > Seans Yönetimi'ne
+                      // gitmek zorundaydı. Zaten iptal edilmiş bir seans için
+                      // hâlâ sadece "Kapat" gösteriliyor, çünkü tekrar iptal
+                      // edilecek bir şey yok.
+                      child: slot.state == AdminSessionState.cancelled
+                          ? AppButton(
+                              label: ref.read(
+                                rcTextProvider(RemoteConfigKeys.commonKapat),
+                              ),
+                              variant: AppButtonVariant.secondary,
+                              onPressed: () => Navigator.of(sheetContext).pop(),
+                            )
+                          : Material(
+                              color: colors.errorContainer,
+                              borderRadius: BorderRadius.circular(
+                                AppSpacing.radiusInner,
+                              ),
+                              child: InkWell(
+                                borderRadius: BorderRadius.circular(
+                                  AppSpacing.radiusInner,
+                                ),
+                                onTap: isCancelling
+                                    ? null
+                                    : () async {
+                                        setLocalState(() {
+                                          isCancelling = true;
+                                          cancelError = null;
+                                        });
+                                        try {
+                                          await ref
+                                              .read(
+                                                sessionsWriteServiceProvider,
+                                              )
+                                              .cancelSession(slot.id);
+                                          if (sheetContext.mounted) {
+                                            Navigator.of(sheetContext).pop();
+                                          }
+                                        } catch (_) {
+                                          setLocalState(() {
+                                            isCancelling = false;
+                                            cancelError = ref.read(
+                                              rcTextProvider(
+                                                RemoteConfigKeys
+                                                    .sessionsManagementCancelError,
+                                              ),
+                                            );
+                                          });
+                                        }
+                                      },
+                                child: Container(
+                                  constraints: const BoxConstraints(
+                                    minHeight: AppSpacing.primaryActionHeight,
+                                  ),
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                    isCancelling
+                                        ? ref.read(
+                                            rcTextProvider(
+                                              RemoteConfigKeys
+                                                  .sessionsManagementCancellingLabel,
+                                            ),
+                                          )
+                                        : ref.read(
+                                            rcTextProvider(
+                                              RemoteConfigKeys
+                                                  .sessionsCancelSessionAction,
+                                            ),
+                                          ),
+                                    style: typography.headingSmall.copyWith(
+                                      fontSize: 15,
+                                      color: colors.onErrorContainer,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         );
       },
