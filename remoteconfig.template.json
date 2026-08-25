@@ -98,6 +98,13 @@
       "description": "Ücretsiz sürümde reklam gösterilsin mi.",
       "valueType": "BOOLEAN"
     },
+    "cfg_allow_past_datetime_creation": {
+      "defaultValue": {
+        "value": "false"
+      },
+      "description": "Test amaçlı — true iken seans/grup dersi/etkinlik oluşturma ekranları geçmiş bir tarih/saat seçilmesine izin verir. Prod'da false kalmalı.",
+      "valueType": "BOOLEAN"
+    },
     "cfg_trial_duration_days": {
       "defaultValue": {
         "value": "14"
@@ -308,6 +315,18 @@
     "lbl_common_seansi_ertele_en": {
       "defaultValue": {
         "value": "Postpone session"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_common_past_datetime_error_tr": {
+      "defaultValue": {
+        "value": "Geçmiş bir tarih/saate oluşturamazsın."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_common_past_datetime_error_en": {
+      "defaultValue": {
+        "value": "You can't create this in the past."
       },
       "valueType": "STRING"
     },

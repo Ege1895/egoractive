@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
+import '../../../../core/remote_config/past_datetime_gate.dart';
 import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/subscription/subscription_write_gate.dart';
 import '../../../../core/theme/app_theme.dart';
@@ -351,6 +352,18 @@ class _CreateEventPanelState extends BasePanelState<CreateEventPanel> {
                                 () => _dateError = ref.read(
                                   rcTextProvider(
                                     RemoteConfigKeys.eventsDateFormatError,
+                                  ),
+                                ),
+                              );
+                              hasError = true;
+                            } else if (isPastDatetimeCreationBlocked(
+                              ref,
+                              dateTime,
+                            )) {
+                              setState(
+                                () => _dateError = ref.read(
+                                  rcTextProvider(
+                                    RemoteConfigKeys.commonPastDatetimeError,
                                   ),
                                 ),
                               );

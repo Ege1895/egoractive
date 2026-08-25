@@ -130,10 +130,16 @@ class CreateGroupSessionController extends _$CreateGroupSessionController {
     }
   }
 
+  /// Seçili gün için en yakın gelecekteki tekrarı bulur — RC'deki
+  /// `cfg_allow_past_datetime_creation` testte açık DEĞİLSE asla geçmişte
+  /// bir tarih dönmez (`date.isBefore(now)` sürekli ileri sardırır).
+  /// Test amaçlı açıldığında bu ileri sardırma atlanır, bu haftaki (belki
+  /// zaten geçmiş) tekrar olduğu gibi döner.
   DateTime _nextOccurrence(int weekday, int hour, int minute) {
     final now = DateTime.now();
     var date = DateTime(now.year, now.month, now.day, hour, minute);
-    while (date.weekday != weekday || date.isBefore(now)) {
+    final allowPast = ref.read(remoteConfigServiceProvider).allowPastDatetimeCreation;
+    while (date.weekday != weekday || (!allowPast && date.isBefore(now))) {
       date = date.add(const Duration(days: 1));
     }
     return date;

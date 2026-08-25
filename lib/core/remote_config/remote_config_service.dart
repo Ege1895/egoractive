@@ -44,6 +44,13 @@ abstract final class RemoteConfigKeys {
   static const freeVersionAdsEnabled = 'cfg_free_version_ads_enabled';
   static const featureFlags = 'cfg_feature_flags';
 
+  /// Test amaçlı — `true` iken seans/grup dersi/etkinlik oluşturma
+  /// ekranları geçmiş bir tarih/saat seçilmesine izin verir (QA'nın geçmiş
+  /// veriyle test senaryosu kurabilmesi için). Prod'da her zaman `false`
+  /// kalmalı — kapalıyken üçü de şu andan eski bir tarih/saate
+  /// oluşturulamaz.
+  static const allowPastDatetimeCreation = 'cfg_allow_past_datetime_creation';
+
   /// F6-3 — yeni bir salon oluşturulduğunda `trialStartedAt`'ten itibaren
   /// kaç gün ücretsiz deneme süresi tanınır.
   static const trialDurationDays = 'cfg_trial_duration_days';
@@ -107,6 +114,11 @@ abstract final class RemoteConfigKeys {
   static const commonHesabimiSil = 'lbl_common_hesabimi_sil';
   static const commonStudyoKurallariNav = 'lbl_common_studyo_kurallari_nav';
   static const commonSeansiErtele = 'lbl_common_seansi_ertele';
+
+  /// Seans/grup dersi/etkinlik oluşturma ekranlarının üçünde de aynı
+  /// mesajla kullanılan — geçmiş bir tarih/saat seçildiğinde gösterilir
+  /// (bkz. [RemoteConfigKeys.allowPastDatetimeCreation]).
+  static const commonPastDatetimeError = 'lbl_common_past_datetime_error';
   static const commonGelicem = 'lbl_common_gelicem';
   static const commonGelmeyecegim = 'lbl_common_gelmeyecegim';
   static const commonAnaSayfaTab = 'lbl_common_ana_sayfa_tab';
@@ -1272,6 +1284,7 @@ class RemoteConfigService {
     RemoteConfigKeys.defaultOnlineBookingEnabled: true,
     RemoteConfigKeys.defaultAllowSessionsAfterPackageExpiry: false,
     RemoteConfigKeys.defaultMemberCanCancelSession: true,
+    RemoteConfigKeys.allowPastDatetimeCreation: false,
     RemoteConfigKeys.feedbackReminderDayOfMonth: -1,
     RemoteConfigKeys.freeVersionAdsEnabled: true,
     RemoteConfigKeys.trialDurationDays: 14,
@@ -2967,6 +2980,11 @@ class RemoteConfigService {
   /// Ücretsiz sürümde reklam gösterilsin mi.
   bool get freeVersionAdsEnabled =>
       getBool(RemoteConfigKeys.freeVersionAdsEnabled);
+
+  /// Test amaçlı — açıkken seans/grup dersi/etkinlik geçmiş tarih/saate
+  /// oluşturulabilir (bkz. [RemoteConfigKeys.allowPastDatetimeCreation]).
+  bool get allowPastDatetimeCreation =>
+      getBool(RemoteConfigKeys.allowPastDatetimeCreation);
 
   /// F6-3 — yeni salonlara tanınan ücretsiz deneme süresi (gün).
   int get trialDurationDays => getInt(RemoteConfigKeys.trialDurationDays);

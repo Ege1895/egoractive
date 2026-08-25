@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/app_spacing.dart';
+import '../../../../core/remote_config/past_datetime_gate.dart';
 import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/subscription/subscription_write_gate.dart';
 import '../../../../core/theme/app_theme.dart';
@@ -60,6 +61,24 @@ Future<void> showRescheduleSessionSheet(
   );
   if (time == null || !context.mounted) return;
 
+  final newStartTime = DateTime(
+    date.year,
+    date.month,
+    date.day,
+    time.hour,
+    time.minute,
+  );
+  if (isPastDatetimeCreationBlocked(ref, newStartTime)) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          ref.read(rcTextProvider(RemoteConfigKeys.commonPastDatetimeError)),
+        ),
+      ),
+    );
+    return;
+  }
+
   showDialog<void>(
     context: context,
     barrierDismissible: false,
@@ -68,10 +87,7 @@ Future<void> showRescheduleSessionSheet(
   try {
     await ref
         .read(sessionsWriteServiceProvider)
-        .rescheduleSession(
-          sessionId,
-          DateTime(date.year, date.month, date.day, time.hour, time.minute),
-        );
+        .rescheduleSession(sessionId, newStartTime);
   } on TrainerConflictException catch (e) {
     if (context.mounted) {
       Navigator.of(context, rootNavigator: true).pop();
@@ -175,7 +191,20 @@ class _CreateSessionSheetState extends ConsumerState<_CreateSessionSheet> {
     final failedDays = <String>[];
     var anySucceeded = false;
     var ranOutOfSessions = false;
+    var hasPastDatetime = false;
     for (final date in allDates) {
+      final startTime = DateTime(
+        date.year,
+        date.month,
+        date.day,
+        _time.hour,
+        _time.minute,
+      );
+      if (isPastDatetimeCreationBlocked(ref, startTime)) {
+        failedDays.add('${date.day}.${date.month}');
+        hasPastDatetime = true;
+        continue;
+      }
       try {
         await ref
             .read(sessionsWriteServiceProvider)
@@ -185,13 +214,7 @@ class _CreateSessionSheetState extends ConsumerState<_CreateSessionSheet> {
               trainerName: trainer.name,
               memberId: _member!.id,
               memberName: _member!.name,
-              startTime: DateTime(
-                date.year,
-                date.month,
-                date.day,
-                _time.hour,
-                _time.minute,
-              ),
+              startTime: startTime,
             );
         anySucceeded = true;
       } on TrainerConflictException {
@@ -239,6 +262,8 @@ class _CreateSessionSheetState extends ConsumerState<_CreateSessionSheet> {
           ? ref.read(
               rcTextProvider(RemoteConfigKeys.sessionsRepeatCalendarExhaustedError),
             )
+          : hasPastDatetime
+          ? ref.read(rcTextProvider(RemoteConfigKeys.commonPastDatetimeError))
           : ref
                 .read(
                   rcTextProvider(RemoteConfigKeys.sessionsCreateTrainerBusyError),
