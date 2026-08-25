@@ -55,7 +55,7 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
   String? _paletteSourceKey;
 
   Color? _previewColor;
-  late final GymTheme _originalTheme;
+  late final Color _originalThemeColor;
 
   @override
   void initState() {
@@ -77,7 +77,18 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
       text: recipients.accountingReportEmail,
     );
 
-    _originalTheme = ref.read(gymThemeControllerProvider.notifier).activeTheme;
+    // `GymThemeController`, kendi altındaki `_themeStateForGymProvider`
+    // stream'i (autoDispose, bu panel ilk açıldığında soğuk başlıyor) henüz
+    // ilk snapshot'ını vermediyse sessizce `_fallbackState`e (Egora Mavisi)
+    // düşüyor — bu panelin AÇILDIĞI ANDA `activeTheme` okunursa gerçek
+    // salon rengi (ör. sarı) henüz gelmemiş olabilir, "orijinal" renk
+    // olarak yanlışlıkla mavi kilitlenir. `ThemeController` ise uygulama
+    // genelinde zaten `keepAlive` ve ekranda o an GERÇEKTEN render edilen
+    // rengi tutuyor (bu ekrana gelindiğinde zaten çözülmüş olmalı) — geri
+    // dönüş noktası için asıl güvenilir kaynak bu.
+    _originalThemeColor =
+        ref.read(themeControllerProvider).valueOrNull?.primary ??
+        ref.read(gymThemeControllerProvider.notifier).activeTheme.primary;
   }
 
   @override
@@ -675,7 +686,7 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
     if (_previewColor != null) {
       ref
           .read(themeControllerProvider.notifier)
-          .setAccentColor(_originalTheme.primary);
+          .setAccentColor(_originalThemeColor);
     }
     super.onPanelHide();
   }

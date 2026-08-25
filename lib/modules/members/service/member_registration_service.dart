@@ -48,6 +48,7 @@ class MemberRegistrationService {
   }) async {
     final doc = await FirebaseFirestore.instance.collection('users').add({
       'name': name,
+      'nameLower': name.toLowerCase(),
       'phoneNumber': phoneNumber,
       'role': 'member',
       'gymId': gymId,
@@ -82,6 +83,7 @@ class MemberRegistrationService {
   }) {
     return FirebaseFirestore.instance.collection('users').doc(memberId).update({
       'name': name,
+      'nameLower': name.toLowerCase(),
       'phoneNumber': phoneNumber,
       if (trainerId != null) 'trainerId': trainerId,
       if (trainerName != null) 'trainerName': trainerName,
