@@ -1102,6 +1102,12 @@ abstract final class RemoteConfigKeys {
   static const trainersReportOneOnOneToggle =
       'lbl_trainers_report_one_on_one_toggle';
   static const trainersReportGroupToggle = 'lbl_trainers_report_group_toggle';
+  static const trainersReportPeriodWeekly = 'lbl_trainers_report_period_weekly';
+  static const trainersReportPeriodMonthly =
+      'lbl_trainers_report_period_monthly';
+  static const trainersReportPeriodAllTime =
+      'lbl_trainers_report_period_all_time';
+  static const trainersReportPeriodCustom = 'lbl_trainers_report_period_custom';
   static const trainersProfileFooterText = 'lbl_trainers_profile_footer_text';
   static const trainersDetailTitle = 'lbl_trainers_detail_title';
   static const trainersMemberCountSuffix = 'lbl_trainers_member_count_suffix';
@@ -1994,6 +2000,10 @@ class RemoteConfigService {
     'lbl_trainers_report_end_date_field_label_tr': 'Bitiş t.',
     'lbl_trainers_report_one_on_one_toggle_tr': 'Birebir',
     'lbl_trainers_report_group_toggle_tr': 'Grup',
+    'lbl_trainers_report_period_weekly_tr': 'Haftalık',
+    'lbl_trainers_report_period_monthly_tr': 'Aylık',
+    'lbl_trainers_report_period_all_time_tr': 'Tüm zamanlar',
+    'lbl_trainers_report_period_custom_tr': 'Özel',
     'lbl_trainers_profile_footer_text_tr':
         'Egoractive · Egora Games · Sürüm 1.0',
     'lbl_trainers_detail_title_tr': 'Antrenör detayı',
@@ -2752,6 +2762,10 @@ class RemoteConfigService {
     'lbl_trainers_report_end_date_field_label_en': 'End',
     'lbl_trainers_report_one_on_one_toggle_en': 'One-on-one',
     'lbl_trainers_report_group_toggle_en': 'Group',
+    'lbl_trainers_report_period_weekly_en': 'Weekly',
+    'lbl_trainers_report_period_monthly_en': 'Monthly',
+    'lbl_trainers_report_period_all_time_en': 'All time',
+    'lbl_trainers_report_period_custom_en': 'Custom',
     'lbl_trainers_profile_footer_text_en':
         'Egoractive · Egora Games · Version 1.0',
     'lbl_trainers_detail_title_en': 'Trainer detail',

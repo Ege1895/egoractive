@@ -9,10 +9,14 @@ class TrainerReportService {
   const TrainerReportService();
 
   TrainerReportState loadInitial() {
-    return const TrainerReportState(
+    return TrainerReportState(
       startDate: '1 Tem 2026',
       endDate: '31 Tem 2026',
-      breakdown: [
+      period: TrainerReportPeriod.monthly,
+      periodStart: DateTime(2026, 7, 1),
+      periodEnd: DateTime(2026, 7, 31),
+      gymJoinedAt: DateTime(2026, 1, 1),
+      breakdown: const [
         TrainerReportBreakdown(
           title: 'Toplam seanslar',
           total: 61,

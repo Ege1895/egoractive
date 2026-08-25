@@ -221,6 +221,13 @@ abstract class _TrainerReportBreakdown implements TrainerReportBreakdown {
 mixin _$TrainerReportState {
   String get startDate => throw _privateConstructorUsedError;
   String get endDate => throw _privateConstructorUsedError;
+  TrainerReportPeriod get period => throw _privateConstructorUsedError;
+  DateTime get periodStart => throw _privateConstructorUsedError;
+  DateTime get periodEnd => throw _privateConstructorUsedError;
+
+  /// Antrenörün salona katıldığı tarih ("Tüm zamanlar" alt sınırı ve
+  /// "Özel" tarih seçicisinin firstDate'i) — `users/{uid}.createdAt`.
+  DateTime get gymJoinedAt => throw _privateConstructorUsedError;
   List<TrainerReportBreakdown> get breakdown =>
       throw _privateConstructorUsedError;
 
@@ -241,6 +248,10 @@ abstract class $TrainerReportStateCopyWith<$Res> {
   $Res call({
     String startDate,
     String endDate,
+    TrainerReportPeriod period,
+    DateTime periodStart,
+    DateTime periodEnd,
+    DateTime gymJoinedAt,
     List<TrainerReportBreakdown> breakdown,
   });
 }
@@ -262,6 +273,10 @@ class _$TrainerReportStateCopyWithImpl<$Res, $Val extends TrainerReportState>
   $Res call({
     Object? startDate = null,
     Object? endDate = null,
+    Object? period = null,
+    Object? periodStart = null,
+    Object? periodEnd = null,
+    Object? gymJoinedAt = null,
     Object? breakdown = null,
   }) {
     return _then(
@@ -274,6 +289,22 @@ class _$TrainerReportStateCopyWithImpl<$Res, $Val extends TrainerReportState>
                 ? _value.endDate
                 : endDate // ignore: cast_nullable_to_non_nullable
                       as String,
+            period: null == period
+                ? _value.period
+                : period // ignore: cast_nullable_to_non_nullable
+                      as TrainerReportPeriod,
+            periodStart: null == periodStart
+                ? _value.periodStart
+                : periodStart // ignore: cast_nullable_to_non_nullable
+                      as DateTime,
+            periodEnd: null == periodEnd
+                ? _value.periodEnd
+                : periodEnd // ignore: cast_nullable_to_non_nullable
+                      as DateTime,
+            gymJoinedAt: null == gymJoinedAt
+                ? _value.gymJoinedAt
+                : gymJoinedAt // ignore: cast_nullable_to_non_nullable
+                      as DateTime,
             breakdown: null == breakdown
                 ? _value.breakdown
                 : breakdown // ignore: cast_nullable_to_non_nullable
@@ -296,6 +327,10 @@ abstract class _$$TrainerReportStateImplCopyWith<$Res>
   $Res call({
     String startDate,
     String endDate,
+    TrainerReportPeriod period,
+    DateTime periodStart,
+    DateTime periodEnd,
+    DateTime gymJoinedAt,
     List<TrainerReportBreakdown> breakdown,
   });
 }
@@ -316,6 +351,10 @@ class __$$TrainerReportStateImplCopyWithImpl<$Res>
   $Res call({
     Object? startDate = null,
     Object? endDate = null,
+    Object? period = null,
+    Object? periodStart = null,
+    Object? periodEnd = null,
+    Object? gymJoinedAt = null,
     Object? breakdown = null,
   }) {
     return _then(
@@ -328,6 +367,22 @@ class __$$TrainerReportStateImplCopyWithImpl<$Res>
             ? _value.endDate
             : endDate // ignore: cast_nullable_to_non_nullable
                   as String,
+        period: null == period
+            ? _value.period
+            : period // ignore: cast_nullable_to_non_nullable
+                  as TrainerReportPeriod,
+        periodStart: null == periodStart
+            ? _value.periodStart
+            : periodStart // ignore: cast_nullable_to_non_nullable
+                  as DateTime,
+        periodEnd: null == periodEnd
+            ? _value.periodEnd
+            : periodEnd // ignore: cast_nullable_to_non_nullable
+                  as DateTime,
+        gymJoinedAt: null == gymJoinedAt
+            ? _value.gymJoinedAt
+            : gymJoinedAt // ignore: cast_nullable_to_non_nullable
+                  as DateTime,
         breakdown: null == breakdown
             ? _value._breakdown
             : breakdown // ignore: cast_nullable_to_non_nullable
@@ -343,6 +398,10 @@ class _$TrainerReportStateImpl implements _TrainerReportState {
   const _$TrainerReportStateImpl({
     required this.startDate,
     required this.endDate,
+    required this.period,
+    required this.periodStart,
+    required this.periodEnd,
+    required this.gymJoinedAt,
     required final List<TrainerReportBreakdown> breakdown,
   }) : _breakdown = breakdown;
 
@@ -350,6 +409,17 @@ class _$TrainerReportStateImpl implements _TrainerReportState {
   final String startDate;
   @override
   final String endDate;
+  @override
+  final TrainerReportPeriod period;
+  @override
+  final DateTime periodStart;
+  @override
+  final DateTime periodEnd;
+
+  /// Antrenörün salona katıldığı tarih ("Tüm zamanlar" alt sınırı ve
+  /// "Özel" tarih seçicisinin firstDate'i) — `users/{uid}.createdAt`.
+  @override
+  final DateTime gymJoinedAt;
   final List<TrainerReportBreakdown> _breakdown;
   @override
   List<TrainerReportBreakdown> get breakdown {
@@ -360,7 +430,7 @@ class _$TrainerReportStateImpl implements _TrainerReportState {
 
   @override
   String toString() {
-    return 'TrainerReportState(startDate: $startDate, endDate: $endDate, breakdown: $breakdown)';
+    return 'TrainerReportState(startDate: $startDate, endDate: $endDate, period: $period, periodStart: $periodStart, periodEnd: $periodEnd, gymJoinedAt: $gymJoinedAt, breakdown: $breakdown)';
   }
 
   @override
@@ -371,6 +441,13 @@ class _$TrainerReportStateImpl implements _TrainerReportState {
             (identical(other.startDate, startDate) ||
                 other.startDate == startDate) &&
             (identical(other.endDate, endDate) || other.endDate == endDate) &&
+            (identical(other.period, period) || other.period == period) &&
+            (identical(other.periodStart, periodStart) ||
+                other.periodStart == periodStart) &&
+            (identical(other.periodEnd, periodEnd) ||
+                other.periodEnd == periodEnd) &&
+            (identical(other.gymJoinedAt, gymJoinedAt) ||
+                other.gymJoinedAt == gymJoinedAt) &&
             const DeepCollectionEquality().equals(
               other._breakdown,
               _breakdown,
@@ -382,6 +459,10 @@ class _$TrainerReportStateImpl implements _TrainerReportState {
     runtimeType,
     startDate,
     endDate,
+    period,
+    periodStart,
+    periodEnd,
+    gymJoinedAt,
     const DeepCollectionEquality().hash(_breakdown),
   );
 
@@ -401,6 +482,10 @@ abstract class _TrainerReportState implements TrainerReportState {
   const factory _TrainerReportState({
     required final String startDate,
     required final String endDate,
+    required final TrainerReportPeriod period,
+    required final DateTime periodStart,
+    required final DateTime periodEnd,
+    required final DateTime gymJoinedAt,
     required final List<TrainerReportBreakdown> breakdown,
   }) = _$TrainerReportStateImpl;
 
@@ -408,6 +493,17 @@ abstract class _TrainerReportState implements TrainerReportState {
   String get startDate;
   @override
   String get endDate;
+  @override
+  TrainerReportPeriod get period;
+  @override
+  DateTime get periodStart;
+  @override
+  DateTime get periodEnd;
+
+  /// Antrenörün salona katıldığı tarih ("Tüm zamanlar" alt sınırı ve
+  /// "Özel" tarih seçicisinin firstDate'i) — `users/{uid}.createdAt`.
+  @override
+  DateTime get gymJoinedAt;
   @override
   List<TrainerReportBreakdown> get breakdown;
 

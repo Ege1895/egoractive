@@ -167,7 +167,7 @@ class _TrainerDocsForGymProviderElement
 }
 
 String _$adminTrainersControllerHash() =>
-    r'23860111cb296405f72e5e87685bd1458827a9da';
+    r'f9938bc265082acbaea5918abc5ee7fa354c8b7a';
 
 /// `gyms/{gymId}` bilinmediği (henüz gerçek bir salon yoksa) çağrılmaz — bu
 /// durumda [AdminTrainersController] mock listeye düşer (bkz.

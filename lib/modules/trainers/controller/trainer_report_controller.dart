@@ -8,22 +8,88 @@ import '../repository/trainer_report_repository.dart';
 
 part 'trainer_report_controller.g.dart';
 
+final _defaultGymJoinedAt = DateTime.utc(2020);
+
+@riverpod
+class _TrainerReportPeriod extends _$TrainerReportPeriod {
+  @override
+  TrainerReportPeriod build() => TrainerReportPeriod.monthly;
+
+  void select(TrainerReportPeriod period) => state = period;
+}
+
+@riverpod
+class _TrainerReportCustomStart extends _$TrainerReportCustomStart {
+  @override
+  DateTime build() {
+    final now = DateTime.now();
+    return DateTime(now.year, now.month - 1, now.day);
+  }
+
+  void select(DateTime date) => state = date;
+}
+
+@riverpod
+class _TrainerReportCustomEnd extends _$TrainerReportCustomEnd {
+  @override
+  DateTime build() => DateTime.now();
+
+  void select(DateTime date) => state = date;
+}
+
 @riverpod
 Future<TrainerReportState> reportForTrainer(
   ReportForTrainerRef ref,
   String trainerId,
 ) async {
+  final period = ref.watch(_trainerReportPeriodProvider);
+  final customStart = ref.watch(_trainerReportCustomStartProvider);
+  final customEnd = ref.watch(_trainerReportCustomEndProvider);
+
+  final trainerDoc = await FirebaseFirestore.instance
+      .collection('users')
+      .doc(trainerId)
+      .get();
+  final gymJoinedAt =
+      (trainerDoc.data()?['createdAt'] as Timestamp?)?.toDate() ??
+      _defaultGymJoinedAt;
+
   final now = DateTime.now();
-  final monthStart = Timestamp.fromDate(DateTime(now.year, now.month, 1));
+  final DateTime start;
+  final DateTime end;
+  switch (period) {
+    case TrainerReportPeriod.weekly:
+      start = now.subtract(const Duration(days: 7));
+      end = now;
+    case TrainerReportPeriod.monthly:
+      start = DateTime(now.year, now.month - 1, now.day);
+      end = now;
+    case TrainerReportPeriod.allTime:
+      start = gymJoinedAt;
+      end = now;
+    case TrainerReportPeriod.custom:
+      // Başlangıç antrenörün salona katıldığı tarihten, bitiş bugünden
+      // ileri gidemez — kullanıcı tarih seçicide bu sınırların dışına
+      // hiç çıkamasa da (bkz. panel'deki firstDate/lastDate), state'ten
+      // gelen değer eski/farklı bir oturumdan kalmış olabilir diye
+      // burada da kenetleniyor.
+      start = customStart.isBefore(gymJoinedAt) ? gymJoinedAt : customStart;
+      end = customEnd.isAfter(now) ? now : customEnd;
+  }
+  // `startTime` alanı bir Timestamp (saat içerir) olduğu için bitiş
+  // gününün tamamı dahil olsun diye gün sonuna yuvarlanıyor.
+  final endOfDay = DateTime(end.year, end.month, end.day, 23, 59, 59);
+
   // `count()`/`status` bazlı ayrı aggregate sorguları trainerId+status+
   // startTime için yeni bir composite index gerektirirdi — tek bir
   // trainerId+startTime sorgusuyla (mevcut index) dokümanlar çekilip
-  // durum sayımı client tarafında yapılıyor; tek bir antrenörün aylık
-  // seans sayısı küçük olduğu için bu maliyetli değil.
+  // durum sayımı client tarafında yapılıyor; tek bir antrenörün seçili
+  // aralıktaki seans sayısı küçük olduğu için bu maliyetli değil.
   final snapshot = await FirebaseFirestore.instance
       .collection('sessions')
       .where('trainerId', isEqualTo: trainerId)
-      .where('startTime', isGreaterThanOrEqualTo: monthStart)
+      .where('startTime', isGreaterThanOrEqualTo: Timestamp.fromDate(start))
+      .where('startTime', isLessThanOrEqualTo: Timestamp.fromDate(endOfDay))
       .get();
   final total = snapshot.docs.length;
   final completed = snapshot.docs
@@ -37,8 +103,12 @@ Future<TrainerReportState> reportForTrainer(
   // dersleri ayrı bir `groupSessions` koleksiyonunda) — bu yüzden birebir/
   // grup kırılımı yerine tüm sayı `solo`'ya yazılıyor.
   return TrainerReportState(
-    startDate: formatTrDate(DateTime(now.year, now.month, 1)),
-    endDate: formatTrDate(now),
+    startDate: formatTrDate(start),
+    endDate: formatTrDate(end),
+    period: period,
+    periodStart: start,
+    periodEnd: end,
+    gymJoinedAt: gymJoinedAt,
     breakdown: [
       TrainerReportBreakdown(
         title: 'Toplam seanslar',
@@ -62,8 +132,9 @@ Future<TrainerReportState> reportForTrainer(
   );
 }
 
-/// Antrenörün kendi (`trainerId == uid`) bu ayki seans özeti gerçek zamanlı
-/// hesaplanır. Oturum yoksa (test ortamı vb.) mock repository'e düşer.
+/// Antrenörün kendi (`trainerId == uid`) seçili dönem içindeki seans özeti
+/// gerçek zamanlı hesaplanır. Oturum yoksa (test ortamı vb.) mock
+/// repository'e düşer.
 @riverpod
 class TrainerReportController extends _$TrainerReportController {
   @override
@@ -76,11 +147,33 @@ class TrainerReportController extends _$TrainerReportController {
         _loadingState();
   }
 
+  void setPeriod(TrainerReportPeriod period) =>
+      ref.read(_trainerReportPeriodProvider.notifier).select(period);
+
+  /// Kullanıcı "Özel" tarih alanlarından birini değiştirdiğinde çağrılır —
+  /// dönemi de `custom`a çeker ki seçilen tarihler gerçekten kullanılsın.
+  void setCustomRange({DateTime? start, DateTime? end}) {
+    if (start != null) {
+      ref.read(_trainerReportCustomStartProvider.notifier).select(start);
+    }
+    if (end != null) {
+      ref.read(_trainerReportCustomEndProvider.notifier).select(end);
+    }
+    ref
+        .read(_trainerReportPeriodProvider.notifier)
+        .select(TrainerReportPeriod.custom);
+  }
+
   TrainerReportState _loadingState() {
     final now = DateTime.now();
+    final start = DateTime(now.year, now.month - 1, now.day);
     return TrainerReportState(
-      startDate: formatTrDate(DateTime(now.year, now.month, 1)),
+      startDate: formatTrDate(start),
       endDate: formatTrDate(now),
+      period: TrainerReportPeriod.monthly,
+      periodStart: start,
+      periodEnd: now,
+      gymJoinedAt: _defaultGymJoinedAt,
       breakdown: const [
         TrainerReportBreakdown(
           title: 'Toplam seanslar',

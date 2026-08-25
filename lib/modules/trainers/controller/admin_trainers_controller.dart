@@ -78,6 +78,11 @@ class AdminTrainersController extends _$AdminTrainersController {
       'role': 'trainer',
       'gymId': gymId,
       'specialties': specialties,
+      // Seans Raporum'daki "Tüm zamanlar"ın alt sınırı ve "Özel" tarih
+      // seçicisinin firstDate'i olarak kullanılıyor (bkz.
+      // trainer_report_controller.dart) — üye kaydında zaten olan
+      // createdAt'ın antrenör karşılığı, önceden hiç yazılmıyordu.
+      'createdAt': FieldValue.serverTimestamp(),
     });
   }
 

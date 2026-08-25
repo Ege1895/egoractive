@@ -7867,6 +7867,54 @@
       },
       "description": "Grup dersinde katılım sonrası \"Katılmaktan Vazgeç\" başlangıca kaç saat kalana kadar aktif.",
       "valueType": "NUMBER"
+    },
+    "lbl_trainers_report_period_weekly_tr": {
+      "defaultValue": {
+        "value": "Haftalık"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_report_period_weekly_en": {
+      "defaultValue": {
+        "value": "Weekly"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_report_period_monthly_tr": {
+      "defaultValue": {
+        "value": "Aylık"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_report_period_monthly_en": {
+      "defaultValue": {
+        "value": "Monthly"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_report_period_all_time_tr": {
+      "defaultValue": {
+        "value": "Tüm zamanlar"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_report_period_all_time_en": {
+      "defaultValue": {
+        "value": "All time"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_report_period_custom_tr": {
+      "defaultValue": {
+        "value": "Özel"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_report_period_custom_en": {
+      "defaultValue": {
+        "value": "Custom"
+      },
+      "valueType": "STRING"
     }
   }
 }

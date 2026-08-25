@@ -6,7 +6,7 @@ part of 'trainer_report_controller.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$reportForTrainerHash() => r'780b43b24047a421b3ee8d0c259d7128c966770d';
+String _$reportForTrainerHash() => r'0e388e284f5e35ec1b9394de6b6efffb07377ad0';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -148,11 +148,66 @@ class _ReportForTrainerProviderElement
   String get trainerId => (origin as ReportForTrainerProvider).trainerId;
 }
 
-String _$trainerReportControllerHash() =>
-    r'1ebb161967e617d8ac687a20c7f15b04f9d30f21';
+String _$trainerReportPeriodHash() =>
+    r'144288203ed99a52cd8219d3f810ba40dc9e1c17';
 
-/// Antrenörün kendi (`trainerId == uid`) bu ayki seans özeti gerçek zamanlı
-/// hesaplanır. Oturum yoksa (test ortamı vb.) mock repository'e düşer.
+/// See also [_TrainerReportPeriod].
+@ProviderFor(_TrainerReportPeriod)
+final _trainerReportPeriodProvider =
+    AutoDisposeNotifierProvider<
+      _TrainerReportPeriod,
+      TrainerReportPeriod
+    >.internal(
+      _TrainerReportPeriod.new,
+      name: r'_trainerReportPeriodProvider',
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$trainerReportPeriodHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
+
+typedef _$TrainerReportPeriod = AutoDisposeNotifier<TrainerReportPeriod>;
+String _$trainerReportCustomStartHash() =>
+    r'71eec43bfacfc8bb017ea3fa2b248194d9794394';
+
+/// See also [_TrainerReportCustomStart].
+@ProviderFor(_TrainerReportCustomStart)
+final _trainerReportCustomStartProvider =
+    AutoDisposeNotifierProvider<_TrainerReportCustomStart, DateTime>.internal(
+      _TrainerReportCustomStart.new,
+      name: r'_trainerReportCustomStartProvider',
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$trainerReportCustomStartHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
+
+typedef _$TrainerReportCustomStart = AutoDisposeNotifier<DateTime>;
+String _$trainerReportCustomEndHash() =>
+    r'619fa32a32a28c1b525305e8b69d1c5e4ded506e';
+
+/// See also [_TrainerReportCustomEnd].
+@ProviderFor(_TrainerReportCustomEnd)
+final _trainerReportCustomEndProvider =
+    AutoDisposeNotifierProvider<_TrainerReportCustomEnd, DateTime>.internal(
+      _TrainerReportCustomEnd.new,
+      name: r'_trainerReportCustomEndProvider',
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$trainerReportCustomEndHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
+
+typedef _$TrainerReportCustomEnd = AutoDisposeNotifier<DateTime>;
+String _$trainerReportControllerHash() =>
+    r'cda0532319adadda6177ee79f42afc1ea02f782a';
+
+/// Antrenörün kendi (`trainerId == uid`) seçili dönem içindeki seans özeti
+/// gerçek zamanlı hesaplanır. Oturum yoksa (test ortamı vb.) mock
+/// repository'e düşer.
 ///
 /// Copied from [TrainerReportController].
 @ProviderFor(TrainerReportController)
