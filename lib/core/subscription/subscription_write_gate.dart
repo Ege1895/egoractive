@@ -6,6 +6,7 @@ import '../../modules/subscription/domain/subscription_state.dart';
 import '../../modules/subscription/ui/panels/subscription_panel.dart';
 import '../constants/app_spacing.dart';
 import '../panels/panel_stack_controller.dart';
+import '../router/app_router.dart';
 import '../theme/app_theme.dart';
 
 /// F6-3 — yeni içerik oluşturan (üye, paket satışı, seans, grup dersi,
@@ -15,7 +16,15 @@ import '../theme/app_theme.dart';
 /// ve `false` döner — çağıran taraf yazmayı hiç denemez. `firestore.rules`
 /// içindeki `gymSubscriptionAllowsWrite()` bunun gerçek güvenlik sınırı;
 /// bu fonksiyon sadece kullanıcıya erken, net bir geri bildirim verir.
+///
+/// Aboneliği yenileme sorumluluğu SADECE admin'e ait — antrenör/üye
+/// hesapları bu uyarıyı hiç görmemeli (onlar zaten kendi admin'lerinin
+/// aboneliğine bağlı çalışıyor, aboneliği yenilemek onların elinde değil).
+/// Bu yüzden rol admin değilse kontrol hiç yapılmadan geçiliyor.
 Future<bool> ensureSubscriptionAllowsWrite(BuildContext context, WidgetRef ref) async {
+  final role = ref.read(currentRoleProvider).valueOrNull;
+  if (role != AppRole.admin) return true;
+
   final status = ref.read(subscriptionControllerProvider).status;
   if (status == SubscriptionStatus.trial || status == SubscriptionStatus.active) return true;
   if (!context.mounted) return false;
@@ -44,6 +53,16 @@ Future<bool> ensureSubscriptionAllowsWrite(BuildContext context, WidgetRef ref) 
           TextButton(
             onPressed: () {
               Navigator.of(dialogContext).pop();
+              // Bu diyalog çoğunlukla bir bottom sheet'in (ör. "Yeni seans")
+              // İÇİNDEN açılıyor — diyalog kapanınca sheet'in kendisi hâlâ
+              // açık kalıyordu, abonelik paneli onun ARKASINDA açılmış gibi
+              // görünüyordu. `context` (dialogContext değil, orijinal çağıran
+              // context) sheet'e aitse `canPop()` true döner, o zaman önce
+              // sheet kapatılıyor. Sheet olmayan (doğrudan panel içi) çağrı
+              // noktalarında zaten pop edilecek bir şey yok, no-op kalıyor.
+              if (context.mounted && Navigator.of(context).canPop()) {
+                Navigator.of(context).pop();
+              }
               ref.read(panelStackControllerProvider.notifier).push(const SubscriptionPanel());
             },
             child: Text('Aboneliğe git', style: typography.bodyMedium.copyWith(color: colors.primary)),

@@ -453,12 +453,25 @@ test("admin can create a session for their own gym (positive)", async () => {
   );
 });
 
-test("trainer cannot create a session (negative — only admin screens create)", async () => {
+test("trainer can create a session for themselves (positive — own calendar/member detail screen)", async () => {
+  const db = contextFor("trainer-a", { role: "trainer", gymId: "gym-a" }).firestore();
+  await assertSucceeds(
+    setDoc(doc(db, "sessions/s1"), {
+      gymId: "gym-a",
+      trainerId: "trainer-a",
+      memberId: "member-a1",
+      startTime: hoursFromNow(48),
+      status: "planned",
+    }),
+  );
+});
+
+test("trainer cannot create a session for another trainer (negative)", async () => {
   const db = contextFor("trainer-a", { role: "trainer", gymId: "gym-a" }).firestore();
   await assertFails(
     setDoc(doc(db, "sessions/s1"), {
       gymId: "gym-a",
-      trainerId: "trainer-a",
+      trainerId: "trainer-b",
       memberId: "member-a1",
       startTime: hoursFromNow(48),
       status: "planned",
@@ -1002,6 +1015,19 @@ test("admin of an expired gym cannot create a memberPackages doc (negative)", as
 
 test("admin of an expired gym cannot create a session (negative)", async () => {
   const db = contextFor("admin-expired", { role: "admin", gymId: "gym-expired" }).firestore();
+  await assertFails(
+    setDoc(doc(db, "sessions/s1"), {
+      gymId: "gym-expired",
+      trainerId: "trainer-expired",
+      memberId: "m1",
+      startTime: hoursFromNow(48),
+      status: "planned",
+    }),
+  );
+});
+
+test("trainer of an expired gym cannot create a session for themselves either (negative — salon bazlı kısıt)", async () => {
+  const db = contextFor("trainer-expired", { role: "trainer", gymId: "gym-expired" }).firestore();
   await assertFails(
     setDoc(doc(db, "sessions/s1"), {
       gymId: "gym-expired",
