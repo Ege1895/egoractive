@@ -7,12 +7,16 @@ import '../../../../core/theme/app_theme.dart';
 import '../../domain/measurement_metric.dart';
 import '../../domain/measurement_point.dart';
 
-const _boxWidth = 362.0;
-const _boxHeight = 478.0;
-const _imgWidth = 268.0;
-const _imgHeight = 372.0;
+// Tüm ölçüm ekranları (avatar bulunan her yer) tek ekrana sığsın diye
+// önceki 362x478 kutu ~%84'e küçültüldü — noktalar/etiketler _imgWidth/
+// _imgHeight'a göre orantılı (fx/fy fraksiyon) konumlandığı için tüm
+// yerleşim otomatik ölçekleniyor, sadece bu dört sabiti değiştirmek yeterli.
+const _boxWidth = 304.0;
+const _boxHeight = 401.0;
+const _imgWidth = 225.0;
+const _imgHeight = 312.0;
 const _imgX = (_boxWidth - _imgWidth) / 2;
-const _imgY = 48.0;
+const _imgY = 40.0;
 const _lane = 84.0;
 
 /// Egoractive'in imza görsel öğesi — silüet üzerindeki tıklanabilir

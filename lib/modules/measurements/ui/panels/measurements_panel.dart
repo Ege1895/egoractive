@@ -449,7 +449,7 @@ class _AvatarViewState extends ConsumerState<_AvatarView> {
             gender: state.gender,
           ),
         ),
-        const SizedBox(height: AppSpacing.md),
+        const SizedBox(height: AppSpacing.sm),
         Container(
           padding: const EdgeInsets.all(AppSpacing.lg),
           decoration: BoxDecoration(
