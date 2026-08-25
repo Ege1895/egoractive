@@ -1,7 +1,11 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { computeNewlyEarnedBadgeIds, MemberMetrics } from "./badge-check";
+import { computeNewlyEarnedBadgeIds, membershipMonthsSince, MemberMetrics } from "./badge-check";
+
+function fakeTimestamp(date: Date): FirebaseFirestore.Timestamp {
+  return { toDate: () => date } as FirebaseFirestore.Timestamp;
+}
 
 const baseMetrics: MemberMetrics = {
   sessionsCompleted: 0,
@@ -52,6 +56,19 @@ test("supports feedbackCount and measurementEntries metric types", () => {
     "feedback_given",
     "measurement_logged",
   ]);
+});
+
+test("membershipMonthsSince counts only fully completed months (day-of-month aware)", () => {
+  const now = new Date();
+  const exactlySixMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 6, now.getDate());
+  assert.equal(membershipMonthsSince(fakeTimestamp(exactlySixMonthsAgo)), 6);
+
+  // Katılım gününe henüz ulaşılmadıysa (bir gün eksik) o ay tam sayılmamalı —
+  // önceki hatalı davranışta bu durum yine de 6 olarak sayılıyordu. Takvim
+  // bileşenleriyle yeniden inşa etmek yerine milisaniye eklemek, ay
+  // taşması (ör. ayın son günü) kenar durumlarından kaçınıyor.
+  const oneDayShortOfSixMonths = new Date(exactlySixMonthsAgo.getTime() + 24 * 60 * 60 * 1000);
+  assert.equal(membershipMonthsSince(fakeTimestamp(oneDayShortOfSixMonths)), 5);
 });
 
 test("returns empty when every eligible badge is already earned", () => {

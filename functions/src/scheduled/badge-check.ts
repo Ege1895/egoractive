@@ -67,11 +67,21 @@ export function computeNewlyEarnedBadgeIds(
     .map((criterion) => criterion.id);
 }
 
-function membershipMonthsSince(createdAt: FirebaseFirestore.Timestamp | undefined): number {
+/**
+ * Sadece yıl/ay farkını almak (eski hâli) takvim ayı sınırını GÜN'e
+ * bakmadan geçmiş sayıyordu — ör. 31 Ocak'ta katılan bir üye 1 Temmuz'da
+ * (yani sadece ~5 ay 1 gün sonra) "6 ay üyelik" rozetini kazanıyordu. Gün
+ * henüz katılım gününe ulaşmadıysa o ay tam sayılmıyor — membership_6_months/
+ * membership_12_months gibi en zor rozetler bu yüzden gerçekte olduğundan
+ * erken açılmasın diye eklendi.
+ */
+export function membershipMonthsSince(createdAt: FirebaseFirestore.Timestamp | undefined): number {
   if (!createdAt) return 0;
   const now = new Date();
   const created = createdAt.toDate();
-  return (now.getFullYear() - created.getFullYear()) * 12 + (now.getMonth() - created.getMonth());
+  let months = (now.getFullYear() - created.getFullYear()) * 12 + (now.getMonth() - created.getMonth());
+  if (now.getDate() < created.getDate()) months -= 1;
+  return Math.max(0, months);
 }
 
 /**
@@ -106,7 +116,7 @@ export const badgeCheck = onSchedule("every day 03:00", withFailureAlerting("bad
 
     const [completedSessions, groupSessionJoins, eventJoins, feedbackCount, measurementEntries] =
       await Promise.all([
-        db.collection("sessions").where("memberId", "==", uid).where("status", "==", "completed").count().get(),
+        db.collection("sessions").where("memberId", "==", uid).where("status", "==", "completed").where("attended", "==", true).count().get(),
         db.collection("groupSessions").where("attendeeIds", "array-contains", uid).count().get(),
         db.collection("events").where("attendeeIds", "array-contains", uid).count().get(),
         db.collection("feedback").where("memberId", "==", uid).count().get(),
