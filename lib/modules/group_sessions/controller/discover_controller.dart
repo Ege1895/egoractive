@@ -96,9 +96,6 @@ Stream<List<DiscoverItem>> _eventsForGym(
   String gymId,
   String myUid,
 ) {
-  final lockHours = ref
-      .watch(remoteConfigServiceProvider)
-      .groupSessionLockHoursBefore;
   final now = Timestamp.now();
   return FirebaseFirestore.instance
       .collection('events')
@@ -107,16 +104,17 @@ Stream<List<DiscoverItem>> _eventsForGym(
       .orderBy('dateTime')
       .snapshots()
       .map(
-        (snapshot) => snapshot.docs
-            .map((doc) => _toEventItem(doc, myUid, lockHours))
-            .toList(),
+        (snapshot) =>
+            snapshot.docs.map((doc) => _toEventItem(doc, myUid)).toList(),
       );
 }
 
+// Etkinlikler (DiscoverCategory.events) F4-2'deki 24 saatlik kilide hiç
+// tabi değil (bkz. discover_item.dart isLocked) — bu yüzden burada
+// groupSessions'takinin aksine bir lockHours parametresi yok.
 DiscoverItem _toEventItem(
   QueryDocumentSnapshot<Map<String, dynamic>> doc,
   String myUid,
-  int lockHours,
 ) {
   final data = doc.data();
   final dateTime = (data['dateTime'] as Timestamp).toDate();
@@ -137,7 +135,6 @@ DiscoverItem _toEventItem(
     capacity: (data['capacity'] as num?)?.toInt(),
     joined: attendeeIds.contains(myUid),
     startTime: dateTime,
-    lockHoursBefore: lockHours,
   );
 }
 
