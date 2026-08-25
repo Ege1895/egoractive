@@ -3022,6 +3022,14 @@ class RemoteConfigService {
   /// Uygulama açılışında bir kez çağrılır: varsayılanları ayarlar, sonra
   /// fetch+activate dener. İnternet yoksa/başarısız olursa varsayılanlarla
   /// devam eder — uygulama hiçbir zaman bu yüzden çökmez.
+  ///
+  /// Ayrıca `onConfigUpdated` (Remote Config Realtime) dinlenir — Console'da
+  /// bir parametre değiştirildiğinde SDK bunu anlık bir stream event'i
+  /// olarak alır (normal `minimumFetchInterval` kısıtlamasına tabi değil);
+  /// `activate()` çağrılınca yeni değerler hemen `getBool`/`getString` vb.
+  /// okumalarına yansır — kullanıcının uygulamayı kapatıp açmasına gerek
+  /// kalmaz. Bu, özellikle `cfg_allow_past_datetime_creation` gibi test
+  /// bayraklarının anında etkili olması için önemli.
   Future<void> init() async {
     final rc = FirebaseRemoteConfig.instance;
     await rc.setConfigSettings(
@@ -3036,6 +3044,14 @@ class RemoteConfigService {
     } on Exception {
       // Fetch başarısız oldu — setDefaults'taki değerler geçerliliğini korur.
     }
+    rc.onConfigUpdated.listen((_) async {
+      try {
+        await rc.activate();
+      } on Exception {
+        // Aktivasyon başarısız olursa mevcut değerlerle devam edilir —
+        // bir sonraki güncelleme sinyalinde tekrar denenir.
+      }
+    });
   }
 
   int getInt(String key) => FirebaseRemoteConfig.instance.getInt(key);
