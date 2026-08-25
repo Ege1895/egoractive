@@ -9,12 +9,12 @@ import { resolveGymTimeZone, resolveNotificationLocale } from "../shared/notific
 
 const DEFAULT_TEXT: Record<string, { tr: string; en: string }> = {
   lbl_notif_session_reminder_title: {
-    tr: "⏰ Bugün {time}'de dersin var!",
-    en: "⏰ Your session is at {time} today!",
+    tr: "⏰ Bugün saat {time}'de dersin var!",
+    en: "⏰ You've got a session today at {time}!",
   },
   lbl_notif_session_reminder_body: {
-    tr: "{trainerName} seni bekliyor. Gelip gelmeyeceğini onaylamak için dokun 👇",
-    en: "{trainerName} is waiting for you. Tap to confirm you're coming 👇",
+    tr: "💪 {trainerName} seni bekliyor, hazırlan!",
+    en: "💪 {trainerName} is waiting for you — get ready!",
   },
 };
 

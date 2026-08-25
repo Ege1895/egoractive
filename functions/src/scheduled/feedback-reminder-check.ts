@@ -14,8 +14,8 @@ const DEFAULT_TEXT: Record<string, { tr: string; en: string }> = {
     en: "💬 How was your month?",
   },
   lbl_notif_feedback_reminder_body: {
-    tr: "Deneyimini bizimle paylaşır mısın? 1 dakikanı alır.",
-    en: "Would you share your experience with us? It only takes a minute.",
+    tr: "Deneyimini bizimle paylaş, sadece 1 dakikanı alır ⭐",
+    en: "Share your experience with us — it only takes 1 minute ⭐",
   },
 };
 

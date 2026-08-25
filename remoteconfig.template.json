@@ -128,27 +128,27 @@
     },
     "lbl_notif_session_reminder_title_tr": {
       "defaultValue": {
-        "value": "⏰ Bugün {time}'de dersin var!"
+        "value": "⏰ Bugün saat {time}'de dersin var!"
       },
       "description": "F3-4 — sessionReminderCheck push başlığı (Admin SDK'dan da okunur). {time} yer tutucusu fonksiyon tarafında değiştirilir.",
       "valueType": "STRING"
     },
     "lbl_notif_session_reminder_title_en": {
       "defaultValue": {
-        "value": "⏰ Your session is at {time} today!"
+        "value": "⏰ You've got a session today at {time}!"
       },
       "valueType": "STRING"
     },
     "lbl_notif_session_reminder_body_tr": {
       "defaultValue": {
-        "value": "{trainerName} seni bekliyor. Gelip gelmeyeceğini onaylamak için dokun 👇"
+        "value": "💪 {trainerName} seni bekliyor, hazırlan!"
       },
       "description": "{trainerName} yer tutucusu fonksiyon tarafında değiştirilir.",
       "valueType": "STRING"
     },
     "lbl_notif_session_reminder_body_en": {
       "defaultValue": {
-        "value": "{trainerName} is waiting for you. Tap to confirm you're coming 👇"
+        "value": "💪 {trainerName} is waiting for you — get ready!"
       },
       "valueType": "STRING"
     },
@@ -193,13 +193,13 @@
     },
     "lbl_notif_feedback_reminder_body_tr": {
       "defaultValue": {
-        "value": "Deneyimini bizimle paylaşır mısın? 1 dakikanı alır."
+        "value": "Deneyimini bizimle paylaş, sadece 1 dakikanı alır ⭐"
       },
       "valueType": "STRING"
     },
     "lbl_notif_feedback_reminder_body_en": {
       "defaultValue": {
-        "value": "Would you share your experience with us? It only takes a minute."
+        "value": "Share your experience with us — it only takes 1 minute ⭐"
       },
       "valueType": "STRING"
     },
