@@ -6,6 +6,7 @@ import * as logger from "firebase-functions/logger";
 
 import { withFailureAlerting } from "../shared/function-health";
 import { isFeedbackReminderDue } from "../shared/monthly-schedule";
+import { resolveGymTimeZone, resolveNotificationLocale } from "../shared/notification-locale";
 
 const DEFAULT_TEXT: Record<string, { tr: string; en: string }> = {
   lbl_notif_feedback_reminder_title: {
@@ -54,12 +55,25 @@ export const feedbackReminderCheck = onSchedule(
     const membersSnapshot = await db.collection("users").where("role", "==", "member").get();
     if (membersSnapshot.empty) return;
 
+    // Aynı salondan birden çok üye olabilir — salon dokümanını her üye için
+    // ayrı ayrı okumak yerine gymId başına tek Promise'da önbelleğe alınıyor.
+    const gymLocaleCache = new Map<string, Promise<"tr" | "en">>();
+    function getGymLocale(gymId: string | undefined): Promise<"tr" | "en"> {
+      const key = gymId ?? "";
+      let cached = gymLocaleCache.get(key);
+      if (!cached) {
+        cached = resolveGymTimeZone(gymId).then(resolveNotificationLocale);
+        gymLocaleCache.set(key, cached);
+      }
+      return cached;
+    }
+
     for (const memberDoc of membersSnapshot.docs) {
       const data = memberDoc.data();
       const fcmTokens = (data.fcmTokens as string[] | undefined) ?? [];
       if (fcmTokens.length === 0) continue;
 
-      const locale = (data.locale as string | undefined) ?? "en";
+      const locale = await getGymLocale(data.gymId as string | undefined);
       await getMessaging().sendEachForMulticast({
         tokens: fcmTokens,
         notification: {

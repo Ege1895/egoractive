@@ -5,6 +5,7 @@ import { onTaskDispatched, Request } from "firebase-functions/v2/tasks";
 import * as logger from "firebase-functions/logger";
 
 import { withFailureAlerting } from "../shared/function-health";
+import { resolveGymTimeZone, resolveNotificationLocale } from "../shared/notification-locale";
 
 const DEFAULT_TEXT: Record<string, { tr: string; en: string }> = {
   lbl_notif_session_completion_title: {
@@ -63,6 +64,7 @@ export const sendSessionCompletionTask = onTaskDispatched(
       endTime?: Timestamp;
       trainerId?: string;
       memberName?: string;
+      gymId?: string;
     };
 
     if (sessionData.status !== "planned") return;
@@ -88,7 +90,7 @@ export const sendSessionCompletionTask = onTaskDispatched(
       template = { parameters: {} } as RemoteConfigTemplate;
     }
 
-    const locale = (trainerDoc.data()?.locale as string | undefined) ?? "en";
+    const locale = resolveNotificationLocale(await resolveGymTimeZone(sessionData.gymId));
     const vars = { memberName: sessionData.memberName?.trim() || (locale === "tr" ? "Üyen" : "Your member") };
 
     await getMessaging().sendEachForMulticast({

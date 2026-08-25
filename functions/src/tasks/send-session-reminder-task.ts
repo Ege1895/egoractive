@@ -5,6 +5,7 @@ import { onTaskDispatched, Request } from "firebase-functions/v2/tasks";
 import * as logger from "firebase-functions/logger";
 
 import { withFailureAlerting } from "../shared/function-health";
+import { resolveGymTimeZone, resolveNotificationLocale } from "../shared/notification-locale";
 
 const DEFAULT_TEXT: Record<string, { tr: string; en: string }> = {
   lbl_notif_session_reminder_title: {
@@ -35,16 +36,13 @@ function readNotificationText(
   return Object.entries(vars).reduce((text, [key, value]) => text.replaceAll(`{${key}}`, value), raw);
 }
 
-const DEFAULT_TIME_ZONE = "Europe/Istanbul";
-
 /**
  * Cloud Functions runtime'ı UTC'de çalışır — `date.getHours()` sunucunun
  * (UTC) saatini döner, üyenin gördüğü YEREL saati değil (ör. 19:05 yerel
  * saat, UTC+3 farkıyla 22:05 olarak gösterilirdi). Uygulama tek ülkeye
  * özel değil — salon dünyanın herhangi bir yerinde olabilir — bu yüzden
  * saat, seansın gerçekleştiği SALONUN saat dilimine göre formatlanıyor
- * (bkz. [resolveGymTimeZone]); salonun timeZone'u yoksa (eski kayıt)
- * `DEFAULT_TIME_ZONE`'a düşülür.
+ * (bkz. [resolveGymTimeZone]).
  */
 function formatTime(date: Date, timeZone: string): string {
   return new Intl.DateTimeFormat("tr-TR", {
@@ -55,32 +53,13 @@ function formatTime(date: Date, timeZone: string): string {
   }).format(date);
 }
 
-/**
- * `gyms/{gymId}.timeZone` — salon oluşturulurken cihazın IANA saat
- * dilimi kaydedilir (bkz. `signup-gym-admin.ts`). Bu alan hiç yoksa (bu
- * özellikten önce oluşturulmuş eski bir salon) ya da geçersizse
- * `DEFAULT_TIME_ZONE`'a düşülür.
- */
-async function resolveGymTimeZone(gymId: string | undefined): Promise<string> {
-  if (!gymId) return DEFAULT_TIME_ZONE;
-  const gymDoc = await getFirestore().collection("gyms").doc(gymId).get();
-  const timeZone = gymDoc.data()?.timeZone as string | undefined;
-  if (!timeZone) return DEFAULT_TIME_ZONE;
-  try {
-    Intl.DateTimeFormat(undefined, { timeZone });
-    return timeZone;
-  } catch {
-    return DEFAULT_TIME_ZONE;
-  }
-}
-
 interface SessionReminderTaskData {
   sessionId: string;
   expectedStartTimeMs: number;
 }
 
 /**
- * [onSessionWriteScheduleReminder] tarafından, bir seansın başlangıcından
+ * [onSessionWriteScheduleNotifications] tarafından, bir seansın başlangıcından
  * 1 saat önce ateşlenmek üzere kurulan görevin işleyicisi. `expectedStartTimeMs`
  * ile o an Firestore'daki GERÇEK `startTime` karşılaştırılıyor — eşleşmezse
  * bu görev, o seans daha sonra ertelendiği için artık geçersiz demektir
@@ -127,12 +106,11 @@ export const sendSessionReminderTask = onTaskDispatched(
       template = { parameters: {} } as RemoteConfigTemplate;
     }
 
-    const locale = (memberDoc.data()?.locale as string | undefined) ?? "en";
-    const lang = locale === "tr" ? "tr" : "en";
     const gymTimeZone = await resolveGymTimeZone(sessionData.gymId);
+    const locale = resolveNotificationLocale(gymTimeZone);
     const vars = {
       time: sessionData.startTime ? formatTime(sessionData.startTime.toDate(), gymTimeZone) : "--:--",
-      trainerName: sessionData.trainerName?.trim() || FALLBACK_TRAINER_NAME[lang],
+      trainerName: sessionData.trainerName?.trim() || FALLBACK_TRAINER_NAME[locale],
     };
 
     await getMessaging().sendEachForMulticast({
