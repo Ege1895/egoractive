@@ -17,9 +17,6 @@ class TrainerReportState with _$TrainerReportState {
   const factory TrainerReportState({
     required String startDate,
     required String endDate,
-    required String bonusAmount,
-    required int completedSessionCount,
-    required String perSessionRate,
     required List<TrainerReportBreakdown> breakdown,
   }) = _TrainerReportState;
 }

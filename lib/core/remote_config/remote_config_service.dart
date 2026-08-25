@@ -1098,9 +1098,6 @@ abstract final class RemoteConfigKeys {
   static const trainersMembersRemainingSessionsSuffix =
       'lbl_trainers_members_remaining_sessions_suffix';
   static const trainersReportTitle = 'lbl_trainers_report_title';
-  static const trainersReportEarnedCommissionLabel =
-      'lbl_trainers_report_earned_commission_label';
-  static const trainersReportDetailLink = 'lbl_trainers_report_detail_link';
   static const trainersReportStartDateFieldLabel =
       'lbl_trainers_report_start_date_field_label';
   static const trainersReportEndDateFieldLabel =
@@ -1141,11 +1138,6 @@ abstract final class RemoteConfigKeys {
   static const trainersMembersSearchHint = 'lbl_trainers_members_search_hint';
   static const trainersProfileSpecialtyRole =
       'lbl_trainers_profile_specialty_role';
-  static const trainersReportCompletedSummary =
-      'lbl_trainers_report_completed_summary';
-  static const trainersReportCommissionLink =
-      'lbl_trainers_report_commission_link';
-
   // F6-1 abonelik ekranı yeniden tasarımı — 4 durum (deneme/aktif/süresi
   // dolmuş/mağazaya yönlendirildi). `{days}`/`{date}`/`{total}`/`{current}`/
   // `{period}`/`{plan}` yer tutucuları panel tarafında dolduruluyor;
@@ -2006,8 +1998,6 @@ class RemoteConfigService {
     'lbl_trainers_members_filter_expiring_tr': 'Paketi bitiyor',
     'lbl_trainers_members_remaining_sessions_suffix_tr': 'kalan ders',
     'lbl_trainers_report_title_tr': 'Seans raporum',
-    'lbl_trainers_report_earned_commission_label_tr': 'Kazanılan prim',
-    'lbl_trainers_report_detail_link_tr': 'Detay',
     'lbl_trainers_report_start_date_field_label_tr': 'Başlangıç t.',
     'lbl_trainers_report_end_date_field_label_tr': 'Bitiş t.',
     'lbl_trainers_report_one_on_one_toggle_tr': 'Birebir',
@@ -2038,9 +2028,6 @@ class RemoteConfigService {
         'Onay kaydedilemedi, bağlantını kontrol edip tekrar dene.',
     'lbl_trainers_members_search_hint_tr': 'Üye ara',
     'lbl_trainers_profile_specialty_role_tr': '{specialty} · Antrenör',
-    'lbl_trainers_report_completed_summary_tr':
-        '{count} tamamlanan seans · seans başı {rate}',
-    'lbl_trainers_report_commission_link_tr': 'Prim sistemine git',
     'lbl_notif_session_reminder_title_en': '⏰ Your session is at {time} today!',
     'lbl_notif_session_reminder_body_en':
         '{trainerName} is waiting for you. Tap to confirm you\'re coming 👇',
@@ -2775,8 +2762,6 @@ class RemoteConfigService {
     'lbl_trainers_members_filter_expiring_en': 'Package expiring',
     'lbl_trainers_members_remaining_sessions_suffix_en': 'remaining sessions',
     'lbl_trainers_report_title_en': 'My session report',
-    'lbl_trainers_report_earned_commission_label_en': 'Commission earned',
-    'lbl_trainers_report_detail_link_en': 'Detail',
     'lbl_trainers_report_start_date_field_label_en': 'Start',
     'lbl_trainers_report_end_date_field_label_en': 'End',
     'lbl_trainers_report_one_on_one_toggle_en': 'One-on-one',
@@ -2810,9 +2795,6 @@ class RemoteConfigService {
         'Confirmation could not be saved, check your connection and try again.',
     'lbl_trainers_members_search_hint_en': 'Search members',
     'lbl_trainers_profile_specialty_role_en': '{specialty} · Trainer',
-    'lbl_trainers_report_completed_summary_en':
-        '{count} completed sessions · {rate} per session',
-    'lbl_trainers_report_commission_link_en': 'Go to commission system',
 
     RemoteConfigKeys.subscriptionIncludedFeatures:
         _defaultSubscriptionIncludedFeaturesJson,

@@ -239,7 +239,11 @@ service cloud.firestore {
 
     match /groupSessions/{sessionId} {
       allow read: if isSignedIn() && resource.data.gymId == myGymId();
-      allow create: if isSignedIn() && (myRole() == 'admin' || myRole() == 'trainer') &&
+      // Grup dersi/etkinlik oluşturma sadece admin'e ait — antrenör kendi
+      // takviminden sadece birebir seans oluşturabiliyor (client'ta zaten
+      // trainer_calendar_panel.dart'ın "+" butonu buna göre değiştirildi,
+      // bu kural client atlatılsa bile geçerli olan gerçek sınır).
+      allow create: if isSignedIn() && myRole() == 'admin' &&
         request.resource.data.gymId == myGymId() && gymSubscriptionAllowsWrite(myGymId());
       allow update: if isSignedIn() && resource.data.gymId == myGymId() && (
         myRole() == 'admin' || myRole() == 'trainer' || isOwnAttendeeChange()
@@ -250,7 +254,7 @@ service cloud.firestore {
     // events/{id} — F4-3. groupSessions ile aynı kontenjan kuralları.
     match /events/{eventId} {
       allow read: if isSignedIn() && resource.data.gymId == myGymId();
-      allow create: if isSignedIn() && (myRole() == 'admin' || myRole() == 'trainer') &&
+      allow create: if isSignedIn() && myRole() == 'admin' &&
         request.resource.data.gymId == myGymId() && gymSubscriptionAllowsWrite(myGymId());
       allow update: if isSignedIn() && resource.data.gymId == myGymId() && (
         myRole() == 'admin' || myRole() == 'trainer' || isOwnAttendeeChange()

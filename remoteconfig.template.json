@@ -6028,30 +6028,6 @@
       },
       "valueType": "STRING"
     },
-    "lbl_trainers_report_earned_commission_label_tr": {
-      "defaultValue": {
-        "value": "Kazanılan prim"
-      },
-      "valueType": "STRING"
-    },
-    "lbl_trainers_report_earned_commission_label_en": {
-      "defaultValue": {
-        "value": "Commission earned"
-      },
-      "valueType": "STRING"
-    },
-    "lbl_trainers_report_detail_link_tr": {
-      "defaultValue": {
-        "value": "Detay"
-      },
-      "valueType": "STRING"
-    },
-    "lbl_trainers_report_detail_link_en": {
-      "defaultValue": {
-        "value": "Detail"
-      },
-      "valueType": "STRING"
-    },
     "lbl_trainers_report_start_date_field_label_tr": {
       "defaultValue": {
         "value": "Başlangıç t."
@@ -6357,31 +6333,6 @@
     "lbl_trainers_profile_specialty_role_en": {
       "defaultValue": {
         "value": "{specialty} · Trainer"
-      },
-      "valueType": "STRING"
-    },
-    "lbl_trainers_report_completed_summary_tr": {
-      "description": "Antrenör rapor ekranı özet satırı, {count}/{rate} yer tutucuları",
-      "defaultValue": {
-        "value": "{count} tamamlanan seans · seans başı {rate}"
-      },
-      "valueType": "STRING"
-    },
-    "lbl_trainers_report_completed_summary_en": {
-      "defaultValue": {
-        "value": "{count} completed sessions · {rate} per session"
-      },
-      "valueType": "STRING"
-    },
-    "lbl_trainers_report_commission_link_tr": {
-      "defaultValue": {
-        "value": "Prim sistemine git"
-      },
-      "valueType": "STRING"
-    },
-    "lbl_trainers_report_commission_link_en": {
-      "defaultValue": {
-        "value": "Go to commission system"
       },
       "valueType": "STRING"
     },

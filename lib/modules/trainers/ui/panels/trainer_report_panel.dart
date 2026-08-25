@@ -7,8 +7,8 @@ import '../../../../core/theme/app_theme.dart';
 import '../../controller/trainer_report_controller.dart';
 import '../../domain/trainer_report_state.dart';
 
-/// Antrenör 2 · Seans Raporum (Raporum sekmesi kökü) — prim + Birebir/Grup
-/// kırılımı. "Detay" ve "Prim sistemine git" bu fazda görsel, hedefsiz.
+/// Antrenör 2 · Seans Raporum (Raporum sekmesi kökü) — tarih aralığı +
+/// Birebir/Grup kırılımı. Uygulamada bir prim/komisyon sistemi yok.
 class TrainerReportPanel extends ConsumerWidget {
   const TrainerReportPanel({super.key});
 
@@ -17,10 +17,6 @@ class TrainerReportPanel extends ConsumerWidget {
     final colors = context.appColors;
     final typography = context.appTypography;
     final report = ref.watch(trainerReportControllerProvider);
-    final completedSummaryText = ref
-        .watch(rcTextProvider(RemoteConfigKeys.trainersReportCompletedSummary))
-        .replaceAll('{count}', '${report.completedSessionCount}')
-        .replaceAll('{rate}', report.perSessionRate);
     final soloLabel = ref.watch(
       rcTextProvider(RemoteConfigKeys.trainersReportOneOnOneToggle),
     );
@@ -67,105 +63,6 @@ class TrainerReportPanel extends ConsumerWidget {
                   ),
                 ),
               ],
-            ),
-            const SizedBox(height: AppSpacing.lg),
-            Container(
-              padding: const EdgeInsets.all(AppSpacing.xl),
-              decoration: BoxDecoration(
-                color: colors.primaryContainer.withValues(alpha: 0.24),
-                borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
-                border: Border.all(
-                  color: colors.primary.withValues(alpha: 0.32),
-                ),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    ref.watch(
-                      rcTextProvider(
-                        RemoteConfigKeys.trainersReportEarnedCommissionLabel,
-                      ),
-                    ),
-                    style: typography.bodyMedium.copyWith(
-                      color: colors.onPrimaryContainer,
-                      fontSize: 13,
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.xs),
-                  Text(
-                    report.bonusAmount,
-                    style: typography.dataLarge.copyWith(
-                      color: colors.onSurface,
-                      fontSize: 40,
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.xs),
-                  Text(
-                    completedSummaryText,
-                    style: typography.bodyMedium.copyWith(
-                      color: colors.onSurfaceVariant,
-                      fontSize: 13,
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.lg),
-                  // "Detay" ve "Prim sistemine git" için hedef bir ekran/akış
-                  // henüz yok — tıklanabilir gibi görünüp hiçbir şey
-                  // yapmamaları yerine pasif (dokunulamaz, soluk) gösteriliyor.
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: colors.surfaceRaised,
-                            borderRadius: BorderRadius.circular(
-                              AppSpacing.radiusInner,
-                            ),
-                          ),
-                          constraints: const BoxConstraints(minHeight: 44),
-                          alignment: Alignment.center,
-                          child: Text(
-                            ref.watch(
-                              rcTextProvider(
-                                RemoteConfigKeys.trainersReportDetailLink,
-                              ),
-                            ),
-                            style: typography.headingSmall.copyWith(
-                              fontSize: 15,
-                              color: colors.onSurfaceMuted,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: AppSpacing.sm),
-                      Expanded(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: colors.surfaceRaised,
-                            borderRadius: BorderRadius.circular(
-                              AppSpacing.radiusInner,
-                            ),
-                          ),
-                          constraints: const BoxConstraints(minHeight: 44),
-                          alignment: Alignment.center,
-                          child: Text(
-                            ref.watch(
-                              rcTextProvider(
-                                RemoteConfigKeys.trainersReportCommissionLink,
-                              ),
-                            ),
-                            textAlign: TextAlign.center,
-                            style: typography.headingSmall.copyWith(
-                              fontSize: 15,
-                              color: colors.onSurfaceMuted,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
             ),
             const SizedBox(height: AppSpacing.lg),
             for (final b in report.breakdown) ...[

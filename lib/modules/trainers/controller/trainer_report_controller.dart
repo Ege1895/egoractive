@@ -35,16 +35,10 @@ Future<TrainerReportState> reportForTrainer(
 
   // `sessions` koleksiyonu hâlâ sadece birebir dersleri tutuyor (grup
   // dersleri ayrı bir `groupSessions` koleksiyonunda) — bu yüzden birebir/
-  // grup kırılımı yerine tüm sayı `solo`'ya yazılıyor. Antrenör başına bir
-  // prim/komisyon oranı hiçbir yerde tanımlı değil (henüz bir "prim
-  // sistemi" yok, bkz. panelin "Prim sistemine git" pasif butonu) — bu
-  // yüzden bonusAmount/perSessionRate uydurulmuyor, "—" olarak kalıyor.
+  // grup kırılımı yerine tüm sayı `solo`'ya yazılıyor.
   return TrainerReportState(
     startDate: formatTrDate(DateTime(now.year, now.month, 1)),
     endDate: formatTrDate(now),
-    bonusAmount: '—',
-    completedSessionCount: completed,
-    perSessionRate: '—',
     breakdown: [
       TrainerReportBreakdown(
         title: 'Toplam seanslar',
@@ -87,9 +81,6 @@ class TrainerReportController extends _$TrainerReportController {
     return TrainerReportState(
       startDate: formatTrDate(DateTime(now.year, now.month, 1)),
       endDate: formatTrDate(now),
-      bonusAmount: '—',
-      completedSessionCount: 0,
-      perSessionRate: '—',
       breakdown: const [
         TrainerReportBreakdown(
           title: 'Toplam seanslar',

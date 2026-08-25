@@ -221,9 +221,6 @@ abstract class _TrainerReportBreakdown implements TrainerReportBreakdown {
 mixin _$TrainerReportState {
   String get startDate => throw _privateConstructorUsedError;
   String get endDate => throw _privateConstructorUsedError;
-  String get bonusAmount => throw _privateConstructorUsedError;
-  int get completedSessionCount => throw _privateConstructorUsedError;
-  String get perSessionRate => throw _privateConstructorUsedError;
   List<TrainerReportBreakdown> get breakdown =>
       throw _privateConstructorUsedError;
 
@@ -244,9 +241,6 @@ abstract class $TrainerReportStateCopyWith<$Res> {
   $Res call({
     String startDate,
     String endDate,
-    String bonusAmount,
-    int completedSessionCount,
-    String perSessionRate,
     List<TrainerReportBreakdown> breakdown,
   });
 }
@@ -268,9 +262,6 @@ class _$TrainerReportStateCopyWithImpl<$Res, $Val extends TrainerReportState>
   $Res call({
     Object? startDate = null,
     Object? endDate = null,
-    Object? bonusAmount = null,
-    Object? completedSessionCount = null,
-    Object? perSessionRate = null,
     Object? breakdown = null,
   }) {
     return _then(
@@ -282,18 +273,6 @@ class _$TrainerReportStateCopyWithImpl<$Res, $Val extends TrainerReportState>
             endDate: null == endDate
                 ? _value.endDate
                 : endDate // ignore: cast_nullable_to_non_nullable
-                      as String,
-            bonusAmount: null == bonusAmount
-                ? _value.bonusAmount
-                : bonusAmount // ignore: cast_nullable_to_non_nullable
-                      as String,
-            completedSessionCount: null == completedSessionCount
-                ? _value.completedSessionCount
-                : completedSessionCount // ignore: cast_nullable_to_non_nullable
-                      as int,
-            perSessionRate: null == perSessionRate
-                ? _value.perSessionRate
-                : perSessionRate // ignore: cast_nullable_to_non_nullable
                       as String,
             breakdown: null == breakdown
                 ? _value.breakdown
@@ -317,9 +296,6 @@ abstract class _$$TrainerReportStateImplCopyWith<$Res>
   $Res call({
     String startDate,
     String endDate,
-    String bonusAmount,
-    int completedSessionCount,
-    String perSessionRate,
     List<TrainerReportBreakdown> breakdown,
   });
 }
@@ -340,9 +316,6 @@ class __$$TrainerReportStateImplCopyWithImpl<$Res>
   $Res call({
     Object? startDate = null,
     Object? endDate = null,
-    Object? bonusAmount = null,
-    Object? completedSessionCount = null,
-    Object? perSessionRate = null,
     Object? breakdown = null,
   }) {
     return _then(
@@ -354,18 +327,6 @@ class __$$TrainerReportStateImplCopyWithImpl<$Res>
         endDate: null == endDate
             ? _value.endDate
             : endDate // ignore: cast_nullable_to_non_nullable
-                  as String,
-        bonusAmount: null == bonusAmount
-            ? _value.bonusAmount
-            : bonusAmount // ignore: cast_nullable_to_non_nullable
-                  as String,
-        completedSessionCount: null == completedSessionCount
-            ? _value.completedSessionCount
-            : completedSessionCount // ignore: cast_nullable_to_non_nullable
-                  as int,
-        perSessionRate: null == perSessionRate
-            ? _value.perSessionRate
-            : perSessionRate // ignore: cast_nullable_to_non_nullable
                   as String,
         breakdown: null == breakdown
             ? _value._breakdown
@@ -382,9 +343,6 @@ class _$TrainerReportStateImpl implements _TrainerReportState {
   const _$TrainerReportStateImpl({
     required this.startDate,
     required this.endDate,
-    required this.bonusAmount,
-    required this.completedSessionCount,
-    required this.perSessionRate,
     required final List<TrainerReportBreakdown> breakdown,
   }) : _breakdown = breakdown;
 
@@ -392,12 +350,6 @@ class _$TrainerReportStateImpl implements _TrainerReportState {
   final String startDate;
   @override
   final String endDate;
-  @override
-  final String bonusAmount;
-  @override
-  final int completedSessionCount;
-  @override
-  final String perSessionRate;
   final List<TrainerReportBreakdown> _breakdown;
   @override
   List<TrainerReportBreakdown> get breakdown {
@@ -408,7 +360,7 @@ class _$TrainerReportStateImpl implements _TrainerReportState {
 
   @override
   String toString() {
-    return 'TrainerReportState(startDate: $startDate, endDate: $endDate, bonusAmount: $bonusAmount, completedSessionCount: $completedSessionCount, perSessionRate: $perSessionRate, breakdown: $breakdown)';
+    return 'TrainerReportState(startDate: $startDate, endDate: $endDate, breakdown: $breakdown)';
   }
 
   @override
@@ -419,12 +371,6 @@ class _$TrainerReportStateImpl implements _TrainerReportState {
             (identical(other.startDate, startDate) ||
                 other.startDate == startDate) &&
             (identical(other.endDate, endDate) || other.endDate == endDate) &&
-            (identical(other.bonusAmount, bonusAmount) ||
-                other.bonusAmount == bonusAmount) &&
-            (identical(other.completedSessionCount, completedSessionCount) ||
-                other.completedSessionCount == completedSessionCount) &&
-            (identical(other.perSessionRate, perSessionRate) ||
-                other.perSessionRate == perSessionRate) &&
             const DeepCollectionEquality().equals(
               other._breakdown,
               _breakdown,
@@ -436,9 +382,6 @@ class _$TrainerReportStateImpl implements _TrainerReportState {
     runtimeType,
     startDate,
     endDate,
-    bonusAmount,
-    completedSessionCount,
-    perSessionRate,
     const DeepCollectionEquality().hash(_breakdown),
   );
 
@@ -458,9 +401,6 @@ abstract class _TrainerReportState implements TrainerReportState {
   const factory _TrainerReportState({
     required final String startDate,
     required final String endDate,
-    required final String bonusAmount,
-    required final int completedSessionCount,
-    required final String perSessionRate,
     required final List<TrainerReportBreakdown> breakdown,
   }) = _$TrainerReportStateImpl;
 
@@ -468,12 +408,6 @@ abstract class _TrainerReportState implements TrainerReportState {
   String get startDate;
   @override
   String get endDate;
-  @override
-  String get bonusAmount;
-  @override
-  int get completedSessionCount;
-  @override
-  String get perSessionRate;
   @override
   List<TrainerReportBreakdown> get breakdown;
 

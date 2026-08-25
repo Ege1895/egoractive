@@ -5,12 +5,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
-import '../../../../core/remote_config/feature_flags.dart';
 import '../../../../core/remote_config/remote_config_service.dart';
+import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_button.dart';
-import '../../../group_sessions/ui/panels/create_group_session_panel.dart';
 import '../../../sessions/ui/panels/session_completion_panel.dart';
+import '../../../sessions/ui/widgets/create_session_sheet.dart';
 import '../../controller/trainer_calendar_controller.dart';
 import '../../domain/schedule_slot.dart';
 import '../../domain/trainer_calendar_state.dart';
@@ -47,10 +47,6 @@ class _TrainerCalendarPanelState extends BasePanelState<TrainerCalendarPanel> {
     final typography = context.appTypography;
     final state = ref.watch(trainerCalendarControllerProvider);
     final controller = ref.read(trainerCalendarControllerProvider.notifier);
-    final panelStack = ref.read(panelStackControllerProvider.notifier);
-    final groupSessionsEnabled = ref
-        .watch(featureFlagsProvider)
-        .isGroupSessionsEnabled;
 
     return Scaffold(
       body: SafeArea(
@@ -80,27 +76,32 @@ class _TrainerCalendarPanelState extends BasePanelState<TrainerCalendarPanel> {
                           color: colors.onSurface,
                         ),
                       ),
-                      if (groupSessionsEnabled)
-                        Material(
-                          color: colors.primary,
+                      Material(
+                        color: colors.primary,
+                        borderRadius: BorderRadius.circular(
+                          AppSpacing.radiusInner,
+                        ),
+                        child: InkWell(
                           borderRadius: BorderRadius.circular(
                             AppSpacing.radiusInner,
                           ),
-                          child: InkWell(
-                            borderRadius: BorderRadius.circular(
-                              AppSpacing.radiusInner,
-                            ),
-                            onTap: () => panelStack.push(
-                              const CreateGroupSessionPanel(),
-                            ),
-                            child: Container(
-                              width: 44,
-                              height: 44,
-                              alignment: Alignment.center,
-                              child: Icon(Icons.add, color: colors.onPrimary),
-                            ),
+                          onTap: () => showCreateSessionSheet(
+                            context,
+                            ref,
+                            state.selectedDate,
+                            lockedTrainerId: ref
+                                .read(authStateProvider)
+                                .valueOrNull
+                                ?.uid,
+                          ),
+                          child: Container(
+                            width: 44,
+                            height: 44,
+                            alignment: Alignment.center,
+                            child: Icon(Icons.add, color: colors.onPrimary),
                           ),
                         ),
+                      ),
                     ],
                   ),
                   const SizedBox(height: AppSpacing.md),
