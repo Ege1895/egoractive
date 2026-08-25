@@ -363,294 +363,308 @@ class _AvatarViewState extends ConsumerState<_AvatarView> {
       _valueController.text = selectedPoint?.value ?? '';
     }
 
-    return ListView(
+    // Önceki sürüm ListView'du — avatar+kart üstte kümeleniyor, altta
+    // boşluk kalıyordu (ya da avatar küçültülünce her şey ekranın en
+    // üstüne yapışıyordu). Bu ekran zaten measurements_panel.dart'ta bir
+    // Expanded içinde render edildiği için (sınırlı/bilinen yükseklik),
+    // avatar bölümünü kendi içinde Expanded yapıp "Seçili nokta" kartını
+    // sabit boyutlu son eleman olarak bırakmak, kartın gerçekten ekranın
+    // altına yaslanmasını sağlıyor.
+    return Padding(
       padding: const EdgeInsets.fromLTRB(
         AppSpacing.screenEdge,
         AppSpacing.md,
         AppSpacing.screenEdge,
         AppSpacing.lg,
       ),
-      children: [
-        if (state.recordedDates.length > 1)
-          Padding(
-            padding: const EdgeInsets.only(bottom: AppSpacing.md),
-            child: InkWell(
-              borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
-              onTap: () => _showDatePicker(
-                context,
-                ref,
-                state.recordedDates,
-                state.selectedDate,
-              ),
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.md,
-                  vertical: AppSpacing.sm,
+      child: Column(
+        children: [
+          if (state.recordedDates.length > 1)
+            Padding(
+              padding: const EdgeInsets.only(bottom: AppSpacing.md),
+              child: InkWell(
+                borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+                onTap: () => _showDatePicker(
+                  context,
+                  ref,
+                  state.recordedDates,
+                  state.selectedDate,
                 ),
-                decoration: BoxDecoration(
-                  color: colors.surfaceRaised,
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.calendar_month,
-                      size: 16,
-                      color: colors.onSurfaceVariant,
-                    ),
-                    const SizedBox(width: AppSpacing.sm),
-                    Expanded(
-                      child: Text(
-                        isLatest
-                            ? ref.watch(
-                                rcTextProvider(
-                                  RemoteConfigKeys
-                                      .measurementsShowingLatestLabel,
-                                ),
-                              )
-                            : ref
-                                  .watch(
-                                    rcTextProvider(
-                                      RemoteConfigKeys
-                                          .measurementsShowingDateLabel,
-                                    ),
-                                  )
-                                  .replaceAll(
-                                    '{date}',
-                                    _formatDate(state.selectedDate!),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.md,
+                    vertical: AppSpacing.sm,
+                  ),
+                  decoration: BoxDecoration(
+                    color: colors.surfaceRaised,
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.calendar_month,
+                        size: 16,
+                        color: colors.onSurfaceVariant,
+                      ),
+                      const SizedBox(width: AppSpacing.sm),
+                      Expanded(
+                        child: Text(
+                          isLatest
+                              ? ref.watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys
+                                        .measurementsShowingLatestLabel,
                                   ),
-                        style: typography.bodyMedium.copyWith(
-                          color: colors.onSurfaceVariant,
+                                )
+                              : ref
+                                    .watch(
+                                      rcTextProvider(
+                                        RemoteConfigKeys
+                                            .measurementsShowingDateLabel,
+                                      ),
+                                    )
+                                    .replaceAll(
+                                      '{date}',
+                                      _formatDate(state.selectedDate!),
+                                    ),
+                          style: typography.bodyMedium.copyWith(
+                            color: colors.onSurfaceVariant,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ),
+                      Text(
+                        ref.watch(
+                          rcTextProvider(
+                            RemoteConfigKeys.measurementsChangeDateLabel,
+                          ),
+                        ),
+                        style: typography.headingSmall.copyWith(
+                          color: colors.primary,
                           fontSize: 13,
                         ),
                       ),
-                    ),
-                    Text(
-                      ref.watch(
-                        rcTextProvider(
-                          RemoteConfigKeys.measurementsChangeDateLabel,
-                        ),
-                      ),
-                      style: typography.headingSmall.copyWith(
-                        color: colors.primary,
-                        fontSize: 13,
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
+          Expanded(
+            child: Center(
+              child: MeasurementAvatar(
+                points: state.points,
+                selected: state.selectedMetric,
+                onSelect: controller.selectPoint,
+                gender: state.gender,
+              ),
+            ),
           ),
-        Center(
-          child: MeasurementAvatar(
-            points: state.points,
-            selected: state.selectedMetric,
-            onSelect: controller.selectPoint,
-            gender: state.gender,
-          ),
-        ),
-        const SizedBox(height: AppSpacing.sm),
-        Container(
-          padding: const EdgeInsets.all(AppSpacing.lg),
-          decoration: BoxDecoration(
-            color: colors.surface,
-            borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
-            border: Border.all(color: colors.outline),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          ref.watch(
-                            rcTextProvider(
-                              RemoteConfigKeys.measurementsSelectedPointLabel,
+          const SizedBox(height: AppSpacing.sm),
+          Container(
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            decoration: BoxDecoration(
+              color: colors.surface,
+              borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
+              border: Border.all(color: colors.outline),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            ref.watch(
+                              rcTextProvider(
+                                RemoteConfigKeys.measurementsSelectedPointLabel,
+                              ),
+                            ),
+                            style: typography.caption.copyWith(
+                              color: colors.onSurfaceMuted,
                             ),
                           ),
-                          style: typography.caption.copyWith(
-                            color: colors.onSurfaceMuted,
+                          Text(
+                            state.selectedMetric.label,
+                            style: typography.headingMedium.copyWith(
+                              color: colors.onSurface,
+                              fontSize: 19,
+                            ),
                           ),
-                        ),
-                        Text(
-                          state.selectedMetric.label,
-                          style: typography.headingMedium.copyWith(
-                            color: colors.onSurface,
-                            fontSize: 19,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    width: 130,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.sm,
-                    ),
-                    decoration: BoxDecoration(
-                      color: colors.surfaceRaised,
-                      borderRadius: BorderRadius.circular(
-                        AppSpacing.radiusInner,
+                        ],
                       ),
                     ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.edit_outlined,
-                          size: 16,
-                          color: colors.onSurfaceMuted,
-                        ),
-                        const SizedBox(width: AppSpacing.xs),
-                        Expanded(
-                          child: TextField(
-                            controller: _valueController,
-                            focusNode: _valueFocusNode,
-                            enabled: !_isSaving,
-                            textAlign: TextAlign.right,
-                            keyboardType: const TextInputType.numberWithOptions(
-                              decimal: true,
-                            ),
-                            inputFormatters: [
-                              FilteringTextInputFormatter.allow(
-                                RegExp(r'[0-9,.]'),
-                              ),
-                            ],
-                            style: typography.dataLarge.copyWith(
-                              color: colors.onSurface,
-                              fontSize: 24,
-                            ),
-                            decoration: InputDecoration(
-                              isDense: true,
-                              isCollapsed: true,
-                              border: InputBorder.none,
-                              contentPadding: const EdgeInsets.symmetric(
-                                vertical: AppSpacing.sm,
-                              ),
-                              hintText: ref.watch(
-                                rcTextProvider(
-                                  RemoteConfigKeys.measurementsValueFieldHint,
-                                ),
-                              ),
-                              hintStyle: typography.bodyMedium.copyWith(
-                                color: colors.onSurfaceMuted,
-                                fontSize: 14,
-                              ),
-                              suffixText:
-                                  ' ${ref.watch(rcTextProvider(RemoteConfigKeys.measurementsUnitCm))}',
-                              suffixStyle: typography.bodyMedium.copyWith(
-                                color: colors.onSurfaceMuted,
-                                fontSize: 15,
-                              ),
-                            ),
-                            onSubmitted: (_) => _save(state.selectedMetric),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: AppSpacing.sm),
-              if (selectedPoint != null)
-                Row(
-                  children: [
                     Container(
+                      width: 130,
                       padding: const EdgeInsets.symmetric(
                         horizontal: AppSpacing.sm,
-                        vertical: 5,
                       ),
                       decoration: BoxDecoration(
-                        color: selectedPoint.isImprovement
-                            ? colors.successContainer
-                            : colors.primaryContainer,
+                        color: colors.surfaceRaised,
                         borderRadius: BorderRadius.circular(
-                          AppSpacing.radiusPill,
+                          AppSpacing.radiusInner,
                         ),
                       ),
-                      child: Text(
-                        selectedPoint.delta,
-                        style: typography.caption.copyWith(
-                          color: selectedPoint.isImprovement
-                              ? colors.onSuccessContainer
-                              : colors.onPrimaryContainer,
-                          fontSize: 12,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: AppSpacing.sm),
-                    Expanded(
-                      child: Text(
-                        selectedPoint.since,
-                        style: typography.caption.copyWith(
-                          color: colors.onSurfaceMuted,
-                        ),
-                        overflow: TextOverflow.ellipsis,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.edit_outlined,
+                            size: 16,
+                            color: colors.onSurfaceMuted,
+                          ),
+                          const SizedBox(width: AppSpacing.xs),
+                          Expanded(
+                            child: TextField(
+                              controller: _valueController,
+                              focusNode: _valueFocusNode,
+                              enabled: !_isSaving,
+                              textAlign: TextAlign.right,
+                              keyboardType:
+                                  const TextInputType.numberWithOptions(
+                                    decimal: true,
+                                  ),
+                              inputFormatters: [
+                                FilteringTextInputFormatter.allow(
+                                  RegExp(r'[0-9,.]'),
+                                ),
+                              ],
+                              style: typography.dataLarge.copyWith(
+                                color: colors.onSurface,
+                                fontSize: 24,
+                              ),
+                              decoration: InputDecoration(
+                                isDense: true,
+                                isCollapsed: true,
+                                border: InputBorder.none,
+                                contentPadding: const EdgeInsets.symmetric(
+                                  vertical: AppSpacing.sm,
+                                ),
+                                hintText: ref.watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys.measurementsValueFieldHint,
+                                  ),
+                                ),
+                                hintStyle: typography.bodyMedium.copyWith(
+                                  color: colors.onSurfaceMuted,
+                                  fontSize: 14,
+                                ),
+                                suffixText:
+                                    ' ${ref.watch(rcTextProvider(RemoteConfigKeys.measurementsUnitCm))}',
+                                suffixStyle: typography.bodyMedium.copyWith(
+                                  color: colors.onSurfaceMuted,
+                                  fontSize: 15,
+                                ),
+                              ),
+                              onSubmitted: (_) => _save(state.selectedMetric),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
-                )
-              else
-                Text(
-                  ref.watch(
-                    rcTextProvider(RemoteConfigKeys.measurementsEmptyPointHint),
-                  ),
-                  style: typography.caption.copyWith(
-                    color: colors.onSurfaceMuted,
-                  ),
                 ),
-              if (_errorMessage != null) ...[
                 const SizedBox(height: AppSpacing.sm),
-                Text(
-                  _errorMessage!,
-                  style: typography.bodyMedium.copyWith(
-                    color: colors.error,
-                    fontSize: 13,
-                  ),
-                ),
-              ],
-              const SizedBox(height: AppSpacing.md),
-              Material(
-                color: colors.primary,
-                borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
-                  onTap: _isSaving ? null : () => _save(state.selectedMetric),
-                  child: Container(
-                    width: double.infinity,
-                    constraints: const BoxConstraints(
-                      minHeight: AppSpacing.primaryActionHeight,
+                if (selectedPoint != null)
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.sm,
+                          vertical: 5,
+                        ),
+                        decoration: BoxDecoration(
+                          color: selectedPoint.isImprovement
+                              ? colors.successContainer
+                              : colors.primaryContainer,
+                          borderRadius: BorderRadius.circular(
+                            AppSpacing.radiusPill,
+                          ),
+                        ),
+                        child: Text(
+                          selectedPoint.delta,
+                          style: typography.caption.copyWith(
+                            color: selectedPoint.isImprovement
+                                ? colors.onSuccessContainer
+                                : colors.onPrimaryContainer,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.sm),
+                      Expanded(
+                        child: Text(
+                          selectedPoint.since,
+                          style: typography.caption.copyWith(
+                            color: colors.onSurfaceMuted,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  )
+                else
+                  Text(
+                    ref.watch(
+                      rcTextProvider(
+                        RemoteConfigKeys.measurementsEmptyPointHint,
+                      ),
                     ),
-                    alignment: Alignment.center,
-                    child: Text(
-                      _isSaving
-                          ? ref.watch(
-                              rcTextProvider(
-                                RemoteConfigKeys.membersSavingLabel,
+                    style: typography.caption.copyWith(
+                      color: colors.onSurfaceMuted,
+                    ),
+                  ),
+                if (_errorMessage != null) ...[
+                  const SizedBox(height: AppSpacing.sm),
+                  Text(
+                    _errorMessage!,
+                    style: typography.bodyMedium.copyWith(
+                      color: colors.error,
+                      fontSize: 13,
+                    ),
+                  ),
+                ],
+                const SizedBox(height: AppSpacing.md),
+                Material(
+                  color: colors.primary,
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+                    onTap: _isSaving ? null : () => _save(state.selectedMetric),
+                    child: Container(
+                      width: double.infinity,
+                      constraints: const BoxConstraints(
+                        minHeight: AppSpacing.primaryActionHeight,
+                      ),
+                      alignment: Alignment.center,
+                      child: Text(
+                        _isSaving
+                            ? ref.watch(
+                                rcTextProvider(
+                                  RemoteConfigKeys.membersSavingLabel,
+                                ),
+                              )
+                            : ref.watch(
+                                rcTextProvider(RemoteConfigKeys.commonKaydet),
                               ),
-                            )
-                          : ref.watch(
-                              rcTextProvider(RemoteConfigKeys.commonKaydet),
-                            ),
-                      style: typography.headingSmall.copyWith(
-                        fontSize: 15,
-                        color: colors.onPrimary,
+                        style: typography.headingSmall.copyWith(
+                          fontSize: 15,
+                          color: colors.onPrimary,
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 

@@ -8,15 +8,18 @@ import '../../domain/measurement_metric.dart';
 import '../../domain/measurement_point.dart';
 
 // Tüm ölçüm ekranları (avatar bulunan her yer) tek ekrana sığsın diye
-// önceki 362x478 kutu ~%84'e küçültüldü — noktalar/etiketler _imgWidth/
-// _imgHeight'a göre orantılı (fx/fy fraksiyon) konumlandığı için tüm
-// yerleşim otomatik ölçekleniyor, sadece bu dört sabiti değiştirmek yeterli.
-const _boxWidth = 304.0;
-const _boxHeight = 401.0;
-const _imgWidth = 225.0;
-const _imgHeight = 312.0;
+// önceki 362x478 kutu ~%94'e küçültüldü (asıl "tek ekrana sığdırma" işi
+// artık _AvatarView'ın Expanded'lı düzeninde yapılıyor, bu yüzden avatar
+// neredeyse orijinal boyutunda kalabiliyor) — noktalar/etiketler
+// _imgWidth/_imgHeight'a göre orantılı (fx/fy fraksiyon) konumlandığı
+// için tüm yerleşim otomatik ölçekleniyor, sadece bu dört sabiti
+// değiştirmek yeterli.
+const _boxWidth = 340.0;
+const _boxHeight = 449.0;
+const _imgWidth = 252.0;
+const _imgHeight = 350.0;
 const _imgX = (_boxWidth - _imgWidth) / 2;
-const _imgY = 40.0;
+const _imgY = 45.0;
 const _lane = 84.0;
 
 /// Egoractive'in imza görsel öğesi — silüet üzerindeki tıklanabilir
