@@ -4,7 +4,10 @@ import { getRemoteConfig, RemoteConfigTemplate } from "firebase-admin/remote-con
 import { onSchedule } from "firebase-functions/v2/scheduler";
 import * as logger from "firebase-functions/logger";
 
+import { mapWithConcurrency } from "../shared/concurrency";
 import { withFailureAlerting } from "../shared/function-health";
+
+const SESSION_CONCURRENCY = 25;
 
 const DEFAULT_TEXT: Record<string, { tr: string; en: string }> = {
   lbl_notif_session_completion_title: {
@@ -65,17 +68,31 @@ export const sessionCompletionCheck = onSchedule("every 15 minutes", withFailure
     return;
   }
 
-  for (const sessionDoc of dueSessions.docs) {
+  // Aynı antrenörün bu pencerede birden fazla bitmiş seansı olabilir —
+  // dokümanı her seans için ayrı ayrı okumak yerine uid başına tek
+  // Promise'da önbelleğe alınıyor (Promise cache, eşzamanlı isteklerde de
+  // tekilleştirir).
+  const trainerDocCache = new Map<string, Promise<FirebaseFirestore.DocumentSnapshot>>();
+  function getTrainerDoc(trainerId: string): Promise<FirebaseFirestore.DocumentSnapshot> {
+    let cached = trainerDocCache.get(trainerId);
+    if (!cached) {
+      cached = db.collection("users").doc(trainerId).get();
+      trainerDocCache.set(trainerId, cached);
+    }
+    return cached;
+  }
+
+  await mapWithConcurrency(dueSessions.docs, SESSION_CONCURRENCY, async (sessionDoc) => {
     const sessionData = sessionDoc.data() as { trainerId?: string; memberName?: string };
     const { trainerId } = sessionData;
-    if (!trainerId) continue;
+    if (!trainerId) return;
 
-    const trainerDoc = await db.collection("users").doc(trainerId).get();
+    const trainerDoc = await getTrainerDoc(trainerId);
     const fcmTokens = (trainerDoc.data()?.fcmTokens as string[] | undefined) ?? [];
     if (fcmTokens.length === 0) {
       logger.info(`Antrenör ${trainerId} için kayıtlı FCM token yok, atlandı.`);
       await sessionDoc.ref.update({ completionPushSent: true });
-      continue;
+      return;
     }
 
     const locale = (trainerDoc.data()?.locale as string | undefined) ?? "en";
@@ -91,5 +108,5 @@ export const sessionCompletionCheck = onSchedule("every 15 minutes", withFailure
     });
 
     await sessionDoc.ref.update({ completionPushSent: true });
-  }
+  });
 }));

@@ -4,7 +4,10 @@ import { getRemoteConfig, RemoteConfigTemplate } from "firebase-admin/remote-con
 import { onSchedule } from "firebase-functions/v2/scheduler";
 import * as logger from "firebase-functions/logger";
 
+import { mapWithConcurrency } from "../shared/concurrency";
 import { withFailureAlerting } from "../shared/function-health";
+
+const SESSION_CONCURRENCY = 25;
 
 const DEFAULT_REMINDER_MINUTES = 120;
 
@@ -89,17 +92,30 @@ export const sessionReminderCheck = onSchedule("every 15 minutes", withFailureAl
     return;
   }
 
-  for (const sessionDoc of dueSessions.docs) {
+  // Aynı üyenin bu pencerede birden fazla seansı olabilir — dokümanı her
+  // seans için ayrı ayrı okumak yerine uid başına tek Promise'da önbelleğe
+  // alınıyor (Promise cache, eşzamanlı isteklerde de tekilleştirir).
+  const memberDocCache = new Map<string, Promise<FirebaseFirestore.DocumentSnapshot>>();
+  function getMemberDoc(memberId: string): Promise<FirebaseFirestore.DocumentSnapshot> {
+    let cached = memberDocCache.get(memberId);
+    if (!cached) {
+      cached = db.collection("users").doc(memberId).get();
+      memberDocCache.set(memberId, cached);
+    }
+    return cached;
+  }
+
+  await mapWithConcurrency(dueSessions.docs, SESSION_CONCURRENCY, async (sessionDoc) => {
     const sessionData = sessionDoc.data() as { memberId?: string; trainerName?: string; startTime?: Timestamp };
     const { memberId } = sessionData;
-    if (!memberId) continue;
+    if (!memberId) return;
 
-    const memberDoc = await db.collection("users").doc(memberId).get();
+    const memberDoc = await getMemberDoc(memberId);
     const fcmTokens = (memberDoc.data()?.fcmTokens as string[] | undefined) ?? [];
     if (fcmTokens.length === 0) {
       logger.info(`Üye ${memberId} için kayıtlı FCM token yok, atlandı.`);
       await sessionDoc.ref.update({ confirmationRequested: true });
-      continue;
+      return;
     }
 
     const locale = (memberDoc.data()?.locale as string | undefined) ?? "en";
@@ -119,5 +135,5 @@ export const sessionReminderCheck = onSchedule("every 15 minutes", withFailureAl
     });
 
     await sessionDoc.ref.update({ confirmationRequested: true });
-  }
+  });
 }));

@@ -39,8 +39,21 @@ async function recordFailure(functionName: string, error: unknown): Promise<void
   }
 }
 
+/**
+ * `onUserRoleAssigned` gibi çok sık tetiklenen fonksiyonlarda (users/{uid}'e
+ * yapılan HER yazımda çalışıyor) önceden burada koşulsuz bir Firestore
+ * yazması yapılıyordu — art arda hata sayacı zaten 0'ken 0'ı tekrar
+ * yazmanın hiçbir işlevsel etkisi yok, sadece maliyet. Artık önce okunuyor,
+ * sayaç zaten 0'sa (yani sıfırlanacak bir şey yoksa) yazma tamamen
+ * atlanıyor — bir hatadan TOPARLANIRKEN sayacı gerçekten sıfırlama işlevi
+ * (asıl amaç) değişmeden korunuyor.
+ */
 async function recordSuccess(functionName: string): Promise<void> {
-  await getFirestore().collection("functionHealth").doc(functionName).set({ consecutiveFailures: 0 }, { merge: true });
+  const ref = getFirestore().collection("functionHealth").doc(functionName);
+  const snapshot = await ref.get();
+  const current = (snapshot.data()?.consecutiveFailures as number | undefined) ?? 0;
+  if (current === 0) return;
+  await ref.set({ consecutiveFailures: 0 }, { merge: true });
 }
 
 /**

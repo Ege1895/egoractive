@@ -3,7 +3,14 @@ import { getRemoteConfig, RemoteConfigTemplate } from "firebase-admin/remote-con
 import { onSchedule } from "firebase-functions/v2/scheduler";
 import * as logger from "firebase-functions/logger";
 
+import { mapWithConcurrency } from "../shared/concurrency";
 import { withFailureAlerting } from "../shared/function-health";
+
+/** Aynı anda en fazla bu kadar üye işlenir — büyük salonlarda (F7-2'nin
+ * 10.000 üyelik yük testi ölçeği) tamamen sıralı işlemek fonksiyonun zaman
+ * aşımına yaklaşmasına yol açabiliyordu, tamamen paralel işlemek ise
+ * Firestore'a aynı anda onbinlerce sorgu göndermek anlamına gelirdi. */
+const MEMBER_CONCURRENCY = 25;
 
 export interface BadgeCriterion {
   id: string;
@@ -92,7 +99,7 @@ export const badgeCheck = onSchedule("every day 03:00", withFailureAlerting("bad
   const membersSnapshot = await db.collection("users").where("role", "==", "member").get();
   if (membersSnapshot.empty) return;
 
-  for (const memberDoc of membersSnapshot.docs) {
+  await mapWithConcurrency(membersSnapshot.docs, MEMBER_CONCURRENCY, async (memberDoc) => {
     const uid = memberDoc.id;
     const data = memberDoc.data();
     const existingBadgeIds = (data.badges as string[] | undefined) ?? [];
@@ -116,9 +123,9 @@ export const badgeCheck = onSchedule("every day 03:00", withFailureAlerting("bad
     };
 
     const newlyEarned = computeNewlyEarnedBadgeIds(criteria, metrics, existingBadgeIds);
-    if (newlyEarned.length === 0) continue;
+    if (newlyEarned.length === 0) return;
 
     await memberDoc.ref.update({ badges: [...existingBadgeIds, ...newlyEarned] });
     logger.info(`Üye ${uid} yeni rozet kazandı: ${newlyEarned.join(", ")}`);
-  }
+  });
 }));
