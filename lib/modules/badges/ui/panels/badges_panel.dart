@@ -10,6 +10,37 @@ import '../../../../shared/widgets/app_back_button.dart';
 import '../../controller/badges_controller.dart';
 import '../../domain/badge_item.dart';
 
+/// Rozetlerin en kolaydan en zora doğru gösterim sırası (bkz.
+/// docs/badge_icon_prompts.md'deki bronz→elmas kademelendirme) — RC'deki
+/// `cfg_badge_criteria` dizisinin sırası bunu garanti etmiyor, bu yüzden
+/// listelemeden önce burada tanımlanan sıraya göre yeniden diziliyor.
+/// Kriterlerde olup burada olmayan bir id (yeni eklenmiş, henüz
+/// sıralanmamış bir rozet) sona düşer.
+const _badgeDisplayOrder = [
+  'first_session',
+  'feedback_given',
+  'measurement_logged',
+  'group_session_join',
+  'event_join',
+  'sessions_5',
+  'sessions_20',
+  'membership_6_months',
+  'sessions_50',
+  'membership_12_months',
+];
+
+List<BadgeItem> _sortedByDifficulty(List<BadgeItem> badges) {
+  final sorted = [...badges];
+  sorted.sort((a, b) {
+    final aIndex = _badgeDisplayOrder.indexOf(a.id);
+    final bIndex = _badgeDisplayOrder.indexOf(b.id);
+    return (aIndex == -1 ? _badgeDisplayOrder.length : aIndex).compareTo(
+      bIndex == -1 ? _badgeDisplayOrder.length : bIndex,
+    );
+  });
+  return sorted;
+}
+
 /// Üye 6 · Rozetlerim — kazanılan + yolda olan.
 class BadgesPanel extends BasePanel {
   const BadgesPanel({super.key});
@@ -23,7 +54,7 @@ class _BadgesPanelState extends BasePanelState<BadgesPanel> {
   Widget build(BuildContext context) {
     final colors = context.appColors;
     final typography = context.appTypography;
-    final badges = ref.watch(badgesControllerProvider);
+    final badges = _sortedByDifficulty(ref.watch(badgesControllerProvider));
     final hasError = ref.watch(badgesControllerProvider.notifier).hasError;
     final earnedCount = badges.where((b) => b.earned).length;
     final nextLocked = badges.isEmpty
@@ -173,19 +204,31 @@ class _BadgesPanelState extends BasePanelState<BadgesPanel> {
                     ),
                   ),
                   const SizedBox(height: AppSpacing.lg),
-                  GridView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: badges.length,
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 3,
-                          mainAxisSpacing: AppSpacing.md,
-                          crossAxisSpacing: AppSpacing.md,
-                          mainAxisExtent: 118,
-                        ),
-                    itemBuilder: (context, index) =>
-                        _BadgeTile(badge: badges[index]),
+                  LayoutBuilder(
+                    builder: (context, constraints) {
+                      const crossAxisCount = 3;
+                      const spacing = AppSpacing.md;
+                      final itemWidth =
+                          (constraints.maxWidth -
+                              spacing * (crossAxisCount - 1)) /
+                          crossAxisCount;
+                      return Wrap(
+                        spacing: spacing,
+                        runSpacing: spacing,
+                        // 10 rozet 3'lü gridde son satırda tek başına kalıyor
+                        // — WrapAlignment.center o satırdaki tek rozeti
+                        // sol yaslı bırakmak yerine ekranın ortasına alıyor.
+                        alignment: WrapAlignment.center,
+                        children: [
+                          for (final badge in badges)
+                            SizedBox(
+                              width: itemWidth,
+                              height: 138,
+                              child: _BadgeTile(badge: badge),
+                            ),
+                        ],
+                      );
+                    },
                   ),
                 ],
               ),
@@ -226,8 +269,10 @@ class _BadgeTile extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            width: 44,
-            height: 44,
+            // Kullanıcının rozet ikonunu net görebilmesi için orijinal
+            // 44'ün 1.3 katı.
+            width: 57,
+            height: 57,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               border: Border.all(
@@ -250,7 +295,7 @@ class _BadgeTile extends StatelessWidget {
                     alignment: Alignment.center,
                     child: Icon(
                       badge.earned ? Icons.emoji_events : Icons.lock_outline,
-                      size: 18,
+                      size: 23,
                       color: badge.earned
                           ? colors.primary
                           : colors.onSurfaceMuted,
