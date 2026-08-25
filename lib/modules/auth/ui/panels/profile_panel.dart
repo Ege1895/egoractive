@@ -10,6 +10,7 @@ import '../../../badges/controller/badges_controller.dart';
 import '../../../badges/ui/panels/badges_panel.dart';
 import '../../../feedback/ui/panels/feedback_panel.dart';
 import '../../../gyms/ui/panels/gym_rules_view_panel.dart';
+import '../../../members/ui/panels/member_self_info_panel.dart';
 import '../../controller/auth_controller.dart';
 import '../../controller/member_profile_controller.dart';
 import 'delete_account_confirm_panel.dart';
@@ -60,56 +61,66 @@ class ProfilePanel extends ConsumerWidget {
               style: typography.headingLarge.copyWith(color: colors.onSurface),
             ),
             const SizedBox(height: AppSpacing.lg),
-            Container(
-              padding: const EdgeInsets.all(AppSpacing.xl),
-              decoration: BoxDecoration(
-                color: colors.surface,
-                borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
-                border: Border.all(color: colors.outline),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      _InitialsAvatar(
-                        initials: _initialsOf(profile.name),
-                        size: 64,
-                      ),
-                      const SizedBox(width: AppSpacing.md),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              profile.name.isEmpty ? '—' : profile.name,
-                              style: typography.headingMedium.copyWith(
-                                color: colors.onSurface,
-                                fontSize: 19,
-                              ),
-                            ),
-                            Text(
-                              ref
-                                  .watch(
-                                    rcTextProvider(
-                                      RemoteConfigKeys.authProfileMemberCaption,
-                                    ),
-                                  )
-                                  .replaceAll(
-                                    '{phone}',
-                                    formatTrPhoneDigits(profile.phoneDigits),
-                                  ),
-                              style: typography.bodyMedium.copyWith(
-                                color: colors.onSurfaceVariant,
-                                fontSize: 14,
-                              ),
-                            ),
-                          ],
+            InkWell(
+              borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
+              onTap: () => panelStack.push(const MemberSelfInfoPanel()),
+              child: Container(
+                padding: const EdgeInsets.all(AppSpacing.xl),
+                decoration: BoxDecoration(
+                  color: colors.surface,
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
+                  border: Border.all(color: colors.outline),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        _InitialsAvatar(
+                          initials: _initialsOf(profile.name),
+                          size: 64,
                         ),
-                      ),
-                    ],
-                  ),
-                ],
+                        const SizedBox(width: AppSpacing.md),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                profile.name.isEmpty ? '—' : profile.name,
+                                style: typography.headingMedium.copyWith(
+                                  color: colors.onSurface,
+                                  fontSize: 19,
+                                ),
+                              ),
+                              Text(
+                                ref
+                                    .watch(
+                                      rcTextProvider(
+                                        RemoteConfigKeys
+                                            .authProfileMemberCaption,
+                                      ),
+                                    )
+                                    .replaceAll(
+                                      '{phone}',
+                                      formatTrPhoneDigits(profile.phoneDigits),
+                                    ),
+                                style: typography.bodyMedium.copyWith(
+                                  color: colors.onSurfaceVariant,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Icon(
+                          Icons.chevron_right,
+                          color: colors.onSurfaceMuted,
+                          size: 20,
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
             const SizedBox(height: AppSpacing.lg),

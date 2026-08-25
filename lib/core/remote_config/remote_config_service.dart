@@ -736,6 +736,14 @@ abstract final class RemoteConfigKeys {
   static const membersPaymentInstallmentNote =
       'lbl_members_payment_installment_note';
   static const membersSavingLabel = 'lbl_members_saving_label';
+  static const membersSelfInfoTitle = 'lbl_members_self_info_title';
+  static const membersSelfInfoNameRequiredError =
+      'lbl_members_self_info_name_required_error';
+  static const membersSelfInfoPhoneInvalidError =
+      'lbl_members_self_info_phone_invalid_error';
+  static const membersSelfInfoPhoneTakenError =
+      'lbl_members_self_info_phone_taken_error';
+  static const membersSelfInfoSaveError = 'lbl_members_self_info_save_error';
   static const membersInfoNewTitle = 'lbl_members_info_new_title';
   static const membersInfoEditTitle = 'lbl_members_info_edit_title';
   static const membersInfoPhoneHint = 'lbl_members_info_phone_hint';
@@ -1749,6 +1757,14 @@ class RemoteConfigService {
         'Üye kendi ekranında yalnızca taksitlerin ödenip ödenmediğini görür; '
         'tutarlar üyeye gösterilmez.',
     'lbl_members_saving_label_tr': 'Kaydediliyor…',
+    'lbl_members_self_info_title_tr': 'Bilgilerim',
+    'lbl_members_self_info_name_required_error_tr': 'Ad ve soyad gerekli.',
+    'lbl_members_self_info_phone_invalid_error_tr':
+        'Geçerli bir telefon numarası gir.',
+    'lbl_members_self_info_phone_taken_error_tr':
+        'Bu telefon numarası zaten kayıtlı.',
+    'lbl_members_self_info_save_error_tr':
+        'Kaydedilemedi, bağlantını kontrol edip tekrar dene.',
     'lbl_members_info_new_title_tr': 'Yeni üye',
     'lbl_members_info_edit_title_tr': 'Üye bilgileri',
     'lbl_members_info_phone_hint_tr': '5XX XXX XX XX',
@@ -2506,6 +2522,15 @@ class RemoteConfigService {
         'The member only sees whether installments are paid on their own '
         'screen; amounts are not shown to them.',
     'lbl_members_saving_label_en': 'Saving…',
+    'lbl_members_self_info_title_en': 'My Info',
+    'lbl_members_self_info_name_required_error_en':
+        'Name and surname are required.',
+    'lbl_members_self_info_phone_invalid_error_en':
+        'Enter a valid phone number.',
+    'lbl_members_self_info_phone_taken_error_en':
+        'This phone number is already registered.',
+    'lbl_members_self_info_save_error_en':
+        'Could not save, check your connection and try again.',
     'lbl_members_info_new_title_en': 'New member',
     'lbl_members_info_edit_title_en': 'Member details',
     'lbl_members_info_phone_hint_en': '5XX XXX XX XX',

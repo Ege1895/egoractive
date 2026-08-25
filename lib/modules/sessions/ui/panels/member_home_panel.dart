@@ -10,6 +10,7 @@ import '../../../../shared/widgets/progress_ring.dart';
 import '../../../../shared/utils/tr_date_formatter.dart';
 import '../../../auth/controller/member_profile_controller.dart';
 import '../../../gyms/controller/gym_profile_controller.dart';
+import '../../../members/ui/panels/member_self_info_panel.dart';
 import '../../../packages/controller/package_controller.dart';
 import '../../controller/sessions_controller.dart';
 import '../../domain/session.dart';
@@ -65,51 +66,71 @@ class MemberHomePanel extends ConsumerWidget {
           children: [
             Row(
               children: [
-                Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(
-                    color: colors.primaryContainer,
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
-                  ),
-                  alignment: Alignment.center,
-                  child: Text(
-                    initials,
-                    style: typography.headingSmall.copyWith(
-                      color: colors.onPrimaryContainer,
-                      fontSize: 16,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: AppSpacing.md),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                InkWell(
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+                  onTap: () => ref
+                      .read(panelStackControllerProvider.notifier)
+                      .push(const MemberSelfInfoPanel()),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(
-                        gymProfile.name.isEmpty ? '—' : gymProfile.name,
-                        style: typography.caption.copyWith(
-                          color: colors.onSurfaceMuted,
+                      Container(
+                        width: 44,
+                        height: 44,
+                        decoration: BoxDecoration(
+                          color: colors.primaryContainer,
+                          borderRadius: BorderRadius.circular(
+                            AppSpacing.radiusInner,
+                          ),
+                        ),
+                        alignment: Alignment.center,
+                        child: Text(
+                          initials,
+                          style: typography.headingSmall.copyWith(
+                            color: colors.onPrimaryContainer,
+                            fontSize: 16,
+                          ),
                         ),
                       ),
-                      Text(
-                        ref
-                            .watch(
-                              rcTextProvider(
-                                RemoteConfigKeys.sessionsMemberHomeGreeting,
+                      const SizedBox(width: AppSpacing.md),
+                      ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 200),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              gymProfile.name.isEmpty ? '—' : gymProfile.name,
+                              overflow: TextOverflow.ellipsis,
+                              style: typography.caption.copyWith(
+                                color: colors.onSurfaceMuted,
                               ),
-                            )
-                            .replaceAll(
-                              '{name}',
-                              firstName.isEmpty ? '' : ' $firstName',
                             ),
-                        style: typography.headingMedium.copyWith(
-                          color: colors.onSurface,
+                            Text(
+                              ref
+                                  .watch(
+                                    rcTextProvider(
+                                      RemoteConfigKeys
+                                          .sessionsMemberHomeGreeting,
+                                    ),
+                                  )
+                                  .replaceAll(
+                                    '{name}',
+                                    firstName.isEmpty ? '' : ' $firstName',
+                                  ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: typography.headingMedium.copyWith(
+                                color: colors.onSurface,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
                   ),
                 ),
+                const Spacer(),
                 Container(
                   width: 44,
                   height: 44,

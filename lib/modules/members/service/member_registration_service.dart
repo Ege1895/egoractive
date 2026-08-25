@@ -91,6 +91,24 @@ class MemberRegistrationService {
       'canConfirmAttendance': canConfirmAttendance,
     });
   }
+
+  /// [MemberSelfInfoPanel] — üyenin KENDİ bilgilerini (ad/soyad/telefon)
+  /// düzenlemesi. `updateMember`'dan farklı olarak `trainerId`/`gender`/
+  /// `canConfirmAttendance` gibi admin'e özel alanlara hiç dokunmuyor —
+  /// üye kendi dokümanında yalnızca bu üç alanı değiştirebilir
+  /// (`firestore.rules`'taki `users/{uid}` update kuralı zaten
+  /// `request.auth.uid == uid` için kısıtsız izin veriyor).
+  Future<void> updateOwnInfo({
+    required String memberId,
+    required String name,
+    required String phoneNumber,
+  }) {
+    return FirebaseFirestore.instance.collection('users').doc(memberId).update({
+      'name': name,
+      'nameLower': name.toLowerCase(),
+      'phoneNumber': phoneNumber,
+    });
+  }
 }
 
 @riverpod

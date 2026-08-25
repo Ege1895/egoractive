@@ -7898,6 +7898,66 @@
         "value": "Could not save, check your connection and try again."
       },
       "valueType": "STRING"
+    },
+    "lbl_members_self_info_title_tr": {
+      "defaultValue": {
+        "value": "Bilgilerim"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_self_info_title_en": {
+      "defaultValue": {
+        "value": "My Info"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_self_info_name_required_error_tr": {
+      "defaultValue": {
+        "value": "Ad ve soyad gerekli."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_self_info_name_required_error_en": {
+      "defaultValue": {
+        "value": "Name and surname are required."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_self_info_phone_invalid_error_tr": {
+      "defaultValue": {
+        "value": "Geçerli bir telefon numarası gir."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_self_info_phone_invalid_error_en": {
+      "defaultValue": {
+        "value": "Enter a valid phone number."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_self_info_phone_taken_error_tr": {
+      "defaultValue": {
+        "value": "Bu telefon numarası zaten kayıtlı."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_self_info_phone_taken_error_en": {
+      "defaultValue": {
+        "value": "This phone number is already registered."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_self_info_save_error_tr": {
+      "defaultValue": {
+        "value": "Kaydedilemedi, bağlantını kontrol edip tekrar dene."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_self_info_save_error_en": {
+      "defaultValue": {
+        "value": "Could not save, check your connection and try again."
+      },
+      "valueType": "STRING"
     }
   }
 }

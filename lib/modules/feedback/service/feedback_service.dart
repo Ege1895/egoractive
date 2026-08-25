@@ -4,10 +4,12 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'feedback_service.g.dart';
 
-/// F5-4 — `feedback` koleksiyonuna yazar. Antrenör adı/ismi, üyenin kendi
-/// `users/{uid}` dokümanından (gymId, name, trainerId) ve antrenörün
-/// dokümanından (name) okunup denormalize edilir — admin listesi ekstra
-/// join yapmadan gösterebiliyor.
+/// F5-4 — `feedback` koleksiyonuna yazar. Antrenör adı, üyenin kendi
+/// `users/{uid}` dokümanında zaten denormalize duran `trainerName`
+/// alanından okunur — antrenörün KENDİ dokümanını ayrıca okumaya
+/// çalışmak (önceki sürüm) `firestore.rules`'ta üyenin başka bir
+/// kullanıcı dokümanını okumasına izin veren bir madde olmadığı için
+/// PERMISSION_DENIED ile gönderimin tamamını başarısız ediyordu.
 class FeedbackService {
   const FeedbackService();
 
@@ -15,24 +17,20 @@ class FeedbackService {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return;
 
-    final memberDoc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+    final memberDoc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid)
+        .get();
     final memberData = memberDoc.data();
     final gymId = memberData?['gymId'] as String?;
     if (gymId == null) return;
-
-    final trainerId = memberData?['trainerId'] as String?;
-    var trainerName = '';
-    if (trainerId != null && trainerId.isNotEmpty) {
-      final trainerDoc = await FirebaseFirestore.instance.collection('users').doc(trainerId).get();
-      trainerName = (trainerDoc.data()?['name'] as String?) ?? '';
-    }
 
     await FirebaseFirestore.instance.collection('feedback').add({
       'gymId': gymId,
       'memberId': user.uid,
       'memberName': (memberData?['name'] as String?) ?? '',
-      'trainerId': trainerId,
-      'trainerName': trainerName,
+      'trainerId': memberData?['trainerId'] as String?,
+      'trainerName': (memberData?['trainerName'] as String?) ?? '',
       'stars': rating,
       'comment': comment,
       'createdAt': FieldValue.serverTimestamp(),
@@ -41,4 +39,5 @@ class FeedbackService {
 }
 
 @riverpod
-FeedbackService feedbackService(FeedbackServiceRef ref) => const FeedbackService();
+FeedbackService feedbackService(FeedbackServiceRef ref) =>
+    const FeedbackService();
