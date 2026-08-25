@@ -11,7 +11,7 @@ class ProgressRing extends StatelessWidget {
     required this.size,
     required this.progress,
     required this.child,
-    this.strokeWidth = 3,
+    this.strokeWidth = 7,
     super.key,
   });
 
@@ -32,7 +32,7 @@ class ProgressRing extends StatelessWidget {
           CircularProgressIndicator(
             value: 1,
             strokeWidth: strokeWidth,
-            valueColor: AlwaysStoppedAnimation(colors.outline),
+            valueColor: AlwaysStoppedAnimation(colors.surfaceRaised),
           ),
           CircularProgressIndicator(
             value: progress.clamp(0, 1),
