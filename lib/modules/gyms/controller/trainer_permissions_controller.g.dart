@@ -7,7 +7,7 @@ part of 'trainer_permissions_controller.dart';
 // **************************************************************************
 
 String _$trainerPermissionsControllerHash() =>
-    r'7f3d5dcbd909d8eb95c7b0814faf900c323790df';
+    r'274b3d8c4ffa5ed4feff40656e6b29f3203e90fd';
 
 /// [AdminPermissionsPanel]'in antrenör seçim adımından sonra açılan
 /// [TrainerPermissionsEditPanel]'in state'i — gym-wide `AdminPermissionsController`'dan

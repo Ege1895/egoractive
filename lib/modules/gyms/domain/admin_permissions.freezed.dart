@@ -19,10 +19,15 @@ final _privateConstructorUsedError = UnsupportedError(
 mixin _$AdminPermissions {
   TrainerReminderDelay get trainerReminderDelay =>
       throw _privateConstructorUsedError;
-  bool get onlineBookingEnabled => throw _privateConstructorUsedError;
-  bool get allowSessionsAfterPackageExpiry =>
-      throw _privateConstructorUsedError;
-  bool get memberCanCancelSession => throw _privateConstructorUsedError;
+
+  /// Antrenör, üyelerinin seanslarını iptal edebilir mi —
+  /// `firestore.rules`'taki `trainerPermission('canCancelMemberSessions')`
+  /// ile canlı olarak zorlanır (bu sadece UI değil, gerçek bir kural).
+  bool get canCancelMemberSessions => throw _privateConstructorUsedError;
+
+  /// Antrenör, üyelerinin seanslarını erteleyebilir mi — aynı şekilde
+  /// `trainerPermission('canRescheduleMemberSessions')` ile zorlanır.
+  bool get canRescheduleMemberSessions => throw _privateConstructorUsedError;
 
   /// Create a copy of AdminPermissions
   /// with the given fields replaced by the non-null parameter values.
@@ -40,9 +45,8 @@ abstract class $AdminPermissionsCopyWith<$Res> {
   @useResult
   $Res call({
     TrainerReminderDelay trainerReminderDelay,
-    bool onlineBookingEnabled,
-    bool allowSessionsAfterPackageExpiry,
-    bool memberCanCancelSession,
+    bool canCancelMemberSessions,
+    bool canRescheduleMemberSessions,
   });
 }
 
@@ -62,9 +66,8 @@ class _$AdminPermissionsCopyWithImpl<$Res, $Val extends AdminPermissions>
   @override
   $Res call({
     Object? trainerReminderDelay = null,
-    Object? onlineBookingEnabled = null,
-    Object? allowSessionsAfterPackageExpiry = null,
-    Object? memberCanCancelSession = null,
+    Object? canCancelMemberSessions = null,
+    Object? canRescheduleMemberSessions = null,
   }) {
     return _then(
       _value.copyWith(
@@ -72,18 +75,13 @@ class _$AdminPermissionsCopyWithImpl<$Res, $Val extends AdminPermissions>
                 ? _value.trainerReminderDelay
                 : trainerReminderDelay // ignore: cast_nullable_to_non_nullable
                       as TrainerReminderDelay,
-            onlineBookingEnabled: null == onlineBookingEnabled
-                ? _value.onlineBookingEnabled
-                : onlineBookingEnabled // ignore: cast_nullable_to_non_nullable
+            canCancelMemberSessions: null == canCancelMemberSessions
+                ? _value.canCancelMemberSessions
+                : canCancelMemberSessions // ignore: cast_nullable_to_non_nullable
                       as bool,
-            allowSessionsAfterPackageExpiry:
-                null == allowSessionsAfterPackageExpiry
-                ? _value.allowSessionsAfterPackageExpiry
-                : allowSessionsAfterPackageExpiry // ignore: cast_nullable_to_non_nullable
-                      as bool,
-            memberCanCancelSession: null == memberCanCancelSession
-                ? _value.memberCanCancelSession
-                : memberCanCancelSession // ignore: cast_nullable_to_non_nullable
+            canRescheduleMemberSessions: null == canRescheduleMemberSessions
+                ? _value.canRescheduleMemberSessions
+                : canRescheduleMemberSessions // ignore: cast_nullable_to_non_nullable
                       as bool,
           )
           as $Val,
@@ -102,9 +100,8 @@ abstract class _$$AdminPermissionsImplCopyWith<$Res>
   @useResult
   $Res call({
     TrainerReminderDelay trainerReminderDelay,
-    bool onlineBookingEnabled,
-    bool allowSessionsAfterPackageExpiry,
-    bool memberCanCancelSession,
+    bool canCancelMemberSessions,
+    bool canRescheduleMemberSessions,
   });
 }
 
@@ -123,9 +120,8 @@ class __$$AdminPermissionsImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? trainerReminderDelay = null,
-    Object? onlineBookingEnabled = null,
-    Object? allowSessionsAfterPackageExpiry = null,
-    Object? memberCanCancelSession = null,
+    Object? canCancelMemberSessions = null,
+    Object? canRescheduleMemberSessions = null,
   }) {
     return _then(
       _$AdminPermissionsImpl(
@@ -133,17 +129,13 @@ class __$$AdminPermissionsImplCopyWithImpl<$Res>
             ? _value.trainerReminderDelay
             : trainerReminderDelay // ignore: cast_nullable_to_non_nullable
                   as TrainerReminderDelay,
-        onlineBookingEnabled: null == onlineBookingEnabled
-            ? _value.onlineBookingEnabled
-            : onlineBookingEnabled // ignore: cast_nullable_to_non_nullable
+        canCancelMemberSessions: null == canCancelMemberSessions
+            ? _value.canCancelMemberSessions
+            : canCancelMemberSessions // ignore: cast_nullable_to_non_nullable
                   as bool,
-        allowSessionsAfterPackageExpiry: null == allowSessionsAfterPackageExpiry
-            ? _value.allowSessionsAfterPackageExpiry
-            : allowSessionsAfterPackageExpiry // ignore: cast_nullable_to_non_nullable
-                  as bool,
-        memberCanCancelSession: null == memberCanCancelSession
-            ? _value.memberCanCancelSession
-            : memberCanCancelSession // ignore: cast_nullable_to_non_nullable
+        canRescheduleMemberSessions: null == canRescheduleMemberSessions
+            ? _value.canRescheduleMemberSessions
+            : canRescheduleMemberSessions // ignore: cast_nullable_to_non_nullable
                   as bool,
       ),
     );
@@ -155,27 +147,30 @@ class __$$AdminPermissionsImplCopyWithImpl<$Res>
 class _$AdminPermissionsImpl implements _AdminPermissions {
   const _$AdminPermissionsImpl({
     this.trainerReminderDelay = TrainerReminderDelay.thirtyMinutes,
-    this.onlineBookingEnabled = true,
-    this.allowSessionsAfterPackageExpiry = false,
-    this.memberCanCancelSession = true,
+    this.canCancelMemberSessions = true,
+    this.canRescheduleMemberSessions = true,
   });
 
   @override
   @JsonKey()
   final TrainerReminderDelay trainerReminderDelay;
+
+  /// Antrenör, üyelerinin seanslarını iptal edebilir mi —
+  /// `firestore.rules`'taki `trainerPermission('canCancelMemberSessions')`
+  /// ile canlı olarak zorlanır (bu sadece UI değil, gerçek bir kural).
   @override
   @JsonKey()
-  final bool onlineBookingEnabled;
+  final bool canCancelMemberSessions;
+
+  /// Antrenör, üyelerinin seanslarını erteleyebilir mi — aynı şekilde
+  /// `trainerPermission('canRescheduleMemberSessions')` ile zorlanır.
   @override
   @JsonKey()
-  final bool allowSessionsAfterPackageExpiry;
-  @override
-  @JsonKey()
-  final bool memberCanCancelSession;
+  final bool canRescheduleMemberSessions;
 
   @override
   String toString() {
-    return 'AdminPermissions(trainerReminderDelay: $trainerReminderDelay, onlineBookingEnabled: $onlineBookingEnabled, allowSessionsAfterPackageExpiry: $allowSessionsAfterPackageExpiry, memberCanCancelSession: $memberCanCancelSession)';
+    return 'AdminPermissions(trainerReminderDelay: $trainerReminderDelay, canCancelMemberSessions: $canCancelMemberSessions, canRescheduleMemberSessions: $canRescheduleMemberSessions)';
   }
 
   @override
@@ -185,25 +180,25 @@ class _$AdminPermissionsImpl implements _AdminPermissions {
             other is _$AdminPermissionsImpl &&
             (identical(other.trainerReminderDelay, trainerReminderDelay) ||
                 other.trainerReminderDelay == trainerReminderDelay) &&
-            (identical(other.onlineBookingEnabled, onlineBookingEnabled) ||
-                other.onlineBookingEnabled == onlineBookingEnabled) &&
             (identical(
-                  other.allowSessionsAfterPackageExpiry,
-                  allowSessionsAfterPackageExpiry,
+                  other.canCancelMemberSessions,
+                  canCancelMemberSessions,
                 ) ||
-                other.allowSessionsAfterPackageExpiry ==
-                    allowSessionsAfterPackageExpiry) &&
-            (identical(other.memberCanCancelSession, memberCanCancelSession) ||
-                other.memberCanCancelSession == memberCanCancelSession));
+                other.canCancelMemberSessions == canCancelMemberSessions) &&
+            (identical(
+                  other.canRescheduleMemberSessions,
+                  canRescheduleMemberSessions,
+                ) ||
+                other.canRescheduleMemberSessions ==
+                    canRescheduleMemberSessions));
   }
 
   @override
   int get hashCode => Object.hash(
     runtimeType,
     trainerReminderDelay,
-    onlineBookingEnabled,
-    allowSessionsAfterPackageExpiry,
-    memberCanCancelSession,
+    canCancelMemberSessions,
+    canRescheduleMemberSessions,
   );
 
   /// Create a copy of AdminPermissions
@@ -221,19 +216,23 @@ class _$AdminPermissionsImpl implements _AdminPermissions {
 abstract class _AdminPermissions implements AdminPermissions {
   const factory _AdminPermissions({
     final TrainerReminderDelay trainerReminderDelay,
-    final bool onlineBookingEnabled,
-    final bool allowSessionsAfterPackageExpiry,
-    final bool memberCanCancelSession,
+    final bool canCancelMemberSessions,
+    final bool canRescheduleMemberSessions,
   }) = _$AdminPermissionsImpl;
 
   @override
   TrainerReminderDelay get trainerReminderDelay;
+
+  /// Antrenör, üyelerinin seanslarını iptal edebilir mi —
+  /// `firestore.rules`'taki `trainerPermission('canCancelMemberSessions')`
+  /// ile canlı olarak zorlanır (bu sadece UI değil, gerçek bir kural).
   @override
-  bool get onlineBookingEnabled;
+  bool get canCancelMemberSessions;
+
+  /// Antrenör, üyelerinin seanslarını erteleyebilir mi — aynı şekilde
+  /// `trainerPermission('canRescheduleMemberSessions')` ile zorlanır.
   @override
-  bool get allowSessionsAfterPackageExpiry;
-  @override
-  bool get memberCanCancelSession;
+  bool get canRescheduleMemberSessions;
 
   /// Create a copy of AdminPermissions
   /// with the given fields replaced by the non-null parameter values.

@@ -52,15 +52,12 @@ class TrainerPermissionsController extends _$TrainerPermissionsController {
         (data?['trainerReminderDelayMinutes'] as num?)?.toInt() ??
             rc.defaultTrainerReminderDelayMinutes,
       ),
-      onlineBookingEnabled:
-          (data?['onlineBookingEnabled'] as bool?) ??
-          rc.defaultOnlineBookingEnabled,
-      allowSessionsAfterPackageExpiry:
-          (data?['allowSessionsAfterPackageExpiry'] as bool?) ??
-          rc.defaultAllowSessionsAfterPackageExpiry,
-      memberCanCancelSession:
-          (data?['memberCanCancelSession'] as bool?) ??
-          rc.defaultMemberCanCancelSession,
+      canCancelMemberSessions:
+          (data?['canCancelMemberSessions'] as bool?) ??
+          rc.defaultCanCancelMemberSessions,
+      canRescheduleMemberSessions:
+          (data?['canRescheduleMemberSessions'] as bool?) ??
+          rc.defaultCanRescheduleMemberSessions,
     );
   }
 
@@ -74,34 +71,25 @@ class TrainerPermissionsController extends _$TrainerPermissionsController {
     optimistic: state.copyWith(trainerReminderDelay: delay),
   );
 
-  Future<void> toggleOnlineBooking(List<String> trainerIds) => _apply(
-    trainerIds,
-    field: 'onlineBookingEnabled',
-    value: !state.onlineBookingEnabled,
-    optimistic: state.copyWith(
-      onlineBookingEnabled: !state.onlineBookingEnabled,
-    ),
-  );
-
-  Future<void> toggleAllowSessionsAfterExpiry(List<String> trainerIds) =>
+  Future<void> toggleCanCancelMemberSessions(List<String> trainerIds) =>
       _apply(
         trainerIds,
-        field: 'allowSessionsAfterPackageExpiry',
-        value: !state.allowSessionsAfterPackageExpiry,
+        field: 'canCancelMemberSessions',
+        value: !state.canCancelMemberSessions,
         optimistic: state.copyWith(
-          allowSessionsAfterPackageExpiry:
-              !state.allowSessionsAfterPackageExpiry,
+          canCancelMemberSessions: !state.canCancelMemberSessions,
         ),
       );
 
-  Future<void> toggleMemberCanCancel(List<String> trainerIds) => _apply(
-    trainerIds,
-    field: 'memberCanCancelSession',
-    value: !state.memberCanCancelSession,
-    optimistic: state.copyWith(
-      memberCanCancelSession: !state.memberCanCancelSession,
-    ),
-  );
+  Future<void> toggleCanRescheduleMemberSessions(List<String> trainerIds) =>
+      _apply(
+        trainerIds,
+        field: 'canRescheduleMemberSessions',
+        value: !state.canRescheduleMemberSessions,
+        optimistic: state.copyWith(
+          canRescheduleMemberSessions: !state.canRescheduleMemberSessions,
+        ),
+      );
 
   /// Optimistik günceller (anında geri bildirim), yazma başarısız olursa
   /// önceki değere geri alır — GymThemeController.selectTheme'deki aynı

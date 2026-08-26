@@ -113,16 +113,20 @@ abstract final class RemoteConfigKeys {
   /// birlikte güncellenmeli.
   static const cancellationDeadlineHours = 'cfg_cancellation_deadline_hours';
 
-  /// F3-6 — Yetki Ayarları'nın global varsayılanları. Bir salon
-  /// `gyms/{gymId}.permissions` altında override yazmadıysa buradan okunur.
+  /// F3-6 — Yetki Ayarları'nın global varsayılanı. Bir salon
+  /// `gyms/{gymId}.trainerPermissions.{trainerId}` altında override
+  /// yazmadıysa buradan okunur.
   static const defaultTrainerReminderDelayMinutes =
       'cfg_default_trainer_reminder_delay_minutes';
-  static const defaultOnlineBookingEnabled =
-      'cfg_default_online_booking_enabled';
-  static const defaultAllowSessionsAfterPackageExpiry =
-      'cfg_default_allow_sessions_after_package_expiry';
-  static const defaultMemberCanCancelSession =
-      'cfg_default_member_can_cancel_session';
+
+  /// Antrenörün üye seanslarını iptal/erteleyebilme yetkisi hiç
+  /// ayarlanmamışsa (yeni antrenör) düşülecek varsayılan — `firestore.rules`
+  /// tarafında da (Security Rules RC'ye erişemediği için) ayrıca `true`
+  /// sabit olarak tutuluyor, ikisi senkron kalmalı.
+  static const defaultCanCancelMemberSessions =
+      'cfg_default_can_cancel_member_sessions';
+  static const defaultCanRescheduleMemberSessions =
+      'cfg_default_can_reschedule_member_sessions';
 
   /// F3-4 — sessionReminderCheck Cloud Function'ının gönderdiği push metni.
   /// Admin SDK'dan (Cloud Functions) da okunabildiği için diğer `lbl_*`
@@ -672,18 +676,14 @@ abstract final class RemoteConfigKeys {
       'lbl_gyms_trainer_permissions_reminder_question';
   static const gymsTrainerPermissionsReminderNote =
       'lbl_gyms_trainer_permissions_reminder_note';
-  static const gymsTrainerPermissionsOnlineBookingTitle =
-      'lbl_gyms_trainer_permissions_online_booking_title';
-  static const gymsTrainerPermissionsOnlineBookingNote =
-      'lbl_gyms_trainer_permissions_online_booking_note';
-  static const gymsTrainerPermissionsAllowAfterExpiryTitle =
-      'lbl_gyms_trainer_permissions_allow_after_expiry_title';
-  static const gymsTrainerPermissionsAllowAfterExpiryNote =
-      'lbl_gyms_trainer_permissions_allow_after_expiry_note';
-  static const gymsTrainerPermissionsMemberCancelTitle =
-      'lbl_gyms_trainer_permissions_member_cancel_title';
-  static const gymsTrainerPermissionsMemberCancelNote =
-      'lbl_gyms_trainer_permissions_member_cancel_note';
+  static const gymsTrainerPermissionsCancelTitle =
+      'lbl_gyms_trainer_permissions_cancel_title';
+  static const gymsTrainerPermissionsCancelNote =
+      'lbl_gyms_trainer_permissions_cancel_note';
+  static const gymsTrainerPermissionsRescheduleTitle =
+      'lbl_gyms_trainer_permissions_reschedule_title';
+  static const gymsTrainerPermissionsRescheduleNote =
+      'lbl_gyms_trainer_permissions_reschedule_note';
   static const gymsTrainerPermissionsAutoSaveNote =
       'lbl_gyms_trainer_permissions_auto_save_note';
   static const gymsTrainerPermissionsSaveFailedError =
@@ -1347,9 +1347,8 @@ class RemoteConfigService {
     RemoteConfigKeys.groupSessionLeaveLockHoursBefore: 8,
     RemoteConfigKeys.cancellationDeadlineHours: 24,
     RemoteConfigKeys.defaultTrainerReminderDelayMinutes: 30,
-    RemoteConfigKeys.defaultOnlineBookingEnabled: true,
-    RemoteConfigKeys.defaultAllowSessionsAfterPackageExpiry: false,
-    RemoteConfigKeys.defaultMemberCanCancelSession: true,
+    RemoteConfigKeys.defaultCanCancelMemberSessions: true,
+    RemoteConfigKeys.defaultCanRescheduleMemberSessions: true,
     RemoteConfigKeys.allowPastDatetimeCreation: false,
     RemoteConfigKeys.feedbackReminderDayOfMonth: -1,
     RemoteConfigKeys.freeVersionAdsEnabled: true,
@@ -1755,18 +1754,14 @@ class RemoteConfigService {
         'Seans bitimi eğitmene ne zaman hatırlatılsın?',
     'lbl_gyms_trainer_permissions_reminder_note_tr':
         'Bildirim seans bitiminden sonra gider',
-    'lbl_gyms_trainer_permissions_online_booking_title_tr':
-        'Online Rezervasyon',
-    'lbl_gyms_trainer_permissions_online_booking_note_tr':
-        'Üyeler Keşfet üzerinden grup derslerine katılabilir',
-    'lbl_gyms_trainer_permissions_allow_after_expiry_title_tr':
-        'Paket süresi bitince seans oluşturulabilsin mi?',
-    'lbl_gyms_trainer_permissions_allow_after_expiry_note_tr':
-        'Kapalıysa paketi bitmiş üyeye yeni seans planlanamaz',
-    'lbl_gyms_trainer_permissions_member_cancel_title_tr':
-        'Üye seans iptal edebilir',
-    'lbl_gyms_trainer_permissions_member_cancel_note_tr':
-        'Kapalıysa iptal yalnızca antrenör/yönetici yapabilir',
+    'lbl_gyms_trainer_permissions_cancel_title_tr':
+        'Üye seanslarını iptal edebilir',
+    'lbl_gyms_trainer_permissions_cancel_note_tr':
+        'Kapalıysa bu antrenör kendi üyelerinin seansını iptal edemez',
+    'lbl_gyms_trainer_permissions_reschedule_title_tr':
+        'Üye seanslarını erteleyebilir',
+    'lbl_gyms_trainer_permissions_reschedule_note_tr':
+        'Kapalıysa bu antrenör kendi üyelerinin seansını erteleyemez',
     'lbl_gyms_trainer_permissions_auto_save_note_tr':
         'Her değişiklik anında kaydedilir.',
     'lbl_gyms_trainer_permissions_save_failed_error_tr':
@@ -2527,17 +2522,14 @@ class RemoteConfigService {
         'When should the trainer be reminded after the session ends?',
     'lbl_gyms_trainer_permissions_reminder_note_en':
         'The notification is sent after the session ends',
-    'lbl_gyms_trainer_permissions_online_booking_title_en': 'Online Booking',
-    'lbl_gyms_trainer_permissions_online_booking_note_en':
-        'Members can join group sessions via Discover',
-    'lbl_gyms_trainer_permissions_allow_after_expiry_title_en':
-        'Allow scheduling sessions after the package expires?',
-    'lbl_gyms_trainer_permissions_allow_after_expiry_note_en':
-        'When off, a new session cannot be scheduled for a member with an expired package',
-    'lbl_gyms_trainer_permissions_member_cancel_title_en':
-        'Member can cancel session',
-    'lbl_gyms_trainer_permissions_member_cancel_note_en':
-        'When off, only the trainer/admin can cancel',
+    'lbl_gyms_trainer_permissions_cancel_title_en':
+        'Can cancel member sessions',
+    'lbl_gyms_trainer_permissions_cancel_note_en':
+        'When off, this trainer cannot cancel their members\' sessions',
+    'lbl_gyms_trainer_permissions_reschedule_title_en':
+        'Can reschedule member sessions',
+    'lbl_gyms_trainer_permissions_reschedule_note_en':
+        'When off, this trainer cannot reschedule their members\' sessions',
     'lbl_gyms_trainer_permissions_auto_save_note_en':
         'Every change is saved instantly.',
     'lbl_gyms_trainer_permissions_save_failed_error_en':
@@ -3084,14 +3076,11 @@ class RemoteConfigService {
   int get defaultTrainerReminderDelayMinutes =>
       getInt(RemoteConfigKeys.defaultTrainerReminderDelayMinutes);
 
-  bool get defaultOnlineBookingEnabled =>
-      getBool(RemoteConfigKeys.defaultOnlineBookingEnabled);
+  bool get defaultCanCancelMemberSessions =>
+      getBool(RemoteConfigKeys.defaultCanCancelMemberSessions);
 
-  bool get defaultAllowSessionsAfterPackageExpiry =>
-      getBool(RemoteConfigKeys.defaultAllowSessionsAfterPackageExpiry);
-
-  bool get defaultMemberCanCancelSession =>
-      getBool(RemoteConfigKeys.defaultMemberCanCancelSession);
+  bool get defaultCanRescheduleMemberSessions =>
+      getBool(RemoteConfigKeys.defaultCanRescheduleMemberSessions);
 
   /// Aylık geri bildirim hatırlatmasının gönderileceği gün. -1 = ayın son günü.
   int get feedbackReminderDayOfMonth =>

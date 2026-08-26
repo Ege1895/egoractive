@@ -533,6 +533,78 @@ test("trainer can cancel their own session starting in 48 hours (positive — ou
   await assertSucceeds(updateDoc(doc(db, "sessions/s1"), { status: "cancelled" }));
 });
 
+test("trainer cannot cancel their own session when canCancelMemberSessions is explicitly false (negative)", async () => {
+  await seedSession("s1", { trainerId: "trainer-a", memberId: "member-a1", startTime: hoursFromNow(48) });
+  await testEnv.withSecurityRulesDisabled(async (context) => {
+    await setDoc(
+      doc(context.firestore(), "gyms/gym-a"),
+      { trainerPermissions: { "trainer-a": { canCancelMemberSessions: false } } },
+      { merge: true },
+    );
+  });
+  const db = contextFor("trainer-a", { role: "trainer", gymId: "gym-a" }).firestore();
+  await assertFails(updateDoc(doc(db, "sessions/s1"), { status: "cancelled" }));
+});
+
+test("trainer can still cancel their own session when only canRescheduleMemberSessions is false (positive — ayrı yetkiler)", async () => {
+  await seedSession("s1", { trainerId: "trainer-a", memberId: "member-a1", startTime: hoursFromNow(48) });
+  await testEnv.withSecurityRulesDisabled(async (context) => {
+    await setDoc(
+      doc(context.firestore(), "gyms/gym-a"),
+      { trainerPermissions: { "trainer-a": { canRescheduleMemberSessions: false } } },
+      { merge: true },
+    );
+  });
+  const db = contextFor("trainer-a", { role: "trainer", gymId: "gym-a" }).firestore();
+  await assertSucceeds(updateDoc(doc(db, "sessions/s1"), { status: "cancelled" }));
+});
+
+test("trainer cannot reschedule their own session when canRescheduleMemberSessions is explicitly false (negative)", async () => {
+  await seedSession("s1", { trainerId: "trainer-a", memberId: "member-a1", startTime: hoursFromNow(48) });
+  await testEnv.withSecurityRulesDisabled(async (context) => {
+    await setDoc(
+      doc(context.firestore(), "gyms/gym-a"),
+      { trainerPermissions: { "trainer-a": { canRescheduleMemberSessions: false } } },
+      { merge: true },
+    );
+  });
+  const db = contextFor("trainer-a", { role: "trainer", gymId: "gym-a" }).firestore();
+  await assertFails(
+    updateDoc(doc(db, "sessions/s1"), {
+      startTime: hoursFromNow(72),
+      endTime: hoursFromNow(73),
+      confirmationRequested: false,
+      completionPushSent: false,
+    }),
+  );
+});
+
+test("trainer can reschedule their own session when canRescheduleMemberSessions is unset (positive — varsayılan true)", async () => {
+  await seedSession("s1", { trainerId: "trainer-a", memberId: "member-a1", startTime: hoursFromNow(48) });
+  const db = contextFor("trainer-a", { role: "trainer", gymId: "gym-a" }).firestore();
+  await assertSucceeds(
+    updateDoc(doc(db, "sessions/s1"), {
+      startTime: hoursFromNow(72),
+      endTime: hoursFromNow(73),
+      confirmationRequested: false,
+      completionPushSent: false,
+    }),
+  );
+});
+
+test("admin can cancel a trainer's session even when that trainer's canCancelMemberSessions is false (positive — admin sınırsız)", async () => {
+  await seedSession("s1", { trainerId: "trainer-a", memberId: "member-a1", startTime: hoursFromNow(1) });
+  await testEnv.withSecurityRulesDisabled(async (context) => {
+    await setDoc(
+      doc(context.firestore(), "gyms/gym-a"),
+      { trainerPermissions: { "trainer-a": { canCancelMemberSessions: false } } },
+      { merge: true },
+    );
+  });
+  const db = contextFor("admin-a", { role: "admin", gymId: "gym-a" }).firestore();
+  await assertSucceeds(updateDoc(doc(db, "sessions/s1"), { status: "cancelled" }));
+});
+
 test("member cannot cancel another member's session (negative)", async () => {
   await seedSession("s1", { trainerId: "trainer-a", memberId: "member-a2", startTime: hoursFromNow(48) });
   const db = contextFor("member-a1", { role: "member", gymId: "gym-a" }).firestore();

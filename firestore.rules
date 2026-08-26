@@ -160,14 +160,16 @@ service cloud.firestore {
     // antrenörün KENDİ takvim/üye detay ekranından (create_session_sheet.dart,
     // lockedTrainerId ile) yapılabilir — antrenör başka bir antrenöre seans
     // atayamaz, sadece trainerId kendi uid'si olan bir doküman oluşturabilir.
-    // İptal/erteleme admin için her zaman izinli; antrenör/üye kendi seansı
-    // içinse ve başlangıca 24 saatten fazla varsa izinli. Remote Config'teki
+    // İptal/erteleme admin için her zaman izinli; üye kendi seansı içinse ve
+    // başlangıca 24 saatten fazla varsa izinli. Antrenör kendi seansı içinse
+    // ve başlangıca 24 saatten fazla varsa AYRICA admin'in o antrenöre
+    // Yetki Ayarları'ndan verdiği izne bağlı — iptal ve erteleme ayrı ayrı
+    // yetkilendirilebiliyor (bkz. trainerPermission()). Remote Config'teki
     // cancellationDeadlineHours (varsayılan 24) buradaki 24 saatlik sabitle
     // senkron tutulmalı — Security Rules harici bir servise (Remote Config)
     // erişemediği için buraya sabit olarak yazılıyor.
-    function isOwnSession() {
-      return (myRole() == 'trainer' && resource.data.trainerId == request.auth.uid) ||
-             (myRole() == 'member' && resource.data.memberId == request.auth.uid);
+    function isOwnTrainerSession() {
+      return myRole() == 'trainer' && resource.data.trainerId == request.auth.uid;
     }
 
     function withinCancellationWindow() {
@@ -179,6 +181,29 @@ service cloud.firestore {
     // penceresinden bağımsız (dersten 1 saat önce de onay verebilmeli).
     function isOwnMemberSession() {
       return myRole() == 'member' && resource.data.memberId == request.auth.uid;
+    }
+
+    // Admin, Yetki Ayarları'ndan her antrenöre ayrı ayrı "üye seanslarını
+    // iptal edebilir"/"erteleyebilir" yetkisi verip alabiliyor
+    // (`gyms/{gymId}.trainerPermissions.{trainerId}.canCancelMemberSessions`/
+    // `.canRescheduleMemberSessions`, bkz. `trainer_permissions_controller.dart`).
+    // Alan hiç yoksa (yeni bir antrenör, ya da admin hiç dokunmamış) `true`a
+    // düşülür — bu iki yetki mevcut davranışı KISITLAMAK için var, varsayılan
+    // olarak herkes zaten yapabiliyordu.
+    function trainerPermission(field) {
+      let gym = get(/databases/$(database)/documents/gyms/$(myGymId())).data;
+      return gym.get('trainerPermissions', {}).get(request.auth.uid, {}).get(field, true) == true;
+    }
+
+    function isCancellingSession() {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status']) &&
+        request.resource.data.status == 'cancelled';
+    }
+
+    function isReschedulingSession() {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(
+        ['startTime', 'endTime', 'confirmationRequested', 'completionPushSent']
+      );
     }
 
     function onlyChangesConfirmation() {
@@ -222,7 +247,9 @@ service cloud.firestore {
         );
       allow update, delete: if isSignedIn() && resource.data.gymId == myGymId() && (
         myRole() == 'admin' ||
-        (isOwnSession() && withinCancellationWindow()) ||
+        (isOwnTrainerSession() && withinCancellationWindow() && isCancellingSession() && trainerPermission('canCancelMemberSessions')) ||
+        (isOwnTrainerSession() && withinCancellationWindow() && isReschedulingSession() && trainerPermission('canRescheduleMemberSessions')) ||
+        (isOwnMemberSession() && withinCancellationWindow()) ||
         (isOwnMemberSession() && onlyChangesConfirmation()) ||
         isCompletingOwnSession()
       );

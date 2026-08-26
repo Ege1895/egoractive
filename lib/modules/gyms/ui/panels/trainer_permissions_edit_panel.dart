@@ -194,39 +194,19 @@ class _TrainerPermissionsEditPanelState
                           title: ref.watch(
                             rcTextProvider(
                               RemoteConfigKeys
-                                  .gymsTrainerPermissionsOnlineBookingTitle,
+                                  .gymsTrainerPermissionsCancelTitle,
                             ),
                           ),
                           note: ref.watch(
                             rcTextProvider(
                               RemoteConfigKeys
-                                  .gymsTrainerPermissionsOnlineBookingNote,
+                                  .gymsTrainerPermissionsCancelNote,
                             ),
                           ),
-                          value: permissions.onlineBookingEnabled,
+                          value: permissions.canCancelMemberSessions,
                           onTap: () => _handlePermissionAction(
                             context,
-                            () => controller.toggleOnlineBooking(_trainerIds),
-                          ),
-                          showDivider: true,
-                        ),
-                        _PermissionToggle(
-                          title: ref.watch(
-                            rcTextProvider(
-                              RemoteConfigKeys
-                                  .gymsTrainerPermissionsAllowAfterExpiryTitle,
-                            ),
-                          ),
-                          note: ref.watch(
-                            rcTextProvider(
-                              RemoteConfigKeys
-                                  .gymsTrainerPermissionsAllowAfterExpiryNote,
-                            ),
-                          ),
-                          value: permissions.allowSessionsAfterPackageExpiry,
-                          onTap: () => _handlePermissionAction(
-                            context,
-                            () => controller.toggleAllowSessionsAfterExpiry(
+                            () => controller.toggleCanCancelMemberSessions(
                               _trainerIds,
                             ),
                           ),
@@ -236,19 +216,21 @@ class _TrainerPermissionsEditPanelState
                           title: ref.watch(
                             rcTextProvider(
                               RemoteConfigKeys
-                                  .gymsTrainerPermissionsMemberCancelTitle,
+                                  .gymsTrainerPermissionsRescheduleTitle,
                             ),
                           ),
                           note: ref.watch(
                             rcTextProvider(
                               RemoteConfigKeys
-                                  .gymsTrainerPermissionsMemberCancelNote,
+                                  .gymsTrainerPermissionsRescheduleNote,
                             ),
                           ),
-                          value: permissions.memberCanCancelSession,
+                          value: permissions.canRescheduleMemberSessions,
                           onTap: () => _handlePermissionAction(
                             context,
-                            () => controller.toggleMemberCanCancel(_trainerIds),
+                            () => controller.toggleCanRescheduleMemberSessions(
+                              _trainerIds,
+                            ),
                           ),
                           showDivider: false,
                         ),

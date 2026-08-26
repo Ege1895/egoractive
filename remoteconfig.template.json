@@ -49,25 +49,18 @@
       "description": "F3-6 — Yetki Ayarları'nda bir salon override yazmadıysa antrenör hatırlatma süresi (dakika).",
       "valueType": "NUMBER"
     },
-    "cfg_default_online_booking_enabled": {
+    "cfg_default_can_cancel_member_sessions": {
       "defaultValue": {
         "value": "true"
       },
-      "description": "F3-6 — bir salon override yazmadıysa online rezervasyon varsayılanı.",
+      "description": "F3-6 — bir antrenör için override yazılmadıysa 'üye seanslarını iptal edebilir' varsayılanı. firestore.rules'ta da true sabit, senkron tutulmalı.",
       "valueType": "BOOLEAN"
     },
-    "cfg_default_allow_sessions_after_package_expiry": {
-      "defaultValue": {
-        "value": "false"
-      },
-      "description": "F3-6 — bir salon override yazmadıysa paket süresi bitince seans oluşturulabilsin mi varsayılanı.",
-      "valueType": "BOOLEAN"
-    },
-    "cfg_default_member_can_cancel_session": {
+    "cfg_default_can_reschedule_member_sessions": {
       "defaultValue": {
         "value": "true"
       },
-      "description": "F3-6 — bir salon override yazmadıysa üye kendi seansını iptal edebilsin mi varsayılanı.",
+      "description": "F3-6 — bir antrenör için override yazılmadıysa 'üye seanslarını erteleyebilir' varsayılanı. firestore.rules'ta da true sabit, senkron tutulmalı.",
       "valueType": "BOOLEAN"
     },
     "cfg_feedback_reminder_day_of_month": {
@@ -3699,75 +3692,51 @@
       },
       "valueType": "STRING"
     },
-    "lbl_gyms_trainer_permissions_online_booking_title_tr": {
+    "lbl_gyms_trainer_permissions_cancel_title_tr": {
       "defaultValue": {
-        "value": "Online Rezervasyon"
+        "value": "Üye seanslarını iptal edebilir"
       },
       "valueType": "STRING"
     },
-    "lbl_gyms_trainer_permissions_online_booking_title_en": {
+    "lbl_gyms_trainer_permissions_cancel_title_en": {
       "defaultValue": {
-        "value": "Online Booking"
+        "value": "Can cancel member sessions"
       },
       "valueType": "STRING"
     },
-    "lbl_gyms_trainer_permissions_online_booking_note_tr": {
+    "lbl_gyms_trainer_permissions_cancel_note_tr": {
       "defaultValue": {
-        "value": "Üyeler Keşfet üzerinden grup derslerine katılabilir"
+        "value": "Kapalıysa bu antrenör kendi üyelerinin seansını iptal edemez"
       },
       "valueType": "STRING"
     },
-    "lbl_gyms_trainer_permissions_online_booking_note_en": {
+    "lbl_gyms_trainer_permissions_cancel_note_en": {
       "defaultValue": {
-        "value": "Members can join group sessions via Discover"
+        "value": "When off, this trainer cannot cancel their members' sessions"
       },
       "valueType": "STRING"
     },
-    "lbl_gyms_trainer_permissions_allow_after_expiry_title_tr": {
+    "lbl_gyms_trainer_permissions_reschedule_title_tr": {
       "defaultValue": {
-        "value": "Paket süresi bitince seans oluşturulabilsin mi?"
+        "value": "Üye seanslarını erteleyebilir"
       },
       "valueType": "STRING"
     },
-    "lbl_gyms_trainer_permissions_allow_after_expiry_title_en": {
+    "lbl_gyms_trainer_permissions_reschedule_title_en": {
       "defaultValue": {
-        "value": "Allow scheduling sessions after the package expires?"
+        "value": "Can reschedule member sessions"
       },
       "valueType": "STRING"
     },
-    "lbl_gyms_trainer_permissions_allow_after_expiry_note_tr": {
+    "lbl_gyms_trainer_permissions_reschedule_note_tr": {
       "defaultValue": {
-        "value": "Kapalıysa paketi bitmiş üyeye yeni seans planlanamaz"
+        "value": "Kapalıysa bu antrenör kendi üyelerinin seansını erteleyemez"
       },
       "valueType": "STRING"
     },
-    "lbl_gyms_trainer_permissions_allow_after_expiry_note_en": {
+    "lbl_gyms_trainer_permissions_reschedule_note_en": {
       "defaultValue": {
-        "value": "When off, a new session cannot be scheduled for a member with an expired package"
-      },
-      "valueType": "STRING"
-    },
-    "lbl_gyms_trainer_permissions_member_cancel_title_tr": {
-      "defaultValue": {
-        "value": "Üye seans iptal edebilir"
-      },
-      "valueType": "STRING"
-    },
-    "lbl_gyms_trainer_permissions_member_cancel_title_en": {
-      "defaultValue": {
-        "value": "Member can cancel session"
-      },
-      "valueType": "STRING"
-    },
-    "lbl_gyms_trainer_permissions_member_cancel_note_tr": {
-      "defaultValue": {
-        "value": "Kapalıysa iptal yalnızca antrenör/yönetici yapabilir"
-      },
-      "valueType": "STRING"
-    },
-    "lbl_gyms_trainer_permissions_member_cancel_note_en": {
-      "defaultValue": {
-        "value": "When off, only the trainer/admin can cancel"
+        "value": "When off, this trainer cannot reschedule their members' sessions"
       },
       "valueType": "STRING"
     },
