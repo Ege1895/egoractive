@@ -22,6 +22,12 @@ const _imgX = (_boxWidth - _imgWidth) / 2;
 const _imgY = 45.0;
 const _lane = 84.0;
 
+/// Kilo/yağ oranının silüet üzerinde anatomik bir karşılığı yok (avatarLayout
+/// sadece çevre ölçülerini konumlandırıyor) — bu yüzden ikisi ayakların
+/// altındaki ortak bir çizgide, sol ve sağ uçta birer "ekle" pili olarak
+/// gösteriliyor (diğer noktalarla birebir aynı pil görünümünde).
+const _footerY = _imgY + _imgHeight + 15;
+
 /// Egoractive'in imza görsel öğesi — silüet üzerindeki tıklanabilir
 /// ölçüm noktaları (nokta-küme motifi, logodaki "o" harfinden geliyor).
 class MeasurementAvatar extends ConsumerWidget {
@@ -79,7 +85,82 @@ class MeasurementAvatar extends ConsumerWidget {
               colors: colors,
               addMetricLabel: addMetricLabel,
             ),
+          ..._buildFooterRow(
+            context,
+            colors: colors,
+            addMetricLabel: addMetricLabel,
+          ),
         ],
+      ),
+    );
+  }
+
+  List<Widget> _buildFooterRow(
+    BuildContext context, {
+    required AppColorScheme colors,
+    required String addMetricLabel,
+  }) {
+    return [
+      Positioned(
+        top: _footerY,
+        left: _lane,
+        right: _lane,
+        child: Container(height: 1, color: colors.outlineStrong),
+      ),
+      _buildFooterPill(
+        context,
+        metric: MeasurementMetric.yagOrani,
+        isLeft: true,
+        colors: colors,
+        addMetricLabel: addMetricLabel,
+      ),
+      _buildFooterPill(
+        context,
+        metric: MeasurementMetric.kilo,
+        isLeft: false,
+        colors: colors,
+        addMetricLabel: addMetricLabel,
+      ),
+    ];
+  }
+
+  Widget _buildFooterPill(
+    BuildContext context, {
+    required MeasurementMetric metric,
+    required bool isLeft,
+    required AppColorScheme colors,
+    required String addMetricLabel,
+  }) {
+    final typography = context.appTypography;
+    final point = points[metric];
+    final active = metric == selected;
+    final label = point == null
+        ? addMetricLabel.replaceAll('{metric}', metric.label)
+        : '${metric.label} ${point.value}';
+
+    return Positioned(
+      top: _footerY - 14,
+      left: isLeft ? 0 : null,
+      right: isLeft ? null : 0,
+      child: GestureDetector(
+        onTap: () => onSelect(metric),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+          decoration: BoxDecoration(
+            color: active ? colors.primary : colors.surfaceRaised,
+            borderRadius: BorderRadius.circular(999),
+            border: Border.all(
+              color: active ? colors.primary : colors.outlineStrong,
+            ),
+          ),
+          child: Text(
+            label,
+            style: typography.dataSmall.copyWith(
+              fontSize: 13,
+              color: active ? colors.onPrimary : colors.onSurfaceVariant,
+            ),
+          ),
+        ),
       ),
     );
   }

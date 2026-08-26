@@ -460,45 +460,6 @@ class _AvatarViewState extends ConsumerState<_AvatarView> {
                 ),
               ),
             ),
-          // Kilo/yağ oranının silüet üzerinde anatomik bir karşılığı yok
-          // (avatarLayout sadece çevre ölçülerini konumlandırıyor) — bu
-          // yüzden aynı seçim mekanizmasını (controller.selectPoint,
-          // grafik ekranındaki chip'lerle aynı) burada da sunan iki ayrı
-          // hızlı-seçim chip'i var. Seçilince alttaki "Seçili nokta"
-          // kartı normal şekilde o metriğin giriş alanını gösterir.
-          Padding(
-            padding: const EdgeInsets.only(bottom: AppSpacing.md),
-            child: Container(
-              padding: const EdgeInsets.all(4),
-              decoration: BoxDecoration(
-                color: colors.surface,
-                border: Border.all(color: colors.outline),
-                borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: _MetricChip(
-                      label: MeasurementMetric.kilo.label,
-                      selected:
-                          state.selectedMetric == MeasurementMetric.kilo,
-                      onTap: () =>
-                          controller.selectPoint(MeasurementMetric.kilo),
-                    ),
-                  ),
-                  Expanded(
-                    child: _MetricChip(
-                      label: MeasurementMetric.yagOrani.label,
-                      selected:
-                          state.selectedMetric == MeasurementMetric.yagOrani,
-                      onTap: () =>
-                          controller.selectPoint(MeasurementMetric.yagOrani),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
           Expanded(
             child: Center(
               child: MeasurementAvatar(
