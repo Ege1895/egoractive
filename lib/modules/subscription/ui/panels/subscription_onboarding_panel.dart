@@ -10,6 +10,7 @@ import '../../../../core/panels/base_panel.dart';
 import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_loading_indicator.dart';
+import '../../../auth/controller/auth_controller.dart';
 import '../../controller/subscription_controller.dart';
 import '../../domain/subscription_state.dart';
 
@@ -225,6 +226,26 @@ class _SubscriptionOnboardingPanelState
           ),
           const SizedBox(height: AppSpacing.sm),
         ],
+        // Bu ekran atlanamaz (bkz. dosya üstü yorumu) — ama salonu abone
+        // olmayan bir hesapla girmiş kullanıcı BAŞKA bir hesaba (ör. farklı
+        // bir salonun admin'i) geçmek isteyebilir. Bu olmadan uygulamayı
+        // silip yeniden yüklemesi gerekirdi. Sadece metin — birincil "başlat"
+        // eylemiyle karışmasın diye çerçeve/arka plan yok.
+        Center(
+          child: TextButton(
+            onPressed: subscription.isPurchasing
+                ? null
+                : () => ref.read(authControllerProvider.notifier).logout(),
+            child: Text(
+              ref.watch(rcTextProvider(RemoteConfigKeys.commonCikisYap)),
+              style: typography.bodyMedium.copyWith(
+                color: colors.onSurfaceMuted,
+                fontSize: 14,
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: AppSpacing.sm),
         _OnboardingCta(
           label: selected == null
               ? '…'
