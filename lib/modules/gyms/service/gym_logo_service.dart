@@ -30,7 +30,16 @@ class GymLogoService {
   }) async {
     final bytes = encodeGymLogoPng(await file.readAsBytes());
     final storageRef = FirebaseStorage.instance.ref('gym_logos/$gymId.png');
-    await storageRef.putData(bytes, SettableMetadata(contentType: 'image/png'));
+    await storageRef.putData(
+      bytes,
+      SettableMetadata(
+        contentType: 'image/png',
+        // Her upload `getDownloadURL()`'den yeni bir token'lı URL üretir
+        // (bkz. sınıf yorumu) — yani aynı path'e uzun süreli cache-control
+        // yazmak eski logoyu "yapışık" bırakmaz, `logoUrl` zaten değişiyor.
+        cacheControl: 'public, max-age=31536000, immutable',
+      ),
+    );
     final url = await storageRef.getDownloadURL();
     await FirebaseFirestore.instance.collection('gyms').doc(gymId).update({
       'logoUrl': url,

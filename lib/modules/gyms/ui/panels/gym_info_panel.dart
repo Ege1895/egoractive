@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
@@ -251,8 +252,8 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
                             borderRadius: BorderRadius.circular(
                               AppSpacing.radiusInner,
                             ),
-                            child: Image.network(
-                              profileState.logoUrl,
+                            child: CachedNetworkImage(
+                              imageUrl: profileState.logoUrl,
                               width: 84,
                               height: 84,
                               fit: BoxFit.cover,
@@ -297,7 +298,9 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
                                   AppSpacing.radiusInner,
                                 ),
                                 child: InkWell(
-                                  onTap: _isUploadingLogo ? null : _pickLogo,
+                                  onTap: (_isUploadingLogo || _isSaving)
+                                      ? null
+                                      : _pickLogo,
                                   borderRadius: BorderRadius.circular(
                                     AppSpacing.radiusInner,
                                   ),
@@ -691,6 +694,12 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
     super.onPanelHide();
   }
 
+  /// Sadece yerel önizleme + palet çıkarımı yapar — gerçek upload artık
+  /// `_save()`e (Kaydet butonuna) bağlı. Önceden burada hemen `_uploadLogo`
+  /// çağrılıyordu, yani logo Kaydet'e basılmadan da Storage'a yükleniyor ve
+  /// `gyms/{gymId}.logoUrl` hemen güncelleniyordu — kullanıcı "Kaydet"e
+  /// basmadan geri dönse bile yeni logo kalıcı oluyordu. Artık Kaydet'e
+  /// basılmazsa eski logo geçerliliğini koruyor.
   Future<void> _pickLogo() async {
     final file = await ref.read(gymLogoServiceProvider).pickLogo();
     if (file == null) return;
@@ -701,28 +710,34 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
       _paletteSourceKey = null;
     });
     await _extractPaletteFromFile(file);
-    await _uploadLogo(file);
   }
 
-  Future<void> _uploadLogo(XFile file) async {
+  /// `true` döner ise upload başarılı — `_save()` bunu kontrol edip
+  /// başarısızsa kaydetmeyi (ve panelden çıkmayı) durdurur.
+  Future<bool> _uploadLogo(XFile file) async {
     final gymId = await ref.read(activeGymIdProvider.future);
     if (gymId == null) {
       setState(() => _logoError = _logoUploadFailedError());
-      return;
+      return false;
     }
     setState(() => _isUploadingLogo = true);
     try {
       await ref
           .read(gymLogoServiceProvider)
           .uploadLogo(gymId: gymId, file: file);
-      if (!mounted) return;
-      setState(() => _isUploadingLogo = false);
+      if (!mounted) return false;
+      setState(() {
+        _isUploadingLogo = false;
+        _logoError = null;
+      });
+      return true;
     } catch (_) {
-      if (!mounted) return;
+      if (!mounted) return false;
       setState(() {
         _isUploadingLogo = false;
         _logoError = _logoUploadFailedError();
       });
+      return false;
     }
   }
 
@@ -831,6 +846,14 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
 
     setState(() => _isSaving = true);
     try {
+      final pickedLogo = _pickedLogoFile;
+      if (pickedLogo != null) {
+        final uploaded = await _uploadLogo(pickedLogo);
+        if (!uploaded) {
+          if (mounted) setState(() => _isSaving = false);
+          return;
+        }
+      }
       await ref.read(gymProfileControllerProvider.notifier).save();
       if (_previewColor != null) await _saveTheme();
     } catch (_) {

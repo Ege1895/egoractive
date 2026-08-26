@@ -86,7 +86,14 @@ export const signupGymAdmin = onCall(async (request) => {
   if (logoBuffer !== undefined) {
     const logoPath = `gym_logos/${gymRef.id}.png`;
     const file = getStorage().bucket().file(logoPath);
-    await file.save(logoBuffer, { contentType: "image/png" });
+    await file.save(logoBuffer, {
+      contentType: "image/png",
+      // Logo değişince `gyms/{gymId}.logoUrl` de (yeni bir download token'ıyla)
+      // değişiyor (bkz. gym_logo_service.dart) — bu yüzden aynı path'e uzun
+      // süreli cache-control yazmak eski görseli "yapışık" bırakmıyor,
+      // client zaten güncel URL'i okuyor.
+      metadata: { cacheControl: "public, max-age=31536000, immutable" },
+    });
     await file.makePublic();
     logoUrl = `https://storage.googleapis.com/${file.bucket.name}/${logoPath}`;
   }

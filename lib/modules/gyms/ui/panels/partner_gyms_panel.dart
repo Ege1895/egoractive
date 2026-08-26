@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -156,10 +157,10 @@ class _PartnerGymCard extends StatelessWidget {
                     color: colors.onPrimaryContainer,
                     size: 24,
                   )
-                : Image.network(
-                    gym.logoUrl,
+                : CachedNetworkImage(
+                    imageUrl: gym.logoUrl,
                     fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => Icon(
+                    errorWidget: (context, url, error) => Icon(
                       Icons.fitness_center_rounded,
                       color: colors.onPrimaryContainer,
                       size: 24,
