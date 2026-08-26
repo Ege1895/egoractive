@@ -23,11 +23,10 @@ const _emptySeriesByMetric = {
 };
 
 /// `users/{memberId}` dokümanını [AdminMemberDetail]'e çevirir. Ödeme
-/// bilgisi, ders geçmişi ve bel çevresi serisi [AdminMemberDetailController]
-/// tarafından ayrıca gerçek `memberPackages`/`sessions`/`measurements`
-/// koleksiyonlarından doldurulur — burada boş bırakılıyor. Kilo ve yağ
-/// oranının gerçek bir kaynağı yok (ölçüm modülü sadece göğüs/kol/bel/
-/// kalça/bacak cm ölçüyor), bu yüzden kalıcı olarak boş kalıyor.
+/// bilgisi, ders geçmişi ve kilo/bel çevresi/yağ oranı serileri
+/// [AdminMemberDetailController] tarafından ayrıca gerçek
+/// `memberPackages`/`sessions`/`measurements` koleksiyonlarından
+/// doldurulur — burada sadece ilk render'a kadar boş bırakılıyor.
 AdminMemberDetail adminMemberDetailFromDoc(
   DocumentSnapshot<Map<String, dynamic>> doc,
 ) {

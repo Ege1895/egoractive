@@ -5,6 +5,7 @@ import '../../../core/router/app_router.dart';
 import '../domain/trainer_member_detail.dart';
 import '../domain/trainer_member_detail_mapper.dart';
 import '../domain/trainer_metric.dart';
+import '../domain/trainer_metric_measurement_source.dart';
 import '../repository/trainer_member_detail_repository.dart';
 
 part 'trainer_member_detail_controller.g.dart';
@@ -76,38 +77,17 @@ SessionHistoryEntry _toHistoryEntry(
   );
 }
 
-/// Ölçüm modülünün `measurements/{memberId}/entries` koleksiyonundaki
-/// gerçek bel ölçüsü — "belCevresi" metriği için kullanılabilecek tek
-/// gerçek kaynak (kilo ve yağ oranı hiçbir yerde tutulmuyor).
+/// Ölçüm modülünün `measurements/{memberId}/entries` koleksiyonundan
+/// antrenörün üye detayındaki dropdown'ın 3 metriğinin (kilo/bel çevresi/
+/// yağ oranı) tamamını tek sorgudan üretir (bkz.
+/// `trainer_metric_measurement_source.dart` — admin tarafındaki
+/// karşılığıyla aynı kaynak).
 @riverpod
-Stream<TrainerMetricSeries> _waistSeriesForMember(
-  _WaistSeriesForMemberRef ref,
+Stream<Map<TrainerMetric, TrainerMetricSeries>> _metricSeriesForMember(
+  _MetricSeriesForMemberRef ref,
   String memberId,
 ) {
-  return FirebaseFirestore.instance
-      .collection('measurements')
-      .doc(memberId)
-      .collection('entries')
-      .orderBy('date')
-      .snapshots()
-      .map((snapshot) {
-        final months = <String>[];
-        final values = <double>[];
-        for (final doc in snapshot.docs) {
-          final data = doc.data();
-          final bel = data['bel'];
-          if (bel is num) {
-            final date = (data['date'] as Timestamp).toDate();
-            months.add(_monthAbbrev[date.month] ?? '');
-            values.add(bel.toDouble());
-          }
-        }
-        return TrainerMetricSeries(
-          metric: TrainerMetric.belCevresi,
-          values: values,
-          months: months,
-        );
-      });
+  return watchTrainerMetricSeries(memberId);
 }
 
 @riverpod
@@ -125,14 +105,12 @@ class TrainerMemberDetailController extends _$TrainerMemberDetailController {
             .watch(_sessionHistoryForMemberProvider(trainerId, memberId))
             .valueOrNull ??
         base.history;
-    final waistSeries = ref
-        .watch(_waistSeriesForMemberProvider(memberId))
+    final metricSeries = ref
+        .watch(_metricSeriesForMemberProvider(memberId))
         .valueOrNull;
     return base.copyWith(
       history: history,
-      seriesByMetric: waistSeries == null
-          ? base.seriesByMetric
-          : {...base.seriesByMetric, TrainerMetric.belCevresi: waistSeries},
+      seriesByMetric: metricSeries ?? base.seriesByMetric,
     );
   }
 

@@ -99,11 +99,22 @@ MeasurementsState _toState(List<_Entry> entries, {DateTime? selectedDate}) {
       metric: metric,
       months: months,
       values: values,
-      totalDeltaLabel: _formatDelta(totalDelta, zeroLabel: '0 cm'),
+      totalDeltaLabel: _formatDelta(
+        totalDelta,
+        zeroLabel: '0 ${metric.unit}',
+        unit: metric.unit,
+      ),
     );
 
+    // `avatarLayout` sadece silüet üzerinde gösterilebilen çevre
+    // ölçülerini (bel/göğüs/kalça/kol/bacak) içerir — kilo/yağ oranının
+    // orada bir karşılığı yok. Önceden bu durumda nokta hiç
+    // oluşturulmuyordu (kilo/yağ oranı asla eklenemiyordu); artık avatar
+    // üzerinde bir konumu olmasa bile "seçili nokta" kartında
+    // değer/değişim gösterilebilsin diye nokta yine oluşturuluyor,
+    // fx/fy/side sadece avatar konumlaması içindir (bu metrikler için
+    // hiç okunmaz).
     final layout = avatarLayout[metric];
-    if (layout == null) continue;
 
     final target = selectedDate == null
         ? withMetric.last
@@ -117,13 +128,13 @@ MeasurementsState _toState(List<_Entry> entries, {DateTime? selectedDate}) {
     points[metric] = MeasurementPoint(
       metric: metric,
       value: targetValue.toStringAsFixed(1).replaceAll('.', ','),
-      delta: _formatDelta(diff, zeroLabel: 'değişim yok'),
+      delta: _formatDelta(diff, zeroLabel: 'değişim yok', unit: metric.unit),
       isImprovement: diff <= 0,
       since:
           '${target.$1.day} ${_monthAbbrev[target.$1.month]} ${target.$1.year}',
-      fx: layout.fx,
-      fy: layout.fy,
-      side: layout.side,
+      fx: layout?.fx ?? 0,
+      fy: layout?.fy ?? 0,
+      side: layout?.side ?? AvatarSide.left,
     );
   }
 
@@ -134,10 +145,14 @@ MeasurementsState _toState(List<_Entry> entries, {DateTime? selectedDate}) {
   );
 }
 
-String _formatDelta(double diff, {required String zeroLabel}) {
+String _formatDelta(
+  double diff, {
+  required String zeroLabel,
+  required String unit,
+}) {
   if (diff == 0) return zeroLabel;
   final formatted = diff.abs().toStringAsFixed(1).replaceAll('.', ',');
-  return '${diff < 0 ? '−' : '+'}$formatted cm';
+  return '${diff < 0 ? '−' : '+'}$formatted $unit';
 }
 
 /// F4-1 — admin/antrenör bir üyenin ölçüm ekranını açtığında bu sağlanır;

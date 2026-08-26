@@ -324,43 +324,51 @@ class _SessionHistoryForMemberProviderElement
   String get memberId => (origin as _SessionHistoryForMemberProvider).memberId;
 }
 
-String _$waistSeriesForMemberHash() =>
-    r'5e4abe22b4606dc34985201d61d745db57778df4';
+String _$metricSeriesForMemberHash() =>
+    r'f822604a41e7a67c573bacf8fb76a366289cfdff';
 
-/// Ölçüm modülünün `measurements/{memberId}/entries` koleksiyonundaki
-/// gerçek bel ölçüsü — "belCevresi" metriği için kullanılabilecek tek
-/// gerçek kaynak (kilo ve yağ oranı hiçbir yerde tutulmuyor).
+/// Ölçüm modülünün `measurements/{memberId}/entries` koleksiyonundan
+/// antrenörün üye detayındaki dropdown'ın 3 metriğinin (kilo/bel çevresi/
+/// yağ oranı) tamamını tek sorgudan üretir (bkz.
+/// `trainer_metric_measurement_source.dart` — admin tarafındaki
+/// karşılığıyla aynı kaynak).
 ///
-/// Copied from [_waistSeriesForMember].
-@ProviderFor(_waistSeriesForMember)
-const _waistSeriesForMemberProvider = _WaistSeriesForMemberFamily();
+/// Copied from [_metricSeriesForMember].
+@ProviderFor(_metricSeriesForMember)
+const _metricSeriesForMemberProvider = _MetricSeriesForMemberFamily();
 
-/// Ölçüm modülünün `measurements/{memberId}/entries` koleksiyonundaki
-/// gerçek bel ölçüsü — "belCevresi" metriği için kullanılabilecek tek
-/// gerçek kaynak (kilo ve yağ oranı hiçbir yerde tutulmuyor).
+/// Ölçüm modülünün `measurements/{memberId}/entries` koleksiyonundan
+/// antrenörün üye detayındaki dropdown'ın 3 metriğinin (kilo/bel çevresi/
+/// yağ oranı) tamamını tek sorgudan üretir (bkz.
+/// `trainer_metric_measurement_source.dart` — admin tarafındaki
+/// karşılığıyla aynı kaynak).
 ///
-/// Copied from [_waistSeriesForMember].
-class _WaistSeriesForMemberFamily
-    extends Family<AsyncValue<TrainerMetricSeries>> {
-  /// Ölçüm modülünün `measurements/{memberId}/entries` koleksiyonundaki
-  /// gerçek bel ölçüsü — "belCevresi" metriği için kullanılabilecek tek
-  /// gerçek kaynak (kilo ve yağ oranı hiçbir yerde tutulmuyor).
+/// Copied from [_metricSeriesForMember].
+class _MetricSeriesForMemberFamily
+    extends Family<AsyncValue<Map<TrainerMetric, TrainerMetricSeries>>> {
+  /// Ölçüm modülünün `measurements/{memberId}/entries` koleksiyonundan
+  /// antrenörün üye detayındaki dropdown'ın 3 metriğinin (kilo/bel çevresi/
+  /// yağ oranı) tamamını tek sorgudan üretir (bkz.
+  /// `trainer_metric_measurement_source.dart` — admin tarafındaki
+  /// karşılığıyla aynı kaynak).
   ///
-  /// Copied from [_waistSeriesForMember].
-  const _WaistSeriesForMemberFamily();
+  /// Copied from [_metricSeriesForMember].
+  const _MetricSeriesForMemberFamily();
 
-  /// Ölçüm modülünün `measurements/{memberId}/entries` koleksiyonundaki
-  /// gerçek bel ölçüsü — "belCevresi" metriği için kullanılabilecek tek
-  /// gerçek kaynak (kilo ve yağ oranı hiçbir yerde tutulmuyor).
+  /// Ölçüm modülünün `measurements/{memberId}/entries` koleksiyonundan
+  /// antrenörün üye detayındaki dropdown'ın 3 metriğinin (kilo/bel çevresi/
+  /// yağ oranı) tamamını tek sorgudan üretir (bkz.
+  /// `trainer_metric_measurement_source.dart` — admin tarafındaki
+  /// karşılığıyla aynı kaynak).
   ///
-  /// Copied from [_waistSeriesForMember].
-  _WaistSeriesForMemberProvider call(String memberId) {
-    return _WaistSeriesForMemberProvider(memberId);
+  /// Copied from [_metricSeriesForMember].
+  _MetricSeriesForMemberProvider call(String memberId) {
+    return _MetricSeriesForMemberProvider(memberId);
   }
 
   @override
-  _WaistSeriesForMemberProvider getProviderOverride(
-    covariant _WaistSeriesForMemberProvider provider,
+  _MetricSeriesForMemberProvider getProviderOverride(
+    covariant _MetricSeriesForMemberProvider provider,
   ) {
     return call(provider.memberId);
   }
@@ -377,37 +385,41 @@ class _WaistSeriesForMemberFamily
       _allTransitiveDependencies;
 
   @override
-  String? get name => r'_waistSeriesForMemberProvider';
+  String? get name => r'_metricSeriesForMemberProvider';
 }
 
-/// Ölçüm modülünün `measurements/{memberId}/entries` koleksiyonundaki
-/// gerçek bel ölçüsü — "belCevresi" metriği için kullanılabilecek tek
-/// gerçek kaynak (kilo ve yağ oranı hiçbir yerde tutulmuyor).
+/// Ölçüm modülünün `measurements/{memberId}/entries` koleksiyonundan
+/// antrenörün üye detayındaki dropdown'ın 3 metriğinin (kilo/bel çevresi/
+/// yağ oranı) tamamını tek sorgudan üretir (bkz.
+/// `trainer_metric_measurement_source.dart` — admin tarafındaki
+/// karşılığıyla aynı kaynak).
 ///
-/// Copied from [_waistSeriesForMember].
-class _WaistSeriesForMemberProvider
-    extends AutoDisposeStreamProvider<TrainerMetricSeries> {
-  /// Ölçüm modülünün `measurements/{memberId}/entries` koleksiyonundaki
-  /// gerçek bel ölçüsü — "belCevresi" metriği için kullanılabilecek tek
-  /// gerçek kaynak (kilo ve yağ oranı hiçbir yerde tutulmuyor).
+/// Copied from [_metricSeriesForMember].
+class _MetricSeriesForMemberProvider
+    extends AutoDisposeStreamProvider<Map<TrainerMetric, TrainerMetricSeries>> {
+  /// Ölçüm modülünün `measurements/{memberId}/entries` koleksiyonundan
+  /// antrenörün üye detayındaki dropdown'ın 3 metriğinin (kilo/bel çevresi/
+  /// yağ oranı) tamamını tek sorgudan üretir (bkz.
+  /// `trainer_metric_measurement_source.dart` — admin tarafındaki
+  /// karşılığıyla aynı kaynak).
   ///
-  /// Copied from [_waistSeriesForMember].
-  _WaistSeriesForMemberProvider(String memberId)
+  /// Copied from [_metricSeriesForMember].
+  _MetricSeriesForMemberProvider(String memberId)
     : this._internal(
         (ref) =>
-            _waistSeriesForMember(ref as _WaistSeriesForMemberRef, memberId),
-        from: _waistSeriesForMemberProvider,
-        name: r'_waistSeriesForMemberProvider',
+            _metricSeriesForMember(ref as _MetricSeriesForMemberRef, memberId),
+        from: _metricSeriesForMemberProvider,
+        name: r'_metricSeriesForMemberProvider',
         debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
             ? null
-            : _$waistSeriesForMemberHash,
-        dependencies: _WaistSeriesForMemberFamily._dependencies,
+            : _$metricSeriesForMemberHash,
+        dependencies: _MetricSeriesForMemberFamily._dependencies,
         allTransitiveDependencies:
-            _WaistSeriesForMemberFamily._allTransitiveDependencies,
+            _MetricSeriesForMemberFamily._allTransitiveDependencies,
         memberId: memberId,
       );
 
-  _WaistSeriesForMemberProvider._internal(
+  _MetricSeriesForMemberProvider._internal(
     super._createNotifier, {
     required super.name,
     required super.dependencies,
@@ -421,13 +433,15 @@ class _WaistSeriesForMemberProvider
 
   @override
   Override overrideWith(
-    Stream<TrainerMetricSeries> Function(_WaistSeriesForMemberRef provider)
+    Stream<Map<TrainerMetric, TrainerMetricSeries>> Function(
+      _MetricSeriesForMemberRef provider,
+    )
     create,
   ) {
     return ProviderOverride(
       origin: this,
-      override: _WaistSeriesForMemberProvider._internal(
-        (ref) => create(ref as _WaistSeriesForMemberRef),
+      override: _MetricSeriesForMemberProvider._internal(
+        (ref) => create(ref as _MetricSeriesForMemberRef),
         from: from,
         name: null,
         dependencies: null,
@@ -439,13 +453,15 @@ class _WaistSeriesForMemberProvider
   }
 
   @override
-  AutoDisposeStreamProviderElement<TrainerMetricSeries> createElement() {
-    return _WaistSeriesForMemberProviderElement(this);
+  AutoDisposeStreamProviderElement<Map<TrainerMetric, TrainerMetricSeries>>
+  createElement() {
+    return _MetricSeriesForMemberProviderElement(this);
   }
 
   @override
   bool operator ==(Object other) {
-    return other is _WaistSeriesForMemberProvider && other.memberId == memberId;
+    return other is _MetricSeriesForMemberProvider &&
+        other.memberId == memberId;
   }
 
   @override
@@ -459,23 +475,26 @@ class _WaistSeriesForMemberProvider
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-mixin _WaistSeriesForMemberRef
-    on AutoDisposeStreamProviderRef<TrainerMetricSeries> {
+mixin _MetricSeriesForMemberRef
+    on AutoDisposeStreamProviderRef<Map<TrainerMetric, TrainerMetricSeries>> {
   /// The parameter `memberId` of this provider.
   String get memberId;
 }
 
-class _WaistSeriesForMemberProviderElement
-    extends AutoDisposeStreamProviderElement<TrainerMetricSeries>
-    with _WaistSeriesForMemberRef {
-  _WaistSeriesForMemberProviderElement(super.provider);
+class _MetricSeriesForMemberProviderElement
+    extends
+        AutoDisposeStreamProviderElement<
+          Map<TrainerMetric, TrainerMetricSeries>
+        >
+    with _MetricSeriesForMemberRef {
+  _MetricSeriesForMemberProviderElement(super.provider);
 
   @override
-  String get memberId => (origin as _WaistSeriesForMemberProvider).memberId;
+  String get memberId => (origin as _MetricSeriesForMemberProvider).memberId;
 }
 
 String _$trainerMemberDetailControllerHash() =>
-    r'3c9fca327a79aef3e30c1f8b63175a75420c3057';
+    r'24bd9ca32604eae6d3a82d46b63a2a6a71c513af';
 
 abstract class _$TrainerMemberDetailController
     extends BuildlessAutoDisposeNotifier<TrainerMemberDetail> {

@@ -198,6 +198,17 @@ const _monthNames = {
 String _formatDate(DateTime date) =>
     '${date.day} ${_monthNames[date.month]} ${date.year}';
 
+/// Çevre ölçüleri (bel/göğüs/kalça/kol/bacak) hâlâ RC'deki `cm` metnini
+/// kullanıyor (davranış değişmedi); kilo/yağ oranı kendi sabit birimlerini
+/// (`MeasurementMetric.unit`) döner — bunlar dile göre değişmediği için
+/// RC'ye taşımaya gerek yok.
+String _unitFor(MeasurementMetric metric, WidgetRef ref) {
+  return switch (metric) {
+    MeasurementMetric.kilo || MeasurementMetric.yagOrani => metric.unit,
+    _ => ref.watch(rcTextProvider(RemoteConfigKeys.measurementsUnitCm)),
+  };
+}
+
 /// F4-1 — üyenin geçmiş ölçüm kayıtlarından birini seçip avatar ekranında
 /// o tarihe ait değerleri görüntülemek için (en son kayıt varsayılan).
 void _showDatePicker(
@@ -449,6 +460,32 @@ class _AvatarViewState extends ConsumerState<_AvatarView> {
                 ),
               ),
             ),
+          // Kilo/yağ oranının silüet üzerinde anatomik bir karşılığı yok
+          // (avatarLayout sadece çevre ölçülerini konumlandırıyor) — bu
+          // yüzden aynı seçim mekanizmasını (controller.selectPoint,
+          // grafik ekranındaki chip'lerle aynı) burada da sunan iki ayrı
+          // hızlı-seçim chip'i var. Seçilince alttaki "Seçili nokta"
+          // kartı normal şekilde o metriğin giriş alanını gösterir.
+          Padding(
+            padding: const EdgeInsets.only(bottom: AppSpacing.md),
+            child: Row(
+              children: [
+                _MetricChip(
+                  label: MeasurementMetric.kilo.label,
+                  selected: state.selectedMetric == MeasurementMetric.kilo,
+                  onTap: () => controller.selectPoint(MeasurementMetric.kilo),
+                ),
+                const SizedBox(width: AppSpacing.sm),
+                _MetricChip(
+                  label: MeasurementMetric.yagOrani.label,
+                  selected:
+                      state.selectedMetric == MeasurementMetric.yagOrani,
+                  onTap: () =>
+                      controller.selectPoint(MeasurementMetric.yagOrani),
+                ),
+              ],
+            ),
+          ),
           Expanded(
             child: Center(
               child: MeasurementAvatar(
@@ -555,7 +592,7 @@ class _AvatarViewState extends ConsumerState<_AvatarView> {
                                   fontSize: 14,
                                 ),
                                 suffixText:
-                                    ' ${ref.watch(rcTextProvider(RemoteConfigKeys.measurementsUnitCm))}',
+                                    ' ${_unitFor(state.selectedMetric, ref)}',
                                 suffixStyle: typography.bodyMedium.copyWith(
                                   color: colors.onSurfaceMuted,
                                   fontSize: 15,
@@ -783,8 +820,7 @@ class _ChartView extends ConsumerWidget {
                                 ),
                                 children: [
                                   TextSpan(
-                                    text:
-                                        ' ${ref.watch(rcTextProvider(RemoteConfigKeys.measurementsUnitCm))}',
+                                    text: ' ${_unitFor(series.metric, ref)}',
                                     style: typography.bodyMedium.copyWith(
                                       color: colors.onSurfaceMuted,
                                       fontSize: 17,
@@ -821,7 +857,7 @@ class _ChartView extends ConsumerWidget {
                                               .measurementsNoChangeLabel,
                                         ),
                                       )
-                                    : '${diff < 0 ? '−' : '+'}${diff.abs().toStringAsFixed(1).replaceAll('.', ',')} ${ref.watch(rcTextProvider(RemoteConfigKeys.measurementsUnitCm))}',
+                                    : '${diff < 0 ? '−' : '+'}${diff.abs().toStringAsFixed(1).replaceAll('.', ',')} ${_unitFor(series.metric, ref)}',
                                 style: typography.caption.copyWith(
                                   fontSize: 12,
                                   color: diff == 0
@@ -904,6 +940,7 @@ class _ChartView extends ConsumerWidget {
                         ? null
                         : series.values[i] - series.values[i - 1],
                     showDivider: i > 0 && i >= series.values.length - 4,
+                    metric: series.metric,
                   ),
               ],
             ),
@@ -989,12 +1026,14 @@ class _HistoryRow extends ConsumerWidget {
     required this.value,
     required this.delta,
     required this.showDivider,
+    required this.metric,
   });
 
   final String date;
   final double value;
   final double? delta;
   final bool showDivider;
+  final MeasurementMetric metric;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -1029,7 +1068,7 @@ class _HistoryRow extends ConsumerWidget {
           Row(
             children: [
               Text(
-                '${value.toStringAsFixed(1).replaceAll('.', ',')} ${ref.watch(rcTextProvider(RemoteConfigKeys.measurementsUnitCm))}',
+                '${value.toStringAsFixed(1).replaceAll('.', ',')} ${_unitFor(metric, ref)}',
                 style: typography.headingSmall.copyWith(
                   color: colors.onSurface,
                   fontSize: 16,
