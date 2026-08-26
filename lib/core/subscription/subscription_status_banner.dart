@@ -21,8 +21,16 @@ class SubscriptionStatusBanner extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final status = ref.watch(subscriptionControllerProvider).status;
-    if (status != SubscriptionStatus.expired) return const SizedBox.shrink();
+    final subscription = ref.watch(subscriptionControllerProvider);
+    const blockedStatuses = {
+      SubscriptionStatus.expired,
+      SubscriptionStatus.pastDue,
+      SubscriptionStatus.canceled,
+    };
+    if (subscription.subscriptionExempt ||
+        !blockedStatuses.contains(subscription.status)) {
+      return const SizedBox.shrink();
+    }
 
     final colors = context.appColors;
     final typography = context.appTypography;

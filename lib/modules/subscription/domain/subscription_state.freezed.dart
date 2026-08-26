@@ -25,6 +25,19 @@ mixin _$SubscriptionState {
   String? get productId => throw _privateConstructorUsedError;
   bool get isPurchasing => throw _privateConstructorUsedError;
 
+  /// Salon daha önce (herhangi bir admin/hesapla) hiç trial kullandı mı —
+  /// bir kez `true` olunca kalıcıdır, salon bir daha ücretsiz deneme
+  /// alamaz (bkz. `apply-subscription-update.ts`).
+  bool get trialUsed => throw _privateConstructorUsedError;
+
+  /// `gyms/{gymId}.subscriptionExempt` — sadece Firebase Console/Admin
+  /// SDK'dan elle set edilen bir bayrak (client hiç yazamaz, bkz.
+  /// firestore.rules `subscriptionFields()`). `true` iken bu salon
+  /// abonelik durumu ne olursa olsun (hatta `none`/`expired` iken bile)
+  /// tam erişimli sayılır — test/demo salonları için ödeme almadan aktif
+  /// tutma amaçlı.
+  bool get subscriptionExempt => throw _privateConstructorUsedError;
+
   /// Satın alma akışı başlatılan ürün — mağaza penceresi açıkken hangi
   /// plan kartının "bekleniyor" durumunda gösterileceğini belirler.
   String? get pendingProductId => throw _privateConstructorUsedError;
@@ -56,6 +69,8 @@ abstract class $SubscriptionStateCopyWith<$Res> {
     DateTime? expiresAt,
     String? productId,
     bool isPurchasing,
+    bool trialUsed,
+    bool subscriptionExempt,
     String? pendingProductId,
     String? purchaseErrorMessage,
   });
@@ -83,6 +98,8 @@ class _$SubscriptionStateCopyWithImpl<$Res, $Val extends SubscriptionState>
     Object? expiresAt = freezed,
     Object? productId = freezed,
     Object? isPurchasing = null,
+    Object? trialUsed = null,
+    Object? subscriptionExempt = null,
     Object? pendingProductId = freezed,
     Object? purchaseErrorMessage = freezed,
   }) {
@@ -116,6 +133,14 @@ class _$SubscriptionStateCopyWithImpl<$Res, $Val extends SubscriptionState>
                 ? _value.isPurchasing
                 : isPurchasing // ignore: cast_nullable_to_non_nullable
                       as bool,
+            trialUsed: null == trialUsed
+                ? _value.trialUsed
+                : trialUsed // ignore: cast_nullable_to_non_nullable
+                      as bool,
+            subscriptionExempt: null == subscriptionExempt
+                ? _value.subscriptionExempt
+                : subscriptionExempt // ignore: cast_nullable_to_non_nullable
+                      as bool,
             pendingProductId: freezed == pendingProductId
                 ? _value.pendingProductId
                 : pendingProductId // ignore: cast_nullable_to_non_nullable
@@ -147,6 +172,8 @@ abstract class _$$SubscriptionStateImplCopyWith<$Res>
     DateTime? expiresAt,
     String? productId,
     bool isPurchasing,
+    bool trialUsed,
+    bool subscriptionExempt,
     String? pendingProductId,
     String? purchaseErrorMessage,
   });
@@ -173,6 +200,8 @@ class __$$SubscriptionStateImplCopyWithImpl<$Res>
     Object? expiresAt = freezed,
     Object? productId = freezed,
     Object? isPurchasing = null,
+    Object? trialUsed = null,
+    Object? subscriptionExempt = null,
     Object? pendingProductId = freezed,
     Object? purchaseErrorMessage = freezed,
   }) {
@@ -206,6 +235,14 @@ class __$$SubscriptionStateImplCopyWithImpl<$Res>
             ? _value.isPurchasing
             : isPurchasing // ignore: cast_nullable_to_non_nullable
                   as bool,
+        trialUsed: null == trialUsed
+            ? _value.trialUsed
+            : trialUsed // ignore: cast_nullable_to_non_nullable
+                  as bool,
+        subscriptionExempt: null == subscriptionExempt
+            ? _value.subscriptionExempt
+            : subscriptionExempt // ignore: cast_nullable_to_non_nullable
+                  as bool,
         pendingProductId: freezed == pendingProductId
             ? _value.pendingProductId
             : pendingProductId // ignore: cast_nullable_to_non_nullable
@@ -230,6 +267,8 @@ class _$SubscriptionStateImpl implements _SubscriptionState {
     this.expiresAt,
     this.productId,
     this.isPurchasing = false,
+    this.trialUsed = false,
+    this.subscriptionExempt = false,
     this.pendingProductId,
     this.purchaseErrorMessage,
   });
@@ -251,6 +290,23 @@ class _$SubscriptionStateImpl implements _SubscriptionState {
   @JsonKey()
   final bool isPurchasing;
 
+  /// Salon daha önce (herhangi bir admin/hesapla) hiç trial kullandı mı —
+  /// bir kez `true` olunca kalıcıdır, salon bir daha ücretsiz deneme
+  /// alamaz (bkz. `apply-subscription-update.ts`).
+  @override
+  @JsonKey()
+  final bool trialUsed;
+
+  /// `gyms/{gymId}.subscriptionExempt` — sadece Firebase Console/Admin
+  /// SDK'dan elle set edilen bir bayrak (client hiç yazamaz, bkz.
+  /// firestore.rules `subscriptionFields()`). `true` iken bu salon
+  /// abonelik durumu ne olursa olsun (hatta `none`/`expired` iken bile)
+  /// tam erişimli sayılır — test/demo salonları için ödeme almadan aktif
+  /// tutma amaçlı.
+  @override
+  @JsonKey()
+  final bool subscriptionExempt;
+
   /// Satın alma akışı başlatılan ürün — mağaza penceresi açıkken hangi
   /// plan kartının "bekleniyor" durumunda gösterileceğini belirler.
   @override
@@ -264,7 +320,7 @@ class _$SubscriptionStateImpl implements _SubscriptionState {
 
   @override
   String toString() {
-    return 'SubscriptionState(status: $status, trialStartedAt: $trialStartedAt, trialEndsAt: $trialEndsAt, startedAt: $startedAt, expiresAt: $expiresAt, productId: $productId, isPurchasing: $isPurchasing, pendingProductId: $pendingProductId, purchaseErrorMessage: $purchaseErrorMessage)';
+    return 'SubscriptionState(status: $status, trialStartedAt: $trialStartedAt, trialEndsAt: $trialEndsAt, startedAt: $startedAt, expiresAt: $expiresAt, productId: $productId, isPurchasing: $isPurchasing, trialUsed: $trialUsed, subscriptionExempt: $subscriptionExempt, pendingProductId: $pendingProductId, purchaseErrorMessage: $purchaseErrorMessage)';
   }
 
   @override
@@ -285,6 +341,10 @@ class _$SubscriptionStateImpl implements _SubscriptionState {
                 other.productId == productId) &&
             (identical(other.isPurchasing, isPurchasing) ||
                 other.isPurchasing == isPurchasing) &&
+            (identical(other.trialUsed, trialUsed) ||
+                other.trialUsed == trialUsed) &&
+            (identical(other.subscriptionExempt, subscriptionExempt) ||
+                other.subscriptionExempt == subscriptionExempt) &&
             (identical(other.pendingProductId, pendingProductId) ||
                 other.pendingProductId == pendingProductId) &&
             (identical(other.purchaseErrorMessage, purchaseErrorMessage) ||
@@ -301,6 +361,8 @@ class _$SubscriptionStateImpl implements _SubscriptionState {
     expiresAt,
     productId,
     isPurchasing,
+    trialUsed,
+    subscriptionExempt,
     pendingProductId,
     purchaseErrorMessage,
   );
@@ -326,6 +388,8 @@ abstract class _SubscriptionState implements SubscriptionState {
     final DateTime? expiresAt,
     final String? productId,
     final bool isPurchasing,
+    final bool trialUsed,
+    final bool subscriptionExempt,
     final String? pendingProductId,
     final String? purchaseErrorMessage,
   }) = _$SubscriptionStateImpl;
@@ -344,6 +408,21 @@ abstract class _SubscriptionState implements SubscriptionState {
   String? get productId;
   @override
   bool get isPurchasing;
+
+  /// Salon daha önce (herhangi bir admin/hesapla) hiç trial kullandı mı —
+  /// bir kez `true` olunca kalıcıdır, salon bir daha ücretsiz deneme
+  /// alamaz (bkz. `apply-subscription-update.ts`).
+  @override
+  bool get trialUsed;
+
+  /// `gyms/{gymId}.subscriptionExempt` — sadece Firebase Console/Admin
+  /// SDK'dan elle set edilen bir bayrak (client hiç yazamaz, bkz.
+  /// firestore.rules `subscriptionFields()`). `true` iken bu salon
+  /// abonelik durumu ne olursa olsun (hatta `none`/`expired` iken bile)
+  /// tam erişimli sayılır — test/demo salonları için ödeme almadan aktif
+  /// tutma amaçlı.
+  @override
+  bool get subscriptionExempt;
 
   /// Satın alma akışı başlatılan ürün — mağaza penceresi açıkken hangi
   /// plan kartının "bekleniyor" durumunda gösterileceğini belirler.

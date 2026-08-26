@@ -47,6 +47,8 @@ class AuthService {
         return AuthLoginErrorReason.notFound;
       case 'resource-exhausted':
         return AuthLoginErrorReason.rateLimited;
+      case 'failed-precondition':
+        return AuthLoginErrorReason.subscriptionInactive;
       default:
         return AuthLoginErrorReason.generic;
     }

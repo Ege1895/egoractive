@@ -95,6 +95,8 @@ class AuthController extends _$AuthController {
       AuthLoginErrorReason.notFound => RemoteConfigKeys.authLoginErrorNotFound,
       AuthLoginErrorReason.rateLimited =>
         RemoteConfigKeys.authLoginErrorRateLimited,
+      AuthLoginErrorReason.subscriptionInactive =>
+        RemoteConfigKeys.authLoginErrorSubscriptionInactive,
       AuthLoginErrorReason.generic => RemoteConfigKeys.authLoginErrorGeneric,
     };
     return rc.getText(key, ref.read(localeControllerProvider));

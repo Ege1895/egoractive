@@ -2,7 +2,7 @@ import { getAuth } from "firebase-admin/auth";
 import { getFirestore } from "firebase-admin/firestore";
 import { HttpsError, onCall } from "firebase-functions/v2/https";
 
-import { usersCollection } from "../shared/firestore-paths";
+import { gymDoc, usersCollection } from "../shared/firestore-paths";
 
 const RATE_LIMIT_WINDOW_MS = 60_000;
 const RATE_LIMIT_MAX_REQUESTS = 5;
@@ -57,6 +57,20 @@ export const requestCustomToken = onCall(async (request) => {
   const role = typeof userData.role === "string" ? userData.role : undefined;
   const gymId = typeof userData.gymId === "string" ? userData.gymId : null;
   const claims = role ? { role, gymId } : undefined;
+
+  // Salon Abonelik ve Erişim Akışı — antrenör/üye salonu aboneliği aktif
+  // değilken hiç giriş yapamamalı (Bölüm 8/9). Admin'e bu kısıtlama
+  // uygulanmaz: admin her zaman token alır, uygulama içi yönlendirme onu
+  // SubscriptionOnboardingPanel'e taşır (bkz. `lib/core/router/app_access.dart`).
+  if (role && role !== "admin" && gymId) {
+    const gymSnap = await getFirestore().doc(gymDoc(gymId)).get();
+    const gymData = gymSnap.data();
+    const status = gymData?.subscriptionStatus;
+    const exempt = gymData?.subscriptionExempt === true;
+    if (!exempt && status !== "trial" && status !== "active") {
+      throw new HttpsError("failed-precondition", "SALON_SUBSCRIPTION_INACTIVE");
+    }
+  }
 
   // İlk giriş için (Firebase Auth hesabı henüz yok — F2-9 lazy account
   // creation) `onUserRoleAssigned` trigger'ı `setCustomUserClaims`'i hesap

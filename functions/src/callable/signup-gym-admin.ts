@@ -1,4 +1,4 @@
-import { FieldValue, getFirestore } from "firebase-admin/firestore";
+import { getFirestore } from "firebase-admin/firestore";
 import { getStorage } from "firebase-admin/storage";
 import { HttpsError, onCall } from "firebase-functions/v2/https";
 
@@ -99,8 +99,12 @@ export const signupGymAdmin = onCall(async (request) => {
     timeZone,
     ...(logoUrl !== undefined ? { logoUrl } : {}),
     themeColors: { primary: themeColorHex },
-    subscriptionStatus: "trial",
-    trialStartedAt: FieldValue.serverTimestamp(),
+    // subscriptionStatus artık burada otomatik "trial" yazılmıyor — admin,
+    // girişten hemen sonra zorunlu SubscriptionOnboardingPanel'de gerçek bir
+    // mağaza aboneliği (store'un kendi "free trial" introductory offer'ıyla)
+    // başlatana kadar `subscriptionStatus` alanı yok = SubscriptionStatus.none
+    // (bkz. subscription_status_service.dart). O ekranda seçtiği pakete
+    // `verifySubscriptionPurchase` (F6-1d) ile abone olunca "active" yazılır.
   });
 
   const userRef = firestore.collection(usersCollection()).doc();

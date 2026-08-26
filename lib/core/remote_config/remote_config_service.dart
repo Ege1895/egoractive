@@ -55,6 +55,37 @@ abstract final class RemoteConfigKeys {
   /// kaç gün ücretsiz deneme süresi tanınır.
   static const trialDurationDays = 'cfg_trial_duration_days';
 
+  /// `true` iken yeni oluşturulan bir salonun admin'i, girişten hemen sonra
+  /// zorunlu [SubscriptionOnboardingPanel]'e (geri butonu yok, pakete abone
+  /// olmadan atlanamaz) yönlendirilir. Mağaza ürünleri (App Store Connect/
+  /// Play Console) henüz canlıya alınmadıysa bu ekranda hiç ürün listelenmez
+  /// ve admin sonsuza kadar takılı kalır — o yüzden mağaza kurulumu
+  /// tamamlanana kadar Console'dan `false` yapılabilir (test amaçlı, bkz.
+  /// `allowPastDatetimeCreation` ile aynı desen). Prod'da `true` olmalı.
+  static const requireSubscriptionOnboarding =
+      'cfg_require_subscription_onboarding';
+
+  /// Onboarding — zorunlu abonelik başlatma ekranı ([SubscriptionOnboardingPanel]).
+  static const subscriptionOnboardingTitle =
+      'lbl_subscription_onboarding_title';
+  static const subscriptionOnboardingSubtitle =
+      'lbl_subscription_onboarding_subtitle';
+  static const subscriptionOnboardingCta = 'lbl_subscription_onboarding_cta';
+  static const subscriptionOnboardingCaption =
+      'lbl_subscription_onboarding_caption';
+  static const subscriptionOnboardingNoProducts =
+      'lbl_subscription_onboarding_no_products';
+
+  /// Salon Abonelik ve Erişim Akışı — salon daha önce trial kullandıysa
+  /// (`trialUsed == true`) bu ekranda "X gün ücretsiz" yerine sadece ücretli
+  /// plan kopyası gösterilir (Bölüm 11).
+  static const subscriptionOnboardingSubtitlePaidOnly =
+      'lbl_subscription_onboarding_subtitle_paid_only';
+  static const subscriptionOnboardingCtaPaidOnly =
+      'lbl_subscription_onboarding_cta_paid_only';
+  static const subscriptionOnboardingCaptionPaidOnly =
+      'lbl_subscription_onboarding_caption_paid_only';
+
   /// F4-4 — rozet kriterleri: `[{id, title, note, type, threshold}]`.
   /// `type`: sessionsCompleted | groupSessionJoins | eventJoins |
   /// membershipMonths. Yeni bir rozet eklemek/eşiği değiştirmek için store
@@ -179,6 +210,8 @@ abstract final class RemoteConfigKeys {
   static const authLoginErrorNotFound = 'lbl_auth_login_error_not_found';
   static const authLoginErrorRateLimited = 'lbl_auth_login_error_rate_limited';
   static const authLoginErrorGeneric = 'lbl_auth_login_error_generic';
+  static const authLoginErrorSubscriptionInactive =
+      'lbl_auth_login_error_subscription_inactive';
   static const authRetryButton = 'lbl_auth_retry_button';
   static const authDeleteAccountErrorGeneric =
       'lbl_auth_delete_account_error_generic';
@@ -1301,6 +1334,7 @@ class RemoteConfigService {
     RemoteConfigKeys.feedbackReminderDayOfMonth: -1,
     RemoteConfigKeys.freeVersionAdsEnabled: true,
     RemoteConfigKeys.trialDurationDays: 14,
+    RemoteConfigKeys.requireSubscriptionOnboarding: false,
     RemoteConfigKeys.featureFlags: '{"group_sessions_enabled": true}',
     RemoteConfigKeys.badgeCriteria: _defaultBadgeCriteriaJson,
     RemoteConfigKeys.expenseCategories: _defaultExpenseCategoriesJson,
@@ -1376,6 +1410,8 @@ class RemoteConfigService {
         'Çok fazla deneme yapıldı. Bir dakika sonra tekrar dene.',
     'lbl_auth_login_error_generic_tr':
         'Giriş yapılamadı. Bağlantını kontrol edip tekrar dene.',
+    'lbl_auth_login_error_subscription_inactive_tr':
+        'Hesabınız şu anda aktif değil. Lütfen salonunuzla iletişime geçin.',
     'lbl_auth_retry_button_tr': 'Tekrar dene',
     'lbl_auth_delete_account_error_generic_tr':
         'Hesap silinemedi. Bağlantını kontrol edip tekrar dene.',
@@ -2139,6 +2175,8 @@ class RemoteConfigService {
         'Too many attempts. Try again in a minute.',
     'lbl_auth_login_error_generic_en':
         'Could not log in. Check your connection and try again.',
+    'lbl_auth_login_error_subscription_inactive_en':
+        'Your account is not active right now. Please contact your gym.',
     'lbl_auth_retry_button_en': 'Try again',
     'lbl_auth_delete_account_error_generic_en':
         'Could not delete account. Check your connection and try again.',
@@ -2939,6 +2977,32 @@ class RemoteConfigService {
         'Şu an satın alınabilir bir abonelik ürünü bulunamadı.',
     'lbl_subscription_no_products_en':
         'No purchasable subscription product is available right now.',
+    'lbl_subscription_onboarding_title_tr': 'Aboneliğini başlat',
+    'lbl_subscription_onboarding_title_en': 'Start your subscription',
+    'lbl_subscription_onboarding_subtitle_tr':
+        'Devam etmek için bir plan seç. {days} gün boyunca hiç ücret alınmaz, süre sonunda seçtiğin paket {store} üzerinden otomatik olarak devam eder.',
+    'lbl_subscription_onboarding_subtitle_en':
+        "Pick a plan to continue. You won't be charged for {days} days — after that, your selected plan renews automatically via {store}.",
+    'lbl_subscription_onboarding_cta_tr': '{plan} ile {days} gün ücretsiz başlat',
+    'lbl_subscription_onboarding_cta_en': 'Start {days}-day free trial with {plan}',
+    'lbl_subscription_onboarding_caption_tr':
+        'Şimdi ücret alınmaz. İlk ödeme {days}. günde {store} hesabından çekilir.',
+    'lbl_subscription_onboarding_caption_en':
+        "You won't be charged today. Your first payment is taken on day {days} via {store}.",
+    'lbl_subscription_onboarding_no_products_tr':
+        'Planlar şu anda yüklenemiyor. Lütfen daha sonra tekrar dene.',
+    'lbl_subscription_onboarding_no_products_en':
+        'Plans can\'t be loaded right now. Please try again later.',
+    'lbl_subscription_onboarding_subtitle_paid_only_tr':
+        'Devam etmek için bir plan seç. Seçtiğin paket {store} üzerinden hemen başlar.',
+    'lbl_subscription_onboarding_subtitle_paid_only_en':
+        'Pick a plan to continue. Your selected plan starts right away via {store}.',
+    'lbl_subscription_onboarding_cta_paid_only_tr': '{plan} ile abone ol',
+    'lbl_subscription_onboarding_cta_paid_only_en': 'Subscribe with {plan}',
+    'lbl_subscription_onboarding_caption_paid_only_tr':
+        'İlk ödeme hemen {store} hesabından çekilir.',
+    'lbl_subscription_onboarding_caption_paid_only_en':
+        'Your first payment is taken right away via {store}.',
     'lbl_subscription_yearly_plan_fallback_tr': 'Yıllık',
     'lbl_subscription_yearly_plan_fallback_en': 'Yearly',
     'lbl_subscription_monthly_plan_fallback_tr': 'Aylık',
@@ -3009,6 +3073,11 @@ class RemoteConfigService {
 
   /// F6-3 — yeni salonlara tanınan ücretsiz deneme süresi (gün).
   int get trialDurationDays => getInt(RemoteConfigKeys.trialDurationDays);
+
+  /// Bkz. [RemoteConfigKeys.requireSubscriptionOnboarding] — mağaza
+  /// kurulumu tamamlanana kadar Console'dan `false` yapılabilir.
+  bool get requireSubscriptionOnboarding =>
+      getBool(RemoteConfigKeys.requireSubscriptionOnboarding);
 
   /// Feature flag'lerin tutulduğu JSON obje (esnek, sabit alanı yok).
   Map<String, dynamic> get featureFlags =>

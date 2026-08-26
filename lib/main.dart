@@ -16,6 +16,7 @@ import 'core/locale/locale_prefs.dart';
 import 'core/panels/panel_stack_controller.dart';
 import 'core/panels/panel_stack_view.dart';
 import 'core/remote_config/remote_config_service.dart';
+import 'core/router/app_access.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_color_scheme.dart';
 import 'core/theme/app_theme.dart';
@@ -25,6 +26,7 @@ import 'firebase_options.dart';
 import 'modules/auth/ui/panels/phone_login_panel.dart';
 import 'modules/auth/ui/panels/splash_panel.dart';
 import 'modules/notifications/service/push_notification_service.dart';
+import 'modules/subscription/ui/panels/subscription_onboarding_panel.dart';
 
 /// Widget ağacı dışından (bildirim servisi gibi) `PanelStackController`'a
 /// erişebilmek için paylaşılan container — `UncontrolledProviderScope` bunu
@@ -97,6 +99,14 @@ class _AppRoot extends ConsumerStatefulWidget {
 }
 
 class _AppRootState extends ConsumerState<_AppRoot> {
+  /// `appAccessProvider` abonelikle ilgisiz bir gym alanı (ör. logo)
+  /// değiştiğinde bile yeniden hesaplanıp aynı kararı tekrar yayınlayabilir
+  /// (bkz. o dosyadaki yorum) — burada son uygulanan kararla karşılaştırıp
+  /// gerçek bir değişiklik yoksa `replaceRoot`'u tekrar çağırmayız, yoksa
+  /// ekran (ör. admin'in o an bulunduğu sekme/scroll konumu) gereksiz yere
+  /// sıfırlanırdı.
+  AppAccess? _lastAccess;
+
   @override
   void initState() {
     super.initState();
@@ -109,18 +119,22 @@ class _AppRootState extends ConsumerState<_AppRoot> {
   Widget build(BuildContext context) {
     final stack = ref.watch(panelStackControllerProvider);
 
-    // F1-11 — tek yönlendirme kaynağı: rol çözülünce ilgili shell'e, oturum
-    // var ama claim geçersiz/eksikse login ekranına dönülür. Splash sadece
-    // marka gösterimi + basit bir fallback'tir; asıl karar burada verilir.
-    ref.listen(currentRoleProvider, (previous, next) {
-      next.whenData((role) {
-        final panelStack = ref.read(panelStackControllerProvider.notifier);
-        if (role != null) {
-          panelStack.replaceRoot(shellForRole(role));
-        } else if (FirebaseAuth.instance.currentUser != null) {
-          FirebaseAuth.instance.signOut();
-          panelStack.replaceRoot(const PhoneLoginPanel());
-        }
+    // Salon Abonelik ve Erişim Akışı — tek yönlendirme kaynağı, artık
+    // `appAccessProvider` üzerinden (rol + salonun CANLI abonelik durumu).
+    // Splash sadece marka gösterimi + basit bir fallback'tir; asıl karar
+    // burada verilir. Bu, uygulama açıkken abonelik durumu değişirse (admin
+    // abone olur/olmaz, antrenör/üyenin salonu askıya alınır) ekranın anında
+    // tepki vermesini sağlar — eskisi gibi sadece giriş anında tek seferlik
+    // kontrol değil.
+    ref.listen(appAccessProvider, (previous, next) {
+      debugPrint(
+        '[appAccess] listener isLoading=${next.isLoading} hasError=${next.hasError} '
+        'error=${next.error} value=${next.valueOrNull}',
+      );
+      next.whenData((access) {
+        if (access == _lastAccess) return;
+        _lastAccess = access;
+        _applyAccess(access);
       });
     });
 
@@ -128,5 +142,37 @@ class _AppRootState extends ConsumerState<_AppRoot> {
       return const Scaffold(body: SizedBox.shrink());
     }
     return const PanelStackView();
+  }
+
+  /// `signedOut` → oturumu kapatıp girişe döner. `blocked` (antrenör/üye,
+  /// salonu inaktifken) → oturumu kapatıp girişe, bilgilendirici bir mesajla
+  /// döner — [PhoneLoginPanel.errorBanner]'ın gösterdiği metin zaten reason-
+  /// agnostic olduğu için burada ayrıca metin üretmeye gerek yok, sadece
+  /// [AuthController]'ın normal login denemesi başarısız olduğunda gösterdiği
+  /// mesajla tutarlı kalsın diye aynı Remote Config metnini okuyoruz.
+  /// `subscriptionOnboarding` (admin, salonu inaktifken) → zorunlu abonelik
+  /// ekranı. `ready` → role uygun shell.
+  Future<void> _applyAccess(AppAccess access) async {
+    final panelStack = ref.read(panelStackControllerProvider.notifier);
+    switch (access.kind) {
+      case AppAccessKind.signedOut:
+        if (FirebaseAuth.instance.currentUser != null) {
+          await FirebaseAuth.instance.signOut();
+        }
+        panelStack.replaceRoot(const PhoneLoginPanel());
+      case AppAccessKind.blocked:
+        final message = ref
+            .read(remoteConfigServiceProvider)
+            .getText(
+              RemoteConfigKeys.authLoginErrorSubscriptionInactive,
+              ref.read(localeControllerProvider),
+            );
+        await FirebaseAuth.instance.signOut();
+        panelStack.replaceRoot(PhoneLoginPanel(errorBanner: message));
+      case AppAccessKind.subscriptionOnboarding:
+        panelStack.replaceRoot(const SubscriptionOnboardingPanel());
+      case AppAccessKind.ready:
+        panelStack.replaceRoot(shellForRole(access.role!));
+    }
   }
 }

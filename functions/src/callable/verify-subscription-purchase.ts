@@ -1,8 +1,7 @@
-import { getFirestore, Timestamp } from "firebase-admin/firestore";
 import { defineSecret } from "firebase-functions/params";
 import { HttpsError, onCall } from "firebase-functions/v2/https";
 
-import { gymDoc } from "../shared/firestore-paths";
+import { applySubscriptionUpdate } from "../shared/apply-subscription-update";
 import { isKnownSubscriptionProductId } from "../shared/subscription-constants";
 import { verifyAppleReceipt, verifyGooglePurchase } from "../shared/subscription-verification";
 
@@ -72,16 +71,15 @@ export const verifySubscriptionPurchase = onCall(
       throw new HttpsError("failed-precondition", `Makbuz doğrulanamadı: ${message}`);
     }
 
-    await getFirestore()
-      .doc(gymDoc(gymId))
-      .update({
-        subscriptionStatus: verified.isActive ? "active" : "expired",
-        subscriptionExpiresAt: Timestamp.fromMillis(verified.expiresAtMs),
-        subscriptionStartedAt: Timestamp.fromMillis(verified.startAtMs),
-        subscriptionProductId: productId,
-        subscriptionPlatform: platform,
-      });
+    const status = await applySubscriptionUpdate({
+      gymId,
+      verified,
+      productId,
+      platform,
+      source: "purchase",
+      rawVerificationData: verificationData,
+    });
 
-    return { status: verified.isActive ? "active" : "expired", expiresAtMs: verified.expiresAtMs };
+    return { status, expiresAtMs: verified.expiresAtMs };
   },
 );

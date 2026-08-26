@@ -24,6 +24,16 @@ class SubscriptionPurchaseService {
       ..clear()
       ..addEntries(response.productDetails.map((p) => MapEntry(p.id, p)));
 
+    if (response.productDetails.isEmpty) {
+      // Mağaza ürünleri henüz App Store Connect/Play Console'da
+      // yayınlanmadıysa (bkz. docs/Abonelik_Store_Kurulumu.md) gerçek bir
+      // yanıt hiç gelmez — ekran boş kalıp test/inceleme için kullanılamaz
+      // hale gelirdi. `_cache` boş bırakılır (mock ürünler için satın alma
+      // denemesi zaten `buySubscription`'da StateError ile güvenle
+      // reddedilir), sadece görüntüleme için sahte veri döndürülür.
+      return mockSubscriptionProducts;
+    }
+
     return response.productDetails
         .map((p) => SubscriptionProduct(id: p.id, title: p.title, description: p.description, price: p.price))
         .toList();

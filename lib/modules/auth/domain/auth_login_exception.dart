@@ -1,5 +1,7 @@
 /// `requestCustomToken` callable'ından dönen bilinen hata kodları.
-enum AuthLoginErrorReason { notFound, rateLimited, generic }
+/// `subscriptionInactive` — Salon Abonelik ve Erişim Akışı: antrenör/üye,
+/// salonun aboneliği `trial`/`active` değilken giriş yapamaz.
+enum AuthLoginErrorReason { notFound, rateLimited, subscriptionInactive, generic }
 
 /// [AuthService.requestLogin] bu istisnayı fırlatır; [AuthRepository]/[AuthController]
 /// katmanı [reason]'ı kullanıcıya gösterilecek Remote Config metnine çevirir.

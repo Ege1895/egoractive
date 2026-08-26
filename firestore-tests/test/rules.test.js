@@ -41,8 +41,19 @@ test.beforeEach(async () => {
     await setDoc(doc(db, "gyms/gym-b"), { name: "Gym B", subscriptionStatus: "trial" });
     // F6-3 — deneme süresi dolmuş/aboneliği sona ermiş bir salon.
     await setDoc(doc(db, "gyms/gym-expired"), { name: "Gym Expired", subscriptionStatus: "expired" });
+    // Salon Abonelik ve Erişim Akışı — subscriptionExempt=true, alanı hiç
+    // olmayan (eski/legacy) bir salon da dahil, abonelik durumundan bağımsız
+    // her zaman aktif sayılmalı.
+    await setDoc(doc(db, "gyms/gym-exempt"), { name: "Gym Exempt", subscriptionExempt: true });
+    await setDoc(doc(db, "users/admin-exempt"), { role: "admin", gymId: "gym-exempt" });
     await setDoc(doc(db, "users/admin-expired"), { role: "admin", gymId: "gym-expired" });
     await setDoc(doc(db, "users/trainer-expired"), { role: "trainer", gymId: "gym-expired" });
+    await setDoc(doc(db, "users/member-expired"), {
+      role: "member",
+      gymId: "gym-expired",
+      trainerId: "trainer-expired",
+      name: "Member Expired",
+    });
     await setDoc(doc(db, "users/admin-a"), { role: "admin", gymId: "gym-a" });
     await setDoc(doc(db, "users/trainer-a"), { role: "trainer", gymId: "gym-a" });
     await setDoc(doc(db, "users/member-a1"), {
@@ -170,9 +181,14 @@ test("trainer cannot delete a package catalog entry (negative)", async () => {
 
 // --- gyms/{gymId} subscription fields (F6-1) ---
 
-test("admin can create a gym doc with subscriptionStatus 'trial' (positive)", async () => {
+test("admin can create a gym doc without any subscription field (positive — gerçek akış Admin SDK üzerinden, bu client yolu sadece güvenlik ağı)", async () => {
   const db = contextFor("admin-a", { role: "admin", gymId: "gym-new" }).firestore();
-  await assertSucceeds(
+  await assertSucceeds(setDoc(doc(db, "gyms/gym-new"), { name: "New Gym" }));
+});
+
+test("admin cannot create a gym doc directly as 'trial' (negative — Salon Abonelik ve Erişim Akışı: trial artık sadece gerçek mağaza satın almasıyla başlar)", async () => {
+  const db = contextFor("admin-a", { role: "admin", gymId: "gym-new" }).firestore();
+  await assertFails(
     setDoc(doc(db, "gyms/gym-new"), { name: "New Gym", subscriptionStatus: "trial" }),
   );
 });
@@ -1110,5 +1126,147 @@ test("admin of a gym with subscriptionStatus 'active' CAN create a new member (p
   const db = contextFor("admin-active", { role: "admin", gymId: "gym-active" }).firestore();
   await assertSucceeds(
     setDoc(doc(db, "users/new-member"), { role: "member", gymId: "gym-active", trainerId: "" }),
+  );
+});
+
+// --- Salon Abonelik ve Erişim Akışı — abonelik inaktifken TÜM okuma da kesilir ---
+// (F6-3'ün orijinal tasarımı sadece create'i engelliyordu; bu daha geniş
+// kilitleme onun yerini alıyor — bkz. firestore.rules'daki gymSubscriptionActive() yorumu.)
+
+test("gyms/{gymId} document itself stays readable even when the subscription is inactive (positive — client durumu görüp yönlenebilsin diye bilerek kapsam dışı)", async () => {
+  const db = contextFor("admin-expired", { role: "admin", gymId: "gym-expired" }).firestore();
+  await assertSucceeds(getDoc(doc(db, "gyms/gym-expired")));
+});
+
+test("a user can still read their OWN users/{uid} document even when their gym's subscription is inactive (positive — rol/salon çözüp engellendi ekranını gösterebilmek için gerekli asgari okuma)", async () => {
+  const db = contextFor("member-expired", { role: "member", gymId: "gym-expired" }).firestore();
+  await assertSucceeds(getDoc(doc(db, "users/member-expired")));
+});
+
+test("admin of an expired gym cannot read another user in the same gym (negative)", async () => {
+  const db = contextFor("admin-expired", { role: "admin", gymId: "gym-expired" }).firestore();
+  await assertFails(getDoc(doc(db, "users/member-expired")));
+});
+
+test("trainer of an expired gym cannot read their own member (negative)", async () => {
+  const db = contextFor("trainer-expired", { role: "trainer", gymId: "gym-expired" }).firestore();
+  await assertFails(getDoc(doc(db, "users/member-expired")));
+});
+
+test("admin of an expired gym cannot read a session in their own gym (negative)", async () => {
+  await testEnv.withSecurityRulesDisabled(async (context) => {
+    await setDoc(context.firestore().doc("sessions/s-expired"), {
+      gymId: "gym-expired",
+      trainerId: "trainer-expired",
+      memberId: "member-expired",
+      startTime: hoursFromNow(48),
+      status: "planned",
+    });
+  });
+  const db = contextFor("admin-expired", { role: "admin", gymId: "gym-expired" }).firestore();
+  await assertFails(getDoc(doc(db, "sessions/s-expired")));
+});
+
+test("member of an expired gym cannot read their own measurements (negative — tam kilitleme niyeti)", async () => {
+  await testEnv.withSecurityRulesDisabled(async (context) => {
+    await setDoc(context.firestore().doc("measurements/member-expired/entries/e1"), { kilo: 70 });
+  });
+  const db = contextFor("member-expired", { role: "member", gymId: "gym-expired" }).firestore();
+  await assertFails(getDoc(doc(db, "measurements/member-expired/entries/e1")));
+});
+
+test("admin of an expired gym cannot read the studio package catalog (negative)", async () => {
+  await testEnv.withSecurityRulesDisabled(async (context) => {
+    await setDoc(context.firestore().doc("gyms/gym-expired/packages/pkg-1"), { name: "10 Ders", sessionCount: 10, priceTl: 9600 });
+  });
+  const db = contextFor("admin-expired", { role: "admin", gymId: "gym-expired" }).firestore();
+  await assertFails(getDoc(doc(db, "gyms/gym-expired/packages/pkg-1")));
+});
+
+test("admin of a trial/active gym CAN still read a session (positive — sadece expired kilitleniyor)", async () => {
+  await testEnv.withSecurityRulesDisabled(async (context) => {
+    await setDoc(context.firestore().doc("sessions/s-a"), {
+      gymId: "gym-a",
+      trainerId: "trainer-a",
+      memberId: "member-a1",
+      startTime: hoursFromNow(48),
+      status: "planned",
+    });
+  });
+  const db = contextFor("admin-a", { role: "admin", gymId: "gym-a" }).firestore();
+  await assertSucceeds(getDoc(doc(db, "sessions/s-a")));
+});
+
+// --- subscriptionHistory / subscriptionTransactions — Admin SDK-only ---
+
+test("nobody (not even the gym's own admin) can read subscriptionHistory (negative)", async () => {
+  await testEnv.withSecurityRulesDisabled(async (context) => {
+    await setDoc(context.firestore().doc("gyms/gym-a/subscriptionHistory/h1"), { status: "active" });
+  });
+  const db = contextFor("admin-a", { role: "admin", gymId: "gym-a" }).firestore();
+  await assertFails(getDoc(doc(db, "gyms/gym-a/subscriptionHistory/h1")));
+});
+
+test("nobody can read subscriptionTransactions (negative)", async () => {
+  await testEnv.withSecurityRulesDisabled(async (context) => {
+    await setDoc(context.firestore().doc("subscriptionTransactions/tx-1"), { gymId: "gym-a" });
+  });
+  const db = contextFor("admin-a", { role: "admin", gymId: "gym-a" }).firestore();
+  await assertFails(getDoc(doc(db, "subscriptionTransactions/tx-1")));
+});
+
+test("admin cannot set trialUsed directly on their own gym (negative — sadece Admin SDK yazabilir)", async () => {
+  const db = contextFor("admin-a", { role: "admin", gymId: "gym-a" }).firestore();
+  await assertFails(setDoc(doc(db, "gyms/gym-a"), { trialUsed: true }, { merge: true }));
+});
+
+// --- subscriptionExempt — Console'dan elle "abonelik gerekmiyor" işaretlenmiş salonlar ---
+
+test("admin of a subscriptionExempt gym (no subscriptionStatus field at all) CAN create a session (positive)", async () => {
+  const db = contextFor("admin-exempt", { role: "admin", gymId: "gym-exempt" }).firestore();
+  await assertSucceeds(
+    setDoc(doc(db, "sessions/s-exempt"), {
+      gymId: "gym-exempt",
+      trainerId: "trainer-exempt",
+      memberId: "m1",
+      startTime: hoursFromNow(48),
+      status: "planned",
+    }),
+  );
+});
+
+test("admin of a subscriptionExempt gym CAN read a session (positive)", async () => {
+  await testEnv.withSecurityRulesDisabled(async (context) => {
+    await setDoc(context.firestore().doc("sessions/s-exempt"), {
+      gymId: "gym-exempt",
+      trainerId: "trainer-exempt",
+      memberId: "m1",
+      startTime: hoursFromNow(48),
+      status: "planned",
+    });
+  });
+  const db = contextFor("admin-exempt", { role: "admin", gymId: "gym-exempt" }).firestore();
+  await assertSucceeds(getDoc(doc(db, "sessions/s-exempt")));
+});
+
+test("admin cannot set subscriptionExempt directly on their own gym (negative — sadece Console/Admin SDK)", async () => {
+  const db = contextFor("admin-a", { role: "admin", gymId: "gym-a" }).firestore();
+  await assertFails(setDoc(doc(db, "gyms/gym-a"), { subscriptionExempt: true }, { merge: true }));
+});
+
+test("a gym with neither subscriptionStatus nor subscriptionExempt set still blocks reads (negative — güvenli varsayılan)", async () => {
+  await testEnv.withSecurityRulesDisabled(async (context) => {
+    await setDoc(context.firestore().doc("gyms/gym-blank"), { name: "Gym Blank" });
+    await setDoc(context.firestore().doc("users/admin-blank"), { role: "admin", gymId: "gym-blank" });
+  });
+  const db = contextFor("admin-blank", { role: "admin", gymId: "gym-blank" }).firestore();
+  await assertFails(
+    setDoc(doc(db, "sessions/s-blank"), {
+      gymId: "gym-blank",
+      trainerId: "trainer-blank",
+      memberId: "m1",
+      startTime: hoursFromNow(48),
+      status: "planned",
+    }),
   );
 });

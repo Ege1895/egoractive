@@ -31,10 +31,17 @@ class PhoneLoginPanel extends BasePanel {
     super.key,
     this.prefillPhoneDigits,
     this.successBanner,
+    this.errorBanner,
   });
 
   final String? prefillPhoneDigits;
   final String? successBanner;
+
+  /// Salon Abonelik ve Erişim Akışı — zaten oturum açmış bir antrenör/üyenin
+  /// salonu aboneliği inaktif olunca [main.dart]'ın erişim kapısı tarafından
+  /// otomatik çıkış yaptırılıp bu ekrana yönlendirildiğinde gösterilir
+  /// (`successBanner`'ın kırmızı/error eşdeğeri).
+  final String? errorBanner;
 
   @override
   ConsumerState<PhoneLoginPanel> createState() => _PhoneLoginPanelState();
@@ -107,6 +114,25 @@ class _PhoneLoginPanelState extends BasePanelState<PhoneLoginPanel> {
                     widget.successBanner!,
                     style: typography.bodyMedium.copyWith(
                       color: colors.onPrimaryContainer,
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.lg),
+              ],
+              if (widget.errorBanner != null) ...[
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(AppSpacing.md),
+                  decoration: BoxDecoration(
+                    color: colors.errorContainer,
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+                    border: Border.all(color: colors.error.withValues(alpha: 0.3)),
+                  ),
+                  child: Text(
+                    widget.errorBanner!,
+                    style: typography.bodyMedium.copyWith(
+                      color: colors.error,
                       fontSize: 14,
                     ),
                   ),

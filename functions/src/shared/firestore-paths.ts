@@ -95,3 +95,25 @@ export function feedbackCollection(gymId: string) {
 export function feedbackDoc(gymId: string, feedbackId: string) {
   return `${feedbackCollection(gymId)}/${feedbackId}`;
 }
+
+/** Salon Abonelik ve Erişim Akışı — abonelik geçmişi ledger'ı (Admin SDK-only). */
+export function subscriptionHistoryCollection(gymId: string) {
+  return `${gymDoc(gymId)}/subscriptionHistory`;
+}
+
+export function subscriptionHistoryDoc(gymId: string, entryId: string) {
+  return `${subscriptionHistoryCollection(gymId)}/${entryId}`;
+}
+
+/**
+ * Store transaction/purchase token'ından gymId'ye dönüş için lookup index'i
+ * (webhook'lar bildirimde sadece transaction/purchase token'ı alır, gymId'yi
+ * değil). Top-level, Admin SDK-only.
+ */
+export function subscriptionTransactionsCollection() {
+  return "subscriptionTransactions";
+}
+
+export function subscriptionTransactionDoc(transactionKey: string) {
+  return `${subscriptionTransactionsCollection()}/${transactionKey}`;
+}

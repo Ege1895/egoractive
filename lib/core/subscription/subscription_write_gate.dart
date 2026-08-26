@@ -25,8 +25,13 @@ Future<bool> ensureSubscriptionAllowsWrite(BuildContext context, WidgetRef ref) 
   final role = ref.read(currentRoleProvider).valueOrNull;
   if (role != AppRole.admin) return true;
 
-  final status = ref.read(subscriptionControllerProvider).status;
-  if (status == SubscriptionStatus.trial || status == SubscriptionStatus.active) return true;
+  final subscription = ref.read(subscriptionControllerProvider);
+  final status = subscription.status;
+  if (subscription.subscriptionExempt ||
+      status == SubscriptionStatus.trial ||
+      status == SubscriptionStatus.active) {
+    return true;
+  }
   if (!context.mounted) return false;
 
   await showDialog<void>(

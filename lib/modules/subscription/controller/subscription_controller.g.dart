@@ -7,7 +7,7 @@ part of 'subscription_controller.dart';
 // **************************************************************************
 
 String _$subscriptionStateForGymHash() =>
-    r'57e774a29cfcd20df63918a20c420cc79ad009cc';
+    r'cdf66ac32f2d0d78954934142eb17798684d48ed';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -30,24 +30,56 @@ class _SystemHash {
   }
 }
 
-/// See also [_subscriptionStateForGym].
-@ProviderFor(_subscriptionStateForGym)
-const _subscriptionStateForGymProvider = _SubscriptionStateForGymFamily();
+/// Salon Abonelik ve Erişim Akışı — `app_access.dart`'taki merkezi erişim
+/// kapısı da bunu izler; ikisi AYRI birer `watchState()` çağrısı (dolayısıyla
+/// ayrı birer Firestore listener'ı) açmak yerine bu TEK provider'ı paylaşır
+/// (Riverpod aynı provider'ı izleyen tüm taraflar için tek bir alttaki
+/// stream'i yeniden kullanır) — aksi halde admin oturumlarında aynı
+/// `gyms/{gymId}` dokümanı için (biri bu controller'dan, biri erişim
+/// kapısından) iki ayrı canlı dinleyici açık kalırdı.
+///
+/// Copied from [subscriptionStateForGym].
+@ProviderFor(subscriptionStateForGym)
+const subscriptionStateForGymProvider = SubscriptionStateForGymFamily();
 
-/// See also [_subscriptionStateForGym].
-class _SubscriptionStateForGymFamily
+/// Salon Abonelik ve Erişim Akışı — `app_access.dart`'taki merkezi erişim
+/// kapısı da bunu izler; ikisi AYRI birer `watchState()` çağrısı (dolayısıyla
+/// ayrı birer Firestore listener'ı) açmak yerine bu TEK provider'ı paylaşır
+/// (Riverpod aynı provider'ı izleyen tüm taraflar için tek bir alttaki
+/// stream'i yeniden kullanır) — aksi halde admin oturumlarında aynı
+/// `gyms/{gymId}` dokümanı için (biri bu controller'dan, biri erişim
+/// kapısından) iki ayrı canlı dinleyici açık kalırdı.
+///
+/// Copied from [subscriptionStateForGym].
+class SubscriptionStateForGymFamily
     extends Family<AsyncValue<SubscriptionState>> {
-  /// See also [_subscriptionStateForGym].
-  const _SubscriptionStateForGymFamily();
+  /// Salon Abonelik ve Erişim Akışı — `app_access.dart`'taki merkezi erişim
+  /// kapısı da bunu izler; ikisi AYRI birer `watchState()` çağrısı (dolayısıyla
+  /// ayrı birer Firestore listener'ı) açmak yerine bu TEK provider'ı paylaşır
+  /// (Riverpod aynı provider'ı izleyen tüm taraflar için tek bir alttaki
+  /// stream'i yeniden kullanır) — aksi halde admin oturumlarında aynı
+  /// `gyms/{gymId}` dokümanı için (biri bu controller'dan, biri erişim
+  /// kapısından) iki ayrı canlı dinleyici açık kalırdı.
+  ///
+  /// Copied from [subscriptionStateForGym].
+  const SubscriptionStateForGymFamily();
 
-  /// See also [_subscriptionStateForGym].
-  _SubscriptionStateForGymProvider call(String gymId) {
-    return _SubscriptionStateForGymProvider(gymId);
+  /// Salon Abonelik ve Erişim Akışı — `app_access.dart`'taki merkezi erişim
+  /// kapısı da bunu izler; ikisi AYRI birer `watchState()` çağrısı (dolayısıyla
+  /// ayrı birer Firestore listener'ı) açmak yerine bu TEK provider'ı paylaşır
+  /// (Riverpod aynı provider'ı izleyen tüm taraflar için tek bir alttaki
+  /// stream'i yeniden kullanır) — aksi halde admin oturumlarında aynı
+  /// `gyms/{gymId}` dokümanı için (biri bu controller'dan, biri erişim
+  /// kapısından) iki ayrı canlı dinleyici açık kalırdı.
+  ///
+  /// Copied from [subscriptionStateForGym].
+  SubscriptionStateForGymProvider call(String gymId) {
+    return SubscriptionStateForGymProvider(gymId);
   }
 
   @override
-  _SubscriptionStateForGymProvider getProviderOverride(
-    covariant _SubscriptionStateForGymProvider provider,
+  SubscriptionStateForGymProvider getProviderOverride(
+    covariant SubscriptionStateForGymProvider provider,
   ) {
     return call(provider.gymId);
   }
@@ -64,29 +96,45 @@ class _SubscriptionStateForGymFamily
       _allTransitiveDependencies;
 
   @override
-  String? get name => r'_subscriptionStateForGymProvider';
+  String? get name => r'subscriptionStateForGymProvider';
 }
 
-/// See also [_subscriptionStateForGym].
-class _SubscriptionStateForGymProvider
+/// Salon Abonelik ve Erişim Akışı — `app_access.dart`'taki merkezi erişim
+/// kapısı da bunu izler; ikisi AYRI birer `watchState()` çağrısı (dolayısıyla
+/// ayrı birer Firestore listener'ı) açmak yerine bu TEK provider'ı paylaşır
+/// (Riverpod aynı provider'ı izleyen tüm taraflar için tek bir alttaki
+/// stream'i yeniden kullanır) — aksi halde admin oturumlarında aynı
+/// `gyms/{gymId}` dokümanı için (biri bu controller'dan, biri erişim
+/// kapısından) iki ayrı canlı dinleyici açık kalırdı.
+///
+/// Copied from [subscriptionStateForGym].
+class SubscriptionStateForGymProvider
     extends AutoDisposeStreamProvider<SubscriptionState> {
-  /// See also [_subscriptionStateForGym].
-  _SubscriptionStateForGymProvider(String gymId)
+  /// Salon Abonelik ve Erişim Akışı — `app_access.dart`'taki merkezi erişim
+  /// kapısı da bunu izler; ikisi AYRI birer `watchState()` çağrısı (dolayısıyla
+  /// ayrı birer Firestore listener'ı) açmak yerine bu TEK provider'ı paylaşır
+  /// (Riverpod aynı provider'ı izleyen tüm taraflar için tek bir alttaki
+  /// stream'i yeniden kullanır) — aksi halde admin oturumlarında aynı
+  /// `gyms/{gymId}` dokümanı için (biri bu controller'dan, biri erişim
+  /// kapısından) iki ayrı canlı dinleyici açık kalırdı.
+  ///
+  /// Copied from [subscriptionStateForGym].
+  SubscriptionStateForGymProvider(String gymId)
     : this._internal(
         (ref) =>
-            _subscriptionStateForGym(ref as _SubscriptionStateForGymRef, gymId),
-        from: _subscriptionStateForGymProvider,
-        name: r'_subscriptionStateForGymProvider',
+            subscriptionStateForGym(ref as SubscriptionStateForGymRef, gymId),
+        from: subscriptionStateForGymProvider,
+        name: r'subscriptionStateForGymProvider',
         debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
             ? null
             : _$subscriptionStateForGymHash,
-        dependencies: _SubscriptionStateForGymFamily._dependencies,
+        dependencies: SubscriptionStateForGymFamily._dependencies,
         allTransitiveDependencies:
-            _SubscriptionStateForGymFamily._allTransitiveDependencies,
+            SubscriptionStateForGymFamily._allTransitiveDependencies,
         gymId: gymId,
       );
 
-  _SubscriptionStateForGymProvider._internal(
+  SubscriptionStateForGymProvider._internal(
     super._createNotifier, {
     required super.name,
     required super.dependencies,
@@ -100,13 +148,13 @@ class _SubscriptionStateForGymProvider
 
   @override
   Override overrideWith(
-    Stream<SubscriptionState> Function(_SubscriptionStateForGymRef provider)
+    Stream<SubscriptionState> Function(SubscriptionStateForGymRef provider)
     create,
   ) {
     return ProviderOverride(
       origin: this,
-      override: _SubscriptionStateForGymProvider._internal(
-        (ref) => create(ref as _SubscriptionStateForGymRef),
+      override: SubscriptionStateForGymProvider._internal(
+        (ref) => create(ref as SubscriptionStateForGymRef),
         from: from,
         name: null,
         dependencies: null,
@@ -124,7 +172,7 @@ class _SubscriptionStateForGymProvider
 
   @override
   bool operator ==(Object other) {
-    return other is _SubscriptionStateForGymProvider && other.gymId == gymId;
+    return other is SubscriptionStateForGymProvider && other.gymId == gymId;
   }
 
   @override
@@ -138,7 +186,7 @@ class _SubscriptionStateForGymProvider
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-mixin _SubscriptionStateForGymRef
+mixin SubscriptionStateForGymRef
     on AutoDisposeStreamProviderRef<SubscriptionState> {
   /// The parameter `gymId` of this provider.
   String get gymId;
@@ -146,15 +194,15 @@ mixin _SubscriptionStateForGymRef
 
 class _SubscriptionStateForGymProviderElement
     extends AutoDisposeStreamProviderElement<SubscriptionState>
-    with _SubscriptionStateForGymRef {
+    with SubscriptionStateForGymRef {
   _SubscriptionStateForGymProviderElement(super.provider);
 
   @override
-  String get gymId => (origin as _SubscriptionStateForGymProvider).gymId;
+  String get gymId => (origin as SubscriptionStateForGymProvider).gymId;
 }
 
 String _$subscriptionControllerHash() =>
-    r'7982866b60e4ea78e561ea364b11de237a026e6e';
+    r'e8c8482907646fa08807aed3427811f27efaf026';
 
 /// F6-1 — aktif salonun abonelik durumunu okur ve mağaza satın alma akışını
 /// başlatır. Satın alma tamamlandığında `verifySubscriptionPurchase`

@@ -193,6 +193,8 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
       case SubscriptionStatus.active:
         return _activeView(context, products, subscription, rc);
       case SubscriptionStatus.expired:
+      case SubscriptionStatus.pastDue:
+      case SubscriptionStatus.canceled:
         return _expiredView(context, products, subscription, rc);
       case SubscriptionStatus.trial:
       case SubscriptionStatus.none:

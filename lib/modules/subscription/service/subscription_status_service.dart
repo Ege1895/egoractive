@@ -33,6 +33,8 @@ class SubscriptionStatusService {
         startedAt: (data?['subscriptionStartedAt'] as Timestamp?)?.toDate(),
         expiresAt: (data?['subscriptionExpiresAt'] as Timestamp?)?.toDate(),
         productId: data?['subscriptionProductId'] as String?,
+        trialUsed: (data?['trialUsed'] as bool?) ?? false,
+        subscriptionExempt: (data?['subscriptionExempt'] as bool?) ?? false,
       );
     });
   }

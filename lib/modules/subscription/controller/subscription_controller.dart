@@ -9,9 +9,16 @@ import '../repository/subscription_repository.dart';
 
 part 'subscription_controller.g.dart';
 
+/// Salon Abonelik ve Erişim Akışı — `app_access.dart`'taki merkezi erişim
+/// kapısı da bunu izler; ikisi AYRI birer `watchState()` çağrısı (dolayısıyla
+/// ayrı birer Firestore listener'ı) açmak yerine bu TEK provider'ı paylaşır
+/// (Riverpod aynı provider'ı izleyen tüm taraflar için tek bir alttaki
+/// stream'i yeniden kullanır) — aksi halde admin oturumlarında aynı
+/// `gyms/{gymId}` dokümanı için (biri bu controller'dan, biri erişim
+/// kapısından) iki ayrı canlı dinleyici açık kalırdı.
 @riverpod
-Stream<SubscriptionState> _subscriptionStateForGym(
-  _SubscriptionStateForGymRef ref,
+Stream<SubscriptionState> subscriptionStateForGym(
+  SubscriptionStateForGymRef ref,
   String gymId,
 ) {
   return ref.watch(subscriptionRepositoryProvider).watchState(gymId);
@@ -46,7 +53,7 @@ class SubscriptionController extends _$SubscriptionController {
     final gymId = ref.watch(activeGymIdProvider).valueOrNull;
     final base = gymId == null
         ? const SubscriptionState()
-        : ref.watch(_subscriptionStateForGymProvider(gymId)).valueOrNull ??
+        : ref.watch(subscriptionStateForGymProvider(gymId)).valueOrNull ??
               const SubscriptionState();
     return base.copyWith(
       isPurchasing: _isPurchasing,

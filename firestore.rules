@@ -23,31 +23,54 @@ service cloud.firestore {
     // aynı kurala tabi.
     //
     // F6-1 — subscriptionStatus/subscriptionExpiresAt/subscriptionProductId/
-    // subscriptionPlatform/trialStartedAt admin'in normal yazma yetkisinin
-    // DIŞINDA tutulur: bu alanları sadece verifySubscriptionPurchase Cloud
-    // Function'ı (Admin SDK, kurallara tabi değil) değiştirebilir — yoksa bir
-    // admin kendi salonunu doğrudan "active" yaparak abonelik ücreti
-    // ödemeden premium'a geçebilirdi.
+    // subscriptionPlatform/trialStartedAt/trialUsed/subscriptionCancelAtPeriodEnd/
+    // subscriptionLastVerificationData/subscriptionLastVerificationPlatform/
+    // subscriptionExempt admin'in normal yazma yetkisinin DIŞINDA tutulur: bu
+    // alanları sadece verifySubscriptionPurchase / webhook / günlük yenileme
+    // Cloud Function'ları YA DA Firebase Console'dan elle (Admin SDK, kurallara
+    // tabi değil) değiştirilebilir — yoksa bir admin kendi salonunu doğrudan
+    // "active" yaparak, trialUsed'ı sıfırlayarak ya da subscriptionExempt'i
+    // kendi kendine `true` yaparak abonelik ücreti ödemeden premium'a
+    // geçebilirdi. `subscriptionExempt` BİLEREK sadece Console/Admin SDK'dan
+    // set edilebilecek şekilde bırakıldı — test/demo salonlarını ödeme
+    // almadan aktif tutmak için (bkz. `apply-subscription-update.ts` yorumu).
     function subscriptionFields() {
-      return ['subscriptionStatus', 'subscriptionExpiresAt', 'subscriptionProductId', 'subscriptionPlatform', 'trialStartedAt'];
+      return [
+        'subscriptionStatus', 'subscriptionExpiresAt', 'subscriptionProductId',
+        'subscriptionPlatform', 'trialStartedAt', 'trialUsed',
+        'subscriptionCancelAtPeriodEnd', 'subscriptionLastVerificationData',
+        'subscriptionLastVerificationPlatform', 'subscriptionExempt'
+      ];
     }
 
-    // F6-3 — deneme süresi dolan (trialExpiryCheck scheduled function
-    // 'trial'ı süresi dolunca 'expired'e çevirir) ya da aboneliği sona eren
-    // bir salon yeni içerik (üye/paket satışı/seans/grup dersi/etkinlik/
-    // gider/paket kataloğu) OLUŞTURAMAZ — mevcut kayıtları görüntüleme/
-    // düzenleme/silme etkilenmez. Client tarafında `subscription_write_gate.dart`
-    // aynı durumu proaktif kontrol edip "aboneliğini yenile" uyarısı
-    // gösteriyor, ama bu kural client atlatılsa bile geçerli olan gerçek
-    // güvenlik sınırı.
-    function gymSubscriptionAllowsWrite(gymId) {
-      return get(/databases/$(database)/documents/gyms/$(gymId)).data.subscriptionStatus in ['trial', 'active'];
+    // Salon Abonelik ve Erişim Akışı — abonelik `trial`/`active` değilken
+    // salonun TÜMÜ (admin dahil) normal veriye erişemez: sadece yeni içerik
+    // oluşturma değil, MEVCUT kayıtları görüntüleme de kesilir (önceki F6-3
+    // tasarımı sadece create'i engelliyordu, bu daha geniş kilitleme onun
+    // yerini alıyor). `gyms/{gymId}` dokümanının kendisi ve `users/{ownUid}`
+    // self-read'i BİLEREK bu kapsam dışında tutulur — client'ın durumu görüp
+    // doğru ekrana (abonelik/engellendi) yönlenebilmesi için gerekli asgari
+    // okuma. `subscriptionStatus` bir custom claim değil CANLI bir Firestore
+    // alanı olduğu için, buradaki her `get()` en güncel durumu okur — token
+    // yaşına bakılmaksızın erişim anında kesilir/açılır (ayrı bir
+    // sessionVersion/JWT geçersiz kılma mekanizmasına gerek yok).
+    // `subscriptionExempt == true` — Console'dan elle "abonelik gerekmiyor"
+    // işaretlenmiş test/demo salonları — durumdan bağımsız her zaman aktif
+    // sayılır.
+    function gymSubscriptionActive(gymId) {
+      let gym = get(/databases/$(database)/documents/gyms/$(gymId)).data;
+      // `.get(key, default)` kullanılıyor — `subscriptionExempt` yeni bir
+      // alan ve mevcut hiçbir salon dokümanında henüz yok; doğrudan `.`
+      // erişimi eksik alanlarda hataya (dolayısıyla reddedilen bir kurala)
+      // yol açar, `.get()` ise güvenle varsayılana düşer.
+      return gym.get('subscriptionExempt', false) == true ||
+        gym.get('subscriptionStatus', 'none') in ['trial', 'active'];
     }
 
     match /gyms/{gymId} {
       allow read: if isSignedIn() && myGymId() == gymId;
       allow create: if isSignedIn() && myRole() == 'admin' && myGymId() == gymId &&
-        request.resource.data.subscriptionStatus == 'trial';
+        !request.resource.data.keys().hasAny(subscriptionFields());
       allow update: if isSignedIn() && myRole() == 'admin' && myGymId() == gymId &&
         !request.resource.data.diff(resource.data).affectedKeys().hasAny(subscriptionFields());
       allow delete: if isSignedIn() && myRole() == 'admin' && myGymId() == gymId;
@@ -58,10 +81,23 @@ service cloud.firestore {
       // koleksiyonlar (ör. packages) burada isimle eşleniyor, genel bir
       // wildcard değil.
       match /packages/{packageId} {
-        allow read: if isSignedIn() && myGymId() == gymId;
-        allow create: if isSignedIn() && myRole() == 'admin' && myGymId() == gymId && gymSubscriptionAllowsWrite(gymId);
+        allow read: if isSignedIn() && myGymId() == gymId && gymSubscriptionActive(gymId);
+        allow create: if isSignedIn() && myRole() == 'admin' && myGymId() == gymId && gymSubscriptionActive(gymId);
         allow update, delete: if isSignedIn() && myRole() == 'admin' && myGymId() == gymId;
       }
+
+      // subscriptionHistory/{id} — abonelik geçmişi ledger'ı, sadece Admin
+      // SDK (verify/webhook/reverify) yazar; hiçbir client (admin dahil)
+      // okuyup yazamaz.
+      match /subscriptionHistory/{entryId} {
+        allow read, write: if false;
+      }
+    }
+
+    // subscriptionTransactions/{transactionKey} — store transaction/purchase
+    // token'ından gymId'ye dönüş için webhook lookup index'i. Sadece Admin SDK.
+    match /subscriptionTransactions/{transactionKey} {
+      allow read, write: if false;
     }
 
     // users/{uid} — F1-10 (telefon numarasıyla kendi kaydını arama, Admin
@@ -73,13 +109,13 @@ service cloud.firestore {
     match /users/{uid} {
       allow read: if isSignedIn() && (
         request.auth.uid == uid ||
-        (myRole() == 'admin' && resource.data.gymId == myGymId()) ||
-        (myRole() == 'trainer' && resource.data.trainerId == request.auth.uid)
+        (myRole() == 'admin' && resource.data.gymId == myGymId() && gymSubscriptionActive(myGymId())) ||
+        (myRole() == 'trainer' && resource.data.trainerId == request.auth.uid && gymSubscriptionActive(myGymId()))
       );
 
       allow create: if isSignedIn() && (
         request.auth.uid == uid ||
-        (myRole() == 'admin' && request.resource.data.gymId == myGymId() && gymSubscriptionAllowsWrite(myGymId()))
+        (myRole() == 'admin' && request.resource.data.gymId == myGymId() && gymSubscriptionActive(myGymId()))
       );
 
       allow update: if isSignedIn() && (
@@ -112,9 +148,10 @@ service cloud.firestore {
     // remainingSessions/packageEndDate alanları) okur, bu koleksiyona hiç
     // dokunmaz.
     match /memberPackages/{packageId} {
-      allow read, update, delete: if isSignedIn() && myRole() == 'admin' && resource.data.gymId == myGymId();
+      allow read: if isSignedIn() && myRole() == 'admin' && resource.data.gymId == myGymId() && gymSubscriptionActive(myGymId());
+      allow update, delete: if isSignedIn() && myRole() == 'admin' && resource.data.gymId == myGymId();
       allow create: if isSignedIn() && myRole() == 'admin' && request.resource.data.gymId == myGymId() &&
-        gymSubscriptionAllowsWrite(myGymId());
+        gymSubscriptionActive(myGymId());
     }
 
     // sessions/{sessionId} — F3-3. Oluşturma admin ekranlarından ya da
@@ -171,13 +208,13 @@ service cloud.firestore {
     // "tamamlandı/gelmedi" isteğinin sürekli reddedilmesinin asıl kök
     // nedeniydi (yazma kuralı değil, okuma kuralıydı).
     match /sessions/{sessionId} {
-      allow read: if isSignedIn() && (
+      allow read: if isSignedIn() && gymSubscriptionActive(myGymId()) && (
         (myRole() == 'admin' && resource.data.gymId == myGymId()) ||
         (myRole() == 'trainer' && resource.data.trainerId == request.auth.uid) ||
         (myRole() == 'member' && resource.data.memberId == request.auth.uid)
       );
       allow create: if isSignedIn() && request.resource.data.gymId == myGymId() &&
-        gymSubscriptionAllowsWrite(myGymId()) && (
+        gymSubscriptionActive(myGymId()) && (
           myRole() == 'admin' ||
           (myRole() == 'trainer' && request.resource.data.trainerId == request.auth.uid)
         );
@@ -202,7 +239,7 @@ service cloud.firestore {
     }
 
     match /measurements/{uid}/entries/{entryId} {
-      allow read, write: if isSignedIn() && (
+      allow read, write: if isSignedIn() && gymSubscriptionActive(myGymId()) && (
         request.auth.uid == uid ||
         (myRole() == 'admin' && targetUser(uid).gymId == myGymId()) ||
         (myRole() == 'trainer' && targetUser(uid).trainerId == request.auth.uid)
@@ -243,13 +280,13 @@ service cloud.firestore {
     }
 
     match /groupSessions/{sessionId} {
-      allow read: if isSignedIn() && resource.data.gymId == myGymId();
+      allow read: if isSignedIn() && resource.data.gymId == myGymId() && gymSubscriptionActive(myGymId());
       // Grup dersi/etkinlik oluşturma sadece admin'e ait — antrenör kendi
       // takviminden sadece birebir seans oluşturabiliyor (client'ta zaten
       // trainer_calendar_panel.dart'ın "+" butonu buna göre değiştirildi,
       // bu kural client atlatılsa bile geçerli olan gerçek sınır).
       allow create: if isSignedIn() && myRole() == 'admin' &&
-        request.resource.data.gymId == myGymId() && gymSubscriptionAllowsWrite(myGymId());
+        request.resource.data.gymId == myGymId() && gymSubscriptionActive(myGymId());
       allow update: if isSignedIn() && resource.data.gymId == myGymId() && (
         myRole() == 'admin' || myRole() == 'trainer' || isOwnAttendeeChange()
       );
@@ -258,9 +295,9 @@ service cloud.firestore {
 
     // events/{id} — F4-3. groupSessions ile aynı kontenjan kuralları.
     match /events/{eventId} {
-      allow read: if isSignedIn() && resource.data.gymId == myGymId();
+      allow read: if isSignedIn() && resource.data.gymId == myGymId() && gymSubscriptionActive(myGymId());
       allow create: if isSignedIn() && myRole() == 'admin' &&
-        request.resource.data.gymId == myGymId() && gymSubscriptionAllowsWrite(myGymId());
+        request.resource.data.gymId == myGymId() && gymSubscriptionActive(myGymId());
       allow update: if isSignedIn() && resource.data.gymId == myGymId() && (
         myRole() == 'admin' || myRole() == 'trainer' || isOwnAttendeeChange()
       );
@@ -271,9 +308,10 @@ service cloud.firestore {
     // (giriş ekranı F5-3'te gelecek). memberPackages ile aynı hassasiyet:
     // sadece kendi salonunun admin'i erişir.
     match /expenses/{expenseId} {
-      allow read, update, delete: if isSignedIn() && myRole() == 'admin' && resource.data.gymId == myGymId();
+      allow read: if isSignedIn() && myRole() == 'admin' && resource.data.gymId == myGymId() && gymSubscriptionActive(myGymId());
+      allow update, delete: if isSignedIn() && myRole() == 'admin' && resource.data.gymId == myGymId();
       allow create: if isSignedIn() && myRole() == 'admin' && request.resource.data.gymId == myGymId() &&
-        gymSubscriptionAllowsWrite(myGymId());
+        gymSubscriptionActive(myGymId());
     }
 
     // feedback/{id} — F5-4. Üye kendi geri bildirimini yazar (değiştiremez/
@@ -281,7 +319,7 @@ service cloud.firestore {
     // antrenöre hiç açılmıyor (F5-4 gizlilik notu: "antrenörüne isimsiz
     // iletilir" — bu app'te antrenör tarafında hiç gösterilmiyor).
     match /feedback/{feedbackId} {
-      allow read: if isSignedIn() && myRole() == 'admin' && resource.data.gymId == myGymId();
+      allow read: if isSignedIn() && myRole() == 'admin' && resource.data.gymId == myGymId() && gymSubscriptionActive(myGymId());
       allow create: if isSignedIn() && myRole() == 'member' &&
         request.resource.data.gymId == myGymId() &&
         request.resource.data.memberId == request.auth.uid;

@@ -112,6 +112,13 @@
       "description": "F6-3 — yeni bir salona trialStartedAt'ten itibaren tanınan ücretsiz deneme süresi (gün).",
       "valueType": "NUMBER"
     },
+    "cfg_require_subscription_onboarding": {
+      "defaultValue": {
+        "value": "false"
+      },
+      "description": "true iken yeni salon admin'i girişten hemen sonra zorunlu SubscriptionOnboardingPanel'e yönlendirilir (paket seçip abone olmadan atlanamaz). Mağaza ürünleri (ASC/Play Console) canlı olana kadar false tut, yoksa yeni adminler ekranda takılı kalır.",
+      "valueType": "BOOLEAN"
+    },
     "cfg_feature_flags": {
       "defaultValue": {
         "value": "{\"group_sessions_enabled\": true}"
@@ -1015,6 +1022,18 @@
     "lbl_auth_login_error_generic_en": {
       "defaultValue": {
         "value": "Could not log in. Check your connection and try again."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_login_error_subscription_inactive_tr": {
+      "defaultValue": {
+        "value": "Hesabınız şu anda aktif değil. Lütfen salonunuzla iletişime geçin."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_login_error_subscription_inactive_en": {
+      "defaultValue": {
+        "value": "Your account is not active right now. Please contact your gym."
       },
       "valueType": "STRING"
     },
@@ -6845,6 +6864,102 @@
     "lbl_subscription_no_products_en": {
       "defaultValue": {
         "value": "No purchasable subscription product is available right now."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_onboarding_title_tr": {
+      "defaultValue": {
+        "value": "Aboneliğini başlat"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_onboarding_title_en": {
+      "defaultValue": {
+        "value": "Start your subscription"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_onboarding_subtitle_tr": {
+      "defaultValue": {
+        "value": "Devam etmek için bir plan seç. {days} gün boyunca hiç ücret alınmaz, süre sonunda seçtiğin paket {store} üzerinden otomatik olarak devam eder."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_onboarding_subtitle_en": {
+      "defaultValue": {
+        "value": "Pick a plan to continue. You won't be charged for {days} days — after that, your selected plan renews automatically via {store}."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_onboarding_cta_tr": {
+      "defaultValue": {
+        "value": "{plan} ile {days} gün ücretsiz başlat"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_onboarding_cta_en": {
+      "defaultValue": {
+        "value": "Start {days}-day free trial with {plan}"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_onboarding_caption_tr": {
+      "defaultValue": {
+        "value": "Şimdi ücret alınmaz. İlk ödeme {days}. günde {store} hesabından çekilir."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_onboarding_caption_en": {
+      "defaultValue": {
+        "value": "You won't be charged today. Your first payment is taken on day {days} via {store}."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_onboarding_no_products_tr": {
+      "defaultValue": {
+        "value": "Planlar şu anda yüklenemiyor. Lütfen daha sonra tekrar dene."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_onboarding_no_products_en": {
+      "defaultValue": {
+        "value": "Plans can't be loaded right now. Please try again later."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_onboarding_subtitle_paid_only_tr": {
+      "defaultValue": {
+        "value": "Devam etmek için bir plan seç. Seçtiğin paket {store} üzerinden hemen başlar."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_onboarding_subtitle_paid_only_en": {
+      "defaultValue": {
+        "value": "Pick a plan to continue. Your selected plan starts right away via {store}."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_onboarding_cta_paid_only_tr": {
+      "defaultValue": {
+        "value": "{plan} ile abone ol"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_onboarding_cta_paid_only_en": {
+      "defaultValue": {
+        "value": "Subscribe with {plan}"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_onboarding_caption_paid_only_tr": {
+      "defaultValue": {
+        "value": "İlk ödeme hemen {store} hesabından çekilir."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_onboarding_caption_paid_only_en": {
+      "defaultValue": {
+        "value": "Your first payment is taken right away via {store}."
       },
       "valueType": "STRING"
     },

@@ -7,6 +7,20 @@ export interface VerifiedSubscription {
   isActive: boolean;
   /** Aboneliğin mağazadaki orijinal başlangıç tarihi — yenilemelerde değişmez. */
   startAtMs: number;
+  /**
+   * Salon Abonelik ve Erişim Akışı — bu işlem mağazanın "Free Trial"
+   * introductory offer'ı kapsamında mı gerçekleşti (Apple `is_trial_period`,
+   * Google `paymentState === 2`). `gyms/{gymId}.trialUsed` bunu true'ya
+   * çevirmek için okunur.
+   */
+  isTrialPeriod: boolean;
+  /**
+   * Store'un abonelik/işlem için verdiği KALICI kimlik (Apple
+   * `original_transaction_id`, Google'da doğrulamada kullanılan purchase
+   * token'ın kendisi) — `subscriptionTransactions/{transactionKey}` lookup
+   * index'inde webhook'ların gymId'yi bulabilmesi için saklanır.
+   */
+  transactionKey: string;
 }
 
 const APPLE_PRODUCTION_VERIFY_URL = "https://buy.itunes.apple.com/verifyReceipt";
@@ -43,6 +57,8 @@ export async function verifyAppleReceipt(params: {
     product_id: string;
     expires_date_ms: string;
     original_purchase_date_ms: string;
+    is_trial_period?: string;
+    original_transaction_id: string;
   }>;
   const matching = latestReceipts
     .filter((entry) => entry.product_id === params.productId)
@@ -54,7 +70,13 @@ export async function verifyAppleReceipt(params: {
 
   const expiresAtMs = Number(matching.expires_date_ms);
   const startAtMs = Number(matching.original_purchase_date_ms);
-  return { expiresAtMs, isActive: expiresAtMs > Date.now(), startAtMs };
+  return {
+    expiresAtMs,
+    isActive: expiresAtMs > Date.now(),
+    startAtMs,
+    isTrialPeriod: matching.is_trial_period === "true",
+    transactionKey: matching.original_transaction_id,
+  };
 }
 
 async function fetchAppleVerify(url: string, body: string): Promise<{ status: number; latest_receipt_info?: unknown }> {
@@ -88,8 +110,19 @@ export async function verifyGooglePurchase(params: {
     throw new Error(`Google Play doğrulaması başarısız (HTTP ${res.status}).`);
   }
 
-  const data = (await res.json()) as { expiryTimeMillis: string; startTimeMillis: string };
+  const data = (await res.json()) as {
+    expiryTimeMillis: string;
+    startTimeMillis: string;
+    paymentState?: number;
+  };
   const expiresAtMs = Number(data.expiryTimeMillis);
   const startAtMs = Number(data.startTimeMillis);
-  return { expiresAtMs, isActive: expiresAtMs > Date.now(), startAtMs };
+  return {
+    expiresAtMs,
+    isActive: expiresAtMs > Date.now(),
+    startAtMs,
+    // paymentState: 2 = free trial (Play Developer API SubscriptionPurchase).
+    isTrialPeriod: data.paymentState === 2,
+    transactionKey: params.purchaseToken,
+  };
 }
