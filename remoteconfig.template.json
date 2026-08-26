@@ -206,6 +206,54 @@
       },
       "valueType": "STRING"
     },
+    "lbl_notif_package_ending_soon_title_tr": {
+      "defaultValue": {
+        "value": "⏳ Paketin bitmek üzere"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notif_package_ending_soon_title_en": {
+      "defaultValue": {
+        "value": "⏳ Your package is running low"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notif_package_ending_soon_body_tr": {
+      "defaultValue": {
+        "value": "{remaining} ders hakkın kaldı. Yeni paket için salonunla iletişime geç."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notif_package_ending_soon_body_en": {
+      "defaultValue": {
+        "value": "You have {remaining} sessions left. Contact your gym to get a new package."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notif_package_none_title_tr": {
+      "defaultValue": {
+        "value": "📦 Paketin bitti"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notif_package_none_title_en": {
+      "defaultValue": {
+        "value": "📦 Your package has ended"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notif_package_none_body_tr": {
+      "defaultValue": {
+        "value": "Ders hakkın kalmadı. Devam edebilmek için yeni bir paket almalısın."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notif_package_none_body_en": {
+      "defaultValue": {
+        "value": "You have no sessions left. Get a new package to keep training."
+      },
+      "valueType": "STRING"
+    },
     "lbl_notif_feedback_reminder_title_tr": {
       "defaultValue": {
         "value": "💬 Bu ay nasıl geçti?"

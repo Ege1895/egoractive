@@ -138,6 +138,18 @@ abstract final class RemoteConfigKeys {
       'lbl_notif_session_completion_title';
   static const notifSessionCompletionBody = 'lbl_notif_session_completion_body';
 
+  /// Üyenin kalan ders toplamı (remainingSessions+plannedSessionsCount)
+  /// admin Üyeler listesindeki "Bitiyor"/"Paketi yok" eşiğini aşağı doğru
+  /// geçtiğinde `onMemberPackageQuotaChanged` Cloud Function'ının üyeye
+  /// gönderdiği push metinleri. `{remaining}` yer tutucusu (sadece
+  /// endingSoon metninde) fonksiyon tarafında değişir.
+  static const notifPackageEndingSoonTitle =
+      'lbl_notif_package_ending_soon_title';
+  static const notifPackageEndingSoonBody =
+      'lbl_notif_package_ending_soon_body';
+  static const notifPackageNoneTitle = 'lbl_notif_package_none_title';
+  static const notifPackageNoneBody = 'lbl_notif_package_none_body';
+
   /// F5-4 — feedbackReminderCheck Cloud Function'ının üyelere gönderdiği
   /// push metni.
   static const notifFeedbackReminderTitle = 'lbl_notif_feedback_reminder_title';
@@ -1352,6 +1364,12 @@ class RemoteConfigService {
     'lbl_notif_session_completion_title_tr': '✅ Dersini onaylar mısın?',
     'lbl_notif_session_completion_body_tr':
         '{memberName} ile dersin bitti. Tamamlandı mı, yoksa üye gelmedi mi?',
+    'lbl_notif_package_ending_soon_title_tr': '⏳ Paketin bitmek üzere',
+    'lbl_notif_package_ending_soon_body_tr':
+        '{remaining} ders hakkın kaldı. Yeni paket için salonunla iletişime geç.',
+    'lbl_notif_package_none_title_tr': '📦 Paketin bitti',
+    'lbl_notif_package_none_body_tr':
+        'Ders hakkın kalmadı. Devam edebilmek için yeni bir paket almalısın.',
     'lbl_notif_feedback_reminder_title_tr': '💬 Bu ay nasıl geçti?',
     'lbl_notif_feedback_reminder_body_tr':
         'Deneyimini bizimle paylaşır mısın? 1 dakikanı alır.',
@@ -2117,6 +2135,12 @@ class RemoteConfigService {
     'lbl_notif_session_completion_title_en': '✅ Can you confirm your session?',
     'lbl_notif_session_completion_body_en':
         'Your session with {memberName} has ended. Was it completed, or did they not show up?',
+    'lbl_notif_package_ending_soon_title_en': '⏳ Your package is running low',
+    'lbl_notif_package_ending_soon_body_en':
+        'You have {remaining} sessions left. Contact your gym to get a new package.',
+    'lbl_notif_package_none_title_en': '📦 Your package has ended',
+    'lbl_notif_package_none_body_en':
+        'You have no sessions left. Get a new package to keep training.',
     'lbl_notif_feedback_reminder_title_en': '💬 How was your month?',
     'lbl_notif_feedback_reminder_body_en':
         'Would you share your experience with us? It only takes a minute.',
