@@ -105,6 +105,10 @@ export const signupGymAdmin = onCall(async (request) => {
     // başlatana kadar `subscriptionStatus` alanı yok = SubscriptionStatus.none
     // (bkz. subscription_status_service.dart). O ekranda seçtiği pakete
     // `verifySubscriptionPurchase` (F6-1d) ile abone olunca "active" yazılır.
+    // `subscriptionExempt` bilerek false yazılıyor (varsayılan davranışla
+    // aynı sonuç, ama Console'da alanı görünür/tutarlı kılmak için) — bunu
+    // sonradan sadece Console/Admin SDK'dan true'ya çevirebilirsin.
+    subscriptionExempt: false,
   });
 
   const userRef = firestore.collection(usersCollection()).doc();

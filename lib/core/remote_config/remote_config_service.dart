@@ -58,10 +58,11 @@ abstract final class RemoteConfigKeys {
   /// `true` iken yeni oluşturulan bir salonun admin'i, girişten hemen sonra
   /// zorunlu [SubscriptionOnboardingPanel]'e (geri butonu yok, pakete abone
   /// olmadan atlanamaz) yönlendirilir. Mağaza ürünleri (App Store Connect/
-  /// Play Console) henüz canlıya alınmadıysa bu ekranda hiç ürün listelenmez
-  /// ve admin sonsuza kadar takılı kalır — o yüzden mağaza kurulumu
-  /// tamamlanana kadar Console'dan `false` yapılabilir (test amaçlı, bkz.
-  /// `allowPastDatetimeCreation` ile aynı desen). Prod'da `true` olmalı.
+  /// Play Console) henüz canlıya alınmadıysa `SubscriptionPurchaseService`
+  /// mock veriyle açar (bkz. `mockSubscriptionProducts`) — ekran boş
+  /// kalmaz, tasarım/test amaçlı görüntülenip gezilebilir; gerçek satın alma
+  /// denemesi güvenle başarısız olur. Gerekirse test amaçlı Console'dan
+  /// `false` yapılabilir (`allowPastDatetimeCreation` ile aynı desen).
   static const requireSubscriptionOnboarding =
       'cfg_require_subscription_onboarding';
 
@@ -1334,7 +1335,7 @@ class RemoteConfigService {
     RemoteConfigKeys.feedbackReminderDayOfMonth: -1,
     RemoteConfigKeys.freeVersionAdsEnabled: true,
     RemoteConfigKeys.trialDurationDays: 14,
-    RemoteConfigKeys.requireSubscriptionOnboarding: false,
+    RemoteConfigKeys.requireSubscriptionOnboarding: true,
     RemoteConfigKeys.featureFlags: '{"group_sessions_enabled": true}',
     RemoteConfigKeys.badgeCriteria: _defaultBadgeCriteriaJson,
     RemoteConfigKeys.expenseCategories: _defaultExpenseCategoriesJson,

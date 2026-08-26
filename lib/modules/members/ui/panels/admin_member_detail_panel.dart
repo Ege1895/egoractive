@@ -479,6 +479,20 @@ class _AdminMemberDetailPanelState
                     ),
                   ),
                   const SizedBox(height: AppSpacing.lg),
+                  Text(
+                    ref.watch(
+                      rcTextProvider(
+                        RemoteConfigKeys.membersDetailBadgesSectionHeader,
+                      ),
+                    ),
+                    style: typography.caption.copyWith(
+                      color: colors.onSurfaceMuted,
+                      letterSpacing: 1.2,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                  _MemberBadgesRow(memberId: widget.memberId),
+                  const SizedBox(height: AppSpacing.lg),
                   AppButton(
                     label: ref.watch(
                       rcTextProvider(
@@ -495,20 +509,6 @@ class _AdminMemberDetailPanelState
                           ),
                         ),
                   ),
-                  const SizedBox(height: AppSpacing.lg),
-                  Text(
-                    ref.watch(
-                      rcTextProvider(
-                        RemoteConfigKeys.membersDetailBadgesSectionHeader,
-                      ),
-                    ),
-                    style: typography.caption.copyWith(
-                      color: colors.onSurfaceMuted,
-                      letterSpacing: 1.2,
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.sm),
-                  _MemberBadgesRow(memberId: widget.memberId),
                   const SizedBox(height: AppSpacing.lg),
                   InkWell(
                     borderRadius: BorderRadius.circular(AppSpacing.radiusInner),

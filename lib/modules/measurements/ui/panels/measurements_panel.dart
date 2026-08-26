@@ -468,22 +468,35 @@ class _AvatarViewState extends ConsumerState<_AvatarView> {
           // kartı normal şekilde o metriğin giriş alanını gösterir.
           Padding(
             padding: const EdgeInsets.only(bottom: AppSpacing.md),
-            child: Row(
-              children: [
-                _MetricChip(
-                  label: MeasurementMetric.kilo.label,
-                  selected: state.selectedMetric == MeasurementMetric.kilo,
-                  onTap: () => controller.selectPoint(MeasurementMetric.kilo),
-                ),
-                const SizedBox(width: AppSpacing.sm),
-                _MetricChip(
-                  label: MeasurementMetric.yagOrani.label,
-                  selected:
-                      state.selectedMetric == MeasurementMetric.yagOrani,
-                  onTap: () =>
-                      controller.selectPoint(MeasurementMetric.yagOrani),
-                ),
-              ],
+            child: Container(
+              padding: const EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                color: colors.surface,
+                border: Border.all(color: colors.outline),
+                borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: _MetricChip(
+                      label: MeasurementMetric.kilo.label,
+                      selected:
+                          state.selectedMetric == MeasurementMetric.kilo,
+                      onTap: () =>
+                          controller.selectPoint(MeasurementMetric.kilo),
+                    ),
+                  ),
+                  Expanded(
+                    child: _MetricChip(
+                      label: MeasurementMetric.yagOrani.label,
+                      selected:
+                          state.selectedMetric == MeasurementMetric.yagOrani,
+                      onTap: () =>
+                          controller.selectPoint(MeasurementMetric.yagOrani),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
           Expanded(

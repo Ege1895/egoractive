@@ -114,9 +114,9 @@
     },
     "cfg_require_subscription_onboarding": {
       "defaultValue": {
-        "value": "false"
+        "value": "true"
       },
-      "description": "true iken yeni salon admin'i girişten hemen sonra zorunlu SubscriptionOnboardingPanel'e yönlendirilir (paket seçip abone olmadan atlanamaz). Mağaza ürünleri (ASC/Play Console) canlı olana kadar false tut, yoksa yeni adminler ekranda takılı kalır.",
+      "description": "true iken yeni salon admin'i girişten hemen sonra zorunlu SubscriptionOnboardingPanel'e yönlendirilir (paket seçip abone olmadan atlanamaz). Mağaza ürünleri (ASC/Play Console) canlı olmasa bile mock veriyle açılır (tasarım/test amaçlı) — gerekirse test için Console'dan false yapılabilir.",
       "valueType": "BOOLEAN"
     },
     "cfg_feature_flags": {
