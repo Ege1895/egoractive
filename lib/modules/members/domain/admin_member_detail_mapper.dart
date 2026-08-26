@@ -32,7 +32,11 @@ AdminMemberDetail adminMemberDetailFromDoc(
 ) {
   final data = doc.data() ?? const {};
   final name = (data['name'] as String?)?.trim() ?? '';
-  final remainingSessions = (data['remainingSessions'] as num?)?.toInt() ?? 0;
+  // "Kalan ders" — bkz. admin_member_summary_mapper.dart: henüz
+  // planlanmamış hak + hâlâ takvimde bekleyen (tamamlanmamış) seans sayısı.
+  final unplanned = (data['remainingSessions'] as num?)?.toInt() ?? 0;
+  final planned = (data['plannedSessionsCount'] as num?)?.toInt() ?? 0;
+  final remainingSessions = unplanned + planned;
   final packageEndDateIso = data['packageEndDate'] as String?;
   final packageEndDate = packageEndDateIso == null
       ? null

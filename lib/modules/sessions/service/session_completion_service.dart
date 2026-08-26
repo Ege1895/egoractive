@@ -36,15 +36,45 @@ class SessionCompletionService {
   /// durumu sadece raporlama amaçlı, kotayı etkilemiyor — üye rezervasyonu
   /// yaptığında hakkı zaten harcanmış sayılıyor, gelip gelmemesi bunu
   /// değiştirmiyor.
+  ///
+  /// `plannedSessionsCount` burada düşülür — bu seans artık "takvimde
+  /// bekleyen" değil, tamamlanmış sayılıyor. Sadece session hâlâ
+  /// `planned` durumundaysa düşülür (transaction içinde okunuyor); admin
+  /// aynı seansın attendance'ını sonradan düzeltirse (completed→completed)
+  /// tekrar düşülmez.
   Future<void> setAttendance({
     required String sessionId,
     required String memberId,
     required bool attended,
   }) async {
-    await FirebaseFirestore.instance
-        .collection('sessions')
-        .doc(sessionId)
-        .update({'status': 'completed', 'attended': attended});
+    final firestore = FirebaseFirestore.instance;
+    final sessionRef = firestore.collection('sessions').doc(sessionId);
+    final memberRef = firestore.collection('users').doc(memberId);
+
+    await firestore.runTransaction((transaction) async {
+      // Firestore transaction kuralı: tüm okumalar tüm yazmalardan önce
+      // yapılmalı — bu yüzden memberRef koşullu de olsa write'lardan
+      // önce okunuyor.
+      final sessionSnapshot = await transaction.get(sessionRef);
+      final wasPlanned = sessionSnapshot.data()?['status'] == 'planned';
+      final memberSnapshot = wasPlanned
+          ? await transaction.get(memberRef)
+          : null;
+
+      transaction.update(sessionRef, {
+        'status': 'completed',
+        'attended': attended,
+      });
+      if (memberSnapshot != null) {
+        final planned =
+            (memberSnapshot.data()?['plannedSessionsCount'] as num?)
+                ?.toInt() ??
+            0;
+        transaction.update(memberRef, {
+          'plannedSessionsCount': planned > 0 ? planned - 1 : 0,
+        });
+      }
+    });
 
     if (attended) {
       await _analytics.logEvent(

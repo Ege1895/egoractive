@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../core/remote_config/remote_config_service.dart';
 import '../../../core/theme/theme_controller.dart';
 import '../domain/admin_member_summary.dart';
 import '../domain/admin_member_summary_mapper.dart';
@@ -18,12 +19,24 @@ part 'admin_members_controller.g.dart';
 /// provider sadece o üç tüketici için hâlâ geçerli.
 @riverpod
 Stream<List<AdminMemberSummary>> _membersForGym(_MembersForGymRef ref, String gymId) {
+  final endingSoonThreshold = ref
+      .watch(remoteConfigServiceProvider)
+      .memberEndingSoonSessionsThreshold;
   return FirebaseFirestore.instance
       .collection('users')
       .where('gymId', isEqualTo: gymId)
       .where('role', isEqualTo: 'member')
       .snapshots()
-      .map((snapshot) => snapshot.docs.map(adminMemberSummaryFromDoc).toList());
+      .map(
+        (snapshot) => snapshot.docs
+            .map(
+              (doc) => adminMemberSummaryFromDoc(
+                doc,
+                endingSoonThreshold: endingSoonThreshold,
+              ),
+            )
+            .toList(),
+      );
 }
 
 /// Üye detayı/seans oluşturma/bildirim gönderme ekranlarının kullandığı,

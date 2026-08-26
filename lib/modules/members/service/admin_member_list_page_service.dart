@@ -31,13 +31,21 @@ class AdminMemberListPageService {
   Future<AdminMemberListPage> loadPage(
     String gymId, {
     DocumentSnapshot<Map<String, dynamic>>? startAfter,
+    required int endingSoonThreshold,
   }) async {
     var query = _baseQuery(gymId).limit(adminMemberListPageSize);
     if (startAfter != null) query = query.startAfterDocument(startAfter);
 
     final snapshot = await query.get();
     return AdminMemberListPage(
-      items: snapshot.docs.map(adminMemberSummaryFromDoc).toList(),
+      items: snapshot.docs
+          .map(
+            (doc) => adminMemberSummaryFromDoc(
+              doc,
+              endingSoonThreshold: endingSoonThreshold,
+            ),
+          )
+          .toList(),
       lastDocument: snapshot.docs.isEmpty ? startAfter : snapshot.docs.last,
       hasMore: snapshot.docs.length == adminMemberListPageSize,
     );
@@ -57,8 +65,9 @@ class AdminMemberListPageService {
   /// (telefon numarası ya da isim ortası araması desteklenmiyor).
   Future<List<AdminMemberSummary>> searchByNamePrefix(
     String gymId,
-    String prefix,
-  ) async {
+    String prefix, {
+    required int endingSoonThreshold,
+  }) async {
     final normalized = prefix.toLowerCase();
     final snapshot = await FirebaseFirestore.instance
         .collection('users')
@@ -69,7 +78,14 @@ class AdminMemberListPageService {
         .endAt(['$normalized'])
         .limit(adminMemberListSearchLimit)
         .get();
-    return snapshot.docs.map(adminMemberSummaryFromDoc).toList();
+    return snapshot.docs
+        .map(
+          (doc) => adminMemberSummaryFromDoc(
+            doc,
+            endingSoonThreshold: endingSoonThreshold,
+          ),
+        )
+        .toList();
   }
 
   Query<Map<String, dynamic>> _baseQuery(String gymId) {

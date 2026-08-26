@@ -123,8 +123,10 @@ service cloud.firestore {
         (myRole() == 'admin' &&
           resource.data.gymId == myGymId() &&
           request.resource.data.gymId == myGymId()) ||
-        // F3-5 — antrenör, ders tamamlama transaction'ının parçası olarak
-        // üyenin SADECE remainingSessions alanını düşürür. Bunu üyenin O
+        // F3-5 — antrenör, seans oluşturma/iptal/tamamlama transaction'ının
+        // parçası olarak üyenin SADECE remainingSessions ve
+        // plannedSessionsCount alanlarını günceller (bkz.
+        // SessionsWriteService, SessionCompletionService). Bunu üyenin O
         // ANKİ (resource.data.trainerId) atanmış antrenörüyle sınırlamak
         // hataydı: üyenin antrenörü değiştirildiğinde ya da tamamlanan seans
         // üyenin GÜNCEL atanmış antrenöründen farklı bir antrenöre aitse
@@ -136,7 +138,7 @@ service cloud.firestore {
         // şartı yeterli.
         (myRole() == 'trainer' &&
           resource.data.gymId == myGymId() &&
-          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['remainingSessions']))
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['remainingSessions', 'plannedSessionsCount']))
       );
 
       allow delete: if isSignedIn() && myRole() == 'admin' && resource.data.gymId == myGymId();

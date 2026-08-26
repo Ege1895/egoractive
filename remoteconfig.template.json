@@ -28,6 +28,13 @@
       "description": "Üye anasayfasındaki taksit listesinde bir taksitin son ödeme tarihine kaç gün kala (veya geçmişse) kırmızı 'Ödeme yaklaşıyor' gösterileceği.",
       "valueType": "NUMBER"
     },
+    "cfg_member_ending_soon_sessions_threshold": {
+      "defaultValue": {
+        "value": "3"
+      },
+      "description": "Admin Üyeler listesinde bir üyenin (planlanmış+planlanmamış) kalan ders sayısı kaç veya altındaysa 'Bitiyor' rozeti/filtresine düşeceği.",
+      "valueType": "NUMBER"
+    },
     "cfg_cancellation_deadline_hours": {
       "defaultValue": {
         "value": "24"

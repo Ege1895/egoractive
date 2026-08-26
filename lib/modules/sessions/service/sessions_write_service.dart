@@ -58,6 +58,12 @@ class SessionsWriteService {
     // değil) — üyenin kotası her zaman "rezerve edilmiş" seans sayısını
     // yansıtmalı. Aynı transaction içinde okunup düşülüyor ki eşzamanlı
     // iki oluşturma isteği aynı son hakkı iki kez tüketemesin.
+    //
+    // `plannedSessionsCount`, `remainingSessions`'ın tam tersi bir sayaç:
+    // henüz planlanmamış "havuz" değil, ŞU AN takvimde duran (planned,
+    // henüz tamamlanmamış/iptal edilmemiş) seans sayısı. Üyeler listesinde
+    // gösterilen "Kalan ders" ikisinin toplamı — sadece gerçekten
+    // tamamlanmış dersler düşülüyor (bkz. admin_member_summary_mapper.dart).
     await firestore.runTransaction((transaction) async {
       final memberSnapshot = await transaction.get(memberRef);
       final remaining =
@@ -65,6 +71,9 @@ class SessionsWriteService {
       if (remaining <= 0) {
         throw InsufficientSessionsException(memberName);
       }
+      final planned =
+          (memberSnapshot.data()?['plannedSessionsCount'] as num?)?.toInt() ??
+          0;
       transaction.set(sessionRef, {
         'gymId': gymId,
         'trainerId': trainerId,
@@ -78,7 +87,10 @@ class SessionsWriteService {
         'completionPushSent': false,
         'createdAt': FieldValue.serverTimestamp(),
       });
-      transaction.update(memberRef, {'remainingSessions': remaining - 1});
+      transaction.update(memberRef, {
+        'remainingSessions': remaining - 1,
+        'plannedSessionsCount': planned + 1,
+      });
     });
   }
 
@@ -162,17 +174,25 @@ class SessionsWriteService {
 
       DocumentReference<Map<String, dynamic>>? memberRef;
       var remaining = 0;
+      var planned = 0;
       if (shouldRefund) {
         memberRef = firestore.collection('users').doc(memberId);
         final memberSnapshot = await transaction.get(memberRef);
         remaining =
             (memberSnapshot.data()?['remainingSessions'] as num?)?.toInt() ??
             0;
+        planned =
+            (memberSnapshot.data()?['plannedSessionsCount'] as num?)
+                ?.toInt() ??
+            0;
       }
 
       transaction.update(sessionRef, {'status': 'cancelled'});
       if (memberRef != null) {
-        transaction.update(memberRef, {'remainingSessions': remaining + 1});
+        transaction.update(memberRef, {
+          'remainingSessions': remaining + 1,
+          'plannedSessionsCount': planned > 0 ? planned - 1 : 0,
+        });
       }
     });
 

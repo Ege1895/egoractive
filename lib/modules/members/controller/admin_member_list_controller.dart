@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../core/remote_config/remote_config_service.dart';
 import '../../../core/theme/theme_controller.dart';
 import '../domain/admin_member_list_state.dart';
 import '../service/admin_member_list_page_service.dart';
@@ -40,7 +41,11 @@ class AdminMemberListController extends _$AdminMemberListController {
     try {
       final page = await ref
           .read(adminMemberListPageServiceProvider)
-          .loadPage(gymId, startAfter: _lastDocument);
+          .loadPage(
+            gymId,
+            startAfter: _lastDocument,
+            endingSoonThreshold: _endingSoonThreshold(),
+          );
       _lastDocument = page.lastDocument;
       state = state.copyWith(
         items: [...state.items, ...page.items],
@@ -77,7 +82,11 @@ class AdminMemberListController extends _$AdminMemberListController {
     try {
       final results = await ref
           .read(adminMemberListPageServiceProvider)
-          .searchByNamePrefix(gymId, trimmed);
+          .searchByNamePrefix(
+            gymId,
+            trimmed,
+            endingSoonThreshold: _endingSoonThreshold(),
+          );
       state = state.copyWith(searchResults: results, isSearching: false);
     } on FirebaseException catch (e) {
       if (e.code == 'permission-denied') {
@@ -110,7 +119,7 @@ class AdminMemberListController extends _$AdminMemberListController {
     try {
       final page = await ref
           .read(adminMemberListPageServiceProvider)
-          .loadPage(gymId);
+          .loadPage(gymId, endingSoonThreshold: _endingSoonThreshold());
       _lastDocument = page.lastDocument;
       state = state.copyWith(
         items: page.items,
@@ -140,4 +149,7 @@ class AdminMemberListController extends _$AdminMemberListController {
       );
     }
   }
+
+  int _endingSoonThreshold() =>
+      ref.read(remoteConfigServiceProvider).memberEndingSoonSessionsThreshold;
 }

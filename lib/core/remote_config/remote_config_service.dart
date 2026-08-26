@@ -30,6 +30,12 @@ abstract final class RemoteConfigKeys {
   /// gösterileceği.
   static const installmentDueSoonDays = 'cfg_installment_due_soon_days';
 
+  /// Admin Üyeler listesinde bir üyenin "Bitiyor" filtresine/rozetine
+  /// düşmesi için kalan ders sayısının (planlanmış + henüz planlanmamış
+  /// toplamı) kaç veya altında olması gerektiği. 0 her zaman "Paketi yok".
+  static const memberEndingSoonSessionsThreshold =
+      'cfg_member_ending_soon_sessions_threshold';
+
   /// F4-2/F4-3 — grup dersi/etkinlikte katılım her zaman açık (bkz.
   /// discover_item.dart canLeave), ama bir kez katılınca "Katılmaktan
   /// Vazgeç" başlangıca kaç saat kalana kadar aktif — sonrasında sadece
@@ -1324,6 +1330,7 @@ class RemoteConfigService {
     RemoteConfigKeys.defaultGroupSessionCapacity: 6,
     RemoteConfigKeys.groupSessionCapacityMax: 20,
     RemoteConfigKeys.installmentDueSoonDays: 3,
+    RemoteConfigKeys.memberEndingSoonSessionsThreshold: 3,
     RemoteConfigKeys.eventLeaveLockHoursBefore: 24,
     RemoteConfigKeys.groupSessionLeaveLockHoursBefore: 8,
     RemoteConfigKeys.cancellationDeadlineHours: 24,
@@ -3032,6 +3039,9 @@ class RemoteConfigService {
 
   int get installmentDueSoonDays =>
       getInt(RemoteConfigKeys.installmentDueSoonDays);
+
+  int get memberEndingSoonSessionsThreshold =>
+      getInt(RemoteConfigKeys.memberEndingSoonSessionsThreshold);
 
   /// Etkinlikte "Katılmaktan Vazgeç" başlangıca kaç saat kalana kadar aktif.
   int get eventLeaveLockHoursBefore =>

@@ -609,6 +609,22 @@ test("trainer cannot decrement remainingSessions on a member not assigned to the
   await assertFails(updateDoc(doc(db, "users/member-a2"), { remainingSessions: 4 }));
 });
 
+test("trainer can update both remainingSessions and plannedSessionsCount together (positive — seans oluşturma/tamamlama sayaçları)", async () => {
+  await testEnv.withSecurityRulesDisabled(async (context) => {
+    await setDoc(context.firestore().doc("users/member-a1"), {
+      role: "member",
+      gymId: "gym-a",
+      trainerId: "trainer-a",
+      remainingSessions: 5,
+      plannedSessionsCount: 2,
+    });
+  });
+  const db = contextFor("trainer-a", { role: "trainer", gymId: "gym-a" }).firestore();
+  await assertSucceeds(
+    updateDoc(doc(db, "users/member-a1"), { remainingSessions: 4, plannedSessionsCount: 3 }),
+  );
+});
+
 test("trainer cannot change other fields while updating remainingSessions (negative — sadece o alan)", async () => {
   await testEnv.withSecurityRulesDisabled(async (context) => {
     await setDoc(context.firestore().doc("users/member-a1"), {
