@@ -62,17 +62,25 @@ class SubscriptionProduct with _$SubscriptionProduct {
 /// gerçek yanıt yerine bunu döner — abonelik ekranları böylece boş kalmaz,
 /// görüntülenip test edilebilir. Bu ürünlerle gerçek satın alma denemesi
 /// (mağazada karşılığı olmadığı için) güvenle başarısız olur.
-final mockSubscriptionProducts = [
-  const SubscriptionProduct(
-    id: gymMonthlySubscriptionProductId,
-    title: 'Aylık',
-    description: 'Her ay yenilenir',
-    price: '₺299,99',
-  ),
-  const SubscriptionProduct(
-    id: gymYearlySubscriptionProductId,
-    title: 'Yıllık',
-    description: '2 ay bedava',
-    price: '₺2.999,99',
-  ),
-];
+///
+/// Fiyatlar gerçek (planlanan) abonelik fiyatlarımız — Türkiye için TL,
+/// diğer tüm bölgeler için USD (mağaza kurulumu tamamlanınca gerçek
+/// fiyatlandırma App Store Connect/Play Console'dan region bazlı
+/// otomatik gelecek, bu sadece görüntüleme amaçlı sabit).
+List<SubscriptionProduct> mockSubscriptionProducts(String locale) {
+  final isTr = locale == 'tr';
+  return [
+    SubscriptionProduct(
+      id: gymMonthlySubscriptionProductId,
+      title: isTr ? 'Aylık' : 'Monthly',
+      description: isTr ? 'Her ay yenilenir' : 'Renews every month',
+      price: isTr ? '₺999,00' : '\$19.99',
+    ),
+    SubscriptionProduct(
+      id: gymYearlySubscriptionProductId,
+      title: isTr ? 'Yıllık' : 'Yearly',
+      description: isTr ? '2 ay bedava' : '2 months free',
+      price: isTr ? '₺9.990,00' : '\$199.99',
+    ),
+  ];
+}

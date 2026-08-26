@@ -22,6 +22,15 @@ class SubscriptionVerificationService {
       'verificationData': purchase.verificationData.serverVerificationData,
     });
   }
+
+  /// GEÇİCİ — mağaza ürünleri henüz canlı değilken (bkz.
+  /// `SubscriptionPurchaseService.lastFetchWasMock`) gerçek satın alma
+  /// yerine bunu çağırır — `startMockSubscription` callable'ı gerçek bir
+  /// doğrulama yapmadan salonu `trial`a geçirir.
+  Future<void> startMockSubscription({required String gymId, required String productId}) {
+    final callable = FirebaseFunctions.instance.httpsCallable('startMockSubscription');
+    return callable.call<void>({'gymId': gymId, 'productId': productId});
+  }
 }
 
 @riverpod

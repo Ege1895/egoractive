@@ -78,10 +78,20 @@ Bu `true` olduğu sürece o salonun admin'i, antrenörleri ve üyeleri **aboneli
 
 ## 5) Bu tamamlanana kadar dikkat
 
-- **Remote Config → `cfg_require_subscription_onboarding`** şu an `false` — bu SADECE admin'in zorunlu abonelik ekranına düşüp düşmeyeceğini kontrol ediyor (mağaza ürünleri olmadan gösterilirse liste boş kalır, kimse ilerleyemez). Yukarıdaki test akışını uçtan uca doğruladıktan sonra bu değeri Console'dan `true` yap.
+- **Remote Config → `cfg_require_subscription_onboarding`** şu an `true` — admin girişten hemen sonra zorunlu abonelik ekranına düşüyor. Mağaza ürünleri henüz canlı olmadığı için ekran mock veriyle açılıyor (bkz. Bölüm 5a) — kimse takılı kalmıyor.
 - **ÖNEMLİ — bu bayrak antrenör/üye girişini etkilemiyor.** Salon Abonelik ve Erişim Akışı kapsamında artık: bir salonun `subscriptionStatus`'u `trial`/`active` değilse o salonun antrenör/üyeleri HİÇBİR ZAMAN giriş yapamaz (bu bayraktan bağımsız, her zaman geçerli) ve admin de normal ekranlara erişemez (sadece okuma/yazma değil). Yeni oluşturduğun test salonlarında antrenör/üye girişini test edeceksen, o salonun admin'inin (gerçek ya da sandbox) bir abonelik başlatmış olması gerekir.
 - Mevcut/eski salonlar (bu değişiklikten önce oluşturulanlar) etkilenmiyor — onların `subscriptionStatus` alanı zaten `trial`/`active` olarak yazılmıştı, yeniden abone olmaları istenmiyor.
 - `trialExpiryCheck` (eski, saf Firestore tabanlı 14 gün sayacı) hâlâ çalışıyor ama artık sadece bu eski salonlar için anlamlı — yeni salonlarda gerçek mağaza aboneliği zaten `subscriptionExpiresAt`'i kendi belirliyor (`subscriptionRenewalCheck` + webhook'lar üzerinden).
+
+## 5a) ŞU AN mock modda çalışan kısım — store bağlanmadan test edilebiliyor
+
+Mağaza ürünleri henüz canlı olmadığı için (2026-08-26 itibarıyla) abonelik ekranındaki "X gün ücretsiz başlat" butonu gerçek satın alma yerine geçici bir **mock başlatma** yoluna gidiyor:
+
+- `SubscriptionPurchaseService.fetchProducts()` mağazadan hiç ürün alamayınca (`lastFetchWasMock = true`) mock plan verisi gösteriyor — fiyatlar gerçek (planlanan) fiyatlarımız: **TR: Aylık ₺999,00 / Yıllık ₺9.990,00**, **Global: Aylık $19.99 / Yıllık $199.99** (cihazın dil ayarına göre TR/EN seçiliyor).
+- Butona basınca client bunu görüp gerçek `verifySubscriptionPurchase` yerine yeni **`startMockSubscription`** callable'ını çağırıyor — bu, hiçbir mağaza doğrulaması yapmadan salonu doğrudan `subscriptionStatus: trial` yapıyor (ücret çekilmez, gerçek bir işlem yok).
+- **Store ürünleri canlıya alınıp `queryProductDetails` gerçek ürün döndürmeye başlar başlamaz `lastFetchWasMock` otomatik olarak `false` olur ve client kendiliğinden gerçek satın alma akışına geçer — bunun için BENİM ayrıca bir kod değişikliği yapmama gerek YOK.** Sadece ek bir güvenlik kapağı olarak `cfg_require_subscription_onboarding` gibi Remote Config'te `cfg_subscription_mock_start_enabled` var (varsayılan `true`) — istersen store canlıya alınmadan önce bile bunu `false` yapıp mock yolunu tamamen kapatabilirsin.
+
+**Sana düşen:** Store süreçlerini (Bölüm 1/2) tamamladığında bana "storeları tamamladım" de — birlikte gerçek ürünlerin (`queryProductDetails`) doğru döndüğünü doğrularız, `verifySubscriptionPurchase` secret'larını (Bölüm 3) bağlarız ve test sırasını (Bölüm 4) birlikte çalıştırırız. Kod tarafında bekleyen bir iş yok, sadece store console kurulumu + secret'lar.
 
 ## 6) Trial bir kez kullanılır (`trialUsed`)
 

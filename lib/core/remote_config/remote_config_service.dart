@@ -1439,7 +1439,7 @@ class RemoteConfigService {
     'lbl_auth_onboarding_role_title_tr': 'Hoş geldin',
     'lbl_auth_onboarding_role_subtitle_tr': 'Devam etmek için rolünü seç.',
     'lbl_auth_onboarding_role_trainer_title_tr': 'Antrenörüm',
-    'lbl_auth_onboarding_role_trainer_note_tr': 'Bir stüdyoda ders veriyorum',
+    'lbl_auth_onboarding_role_trainer_note_tr': 'Antrenörlük belgem var',
     'lbl_auth_onboarding_role_member_title_tr': 'Üyeyim',
     'lbl_auth_onboarding_role_member_note_tr': 'Bir salona/stüdyoya kayıtlıyım',
     'lbl_auth_onboarding_role_hint_trainer_tr':
@@ -2204,7 +2204,7 @@ class RemoteConfigService {
     'lbl_auth_onboarding_role_title_en': 'Welcome',
     'lbl_auth_onboarding_role_subtitle_en': 'Choose your role to continue.',
     'lbl_auth_onboarding_role_trainer_title_en': "I'm a trainer",
-    'lbl_auth_onboarding_role_trainer_note_en': 'I teach at a studio',
+    'lbl_auth_onboarding_role_trainer_note_en': 'I have a trainer certification',
     'lbl_auth_onboarding_role_member_title_en': "I'm a member",
     'lbl_auth_onboarding_role_member_note_en': "I'm registered at a gym/studio",
     'lbl_auth_onboarding_role_hint_trainer_en':

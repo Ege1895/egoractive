@@ -14,24 +14,32 @@ class SubscriptionPurchaseService {
   final InAppPurchase _iap = InAppPurchase.instance;
   final Map<String, ProductDetails> _cache = {};
 
+  /// Son `fetchProducts()` çağrısı mağazadan gerçek ürün alamayıp
+  /// [mockSubscriptionProducts]'a düştü mü — `SubscriptionOnboardingPanel`
+  /// bunu görüp CTA'yı gerçek satın alma yerine `startMockSubscription`
+  /// callable'ına yönlendirir (bkz. o dosyadaki yorum). Mağaza gerçek ürün
+  /// döndürmeye başlar başlamaz bu otomatik olarak `false` olur.
+  bool lastFetchWasMock = false;
+
   Stream<List<PurchaseDetails>> get purchaseUpdates => _iap.purchaseStream;
 
   Future<bool> isAvailable() => _iap.isAvailable();
 
-  Future<List<SubscriptionProduct>> fetchProducts() async {
+  Future<List<SubscriptionProduct>> fetchProducts({required String locale}) async {
     final response = await _iap.queryProductDetails(gymSubscriptionProductIds);
     _cache
       ..clear()
       ..addEntries(response.productDetails.map((p) => MapEntry(p.id, p)));
 
-    if (response.productDetails.isEmpty) {
+    lastFetchWasMock = response.productDetails.isEmpty;
+    if (lastFetchWasMock) {
       // Mağaza ürünleri henüz App Store Connect/Play Console'da
       // yayınlanmadıysa (bkz. docs/Abonelik_Store_Kurulumu.md) gerçek bir
       // yanıt hiç gelmez — ekran boş kalıp test/inceleme için kullanılamaz
       // hale gelirdi. `_cache` boş bırakılır (mock ürünler için satın alma
       // denemesi zaten `buySubscription`'da StateError ile güvenle
       // reddedilir), sadece görüntüleme için sahte veri döndürülür.
-      return mockSubscriptionProducts;
+      return mockSubscriptionProducts(locale);
     }
 
     return response.productDetails

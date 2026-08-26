@@ -119,6 +119,13 @@
       "description": "true iken yeni salon admin'i girişten sonra zorunlu SubscriptionOnboardingPanel'e yönlendirilir. Mağaza bağlı olmasa bile mock veriyle açılır — test için Console'dan false yapılabilir.",
       "valueType": "BOOLEAN"
     },
+    "cfg_subscription_mock_start_enabled": {
+      "defaultValue": {
+        "value": "true"
+      },
+      "description": "true iken mağaza ürünleri yoksa admin gerçek satın alma yapmadan trial başlatabilir (mock). Store canlı olunca client otomatik gerçek akışa geçer — bu sadece ek bir güvenlik kapağı.",
+      "valueType": "BOOLEAN"
+    },
     "cfg_feature_flags": {
       "defaultValue": {
         "value": "{\"group_sessions_enabled\": true}"
@@ -1243,13 +1250,13 @@
     },
     "lbl_auth_onboarding_role_trainer_note_tr": {
       "defaultValue": {
-        "value": "Bir stüdyoda ders veriyorum"
+        "value": "Antrenörlük belgem var"
       },
       "valueType": "STRING"
     },
     "lbl_auth_onboarding_role_trainer_note_en": {
       "defaultValue": {
-        "value": "I teach at a studio"
+        "value": "I have a trainer certification"
       },
       "valueType": "STRING"
     },

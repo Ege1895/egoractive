@@ -8,6 +8,7 @@ export { deleteAccount } from "./callable/delete-account";
 export { checkPhoneAvailable } from "./callable/check-phone-available";
 export { listPartnerGyms } from "./callable/list-partner-gyms";
 export { verifySubscriptionPurchase } from "./callable/verify-subscription-purchase";
+export { startMockSubscription } from "./callable/start-mock-subscription";
 export { sendManualNotification } from "./callable/send-manual-notification";
 export { onUserRoleAssigned } from "./triggers/on-user-role-assigned";
 export { onSessionWriteScheduleNotifications } from "./triggers/on-session-write-schedule-notifications";

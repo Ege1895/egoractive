@@ -12,10 +12,16 @@ abstract interface class SubscriptionRepository {
   Stream<SubscriptionState> watchState(String gymId);
   Stream<List<PurchaseDetails>> get purchaseUpdates;
   Future<bool> isAvailable();
-  Future<List<SubscriptionProduct>> fetchProducts();
+  Future<List<SubscriptionProduct>> fetchProducts({required String locale});
   Future<void> buySubscription(String productId);
   Future<void> completePurchase(PurchaseDetails purchase);
   Future<void> verifyPurchase({required String gymId, required PurchaseDetails purchase});
+
+  /// Son `fetchProducts()` çağrısı gerçek mağaza ürünü bulamayıp mock
+  /// veriye mi düştü — bkz. `SubscriptionPurchaseService.lastFetchWasMock`.
+  bool get lastFetchWasMock;
+
+  Future<void> startMockSubscription({required String gymId, required String productId});
 }
 
 class SubscriptionRepositoryImpl implements SubscriptionRepository {
@@ -35,7 +41,8 @@ class SubscriptionRepositoryImpl implements SubscriptionRepository {
   Future<bool> isAvailable() => _purchaseService.isAvailable();
 
   @override
-  Future<List<SubscriptionProduct>> fetchProducts() => _purchaseService.fetchProducts();
+  Future<List<SubscriptionProduct>> fetchProducts({required String locale}) =>
+      _purchaseService.fetchProducts(locale: locale);
 
   @override
   Future<void> buySubscription(String productId) => _purchaseService.buySubscription(productId);
@@ -46,6 +53,14 @@ class SubscriptionRepositoryImpl implements SubscriptionRepository {
   @override
   Future<void> verifyPurchase({required String gymId, required PurchaseDetails purchase}) {
     return _verificationService.verifyPurchase(gymId: gymId, purchase: purchase);
+  }
+
+  @override
+  bool get lastFetchWasMock => _purchaseService.lastFetchWasMock;
+
+  @override
+  Future<void> startMockSubscription({required String gymId, required String productId}) {
+    return _verificationService.startMockSubscription(gymId: gymId, productId: productId);
   }
 }
 

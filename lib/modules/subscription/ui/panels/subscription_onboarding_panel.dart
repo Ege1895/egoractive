@@ -255,9 +255,21 @@ class _SubscriptionOnboardingPanelState
           busy: subscription.isPurchasing,
           onTap: _selectedProductId == null || subscription.isPurchasing
               ? null
-              : () => ref
-                    .read(subscriptionControllerProvider.notifier)
-                    .purchase(_selectedProductId!),
+              : () {
+                  final controller = ref.read(
+                    subscriptionControllerProvider.notifier,
+                  );
+                  // GEÇİCİ — mağaza ürünleri henüz canlı değilken (bkz.
+                  // SubscriptionPurchaseService.lastFetchWasMock) gerçek
+                  // satın alma yerine mock başlatmayı kullan; store
+                  // ürünleri canlı olunca bu otomatik olarak gerçek akışa
+                  // döner, elle bir şey değiştirmen gerekmez.
+                  if (controller.lastFetchWasMock) {
+                    controller.startMockSubscription(_selectedProductId!);
+                  } else {
+                    controller.purchase(_selectedProductId!);
+                  }
+                },
         ),
       ],
     );

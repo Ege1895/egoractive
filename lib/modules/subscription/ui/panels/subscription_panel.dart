@@ -331,9 +331,7 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
           ),
           onTap: _selectedProductId == null
               ? null
-              : () => ref
-                    .read(subscriptionControllerProvider.notifier)
-                    .purchase(_selectedProductId!),
+              : () => _purchaseOrMockStart(_selectedProductId!),
         ),
       ],
     );
@@ -731,9 +729,7 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
           ),
           onTap: _selectedProductId == null
               ? null
-              : () => ref
-                    .read(subscriptionControllerProvider.notifier)
-                    .purchase(_selectedProductId!),
+              : () => _purchaseOrMockStart(_selectedProductId!),
         ),
       ],
     );
@@ -849,6 +845,19 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
     'store': _storeName,
     'storeAccount': _storeAccountName,
   };
+
+  /// GEÇİCİ — mağaza ürünleri henüz canlı değilken (bkz.
+  /// `SubscriptionPurchaseService.lastFetchWasMock`) gerçek satın alma
+  /// yerine mock başlatmayı kullan; store canlı olunca otomatik gerçek
+  /// akışa döner.
+  void _purchaseOrMockStart(String productId) {
+    final controller = ref.read(subscriptionControllerProvider.notifier);
+    if (controller.lastFetchWasMock) {
+      controller.startMockSubscription(productId);
+    } else {
+      controller.purchase(productId);
+    }
+  }
 
   /// "Aboneliği yönet" — cihazın kendi abonelik yönetim sayfasını açar.
   /// Uygulama içinde plan değişikliği/iptal işlemi yok, hepsi mağazada.

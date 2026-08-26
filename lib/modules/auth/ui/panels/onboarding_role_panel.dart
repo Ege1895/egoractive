@@ -48,24 +48,54 @@ class _OnboardingRolePanelState extends BasePanelState<OnboardingRolePanel> {
             children: [
               Align(
                 alignment: Alignment.centerRight,
-                child: TextButton.icon(
-                  onPressed: () => ref
-                      .read(panelStackControllerProvider.notifier)
-                      .push(const PartnerGymsPanel()),
-                  icon: Icon(
-                    Icons.storefront_outlined,
-                    size: 18,
-                    color: colors.primary,
-                  ),
-                  label: Text(
-                    ref.watch(
-                      rcTextProvider(
-                        RemoteConfigKeys.authOnboardingRolePartnerGymsButton,
+                child: Material(
+                  color: colors.surfaceRaised,
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
+                  child: InkWell(
+                    onTap: () => ref
+                        .read(panelStackControllerProvider.notifier)
+                        .push(const PartnerGymsPanel()),
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.md,
+                        vertical: AppSpacing.sm,
                       ),
-                    ),
-                    style: typography.bodyMedium.copyWith(
-                      color: colors.primary,
-                      fontSize: 13,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(
+                          AppSpacing.radiusPill,
+                        ),
+                        border: Border.all(color: colors.outline),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.storefront_outlined,
+                            size: 17,
+                            color: colors.onSurface,
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            ref.watch(
+                              rcTextProvider(
+                                RemoteConfigKeys
+                                    .authOnboardingRolePartnerGymsButton,
+                              ),
+                            ),
+                            style: typography.headingSmall.copyWith(
+                              color: colors.onSurface,
+                              fontSize: 13,
+                            ),
+                          ),
+                          const SizedBox(width: 2),
+                          Icon(
+                            Icons.chevron_right,
+                            size: 16,
+                            color: colors.onSurfaceMuted,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
