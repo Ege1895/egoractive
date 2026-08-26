@@ -7,6 +7,7 @@ import '../../../../core/panels/panel_stack_controller.dart';
 import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_button.dart';
+import '../../../gyms/ui/panels/partner_gyms_panel.dart';
 import 'onboarding_trainer_path_panel.dart';
 import 'phone_login_panel.dart';
 
@@ -45,6 +46,30 @@ class _OnboardingRolePanelState extends BasePanelState<OnboardingRolePanel> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton.icon(
+                  onPressed: () => ref
+                      .read(panelStackControllerProvider.notifier)
+                      .push(const PartnerGymsPanel()),
+                  icon: Icon(
+                    Icons.storefront_outlined,
+                    size: 18,
+                    color: colors.primary,
+                  ),
+                  label: Text(
+                    ref.watch(
+                      rcTextProvider(
+                        RemoteConfigKeys.authOnboardingRolePartnerGymsButton,
+                      ),
+                    ),
+                    style: typography.bodyMedium.copyWith(
+                      color: colors.primary,
+                      fontSize: 13,
+                    ),
+                  ),
+                ),
+              ),
               Column(
                 children: [
                   Container(

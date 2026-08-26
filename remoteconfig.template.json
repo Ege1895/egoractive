@@ -1306,6 +1306,54 @@
       },
       "valueType": "STRING"
     },
+    "lbl_auth_onboarding_role_partner_gyms_button_tr": {
+      "defaultValue": {
+        "value": "Anlaşmalı Salonlar"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_onboarding_role_partner_gyms_button_en": {
+      "defaultValue": {
+        "value": "Partner Gyms"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_partner_gyms_title_tr": {
+      "defaultValue": {
+        "value": "Anlaşmalı Salonlar"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_partner_gyms_title_en": {
+      "defaultValue": {
+        "value": "Partner Gyms"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_partner_gyms_empty_tr": {
+      "defaultValue": {
+        "value": "Henüz listelenen bir salon yok."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_partner_gyms_empty_en": {
+      "defaultValue": {
+        "value": "No gyms listed yet."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_partner_gyms_error_tr": {
+      "defaultValue": {
+        "value": "Salonlar yüklenemedi, tekrar dene."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_partner_gyms_error_en": {
+      "defaultValue": {
+        "value": "Couldn't load gyms, please try again."
+      },
+      "valueType": "STRING"
+    },
     "lbl_auth_trainer_path_title_tr": {
       "defaultValue": {
         "value": "Bir salona bağlı mısın?"

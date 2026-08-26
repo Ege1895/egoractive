@@ -228,6 +228,13 @@ abstract final class RemoteConfigKeys {
       'lbl_auth_onboarding_role_continue_button';
   static const authOnboardingRoleGoToLoginButton =
       'lbl_auth_onboarding_role_go_to_login_button';
+  static const authOnboardingRolePartnerGymsButton =
+      'lbl_auth_onboarding_role_partner_gyms_button';
+
+  /// Onboarding — anlaşmalı salonlar listesi.
+  static const partnerGymsTitle = 'lbl_partner_gyms_title';
+  static const partnerGymsEmpty = 'lbl_partner_gyms_empty';
+  static const partnerGymsError = 'lbl_partner_gyms_error';
 
   /// Onboarding — antrenör alt seçimi ekranı.
   static const authTrainerPathTitle = 'lbl_auth_trainer_path_title';
@@ -1404,6 +1411,10 @@ class RemoteConfigService {
         'Stüdyona kayıtlı telefon numaranla giriş yapacaksın.',
     'lbl_auth_onboarding_role_continue_button_tr': 'Devam et',
     'lbl_auth_onboarding_role_go_to_login_button_tr': 'Girişe geç',
+    'lbl_auth_onboarding_role_partner_gyms_button_tr': 'Anlaşmalı Salonlar',
+    'lbl_partner_gyms_title_tr': 'Anlaşmalı Salonlar',
+    'lbl_partner_gyms_empty_tr': 'Henüz listelenen bir salon yok.',
+    'lbl_partner_gyms_error_tr': 'Salonlar yüklenemedi, tekrar dene.',
     'lbl_auth_trainer_path_title_tr': 'Bir salona bağlı mısın?',
     'lbl_auth_trainer_path_subtitle_tr':
         'Zaten çalıştığın bir stüdyo varsa oraya bağlan; yoksa kendi salonunu sen oluştur.',
@@ -2163,6 +2174,10 @@ class RemoteConfigService {
         "You'll log in with the phone number registered at your studio.",
     'lbl_auth_onboarding_role_continue_button_en': 'Continue',
     'lbl_auth_onboarding_role_go_to_login_button_en': 'Go to login',
+    'lbl_auth_onboarding_role_partner_gyms_button_en': 'Partner Gyms',
+    'lbl_partner_gyms_title_en': 'Partner Gyms',
+    'lbl_partner_gyms_empty_en': 'No gyms listed yet.',
+    'lbl_partner_gyms_error_en': 'Couldn\'t load gyms, please try again.',
     'lbl_auth_trainer_path_title_en': 'Are you linked to a gym?',
     'lbl_auth_trainer_path_subtitle_en':
         'If you already work at a studio, link to it; otherwise create your own gym.',
