@@ -34,7 +34,12 @@ const _dayNames = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'];
 /// takvimiyle (bkz. admin_calendar_panel.dart) birebir aynı tasarım:
 /// ay ızgarası + gün altında ajanda listesi, hafta/ay geçişi yok.
 class TrainerCalendarPanel extends BasePanel {
-  const TrainerCalendarPanel({super.key});
+  const TrainerCalendarPanel({this.focusSessionId, super.key});
+
+  /// Push bildirimi ("Dersini onaylar mısın?") üzerinden açıldığında set
+  /// edilir — panel bu seansın tarihini otomatik seçip "Dersi onayla"
+  /// sheet'ini otomatik açar (bkz. `push_notification_service.dart`).
+  final String? focusSessionId;
 
   @override
   ConsumerState<TrainerCalendarPanel> createState() =>
@@ -42,6 +47,36 @@ class TrainerCalendarPanel extends BasePanel {
 }
 
 class _TrainerCalendarPanelState extends BasePanelState<TrainerCalendarPanel> {
+  /// `focusSessionId` sheet'i bir kez otomatik açtıktan sonra (ya da hedef
+  /// seans bulunamadığında) `true` olur — her rebuild'de sheet'in tekrar
+  /// tekrar açılmasını engeller.
+  bool _focusSessionHandled = false;
+
+  @override
+  void initState() {
+    super.initState();
+    final sessionId = widget.focusSessionId;
+    if (sessionId == null) {
+      _focusSessionHandled = true;
+      return;
+    }
+    _selectFocusSessionDate(sessionId);
+  }
+
+  Future<void> _selectFocusSessionDate(String sessionId) async {
+    final doc = await FirebaseFirestore.instance
+        .collection('sessions')
+        .doc(sessionId)
+        .get();
+    if (!mounted) return;
+    final startTime = (doc.data()?['startTime'] as Timestamp?)?.toDate();
+    if (startTime == null) {
+      setState(() => _focusSessionHandled = true);
+      return;
+    }
+    ref.read(trainerCalendarControllerProvider.notifier).selectDate(startTime);
+  }
+
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
@@ -56,6 +91,19 @@ class _TrainerCalendarPanelState extends BasePanelState<TrainerCalendarPanel> {
     final selectedSlots =
         state.slotsByDayOfMonth[state.selectedDate.day] ??
         const <ScheduleSlot>[];
+
+    if (!_focusSessionHandled && widget.focusSessionId != null) {
+      final matches = selectedSlots.where(
+        (slot) => slot.id == widget.focusSessionId,
+      );
+      if (matches.isNotEmpty) {
+        _focusSessionHandled = true;
+        final slot = matches.first;
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) _showSlotDetail(context, slot);
+        });
+      }
+    }
 
     return Scaffold(
       body: SafeArea(

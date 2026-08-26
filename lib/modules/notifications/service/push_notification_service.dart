@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -8,7 +10,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/panels/panel_stack_controller.dart';
 import '../../feedback/ui/panels/feedback_panel.dart';
 import '../../sessions/ui/panels/attendance_confirm_panel.dart';
-import '../../sessions/ui/panels/trainer_notifications_panel.dart';
+import '../../trainers/ui/panels/trainer_calendar_panel.dart';
 import '../../../firebase_options.dart';
 
 /// Uygulama tamamen kapalıyken gelen bildirimler ayrı bir isolate'te işlenir
@@ -52,7 +54,7 @@ class PushNotificationService {
         iOS: DarwinInitializationSettings(),
       ),
       onDidReceiveNotificationResponse: (response) =>
-          _navigateForType(container, response.payload),
+          _navigateForPayload(container, response.payload),
     );
 
     // APNS token'ın cihaza/simülatöre ulaşması gecikebilir (ya da kullanıcı
@@ -91,12 +93,12 @@ class PushNotificationService {
 
     FirebaseMessaging.onMessage.listen(_showForegroundNotification);
     FirebaseMessaging.onMessageOpenedApp.listen(
-      (message) => _navigateForType(container, message.data['type'] as String?),
+      (message) => _navigateForData(container, message.data),
     );
 
     final initialMessage = await FirebaseMessaging.instance.getInitialMessage();
     if (initialMessage != null) {
-      _navigateForType(container, initialMessage.data['type'] as String?);
+      _navigateForData(container, initialMessage.data);
     }
   }
 
@@ -122,7 +124,13 @@ class PushNotificationService {
         ),
         iOS: const DarwinNotificationDetails(),
       ),
-      payload: message.data['type'] as String?,
+      // `payload` tek bir string — antrenörün "Dersi onayla" push'una
+      // dokununca hangi seansa gideceğini bilmek için `type` yetmiyor,
+      // `sessionId`'nin de taşınması lazım. Ön plandaki bildirim bu yolla
+      // (flutter_local_notifications) geçtiği için `data`'nın tamamı JSON
+      // olarak kodlanıyor — arkaplan/kapalıyken gelen dokunuşlar zaten
+      // `onMessageOpenedApp`/`getInitialMessage` ile ham `data` map'ini alıyor.
+      payload: jsonEncode(message.data),
     );
   }
 
@@ -131,13 +139,30 @@ class PushNotificationService {
   /// gidiliyordu. Cloud Functions tarafı zaten her push'ta `data.type`
   /// gönderiyor (bkz. session-reminder-check.ts, session-completion-check.ts,
   /// feedback-reminder-check.ts, send-manual-notification.ts).
-  void _navigateForType(ProviderContainer container, String? type) {
+  void _navigateForPayload(ProviderContainer container, String? payload) {
+    if (payload == null) return;
+    Map<String, dynamic> data;
+    try {
+      data = jsonDecode(payload) as Map<String, dynamic>;
+    } catch (_) {
+      return;
+    }
+    _navigateForData(container, data);
+  }
+
+  void _navigateForData(ProviderContainer container, Map<String, dynamic> data) {
     final panelStack = container.read(panelStackControllerProvider.notifier);
-    switch (type) {
+    switch (data['type'] as String?) {
       case 'session_reminder':
         panelStack.push(const AttendanceConfirmPanel());
       case 'session_completion':
-        panelStack.push(const TrainerNotificationsPanel());
+        // Antrenör "Dersini onaylar mısın?" push'una dokununca doğrudan
+        // Takvimim'e, o seansın tarihi seçili ve "Dersi onayla" sheet'i
+        // otomatik açık şekilde gitmeli — genel onay bekleyenler listesine
+        // değil (önceden TrainerNotificationsPanel açılıyordu).
+        panelStack.push(
+          TrainerCalendarPanel(focusSessionId: data['sessionId'] as String?),
+        );
       case 'feedback_reminder':
         panelStack.push(const FeedbackPanel());
       default:
