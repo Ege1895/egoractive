@@ -116,7 +116,7 @@
       "defaultValue": {
         "value": "true"
       },
-      "description": "true iken yeni salon admin'i girişten hemen sonra zorunlu SubscriptionOnboardingPanel'e yönlendirilir (paket seçip abone olmadan atlanamaz). Mağaza ürünleri (ASC/Play Console) canlı olmasa bile mock veriyle açılır (tasarım/test amaçlı) — gerekirse test için Console'dan false yapılabilir.",
+      "description": "true iken yeni salon admin'i girişten sonra zorunlu SubscriptionOnboardingPanel'e yönlendirilir. Mağaza bağlı olmasa bile mock veriyle açılır — test için Console'dan false yapılabilir.",
       "valueType": "BOOLEAN"
     },
     "cfg_feature_flags": {
