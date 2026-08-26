@@ -1,10 +1,11 @@
 import { getFirestore } from "firebase-admin/firestore";
-import { getRemoteConfig, RemoteConfigTemplate } from "firebase-admin/remote-config";
+import { RemoteConfigTemplate } from "firebase-admin/remote-config";
 import { onSchedule } from "firebase-functions/v2/scheduler";
 import * as logger from "firebase-functions/logger";
 
 import { mapWithConcurrency } from "../shared/concurrency";
 import { withFailureAlerting } from "../shared/function-health";
+import { getCachedRemoteConfigTemplate } from "../shared/remote-config-cache";
 
 /** Aynı anda en fazla bu kadar üye işlenir — büyük salonlarda (F7-2'nin
  * 10.000 üyelik yük testi ölçeği) tamamen sıralı işlemek fonksiyonun zaman
@@ -94,9 +95,9 @@ export const badgeCheck = onSchedule("every day 03:00", withFailureAlerting("bad
 
   let template: RemoteConfigTemplate;
   try {
-    template = await getRemoteConfig().getTemplate();
+    template = await getCachedRemoteConfigTemplate();
   } catch (error) {
-    logger.warn("Remote Config okunamadı, badge kontrolü atlandı.", error);
+    logger.warn("Remote Config cache okunamadı, badge kontrolü atlandı.", error);
     return;
   }
 

@@ -20,3 +20,4 @@ export { feedbackReminderCheck } from "./scheduled/feedback-reminder-check";
 export { monthlyFeedbackSummary } from "./scheduled/monthly-feedback-summary";
 export { weeklySubscriberSummary } from "./scheduled/weekly-subscriber-summary";
 export { trialExpiryCheck } from "./scheduled/trial-expiry-check";
+export { refreshRemoteConfigCache } from "./scheduled/refresh-remote-config-cache";

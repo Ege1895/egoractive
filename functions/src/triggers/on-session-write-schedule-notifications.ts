@@ -1,5 +1,5 @@
 import { Timestamp } from "firebase-admin/firestore";
-import { getRemoteConfig, RemoteConfigTemplate } from "firebase-admin/remote-config";
+import { RemoteConfigTemplate } from "firebase-admin/remote-config";
 import { onDocumentWritten } from "firebase-functions/v2/firestore";
 import * as logger from "firebase-functions/logger";
 
@@ -11,6 +11,7 @@ import {
   scheduleSessionReminderTask,
 } from "../shared/session-scheduled-tasks";
 import { withFailureAlerting } from "../shared/function-health";
+import { getCachedRemoteConfigTemplate } from "../shared/remote-config-cache";
 
 const DEFAULT_REMINDER_MINUTES = 60;
 
@@ -55,9 +56,9 @@ export const onSessionWriteScheduleNotifications = onDocumentWritten(
     async function getTemplate(): Promise<RemoteConfigTemplate> {
       if (template) return template;
       try {
-        template = await getRemoteConfig().getTemplate();
+        template = await getCachedRemoteConfigTemplate();
       } catch (error) {
-        logger.warn("Remote Config okunamadı, varsayılan hatırlatma süresi (60dk) kullanılıyor.", error);
+        logger.warn("Remote Config cache okunamadı, varsayılan hatırlatma süresi (60dk) kullanılıyor.", error);
         template = { parameters: {} } as RemoteConfigTemplate;
       }
       return template;

@@ -1,11 +1,12 @@
 import { getFirestore } from "firebase-admin/firestore";
-import { getRemoteConfig, RemoteConfigTemplate } from "firebase-admin/remote-config";
+import { RemoteConfigTemplate } from "firebase-admin/remote-config";
 import { onSchedule } from "firebase-functions/v2/scheduler";
 import * as logger from "firebase-functions/logger";
 
 import { formatDateTr, formatWeekRangeTr } from "../shared/format";
 import { withFailureAlerting } from "../shared/function-health";
 import { queueEmail } from "../shared/mail";
+import { getCachedRemoteConfigTemplate } from "../shared/remote-config-cache";
 import { isWeeklyReportDue, previousWeekRange } from "../shared/weekly-schedule";
 
 /** Egora Games'in kendi işletme raporu — salon başına değil, tek bir sabit adrese gider. */
@@ -65,9 +66,9 @@ export const weeklySubscriberSummary = onSchedule("every 60 minutes", withFailur
 
   let template: RemoteConfigTemplate;
   try {
-    template = await getRemoteConfig().getTemplate();
+    template = await getCachedRemoteConfigTemplate();
   } catch (error) {
-    logger.warn("Remote Config okunamadı, haftalık abone özeti atlandı.", error);
+    logger.warn("Remote Config cache okunamadı, haftalık abone özeti atlandı.", error);
     return;
   }
 

@@ -1,9 +1,10 @@
 import { getFirestore } from "firebase-admin/firestore";
-import { getRemoteConfig, RemoteConfigTemplate } from "firebase-admin/remote-config";
+import { RemoteConfigTemplate } from "firebase-admin/remote-config";
 import { onSchedule } from "firebase-functions/v2/scheduler";
 import * as logger from "firebase-functions/logger";
 
 import { withFailureAlerting } from "../shared/function-health";
+import { getCachedRemoteConfigTemplate } from "../shared/remote-config-cache";
 
 function readIntParam(template: RemoteConfigTemplate, key: string, fallback: number): number {
   const param = template.parameters[key];
@@ -27,10 +28,10 @@ export const trialExpiryCheck = onSchedule("every 24 hours", withFailureAlerting
 
   let trialDurationDays = 14;
   try {
-    const template = await getRemoteConfig().getTemplate();
+    const template = await getCachedRemoteConfigTemplate();
     trialDurationDays = readIntParam(template, "cfg_trial_duration_days", 14);
   } catch (error) {
-    logger.warn("Remote Config okunamadı, varsayılan deneme süresi (14 gün) kullanılıyor.", error);
+    logger.warn("Remote Config cache okunamadı, varsayılan deneme süresi (14 gün) kullanılıyor.", error);
   }
 
   const now = Date.now();

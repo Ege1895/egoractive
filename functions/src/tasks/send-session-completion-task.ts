@@ -1,11 +1,12 @@
 import { getFirestore, Timestamp } from "firebase-admin/firestore";
 import { getMessaging } from "firebase-admin/messaging";
-import { getRemoteConfig, RemoteConfigTemplate } from "firebase-admin/remote-config";
+import { RemoteConfigTemplate } from "firebase-admin/remote-config";
 import { onTaskDispatched, Request } from "firebase-functions/v2/tasks";
 import * as logger from "firebase-functions/logger";
 
 import { withFailureAlerting } from "../shared/function-health";
 import { resolveGymTimeZone, resolveNotificationLocale } from "../shared/notification-locale";
+import { getCachedRemoteConfigTemplate } from "../shared/remote-config-cache";
 
 const DEFAULT_TEXT: Record<string, { tr: string; en: string }> = {
   lbl_notif_session_completion_title: {
@@ -84,9 +85,9 @@ export const sendSessionCompletionTask = onTaskDispatched(
 
     let template: RemoteConfigTemplate;
     try {
-      template = await getRemoteConfig().getTemplate();
+      template = await getCachedRemoteConfigTemplate();
     } catch (error) {
-      logger.warn("Remote Config okunamadı, varsayılanlar kullanılıyor.", error);
+      logger.warn("Remote Config cache okunamadı, varsayılanlar kullanılıyor.", error);
       template = { parameters: {} } as RemoteConfigTemplate;
     }
 

@@ -1,9 +1,10 @@
 import { getFirestore } from "firebase-admin/firestore";
 import { getMessaging } from "firebase-admin/messaging";
-import { getRemoteConfig, RemoteConfigTemplate } from "firebase-admin/remote-config";
+import { RemoteConfigTemplate } from "firebase-admin/remote-config";
 import { HttpsError, onCall } from "firebase-functions/v2/https";
 
 import { userDoc, usersCollection } from "../shared/firestore-paths";
+import { getCachedRemoteConfigTemplate } from "../shared/remote-config-cache";
 
 const DEFAULT_HOURLY_LIMIT = 10;
 const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000;
@@ -74,7 +75,7 @@ export const sendManualNotification = onCall(async (request) => {
 
   let hourlyLimit = DEFAULT_HOURLY_LIMIT;
   try {
-    const template = await getRemoteConfig().getTemplate();
+    const template = await getCachedRemoteConfigTemplate();
     hourlyLimit = readIntParam(template, "cfg_manual_notification_hourly_limit", DEFAULT_HOURLY_LIMIT);
   } catch {
     // RC okunamazsa varsayılan limitle devam edilir — bildirim gönderimi

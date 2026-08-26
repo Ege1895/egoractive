@@ -1,11 +1,12 @@
 import { getFirestore } from "firebase-admin/firestore";
-import { getRemoteConfig, RemoteConfigTemplate } from "firebase-admin/remote-config";
+import { RemoteConfigTemplate } from "firebase-admin/remote-config";
 import { onSchedule } from "firebase-functions/v2/scheduler";
 import * as logger from "firebase-functions/logger";
 
 import { formatWeekRangeTr, formatTl } from "../shared/format";
 import { withFailureAlerting } from "../shared/function-health";
 import { queueEmail } from "../shared/mail";
+import { getCachedRemoteConfigTemplate } from "../shared/remote-config-cache";
 import { fetchGymWeeklyStats } from "../shared/weekly-report-stats";
 import { isWeeklyReportDue, previousWeekRange } from "../shared/weekly-schedule";
 
@@ -38,9 +39,9 @@ export const weeklyGymReport = onSchedule("every 60 minutes", withFailureAlertin
 
   let template: RemoteConfigTemplate;
   try {
-    template = await getRemoteConfig().getTemplate();
+    template = await getCachedRemoteConfigTemplate();
   } catch (error) {
-    logger.warn("Remote Config okunamadı, haftalık salon raporu atlandı.", error);
+    logger.warn("Remote Config cache okunamadı, haftalık salon raporu atlandı.", error);
     return;
   }
 

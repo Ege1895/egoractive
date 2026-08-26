@@ -286,5 +286,15 @@ service cloud.firestore {
         request.resource.data.gymId == myGymId() &&
         request.resource.data.memberId == request.auth.uid;
     }
+
+    // internal/{document=**} — `refreshRemoteConfigCache`'in 2 saatte bir
+    // yazdığı Remote Config önbelleği (shared/remote-config-cache.ts).
+    // Sadece Cloud Functions'ın Admin SDK'sı okur/yazar (kurallara tabi
+    // değil) — hiçbir client bu koleksiyona hiçbir şekilde erişemez.
+    // Eşleşmeyen yollar zaten varsayılan olarak reddedilir, bu kural sadece
+    // niyeti açıkça belgelemek için var.
+    match /internal/{document=**} {
+      allow read, write: if false;
+    }
   }
 }
