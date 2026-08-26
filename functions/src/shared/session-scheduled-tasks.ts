@@ -26,13 +26,22 @@ export async function cancelSessionReminderTask(sessionId: string, startTimeMs: 
 }
 
 /**
- * Bir seans oluşturulduğunda/ertelendiğinde, bitişinde antrenöre
- * "tamamlandı mı?" görevi kurar. Reminder'ın aksine geçmişte kalmış bir
- * bitiş zamanı için de kurulur (o an itibarıyla hemen ateşlenir) — zaten
- * bu görevin var oluş amacı, session bitince antrenöre sorulması.
+ * Bir seans oluşturulduğunda/ertelendiğinde, bitişinden `delayMinutes`
+ * (admin'in Yetki Ayarları'ndan o antrenöre özel setlediği süre, bkz.
+ * `trainer-completion-delay.ts`) sonra antrenöre "tamamlandı mı?" görevi
+ * kurar. Reminder'ın aksine geçmişte kalmış bir zaman için de kurulur (o
+ * an itibarıyla hemen ateşlenir) — zaten bu görevin var oluş amacı,
+ * session bitince antrenöre sorulması. Görev ID'si (idTimeMs) hâlâ ham
+ * `endTimeMs`'e dayanıyor — gecikme değişse bile aynı seansın aynı
+ * bitişi için tek görev kalması, gecikme aynı kalsa bile erteleme/iptal
+ * karşılaştırmasının doğru çalışması için.
  */
-export async function scheduleSessionCompletionTask(sessionId: string, endTimeMs: number): Promise<void> {
-  await enqueueScheduledTask(COMPLETION_QUEUE, sessionId, endTimeMs, endTimeMs, {
+export async function scheduleSessionCompletionTask(
+  sessionId: string,
+  endTimeMs: number,
+  delayMinutes: number,
+): Promise<void> {
+  await enqueueScheduledTask(COMPLETION_QUEUE, sessionId, endTimeMs, endTimeMs + delayMinutes * 60_000, {
     sessionId,
     expectedEndTimeMs: endTimeMs,
   });

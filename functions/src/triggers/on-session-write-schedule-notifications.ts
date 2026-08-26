@@ -12,6 +12,7 @@ import {
 } from "../shared/session-scheduled-tasks";
 import { withFailureAlerting } from "../shared/function-health";
 import { getCachedRemoteConfigTemplate } from "../shared/remote-config-cache";
+import { resolveTrainerCompletionDelayMinutes } from "../shared/trainer-completion-delay";
 
 const DEFAULT_REMINDER_MINUTES = 60;
 
@@ -73,7 +74,14 @@ export const onSessionWriteScheduleNotifications = onDocumentWritten(
     await reconcileSessionTask(
       { wasPlanned, beforeTimeMs: beforeEndMs, isPlanned, afterTimeMs: afterEndMs },
       (timeMs) => cancelSessionCompletionTask(sessionId, timeMs),
-      (timeMs) => scheduleSessionCompletionTask(sessionId, timeMs),
+      async (timeMs) => {
+        const delayMinutes = await resolveTrainerCompletionDelayMinutes(
+          afterData?.gymId as string | undefined,
+          afterData?.trainerId as string | undefined,
+          await getTemplate(),
+        );
+        await scheduleSessionCompletionTask(sessionId, timeMs, delayMinutes);
+      },
     );
   }),
 );
