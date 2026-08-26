@@ -10,8 +10,12 @@ export { verifySubscriptionPurchase } from "./callable/verify-subscription-purch
 export { sendManualNotification } from "./callable/send-manual-notification";
 export { onUserRoleAssigned } from "./triggers/on-user-role-assigned";
 export { onSessionWriteScheduleNotifications } from "./triggers/on-session-write-schedule-notifications";
+export { onEventCreated } from "./triggers/on-event-created";
+export { onGroupSessionCreated } from "./triggers/on-group-session-created";
 export { sendSessionReminderTask } from "./tasks/send-session-reminder-task";
 export { sendSessionCompletionTask } from "./tasks/send-session-completion-task";
+export { sendEventReminderTask } from "./tasks/send-event-reminder-task";
+export { sendGroupSessionReminderTask } from "./tasks/send-group-session-reminder-task";
 export { badgeCheck } from "./scheduled/badge-check";
 export { weeklyGymReport } from "./scheduled/weekly-gym-report";
 export { weeklyAccountingReport } from "./scheduled/weekly-accounting-report";

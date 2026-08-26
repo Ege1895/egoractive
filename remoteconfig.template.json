@@ -210,6 +210,102 @@
       },
       "valueType": "STRING"
     },
+    "lbl_notif_event_created_title_tr": {
+      "defaultValue": {
+        "value": "🎉 Yeni bir etkinlik eklendi!"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notif_event_created_title_en": {
+      "defaultValue": {
+        "value": "🎉 A new event just got added!"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notif_event_created_body_tr": {
+      "defaultValue": {
+        "value": "{eventName} · {date}. Hemen göz at, yerini ayırt!"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notif_event_created_body_en": {
+      "defaultValue": {
+        "value": "{eventName} · {date}. Take a look and grab your spot!"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notif_group_session_created_title_tr": {
+      "defaultValue": {
+        "value": "🧘 Yeni bir grup dersi eklendi!"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notif_group_session_created_title_en": {
+      "defaultValue": {
+        "value": "🧘 A new group class just got added!"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notif_group_session_created_body_tr": {
+      "defaultValue": {
+        "value": "{className} · {day} {time}. Hemen katıl!"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notif_group_session_created_body_en": {
+      "defaultValue": {
+        "value": "{className} · {day} {time}. Join now!"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notif_event_reminder_title_tr": {
+      "defaultValue": {
+        "value": "⏰ Yarın {eventName} var!"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notif_event_reminder_title_en": {
+      "defaultValue": {
+        "value": "⏰ {eventName} is tomorrow!"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notif_event_reminder_body_tr": {
+      "defaultValue": {
+        "value": "Katılacağını unutma, saat {time}'te başlıyor 🙌"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notif_event_reminder_body_en": {
+      "defaultValue": {
+        "value": "Don't forget — it starts at {time} 🙌"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notif_group_session_reminder_title_tr": {
+      "defaultValue": {
+        "value": "⏰ Yarın {className} var!"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notif_group_session_reminder_title_en": {
+      "defaultValue": {
+        "value": "⏰ {className} is tomorrow!"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notif_group_session_reminder_body_tr": {
+      "defaultValue": {
+        "value": "Katılacağını unutma, saat {time}'te başlıyor 💪"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notif_group_session_reminder_body_en": {
+      "defaultValue": {
+        "value": "Don't forget — it starts at {time} 💪"
+      },
+      "valueType": "STRING"
+    },
     "lbl_common_vazgec_tr": {
       "defaultValue": {
         "value": "Vazgeç"

@@ -1,60 +1,4 @@
-import { getFunctions } from "firebase-admin/functions";
-import * as logger from "firebase-functions/logger";
-
-/**
- * Cloud Tasks görev ID'si sessionId + o alanın (startTime/endTime) o anki
- * değerinden türetilir — böylece erteleme/iptal, hangi görevi sileceğini
- * bilmek için ayrıca bir Firestore alanına (ör. "reminderTaskName") ihtiyaç
- * duymaz: eski değerden ID'yi yeniden hesaplayıp silebilir.
- */
-function sessionTaskId(sessionId: string, timeMs: number): string {
-  return `${sessionId}_${timeMs}`;
-}
-
-function isTaskAlreadyExistsError(error: unknown): boolean {
-  return typeof error === "object" && error !== null && "code" in error && String((error as { code?: unknown }).code).includes("task-already-exists");
-}
-
-/**
- * `idTimeMs`, görev ID'sinin türediği (dokümandaki alanın değeri —
- * schedule ile cancel'ın aynı ID'yi üretebilmesi için sabit kalması
- * gereken) zaman; `fireAtMs` ise GERÇEKTEN ateşlenmesi istenen zaman
- * (reminder'da lead süresi düşülmüş hali, completion'da aynısı). Geçmişte
- * kaldıysa hemen ateşlenir, hiç kaybolmaz.
- */
-async function enqueueSessionTask(
-  queueName: string,
-  sessionId: string,
-  idTimeMs: number,
-  fireAtMs: number,
-  data: Record<string, unknown>,
-): Promise<void> {
-  const clampedFireAtMs = Math.max(fireAtMs, Date.now());
-  try {
-    await getFunctions()
-      .taskQueue(queueName)
-      .enqueue(
-        { sessionId, ...data },
-        { id: sessionTaskId(sessionId, idTimeMs), scheduleTime: new Date(clampedFireAtMs) },
-      );
-  } catch (error) {
-    if (!isTaskAlreadyExistsError(error)) throw error;
-    logger.info(`${queueName} görevi zaten kurulu, atlandı: ${sessionId}`, error);
-  }
-}
-
-/**
- * Task zaten ateşlenmiş ya da daha önce silinmişse Cloud Tasks hata
- * fırlatır — bu, erteleme/iptal akışında beklenen ve zararsız bir durum
- * olduğu için yutuluyor.
- */
-async function cancelSessionTask(queueName: string, sessionId: string, idTimeMs: number): Promise<void> {
-  try {
-    await getFunctions().taskQueue(queueName).delete(sessionTaskId(sessionId, idTimeMs));
-  } catch (error) {
-    logger.info(`${queueName} görevi silinemedi (muhtemelen zaten ateşlenmiş): ${sessionId}`, error);
-  }
-}
+import { cancelScheduledTask, enqueueScheduledTask } from "./scheduled-task-engine";
 
 const REMINDER_QUEUE = "sendSessionReminderTask";
 const COMPLETION_QUEUE = "sendSessionCompletionTask";
@@ -71,13 +15,14 @@ export async function scheduleSessionReminderTask(
   leadMinutes: number,
 ): Promise<void> {
   if (startTimeMs <= Date.now()) return;
-  await enqueueSessionTask(REMINDER_QUEUE, sessionId, startTimeMs, startTimeMs - leadMinutes * 60_000, {
+  await enqueueScheduledTask(REMINDER_QUEUE, sessionId, startTimeMs, startTimeMs - leadMinutes * 60_000, {
+    sessionId,
     expectedStartTimeMs: startTimeMs,
   });
 }
 
 export async function cancelSessionReminderTask(sessionId: string, startTimeMs: number): Promise<void> {
-  await cancelSessionTask(REMINDER_QUEUE, sessionId, startTimeMs);
+  await cancelScheduledTask(REMINDER_QUEUE, sessionId, startTimeMs);
 }
 
 /**
@@ -87,11 +32,14 @@ export async function cancelSessionReminderTask(sessionId: string, startTimeMs: 
  * bu görevin var oluş amacı, session bitince antrenöre sorulması.
  */
 export async function scheduleSessionCompletionTask(sessionId: string, endTimeMs: number): Promise<void> {
-  await enqueueSessionTask(COMPLETION_QUEUE, sessionId, endTimeMs, endTimeMs, { expectedEndTimeMs: endTimeMs });
+  await enqueueScheduledTask(COMPLETION_QUEUE, sessionId, endTimeMs, endTimeMs, {
+    sessionId,
+    expectedEndTimeMs: endTimeMs,
+  });
 }
 
 export async function cancelSessionCompletionTask(sessionId: string, endTimeMs: number): Promise<void> {
-  await cancelSessionTask(COMPLETION_QUEUE, sessionId, endTimeMs);
+  await cancelScheduledTask(COMPLETION_QUEUE, sessionId, endTimeMs);
 }
 
 /**
