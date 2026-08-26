@@ -13,6 +13,7 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'core/constants/ad_constants.dart';
 import 'core/locale/locale_controller.dart';
 import 'core/locale/locale_prefs.dart';
+import 'core/onboarding/onboarding_prefs.dart';
 import 'core/panels/panel_stack_controller.dart';
 import 'core/panels/panel_stack_view.dart';
 import 'core/remote_config/remote_config_service.dart';
@@ -38,6 +39,7 @@ void main() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await const RemoteConfigService().init();
   await LocalePrefs.init();
+  await OnboardingPrefs.init();
   unawaited(MobileAds.instance.initialize());
   if (debugTestDeviceIds.isNotEmpty) {
     MobileAds.instance.updateRequestConfiguration(

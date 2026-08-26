@@ -47,6 +47,15 @@ class AdminMemberListController extends _$AdminMemberListController {
         isLoadingMore: false,
         hasMore: page.hasMore,
       );
+    } on FirebaseException catch (e) {
+      if (e.code == 'permission-denied') {
+        state = state.copyWith(isLoadingMore: false, hasMore: false);
+      } else {
+        state = state.copyWith(
+          isLoadingMore: false,
+          errorMessage: 'Daha fazla üye yüklenemedi, tekrar dene.',
+        );
+      }
     } catch (_) {
       state = state.copyWith(
         isLoadingMore: false,
@@ -70,6 +79,15 @@ class AdminMemberListController extends _$AdminMemberListController {
           .read(adminMemberListPageServiceProvider)
           .searchByNamePrefix(gymId, trimmed);
       state = state.copyWith(searchResults: results, isSearching: false);
+    } on FirebaseException catch (e) {
+      if (e.code == 'permission-denied') {
+        state = state.copyWith(searchResults: const [], isSearching: false);
+      } else {
+        state = state.copyWith(
+          isSearching: false,
+          errorMessage: 'Arama yapılamadı, tekrar dene.',
+        );
+      }
     } catch (_) {
       state = state.copyWith(
         isSearching: false,
@@ -100,6 +118,21 @@ class AdminMemberListController extends _$AdminMemberListController {
         hasMore: page.hasMore,
         errorMessage: null,
       );
+    } on FirebaseException catch (e) {
+      // Salonun aboneliği henüz aktif değilken (bkz. Salon Abonelik ve
+      // Erişim Akışı — firestore.rules'daki gymSubscriptionActive) bu sorgu
+      // PERMISSION_DENIED ile reddedilir; bu, gerçek bir hata değil, salon
+      // henüz gerçekten hiç üye kaydedememiş olması ile aynı sonucu
+      // (görünürde boş liste) vermeli — kullanıcıya korkutucu bir "yüklenemedi"
+      // mesajı yerine normal boş durumu gösteriyoruz.
+      if (e.code == 'permission-denied') {
+        state = state.copyWith(items: const [], isLoading: false, hasMore: false, errorMessage: null);
+      } else {
+        state = state.copyWith(
+          isLoading: false,
+          errorMessage: 'Üye listesi yüklenemedi, tekrar dene.',
+        );
+      }
     } catch (_) {
       state = state.copyWith(
         isLoading: false,

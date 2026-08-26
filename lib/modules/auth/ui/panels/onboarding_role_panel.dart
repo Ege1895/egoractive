@@ -72,18 +72,14 @@ class _OnboardingRolePanelState extends BasePanelState<OnboardingRolePanel> {
               ),
               Column(
                 children: [
-                  Container(
-                    width: 64,
-                    height: 64,
-                    padding: const EdgeInsets.all(11),
-                    decoration: BoxDecoration(
-                      color: colors.primaryContainer,
-                      borderRadius: BorderRadius.circular(22),
-                      border: Border.all(
-                        color: colors.primary.withValues(alpha: 0.3),
-                      ),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(22),
+                    child: Image.asset(
+                      'assets/images/egora-logo.png',
+                      width: 64,
+                      height: 64,
+                      fit: BoxFit.cover,
                     ),
-                    child: Image.asset('assets/images/egora-logo.png'),
                   ),
                   const SizedBox(height: AppSpacing.md),
                   Text(

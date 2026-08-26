@@ -4,19 +4,25 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/app_spacing.dart';
+import '../../../../core/onboarding/onboarding_prefs.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
 import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import 'onboarding_role_panel.dart';
+import 'phone_login_panel.dart';
 
 /// Ortak 1 · Splash — logo + oturum kontrolü simülasyonu.
 ///
 /// Burada aktif bir Firebase Auth oturumu varsa `main.dart`'taki
-/// `currentRoleProvider` dinleyicisi zaten devreye girip ilgili role
-/// shell'ine yönlendirir (bu ekranın timer'ı geçersiz kılınır). Oturum
-/// yoksa (yeni kullanıcı ya da çıkış yapılmış) bu timer [OnboardingRolePanel]'e
-/// geçer — "antrenör müsün, üye misin?" sorusuyla başlayan ilk açılış akışı.
+/// `appAccessProvider` dinleyicisi zaten devreye girip ilgili role/duruma
+/// yönlendirir (bu ekranın timer'ı geçersiz kılınır). Oturum yoksa bu timer
+/// [OnboardingPrefs.hasSeenRoleOnboarding]'e bakar: cihaz bu ekranı DAHA ÖNCE
+/// hiç görmediyse (gerçek ilk kurulum) [OnboardingRolePanel]'e ("antrenör
+/// müsün, üye misin?") geçer ve bir daha görülmemek üzere işaretler;
+/// aksi halde (daha önce görülmüş — ör. kullanıcı çıkış yapıp uygulamayı
+/// kapatıp açtı) doğrudan [PhoneLoginPanel]'e gider. Bu rol seçimi gerçekten
+/// sadece cihazın hayatında bir kez gösterilsin diye.
 class SplashPanel extends BasePanel {
   const SplashPanel({super.key});
 
@@ -39,18 +45,14 @@ class _SplashPanelState extends BasePanelState<SplashPanel> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Container(
-                  width: 96,
-                  height: 96,
-                  decoration: BoxDecoration(
-                    color: colors.primaryContainer,
-                    borderRadius: BorderRadius.circular(32),
-                    border: Border.all(
-                      color: colors.primary.withValues(alpha: 0.3),
-                    ),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(32),
+                  child: Image.asset(
+                    'assets/images/egora-logo.png',
+                    width: 96,
+                    height: 96,
+                    fit: BoxFit.cover,
                   ),
-                  padding: const EdgeInsets.all(AppSpacing.lg),
-                  child: Image.asset('assets/images/egora-logo.png'),
                 ),
                 const SizedBox(height: AppSpacing.lg),
                 Text(
@@ -103,9 +105,13 @@ class _SplashPanelState extends BasePanelState<SplashPanel> {
   void onPanelShow() {
     _sessionCheckTimer = Timer(const Duration(milliseconds: 1600), () {
       if (!mounted) return;
-      ref
-          .read(panelStackControllerProvider.notifier)
-          .replaceRoot(const OnboardingRolePanel());
+      final panelStack = ref.read(panelStackControllerProvider.notifier);
+      if (OnboardingPrefs.hasSeenRoleOnboarding) {
+        panelStack.replaceRoot(const PhoneLoginPanel());
+      } else {
+        OnboardingPrefs.markRoleOnboardingSeen();
+        panelStack.replaceRoot(const OnboardingRolePanel());
+      }
     });
   }
 
