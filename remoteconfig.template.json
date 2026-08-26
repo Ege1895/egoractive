@@ -5341,18 +5341,6 @@
       },
       "valueType": "STRING"
     },
-    "lbl_sessions_completion_title_tr": {
-      "defaultValue": {
-        "value": "Seans onayı"
-      },
-      "valueType": "STRING"
-    },
-    "lbl_sessions_completion_title_en": {
-      "defaultValue": {
-        "value": "Session confirmation"
-      },
-      "valueType": "STRING"
-    },
     "lbl_sessions_completion_member_no_show_option_tr": {
       "defaultValue": {
         "value": "Üye gelmedi"
@@ -5362,18 +5350,6 @@
     "lbl_sessions_completion_member_no_show_option_en": {
       "defaultValue": {
         "value": "Member didn't show"
-      },
-      "valueType": "STRING"
-    },
-    "lbl_sessions_completion_undo_button_tr": {
-      "defaultValue": {
-        "value": "Geri al"
-      },
-      "valueType": "STRING"
-    },
-    "lbl_sessions_completion_undo_button_en": {
-      "defaultValue": {
-        "value": "Undo"
       },
       "valueType": "STRING"
     },
@@ -5701,27 +5677,15 @@
       },
       "valueType": "STRING"
     },
-    "lbl_sessions_completion_done_marked_tr": {
+    "lbl_sessions_completion_expired_note_tr": {
       "defaultValue": {
-        "value": "Ders tamamlandı işaretlendi"
+        "value": "Bu seansı onaylama süresi geçti. Yönetici ile iletişime geçmelisin."
       },
       "valueType": "STRING"
     },
-    "lbl_sessions_completion_done_marked_en": {
+    "lbl_sessions_completion_expired_note_en": {
       "defaultValue": {
-        "value": "Marked as completed"
-      },
-      "valueType": "STRING"
-    },
-    "lbl_sessions_completion_absent_marked_tr": {
-      "defaultValue": {
-        "value": "Üye gelmedi olarak işaretlendi"
-      },
-      "valueType": "STRING"
-    },
-    "lbl_sessions_completion_absent_marked_en": {
-      "defaultValue": {
-        "value": "Marked as no-show"
+        "value": "The window to confirm this session has passed. Please contact your admin."
       },
       "valueType": "STRING"
     },
@@ -6171,13 +6135,13 @@
     },
     "lbl_trainers_calendar_mark_completed_action_tr": {
       "defaultValue": {
-        "value": "Dersi onayla"
+        "value": "Ders tamamlandı"
       },
       "valueType": "STRING"
     },
     "lbl_trainers_calendar_mark_completed_action_en": {
       "defaultValue": {
-        "value": "Confirm session"
+        "value": "Session completed"
       },
       "valueType": "STRING"
     },

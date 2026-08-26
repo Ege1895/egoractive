@@ -4,12 +4,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/base_panel.dart';
-import '../../../../core/panels/panel_stack_controller.dart';
 import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_button.dart';
-import '../../../sessions/ui/panels/session_completion_panel.dart';
+import '../../../sessions/service/session_completion_service.dart';
 import '../../../sessions/ui/widgets/create_session_sheet.dart';
 import '../../controller/trainer_calendar_controller.dart';
 import '../../domain/schedule_slot.dart';
@@ -366,8 +365,16 @@ class _TrainerCalendarPanelState extends BasePanelState<TrainerCalendarPanel> {
                             _AgendaRow(
                               slot: selectedSlots[i],
                               showDivider: i < selectedSlots.length - 1,
-                              onTap: () =>
-                                  _showSlotDetail(context, selectedSlots[i]),
+                              onTap:
+                                  selectedSlots[i].state ==
+                                          ScheduleSlotState.planned ||
+                                      selectedSlots[i].state ==
+                                          ScheduleSlotState.current
+                                  ? () => _showSlotDetail(
+                                      context,
+                                      selectedSlots[i],
+                                    )
+                                  : null,
                             ),
                         ],
                       ),
@@ -381,13 +388,55 @@ class _TrainerCalendarPanelState extends BasePanelState<TrainerCalendarPanel> {
     );
   }
 
+  /// Antrenörün kendi seansı için "Dersi onayla" sheet'i — planned/current
+  /// seanslarda soru + "Ders tamamlandı"/"Üye gelmedi" butonlarını,
+  /// başlangıcının üzerinden 24 saat geçmiş bir seansta ise butonları
+  /// devre dışı bırakıp "yönetici ile iletişime geç" notunu gösterir (bkz.
+  /// `firestore.rules`'taki `withinCompletionWindow()` — aynı pencere orada
+  /// da zorlanıyor, burası sadece kullanıcıya erken/anlaşılır geri bildirim
+  /// için). Zaten tamamlanmış/iptal edilmiş/üye gelmedi işaretli bir seans
+  /// artık ajanda listesinden hiç tıklanamadığı için (bkz. `_AgendaRow`)
+  /// buraya normalde ulaşmaz — sadece push bildirimiyle (`focusSessionId`)
+  /// açıldığında, sheet açılana kadar başka biri seansı değiştirmişse diye
+  /// yine de salt-okunur bir geri dönüş sağlanıyor.
   void _showSlotDetail(BuildContext context, ScheduleSlot slot) {
     final colors = context.appColors;
     final typography = context.appTypography;
+    final isActionable =
+        slot.state == ScheduleSlotState.planned ||
+        slot.state == ScheduleSlotState.current;
+    final isExpired =
+        isActionable &&
+        DateTime.now().isAfter(
+          slot.startTime.add(const Duration(hours: 24)),
+        );
     final markCompletedLabel = ref.read(
       rcTextProvider(RemoteConfigKeys.trainersCalendarMarkCompletedAction),
     );
+    final noShowLabel = ref.read(
+      rcTextProvider(RemoteConfigKeys.sessionsCompletionMemberNoShowOption),
+    );
+    final questionText = ref
+        .read(rcTextProvider(RemoteConfigKeys.sessionsCompletionQuestion))
+        .replaceAll('{time}', slot.time)
+        .replaceAll('{name}', slot.name);
+    final timeLimitNote = ref.read(
+      rcTextProvider(RemoteConfigKeys.sessionsCompletionTimeLimitNote),
+    );
+    final expiredNote = ref.read(
+      rcTextProvider(RemoteConfigKeys.sessionsCompletionExpiredNote),
+    );
+    final genericErrorText = ref.read(
+      rcTextProvider(RemoteConfigKeys.sessionsCompletionConfirmError),
+    );
+    final submittingLabel = ref.read(
+      rcTextProvider(RemoteConfigKeys.gymsGymSetupSubmittingLabel),
+    );
     final closeLabel = ref.read(rcTextProvider(RemoteConfigKeys.commonKapat));
+
+    var isSubmitting = false;
+    String? errorMessage;
+
     showModalBottomSheet<void>(
       context: context,
       backgroundColor: colors.surface,
@@ -395,132 +444,192 @@ class _TrainerCalendarPanelState extends BasePanelState<TrainerCalendarPanel> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
       builder: (sheetContext) {
-        return Padding(
-          padding: const EdgeInsets.fromLTRB(
-            AppSpacing.screenEdge,
-            AppSpacing.lg,
-            AppSpacing.screenEdge,
-            AppSpacing.xxl,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
+        return StatefulBuilder(
+          builder: (sheetContext, setSheetState) {
+            Future<void> handle(bool attended) async {
+              // slot.memberId sadece gerçek Firestore verisinden geliyorsa
+              // dolu (bkz. #114) — mock fallback'te boş kalıp yazmadan
+              // sheet'i kapatan eski önizleme davranışına düşer.
+              if (slot.memberId.isEmpty) {
+                Navigator.of(sheetContext).pop();
+                return;
+              }
+              setSheetState(() {
+                isSubmitting = true;
+                errorMessage = null;
+              });
+              try {
+                final service = ref.read(sessionCompletionServiceProvider);
+                if (attended) {
+                  await service.markCompleted(
+                    sessionId: slot.id,
+                    memberId: slot.memberId,
+                  );
+                } else {
+                  await service.markAbsent(
+                    sessionId: slot.id,
+                    memberId: slot.memberId,
+                  );
+                }
+                if (sheetContext.mounted) Navigator.of(sheetContext).pop();
+              } catch (_) {
+                setSheetState(() {
+                  isSubmitting = false;
+                  errorMessage = genericErrorText;
+                });
+              }
+            }
+
+            return Padding(
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.screenEdge,
+                AppSpacing.lg,
+                AppSpacing.screenEdge,
+                AppSpacing.xxl,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.md,
-                      vertical: AppSpacing.sm,
-                    ),
-                    decoration: BoxDecoration(
-                      color: colors.surfaceRaised,
-                      borderRadius: BorderRadius.circular(
-                        AppSpacing.radiusInner,
-                      ),
-                    ),
-                    child: Text(
-                      slot.time,
-                      style: typography.headingSmall.copyWith(
+                  if (isActionable)
+                    Text(
+                      questionText,
+                      style: typography.headingMedium.copyWith(
                         color: colors.onSurface,
-                        fontSize: 15,
+                        fontSize: 24,
                       ),
-                    ),
-                  ),
-                  const SizedBox(width: AppSpacing.md),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    )
+                  else
+                    Row(
                       children: [
-                        Text(
-                          slot.name,
-                          style: typography.headingSmall.copyWith(
-                            color: colors.onSurface,
-                            fontSize: 17,
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: AppSpacing.md,
+                            vertical: AppSpacing.sm,
+                          ),
+                          decoration: BoxDecoration(
+                            color: colors.surfaceRaised,
+                            borderRadius: BorderRadius.circular(
+                              AppSpacing.radiusInner,
+                            ),
+                          ),
+                          child: Text(
+                            slot.time,
+                            style: typography.headingSmall.copyWith(
+                              color: colors.onSurface,
+                              fontSize: 15,
+                            ),
                           ),
                         ),
-                        Text(
-                          slot.meta,
-                          style: typography.bodyMedium.copyWith(
-                            color: colors.onSurfaceMuted,
-                            fontSize: 13,
+                        const SizedBox(width: AppSpacing.md),
+                        Expanded(
+                          child: Text(
+                            slot.name,
+                            style: typography.headingSmall.copyWith(
+                              color: colors.onSurface,
+                              fontSize: 17,
+                            ),
                           ),
                         ),
                       ],
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: AppSpacing.lg),
-              // Zaten tamamlanmış/iptal edilmiş bir seansta "Dersi onayla"
-              // butonu gösterilmeye devam ediyordu — dokununca
-              // isCompletingOwnSession() kuralı (status == 'planned' şartı)
-              // PERMISSION_DENIED ile reddediyor, kullanıcıya anlamsız bir
-              // hata olarak görünüyordu. Sadece henüz onaylanmamış
-              // (planned/current) seanslarda gösteriliyor artık.
-              if (slot.state == ScheduleSlotState.planned ||
-                  slot.state == ScheduleSlotState.current)
-                Row(
-                  children: [
-                    Expanded(
-                      child: AppButton(
-                        label: markCompletedLabel,
-                        onPressed: () async {
-                          Navigator.of(sheetContext).pop();
-                          // slot.id/memberId sadece gerçek Firestore
-                          // verisinden geliyorsa dolu (bkz. #114) — mock
-                          // fallback'te boş kalıp eski (yazma yapmayan)
-                          // önizleme davranışına düşer.
-                          var remainingBefore = 0;
-                          if (slot.memberId.isNotEmpty) {
-                            final memberDoc = await FirebaseFirestore.instance
-                                .collection('users')
-                                .doc(slot.memberId)
-                                .get();
-                            remainingBefore =
-                                (memberDoc.data()?['remainingSessions'] as num?)
-                                    ?.toInt() ??
-                                0;
-                          }
-                          if (!context.mounted) return;
-                          ref
-                              .read(panelStackControllerProvider.notifier)
-                              .push(
-                                SessionCompletionPanel(
-                                  time: slot.time,
-                                  memberInitials: _initialsOf(slot.name),
-                                  memberName: slot.name,
-                                  meta: slot.meta,
-                                  remainingBefore: remainingBefore,
-                                  sessionId: slot.memberId.isEmpty
-                                      ? null
-                                      : slot.id,
-                                  memberId: slot.memberId.isEmpty
-                                      ? null
-                                      : slot.memberId,
-                                ),
-                              );
-                        },
+                  if (isActionable) ...[
+                    const SizedBox(height: AppSpacing.lg),
+                    Container(
+                      padding: const EdgeInsets.all(AppSpacing.md),
+                      decoration: BoxDecoration(
+                        color: colors.surfaceRaised,
+                        borderRadius: BorderRadius.circular(
+                          AppSpacing.radiusInner,
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: AppSpacing.sm),
-                    Expanded(
-                      child: AppButton(
-                        label: closeLabel,
-                        variant: AppButtonVariant.secondary,
-                        onPressed: () => Navigator.of(sheetContext).pop(),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 44,
+                            height: 44,
+                            decoration: BoxDecoration(
+                              color: colors.primaryContainer,
+                              shape: BoxShape.circle,
+                            ),
+                            alignment: Alignment.center,
+                            child: Text(
+                              _initialsOf(slot.name),
+                              style: typography.headingSmall.copyWith(
+                                color: colors.onPrimaryContainer,
+                                fontSize: 15,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: AppSpacing.md),
+                          Text(
+                            slot.meta,
+                            style: typography.headingSmall.copyWith(
+                              color: colors.onSurface,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
-                )
-              else
-                AppButton(
-                  label: closeLabel,
-                  variant: AppButtonVariant.secondary,
-                  onPressed: () => Navigator.of(sheetContext).pop(),
-                ),
-            ],
-          ),
+                  const SizedBox(height: AppSpacing.lg),
+                  if (errorMessage != null) ...[
+                    Text(
+                      errorMessage!,
+                      style: typography.bodyMedium.copyWith(
+                        color: colors.error,
+                        fontSize: 13,
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                  ],
+                  if (!isActionable)
+                    AppButton(
+                      label: closeLabel,
+                      variant: AppButtonVariant.secondary,
+                      onPressed: () => Navigator.of(sheetContext).pop(),
+                    )
+                  else ...[
+                    Row(
+                      children: [
+                        Expanded(
+                          child: AppButton(
+                            label: isSubmitting
+                                ? submittingLabel
+                                : markCompletedLabel,
+                            onPressed: (isSubmitting || isExpired)
+                                ? null
+                                : () => handle(true),
+                          ),
+                        ),
+                        const SizedBox(width: AppSpacing.sm),
+                        Expanded(
+                          child: AppButton(
+                            label: noShowLabel,
+                            variant: AppButtonVariant.secondary,
+                            onPressed: (isSubmitting || isExpired)
+                                ? null
+                                : () => handle(false),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                    Text(
+                      isExpired ? expiredNote : timeLimitNote,
+                      textAlign: TextAlign.center,
+                      style: typography.caption.copyWith(
+                        color: isExpired
+                            ? colors.error
+                            : colors.onSurfaceMuted,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            );
+          },
         );
       },
     );
@@ -588,7 +697,10 @@ class _CalendarBadge extends StatelessWidget {
   }
 }
 
-class _AgendaRow extends StatelessWidget {
+/// `onTap` `null` ise (tamamlanmış/üye gelmedi/iptal edilmiş bir seans)
+/// satır tıklanamaz — sağdaki ok yerine seansın son durumunu gösteren bir
+/// pil rozeti çizilir, ki tıklanamadığı görsel olarak da anlaşılsın.
+class _AgendaRow extends ConsumerWidget {
   const _AgendaRow({
     required this.slot,
     required this.showDivider,
@@ -597,12 +709,13 @@ class _AgendaRow extends StatelessWidget {
 
   final ScheduleSlot slot;
   final bool showDivider;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.appColors;
     final typography = context.appTypography;
+    final statePill = _statePill(context, ref, slot.state);
 
     return InkWell(
       onTap: onTap,
@@ -645,9 +758,53 @@ class _AgendaRow extends StatelessWidget {
                 ],
               ),
             ),
-            Icon(Icons.chevron_right, color: colors.onSurfaceMuted, size: 18),
+            if (statePill != null)
+              statePill
+            else if (onTap != null)
+              Icon(Icons.chevron_right, color: colors.onSurfaceMuted, size: 18),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget? _statePill(
+    BuildContext context,
+    WidgetRef ref,
+    ScheduleSlotState state,
+  ) {
+    final colors = context.appColors;
+    final typography = context.appTypography;
+    final (background, foreground, label) = switch (state) {
+      ScheduleSlotState.completed => (
+        colors.successContainer,
+        colors.onSuccessContainer,
+        ref.watch(rcTextProvider(RemoteConfigKeys.commonTamamlandi)),
+      ),
+      ScheduleSlotState.absent => (
+        colors.warningContainer,
+        colors.onWarningContainer,
+        ref.watch(
+          rcTextProvider(RemoteConfigKeys.sessionsCompletionMemberNoShowOption),
+        ),
+      ),
+      ScheduleSlotState.cancelled => (
+        colors.errorContainer,
+        colors.onErrorContainer,
+        ref.watch(rcTextProvider(RemoteConfigKeys.commonIptalLabel)),
+      ),
+      ScheduleSlotState.planned || ScheduleSlotState.current => (null, null, null),
+    };
+    if (label == null) return null;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: background,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
+      ),
+      child: Text(
+        label,
+        style: typography.caption.copyWith(color: foreground, fontSize: 11),
       ),
     );
   }

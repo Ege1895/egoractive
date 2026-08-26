@@ -22,6 +22,11 @@ mixin _$ScheduleSlot {
   String get name => throw _privateConstructorUsedError;
   String get meta => throw _privateConstructorUsedError;
   ScheduleSlotState get state => throw _privateConstructorUsedError;
+
+  /// Seansın gerçek başlangıç zamanı — antrenörün "Dersi onayla"
+  /// sheet'inin 24 saatlik onay penceresini hesaplamak için gerekli
+  /// (bkz. `trainer_calendar_panel.dart`, `_showSlotDetail`).
+  DateTime get startTime => throw _privateConstructorUsedError;
   String get memberId => throw _privateConstructorUsedError;
 
   /// Create a copy of ScheduleSlot
@@ -44,6 +49,7 @@ abstract class $ScheduleSlotCopyWith<$Res> {
     String name,
     String meta,
     ScheduleSlotState state,
+    DateTime startTime,
     String memberId,
   });
 }
@@ -68,6 +74,7 @@ class _$ScheduleSlotCopyWithImpl<$Res, $Val extends ScheduleSlot>
     Object? name = null,
     Object? meta = null,
     Object? state = null,
+    Object? startTime = null,
     Object? memberId = null,
   }) {
     return _then(
@@ -92,6 +99,10 @@ class _$ScheduleSlotCopyWithImpl<$Res, $Val extends ScheduleSlot>
                 ? _value.state
                 : state // ignore: cast_nullable_to_non_nullable
                       as ScheduleSlotState,
+            startTime: null == startTime
+                ? _value.startTime
+                : startTime // ignore: cast_nullable_to_non_nullable
+                      as DateTime,
             memberId: null == memberId
                 ? _value.memberId
                 : memberId // ignore: cast_nullable_to_non_nullable
@@ -117,6 +128,7 @@ abstract class _$$ScheduleSlotImplCopyWith<$Res>
     String name,
     String meta,
     ScheduleSlotState state,
+    DateTime startTime,
     String memberId,
   });
 }
@@ -140,6 +152,7 @@ class __$$ScheduleSlotImplCopyWithImpl<$Res>
     Object? name = null,
     Object? meta = null,
     Object? state = null,
+    Object? startTime = null,
     Object? memberId = null,
   }) {
     return _then(
@@ -164,6 +177,10 @@ class __$$ScheduleSlotImplCopyWithImpl<$Res>
             ? _value.state
             : state // ignore: cast_nullable_to_non_nullable
                   as ScheduleSlotState,
+        startTime: null == startTime
+            ? _value.startTime
+            : startTime // ignore: cast_nullable_to_non_nullable
+                  as DateTime,
         memberId: null == memberId
             ? _value.memberId
             : memberId // ignore: cast_nullable_to_non_nullable
@@ -182,6 +199,7 @@ class _$ScheduleSlotImpl implements _ScheduleSlot {
     required this.name,
     required this.meta,
     required this.state,
+    required this.startTime,
     this.memberId = '',
   });
 
@@ -195,13 +213,19 @@ class _$ScheduleSlotImpl implements _ScheduleSlot {
   final String meta;
   @override
   final ScheduleSlotState state;
+
+  /// Seansın gerçek başlangıç zamanı — antrenörün "Dersi onayla"
+  /// sheet'inin 24 saatlik onay penceresini hesaplamak için gerekli
+  /// (bkz. `trainer_calendar_panel.dart`, `_showSlotDetail`).
+  @override
+  final DateTime startTime;
   @override
   @JsonKey()
   final String memberId;
 
   @override
   String toString() {
-    return 'ScheduleSlot(id: $id, time: $time, name: $name, meta: $meta, state: $state, memberId: $memberId)';
+    return 'ScheduleSlot(id: $id, time: $time, name: $name, meta: $meta, state: $state, startTime: $startTime, memberId: $memberId)';
   }
 
   @override
@@ -214,13 +238,23 @@ class _$ScheduleSlotImpl implements _ScheduleSlot {
             (identical(other.name, name) || other.name == name) &&
             (identical(other.meta, meta) || other.meta == meta) &&
             (identical(other.state, state) || other.state == state) &&
+            (identical(other.startTime, startTime) ||
+                other.startTime == startTime) &&
             (identical(other.memberId, memberId) ||
                 other.memberId == memberId));
   }
 
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, id, time, name, meta, state, memberId);
+  int get hashCode => Object.hash(
+    runtimeType,
+    id,
+    time,
+    name,
+    meta,
+    state,
+    startTime,
+    memberId,
+  );
 
   /// Create a copy of ScheduleSlot
   /// with the given fields replaced by the non-null parameter values.
@@ -238,6 +272,7 @@ abstract class _ScheduleSlot implements ScheduleSlot {
     required final String name,
     required final String meta,
     required final ScheduleSlotState state,
+    required final DateTime startTime,
     final String memberId,
   }) = _$ScheduleSlotImpl;
 
@@ -251,6 +286,12 @@ abstract class _ScheduleSlot implements ScheduleSlot {
   String get meta;
   @override
   ScheduleSlotState get state;
+
+  /// Seansın gerçek başlangıç zamanı — antrenörün "Dersi onayla"
+  /// sheet'inin 24 saatlik onay penceresini hesaplamak için gerekli
+  /// (bkz. `trainer_calendar_panel.dart`, `_showSlotDetail`).
+  @override
+  DateTime get startTime;
   @override
   String get memberId;
 

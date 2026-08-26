@@ -5,7 +5,6 @@ import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
 import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../../sessions/ui/panels/session_completion_panel.dart';
 import '../../../sessions/ui/panels/trainer_notifications_panel.dart';
 import '../../controller/trainer_home_controller.dart';
 import '../../controller/trainer_profile_controller.dart';
@@ -225,17 +224,6 @@ class TrainerHomePanel extends ConsumerWidget {
                   absentLabel: ref.watch(
                     rcTextProvider(RemoteConfigKeys.trainersHomeNoShowLabel),
                   ),
-                  onTap: () => panelStack.push(
-                    SessionCompletionPanel(
-                      time: pending.time,
-                      memberInitials: pending.memberInitials,
-                      memberName: pending.memberName,
-                      meta: pending.meta,
-                      remainingBefore: pending.remainingBefore,
-                      sessionId: pending.id,
-                      memberId: pending.memberId,
-                    ),
-                  ),
                   onDone: () => _handleCompletionAction(
                     context,
                     () => controller.markCompleted(pending.id),
@@ -356,7 +344,6 @@ class _PendingCard extends StatelessWidget {
     required this.pending,
     required this.doneLabel,
     required this.absentLabel,
-    required this.onTap,
     required this.onDone,
     required this.onAbsent,
   });
@@ -364,7 +351,6 @@ class _PendingCard extends StatelessWidget {
   final PendingConfirmation pending;
   final String doneLabel;
   final String absentLabel;
-  final VoidCallback onTap;
   final VoidCallback onDone;
   final VoidCallback onAbsent;
 
@@ -373,10 +359,7 @@ class _PendingCard extends StatelessWidget {
     final colors = context.appColors;
     final typography = context.appTypography;
 
-    return InkWell(
-      borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
-      onTap: onTap,
-      child: Container(
+    return Container(
         margin: const EdgeInsets.only(bottom: AppSpacing.sm),
         padding: const EdgeInsets.all(AppSpacing.md),
         decoration: BoxDecoration(
@@ -482,7 +465,6 @@ class _PendingCard extends StatelessWidget {
             ),
           ],
         ),
-      ),
     );
   }
 }

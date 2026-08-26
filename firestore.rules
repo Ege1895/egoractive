@@ -210,16 +210,27 @@ service cloud.firestore {
       return request.resource.data.diff(resource.data).affectedKeys().hasOnly(['memberConfirmation']);
     }
 
+    // Antrenör bir seansın başlangıcından itibaren 24 saat içinde
+    // "tamamlandı"/"üye gelmedi" onayı verebilir — bu pencere
+    // `withinCancellationWindow()`daki (başlangıçtan ÖNCEKİ 24 saat)
+    // pencereyle karıştırılmamalı, bu BAŞLANGIÇTAN SONRAKİ 24 saat.
+    // Süre geçtikten sonra sadece admin (myRole() == 'admin' dalı) bu
+    // seansı tamamlanmış işaretleyebilir — client tarafında
+    // `trainer_calendar_panel.dart`'taki "Dersi onayla" sheet'i de aynı
+    // pencereyi kontrol edip süre geçmişse butonları devre dışı bırakıyor.
+    function withinCompletionWindow() {
+      return request.time < resource.data.startTime + duration.value(24, 'h');
+    }
+
     // F3-5 — antrenör kendi seansını "tamamlandı"/"üye gelmedi" olarak
-    // işaretlerken sadece status+attended alanlarını değiştiriyor; bu,
-    // ders zaten bittiği (dolayısıyla 24 saatlik pencerenin çoktan geçmiş
-    // olacağı) için 24 saat kuralından bağımsız tutuluyor.
+    // işaretlerken sadece status+attended alanlarını değiştiriyor.
     function isCompletingOwnSession() {
       return myRole() == 'trainer' &&
         resource.data.trainerId == request.auth.uid &&
         resource.data.status == 'planned' &&
         request.resource.data.status == 'completed' &&
-        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'attended']);
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'attended']) &&
+        withinCompletionWindow();
     }
 
     // F3-3/F3-5 — okuma kuralı önceden tek başına resource.data.gymId ==

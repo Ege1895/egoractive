@@ -11,11 +11,11 @@ class TrainerHomeService {
   const TrainerHomeService();
 
   TrainerHomeState loadInitial() {
-    return const TrainerHomeState(
+    return TrainerHomeState(
       todaySessionCount: 5,
       completedCount: 2,
       freeSlotCount: 3,
-      pendingConfirmations: [
+      pendingConfirmations: const [
         PendingConfirmation(
           id: 'pending-1',
           memberId: 'mock-cem-demir',
@@ -36,11 +36,11 @@ class TrainerHomeService {
         ),
       ],
       todaySchedule: [
-        ScheduleSlot(id: 's-1', time: '09:00', name: 'Zeynep Kaya', meta: 'Birebir · Stüdyo 1', state: ScheduleSlotState.completed),
-        ScheduleSlot(id: 's-2', time: '11:30', name: 'Mert Arslan', meta: 'Birebir · Stüdyo 2', state: ScheduleSlotState.completed),
-        ScheduleSlot(id: 's-3', time: '14:00', name: 'Reformer Grup', meta: '6/8 kişi · Stüdyo 1', state: ScheduleSlotState.current),
-        ScheduleSlot(id: 's-4', time: '18:30', name: 'Ayşe Yılmaz', meta: 'Birebir · Stüdyo 2', state: ScheduleSlotState.planned),
-        ScheduleSlot(id: 's-5', time: '20:00', name: 'Cem Demir', meta: 'Birebir · Stüdyo 1', state: ScheduleSlotState.planned),
+        ScheduleSlot(id: 's-1', time: '09:00', name: 'Zeynep Kaya', meta: 'Birebir · Stüdyo 1', state: ScheduleSlotState.completed, startTime: DateTime(2026, 8, 3, 9, 0)),
+        ScheduleSlot(id: 's-2', time: '11:30', name: 'Mert Arslan', meta: 'Birebir · Stüdyo 2', state: ScheduleSlotState.completed, startTime: DateTime(2026, 8, 3, 11, 30)),
+        ScheduleSlot(id: 's-3', time: '14:00', name: 'Reformer Grup', meta: '6/8 kişi · Stüdyo 1', state: ScheduleSlotState.current, startTime: DateTime(2026, 8, 3, 14, 0)),
+        ScheduleSlot(id: 's-4', time: '18:30', name: 'Ayşe Yılmaz', meta: 'Birebir · Stüdyo 2', state: ScheduleSlotState.planned, startTime: DateTime(2026, 8, 3, 18, 30)),
+        ScheduleSlot(id: 's-5', time: '20:00', name: 'Cem Demir', meta: 'Birebir · Stüdyo 1', state: ScheduleSlotState.planned, startTime: DateTime(2026, 8, 3, 20, 0)),
       ],
     );
   }

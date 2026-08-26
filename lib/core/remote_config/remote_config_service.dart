@@ -1030,11 +1030,8 @@ abstract final class RemoteConfigKeys {
       'lbl_sessions_member_home_see_package_button';
   static const sessionsTrainerNotificationsTitle =
       'lbl_sessions_trainer_notifications_title';
-  static const sessionsCompletionTitle = 'lbl_sessions_completion_title';
   static const sessionsCompletionMemberNoShowOption =
       'lbl_sessions_completion_member_no_show_option';
-  static const sessionsCompletionUndoButton =
-      'lbl_sessions_completion_undo_button';
   static const sessionsListTitle = 'lbl_sessions_list_title';
   static const sessionsListViewToggle = 'lbl_sessions_list_view_toggle';
   static const sessionsCalendarViewToggle = 'lbl_sessions_calendar_view_toggle';
@@ -1089,17 +1086,16 @@ abstract final class RemoteConfigKeys {
   static const sessionsManagementAttendanceError =
       'lbl_sessions_management_attendance_error';
   static const sessionsCompletionQuestion = 'lbl_sessions_completion_question';
-  static const sessionsCompletionSummary = 'lbl_sessions_completion_summary';
   static const sessionsCompletionTimeLimitNote =
       'lbl_sessions_completion_time_limit_note';
-  static const sessionsCompletionDoneMarked =
-      'lbl_sessions_completion_done_marked';
-  static const sessionsCompletionAbsentMarked =
-      'lbl_sessions_completion_absent_marked';
-  static const sessionsCompletionDoneSummary =
-      'lbl_sessions_completion_done_summary';
-  static const sessionsCompletionAbsentSummary =
-      'lbl_sessions_completion_absent_summary';
+
+  /// Seans başlangıcının üzerinden 24 saatten fazla geçmiş, hâlâ
+  /// `planned` durumundaki bir seansın "Dersi onayla" sheet'inde
+  /// gösterilir — butonlar devre dışı bırakılır (bkz.
+  /// `trainer_calendar_panel.dart`, `firestore.rules`'taki
+  /// `withinCompletionWindow()`).
+  static const sessionsCompletionExpiredNote =
+      'lbl_sessions_completion_expired_note';
   static const sessionsListEmptyState = 'lbl_sessions_list_empty_state';
   static const sessionsListCalendarEmptyDay =
       'lbl_sessions_list_calendar_empty_day';
@@ -1983,9 +1979,7 @@ class RemoteConfigService {
     'lbl_sessions_member_home_this_week_section_tr': 'BU HAFTA',
     'lbl_sessions_member_home_see_package_button_tr': 'Paketimi gör',
     'lbl_sessions_trainer_notifications_title_tr': 'Bildirimler',
-    'lbl_sessions_completion_title_tr': 'Seans onayı',
     'lbl_sessions_completion_member_no_show_option_tr': 'Üye gelmedi',
-    'lbl_sessions_completion_undo_button_tr': 'Geri al',
     'lbl_sessions_list_title_tr': 'Derslerim',
     'lbl_sessions_list_view_toggle_tr': 'Liste',
     'lbl_sessions_calendar_view_toggle_tr': 'Takvim',
@@ -2037,17 +2031,10 @@ class RemoteConfigService {
         'Kaydedilemedi, bağlantını kontrol edip tekrar dene.',
     'lbl_sessions_completion_question_tr':
         '{time} {name} seansını tamamladınız mı?',
-    'lbl_sessions_completion_summary_tr':
-        "Onaylarsanız kalan dersi {before}'dan {after}'e düşer",
     'lbl_sessions_completion_time_limit_note_tr':
         'Onayı 24 saat içinde verebilirsiniz, sonrasında yönetici onayı gerekir.',
-    'lbl_sessions_completion_done_marked_tr': 'Ders tamamlandı işaretlendi',
-    'lbl_sessions_completion_absent_marked_tr':
-        'Üye gelmedi olarak işaretlendi',
-    'lbl_sessions_completion_done_summary_tr':
-        "{name}'ın kalan dersi {after}'e düştü.",
-    'lbl_sessions_completion_absent_summary_tr':
-        "{name}'ın kalan dersi düşmedi, yöneticiye iletildi.",
+    'lbl_sessions_completion_expired_note_tr':
+        'Bu seansı onaylama süresi geçti. Yönetici ile iletişime geçmelisin.',
     'lbl_sessions_list_empty_state_tr':
         'Henüz dersin yok — antrenörün seninle bir ders planladığında burada görünecek.',
     'lbl_sessions_list_calendar_empty_day_tr': 'Bu günde dersin yok.',
@@ -2089,7 +2076,7 @@ class RemoteConfigService {
     'lbl_trainers_member_detail_remaining_sessions_label_tr': 'Kalan ders',
     'lbl_trainers_member_detail_package_end_label_tr': 'Paket bitişi',
     'lbl_trainers_calendar_title_tr': 'Takvimim',
-    'lbl_trainers_calendar_mark_completed_action_tr': 'Dersi onayla',
+    'lbl_trainers_calendar_mark_completed_action_tr': 'Ders tamamlandı',
     'lbl_trainers_members_list_title_tr': 'Üyelerim',
     'lbl_trainers_members_filter_expiring_tr': 'Paketi bitiyor',
     'lbl_trainers_members_remaining_sessions_suffix_tr': 'kalan ders',
@@ -2756,9 +2743,7 @@ class RemoteConfigService {
     'lbl_sessions_member_home_this_week_section_en': 'THIS WEEK',
     'lbl_sessions_member_home_see_package_button_en': 'View my package',
     'lbl_sessions_trainer_notifications_title_en': 'Notifications',
-    'lbl_sessions_completion_title_en': 'Session confirmation',
     'lbl_sessions_completion_member_no_show_option_en': 'Member didn\'t show',
-    'lbl_sessions_completion_undo_button_en': 'Undo',
     'lbl_sessions_list_title_en': 'My Sessions',
     'lbl_sessions_list_view_toggle_en': 'List',
     'lbl_sessions_calendar_view_toggle_en': 'Calendar',
@@ -2809,16 +2794,10 @@ class RemoteConfigService {
         'Could not save, check your connection and try again.',
     'lbl_sessions_completion_question_en':
         'Did you complete {name}\'s {time} class?',
-    'lbl_sessions_completion_summary_en':
-        "If confirmed, remaining sessions drop from {before} to {after}",
     'lbl_sessions_completion_time_limit_note_en':
         'You can confirm within 24 hours, after that admin approval is required.',
-    'lbl_sessions_completion_done_marked_en': 'Marked as completed',
-    'lbl_sessions_completion_absent_marked_en': 'Marked as no-show',
-    'lbl_sessions_completion_done_summary_en':
-        "{name}'s remaining sessions dropped to {after}.",
-    'lbl_sessions_completion_absent_summary_en':
-        "{name}'s remaining sessions were not deducted, forwarded to the admin.",
+    'lbl_sessions_completion_expired_note_en':
+        'The window to confirm this session has passed. Please contact your admin.',
     'lbl_sessions_list_empty_state_en':
         "You don't have any classes yet — they'll show up here once your trainer schedules one with you.",
     'lbl_sessions_list_calendar_empty_day_en': 'No classes on this day.',
@@ -2863,7 +2842,7 @@ class RemoteConfigService {
         'Remaining sessions',
     'lbl_trainers_member_detail_package_end_label_en': 'Package end date',
     'lbl_trainers_calendar_title_en': 'My Calendar',
-    'lbl_trainers_calendar_mark_completed_action_en': 'Confirm session',
+    'lbl_trainers_calendar_mark_completed_action_en': 'Session completed',
     'lbl_trainers_members_list_title_en': 'My Members',
     'lbl_trainers_members_filter_expiring_en': 'Package expiring',
     'lbl_trainers_members_remaining_sessions_suffix_en': 'remaining sessions',

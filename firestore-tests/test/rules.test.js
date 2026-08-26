@@ -639,7 +639,7 @@ test("member cannot change status while setting memberConfirmation (negative —
 
 // --- ders tamamlama onayı (F3-5) ---
 
-test("trainer can mark their own past session as completed (positive — 24h kuralına tabi değil, ders zaten bitmiş)", async () => {
+test("trainer can mark their own past session as completed (positive — başlangıçtan 24 saat geçmemiş)", async () => {
   await seedSession("s1", { trainerId: "trainer-a", memberId: "member-a1", startTime: hoursFromNow(-2), endTime: hoursFromNow(-1) });
   const db = contextFor("trainer-a", { role: "trainer", gymId: "gym-a" }).firestore();
   await assertSucceeds(updateDoc(doc(db, "sessions/s1"), { status: "completed", attended: true }));
@@ -649,6 +649,18 @@ test("trainer can mark their own past session as no-show (positive)", async () =
   await seedSession("s1", { trainerId: "trainer-a", memberId: "member-a1", startTime: hoursFromNow(-2), endTime: hoursFromNow(-1) });
   const db = contextFor("trainer-a", { role: "trainer", gymId: "gym-a" }).firestore();
   await assertSucceeds(updateDoc(doc(db, "sessions/s1"), { status: "completed", attended: false }));
+});
+
+test("trainer cannot mark a session completed once 24 hours have passed since it started (negative — yönetici onayı gerekir)", async () => {
+  await seedSession("s1", { trainerId: "trainer-a", memberId: "member-a1", startTime: hoursFromNow(-25), endTime: hoursFromNow(-24) });
+  const db = contextFor("trainer-a", { role: "trainer", gymId: "gym-a" }).firestore();
+  await assertFails(updateDoc(doc(db, "sessions/s1"), { status: "completed", attended: true }));
+});
+
+test("admin can still mark a session completed after the trainer's 24-hour window has passed (positive — admin sınırsız)", async () => {
+  await seedSession("s1", { trainerId: "trainer-a", memberId: "member-a1", startTime: hoursFromNow(-25), endTime: hoursFromNow(-24) });
+  const db = contextFor("admin-a", { role: "admin", gymId: "gym-a" }).firestore();
+  await assertSucceeds(updateDoc(doc(db, "sessions/s1"), { status: "completed", attended: true }));
 });
 
 test("trainer cannot mark another trainer's session as completed (negative)", async () => {

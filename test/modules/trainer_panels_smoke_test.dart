@@ -8,7 +8,6 @@ import 'package:egoractive/core/theme/app_theme.dart';
 import 'package:egoractive/core/theme/app_typography.dart';
 import 'package:egoractive/modules/group_sessions/ui/panels/create_group_session_panel.dart';
 import 'package:egoractive/modules/sessions/ui/panels/attendance_notification_detail_panel.dart';
-import 'package:egoractive/modules/sessions/ui/panels/session_completion_panel.dart';
 import 'package:egoractive/modules/sessions/ui/panels/trainer_notifications_panel.dart';
 import 'package:egoractive/modules/sessions/domain/trainer_notification.dart';
 import 'package:egoractive/modules/trainers/ui/panels/trainer_calendar_panel.dart';
@@ -86,13 +85,6 @@ void main() {
         const AttendanceNotificationDetailPanel(
           notification: _sampleNotification,
         ),
-    'SessionCompletionPanel': const SessionCompletionPanel(
-      time: '18:30',
-      memberInitials: 'AY',
-      memberName: 'Ayşe Yılmaz',
-      meta: 'Birebir · 3 Ağustos 18:30',
-      remainingBefore: 6,
-    ),
   };
 
   for (final entry in panels.entries) {
@@ -142,27 +134,6 @@ void main() {
     );
     await tester.pump();
     await tester.tap(find.text('Paketi bitiyor'));
-    await tester.pump();
-    expect(tester.takeException(), isNull);
-  });
-
-  testWidgets('SessionCompletionPanel answer flow renders without overflow', (
-    tester,
-  ) async {
-    await tester.pumpWidget(
-      _wrap(
-        const SessionCompletionPanel(
-          time: '18:30',
-          memberInitials: 'AY',
-          memberName: 'Ayşe Yılmaz',
-          meta: 'Birebir · 3 Ağustos 18:30',
-          remainingBefore: 6,
-        ),
-        overrides: _fakeRcOverrides,
-      ),
-    );
-    await tester.pump();
-    await tester.tap(find.text('Tamamlandı'));
     await tester.pump();
     expect(tester.takeException(), isNull);
   });
