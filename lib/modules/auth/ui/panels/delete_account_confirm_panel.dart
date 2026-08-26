@@ -9,7 +9,6 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../packages/controller/package_controller.dart';
 import '../../controller/auth_controller.dart';
-import 'phone_login_panel.dart';
 
 List<String> _deleteItems(WidgetRef ref, int remainingSessions) => [
   ref
@@ -222,15 +221,13 @@ class _DeleteAccountConfirmPanelState
                     enabled:
                         authState.deleteAccountAcknowledged &&
                         !authState.isDeletingAccount,
-                    onPressed: () async {
-                      final success = await authController.deleteAccount();
-                      if (!mounted) return;
-                      if (success) {
-                        ref
-                            .read(panelStackControllerProvider.notifier)
-                            .replaceRoot(const PhoneLoginPanel());
-                      }
-                    },
+                    // Başarılıysa girişe dönüş burada elle yapılmıyor —
+                    // `deleteAccount()` zaten sonunda signOut() çağırıyor,
+                    // `main.dart`'taki merkezi `appAccessProvider` dinleyicisi
+                    // auth state null olunca `PhoneLoginPanel`'e geçiyor (iki
+                    // ayrı `replaceRoot` çağrısının yarışa girmesini önlemek
+                    // için — bkz. `profile_panel.dart`'taki aynı düzeltme).
+                    onPressed: () => authController.deleteAccount(),
                   ),
                   const SizedBox(height: AppSpacing.sm),
                   AppButton(

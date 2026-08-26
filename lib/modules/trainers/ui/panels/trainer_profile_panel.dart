@@ -8,7 +8,6 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../auth/controller/auth_controller.dart';
 import '../../../auth/ui/panels/delete_account_confirm_panel.dart';
 import '../../../auth/ui/panels/language_select_panel.dart';
-import '../../../auth/ui/panels/phone_login_panel.dart';
 import '../../../gyms/ui/panels/gym_rules_view_panel.dart';
 import '../../controller/trainer_profile_controller.dart';
 
@@ -145,10 +144,13 @@ class TrainerProfilePanel extends ConsumerWidget {
                     label: ref.watch(
                       rcTextProvider(RemoteConfigKeys.commonCikisYap),
                     ),
-                    onTap: () {
-                      ref.read(authControllerProvider.notifier).logout();
-                      panelStack.replaceRoot(const PhoneLoginPanel());
-                    },
+                    // Girişe dönüş burada elle yapılmıyor — `main.dart`'taki
+                    // merkezi `appAccessProvider` dinleyicisi auth state null
+                    // olunca zaten `PhoneLoginPanel`'e geçiyor (iki ayrı
+                    // `replaceRoot` çağrısının yarışa girip telefon input'unun
+                    // bazen tıklanamaz kalmasını önlemek için).
+                    onTap: () =>
+                        ref.read(authControllerProvider.notifier).logout(),
                   ),
                   _NavRow(
                     label: ref.watch(

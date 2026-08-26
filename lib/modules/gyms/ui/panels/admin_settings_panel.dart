@@ -8,7 +8,6 @@ import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../auth/controller/auth_controller.dart';
 import '../../../auth/ui/panels/language_select_panel.dart';
-import '../../../auth/ui/panels/phone_login_panel.dart';
 import '../../../events/ui/panels/admin_events_panel.dart';
 import '../../../feedback/ui/panels/admin_feedback_list_panel.dart';
 import '../../../group_sessions/ui/panels/admin_group_sessions_panel.dart';
@@ -206,10 +205,13 @@ class AdminSettingsPanel extends ConsumerWidget {
                       rcTextProvider(RemoteConfigKeys.commonCikisYap),
                     ),
                     isLast: true,
-                    onTap: () {
-                      ref.read(authControllerProvider.notifier).logout();
-                      panelStack.replaceRoot(const PhoneLoginPanel());
-                    },
+                    // Girişe dönüş burada elle yapılmıyor — `main.dart`'taki
+                    // merkezi `appAccessProvider` dinleyicisi auth state null
+                    // olunca zaten `PhoneLoginPanel`'e geçiyor (iki ayrı
+                    // `replaceRoot` çağrısının yarışa girip telefon input'unun
+                    // bazen tıklanamaz kalmasını önlemek için).
+                    onTap: () =>
+                        ref.read(authControllerProvider.notifier).logout(),
                   ),
                 ],
               ),

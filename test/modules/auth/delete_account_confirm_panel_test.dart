@@ -64,7 +64,7 @@ class _FakeRemoteConfigService extends RemoteConfigService {
 
 void main() {
   testWidgets(
-    'Hesabımı sil is disabled until the checkbox is acknowledged, then navigates to login on completion',
+    'Hesabımı sil is disabled until the checkbox is acknowledged, then calls deleteAccount',
     (tester) async {
       final container = ProviderContainer(
         overrides: [
@@ -110,8 +110,14 @@ void main() {
       await tester.pump(const Duration(seconds: 2)); // mock çağrı tamamlanır
       await tester.pump();
 
-      expect(find.text('Hesabını silmek geri alınamaz'), findsNothing);
-      expect(find.text('Telefonunla giriş yap'), findsOneWidget);
+      // Girişe dönüş artık bu panelin işi değil — `main.dart`'taki merkezi
+      // `appAccessProvider` dinleyicisi auth state null olunca navigasyonu
+      // kendisi yapıyor (bkz. `deleteAccount()`'ın panel içindeki
+      // `onPressed`'i artık sadece çağrıyı tetikliyor, elle `replaceRoot`
+      // yapmıyor — iki ayrı navigasyonun yarışa girmesini önlemek için).
+      // Bu yüzden burada sadece silme akışının tamamlandığını (ekranın
+      // "siliniyor" durumundan çıktığını) doğruluyoruz.
+      expect(find.text('Hesabını silmek geri alınamaz'), findsOneWidget);
     },
   );
 

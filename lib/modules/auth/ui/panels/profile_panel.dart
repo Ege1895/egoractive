@@ -15,7 +15,6 @@ import '../../controller/auth_controller.dart';
 import '../../controller/member_profile_controller.dart';
 import 'delete_account_confirm_panel.dart';
 import 'language_select_panel.dart';
-import 'phone_login_panel.dart';
 
 /// Üye 8 · Profilim (Profil sekmesi kökü).
 class ProfilePanel extends ConsumerWidget {
@@ -262,10 +261,14 @@ class ProfilePanel extends ConsumerWidget {
                     label: ref.watch(
                       rcTextProvider(RemoteConfigKeys.commonCikisYap),
                     ),
-                    onTap: () {
-                      controller.logout();
-                      panelStack.replaceRoot(const PhoneLoginPanel());
-                    },
+                    // Girişe dönüş burada elle yapılmıyor — `main.dart`'taki
+                    // merkezi `appAccessProvider` dinleyicisi, signOut()
+                    // tamamlanıp auth state null olduğunda zaten
+                    // `PhoneLoginPanel`'e geçiyor. İkisi birden yapılırsa
+                    // (aynı ekran için iki ayrı `replaceRoot` çağrısı yarışa
+                    // girip) telefon input'unun bazen tıklanamaz kalmasına
+                    // yol açan bir gesture/build yarışı oluşuyordu.
+                    onTap: controller.logout,
                   ),
                   _NavRow(
                     label: ref.watch(

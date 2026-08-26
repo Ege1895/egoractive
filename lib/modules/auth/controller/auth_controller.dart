@@ -52,7 +52,11 @@ class AuthController extends _$AuthController {
     );
   }
 
-  /// Başarılıysa `true` döner (çağıran taraf login ekranına yönlendirir).
+  /// Başarılıysa hesap silinip `FirebaseAuth.signOut()` çağrılmış olur —
+  /// `main.dart`'taki merkezi `appAccessProvider` dinleyicisi auth state
+  /// null olduğunda kendiliğinden girişe yönlendirir, çağıran taraf ayrıca
+  /// bir navigasyon yapmaz (iki ayrı `replaceRoot`'un yarışa girmesini
+  /// önlemek için). Dönen `bool` sadece UI'ın hata/başarı ayrımı için.
   Future<bool> deleteAccount() async {
     if (!state.deleteAccountAcknowledged || state.isDeletingAccount) {
       return false;
