@@ -14,7 +14,7 @@ export { onUserRoleAssigned } from "./triggers/on-user-role-assigned";
 export { onSessionWriteScheduleNotifications } from "./triggers/on-session-write-schedule-notifications";
 export { onEventCreated } from "./triggers/on-event-created";
 export { onGroupSessionCreated } from "./triggers/on-group-session-created";
-export { onMemberPackageQuotaChanged } from "./triggers/on-member-package-quota-changed";
+export { notifyMemberPackageQuota } from "./callable/notify-member-package-quota";
 export { sendSessionReminderTask } from "./tasks/send-session-reminder-task";
 export { sendSessionCompletionTask } from "./tasks/send-session-completion-task";
 export { sendEventReminderTask } from "./tasks/send-event-reminder-task";
