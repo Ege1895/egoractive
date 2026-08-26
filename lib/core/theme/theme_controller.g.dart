@@ -6,7 +6,7 @@ part of 'theme_controller.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$activeGymIdHash() => r'84143af14ba99f24c2a4f3e8cf87ecbde240c9fe';
+String _$activeGymIdHash() => r'509ec584c6f44c4ce1af9845c15c43ddc56e393f';
 
 /// Oturum açan kullanıcının custom claim'indeki `gymId`. Gerçek claim
 /// ataması F2-5'te (Custom Claims atama Cloud Function) yapılacağı için

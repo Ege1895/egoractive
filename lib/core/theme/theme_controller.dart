@@ -14,10 +14,8 @@ part 'theme_controller.g.dart';
 /// tema düzgün render ediliyor").
 @riverpod
 Future<String?> activeGymId(ActiveGymIdRef ref) async {
-  final user = await ref.watch(authStateProvider.future);
-  if (user == null) return null;
-  final tokenResult = await user.getIdTokenResult();
-  return tokenResult.claims?['gymId'] as String?;
+  final tokenResult = await ref.watch(authIdTokenResultProvider.future);
+  return tokenResult?.claims?['gymId'] as String?;
 }
 
 /// Salon bazlı dinamik tema (CLAUDE.md §2.4). Aktif salon biliniyorsa

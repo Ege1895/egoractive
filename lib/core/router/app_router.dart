@@ -38,12 +38,27 @@ AppRole? roleFromClaims(Map<String, dynamic>? claims) {
 @riverpod
 Stream<User?> authState(AuthStateRef ref) => FirebaseAuth.instance.authStateChanges();
 
+/// `role` (bu dosyada) ve `gymId` (`theme_controller.dart`'taki
+/// `activeGymIdProvider`) aynı custom claim map'inin iki farklı alanı —
+/// ikisi de `getIdTokenResult()`'a bağımlı. Önceden her biri KENDİ
+/// `getIdTokenResult()` çağrısını yapıyordu; `appAccessProvider` da bunları
+/// ardışık `await`ediyordu (role bitmeden gymId isteği hiç başlamıyordu) —
+/// yani her uygulama açılışında aynı token için iki ayrı round-trip.
+/// Riverpod aynı provider'ı izleyen tüm taraflar arasında sonucu
+/// memoize ettiği için burada TEK bir çağrıya indirgemek, `currentRole` ve
+/// `activeGymId`'nin ikisinin de aynı (tek) fetch'i paylaşmasını sağlıyor.
+@riverpod
+Future<IdTokenResult?> authIdTokenResult(AuthIdTokenResultRef ref) async {
+  final user = await ref.watch(authStateProvider.future);
+  if (user == null) return null;
+  return user.getIdTokenResult();
+}
+
 /// Oturum yoksa `null`. Oturum varsa ID token'ı okuyup rolü çözer — token
 /// custom claim taşımıyorsa/claim geçersizse de `null` döner.
 @riverpod
 Future<AppRole?> currentRole(CurrentRoleRef ref) async {
-  final user = await ref.watch(authStateProvider.future);
-  if (user == null) return null;
-  final tokenResult = await user.getIdTokenResult();
+  final tokenResult = await ref.watch(authIdTokenResultProvider.future);
+  if (tokenResult == null) return null;
   return roleFromClaims(tokenResult.claims);
 }
