@@ -104,6 +104,24 @@
       ]
     },
     {
+      "collectionGroup": "memberPackages",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "gymId", "order": "ASCENDING" },
+        { "fieldPath": "purchasedAt", "order": "ASCENDING" },
+        { "fieldPath": "paidAmount", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "expenses",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "gymId", "order": "ASCENDING" },
+        { "fieldPath": "date", "order": "ASCENDING" },
+        { "fieldPath": "amountTl", "order": "ASCENDING" }
+      ]
+    },
+    {
       "collectionGroup": "groupSessions",
       "queryScope": "COLLECTION",
       "fields": [
