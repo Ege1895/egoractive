@@ -26,6 +26,7 @@ class CreateGymService {
     required GymProfile profile,
     required Color themeColor,
     XFile? logoFile,
+    String? reportEmail,
   }) async {
     // Seans hatırlatma push'larının salonun bulunduğu yerin saatine göre
     // gösterilebilmesi için (bkz. sendSessionReminderTask) — cihazın o anki
@@ -49,6 +50,8 @@ class CreateGymService {
           'address': profile.address,
           'themeColorHex': _toHex(themeColor),
           if (timeZone != null) 'timeZone': timeZone,
+          if (reportEmail != null && reportEmail.isNotEmpty)
+            'reportEmails': {'gym': reportEmail},
           if (logoFile != null)
             'logoBase64': base64Encode(
               encodeGymLogoPng(await logoFile.readAsBytes()),

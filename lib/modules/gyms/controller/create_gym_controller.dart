@@ -158,8 +158,9 @@ class CreateGymController extends _$CreateGymController {
   /// önceki sürüm tüm hataları ("zaten kayıtlı" dahil) tek bir genel
   /// banner'da gösteriyordu, kullanıcı hangi alanın sorunlu olduğunu
   /// görmeden alanlara tek tek bakmak zorunda kalıyordu. Başarılıysa
-  /// oluşturulan `gymId`'yi döner. Logo opsiyoneldir.
-  Future<String?> submit() async {
+  /// oluşturulan `gymId`'yi döner. Logo ve [reportEmail] (F5-16 — rapor
+  /// e-postası) opsiyoneldir, boş geçilirse salon yine oluşturulur.
+  Future<String?> submit({String? reportEmail}) async {
     if (state.isSubmitting) return null;
 
     final profile = ref.read(gymProfileControllerProvider);
@@ -180,6 +181,7 @@ class CreateGymController extends _$CreateGymController {
             profile: profile,
             themeColor: themeColor,
             logoFile: state.logoFile,
+            reportEmail: reportEmail?.trim(),
           );
       state = state.copyWith(isSubmitting: false);
       return gymId;

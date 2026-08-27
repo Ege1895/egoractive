@@ -61,6 +61,10 @@ export const signupGymAdmin = onCall(async (request) => {
   const themeColorHex = requireNonEmptyString(data.themeColorHex, "Tema rengi");
   const logoBase64 = optionalNonEmptyString(data.logoBase64);
   const timeZone = resolveTimeZone(data.timeZone);
+  // F5-16 — rapor e-postası opsiyonel; salon kurulumu sırasında sorulur ama
+  // boş bırakılabilir (girilmezse haftalık/aylık rapor mailleri o salon için
+  // hiç çalışmaz, bkz. weekly-gym-report.ts/monthly-gym-report.ts).
+  const reportEmail = optionalNonEmptyString(data.reportEmails?.gym);
 
   let logoBuffer: Buffer | undefined;
   if (logoBase64 !== undefined) {
@@ -105,6 +109,7 @@ export const signupGymAdmin = onCall(async (request) => {
     address,
     timeZone,
     ...(logoUrl !== undefined ? { logoUrl } : {}),
+    ...(reportEmail !== undefined ? { reportEmails: { gym: reportEmail } } : {}),
     themeColors: { primary: themeColorHex },
     // subscriptionStatus artık burada otomatik "trial" yazılmıyor — admin,
     // girişten hemen sonra zorunlu SubscriptionOnboardingPanel'de gerçek bir

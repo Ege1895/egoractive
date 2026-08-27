@@ -633,6 +633,10 @@ abstract final class RemoteConfigKeys {
   static const gymsGymSetupPhoneHint = 'lbl_gyms_gym_setup_phone_hint';
   static const gymsGymSetupPhoneHelperNote =
       'lbl_gyms_gym_setup_phone_helper_note';
+  static const gymsGymSetupReportEmailLabel =
+      'lbl_gyms_gym_setup_report_email_label';
+  static const gymsGymSetupReportEmailDescription =
+      'lbl_gyms_gym_setup_report_email_description';
   static const gymsGymSetupLogoOptionalLabel =
       'lbl_gyms_gym_setup_logo_optional_label';
   static const gymsGymSetupLogoDescription =
@@ -1721,6 +1725,9 @@ class RemoteConfigService {
     'lbl_gyms_gym_setup_phone_hint_tr': '5XX XXX XX XX',
     'lbl_gyms_gym_setup_phone_helper_note_tr':
         'Salon kaydı tamamlanınca bu numarayla admin olarak giriş yapacaksın.',
+    'lbl_gyms_gym_setup_report_email_label_tr': 'Rapor e-postası (opsiyonel)',
+    'lbl_gyms_gym_setup_report_email_description_tr':
+        'Haftalık ve aylık salon özeti (ders/ciro/gider) bu adrese gönderilir. Şimdi boş bırakabilirsin, sonra Salon Bilgileri panelinden de ekleyebilirsin.',
     'lbl_gyms_gym_setup_logo_optional_label_tr': 'Salon logosu (opsiyonel)',
     'lbl_gyms_gym_setup_logo_description_tr':
         'Kare PNG, en az 512×512. Eklersen üyelerin ve antrenörlerin her ekranında arka planda %25 opaklıkla silüet olarak görünür — sonradan Salon Bilgileri panelinden de ekleyebilirsin.',
@@ -2489,6 +2496,9 @@ class RemoteConfigService {
     'lbl_gyms_gym_setup_phone_hint_en': '5XX XXX XX XX',
     'lbl_gyms_gym_setup_phone_helper_note_en':
         'Once gym registration is complete, you will log in as admin with this number.',
+    'lbl_gyms_gym_setup_report_email_label_en': 'Report email (optional)',
+    'lbl_gyms_gym_setup_report_email_description_en':
+        'The weekly and monthly gym summary (sessions/revenue/expenses) is emailed to this address. You can leave it blank now and add it later from Gym Info.',
     'lbl_gyms_gym_setup_logo_optional_label_en': 'Gym logo (optional)',
     'lbl_gyms_gym_setup_logo_description_en':
         'Square PNG, at least 512×512. If you add one, it appears as a 25%-opacity silhouette in the background on every screen for members and trainers — you can also add it later from the Gym Info panel.',

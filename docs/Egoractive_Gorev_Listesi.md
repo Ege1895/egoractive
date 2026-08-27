@@ -287,6 +287,10 @@ Sıralama, store review sürecini en hızlı şekilde başlatacak şekilde tasar
 **Prompt:** "F5-11'deki zengin rapor maili ciro/gider/net'i zaten içerdiğinden `weekly-accounting-report.ts` (ayrı bir muhasebe özeti maili) artık gereksiz — sil, `index.ts`'teki export'unu kaldır. `GymInfoPanel`'deki 'RAPOR E-POSTALARI' bölümünü tek alana indir: 'Muhasebe raporu e-postası' input'unu ve o karttaki ayrı 'Rapor e-postalarını kaydet' butonunu kaldır. `ReportRecipients` domain modelinden `accountingReportEmail`'i sil. Panelin en altındaki genel 'Kaydet' butonu artık salon bilgileri + tema + logo ile birlikte bu tek rapor e-postasını da kaydetsin (`_save()` akışına ekle, geçersiz e-postada genel kaydetme hatası olarak göster)."
 **Kabul kriterleri:** Salon Bilgileri ekranında tek bir 'Rapor e-postası' alanı var, ayrı bir kaydet butonu yok; en alttaki 'Kaydet'e basınca hem profil hem rapor e-postası tek seferde kaydediliyor; `gyms/{gymId}.reportEmails.gym` boşsa hem haftalık hem aylık rapor fonksiyonu o salonu atlıyor (F5-11/F5-13'teki davranış korunuyor).
 
+### F5-16 — Salon oluşturma ekranına opsiyonel rapor e-postası
+**Prompt:** "`GymSetupPanel`'e (F2-9 salon kurulum akışı) 'Rapor e-postası (opsiyonel)' kartı ekle — kısa bir açıklama ('haftalık/aylık özet bu adrese gönderilir, sonra da eklenebilir') + tek bir e-posta alanı. Zorunlu değil, boş bırakılırsa salon yine sorunsuz oluşturulur (F5-15'teki davranışla aynı: boşsa rapor fonksiyonları o salonu atlar). `CreateGymService.createGym`/`CreateGymController.submit` ve `signup-gym-admin.ts` callable'ı bu opsiyonel değeri `reportEmails.gym` olarak `gyms/{gymId}`'e yazsın (`timeZone`'daki `optionalNonEmptyString` deseniyle aynı)."
+**Kabul kriterleri:** Alan boş bırakılıp 'Salonu oluştur'a basıldığında salon hatasız oluşuyor ve `gyms/{gymId}.reportEmails` alanı hiç yazılmıyor; alan doldurulduğunda `gyms/{gymId}.reportEmails.gym` doğru değerle oluşuyor ve GymInfoPanel'de aynı e-posta önceden dolu görünüyor.
+
 ---
 
 ## FAZ 6 — Monetizasyon ve Çoklu Salon SaaS

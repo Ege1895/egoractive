@@ -3418,6 +3418,30 @@
       },
       "valueType": "STRING"
     },
+    "lbl_gyms_gym_setup_report_email_label_tr": {
+      "defaultValue": {
+        "value": "Rapor e-postası (opsiyonel)"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_setup_report_email_label_en": {
+      "defaultValue": {
+        "value": "Report email (optional)"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_setup_report_email_description_tr": {
+      "defaultValue": {
+        "value": "Haftalık ve aylık salon özeti (ders/ciro/gider) bu adrese gönderilir. Şimdi boş bırakabilirsin, sonra Salon Bilgileri panelinden de ekleyebilirsin."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_setup_report_email_description_en": {
+      "defaultValue": {
+        "value": "The weekly and monthly gym summary (sessions/revenue/expenses) is emailed to this address. You can leave it blank now and add it later from Gym Info."
+      },
+      "valueType": "STRING"
+    },
     "lbl_gyms_gym_setup_logo_optional_label_tr": {
       "defaultValue": {
         "value": "Salon logosu (opsiyonel)"

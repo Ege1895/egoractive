@@ -31,6 +31,7 @@ class _GymSetupPanelState extends BasePanelState<GymSetupPanel> {
   late final TextEditingController _cityController;
   late final TextEditingController _phoneController;
   late final TextEditingController _addressController;
+  late final TextEditingController _reportEmailController;
   final _phoneFieldKey = GlobalKey();
 
   @override
@@ -46,6 +47,10 @@ class _GymSetupPanelState extends BasePanelState<GymSetupPanel> {
     _cityController = TextEditingController();
     _phoneController = TextEditingController();
     _addressController = TextEditingController();
+    // F5-16 — opsiyonel, GymProfile'a dahil değil (o model sadece zorunlu
+    // iletişim alanlarını tutuyor); bu yüzden diğerlerinin aksine bir
+    // provider'a senkronize edilmiyor, submit anında doğrudan okunuyor.
+    _reportEmailController = TextEditingController();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       ref.read(gymProfileControllerProvider.notifier).reset();
@@ -236,6 +241,61 @@ class _GymSetupPanelState extends BasePanelState<GymSetupPanel> {
                             controller: _addressController,
                             errorText: createGymState.addressError,
                             onChanged: profileController.updateAddress,
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.lg),
+                    Container(
+                      padding: const EdgeInsets.all(AppSpacing.lg),
+                      decoration: BoxDecoration(
+                        color: colors.surface,
+                        borderRadius: BorderRadius.circular(
+                          AppSpacing.radiusCard,
+                        ),
+                        border: Border.all(color: colors.outline),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            ref.watch(
+                              rcTextProvider(
+                                RemoteConfigKeys.gymsGymSetupReportEmailLabel,
+                              ),
+                            ),
+                            style: typography.headingSmall.copyWith(
+                              color: colors.onSurface,
+                              fontSize: 16,
+                            ),
+                          ),
+                          const SizedBox(height: AppSpacing.xs),
+                          Text(
+                            ref.watch(
+                              rcTextProvider(
+                                RemoteConfigKeys
+                                    .gymsGymSetupReportEmailDescription,
+                              ),
+                            ),
+                            style: typography.bodyMedium.copyWith(
+                              color: colors.onSurfaceMuted,
+                              fontSize: 13,
+                            ),
+                          ),
+                          const SizedBox(height: AppSpacing.md),
+                          AppTextField(
+                            label: ref.watch(
+                              rcTextProvider(
+                                RemoteConfigKeys.gymsGymInfoGymReportEmailLabel,
+                              ),
+                            ),
+                            hint: ref.watch(
+                              rcTextProvider(
+                                RemoteConfigKeys.gymsGymInfoGymReportEmailHint,
+                              ),
+                            ),
+                            keyboardType: TextInputType.emailAddress,
+                            controller: _reportEmailController,
                           ),
                         ],
                       ),
@@ -496,7 +556,9 @@ class _GymSetupPanelState extends BasePanelState<GymSetupPanel> {
                       onPressed: createGymState.isSubmitting
                           ? null
                           : () async {
-                              final gymId = await createGymController.submit();
+                              final gymId = await createGymController.submit(
+                                reportEmail: _reportEmailController.text,
+                              );
                               if (gymId != null && mounted) {
                                 // `push` (replaceRoot değil) — kullanıcı numarayı
                                 // yanlış girdiyse ya da fikrini değiştirirse geri
@@ -536,6 +598,7 @@ class _GymSetupPanelState extends BasePanelState<GymSetupPanel> {
     _cityController.dispose();
     _phoneController.dispose();
     _addressController.dispose();
+    _reportEmailController.dispose();
     super.dispose();
   }
 }
