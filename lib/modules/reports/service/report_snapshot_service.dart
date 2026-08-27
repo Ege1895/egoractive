@@ -45,6 +45,15 @@ class ReportSnapshotService {
         name: trainer['name'] as String? ?? '—',
         completedSessions: (trainer['completedSessions'] as num?)?.toInt() ?? 0,
         totalSessions: (trainer['totalSessions'] as num?)?.toInt() ?? 0,
+        cancelledSessions: (trainer['cancelledSessions'] as num?)?.toInt() ?? 0,
+      );
+    }).toList();
+    final packagesRaw = data['packages'] as List<dynamic>? ?? const [];
+    final packages = packagesRaw.map((entry) {
+      final map = entry as Map<String, dynamic>;
+      return ReportPackageSale(
+        packageName: map['packageName'] as String? ?? '—',
+        count: (map['count'] as num?)?.toInt() ?? 0,
       );
     }).toList();
 
@@ -62,6 +71,19 @@ class ReportSnapshotService {
         estimatedRevenueTl: (data['estimatedRevenueTl'] as num?)?.toInt() ?? 0,
         totalExpensesTl: (data['totalExpensesTl'] as num?)?.toInt() ?? 0,
       ),
+      packages: packages,
+      groupSessions: _occupancyFrom(data['groupSessions']),
+      events: _occupancyFrom(data['events']),
+    );
+  }
+
+  ReportOccupancy _occupancyFrom(Object? raw) {
+    final map = raw as Map<String, dynamic>?;
+    if (map == null) return ReportOccupancy.empty;
+    return ReportOccupancy(
+      count: (map['count'] as num?)?.toInt() ?? 0,
+      capacity: (map['capacity'] as num?)?.toInt() ?? 0,
+      attendance: (map['attendance'] as num?)?.toInt() ?? 0,
     );
   }
 }

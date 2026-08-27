@@ -20,7 +20,11 @@ mixin _$TrainerPerformance {
   String get trainerId => throw _privateConstructorUsedError;
   String get name => throw _privateConstructorUsedError;
   int get completedSessions => throw _privateConstructorUsedError;
-  int get totalSessions => throw _privateConstructorUsedError;
+  int get totalSessions =>
+      throw _privateConstructorUsedError; // F5-11 rapor snapshot'larında var; canlı dashboard özetinde henüz
+  // hesaplanmıyor (bkz. DashboardReportService.loadTrainerPerformance),
+  // o yüzden varsayılan 0.
+  int get cancelledSessions => throw _privateConstructorUsedError;
 
   /// Create a copy of TrainerPerformance
   /// with the given fields replaced by the non-null parameter values.
@@ -41,6 +45,7 @@ abstract class $TrainerPerformanceCopyWith<$Res> {
     String name,
     int completedSessions,
     int totalSessions,
+    int cancelledSessions,
   });
 }
 
@@ -63,6 +68,7 @@ class _$TrainerPerformanceCopyWithImpl<$Res, $Val extends TrainerPerformance>
     Object? name = null,
     Object? completedSessions = null,
     Object? totalSessions = null,
+    Object? cancelledSessions = null,
   }) {
     return _then(
       _value.copyWith(
@@ -81,6 +87,10 @@ class _$TrainerPerformanceCopyWithImpl<$Res, $Val extends TrainerPerformance>
             totalSessions: null == totalSessions
                 ? _value.totalSessions
                 : totalSessions // ignore: cast_nullable_to_non_nullable
+                      as int,
+            cancelledSessions: null == cancelledSessions
+                ? _value.cancelledSessions
+                : cancelledSessions // ignore: cast_nullable_to_non_nullable
                       as int,
           )
           as $Val,
@@ -102,6 +112,7 @@ abstract class _$$TrainerPerformanceImplCopyWith<$Res>
     String name,
     int completedSessions,
     int totalSessions,
+    int cancelledSessions,
   });
 }
 
@@ -123,6 +134,7 @@ class __$$TrainerPerformanceImplCopyWithImpl<$Res>
     Object? name = null,
     Object? completedSessions = null,
     Object? totalSessions = null,
+    Object? cancelledSessions = null,
   }) {
     return _then(
       _$TrainerPerformanceImpl(
@@ -142,6 +154,10 @@ class __$$TrainerPerformanceImplCopyWithImpl<$Res>
             ? _value.totalSessions
             : totalSessions // ignore: cast_nullable_to_non_nullable
                   as int,
+        cancelledSessions: null == cancelledSessions
+            ? _value.cancelledSessions
+            : cancelledSessions // ignore: cast_nullable_to_non_nullable
+                  as int,
       ),
     );
   }
@@ -155,6 +171,7 @@ class _$TrainerPerformanceImpl extends _TrainerPerformance {
     required this.name,
     required this.completedSessions,
     required this.totalSessions,
+    this.cancelledSessions = 0,
   }) : super._();
 
   @override
@@ -165,10 +182,16 @@ class _$TrainerPerformanceImpl extends _TrainerPerformance {
   final int completedSessions;
   @override
   final int totalSessions;
+  // F5-11 rapor snapshot'larında var; canlı dashboard özetinde henüz
+  // hesaplanmıyor (bkz. DashboardReportService.loadTrainerPerformance),
+  // o yüzden varsayılan 0.
+  @override
+  @JsonKey()
+  final int cancelledSessions;
 
   @override
   String toString() {
-    return 'TrainerPerformance(trainerId: $trainerId, name: $name, completedSessions: $completedSessions, totalSessions: $totalSessions)';
+    return 'TrainerPerformance(trainerId: $trainerId, name: $name, completedSessions: $completedSessions, totalSessions: $totalSessions, cancelledSessions: $cancelledSessions)';
   }
 
   @override
@@ -182,7 +205,9 @@ class _$TrainerPerformanceImpl extends _TrainerPerformance {
             (identical(other.completedSessions, completedSessions) ||
                 other.completedSessions == completedSessions) &&
             (identical(other.totalSessions, totalSessions) ||
-                other.totalSessions == totalSessions));
+                other.totalSessions == totalSessions) &&
+            (identical(other.cancelledSessions, cancelledSessions) ||
+                other.cancelledSessions == cancelledSessions));
   }
 
   @override
@@ -192,6 +217,7 @@ class _$TrainerPerformanceImpl extends _TrainerPerformance {
     name,
     completedSessions,
     totalSessions,
+    cancelledSessions,
   );
 
   /// Create a copy of TrainerPerformance
@@ -212,6 +238,7 @@ abstract class _TrainerPerformance extends TrainerPerformance {
     required final String name,
     required final int completedSessions,
     required final int totalSessions,
+    final int cancelledSessions,
   }) = _$TrainerPerformanceImpl;
   const _TrainerPerformance._() : super._();
 
@@ -222,7 +249,11 @@ abstract class _TrainerPerformance extends TrainerPerformance {
   @override
   int get completedSessions;
   @override
-  int get totalSessions;
+  int get totalSessions; // F5-11 rapor snapshot'larında var; canlı dashboard özetinde henüz
+  // hesaplanmıyor (bkz. DashboardReportService.loadTrainerPerformance),
+  // o yüzden varsayılan 0.
+  @override
+  int get cancelledSessions;
 
   /// Create a copy of TrainerPerformance
   /// with the given fields replaced by the non-null parameter values.

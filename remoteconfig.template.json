@@ -7860,42 +7860,6 @@
       },
       "valueType": "STRING"
     },
-    "lbl_reports_pdf_metric_column_label_tr": {
-      "defaultValue": {
-        "value": "Metrik"
-      },
-      "valueType": "STRING"
-    },
-    "lbl_reports_pdf_metric_column_label_en": {
-      "defaultValue": {
-        "value": "Metric"
-      },
-      "valueType": "STRING"
-    },
-    "lbl_reports_pdf_value_column_label_tr": {
-      "defaultValue": {
-        "value": "Değer"
-      },
-      "valueType": "STRING"
-    },
-    "lbl_reports_pdf_value_column_label_en": {
-      "defaultValue": {
-        "value": "Value"
-      },
-      "valueType": "STRING"
-    },
-    "lbl_reports_pdf_trainer_column_label_tr": {
-      "defaultValue": {
-        "value": "Antrenör"
-      },
-      "valueType": "STRING"
-    },
-    "lbl_reports_pdf_trainer_column_label_en": {
-      "defaultValue": {
-        "value": "Trainer"
-      },
-      "valueType": "STRING"
-    },
     "lbl_reports_pdf_export_error_tr": {
       "defaultValue": {
         "value": "PDF oluşturulamadı, lütfen tekrar deneyin."
@@ -7906,6 +7870,190 @@
       "defaultValue": {
         "value": "Could not generate PDF, please try again."
       },
+      "valueType": "STRING"
+    },
+    "lbl_reports_pdf_hero_positive_template_tr": {
+      "defaultValue": { "value": "Bu dönem net {net} kâr ettin" },
+      "valueType": "STRING"
+    },
+    "lbl_reports_pdf_hero_positive_template_en": {
+      "defaultValue": { "value": "You made {net} net profit this period" },
+      "valueType": "STRING"
+    },
+    "lbl_reports_pdf_hero_negative_template_tr": {
+      "defaultValue": { "value": "Bu dönem net {net} gider fazlası oluştu" },
+      "valueType": "STRING"
+    },
+    "lbl_reports_pdf_hero_negative_template_en": {
+      "defaultValue": { "value": "This period ended with a {net} net loss" },
+      "valueType": "STRING"
+    },
+    "lbl_reports_pdf_hero_sub_positive_tr": {
+      "defaultValue": { "value": "Detaylar aşağıda — antrenör performansı ve en çok satan paketleri incelemeyi unutma." },
+      "valueType": "STRING"
+    },
+    "lbl_reports_pdf_hero_sub_positive_en": {
+      "defaultValue": { "value": "See the details below — check trainer performance and your best-selling packages." },
+      "valueType": "STRING"
+    },
+    "lbl_reports_pdf_hero_sub_negative_tr": {
+      "defaultValue": { "value": "Aşağıdaki gider ve paket satış dökümü, nereden tasarruf edebileceğini görmene yardımcı olabilir." },
+      "valueType": "STRING"
+    },
+    "lbl_reports_pdf_hero_sub_negative_en": {
+      "defaultValue": { "value": "The expense and package breakdown below can help you spot where to save." },
+      "valueType": "STRING"
+    },
+    "lbl_reports_pdf_group_events_title_tr": {
+      "defaultValue": { "value": "Grup Dersleri & Etkinlikler" },
+      "valueType": "STRING"
+    },
+    "lbl_reports_pdf_group_events_title_en": {
+      "defaultValue": { "value": "Group Classes & Events" },
+      "valueType": "STRING"
+    },
+    "lbl_reports_pdf_group_sessions_label_tr": {
+      "defaultValue": { "value": "Grup Dersleri" },
+      "valueType": "STRING"
+    },
+    "lbl_reports_pdf_group_sessions_label_en": {
+      "defaultValue": { "value": "Group Classes" },
+      "valueType": "STRING"
+    },
+    "lbl_reports_pdf_events_label_tr": {
+      "defaultValue": { "value": "Etkinlikler" },
+      "valueType": "STRING"
+    },
+    "lbl_reports_pdf_events_label_en": {
+      "defaultValue": { "value": "Events" },
+      "valueType": "STRING"
+    },
+    "lbl_reports_pdf_sessions_unit_tr": {
+      "defaultValue": { "value": "ders" },
+      "valueType": "STRING"
+    },
+    "lbl_reports_pdf_sessions_unit_en": {
+      "defaultValue": { "value": "classes" },
+      "valueType": "STRING"
+    },
+    "lbl_reports_pdf_events_unit_tr": {
+      "defaultValue": { "value": "etkinlik" },
+      "valueType": "STRING"
+    },
+    "lbl_reports_pdf_events_unit_en": {
+      "defaultValue": { "value": "events" },
+      "valueType": "STRING"
+    },
+    "lbl_reports_pdf_attendance_template_tr": {
+      "defaultValue": { "value": "{attendance} / {capacity} kişi katıldı · %{pct} doluluk" },
+      "valueType": "STRING"
+    },
+    "lbl_reports_pdf_attendance_template_en": {
+      "defaultValue": { "value": "{attendance} / {capacity} attended · %{pct} full" },
+      "valueType": "STRING"
+    },
+    "lbl_reports_pdf_packages_title_tr": {
+      "defaultValue": { "value": "Satın Alınan Paketler" },
+      "valueType": "STRING"
+    },
+    "lbl_reports_pdf_packages_title_en": {
+      "defaultValue": { "value": "Packages Sold" },
+      "valueType": "STRING"
+    },
+    "lbl_reports_pdf_packages_empty_tr": {
+      "defaultValue": { "value": "Bu dönemde paket satışı olmadı." },
+      "valueType": "STRING"
+    },
+    "lbl_reports_pdf_packages_empty_en": {
+      "defaultValue": { "value": "No packages were sold this period." },
+      "valueType": "STRING"
+    },
+    "lbl_reports_pdf_sales_unit_tr": {
+      "defaultValue": { "value": "satış" },
+      "valueType": "STRING"
+    },
+    "lbl_reports_pdf_sales_unit_en": {
+      "defaultValue": { "value": "sold" },
+      "valueType": "STRING"
+    },
+    "lbl_reports_pdf_finance_title_tr": {
+      "defaultValue": { "value": "Mali Özet" },
+      "valueType": "STRING"
+    },
+    "lbl_reports_pdf_finance_title_en": {
+      "defaultValue": { "value": "Financial Summary" },
+      "valueType": "STRING"
+    },
+    "lbl_reports_pdf_net_profit_label_tr": {
+      "defaultValue": { "value": "Net Kâr" },
+      "valueType": "STRING"
+    },
+    "lbl_reports_pdf_net_profit_label_en": {
+      "defaultValue": { "value": "Net Profit" },
+      "valueType": "STRING"
+    },
+    "lbl_reports_pdf_net_loss_label_tr": {
+      "defaultValue": { "value": "Net Zarar" },
+      "valueType": "STRING"
+    },
+    "lbl_reports_pdf_net_loss_label_en": {
+      "defaultValue": { "value": "Net Loss" },
+      "valueType": "STRING"
+    },
+    "lbl_reports_pdf_completed_short_label_tr": {
+      "defaultValue": { "value": "tamamlandı" },
+      "valueType": "STRING"
+    },
+    "lbl_reports_pdf_completed_short_label_en": {
+      "defaultValue": { "value": "completed" },
+      "valueType": "STRING"
+    },
+    "lbl_reports_pdf_cancelled_short_label_tr": {
+      "defaultValue": { "value": "iptal" },
+      "valueType": "STRING"
+    },
+    "lbl_reports_pdf_cancelled_short_label_en": {
+      "defaultValue": { "value": "cancelled" },
+      "valueType": "STRING"
+    },
+    "lbl_reports_pdf_total_short_label_tr": {
+      "defaultValue": { "value": "toplam" },
+      "valueType": "STRING"
+    },
+    "lbl_reports_pdf_total_short_label_en": {
+      "defaultValue": { "value": "total" },
+      "valueType": "STRING"
+    },
+    "lbl_reports_pdf_completion_rate_template_tr": {
+      "defaultValue": { "value": "%{completed} tamamlanma · %{cancelled} iptal oranı" },
+      "valueType": "STRING"
+    },
+    "lbl_reports_pdf_completion_rate_template_en": {
+      "defaultValue": { "value": "%{completed} completion · %{cancelled} cancellation rate" },
+      "valueType": "STRING"
+    },
+    "lbl_reports_pdf_sessions_title_tr": {
+      "defaultValue": { "value": "Ders Özeti" },
+      "valueType": "STRING"
+    },
+    "lbl_reports_pdf_sessions_title_en": {
+      "defaultValue": { "value": "Session Overview" },
+      "valueType": "STRING"
+    },
+    "lbl_reports_pdf_other_label_tr": {
+      "defaultValue": { "value": "Diğer" },
+      "valueType": "STRING"
+    },
+    "lbl_reports_pdf_other_label_en": {
+      "defaultValue": { "value": "Other" },
+      "valueType": "STRING"
+    },
+    "lbl_reports_pdf_footer_tr": {
+      "defaultValue": { "value": "Bu rapor Egoractive tarafından otomatik oluşturuldu." },
+      "valueType": "STRING"
+    },
+    "lbl_reports_pdf_footer_en": {
+      "defaultValue": { "value": "This report was generated automatically by Egoractive." },
       "valueType": "STRING"
     },
     "lbl_subscription_yearly_plan_fallback_tr": {

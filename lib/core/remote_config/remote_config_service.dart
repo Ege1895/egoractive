@@ -1005,13 +1005,40 @@ abstract final class RemoteConfigKeys {
   static const reportsExportPdfButtonLabel =
       'lbl_reports_export_pdf_button_label';
   static const reportsPdfDocumentTitle = 'lbl_reports_pdf_document_title';
-  static const reportsPdfMetricColumnLabel =
-      'lbl_reports_pdf_metric_column_label';
-  static const reportsPdfValueColumnLabel =
-      'lbl_reports_pdf_value_column_label';
-  static const reportsPdfTrainerColumnLabel =
-      'lbl_reports_pdf_trainer_column_label';
   static const reportsPdfExportError = 'lbl_reports_pdf_export_error';
+  static const reportsPdfSessionsTitle = 'lbl_reports_pdf_sessions_title';
+  // F5-21 — mail template'iyle (report-email-template.ts) birebir aynı
+  // yapı/metinler için PDF'e özel RC key'leri.
+  static const reportsPdfHeroPositiveTemplate =
+      'lbl_reports_pdf_hero_positive_template';
+  static const reportsPdfHeroNegativeTemplate =
+      'lbl_reports_pdf_hero_negative_template';
+  static const reportsPdfHeroSubPositive = 'lbl_reports_pdf_hero_sub_positive';
+  static const reportsPdfHeroSubNegative = 'lbl_reports_pdf_hero_sub_negative';
+  static const reportsPdfGroupEventsTitle =
+      'lbl_reports_pdf_group_events_title';
+  static const reportsPdfGroupSessionsLabel =
+      'lbl_reports_pdf_group_sessions_label';
+  static const reportsPdfEventsLabel = 'lbl_reports_pdf_events_label';
+  static const reportsPdfSessionsUnit = 'lbl_reports_pdf_sessions_unit';
+  static const reportsPdfEventsUnit = 'lbl_reports_pdf_events_unit';
+  static const reportsPdfAttendanceTemplate =
+      'lbl_reports_pdf_attendance_template';
+  static const reportsPdfPackagesTitle = 'lbl_reports_pdf_packages_title';
+  static const reportsPdfPackagesEmpty = 'lbl_reports_pdf_packages_empty';
+  static const reportsPdfSalesUnit = 'lbl_reports_pdf_sales_unit';
+  static const reportsPdfFinanceTitle = 'lbl_reports_pdf_finance_title';
+  static const reportsPdfNetProfitLabel = 'lbl_reports_pdf_net_profit_label';
+  static const reportsPdfNetLossLabel = 'lbl_reports_pdf_net_loss_label';
+  static const reportsPdfCompletedShortLabel =
+      'lbl_reports_pdf_completed_short_label';
+  static const reportsPdfCancelledShortLabel =
+      'lbl_reports_pdf_cancelled_short_label';
+  static const reportsPdfTotalShortLabel = 'lbl_reports_pdf_total_short_label';
+  static const reportsPdfCompletionRateTemplate =
+      'lbl_reports_pdf_completion_rate_template';
+  static const reportsPdfOtherLabel = 'lbl_reports_pdf_other_label';
+  static const reportsPdfFooter = 'lbl_reports_pdf_footer';
 
   static const sessionsCalendarTitle = 'lbl_sessions_calendar_title';
   static const sessionsCalendarSlotTimeLabel =
@@ -1985,11 +2012,37 @@ class RemoteConfigService {
     'lbl_reports_snapshot_detail_title_tr': 'Rapor Detayı',
     'lbl_reports_export_pdf_button_label_tr': 'PDF olarak dışa aktar',
     'lbl_reports_pdf_document_title_tr': 'Egoractive · Rapor',
-    'lbl_reports_pdf_metric_column_label_tr': 'Metrik',
-    'lbl_reports_pdf_value_column_label_tr': 'Değer',
-    'lbl_reports_pdf_trainer_column_label_tr': 'Antrenör',
     'lbl_reports_pdf_export_error_tr':
         'PDF oluşturulamadı, lütfen tekrar deneyin.',
+    'lbl_reports_pdf_hero_positive_template_tr': 'Bu dönem net {net} kâr ettin',
+    'lbl_reports_pdf_hero_negative_template_tr':
+        'Bu dönem net {net} gider fazlası oluştu',
+    'lbl_reports_pdf_hero_sub_positive_tr':
+        'Detaylar aşağıda — antrenör performansı ve en çok satan paketleri incelemeyi unutma.',
+    'lbl_reports_pdf_hero_sub_negative_tr':
+        'Aşağıdaki gider ve paket satış dökümü, nereden tasarruf edebileceğini görmene yardımcı olabilir.',
+    'lbl_reports_pdf_group_events_title_tr': 'Grup Dersleri & Etkinlikler',
+    'lbl_reports_pdf_group_sessions_label_tr': 'Grup Dersleri',
+    'lbl_reports_pdf_events_label_tr': 'Etkinlikler',
+    'lbl_reports_pdf_sessions_unit_tr': 'ders',
+    'lbl_reports_pdf_events_unit_tr': 'etkinlik',
+    'lbl_reports_pdf_attendance_template_tr':
+        '{attendance} / {capacity} kişi katıldı · %{pct} doluluk',
+    'lbl_reports_pdf_packages_title_tr': 'Satın Alınan Paketler',
+    'lbl_reports_pdf_packages_empty_tr': 'Bu dönemde paket satışı olmadı.',
+    'lbl_reports_pdf_sales_unit_tr': 'satış',
+    'lbl_reports_pdf_finance_title_tr': 'Mali Özet',
+    'lbl_reports_pdf_net_profit_label_tr': 'Net Kâr',
+    'lbl_reports_pdf_net_loss_label_tr': 'Net Zarar',
+    'lbl_reports_pdf_completed_short_label_tr': 'tamamlandı',
+    'lbl_reports_pdf_cancelled_short_label_tr': 'iptal',
+    'lbl_reports_pdf_total_short_label_tr': 'toplam',
+    'lbl_reports_pdf_completion_rate_template_tr':
+        '%{completed} tamamlanma · %{cancelled} iptal oranı',
+    'lbl_reports_pdf_sessions_title_tr': 'Ders Özeti',
+    'lbl_reports_pdf_other_label_tr': 'Diğer',
+    'lbl_reports_pdf_footer_tr':
+        'Bu rapor Egoractive tarafından otomatik oluşturuldu.',
     'lbl_sessions_calendar_title_tr': 'Takvim',
     'lbl_sessions_calendar_slot_time_label_tr': 'Saat',
     'lbl_sessions_calendar_slot_status_label_tr': 'Durum',
@@ -2763,9 +2816,36 @@ class RemoteConfigService {
     'lbl_reports_snapshot_detail_title_en': 'Report Detail',
     'lbl_reports_export_pdf_button_label_en': 'Export as PDF',
     'lbl_reports_pdf_document_title_en': 'Egoractive · Report',
-    'lbl_reports_pdf_metric_column_label_en': 'Metric',
-    'lbl_reports_pdf_value_column_label_en': 'Value',
-    'lbl_reports_pdf_trainer_column_label_en': 'Trainer',
+    'lbl_reports_pdf_hero_positive_template_en':
+        'You made {net} net profit this period',
+    'lbl_reports_pdf_hero_negative_template_en':
+        'This period ended with a {net} net loss',
+    'lbl_reports_pdf_hero_sub_positive_en':
+        'See the details below — check trainer performance and your best-selling packages.',
+    'lbl_reports_pdf_hero_sub_negative_en':
+        'The expense and package breakdown below can help you spot where to save.',
+    'lbl_reports_pdf_group_events_title_en': 'Group Classes & Events',
+    'lbl_reports_pdf_group_sessions_label_en': 'Group Classes',
+    'lbl_reports_pdf_events_label_en': 'Events',
+    'lbl_reports_pdf_sessions_unit_en': 'classes',
+    'lbl_reports_pdf_events_unit_en': 'events',
+    'lbl_reports_pdf_attendance_template_en':
+        '{attendance} / {capacity} attended · %{pct} full',
+    'lbl_reports_pdf_packages_title_en': 'Packages Sold',
+    'lbl_reports_pdf_packages_empty_en': 'No packages were sold this period.',
+    'lbl_reports_pdf_sales_unit_en': 'sold',
+    'lbl_reports_pdf_finance_title_en': 'Financial Summary',
+    'lbl_reports_pdf_net_profit_label_en': 'Net Profit',
+    'lbl_reports_pdf_net_loss_label_en': 'Net Loss',
+    'lbl_reports_pdf_completed_short_label_en': 'completed',
+    'lbl_reports_pdf_cancelled_short_label_en': 'cancelled',
+    'lbl_reports_pdf_total_short_label_en': 'total',
+    'lbl_reports_pdf_completion_rate_template_en':
+        '%{completed} completion · %{cancelled} cancellation rate',
+    'lbl_reports_pdf_sessions_title_en': 'Session Overview',
+    'lbl_reports_pdf_other_label_en': 'Other',
+    'lbl_reports_pdf_footer_en':
+        'This report was generated automatically by Egoractive.',
     'lbl_reports_pdf_export_error_en':
         'Could not generate PDF, please try again.',
     'lbl_sessions_calendar_title_en': 'Calendar',

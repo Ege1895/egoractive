@@ -309,6 +309,21 @@ Sıralama, store review sürecini en hızlı şekilde başlatacak şekilde tasar
 **Kabul kriterleri:** Bir üyenin ödeme durumu değiştirilip Raporlar ekranına dönüldüğünde ciro/gider güncel değeri gösteriyor; Geçmiş Raporlar listesi ekran her açıldığında yeniden denenip (varsa geçici bir hata durumundan) kurtulabiliyor.
 > **Ek not (aynı gün):** `onPanelShow` düzeltmesi canlı özeti çözdü ama "Geçmiş Raporlar" hâlâ sonsuza kadar dönüyordu — ikinci, daha derin bir bağlanma hatası vardı: `ReportSnapshotController.build()` sadece seçili `ReportPeriod`'u tutuyordu, asıl veriyi (`_snapshotsForGym` family provider'ı) SADECE getter'lar (`snapshots`/`isLoading`/`hasError`) izliyordu. Veri yüklenip bittiğinde controller'ın KENDİ çıktısı (`ReportPeriod`) değişmediğinden, Riverpod `_PastReportsSection` widget'ını (bu controller'ı izleyen) hiç yeniden tetiklemiyordu — widget sonsuza dek İLK (loading) durumda donuk kalıyordu. Fix: family provider public'e çevrilip (`reportSnapshotsForGymProvider`) `_PastReportsSection` bunu DOĞRUDAN `ref.watch` ediyor; controller artık sadece filtre state'i + `retry()` sağlıyor.
 
+### F5-21 — PDF export'u mail template'iyle birebir aynı yap (WIP — yarım kaldı)
+**Prompt:** "Export edilen PDF (`report_pdf_export_service.dart`) eski hali basit tablo bordürlü görünüyordu, F5-11'deki zengin mail template'i (`report-email-template.ts`) kadar güzel değildi. Kullanıcı: 'mail templatinin birebir aynısını yap geliştir.'"
+**Durum (2026-08-27 itibarıyla):** Kod tarafı TAMAMLANDI, doğrulama/teslim adımları YARIM KALDI. Bir sonraki oturum şuradan devam etmeli:
+1. Yapılanlar: `report_pdf_export_service.dart` sıfırdan yeniden yazıldı — mail template'indeki aynı renk paleti (`COLOR` map hex değerleri), header/hero banner, ders özeti segmented bar + legend, grup dersleri & etkinlikler doluluk bölümü, antrenör performans satırları, satılan paketler (sıralı, madalya yerine "1./2./3." numaralandırma), mali özet (ciro/gider bar + net kâr/zarar kutusu) — `pw.MultiPage` + `pw.Row`/`pw.Expanded`/`flex` ile (tablo hack'i gerekmiyor, PDF tek render motoru). Emoji/madalya bilinçli olarak KULLANILMADI (gömülü font emoji glifi içermiyor, boş kutu olarak görünürdü) — bu, "birebir aynı" isteğinden bilinçli/gerekçeli bir sapma.
+   Domain modelleri güncellendi: `TrainerPerformance.cancelledSessions`, yeni `ReportPackageSale`/`ReportOccupancy` sınıfları, `ReportSnapshot.packages/groupSessions/events`. `report_snapshot_service.dart` Firestore parse'ı güncellendi. `remote_config_service.dart` + `remoteconfig.template.json`'a ~27 yeni ikili (TR/EN) RC key eklendi (`reportsPdf*`), 3 ölü key kaldırıldı. `report_snapshot_detail_panel.dart`'ın `_exportPdf()`'i yeni 29 alanlı `ReportPdfLabels`'ı dolduracak + `gymName` (`gymProfileControllerProvider`'dan) geçecek şekilde güncellendi.
+   `flutter analyze` (hem modül bazlı hem tam) TEMİZ — sadece bu oturumun başından beri var olan 5 ilgisiz info-seviye lint var (create_gym_service.dart:52, member_registration_service.dart:88-89, subscription_panel.dart:97,191).
+2. Yapılmayanlar (sırayla):
+   - `flutter test` çalıştırılmadı (bu değişiklik için).
+   - Görsel/runtime doğrulama yapılmadı — bir smoke-test taslağı yazılmıştı (scratchpad'de, session'a özel, kalıcı değil) ama çalıştırılmadan kesildi: `TestWidgetsFlutterBinding.ensureInitialized()` + mock `ReportSnapshot`/`ReportPdfLabels` ile `ReportPdfExportService().buildPdf(...)` çağırıp byte sayısını ve (varsa) sayfalama/overflow exception'ı olup olmadığını doğrulamak gerekiyor.
+   - `dart format` değişen dosyalara uygulanmadı (uygulanınca ilgisiz dosyalarda hash-only değişiklik çıkabilir — established practice: `git diff --stat` kontrol edip ilgisizleri `git checkout --` ile geri al).
+   - Git commit/push yapılmadı — mevcut çalışma ağacında commit edilmemiş halde duruyor.
+   - `firebase deploy --only remoteconfig` yapılmadı (yeni ~27 RC key için).
+   - `flutter build ios --debug --no-codesign` yapılmadı ("hazırla" adımı, kullanıcı henüz istemedi).
+**Kabul kriterleri:** Export edilen PDF, mail template'iyle aynı renk/bölüm/bar-chart görünümünde (emoji hariç); `flutter test` yeşil; commit + push yapılmış; RC deploy edilmiş; kullanıcı "hazırla" dediğinde iOS build hazır.
+
 ---
 
 ## FAZ 6 — Monetizasyon ve Çoklu Salon SaaS

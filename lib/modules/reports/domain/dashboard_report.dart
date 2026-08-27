@@ -9,11 +9,16 @@ class TrainerPerformance with _$TrainerPerformance {
     required String name,
     required int completedSessions,
     required int totalSessions,
+    // F5-11 rapor snapshot'larında var; canlı dashboard özetinde henüz
+    // hesaplanmıyor (bkz. DashboardReportService.loadTrainerPerformance),
+    // o yüzden varsayılan 0.
+    @Default(0) int cancelledSessions,
   }) = _TrainerPerformance;
 
   const TrainerPerformance._();
 
-  double get completionRatio => totalSessions == 0 ? 0 : completedSessions / totalSessions;
+  double get completionRatio =>
+      totalSessions == 0 ? 0 : completedSessions / totalSessions;
 }
 
 /// F7-2 — antrenör performans dökümü (`trainerPerformance`) ayrı, daha
@@ -43,8 +48,10 @@ class DashboardSummary with _$DashboardSummary {
     totalExpensesTl: 0,
   );
 
-  double get completionRatio => totalSessions == 0 ? 0 : completedSessions / totalSessions;
-  double get cancellationRatio => totalSessions == 0 ? 0 : cancelledSessions / totalSessions;
+  double get completionRatio =>
+      totalSessions == 0 ? 0 : completedSessions / totalSessions;
+  double get cancellationRatio =>
+      totalSessions == 0 ? 0 : cancelledSessions / totalSessions;
   int get netTl => estimatedRevenueTl - totalExpensesTl;
 }
 
@@ -72,7 +79,10 @@ class DashboardReport with _$DashboardReport {
     totalExpensesTl: 0,
   );
 
-  factory DashboardReport.from(DashboardSummary summary, List<TrainerPerformance> trainerPerformance) {
+  factory DashboardReport.from(
+    DashboardSummary summary,
+    List<TrainerPerformance> trainerPerformance,
+  ) {
     return DashboardReport(
       monthLabel: summary.monthLabel,
       totalSessions: summary.totalSessions,
@@ -84,7 +94,9 @@ class DashboardReport with _$DashboardReport {
     );
   }
 
-  double get completionRatio => totalSessions == 0 ? 0 : completedSessions / totalSessions;
-  double get cancellationRatio => totalSessions == 0 ? 0 : cancelledSessions / totalSessions;
+  double get completionRatio =>
+      totalSessions == 0 ? 0 : completedSessions / totalSessions;
+  double get cancellationRatio =>
+      totalSessions == 0 ? 0 : cancelledSessions / totalSessions;
   int get netTl => estimatedRevenueTl - totalExpensesTl;
 }

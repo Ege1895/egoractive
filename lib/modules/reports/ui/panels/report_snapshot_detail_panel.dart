@@ -8,6 +8,7 @@ import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_back_button.dart';
 import '../../../../shared/widgets/app_button.dart';
+import '../../../gyms/controller/gym_profile_controller.dart';
 import '../../domain/report_snapshot.dart';
 import '../../service/report_pdf_export_service.dart';
 import '../widgets/report_finance_summary_card.dart';
@@ -183,40 +184,95 @@ class _ReportSnapshotDetailPanelState
       documentTitle: ref.read(
         rcTextProvider(RemoteConfigKeys.reportsPdfDocumentTitle),
       ),
+      heroPositiveTemplate: ref.read(
+        rcTextProvider(RemoteConfigKeys.reportsPdfHeroPositiveTemplate),
+      ),
+      heroNegativeTemplate: ref.read(
+        rcTextProvider(RemoteConfigKeys.reportsPdfHeroNegativeTemplate),
+      ),
+      heroSubPositive: ref.read(
+        rcTextProvider(RemoteConfigKeys.reportsPdfHeroSubPositive),
+      ),
+      heroSubNegative: ref.read(
+        rcTextProvider(RemoteConfigKeys.reportsPdfHeroSubNegative),
+      ),
+      sessionsTitle: ref.read(
+        rcTextProvider(RemoteConfigKeys.reportsPdfSessionsTitle),
+      ),
       totalSessions: ref.read(
         rcTextProvider(RemoteConfigKeys.reportsTotalSessionsLabel),
       ),
-      completedSessions: ref.read(
+      completed: ref.read(
         rcTextProvider(RemoteConfigKeys.gymsAdminHomeCompletedLabel),
       ),
-      cancelledSessions: ref.read(
-        rcTextProvider(RemoteConfigKeys.commonIptalLabel),
+      cancelled: ref.read(rcTextProvider(RemoteConfigKeys.commonIptalLabel)),
+      other: ref.read(rcTextProvider(RemoteConfigKeys.reportsPdfOtherLabel)),
+      groupEventsTitle: ref.read(
+        rcTextProvider(RemoteConfigKeys.reportsPdfGroupEventsTitle),
       ),
-      estimatedRevenue: ref.read(
-        rcTextProvider(RemoteConfigKeys.gymsAdminHomeEstimatedRevenueLabel),
+      groupSessionsLabel: ref.read(
+        rcTextProvider(RemoteConfigKeys.reportsPdfGroupSessionsLabel),
       ),
-      totalExpenses: ref.read(
-        rcTextProvider(RemoteConfigKeys.gymsAdminHomeExpenseLabel),
+      eventsLabel: ref.read(
+        rcTextProvider(RemoteConfigKeys.reportsPdfEventsLabel),
       ),
-      net: ref.read(rcTextProvider(RemoteConfigKeys.reportsNetLabel)),
-      metricColumn: ref.read(
-        rcTextProvider(RemoteConfigKeys.reportsPdfMetricColumnLabel),
+      sessionsUnit: ref.read(
+        rcTextProvider(RemoteConfigKeys.reportsPdfSessionsUnit),
       ),
-      valueColumn: ref.read(
-        rcTextProvider(RemoteConfigKeys.reportsPdfValueColumnLabel),
+      eventsUnit: ref.read(
+        rcTextProvider(RemoteConfigKeys.reportsPdfEventsUnit),
       ),
-      trainerPerformanceSection: ref.read(
+      attendanceTemplate: ref.read(
+        rcTextProvider(RemoteConfigKeys.reportsPdfAttendanceTemplate),
+      ),
+      trainersTitle: ref.read(
         rcTextProvider(RemoteConfigKeys.gymsAdminHomeTrainerPerformanceSection),
       ),
-      trainerColumn: ref.read(
-        rcTextProvider(RemoteConfigKeys.reportsPdfTrainerColumnLabel),
+      trainersEmpty: ref.read(
+        rcTextProvider(RemoteConfigKeys.reportsTrainerPerformanceEmptyState),
       ),
+      completedShort: ref.read(
+        rcTextProvider(RemoteConfigKeys.reportsPdfCompletedShortLabel),
+      ),
+      cancelledShort: ref.read(
+        rcTextProvider(RemoteConfigKeys.reportsPdfCancelledShortLabel),
+      ),
+      totalShort: ref.read(
+        rcTextProvider(RemoteConfigKeys.reportsPdfTotalShortLabel),
+      ),
+      completionRateTemplate: ref.read(
+        rcTextProvider(RemoteConfigKeys.reportsPdfCompletionRateTemplate),
+      ),
+      packagesTitle: ref.read(
+        rcTextProvider(RemoteConfigKeys.reportsPdfPackagesTitle),
+      ),
+      packagesEmpty: ref.read(
+        rcTextProvider(RemoteConfigKeys.reportsPdfPackagesEmpty),
+      ),
+      salesUnit: ref.read(rcTextProvider(RemoteConfigKeys.reportsPdfSalesUnit)),
+      financeTitle: ref.read(
+        rcTextProvider(RemoteConfigKeys.reportsPdfFinanceTitle),
+      ),
+      revenue: ref.read(
+        rcTextProvider(RemoteConfigKeys.gymsAdminHomeEstimatedRevenueLabel),
+      ),
+      expenses: ref.read(
+        rcTextProvider(RemoteConfigKeys.gymsAdminHomeExpenseLabel),
+      ),
+      netProfit: ref.read(
+        rcTextProvider(RemoteConfigKeys.reportsPdfNetProfitLabel),
+      ),
+      netLoss: ref.read(
+        rcTextProvider(RemoteConfigKeys.reportsPdfNetLossLabel),
+      ),
+      footer: ref.read(rcTextProvider(RemoteConfigKeys.reportsPdfFooter)),
     );
+    final gymName = ref.read(gymProfileControllerProvider).name;
 
     try {
       await ref
           .read(reportPdfExportServiceProvider)
-          .share(widget.snapshot, labels);
+          .share(widget.snapshot, gymName, labels);
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
