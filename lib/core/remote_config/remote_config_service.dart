@@ -435,8 +435,6 @@ abstract final class RemoteConfigKeys {
   static const groupSessionsDiscoverTabEvents =
       'lbl_group_sessions_discover_tab_events';
   static const groupSessionsCreateTitle = 'lbl_group_sessions_create_title';
-  static const groupSessionsDaysFieldLabel =
-      'lbl_group_sessions_days_field_label';
   static const groupSessionsCapacityFieldLabel =
       'lbl_group_sessions_capacity_field_label';
   static const groupSessionsOnlineBookingToggleLabel =
@@ -870,8 +868,6 @@ abstract final class RemoteConfigKeys {
   /// (Seanslar ekranı tarih başlığı) gidermek için eklendi.
   static const commonMonthNamesLong = 'lbl_common_month_names_long';
   static const commonWeekdayNamesLong = 'lbl_common_weekday_names_long';
-  static const groupSessionsDayAbbreviations =
-      'lbl_group_sessions_day_abbreviations';
   static const membersInfoConfirmAttendanceLabel =
       'lbl_members_info_confirm_attendance_label';
   static const membersInfoConfirmAttendanceHelper =
@@ -1578,7 +1574,6 @@ class RemoteConfigService {
     'lbl_group_sessions_discover_tab_group_sessions_tr': 'Grup dersleri',
     'lbl_group_sessions_discover_tab_events_tr': 'Etkinlikler',
     'lbl_group_sessions_create_title_tr': 'Grup dersi oluştur',
-    'lbl_group_sessions_days_field_label_tr': 'Günler',
     'lbl_group_sessions_capacity_field_label_tr': 'Kontenjan',
     'lbl_group_sessions_online_booking_toggle_label_tr':
         'Online rezervasyona açık',
@@ -1883,7 +1878,6 @@ class RemoteConfigService {
         'Ocak,Şubat,Mart,Nisan,Mayıs,Haziran,Temmuz,Ağustos,Eylül,Ekim,Kasım,Aralık',
     'lbl_common_weekday_names_long_tr':
         'Pazartesi,Salı,Çarşamba,Perşembe,Cuma,Cumartesi,Pazar',
-    'lbl_group_sessions_day_abbreviations_tr': 'Pzt,Sal,Çar,Per,Cum,Cmt,Paz',
     'lbl_members_info_confirm_attendance_label_tr': 'Ders onayı gönderebilsin',
     'lbl_members_info_confirm_attendance_helper_tr':
         'Üye ana ekranından sıradaki dersi için "Gelicem"/"Gelmeyeceğim" '
@@ -2336,7 +2330,6 @@ class RemoteConfigService {
     'lbl_group_sessions_discover_tab_group_sessions_en': 'Group Sessions',
     'lbl_group_sessions_discover_tab_events_en': 'Events',
     'lbl_group_sessions_create_title_en': 'Create group session',
-    'lbl_group_sessions_days_field_label_en': 'Days',
     'lbl_group_sessions_capacity_field_label_en': 'Capacity',
     'lbl_group_sessions_online_booking_toggle_label_en':
         'Open for online booking',
@@ -2645,7 +2638,6 @@ class RemoteConfigService {
         'January,February,March,April,May,June,July,August,September,October,November,December',
     'lbl_common_weekday_names_long_en':
         'Monday,Tuesday,Wednesday,Thursday,Friday,Saturday,Sunday',
-    'lbl_group_sessions_day_abbreviations_en': 'Mon,Tue,Wed,Thu,Fri,Sat,Sun',
     'lbl_members_info_confirm_attendance_label_en':
         'Can send session confirmations',
     'lbl_members_info_confirm_attendance_helper_en':

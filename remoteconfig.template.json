@@ -2102,18 +2102,6 @@
       },
       "valueType": "STRING"
     },
-    "lbl_group_sessions_days_field_label_tr": {
-      "defaultValue": {
-        "value": "Günler"
-      },
-      "valueType": "STRING"
-    },
-    "lbl_group_sessions_days_field_label_en": {
-      "defaultValue": {
-        "value": "Days"
-      },
-      "valueType": "STRING"
-    },
     "lbl_group_sessions_capacity_field_label_tr": {
       "defaultValue": {
         "value": "Kontenjan"
@@ -7991,19 +7979,6 @@
     "lbl_common_weekday_names_long_en": {
       "defaultValue": {
         "value": "Monday,Tuesday,Wednesday,Thursday,Friday,Saturday,Sunday"
-      },
-      "valueType": "STRING"
-    },
-    "lbl_group_sessions_day_abbreviations_tr": {
-      "defaultValue": {
-        "value": "Pzt,Sal,Çar,Per,Cum,Cmt,Paz"
-      },
-      "valueType": "STRING",
-      "description": "Virgülle ayrılmış 7 gün kısaltması — .split(',') ile kullanılır."
-    },
-    "lbl_group_sessions_day_abbreviations_en": {
-      "defaultValue": {
-        "value": "Mon,Tue,Wed,Thu,Fri,Sat,Sun"
       },
       "valueType": "STRING"
     },

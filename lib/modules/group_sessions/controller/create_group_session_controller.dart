@@ -46,11 +46,17 @@ class CreateGroupSessionController extends _$CreateGroupSessionController {
   void setDurationMinutes(int durationMinutes) =>
       state = state.copyWith(durationMinutes: durationMinutes);
 
-  void toggleDay(int day) {
-    final days = {...state.selectedDays};
-    days.contains(day) ? days.remove(day) : days.add(day);
-    state = state.copyWith(selectedDays: days, daysError: null);
-  }
+  /// Ana tarih değişince önceki "Tekrarla" seçimi de sıfırlanır —
+  /// `create_session_sheet.dart`'taki aynı davranış: eski seçim yeni ana
+  /// tarihle bağlamını yitiriyor.
+  void setSelectedDate(DateTime date) => state = state.copyWith(
+    selectedDate: date,
+    repeatDates: const [],
+    dateError: null,
+  );
+
+  void setRepeatDates(List<DateTime> dates) =>
+      state = state.copyWith(repeatDates: dates);
 
   void incrementCapacity() {
     if (state.capacity >= state.capacityMax) return;
@@ -65,18 +71,40 @@ class CreateGroupSessionController extends _$CreateGroupSessionController {
   void toggleOnlineBooking() =>
       state = state.copyWith(onlineBookingEnabled: !state.onlineBookingEnabled);
 
-  /// Seçili her gün için o günün en yakın gelecekteki tekrarında bir
-  /// `groupSessions` dokümanı oluşturur — tam bir tekrarlı seri motoru
-  /// değil (F4-2 kapsamı bunu gerektirmiyor), her seçili gün için tek bir
-  /// gerçek, katılınabilir seans. Boş başlıkta veya gün seçilmemişse
-  /// alanların altına spesifik hata yazıp `false` döner — önceki sürüm
-  /// sessizce hiçbir açıklama vermeden `false` dönüyordu.
+  /// Ana tarih + "Tekrarla" ile seçilen ek tarihlerin HER biri için ayrı
+  /// bir `groupSessions` dokümanı oluşturur (üyelerin grup dersi listesinde
+  /// tek tek görünürler) — seanslardaki gibi bir üst sınır yok, admin
+  /// istediği kadar tarih ekleyebilir. Boş başlıkta veya tarih
+  /// seçilmemişse alanların altına spesifik hata yazıp `false` döner.
   Future<bool> submit() async {
     final title = state.title.trim();
     final titleError = title.isEmpty ? 'Ders adı boş bırakılamaz.' : null;
-    final daysError = state.selectedDays.isEmpty ? 'En az bir gün seç.' : null;
-    if (titleError != null || daysError != null) {
-      state = state.copyWith(titleError: titleError, daysError: daysError);
+    final selectedDate = state.selectedDate;
+    final dateError = selectedDate == null ? 'Tarih seçmelisin.' : null;
+    if (titleError != null || dateError != null) {
+      state = state.copyWith(titleError: titleError, dateError: dateError);
+      return false;
+    }
+
+    final timeParts = state.startTime.split(':');
+    final hour = int.tryParse(timeParts.elementAt(0)) ?? 0;
+    final minute = timeParts.length > 1
+        ? int.tryParse(timeParts.elementAt(1)) ?? 0
+        : 0;
+    final allowPast = ref
+        .read(remoteConfigServiceProvider)
+        .allowPastDatetimeCreation;
+    final allDates = [selectedDate!, ...state.repeatDates];
+    final startTimes = allDates
+        .map(
+          (date) =>
+              DateTime(date.year, date.month, date.day, hour, minute),
+        )
+        .toList();
+    if (!allowPast && startTimes.any((t) => t.isBefore(DateTime.now()))) {
+      state = state.copyWith(
+        dateError: 'Geçmiş bir tarih/saat seçilemez.',
+      );
       return false;
     }
 
@@ -98,14 +126,8 @@ class CreateGroupSessionController extends _$CreateGroupSessionController {
           .get();
       final trainerName = (userDoc.data()?['name'] as String?)?.trim();
 
-      final timeParts = state.startTime.split(':');
-      final hour = int.tryParse(timeParts.elementAt(0)) ?? 0;
-      final minute = timeParts.length > 1
-          ? int.tryParse(timeParts.elementAt(1)) ?? 0
-          : 0;
-
       final service = ref.read(groupSessionsWriteServiceProvider);
-      for (final weekday in state.selectedDays) {
+      for (final startTime in startTimes) {
         await service.createGroupSession(
           gymId: gymId,
           title: title,
@@ -113,7 +135,7 @@ class CreateGroupSessionController extends _$CreateGroupSessionController {
               ? trainerName!
               : 'Antrenör',
           studioName: state.studioName,
-          startTime: _nextOccurrence(weekday, hour, minute),
+          startTime: startTime,
           durationMinutes: state.durationMinutes,
           capacity: state.capacity,
           onlineBookingEnabled: state.onlineBookingEnabled,
@@ -128,20 +150,5 @@ class CreateGroupSessionController extends _$CreateGroupSessionController {
       );
       return false;
     }
-  }
-
-  /// Seçili gün için en yakın gelecekteki tekrarı bulur — RC'deki
-  /// `cfg_allow_past_datetime_creation` testte açık DEĞİLSE asla geçmişte
-  /// bir tarih dönmez (`date.isBefore(now)` sürekli ileri sardırır).
-  /// Test amaçlı açıldığında bu ileri sardırma atlanır, bu haftaki (belki
-  /// zaten geçmiş) tekrar olduğu gibi döner.
-  DateTime _nextOccurrence(int weekday, int hour, int minute) {
-    final now = DateTime.now();
-    var date = DateTime(now.year, now.month, now.day, hour, minute);
-    final allowPast = ref.read(remoteConfigServiceProvider).allowPastDatetimeCreation;
-    while (date.weekday != weekday || (!allowPast && date.isBefore(now))) {
-      date = date.add(const Duration(days: 1));
-    }
-    return date;
   }
 }

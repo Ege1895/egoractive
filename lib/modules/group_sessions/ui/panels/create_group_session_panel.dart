@@ -9,8 +9,10 @@ import '../../../../core/subscription/subscription_write_gate.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_text_field.dart';
+import '../../../../shared/widgets/native_date_picker.dart';
 import '../../controller/create_group_session_controller.dart';
 import '../../domain/create_group_session_form.dart';
+import '../widgets/repeat_group_session_calendar_sheet.dart';
 
 /// Antrenör 7 · Grup Dersi Oluştur — kontenjan ve gün seçimi.
 class CreateGroupSessionPanel extends BasePanel {
@@ -166,56 +168,84 @@ class _CreateGroupSessionPanelState
                           ],
                         ),
                         const SizedBox(height: AppSpacing.md),
-                        Text(
-                          ref.watch(
-                            rcTextProvider(
-                              RemoteConfigKeys.groupSessionsDaysFieldLabel,
-                            ),
-                          ),
-                          style: typography.bodyMedium.copyWith(
-                            color: colors.onSurfaceMuted,
-                            fontSize: 13,
-                          ),
-                        ),
-                        const SizedBox(height: AppSpacing.sm),
-                        Builder(
-                          builder: (context) {
-                            final dayLabels = ref
-                                .watch(
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: _InfoField(
+                                label: ref.watch(
                                   rcTextProvider(
-                                    RemoteConfigKeys
-                                        .groupSessionsDayAbbreviations,
+                                    RemoteConfigKeys.eventsDateFieldLabel,
                                   ),
-                                )
-                                .split(',');
-                            return Row(
-                              children: [
-                                for (var i = 0; i < dayLabels.length; i++)
-                                  Expanded(
-                                    child: Padding(
-                                      padding: EdgeInsets.only(
-                                        right: i == dayLabels.length - 1
-                                            ? 0
-                                            : AppSpacing.xs,
-                                      ),
-                                      child: _DayChip(
-                                        label: dayLabels[i],
-                                        selected: form.selectedDays.contains(
-                                          i + 1,
+                                ),
+                                value: form.selectedDate == null
+                                    ? ref.watch(
+                                        rcTextProvider(
+                                          RemoteConfigKeys.eventsDateFieldHint,
                                         ),
-                                        onTap: () =>
-                                            controller.toggleDay(i + 1),
-                                      ),
-                                    ),
+                                      )
+                                    : _formatDate(ref, form.selectedDate!),
+                                onTap: () => showNativeDatePicker(
+                                  context: context,
+                                  initial: form.selectedDate ?? DateTime.now(),
+                                  firstDate: DateTime.now().subtract(
+                                    const Duration(days: 1),
                                   ),
-                              ],
-                            );
-                          },
+                                  lastDate: DateTime.now().add(
+                                    const Duration(days: 365 * 2),
+                                  ),
+                                  onSelected: controller.setSelectedDate,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: AppSpacing.sm),
+                            Expanded(
+                              child: _InfoField(
+                                label: ref.watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys.sessionsCreateRepeatLabel,
+                                  ),
+                                ),
+                                value: form.repeatDates.isEmpty
+                                    ? ref.watch(
+                                        rcTextProvider(
+                                          RemoteConfigKeys
+                                              .sessionsCreateSelectPlaceholder,
+                                        ),
+                                      )
+                                    : ref
+                                          .watch(
+                                            rcTextProvider(
+                                              RemoteConfigKeys
+                                                  .sessionsCreateRepeatDaysSelected,
+                                            ),
+                                          )
+                                          .replaceAll(
+                                            '{count}',
+                                            '${form.repeatDates.length}',
+                                          ),
+                                onTap: form.selectedDate == null
+                                    ? null
+                                    : () async {
+                                        final result =
+                                            await showRepeatGroupSessionCalendarSheet(
+                                              context,
+                                              baseDate: form.selectedDate!,
+                                              initiallySelected:
+                                                  form.repeatDates,
+                                            );
+                                        if (result != null) {
+                                          controller.setRepeatDates(result);
+                                        }
+                                      },
+                              ),
+                            ),
+                          ],
                         ),
-                        if (form.daysError != null) ...[
+                        if (form.dateError != null) ...[
                           const SizedBox(height: AppSpacing.xs),
                           Text(
-                            form.daysError!,
+                            form.dateError!,
                             style: typography.bodyMedium.copyWith(
                               color: colors.error,
                               fontSize: 13,
@@ -517,6 +547,16 @@ class _CreateGroupSessionPanelState
   }
 }
 
+String _formatDate(WidgetRef ref, DateTime date) {
+  final names = ref
+      .read(rcTextProvider(RemoteConfigKeys.commonMonthNamesLong))
+      .split(',');
+  final month = date.month >= 1 && date.month <= names.length
+      ? names[date.month - 1]
+      : '';
+  return '${date.day} $month ${date.year}';
+}
+
 Future<void> _pickStartTime(
   BuildContext context,
   CreateGroupSessionController controller,
@@ -655,44 +695,6 @@ class _InfoField extends StatelessWidget {
                   size: 18,
                 ),
             ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _DayChip extends StatelessWidget {
-  const _DayChip({
-    required this.label,
-    required this.selected,
-    required this.onTap,
-  });
-
-  final String label;
-  final bool selected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = context.appColors;
-    return Material(
-      color: selected ? colors.primary : colors.surfaceRaised,
-      borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
-        child: Container(
-          constraints: const BoxConstraints(
-            minHeight: AppSpacing.minTouchTarget,
-          ),
-          alignment: Alignment.center,
-          child: Text(
-            label,
-            style: context.appTypography.headingSmall.copyWith(
-              fontSize: 13,
-              color: selected ? colors.onPrimary : colors.onSurfaceVariant,
-            ),
           ),
         ),
       ),

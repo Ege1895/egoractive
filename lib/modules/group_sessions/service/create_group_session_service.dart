@@ -13,7 +13,6 @@ class CreateGroupSessionService {
       title: '',
       startTime: '09:00',
       durationMinutes: 60,
-      selectedDays: {},
       capacity: 1,
       capacityMax: 20,
       onlineBookingEnabled: true,

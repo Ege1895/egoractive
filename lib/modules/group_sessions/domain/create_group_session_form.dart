@@ -8,14 +8,20 @@ class CreateGroupSessionForm with _$CreateGroupSessionForm {
     required String title,
     required String startTime,
     required int durationMinutes,
-    required Set<int> selectedDays,
+    DateTime? selectedDate,
+
+    /// "Tekrarla" ile seçilen EK tarihler — [selectedDate] hariç, her biri
+    /// için ayrı bir `groupSessions` dokümanı oluşturulur. Seanslardan
+    /// farklı olarak burada bir üst sınır yok (bkz.
+    /// `create_group_session_controller.dart`).
+    @Default(<DateTime>[]) List<DateTime> repeatDates,
     required int capacity,
     required int capacityMax,
     required bool onlineBookingEnabled,
     required String studioName,
     @Default(false) bool isSubmitting,
     String? titleError,
-    String? daysError,
+    String? dateError,
     String? errorMessage,
   }) = _CreateGroupSessionForm;
 }

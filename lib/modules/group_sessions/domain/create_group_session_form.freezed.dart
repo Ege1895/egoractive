@@ -20,14 +20,20 @@ mixin _$CreateGroupSessionForm {
   String get title => throw _privateConstructorUsedError;
   String get startTime => throw _privateConstructorUsedError;
   int get durationMinutes => throw _privateConstructorUsedError;
-  Set<int> get selectedDays => throw _privateConstructorUsedError;
+  DateTime? get selectedDate => throw _privateConstructorUsedError;
+
+  /// "Tekrarla" ile seçilen EK tarihler — [selectedDate] hariç, her biri
+  /// için ayrı bir `groupSessions` dokümanı oluşturulur. Seanslardan
+  /// farklı olarak burada bir üst sınır yok (bkz.
+  /// `create_group_session_controller.dart`).
+  List<DateTime> get repeatDates => throw _privateConstructorUsedError;
   int get capacity => throw _privateConstructorUsedError;
   int get capacityMax => throw _privateConstructorUsedError;
   bool get onlineBookingEnabled => throw _privateConstructorUsedError;
   String get studioName => throw _privateConstructorUsedError;
   bool get isSubmitting => throw _privateConstructorUsedError;
   String? get titleError => throw _privateConstructorUsedError;
-  String? get daysError => throw _privateConstructorUsedError;
+  String? get dateError => throw _privateConstructorUsedError;
   String? get errorMessage => throw _privateConstructorUsedError;
 
   /// Create a copy of CreateGroupSessionForm
@@ -48,14 +54,15 @@ abstract class $CreateGroupSessionFormCopyWith<$Res> {
     String title,
     String startTime,
     int durationMinutes,
-    Set<int> selectedDays,
+    DateTime? selectedDate,
+    List<DateTime> repeatDates,
     int capacity,
     int capacityMax,
     bool onlineBookingEnabled,
     String studioName,
     bool isSubmitting,
     String? titleError,
-    String? daysError,
+    String? dateError,
     String? errorMessage,
   });
 }
@@ -81,14 +88,15 @@ class _$CreateGroupSessionFormCopyWithImpl<
     Object? title = null,
     Object? startTime = null,
     Object? durationMinutes = null,
-    Object? selectedDays = null,
+    Object? selectedDate = freezed,
+    Object? repeatDates = null,
     Object? capacity = null,
     Object? capacityMax = null,
     Object? onlineBookingEnabled = null,
     Object? studioName = null,
     Object? isSubmitting = null,
     Object? titleError = freezed,
-    Object? daysError = freezed,
+    Object? dateError = freezed,
     Object? errorMessage = freezed,
   }) {
     return _then(
@@ -105,10 +113,14 @@ class _$CreateGroupSessionFormCopyWithImpl<
                 ? _value.durationMinutes
                 : durationMinutes // ignore: cast_nullable_to_non_nullable
                       as int,
-            selectedDays: null == selectedDays
-                ? _value.selectedDays
-                : selectedDays // ignore: cast_nullable_to_non_nullable
-                      as Set<int>,
+            selectedDate: freezed == selectedDate
+                ? _value.selectedDate
+                : selectedDate // ignore: cast_nullable_to_non_nullable
+                      as DateTime?,
+            repeatDates: null == repeatDates
+                ? _value.repeatDates
+                : repeatDates // ignore: cast_nullable_to_non_nullable
+                      as List<DateTime>,
             capacity: null == capacity
                 ? _value.capacity
                 : capacity // ignore: cast_nullable_to_non_nullable
@@ -133,9 +145,9 @@ class _$CreateGroupSessionFormCopyWithImpl<
                 ? _value.titleError
                 : titleError // ignore: cast_nullable_to_non_nullable
                       as String?,
-            daysError: freezed == daysError
-                ? _value.daysError
-                : daysError // ignore: cast_nullable_to_non_nullable
+            dateError: freezed == dateError
+                ? _value.dateError
+                : dateError // ignore: cast_nullable_to_non_nullable
                       as String?,
             errorMessage: freezed == errorMessage
                 ? _value.errorMessage
@@ -160,14 +172,15 @@ abstract class _$$CreateGroupSessionFormImplCopyWith<$Res>
     String title,
     String startTime,
     int durationMinutes,
-    Set<int> selectedDays,
+    DateTime? selectedDate,
+    List<DateTime> repeatDates,
     int capacity,
     int capacityMax,
     bool onlineBookingEnabled,
     String studioName,
     bool isSubmitting,
     String? titleError,
-    String? daysError,
+    String? dateError,
     String? errorMessage,
   });
 }
@@ -190,14 +203,15 @@ class __$$CreateGroupSessionFormImplCopyWithImpl<$Res>
     Object? title = null,
     Object? startTime = null,
     Object? durationMinutes = null,
-    Object? selectedDays = null,
+    Object? selectedDate = freezed,
+    Object? repeatDates = null,
     Object? capacity = null,
     Object? capacityMax = null,
     Object? onlineBookingEnabled = null,
     Object? studioName = null,
     Object? isSubmitting = null,
     Object? titleError = freezed,
-    Object? daysError = freezed,
+    Object? dateError = freezed,
     Object? errorMessage = freezed,
   }) {
     return _then(
@@ -214,10 +228,14 @@ class __$$CreateGroupSessionFormImplCopyWithImpl<$Res>
             ? _value.durationMinutes
             : durationMinutes // ignore: cast_nullable_to_non_nullable
                   as int,
-        selectedDays: null == selectedDays
-            ? _value._selectedDays
-            : selectedDays // ignore: cast_nullable_to_non_nullable
-                  as Set<int>,
+        selectedDate: freezed == selectedDate
+            ? _value.selectedDate
+            : selectedDate // ignore: cast_nullable_to_non_nullable
+                  as DateTime?,
+        repeatDates: null == repeatDates
+            ? _value._repeatDates
+            : repeatDates // ignore: cast_nullable_to_non_nullable
+                  as List<DateTime>,
         capacity: null == capacity
             ? _value.capacity
             : capacity // ignore: cast_nullable_to_non_nullable
@@ -242,9 +260,9 @@ class __$$CreateGroupSessionFormImplCopyWithImpl<$Res>
             ? _value.titleError
             : titleError // ignore: cast_nullable_to_non_nullable
                   as String?,
-        daysError: freezed == daysError
-            ? _value.daysError
-            : daysError // ignore: cast_nullable_to_non_nullable
+        dateError: freezed == dateError
+            ? _value.dateError
+            : dateError // ignore: cast_nullable_to_non_nullable
                   as String?,
         errorMessage: freezed == errorMessage
             ? _value.errorMessage
@@ -262,16 +280,17 @@ class _$CreateGroupSessionFormImpl implements _CreateGroupSessionForm {
     required this.title,
     required this.startTime,
     required this.durationMinutes,
-    required final Set<int> selectedDays,
+    this.selectedDate,
+    final List<DateTime> repeatDates = const <DateTime>[],
     required this.capacity,
     required this.capacityMax,
     required this.onlineBookingEnabled,
     required this.studioName,
     this.isSubmitting = false,
     this.titleError,
-    this.daysError,
+    this.dateError,
     this.errorMessage,
-  }) : _selectedDays = selectedDays;
+  }) : _repeatDates = repeatDates;
 
   @override
   final String title;
@@ -279,12 +298,25 @@ class _$CreateGroupSessionFormImpl implements _CreateGroupSessionForm {
   final String startTime;
   @override
   final int durationMinutes;
-  final Set<int> _selectedDays;
   @override
-  Set<int> get selectedDays {
-    if (_selectedDays is EqualUnmodifiableSetView) return _selectedDays;
+  final DateTime? selectedDate;
+
+  /// "Tekrarla" ile seçilen EK tarihler — [selectedDate] hariç, her biri
+  /// için ayrı bir `groupSessions` dokümanı oluşturulur. Seanslardan
+  /// farklı olarak burada bir üst sınır yok (bkz.
+  /// `create_group_session_controller.dart`).
+  final List<DateTime> _repeatDates;
+
+  /// "Tekrarla" ile seçilen EK tarihler — [selectedDate] hariç, her biri
+  /// için ayrı bir `groupSessions` dokümanı oluşturulur. Seanslardan
+  /// farklı olarak burada bir üst sınır yok (bkz.
+  /// `create_group_session_controller.dart`).
+  @override
+  @JsonKey()
+  List<DateTime> get repeatDates {
+    if (_repeatDates is EqualUnmodifiableListView) return _repeatDates;
     // ignore: implicit_dynamic_type
-    return EqualUnmodifiableSetView(_selectedDays);
+    return EqualUnmodifiableListView(_repeatDates);
   }
 
   @override
@@ -301,13 +333,13 @@ class _$CreateGroupSessionFormImpl implements _CreateGroupSessionForm {
   @override
   final String? titleError;
   @override
-  final String? daysError;
+  final String? dateError;
   @override
   final String? errorMessage;
 
   @override
   String toString() {
-    return 'CreateGroupSessionForm(title: $title, startTime: $startTime, durationMinutes: $durationMinutes, selectedDays: $selectedDays, capacity: $capacity, capacityMax: $capacityMax, onlineBookingEnabled: $onlineBookingEnabled, studioName: $studioName, isSubmitting: $isSubmitting, titleError: $titleError, daysError: $daysError, errorMessage: $errorMessage)';
+    return 'CreateGroupSessionForm(title: $title, startTime: $startTime, durationMinutes: $durationMinutes, selectedDate: $selectedDate, repeatDates: $repeatDates, capacity: $capacity, capacityMax: $capacityMax, onlineBookingEnabled: $onlineBookingEnabled, studioName: $studioName, isSubmitting: $isSubmitting, titleError: $titleError, dateError: $dateError, errorMessage: $errorMessage)';
   }
 
   @override
@@ -320,9 +352,11 @@ class _$CreateGroupSessionFormImpl implements _CreateGroupSessionForm {
                 other.startTime == startTime) &&
             (identical(other.durationMinutes, durationMinutes) ||
                 other.durationMinutes == durationMinutes) &&
+            (identical(other.selectedDate, selectedDate) ||
+                other.selectedDate == selectedDate) &&
             const DeepCollectionEquality().equals(
-              other._selectedDays,
-              _selectedDays,
+              other._repeatDates,
+              _repeatDates,
             ) &&
             (identical(other.capacity, capacity) ||
                 other.capacity == capacity) &&
@@ -336,8 +370,8 @@ class _$CreateGroupSessionFormImpl implements _CreateGroupSessionForm {
                 other.isSubmitting == isSubmitting) &&
             (identical(other.titleError, titleError) ||
                 other.titleError == titleError) &&
-            (identical(other.daysError, daysError) ||
-                other.daysError == daysError) &&
+            (identical(other.dateError, dateError) ||
+                other.dateError == dateError) &&
             (identical(other.errorMessage, errorMessage) ||
                 other.errorMessage == errorMessage));
   }
@@ -348,14 +382,15 @@ class _$CreateGroupSessionFormImpl implements _CreateGroupSessionForm {
     title,
     startTime,
     durationMinutes,
-    const DeepCollectionEquality().hash(_selectedDays),
+    selectedDate,
+    const DeepCollectionEquality().hash(_repeatDates),
     capacity,
     capacityMax,
     onlineBookingEnabled,
     studioName,
     isSubmitting,
     titleError,
-    daysError,
+    dateError,
     errorMessage,
   );
 
@@ -377,14 +412,15 @@ abstract class _CreateGroupSessionForm implements CreateGroupSessionForm {
     required final String title,
     required final String startTime,
     required final int durationMinutes,
-    required final Set<int> selectedDays,
+    final DateTime? selectedDate,
+    final List<DateTime> repeatDates,
     required final int capacity,
     required final int capacityMax,
     required final bool onlineBookingEnabled,
     required final String studioName,
     final bool isSubmitting,
     final String? titleError,
-    final String? daysError,
+    final String? dateError,
     final String? errorMessage,
   }) = _$CreateGroupSessionFormImpl;
 
@@ -395,7 +431,14 @@ abstract class _CreateGroupSessionForm implements CreateGroupSessionForm {
   @override
   int get durationMinutes;
   @override
-  Set<int> get selectedDays;
+  DateTime? get selectedDate;
+
+  /// "Tekrarla" ile seçilen EK tarihler — [selectedDate] hariç, her biri
+  /// için ayrı bir `groupSessions` dokümanı oluşturulur. Seanslardan
+  /// farklı olarak burada bir üst sınır yok (bkz.
+  /// `create_group_session_controller.dart`).
+  @override
+  List<DateTime> get repeatDates;
   @override
   int get capacity;
   @override
@@ -409,7 +452,7 @@ abstract class _CreateGroupSessionForm implements CreateGroupSessionForm {
   @override
   String? get titleError;
   @override
-  String? get daysError;
+  String? get dateError;
   @override
   String? get errorMessage;
 
