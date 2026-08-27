@@ -6,7 +6,8 @@ part of 'report_snapshot_controller.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$snapshotsForGymHash() => r'e2435cb69d04900d35bc5429d1b5fa2dd0b2a5d4';
+String _$reportSnapshotsForGymHash() =>
+    r'cbe99a8b064d0eb7a895f54f913d6141508019ef';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -29,23 +30,64 @@ class _SystemHash {
   }
 }
 
-/// See also [_snapshotsForGym].
-@ProviderFor(_snapshotsForGym)
-const _snapshotsForGymProvider = _SnapshotsForGymFamily();
+/// F5-20 fix — BİLEREK public (alt çizgisiz): `_PastReportsSection`
+/// widget'ının BUNU doğrudan `ref.watch` etmesi lazım. Önceki sürümde bu
+/// provider sadece `ReportSnapshotController`'ın getter'ları içinden
+/// izleniyordu — controller'ın kendi `build()`'ı bunu HİÇ izlemediğinden
+/// (sadece `ReportPeriod`'u tutuyor), veri yüklenip bittiğinde
+/// `ReportSnapshotController`'ın çıktısı DEĞİŞMİYOR (aynı `ReportPeriod`
+/// değeri), Riverpod da eşit çıktıda dinleyicileri (bu widget'ı) HİÇ
+/// tetiklemiyordu — ekran sonsuza kadar ilk (loading) durumda donuk
+/// kalıyordu.
+///
+/// Copied from [reportSnapshotsForGym].
+@ProviderFor(reportSnapshotsForGym)
+const reportSnapshotsForGymProvider = ReportSnapshotsForGymFamily();
 
-/// See also [_snapshotsForGym].
-class _SnapshotsForGymFamily extends Family<AsyncValue<List<ReportSnapshot>>> {
-  /// See also [_snapshotsForGym].
-  const _SnapshotsForGymFamily();
+/// F5-20 fix — BİLEREK public (alt çizgisiz): `_PastReportsSection`
+/// widget'ının BUNU doğrudan `ref.watch` etmesi lazım. Önceki sürümde bu
+/// provider sadece `ReportSnapshotController`'ın getter'ları içinden
+/// izleniyordu — controller'ın kendi `build()`'ı bunu HİÇ izlemediğinden
+/// (sadece `ReportPeriod`'u tutuyor), veri yüklenip bittiğinde
+/// `ReportSnapshotController`'ın çıktısı DEĞİŞMİYOR (aynı `ReportPeriod`
+/// değeri), Riverpod da eşit çıktıda dinleyicileri (bu widget'ı) HİÇ
+/// tetiklemiyordu — ekran sonsuza kadar ilk (loading) durumda donuk
+/// kalıyordu.
+///
+/// Copied from [reportSnapshotsForGym].
+class ReportSnapshotsForGymFamily
+    extends Family<AsyncValue<List<ReportSnapshot>>> {
+  /// F5-20 fix — BİLEREK public (alt çizgisiz): `_PastReportsSection`
+  /// widget'ının BUNU doğrudan `ref.watch` etmesi lazım. Önceki sürümde bu
+  /// provider sadece `ReportSnapshotController`'ın getter'ları içinden
+  /// izleniyordu — controller'ın kendi `build()`'ı bunu HİÇ izlemediğinden
+  /// (sadece `ReportPeriod`'u tutuyor), veri yüklenip bittiğinde
+  /// `ReportSnapshotController`'ın çıktısı DEĞİŞMİYOR (aynı `ReportPeriod`
+  /// değeri), Riverpod da eşit çıktıda dinleyicileri (bu widget'ı) HİÇ
+  /// tetiklemiyordu — ekran sonsuza kadar ilk (loading) durumda donuk
+  /// kalıyordu.
+  ///
+  /// Copied from [reportSnapshotsForGym].
+  const ReportSnapshotsForGymFamily();
 
-  /// See also [_snapshotsForGym].
-  _SnapshotsForGymProvider call(String gymId, ReportPeriod period) {
-    return _SnapshotsForGymProvider(gymId, period);
+  /// F5-20 fix — BİLEREK public (alt çizgisiz): `_PastReportsSection`
+  /// widget'ının BUNU doğrudan `ref.watch` etmesi lazım. Önceki sürümde bu
+  /// provider sadece `ReportSnapshotController`'ın getter'ları içinden
+  /// izleniyordu — controller'ın kendi `build()`'ı bunu HİÇ izlemediğinden
+  /// (sadece `ReportPeriod`'u tutuyor), veri yüklenip bittiğinde
+  /// `ReportSnapshotController`'ın çıktısı DEĞİŞMİYOR (aynı `ReportPeriod`
+  /// değeri), Riverpod da eşit çıktıda dinleyicileri (bu widget'ı) HİÇ
+  /// tetiklemiyordu — ekran sonsuza kadar ilk (loading) durumda donuk
+  /// kalıyordu.
+  ///
+  /// Copied from [reportSnapshotsForGym].
+  ReportSnapshotsForGymProvider call(String gymId, ReportPeriod period) {
+    return ReportSnapshotsForGymProvider(gymId, period);
   }
 
   @override
-  _SnapshotsForGymProvider getProviderOverride(
-    covariant _SnapshotsForGymProvider provider,
+  ReportSnapshotsForGymProvider getProviderOverride(
+    covariant ReportSnapshotsForGymProvider provider,
   ) {
     return call(provider.gymId, provider.period);
   }
@@ -62,29 +104,53 @@ class _SnapshotsForGymFamily extends Family<AsyncValue<List<ReportSnapshot>>> {
       _allTransitiveDependencies;
 
   @override
-  String? get name => r'_snapshotsForGymProvider';
+  String? get name => r'reportSnapshotsForGymProvider';
 }
 
-/// See also [_snapshotsForGym].
-class _SnapshotsForGymProvider
+/// F5-20 fix — BİLEREK public (alt çizgisiz): `_PastReportsSection`
+/// widget'ının BUNU doğrudan `ref.watch` etmesi lazım. Önceki sürümde bu
+/// provider sadece `ReportSnapshotController`'ın getter'ları içinden
+/// izleniyordu — controller'ın kendi `build()`'ı bunu HİÇ izlemediğinden
+/// (sadece `ReportPeriod`'u tutuyor), veri yüklenip bittiğinde
+/// `ReportSnapshotController`'ın çıktısı DEĞİŞMİYOR (aynı `ReportPeriod`
+/// değeri), Riverpod da eşit çıktıda dinleyicileri (bu widget'ı) HİÇ
+/// tetiklemiyordu — ekran sonsuza kadar ilk (loading) durumda donuk
+/// kalıyordu.
+///
+/// Copied from [reportSnapshotsForGym].
+class ReportSnapshotsForGymProvider
     extends AutoDisposeFutureProvider<List<ReportSnapshot>> {
-  /// See also [_snapshotsForGym].
-  _SnapshotsForGymProvider(String gymId, ReportPeriod period)
+  /// F5-20 fix — BİLEREK public (alt çizgisiz): `_PastReportsSection`
+  /// widget'ının BUNU doğrudan `ref.watch` etmesi lazım. Önceki sürümde bu
+  /// provider sadece `ReportSnapshotController`'ın getter'ları içinden
+  /// izleniyordu — controller'ın kendi `build()`'ı bunu HİÇ izlemediğinden
+  /// (sadece `ReportPeriod`'u tutuyor), veri yüklenip bittiğinde
+  /// `ReportSnapshotController`'ın çıktısı DEĞİŞMİYOR (aynı `ReportPeriod`
+  /// değeri), Riverpod da eşit çıktıda dinleyicileri (bu widget'ı) HİÇ
+  /// tetiklemiyordu — ekran sonsuza kadar ilk (loading) durumda donuk
+  /// kalıyordu.
+  ///
+  /// Copied from [reportSnapshotsForGym].
+  ReportSnapshotsForGymProvider(String gymId, ReportPeriod period)
     : this._internal(
-        (ref) => _snapshotsForGym(ref as _SnapshotsForGymRef, gymId, period),
-        from: _snapshotsForGymProvider,
-        name: r'_snapshotsForGymProvider',
+        (ref) => reportSnapshotsForGym(
+          ref as ReportSnapshotsForGymRef,
+          gymId,
+          period,
+        ),
+        from: reportSnapshotsForGymProvider,
+        name: r'reportSnapshotsForGymProvider',
         debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
             ? null
-            : _$snapshotsForGymHash,
-        dependencies: _SnapshotsForGymFamily._dependencies,
+            : _$reportSnapshotsForGymHash,
+        dependencies: ReportSnapshotsForGymFamily._dependencies,
         allTransitiveDependencies:
-            _SnapshotsForGymFamily._allTransitiveDependencies,
+            ReportSnapshotsForGymFamily._allTransitiveDependencies,
         gymId: gymId,
         period: period,
       );
 
-  _SnapshotsForGymProvider._internal(
+  ReportSnapshotsForGymProvider._internal(
     super._createNotifier, {
     required super.name,
     required super.dependencies,
@@ -100,13 +166,13 @@ class _SnapshotsForGymProvider
 
   @override
   Override overrideWith(
-    FutureOr<List<ReportSnapshot>> Function(_SnapshotsForGymRef provider)
+    FutureOr<List<ReportSnapshot>> Function(ReportSnapshotsForGymRef provider)
     create,
   ) {
     return ProviderOverride(
       origin: this,
-      override: _SnapshotsForGymProvider._internal(
-        (ref) => create(ref as _SnapshotsForGymRef),
+      override: ReportSnapshotsForGymProvider._internal(
+        (ref) => create(ref as ReportSnapshotsForGymRef),
         from: from,
         name: null,
         dependencies: null,
@@ -120,12 +186,12 @@ class _SnapshotsForGymProvider
 
   @override
   AutoDisposeFutureProviderElement<List<ReportSnapshot>> createElement() {
-    return _SnapshotsForGymProviderElement(this);
+    return _ReportSnapshotsForGymProviderElement(this);
   }
 
   @override
   bool operator ==(Object other) {
-    return other is _SnapshotsForGymProvider &&
+    return other is ReportSnapshotsForGymProvider &&
         other.gymId == gymId &&
         other.period == period;
   }
@@ -142,7 +208,7 @@ class _SnapshotsForGymProvider
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-mixin _SnapshotsForGymRef
+mixin ReportSnapshotsForGymRef
     on AutoDisposeFutureProviderRef<List<ReportSnapshot>> {
   /// The parameter `gymId` of this provider.
   String get gymId;
@@ -151,25 +217,24 @@ mixin _SnapshotsForGymRef
   ReportPeriod get period;
 }
 
-class _SnapshotsForGymProviderElement
+class _ReportSnapshotsForGymProviderElement
     extends AutoDisposeFutureProviderElement<List<ReportSnapshot>>
-    with _SnapshotsForGymRef {
-  _SnapshotsForGymProviderElement(super.provider);
+    with ReportSnapshotsForGymRef {
+  _ReportSnapshotsForGymProviderElement(super.provider);
 
   @override
-  String get gymId => (origin as _SnapshotsForGymProvider).gymId;
+  String get gymId => (origin as ReportSnapshotsForGymProvider).gymId;
   @override
-  ReportPeriod get period => (origin as _SnapshotsForGymProvider).period;
+  ReportPeriod get period => (origin as ReportSnapshotsForGymProvider).period;
 }
 
 String _$reportSnapshotControllerHash() =>
-    r'6f2090c65329be17f523f0d9a41d02923765a1f0';
+    r'cc10ddbb80f79a066c0fe068c6f94d24febcc4e3';
 
-/// F5-9 — Raporlar ekranındaki "Geçmiş Raporlar" bölümü: state, o an seçili
-/// haftalık/aylık filtredir; [snapshots]/[isLoading]/[hasError] getter'ları
-/// bu filtreye göre `gyms/{gymId}/reportSnapshots`'tan (F5-7/F5-8) okunan
-/// listeyi sunar. `DashboardReportController`'daki aynı desen (getter'larda
-/// `ref.watch`, ayrı bir `_snapshotsForGym` family provider) izlenir.
+/// F5-9 — Raporlar ekranındaki "Geçmiş Raporlar" bölümünün seçili
+/// haftalık/aylık filtresi. Asıl veri [reportSnapshotsForGymProvider]'dan
+/// gelir — UI bunu DOĞRUDAN izlemeli (bkz. yukarıdaki not), bu controller
+/// sadece filtre state'ini ve `retry()`'ı sağlar.
 ///
 /// Copied from [ReportSnapshotController].
 @ProviderFor(ReportSnapshotController)

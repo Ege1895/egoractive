@@ -6,6 +6,7 @@ import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
 import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/theme/theme_controller.dart';
 import '../../../../shared/widgets/app_back_button.dart';
 import '../../controller/dashboard_report_controller.dart';
 import '../../controller/report_snapshot_controller.dart';
@@ -280,9 +281,16 @@ class _PastReportsSection extends ConsumerWidget {
     final typography = context.appTypography;
     final selectedPeriod = ref.watch(reportSnapshotControllerProvider);
     final controller = ref.watch(reportSnapshotControllerProvider.notifier);
-    final snapshots = controller.snapshots;
-    final isLoading = controller.isLoading;
-    final hasError = controller.hasError;
+    final gymId = ref.watch(activeGymIdProvider).valueOrNull;
+    // F5-20 fix — bu widget'ın KENDİSİ izlemeli (bkz.
+    // report_snapshot_controller.dart'taki not): veri yüklenip bittiğinde
+    // bu widget'ı gerçekten tetikleyen tek yol bu.
+    final snapshotsAsync = gymId == null
+        ? const AsyncValue<List<ReportSnapshot>>.data(<ReportSnapshot>[])
+        : ref.watch(reportSnapshotsForGymProvider(gymId, selectedPeriod));
+    final snapshots = snapshotsAsync.valueOrNull ?? const [];
+    final isLoading = snapshotsAsync.isLoading;
+    final hasError = snapshotsAsync.hasError;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
