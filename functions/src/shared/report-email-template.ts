@@ -158,22 +158,30 @@ interface Segment {
   color: string;
 }
 
-/** E-posta istemcileri (Gmail/Outlook/Apple Mail) modern CSS'in çoğunu
+/**
+ * E-posta istemcileri (Gmail/Outlook/Apple Mail) modern CSS'in çoğunu
  * desteklemediğinden grafikler SVG/Canvas yerine hücre genişliğine göre
- * renklenen tablolarla ("email-safe bar chart" tekniği) çiziliyor. */
+ * renklenen tablolarla ("email-safe bar chart" tekniği) çiziliyor.
+ *
+ * Gmail'de (özellikle mobil uygulamada) `<td width="X%">` yüzdesi, SARAN
+ * `<table>`'a açık bir genişlik verilmediğinde güvenilir çalışmıyor —
+ * Gmail tabloyu içeriğe göre daraltıp bar'ı ince bir çizgiye indirgiyordu
+ * (gerçek gönderimde görüldü). Bu yüzden hem HTML `width` niteliği hem
+ * eşdeğer `style="width"` birlikte, saran tabloda da HER ZAMAN yazılıyor.
+ */
 function segBar(segments: Segment[], height = 14): string {
   const total = segments.reduce((s, x) => s + x.value, 0) || 1;
   const cells = segments
     .map((seg, i) => {
-      const w = (seg.value / total) * 100;
+      const w = Math.round((seg.value / total) * 10000) / 100;
       if (w <= 0) return "";
       let radius = "";
       if (i === 0) radius += `border-top-left-radius:${height / 2}px;border-bottom-left-radius:${height / 2}px;`;
       if (i === segments.length - 1) radius += `border-top-right-radius:${height / 2}px;border-bottom-right-radius:${height / 2}px;`;
-      return `<td width="${w}%" bgcolor="${seg.color}" style="height:${height}px;font-size:1px;line-height:${height}px;${radius}">&nbsp;</td>`;
+      return `<td width="${w}%" bgcolor="${seg.color}" style="width:${w}%;height:${height}px;font-size:1px;line-height:${height}px;${radius}">&nbsp;</td>`;
     })
     .join("");
-  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:separate;border-spacing:0;"><tr>${cells}</tr></table>`;
+  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="width:100%;border-collapse:separate;border-spacing:0;"><tr>${cells}</tr></table>`;
 }
 
 function legend(items: { color: string; pct: number; label: string }[]): string {
@@ -190,7 +198,7 @@ function legend(items: { color: string; pct: number; label: string }[]): string 
 
 function card(title: string, inner: string): string {
   return (
-    `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;margin-bottom:16px;">` +
+    `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="width:100%;border-collapse:collapse;margin-bottom:16px;">` +
     `<tr><td style="background:#ffffff;border:1px solid ${COLOR.line};border-radius:16px;padding:20px 22px;">` +
     `<div style="font-family:Arial,Helvetica,sans-serif;font-weight:700;font-size:15px;color:${COLOR.ink};margin-bottom:14px;">${title}</div>` +
     inner +
@@ -215,7 +223,7 @@ function sessionsSection(s: GymWeeklyStats, locale: ReportEmailLocale): string {
   const otherCount = Math.max(s.totalSessions - s.completedSessions - s.cancelledSessions, 0);
   const otherPct = Math.max(0, Math.round((100 - completedPct - cancelledPct) * 10) / 10);
   const inner =
-    `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;margin-bottom:16px;"><tr>` +
+    `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="width:100%;border-collapse:collapse;margin-bottom:16px;"><tr>` +
     statBox(t.totalSessions, fmtInt(s.totalSessions, locale), COLOR.ink) +
     statBox(t.completed, fmtInt(s.completedSessions, locale), COLOR.good) +
     statBox(t.cancelled, fmtInt(s.cancelledSessions, locale), COLOR.bad) +
@@ -259,7 +267,7 @@ function occupancyBlock(
 function groupEventsSection(groupSessions: OccupancyStats, events: OccupancyStats, locale: ReportEmailLocale): string {
   const t = COPY[locale];
   const inner =
-    `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;"><tr>` +
+    `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="width:100%;border-collapse:collapse;"><tr>` +
     occupancyBlock(t.groupSessionsLabel, groupSessions.count, t.sessionsUnit, groupSessions, locale) +
     occupancyBlock(t.eventsLabel, events.count, t.eventsUnit, events, locale) +
     `</tr></table>`;
@@ -272,10 +280,10 @@ function trainerRow(trainer: TrainerPerformance, rankIcon: string | undefined, l
   const cancelledPct = pct(trainer.cancelledSessions, trainer.totalSessions);
   const otherCount = Math.max(trainer.totalSessions - trainer.completedSessions - trainer.cancelledSessions, 0);
   return (
-    `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;margin-bottom:12px;">` +
+    `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="width:100%;border-collapse:collapse;margin-bottom:12px;">` +
     `<tr>` +
     `<td style="font-size:13.5px;color:${COLOR.ink};font-weight:600;padding-bottom:6px;">${rankIcon ? rankIcon + " " : ""}${trainer.name}</td>` +
-    `<td align="right" style="font-size:12px;color:${COLOR.muted};padding-bottom:6px;white-space:nowrap;">` +
+    `<td align="right" style="text-align:right;font-size:12px;color:${COLOR.muted};padding-bottom:6px;white-space:nowrap;">` +
     `<b style="color:${COLOR.good};">${trainer.completedSessions}</b> ${t.completedShort} &nbsp;·&nbsp; ` +
     `<b style="color:${COLOR.bad};">${trainer.cancelledSessions}</b> ${t.cancelledShort} &nbsp;·&nbsp; ${trainer.totalSessions} ${t.totalShort}</td>` +
     `</tr>` +
@@ -312,17 +320,23 @@ function packagesSection(packages: PackageSaleCount[], locale: ReportEmailLocale
   const max = sorted[0]?.count || 1;
   const rows = sorted
     .map((p, i) => {
-      const w = Math.max((p.count / max) * 100, 6);
+      // En düşük satışlı paket bile gözle görülür bir bar bıraksın diye
+      // en az %6 genişlik garantisi — segBar oranı verilen iki segment
+      // değerinden hesapladığı için gerçek sayı yerine bu payı temsil eden
+      // kesirler veriliyor (1 = tam genişlik).
+      const share = Math.max(p.count / max, 0.06);
       return (
-        `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;margin-bottom:10px;">` +
+        `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="width:100%;border-collapse:collapse;margin-bottom:10px;">` +
         `<tr>` +
         `<td style="font-size:13px;color:${COLOR.ink};font-weight:600;padding-bottom:5px;">${medals[i] ? medals[i] + " " : `${i + 1}. `}${p.packageName}</td>` +
-        `<td align="right" style="font-size:12.5px;color:${COLOR.muted};padding-bottom:5px;white-space:nowrap;"><b style="color:${COLOR.ink};">${fmtInt(p.count, locale)}</b>&nbsp;${t.salesUnit}</td>` +
+        `<td align="right" style="text-align:right;font-size:12.5px;color:${COLOR.muted};padding-bottom:5px;white-space:nowrap;"><b style="color:${COLOR.ink};">${fmtInt(p.count, locale)}</b>&nbsp;${t.salesUnit}</td>` +
         `</tr>` +
-        `<tr><td colspan="2"><table role="presentation" cellpadding="0" cellspacing="0" style="border-collapse:collapse;"><tr>` +
-        `<td width="${w}%" bgcolor="${COLOR.brand}" style="height:10px;border-radius:5px;font-size:1px;line-height:10px;">&nbsp;</td>` +
-        `<td style="width:${100 - w}%;"></td>` +
-        `</tr></table></td></tr>` +
+        `<tr><td colspan="2">` +
+        segBar([
+          { value: share, color: COLOR.brand },
+          { value: 1 - share, color: COLOR.lineSoft },
+        ], 10) +
+        `</td></tr>` +
         `</table>`
       );
     })
@@ -335,25 +349,29 @@ function financeSection(revenueTl: number, expensesTl: number, locale: ReportEma
   const net = revenueTl - expensesTl;
   const netColor = net >= 0 ? COLOR.good : COLOR.bad;
   const maxBar = Math.max(revenueTl, expensesTl) || 1;
-  const revW = Math.max((revenueTl / maxBar) * 100, 4);
-  const expW = Math.max((expensesTl / maxBar) * 100, 4);
+  const revShare = Math.max(revenueTl / maxBar, 0.04);
+  const expShare = Math.max(expensesTl / maxBar, 0.04);
   const inner =
-    `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;">` +
+    `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="width:100%;border-collapse:collapse;">` +
     `<tr><td style="padding:8px 0;font-size:13px;color:${COLOR.muted};">${t.revenue}</td>` +
-    `<td align="right" style="padding:8px 0;font-family:Arial,Helvetica,sans-serif;font-weight:700;font-size:16px;color:${COLOR.good};">${fmtTl(revenueTl, locale)}</td></tr>` +
-    `<tr><td colspan="2"><table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>` +
-    `<td width="${revW}%" bgcolor="${COLOR.good}" style="height:9px;border-radius:5px;font-size:1px;">&nbsp;</td><td></td></tr></table></td></tr>` +
+    `<td align="right" style="text-align:right;padding:8px 0;font-family:Arial,Helvetica,sans-serif;font-weight:700;font-size:16px;color:${COLOR.good};">${fmtTl(revenueTl, locale)}</td></tr>` +
+    `<tr><td colspan="2">${segBar([
+      { value: revShare, color: COLOR.good },
+      { value: 1 - revShare, color: COLOR.lineSoft },
+    ], 9)}</td></tr>` +
     `<tr><td colspan="2" style="height:12px;"></td></tr>` +
     `<tr><td style="padding:8px 0;font-size:13px;color:${COLOR.muted};">${t.expenses}</td>` +
-    `<td align="right" style="padding:8px 0;font-family:Arial,Helvetica,sans-serif;font-weight:700;font-size:16px;color:${COLOR.amber};">${fmtTl(expensesTl, locale)}</td></tr>` +
-    `<tr><td colspan="2"><table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>` +
-    `<td width="${expW}%" bgcolor="${COLOR.amber}" style="height:9px;border-radius:5px;font-size:1px;">&nbsp;</td><td></td></tr></table></td></tr>` +
+    `<td align="right" style="text-align:right;padding:8px 0;font-family:Arial,Helvetica,sans-serif;font-weight:700;font-size:16px;color:${COLOR.amber};">${fmtTl(expensesTl, locale)}</td></tr>` +
+    `<tr><td colspan="2">${segBar([
+      { value: expShare, color: COLOR.amber },
+      { value: 1 - expShare, color: COLOR.lineSoft },
+    ], 9)}</td></tr>` +
     `</table>` +
-    `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;margin-top:16px;">` +
+    `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="width:100%;border-collapse:collapse;margin-top:16px;">` +
     `<tr><td style="background:${net >= 0 ? COLOR.goodWash : COLOR.badWash};border-radius:12px;padding:14px 16px;">` +
-    `<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>` +
+    `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="width:100%;"><tr>` +
     `<td style="font-size:13px;color:${COLOR.ink};font-weight:600;">${net >= 0 ? t.netProfit : t.netLoss}</td>` +
-    `<td align="right" style="font-family:Arial,Helvetica,sans-serif;font-weight:800;font-size:20px;color:${netColor};">${net >= 0 ? "+" : "−"}${fmtTl(Math.abs(net), locale)}</td>` +
+    `<td align="right" style="text-align:right;font-family:Arial,Helvetica,sans-serif;font-weight:800;font-size:20px;color:${netColor};">${net >= 0 ? "+" : "−"}${fmtTl(Math.abs(net), locale)}</td>` +
     `</tr></table></td></tr></table>`;
   return card(t.financeTitle, inner);
 }
@@ -365,7 +383,7 @@ function heroBanner(net: number, locale: ReportEmailLocale): string {
   const headline = positive ? t.heroPositive(netStr) : t.heroNegative(netStr);
   const sub = positive ? t.heroSubPositive : t.heroSubNegative;
   return (
-    `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;margin-bottom:18px;">` +
+    `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="width:100%;border-collapse:collapse;margin-bottom:18px;">` +
     `<tr><td style="background:${positive ? COLOR.goodWash : COLOR.badWash};border-radius:16px;padding:18px 22px;">` +
     `<div style="font-family:Arial,Helvetica,sans-serif;font-weight:700;font-size:18px;color:${COLOR.ink};">${headline}</div>` +
     `<div style="font-size:12.5px;color:${COLOR.muted};margin-top:6px;">${sub}</div>` +
@@ -387,7 +405,7 @@ export function buildReportEmailHtml(data: ReportEmailData): string {
   const net = revenueTl - expensesTl;
 
   return (
-    `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;">` +
+    `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="width:100%;border-collapse:collapse;">` +
     `<tr><td style="background:${COLOR.brand};padding:26px 28px;border-radius:18px 18px 0 0;">` +
     `<div style="font-family:Arial,Helvetica,sans-serif;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.75);">${t.brandKicker}</div>` +
     `<div style="font-family:Arial,Helvetica,sans-serif;font-weight:800;font-size:24px;color:#ffffff;margin-top:6px;">${data.gymName}</div>` +
