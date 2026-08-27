@@ -296,6 +296,10 @@ Sıralama, store review sürecini en hızlı şekilde başlatacak şekilde tasar
 **Kabul kriterleri:** Borcu olan bir üyede buton pasif ve uyarı notu görünür; borcu biten bir üyede buton aktif, tıklanınca doğrudan paket seçim ekranına gidiyor (üye bilgileri adımı hiç görünmüyor); ödeme adımında kaydedince admin üye detayına dönüyor (sihirbazın kökten sıfırlandığı ana ekrana değil) ve yeni taksit planını gösteriyor.
 > **Not:** Araştırma sırasında `PackageController` (üyenin kendi "Paketim" ekranı) `memberPackages` koleksiyonunu doğrudan sorguluyor, ama `firestore.rules`'taki `memberPackages` okuma kuralı sadece `admin` rolüne izin veriyor — üye kendi taksitlerini görmeye çalıştığında bu muhtemelen `permission-denied` ile başarısız oluyor (bu task'ın kapsamı dışında, ayrı bir hata/task olarak ele alınmalı, burada dokunulmadı).
 
+### F5-18 — Deep link soğuk başlangıçta giriş akışıyla yarışıp kilitleniyordu (fix)
+**Prompt:** "Rapor mailindeki 'Uygulamada Gör' butonuyla uygulama kapalıyken açılınca: admin zaten oturum açmış olsa bile giriş ekranı görünüyor, giriş denemesi hiç bitmiyordu (uygulama kapatılıp yeniden açılınca sorunsuz giriş yapılmış oluyordu). Kök neden: `AppDeepLinkService`, `main()` içinde `runApp()`'tan ÖNCE `currentRoleProvider.future`'ı bekliyordu — bu, Firebase Auth'un kalıcı oturumu geri yüklemesini bloklarcasına bekleyip uygulamanın kendi `appAccessProvider` tabanlı giriş/erişim akışıyla (bkz. `app_access.dart`'taki 'Çmt Saloon' kilitlenme notu) yarışıyordu. Fix: ilk link'in işlenmesi artık `await` edilmiyor (arka planda `unawaited`), `runApp()` hiçbir zaman deep link'i beklemiyor; `_handle` artık ayrı bir `currentRoleProvider` okuması yapmıyor, uygulamanın UI'ının da beklediği AYNI `appAccessProvider`'ı bekleyip `ready` + admin olduğunda push ediyor."
+**Kabul kriterleri:** Uygulama tamamen kapalıyken rapor mailindeki linke dokununca, admin zaten oturum açıksa doğrudan (giriş ekranı hiç görünmeden) Raporlar paneline gidiyor; oturum yoksa normal giriş akışı hiç bozulmadan çalışıyor.
+
 ---
 
 ## FAZ 6 — Monetizasyon ve Çoklu Salon SaaS
