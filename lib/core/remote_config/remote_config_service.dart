@@ -1000,6 +1000,16 @@ abstract final class RemoteConfigKeys {
   static const reportsSnapshotListEmptyState =
       'lbl_reports_snapshot_list_empty_state';
   static const reportsSnapshotDetailTitle = 'lbl_reports_snapshot_detail_title';
+  static const reportsExportPdfButtonLabel =
+      'lbl_reports_export_pdf_button_label';
+  static const reportsPdfDocumentTitle = 'lbl_reports_pdf_document_title';
+  static const reportsPdfMetricColumnLabel =
+      'lbl_reports_pdf_metric_column_label';
+  static const reportsPdfValueColumnLabel =
+      'lbl_reports_pdf_value_column_label';
+  static const reportsPdfTrainerColumnLabel =
+      'lbl_reports_pdf_trainer_column_label';
+  static const reportsPdfExportError = 'lbl_reports_pdf_export_error';
 
   static const sessionsCalendarTitle = 'lbl_sessions_calendar_title';
   static const sessionsCalendarSlotTimeLabel =
@@ -1970,6 +1980,13 @@ class RemoteConfigService {
     'lbl_reports_snapshot_list_empty_state_tr':
         'Bu periyot için henüz oluşturulmuş bir rapor yok.',
     'lbl_reports_snapshot_detail_title_tr': 'Rapor Detayı',
+    'lbl_reports_export_pdf_button_label_tr': 'PDF olarak dışa aktar',
+    'lbl_reports_pdf_document_title_tr': 'Egoractive · Rapor',
+    'lbl_reports_pdf_metric_column_label_tr': 'Metrik',
+    'lbl_reports_pdf_value_column_label_tr': 'Değer',
+    'lbl_reports_pdf_trainer_column_label_tr': 'Antrenör',
+    'lbl_reports_pdf_export_error_tr':
+        'PDF oluşturulamadı, lütfen tekrar deneyin.',
     'lbl_sessions_calendar_title_tr': 'Takvim',
     'lbl_sessions_calendar_slot_time_label_tr': 'Saat',
     'lbl_sessions_calendar_slot_status_label_tr': 'Durum',
@@ -2228,7 +2245,8 @@ class RemoteConfigService {
     'lbl_auth_onboarding_role_title_en': 'Welcome',
     'lbl_auth_onboarding_role_subtitle_en': 'Choose your role to continue.',
     'lbl_auth_onboarding_role_trainer_title_en': "I'm a trainer",
-    'lbl_auth_onboarding_role_trainer_note_en': 'I have a trainer certification',
+    'lbl_auth_onboarding_role_trainer_note_en':
+        'I have a trainer certification',
     'lbl_auth_onboarding_role_member_title_en': "I'm a member",
     'lbl_auth_onboarding_role_member_note_en': "I'm registered at a gym/studio",
     'lbl_auth_onboarding_role_hint_trainer_en':
@@ -2739,6 +2757,13 @@ class RemoteConfigService {
     'lbl_reports_snapshot_list_empty_state_en':
         'No reports generated yet for this period.',
     'lbl_reports_snapshot_detail_title_en': 'Report Detail',
+    'lbl_reports_export_pdf_button_label_en': 'Export as PDF',
+    'lbl_reports_pdf_document_title_en': 'Egoractive · Report',
+    'lbl_reports_pdf_metric_column_label_en': 'Metric',
+    'lbl_reports_pdf_value_column_label_en': 'Value',
+    'lbl_reports_pdf_trainer_column_label_en': 'Trainer',
+    'lbl_reports_pdf_export_error_en':
+        'Could not generate PDF, please try again.',
     'lbl_sessions_calendar_title_en': 'Calendar',
     'lbl_sessions_calendar_slot_time_label_en': 'Time',
     'lbl_sessions_calendar_slot_status_label_en': 'Status',
@@ -3003,8 +3028,10 @@ class RemoteConfigService {
         'Devam etmek için bir plan seç. {days} gün boyunca hiç ücret alınmaz, süre sonunda seçtiğin paket {store} üzerinden otomatik olarak devam eder.',
     'lbl_subscription_onboarding_subtitle_en':
         "Pick a plan to continue. You won't be charged for {days} days — after that, your selected plan renews automatically via {store}.",
-    'lbl_subscription_onboarding_cta_tr': '{plan} ile {days} gün ücretsiz başlat',
-    'lbl_subscription_onboarding_cta_en': 'Start {days}-day free trial with {plan}',
+    'lbl_subscription_onboarding_cta_tr':
+        '{plan} ile {days} gün ücretsiz başlat',
+    'lbl_subscription_onboarding_cta_en':
+        'Start {days}-day free trial with {plan}',
     'lbl_subscription_onboarding_caption_tr':
         'Şimdi ücret alınmaz. İlk ödeme {days}. günde {store} hesabından çekilir.',
     'lbl_subscription_onboarding_caption_en':

@@ -7824,6 +7824,78 @@
       },
       "valueType": "STRING"
     },
+    "lbl_reports_export_pdf_button_label_tr": {
+      "defaultValue": {
+        "value": "PDF olarak dışa aktar"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_reports_export_pdf_button_label_en": {
+      "defaultValue": {
+        "value": "Export as PDF"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_reports_pdf_document_title_tr": {
+      "defaultValue": {
+        "value": "Egoractive · Rapor"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_reports_pdf_document_title_en": {
+      "defaultValue": {
+        "value": "Egoractive · Report"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_reports_pdf_metric_column_label_tr": {
+      "defaultValue": {
+        "value": "Metrik"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_reports_pdf_metric_column_label_en": {
+      "defaultValue": {
+        "value": "Metric"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_reports_pdf_value_column_label_tr": {
+      "defaultValue": {
+        "value": "Değer"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_reports_pdf_value_column_label_en": {
+      "defaultValue": {
+        "value": "Value"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_reports_pdf_trainer_column_label_tr": {
+      "defaultValue": {
+        "value": "Antrenör"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_reports_pdf_trainer_column_label_en": {
+      "defaultValue": {
+        "value": "Trainer"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_reports_pdf_export_error_tr": {
+      "defaultValue": {
+        "value": "PDF oluşturulamadı, lütfen tekrar deneyin."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_reports_pdf_export_error_en": {
+      "defaultValue": {
+        "value": "Could not generate PDF, please try again."
+      },
+      "valueType": "STRING"
+    },
     "lbl_subscription_yearly_plan_fallback_tr": {
       "defaultValue": {
         "value": "Yıllık"

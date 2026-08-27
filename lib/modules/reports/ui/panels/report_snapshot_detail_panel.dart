@@ -7,7 +7,9 @@ import '../../../../core/panels/panel_stack_controller.dart';
 import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_back_button.dart';
+import '../../../../shared/widgets/app_button.dart';
 import '../../domain/report_snapshot.dart';
+import '../../service/report_pdf_export_service.dart';
 import '../widgets/report_finance_summary_card.dart';
 import '../widgets/report_metric_card.dart';
 import '../widgets/report_trainer_performance_chart.dart';
@@ -28,6 +30,8 @@ class ReportSnapshotDetailPanel extends BasePanel {
 
 class _ReportSnapshotDetailPanelState
     extends BasePanelState<ReportSnapshotDetailPanel> {
+  bool _isExporting = false;
+
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
@@ -154,6 +158,16 @@ class _ReportSnapshotDetailPanelState
                       trainerPerformance: report.trainerPerformance,
                     ),
                   ),
+                  const SizedBox(height: AppSpacing.lg),
+                  AppButton(
+                    label: ref.watch(
+                      rcTextProvider(
+                        RemoteConfigKeys.reportsExportPdfButtonLabel,
+                      ),
+                    ),
+                    variant: AppButtonVariant.secondary,
+                    onPressed: _isExporting ? null : _exportPdf,
+                  ),
                 ],
               ),
             ),
@@ -161,5 +175,60 @@ class _ReportSnapshotDetailPanelState
         ),
       ),
     );
+  }
+
+  Future<void> _exportPdf() async {
+    setState(() => _isExporting = true);
+    final labels = ReportPdfLabels(
+      documentTitle: ref.read(
+        rcTextProvider(RemoteConfigKeys.reportsPdfDocumentTitle),
+      ),
+      totalSessions: ref.read(
+        rcTextProvider(RemoteConfigKeys.reportsTotalSessionsLabel),
+      ),
+      completedSessions: ref.read(
+        rcTextProvider(RemoteConfigKeys.gymsAdminHomeCompletedLabel),
+      ),
+      cancelledSessions: ref.read(
+        rcTextProvider(RemoteConfigKeys.commonIptalLabel),
+      ),
+      estimatedRevenue: ref.read(
+        rcTextProvider(RemoteConfigKeys.gymsAdminHomeEstimatedRevenueLabel),
+      ),
+      totalExpenses: ref.read(
+        rcTextProvider(RemoteConfigKeys.gymsAdminHomeExpenseLabel),
+      ),
+      net: ref.read(rcTextProvider(RemoteConfigKeys.reportsNetLabel)),
+      metricColumn: ref.read(
+        rcTextProvider(RemoteConfigKeys.reportsPdfMetricColumnLabel),
+      ),
+      valueColumn: ref.read(
+        rcTextProvider(RemoteConfigKeys.reportsPdfValueColumnLabel),
+      ),
+      trainerPerformanceSection: ref.read(
+        rcTextProvider(RemoteConfigKeys.gymsAdminHomeTrainerPerformanceSection),
+      ),
+      trainerColumn: ref.read(
+        rcTextProvider(RemoteConfigKeys.reportsPdfTrainerColumnLabel),
+      ),
+    );
+
+    try {
+      await ref
+          .read(reportPdfExportServiceProvider)
+          .share(widget.snapshot, labels);
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              ref.read(rcTextProvider(RemoteConfigKeys.reportsPdfExportError)),
+            ),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isExporting = false);
+    }
   }
 }

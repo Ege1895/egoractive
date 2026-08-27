@@ -62,6 +62,8 @@ dependencies:
     sdk: flutter
   flutter_timezone: ^5.1.0
   cached_network_image: ^3.4.1
+  pdf: ^3.11.3
+  printing: ^5.13.4
 dev_dependencies:
   flutter_test:
     sdk: flutter
