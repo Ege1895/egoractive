@@ -304,6 +304,10 @@ Sıralama, store review sürecini en hızlı şekilde başlatacak şekilde tasar
 **Prompt:** "F5-17'nin ödeme adımında üyenin adı yerine '?' avatarı görünüyor, Kaydet'e basınca sessizce hiçbir şey olmuyordu (`memberId` null olduğu için). Kök neden: `newMemberControllerProvider`/`memberRegistrationControllerProvider` (`autoDispose`) — normal Yeni Üyelik akışında 1. adım ekranı (`MemberInfoPanel`) bunları sürekli `ref.watch` edip stack'te kaldığından canlı kalıyorlar; 'Paketi Yenile' 1. adımı atladığı için `_startRenewal`'in `ref.read` ile yazdığı değerler, 2. adım ekranı ilk kez izlemeye başlamadan önceki boşlukta Riverpod tarafından siliniyordu. Fix: `AdminMemberDetailPanel` (sihirbaz boyunca stack'te kalan tek ekran) artık bu iki provider'ı da `ref.watch` ediyor, boşluk kapandı."
 **Kabul kriterleri:** Paketi Yenile ile paket seçilip ödeme adımına geçildiğinde üyenin adı/soyadı başlıkta doğru görünüyor, Kaydet'e basınca paket gerçekten kaydedilip üye detayına dönülüyor.
 
+### F5-20 — Raporlar ekranı geri dönüşte eski veriyi gösteriyordu (fix)
+**Prompt:** "Admin bir üyenin taksit ödeme durumunu değiştirip Raporlar ekranına dönünce ciro hâlâ eski değeri gösteriyordu; ayrıca 'Geçmiş Raporlar' listesi bazen sonsuza kadar yükleniyor gibi takılı kalıyordu. Kök neden: `PanelStackController` panelleri hiç dispose etmiyor (`Visibility(maintainState: true)`) — Raporlar ekranı arka planda gizliyken bile `DashboardReportController`/`ReportSnapshotController`'ın altındaki `autoDispose` provider'lar hâlâ izlendiği için hiç yeniden tetiklenmiyor, ilk açılıştaki veride donup kalıyordu. Fix: `AdminDashboardPanel`, `onPanelShow()` içinde (ekran her ön plana geldiğinde — ilk açılış dahil) her iki controller'ın `retry()`'ını çağırıp canlı özeti ve geçmiş rapor listesini elden tazeliyor."
+**Kabul kriterleri:** Bir üyenin ödeme durumu değiştirilip Raporlar ekranına dönüldüğünde ciro/gider güncel değeri gösteriyor; Geçmiş Raporlar listesi ekran her açıldığında yeniden denenip (varsa geçici bir hata durumundan) kurtulabiliyor.
+
 ---
 
 ## FAZ 6 — Monetizasyon ve Çoklu Salon SaaS

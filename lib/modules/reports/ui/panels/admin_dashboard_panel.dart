@@ -254,6 +254,18 @@ class _AdminDashboardPanelState extends BasePanelState<AdminDashboardPanel> {
       ),
     );
   }
+
+  // `PanelStackController` panelleri hiç dispose etmiyor (`Visibility`
+  // `maintainState: true`) — admin bir üyenin ödeme durumunu değiştirip bu
+  // ekrana geri döndüğünde, altta yatan `autoDispose` provider'lar hâlâ
+  // izlendiği için (bu ekran gizliyken bile) hiç yeniden çekilmiyor,
+  // Raporlar eski/"cache'de kalmış" görünüyordu. Ekran her ön plana
+  // geldiğinde canlı özeti ve geçmiş rapor listesini elle tazeliyoruz.
+  @override
+  void onPanelShow() {
+    ref.read(dashboardReportControllerProvider.notifier).retry();
+    ref.read(reportSnapshotControllerProvider.notifier).retry();
+  }
 }
 
 /// F5-9 — haftalık/aylık filtre + geçmiş `reportSnapshots` listesi. Bir
