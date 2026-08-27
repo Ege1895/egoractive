@@ -31,6 +31,18 @@
 		<!-- F6-2 — AdMob konsolunda com.egoragames.egoractive için oluşturulan gerçek App ID. -->
 		<key>GADApplicationIdentifier</key>
 		<string>ca-app-pub-7842412614783450~1836513159</string>
+		<!-- F5-14 — rapor mailindeki "Uygulamada Gör" butonu için özel URL şeması. -->
+		<key>CFBundleURLTypes</key>
+		<array>
+			<dict>
+				<key>CFBundleURLName</key>
+				<string>com.egoragames.egoractive.deeplink</string>
+				<key>CFBundleURLSchemes</key>
+				<array>
+					<string>egoractive</string>
+				</array>
+			</dict>
+		</array>
 		<key>SKAdNetworkItems</key>
 		<array>
 			<dict>

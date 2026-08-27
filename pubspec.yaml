@@ -64,6 +64,7 @@ dependencies:
   cached_network_image: ^3.4.1
   pdf: ^3.11.3
   printing: ^5.13.4
+  app_links: ^6.3.3
 dev_dependencies:
   flutter_test:
     sdk: flutter

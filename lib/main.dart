@@ -11,6 +11,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import 'core/constants/ad_constants.dart';
+import 'core/deep_links/app_deep_link_service.dart';
 import 'core/locale/locale_controller.dart';
 import 'core/locale/locale_prefs.dart';
 import 'core/onboarding/onboarding_prefs.dart';
@@ -55,6 +56,13 @@ void main() async {
   } on Exception catch (error) {
     debugPrint(
       'Push bildirim kurulumu başarısız oldu, uygulama yine de açılıyor: $error',
+    );
+  }
+  try {
+    await AppDeepLinkService().init(_providerContainer);
+  } on Exception catch (error) {
+    debugPrint(
+      'Deep link kurulumu başarısız oldu, uygulama yine de açılıyor: $error',
     );
   }
   runApp(

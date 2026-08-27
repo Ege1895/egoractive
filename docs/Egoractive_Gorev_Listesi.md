@@ -228,9 +228,10 @@ Sıralama, store review sürecini en hızlı şekilde başlatacak şekilde tasar
 **Prompt:** "`modules/reports/` — `AdminDashboardPanel`: toplam/tamamlanan/iptal seans oranı, antrenör bazlı performans (`fl_chart` bar chart), tahmini ciro/gider özeti. Firestore aggregation query'leri (mümkünse `count()` aggregation, büyük veri setlerinde tüm dokümanları client'a çekmeden)."
 **Kabul kriterleri:** 10.000+ seans kaydı olan bir test verisinde dashboard 2 saniyenin altında yükleniyor.
 
-### F5-2 — Haftalık salon/muhasebe/antrenör raporu (scheduled Cloud Functions + mail)
-**Prompt:** "Firebase 'Trigger Email' extension'ını kur. `functions/src/scheduled/weekly-gym-report.ts`, `weekly-accounting-report.ts`, `weekly-trainer-report.ts` — her Pazartesi 06:00'da (RC: `weeklyReportDayOfWeek`, `weeklyReportHour`) çalışır, ilgili haftanın verisini toplar, HTML e-posta şablonuyla `mail` koleksiyonuna yazar (extension otomatik gönderir). Antrenör raporu sadece o antrenörün verisini içerir."
-**Kabul kriterleri:** Test ortamında 3 farklı mail (admin salon, admin muhasebe, antrenör) doğru alıcılara, doğru veri kapsamıyla gidiyor.
+### F5-2 — Haftalık salon/muhasebe raporu (scheduled Cloud Functions + mail)
+**Prompt:** "Firebase 'Trigger Email' extension'ını kur. `functions/src/scheduled/weekly-gym-report.ts`, `weekly-accounting-report.ts` — her Pazartesi 06:00'da (RC: `weeklyReportDayOfWeek`, `weeklyReportHour`) çalışır, ilgili haftanın verisini toplar, HTML e-posta şablonuyla `mail` koleksiyonuna yazar (extension otomatik gönderir)."
+**Kabul kriterleri:** Test ortamında admin salon ve admin muhasebe maili doğru alıcılara, doğru veri kapsamıyla gidiyor.
+**Not (F5-12):** Bu task orijinalinde `weekly-trainer-report.ts` (antrenöre kendi haftalık özetini gönderen ayrı bir mail) da içeriyordu — F5-12 kararıyla kaldırıldı, rapor mailleri artık sadece admin'e gidiyor.
 
 ### F5-3 — Giderler ekranı
 **Prompt:** "`modules/expenses/` — kategori bazlı gider girişi, F5-1'deki dashboard'a kâr/zarar özeti olarak entegre."
@@ -265,6 +266,22 @@ Sıralama, store review sürecini en hızlı şekilde başlatacak şekilde tasar
 **Kabul kriterleri:** Butona dokununca sistem paylaş/kaydet sheet'i açılıyor; üretilen PDF'te metrik kartları ve antrenör dökümü doğru ve okunabilir görünüyor; işlem tamamen cihazda gerçekleşiyor (network isteği yok).
 
 > **Karar notu (2026-08-27):** Rapor sistemi için "her hafta/ay otomatik PDF üretip mail'e ekleme" yaklaşımı yerine bu dört task'taki hibrit model seçildi — tek gerçek kaynak olarak yapılandırılmış veri (`reportSnapshots`), e-posta HTML olarak kalır, in-app ekran bu veriden native render eder, PDF sadece istenirse cihazda üretilir. Gerekçe: sunucu tarafı PDF üretimi (Puppeteer/headless Chrome) yüksek bellek/cold-start maliyeti getirir ve çoğu otomatik üretilen PDF hiç açılmaz; büyük SaaS ürünlerinin (Stripe, Mixpanel, Mindbody/Zenoti vb.) izlediği desen de budur.
+
+### F5-11 — Salon rapor mailini zengin template'e taşı (grafik/emoji/UX)
+**Prompt:** "`weekly-gym-report.ts`/`monthly-gym-report.ts`'in HTML gövdesini, mock verilerle onaylanan tasarıma göre yeniden yaz (`functions/src/shared/report-email-template.ts`, tek template hem haftalık hem aylık için). Bölümler: (1) toplam/tamamlanan/iptal ders + segment bar + yüzdeler, (2) antrenör bazlı tamamlanan/iptal/toplam + kendi mini bar'ı, en çok tamamlayana göre sıralı, ilk 3'e madalya, (3) dönem içinde satın alınan paketler `packageName`'e göre gruplanıp satış adedine göre sıralı (`memberPackages.purchasedAt` aralığı), (4) dönem içinde üyelerin ödediği toplam tutar (`memberPackages.paidAmount` toplamı — zaten F5-1'de var), (5) dönem içindeki toplam giderler (`expenses.amountTl` toplamı — zaten F5-1'de var), (6) gelir-gider net farkı, (7) dönem içindeki toplam grup dersi + etkinlik sayısı, bu ikisinin toplam kontenjanı ve toplam KATILAN kişi sayısı (kapasite değil — `attendeeIds.length`, `groupSessions`/`events` dokümanları düşük hacimli olduğundan doğrudan okunuyor, bkz. `report-extras-stats.ts`). Grafikler e-posta istemcileri (Gmail/Outlook) yüzünden SVG/Canvas değil, tablo hücre genişliğine dayalı ('email-safe bar chart') teknikle çizilir."
+**Kabul kriterleri:** Mock önizlemedeki tüm 7 veri bloğu gerçek Firestore verisiyle doğru hesaplanıyor; haftalık ve aylık mail birebir aynı template'i kullanıyor (sadece tarih aralığı/sayılar farklı).
+
+### F5-12 — Antrenör haftalık rapor mailini kaldır
+**Prompt:** "`functions/src/scheduled/weekly-trainer-report.ts`'i ve `index.ts`'teki export'unu sil. Rapor mailleri (haftalık + aylık) artık SADECE admin'e (`gyms/{gymId}.reportEmails.gym`) gidiyor — antrenöre ayrı bir özet mail yok."
+**Kabul kriterleri:** `weekly-trainer-report.ts` repoda yok, `functions/src/index.ts`'te ilgili export yok, antrenöre hiçbir otomatik rapor maili gitmiyor.
+
+### F5-13 — Rapor maili yerelleştirme (salonun saat dilimine göre tr/en)
+**Prompt:** "Rapor mailinin dili, alıcının cihaz diline değil salonun `gyms/{gymId}.timeZone`'una göre seçilsin — `Europe/Istanbul` ise Türkçe, değilse İngilizce (`notification-locale.ts`'teki `resolveNotificationLocale`, push bildirimlerinde zaten kullanılan aynı desen). `report-email-template.ts`'teki tüm metinler (başlıklar, buton, tarih aralığı formatı) `locale` parametresine göre iki dilde de tanımlansın."
+**Kabul kriterleri:** Türkiye dışı bir `timeZone`'a sahip mock bir salon için gönderilen mail tamamen İngilizce, İstanbul için Türkçe geliyor; tarih aralığı formatı da dile göre değişiyor ("17 Ağustos 2026" / "August 17, 2026").
+
+### F5-14 — Rapor mailinden uygulamaya derin bağlantı (deep link)
+**Prompt:** "Mail'deki 'Uygulamada Gör' butonu `egoractive://reports` özel URL şemasını açsın. `ios/Runner/Info.plist`'e `CFBundleURLTypes` (`egoractive` şeması), `android/.../AndroidManifest.xml`'e `android.intent.action.VIEW` intent-filter (`scheme=egoractive`) ekle. `app_links` paketiyle `core/deep_links/app_deep_link_service.dart` — gelen `egoractive://reports` linkini dinler, `currentRoleProvider` ile admin olduğunu doğrulayıp `PanelStackController` üzerinden `AdminDashboardPanel`'i açar (admin değilse sessizce yok sayılır — `push_notification_service.dart`'taki aynı yaklaşım). `main.dart`'ta `PushNotificationService` ile aynı yerde, aynı try/catch güvenliğiyle başlatılır."
+**Kabul kriterleri:** Uygulama kapalıyken/arka plandayken/açıkken `egoractive://reports` linkine dokununca uygulama açılıp doğrudan Raporlar paneline gidiyor; admin olmayan bir hesapta link sessizce yok sayılıyor (crash/permission-denied hatası yok).
 
 ---
 
