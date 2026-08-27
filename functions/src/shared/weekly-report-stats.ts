@@ -13,6 +13,13 @@ export interface TrainerWeeklyStats {
   completedSessions: number;
 }
 
+export interface TrainerPerformance {
+  trainerId: string;
+  name: string;
+  totalSessions: number;
+  completedSessions: number;
+}
+
 export interface ExpenseCategoryTotal {
   category: string;
   amountTl: number;
@@ -87,6 +94,36 @@ export async function fetchTrainerWeeklyStats(
   ]);
 
   return { totalSessions: totalSnap.data().count, completedSessions: completedSnap.data().count };
+}
+
+/** F5-7 — gym rapor snapshot'ı için salonun tüm antrenörlerinin performans
+ * dökümü. `fetchGymWeeklyStats` ile aynı `count()` aggregation yaklaşımı,
+ * antrenör başına iki sorguya bölünmüş halde. */
+export async function fetchGymTrainerPerformance(
+  db: Firestore,
+  gymId: string,
+  weekStart: Date,
+  weekEnd: Date,
+): Promise<TrainerPerformance[]> {
+  const trainersSnapshot = await db
+    .collection("users")
+    .where("gymId", "==", gymId)
+    .where("role", "==", "trainer")
+    .get();
+
+  const trainerPerformance = await Promise.all(
+    trainersSnapshot.docs.map(async (trainerDoc) => {
+      const stats = await fetchTrainerWeeklyStats(db, gymId, trainerDoc.id, weekStart, weekEnd);
+      return {
+        trainerId: trainerDoc.id,
+        name: (trainerDoc.data().name as string | undefined) ?? "—",
+        totalSessions: stats.totalSessions,
+        completedSessions: stats.completedSessions,
+      };
+    }),
+  );
+
+  return trainerPerformance.sort((a, b) => b.completedSessions - a.completedSessions);
 }
 
 /** Muhasebe raporu kategori kırılımı için — haftalık gider hacmi düşük

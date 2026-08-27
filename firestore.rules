@@ -92,6 +92,14 @@ service cloud.firestore {
       match /subscriptionHistory/{entryId} {
         allow read, write: if false;
       }
+
+      // reportSnapshots/{snapshotId} — F5-7: haftalık/aylık scheduled
+      // fonksiyonların yazdığı rapor özeti (Raporlar ekranının veri
+      // kaynağı). Sadece Admin SDK yazar, salonun admin'i okuyabilir.
+      match /reportSnapshots/{snapshotId} {
+        allow read: if isSignedIn() && myRole() == 'admin' && myGymId() == gymId;
+        allow write: if false;
+      }
     }
 
     // subscriptionTransactions/{transactionKey} — store transaction/purchase

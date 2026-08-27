@@ -7,7 +7,8 @@ import { formatWeekRangeTr, formatTl } from "../shared/format";
 import { withFailureAlerting } from "../shared/function-health";
 import { queueEmail } from "../shared/mail";
 import { getCachedRemoteConfigTemplate } from "../shared/remote-config-cache";
-import { fetchGymWeeklyStats } from "../shared/weekly-report-stats";
+import { writeReportSnapshot } from "../shared/report-snapshots";
+import { fetchGymTrainerPerformance, fetchGymWeeklyStats } from "../shared/weekly-report-stats";
 import { isWeeklyReportDue, previousWeekRange } from "../shared/weekly-schedule";
 
 function buildHtml(gymName: string, weekLabel: string, stats: Awaited<ReturnType<typeof fetchGymWeeklyStats>>): string {
@@ -64,6 +65,18 @@ export const weeklyGymReport = onSchedule("every 60 minutes", withFailureAlertin
       to: email,
       subject: `${(data.name as string | undefined) ?? "Salon"} · Haftalık Özet (${weekLabel})`,
       html: buildHtml((data.name as string | undefined) ?? "Salonunuz", weekLabel, stats),
+    });
+
+    // F5-7 — aynı hesaplanan veriyi Raporlar ekranının (F5-9) okuyacağı
+    // snapshot'a da yaz; antrenör dökümü sadece burada, mail'e eklenmiyor.
+    const trainerPerformance = await fetchGymTrainerPerformance(db, gymDoc.id, weekStart, weekEnd);
+    await writeReportSnapshot(db, gymDoc.id, {
+      period: "weekly",
+      periodStart: weekStart,
+      periodEnd: weekEnd,
+      periodLabel: weekLabel,
+      stats,
+      trainerPerformance,
     });
   }
 }));
