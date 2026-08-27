@@ -41,6 +41,7 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
 
   bool _isSaving = false;
   bool _hydratedFromProfile = false;
+  bool _hydratedFromRecipients = false;
   String? _nameError;
   String? _addressError;
   String? _phoneError;
@@ -110,6 +111,16 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
       _nameController.text = profileState.name;
       _addressController.text = '${profileState.address}, ${profileState.city}';
       _phoneController.text = formatTrPhoneDigits(profileState.phone);
+    }
+
+    // `reportEmails` ayrı bir stream'den (`_recipientsForGymProvider`) geldiği
+    // için profil verisiyle aynı anda çözülmeyebilir — initState'te
+    // `ref.read` ile alınan değer henüz boş olabiliyordu (stream ilk
+    // yayınını yapmadan), bu yüzden kaydedilmiş bir e-posta olsa bile alan
+    // her zaman boş görünüyordu. Gerçek veri geldiğinde bir kez doldurulur.
+    if (!_hydratedFromRecipients && recipientsState.gymReportEmail.isNotEmpty) {
+      _hydratedFromRecipients = true;
+      _gymReportEmailController.text = recipientsState.gymReportEmail;
     }
 
     if (_pickedLogoFile == null &&
