@@ -2,7 +2,13 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { RemoteConfigTemplate } from "firebase-admin/remote-config";
 
-import { currentMonthRange, isFeedbackReminderDue, isLastDayOfMonth, istanbulYearMonthDay } from "./monthly-schedule";
+import {
+  currentMonthRange,
+  isFeedbackReminderDue,
+  isLastDayOfMonth,
+  isMonthlyReportDue,
+  istanbulYearMonthDay,
+} from "./monthly-schedule";
 
 function template(overrides: Record<string, string>): RemoteConfigTemplate {
   const parameters: RemoteConfigTemplate["parameters"] = {};
@@ -16,6 +22,10 @@ function template(overrides: Record<string, string>): RemoteConfigTemplate {
 // 12:00 için UTC 09:00 kullanılıyor, gece yarısı sınırlarından uzak durmak için.
 function istanbulNoon(year: number, month: number, day: number): Date {
   return new Date(Date.UTC(year, month - 1, day, 9, 0, 0));
+}
+
+function istanbulAt(year: number, month: number, day: number, hour: number): Date {
+  return new Date(Date.UTC(year, month - 1, day, hour - 3, 0, 0));
 }
 
 test("31 günlük ay: 31 Ocak son gün, 30 Ocak değil", () => {
@@ -65,6 +75,29 @@ test("isFeedbackReminderDue: sabit bir gün (ör. 15) sadece o gün doğru", () 
 test("isFeedbackReminderDue: RC param eksikse -1 (ayın son günü) varsayılanına düşer", () => {
   assert.equal(isFeedbackReminderDue(template({}), istanbulNoon(2025, 4, 30)), true);
   assert.equal(isFeedbackReminderDue(template({}), istanbulNoon(2025, 4, 29)), false);
+});
+
+test("isMonthlyReportDue: -1 ayın son gününde, saat de eşleşince true", () => {
+  const t = template({ cfg_monthly_report_day_of_month: "-1", cfg_monthly_report_hour: "6" });
+  assert.equal(isMonthlyReportDue(t, istanbulAt(2025, 2, 28, 6)), true);
+  assert.equal(isMonthlyReportDue(t, istanbulAt(2025, 2, 27, 6)), false);
+  assert.equal(isMonthlyReportDue(t, istanbulAt(2024, 2, 29, 6)), true);
+});
+
+test("isMonthlyReportDue: gün doğru olsa da saat farklıysa false", () => {
+  const t = template({ cfg_monthly_report_day_of_month: "-1", cfg_monthly_report_hour: "6" });
+  assert.equal(isMonthlyReportDue(t, istanbulAt(2025, 2, 28, 7)), false);
+});
+
+test("isMonthlyReportDue: sabit bir gün (ör. 15) sadece o gün ve saatte doğru", () => {
+  const t = template({ cfg_monthly_report_day_of_month: "15", cfg_monthly_report_hour: "6" });
+  assert.equal(isMonthlyReportDue(t, istanbulAt(2025, 3, 15, 6)), true);
+  assert.equal(isMonthlyReportDue(t, istanbulAt(2025, 3, 14, 6)), false);
+});
+
+test("isMonthlyReportDue: RC param eksikse ayın son günü 06:00 varsayılanına düşer", () => {
+  assert.equal(isMonthlyReportDue(template({}), istanbulAt(2025, 4, 30, 6)), true);
+  assert.equal(isMonthlyReportDue(template({}), istanbulAt(2025, 4, 29, 6)), false);
 });
 
 test("currentMonthRange bir aylık, o ayın 1. gününden başlayan bir pencere döner", () => {
