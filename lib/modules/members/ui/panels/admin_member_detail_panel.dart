@@ -122,6 +122,17 @@ class _AdminMemberDetailPanelState
     final controller = ref.read(
       adminMemberDetailControllerProvider(widget.memberId).notifier,
     );
+    // F5-17 renewal fix — `newMemberControllerProvider`/
+    // `memberRegistrationControllerProvider` autoDispose: normal Yeni Üyelik
+    // akışında 1. adım ekranı (MemberInfoPanel) bunları sürekli izleyip
+    // stack'te kaldığı için canlı kalıyorlar. "Paketi Yenile" 1. adımı
+    // atladığından, bu paneli (sihirbaz boyunca stack'te tek kalıcı ekran)
+    // izleyici olarak tutmazsak `_startRenewal`'in yazdığı isim/`memberId`
+    // değerleri, 2. adım ekranı ilk kez izlemeye başlamadan önceki kısa
+    // boşlukta siliniyordu (ad "?" avatarına dönüyor, Kaydet sessizce hiçbir
+    // şey yapmıyordu — memberId null'a düştüğü için).
+    ref.watch(newMemberControllerProvider);
+    ref.watch(memberRegistrationControllerProvider);
 
     if (detail.isLoading) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
