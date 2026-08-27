@@ -248,6 +248,24 @@ Sıralama, store review sürecini en hızlı şekilde başlatacak şekilde tasar
 **Prompt:** "`core/analytics/analytics_service.dart` — tüm event isimlerini enum olarak topla (`AnalyticsEvent.sessionCompleted` vb.), ham string event adı hiçbir yerde geçmesin. En az şu event'leri instrumente et: üyelik oluşturma, ders tamamlama, ders iptali, paket satın alma, feedback gönderme."
 **Kabul kriterleri:** Firebase Analytics DebugView'da tüm event'ler doğru parametrelerle görünüyor.
 
+### F5-7 — Rapor snapshot veri modeli (mail ve app'in ortak veri kaynağı)
+**Prompt:** "`functions/src/scheduled/weekly-gym-report.ts` hesapladığı özet veriyi (toplam/tamamlanan/iptal seans, tahmini ciro, gider, net, antrenör bazlı performans) HTML mail'e yazmadan önce ayrıca `gyms/{gymId}/reportSnapshots/{docId}` koleksiyonuna yazsın — `docId` periyot + tarih içersin (ör. `weekly_2026-01-19`), doküman `{ period: 'weekly'|'monthly', periodStart, periodEnd, ...F5-1'deki DashboardReport alanlarının aynısı }` şeklinde olsun. Amaç: mail ve F5-9'daki Raporlar ekranı aynı hesaplamayı iki kez yapmasın, tek gerçek kaynaktan (bu snapshot) beslensin. PDF üretimi yok — sadece yapılandırılmış veri."
+**Kabul kriterleri:** Bir hafta sonu gönderilen mail ile aynı hafta için Firestore'a yazılan snapshot dokümanındaki sayılar birebir eşleşiyor.
+
+### F5-8 — Aylık salon raporu scheduled function'ı
+**Prompt:** "`functions/src/scheduled/monthly-gym-report.ts` — RC'deki `monthlyReportDayOfMonth` (-1 = ayın son günü) ve `monthlyReportHour` değerlerinde çalışır, o ayın verisini `weekly-gym-report.ts` ile aynı mantıkla (F5-7'deki ortak hesaplama/snapshot yazma kodu paylaşılarak — `functions/src/shared/` altına çıkarılmalı) hesaplar; hem HTML mail atar hem `period: 'monthly'` snapshot'ı yazar."
+**Kabul kriterleri:** Ay sonunda tetiklenince o ayın toplam verisiyle hem mail hem snapshot doğru oluşuyor; ayın 28/29/30/31 gün farkları doğru hesaplanıyor.
+
+### F5-9 — Raporlar ekranı: haftalık/aylık filtre + geçmiş rapor listesi
+**Prompt:** "`AdminDashboardPanel`'i genişlet: üstte haftalık/aylık toggle filtre, altında seçilen periyoda ait `reportSnapshots` dokümanlarının tarih sıralı listesi (ör. '13-19 Ocak', 'Ocak 2026'). Listeden bir öğeye dokununca, panelin metrik kartları + antrenör performans bar chart'ı canlı aggregation yerine seçilen snapshot dokümanının verisiyle render edilsin — mevcut `DashboardReport` domain modeli ve UI bileşenleri (`_MetricCard`, `_TrainerPerformanceChart`) yeniden kullanılsın, yeni bir görüntüleyici yazılmasın. Üstteki 'bugünkü özet' görünümü (F5-1) ile geçmiş bir snapshot görüntüleme durumu net şekilde ayrılsın (başlıkta seçili periyodun tarihi görünsün)."
+**Kabul kriterleri:** Geçmiş bir haftayı/ayı seçince o periyodun sayıları görünüyor, güncel (canlı) özetle karıştırılmıyor; liste boşsa (henüz hiç snapshot yoksa) anlamlı bir boş durum mesajı gösteriliyor.
+
+### F5-10 — Snapshot'tan cihaz üzerinde (client-side) PDF dışa aktarma
+**Prompt:** "`pdf` ve `printing` paketlerini ekle. F5-9'daki snapshot detay görünümüne 'PDF olarak dışa aktar/paylaş' butonu ekle — buton, o an ekranda gösterilen metrik ve antrenör performans verisinden **cihazda** bir PDF üretip sistem paylaş sayfasını açar. Sunucu tarafında (Cloud Functions) hiçbir PDF üretimi yapılmaz — maliyet ve bakım yükü bu yüzden tercih edilmedi (bkz. proje kararı notu)."
+**Kabul kriterleri:** Butona dokununca sistem paylaş/kaydet sheet'i açılıyor; üretilen PDF'te metrik kartları ve antrenör dökümü doğru ve okunabilir görünüyor; işlem tamamen cihazda gerçekleşiyor (network isteği yok).
+
+> **Karar notu (2026-08-27):** Rapor sistemi için "her hafta/ay otomatik PDF üretip mail'e ekleme" yaklaşımı yerine bu dört task'taki hibrit model seçildi — tek gerçek kaynak olarak yapılandırılmış veri (`reportSnapshots`), e-posta HTML olarak kalır, in-app ekran bu veriden native render eder, PDF sadece istenirse cihazda üretilir. Gerekçe: sunucu tarafı PDF üretimi (Puppeteer/headless Chrome) yüksek bellek/cold-start maliyeti getirir ve çoğu otomatik üretilen PDF hiç açılmaz; büyük SaaS ürünlerinin (Stripe, Mixpanel, Mindbody/Zenoti vb.) izlediği desen de budur.
+
 ---
 
 ## FAZ 6 — Monetizasyon ve Çoklu Salon SaaS
