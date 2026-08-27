@@ -74,12 +74,23 @@ export function formatTimeInZone(date: Date, timeZone: string): string {
   }).format(date);
 }
 
-/** `date`'i `timeZone`'da, `locale`'e uygun şekilde "15 Eylül"/"September 15" olarak formatlar. */
-export function formatDateInZone(date: Date, timeZone: string, locale: "tr" | "en"): string {
+/** `date`'i `timeZone`'da, `locale`'e uygun şekilde "15 Eylül"/"September 15"
+ * (ya da `includeYear` ile "15 Eylül 2026"/"September 15, 2026") olarak formatlar. */
+export function formatDateInZone(date: Date, timeZone: string, locale: "tr" | "en", includeYear = false): string {
   return new Intl.DateTimeFormat(locale === "tr" ? "tr-TR" : "en-US", {
     timeZone,
     day: "numeric",
     month: "long",
+    year: includeYear ? "numeric" : undefined,
+  }).format(date);
+}
+
+/** F5-11 — rapor maili ay etiketi: "Ağustos 2026"/"August 2026". */
+export function formatMonthInZone(date: Date, timeZone: string, locale: "tr" | "en"): string {
+  return new Intl.DateTimeFormat(locale === "tr" ? "tr-TR" : "en-US", {
+    timeZone,
+    month: "long",
+    year: "numeric",
   }).format(date);
 }
 

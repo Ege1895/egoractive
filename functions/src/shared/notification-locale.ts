@@ -8,17 +8,23 @@ export const DEFAULT_TIME_ZONE = "Europe/Istanbul";
  * özellikten önce oluşturulmuş eski bir salon) ya da geçersizse
  * `DEFAULT_TIME_ZONE`'a düşülür.
  */
-export async function resolveGymTimeZone(gymId: string | undefined): Promise<string> {
-  if (!gymId) return DEFAULT_TIME_ZONE;
-  const gymDoc = await getFirestore().collection("gyms").doc(gymId).get();
-  const timeZone = gymDoc.data()?.timeZone as string | undefined;
-  if (!timeZone) return DEFAULT_TIME_ZONE;
+/** Geçersiz/eksik bir IANA tanımlayıcısını `DEFAULT_TIME_ZONE`'a düşürür —
+ * salon dokümanı zaten elde bulunan çağrı yerlerinde (ör. rapor scheduled
+ * fonksiyonları) ekstra bir Firestore okuması gerektirmeden kullanılabilir. */
+export function safeTimeZone(raw: string | undefined): string {
+  if (!raw) return DEFAULT_TIME_ZONE;
   try {
-    Intl.DateTimeFormat(undefined, { timeZone });
-    return timeZone;
+    Intl.DateTimeFormat(undefined, { timeZone: raw });
+    return raw;
   } catch {
     return DEFAULT_TIME_ZONE;
   }
+}
+
+export async function resolveGymTimeZone(gymId: string | undefined): Promise<string> {
+  if (!gymId) return DEFAULT_TIME_ZONE;
+  const gymDoc = await getFirestore().collection("gyms").doc(gymId).get();
+  return safeTimeZone(gymDoc.data()?.timeZone as string | undefined);
 }
 
 /**

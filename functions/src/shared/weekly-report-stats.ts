@@ -11,6 +11,7 @@ export interface GymWeeklyStats {
 export interface TrainerWeeklyStats {
   totalSessions: number;
   completedSessions: number;
+  cancelledSessions: number;
 }
 
 export interface TrainerPerformance {
@@ -18,6 +19,7 @@ export interface TrainerPerformance {
   name: string;
   totalSessions: number;
   completedSessions: number;
+  cancelledSessions: number;
 }
 
 export interface ExpenseCategoryTotal {
@@ -88,12 +90,17 @@ export async function fetchTrainerWeeklyStats(
     .where("startTime", ">=", start)
     .where("startTime", "<", end);
 
-  const [totalSnap, completedSnap] = await Promise.all([
+  const [totalSnap, completedSnap, cancelledSnap] = await Promise.all([
     weekSessions.count().get(),
     weekSessions.where("status", "==", "completed").count().get(),
+    weekSessions.where("status", "==", "cancelled").count().get(),
   ]);
 
-  return { totalSessions: totalSnap.data().count, completedSessions: completedSnap.data().count };
+  return {
+    totalSessions: totalSnap.data().count,
+    completedSessions: completedSnap.data().count,
+    cancelledSessions: cancelledSnap.data().count,
+  };
 }
 
 /** F5-7 — gym rapor snapshot'ı için salonun tüm antrenörlerinin performans
@@ -119,6 +126,7 @@ export async function fetchGymTrainerPerformance(
         name: (trainerDoc.data().name as string | undefined) ?? "—",
         totalSessions: stats.totalSessions,
         completedSessions: stats.completedSessions,
+        cancelledSessions: stats.cancelledSessions,
       };
     }),
   );

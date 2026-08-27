@@ -1,5 +1,6 @@
 import { Firestore, Timestamp } from "firebase-admin/firestore";
 
+import { OccupancyStats, PackageSaleCount } from "./report-extras-stats";
 import { GymWeeklyStats, TrainerPerformance } from "./weekly-report-stats";
 
 export type ReportPeriod = "weekly" | "monthly";
@@ -11,6 +12,9 @@ export interface ReportSnapshotInput {
   periodLabel: string;
   stats: GymWeeklyStats;
   trainerPerformance: TrainerPerformance[];
+  packages: PackageSaleCount[];
+  groupSessions: OccupancyStats;
+  events: OccupancyStats;
 }
 
 function snapshotDocId(period: ReportPeriod, periodStart: Date): string {
@@ -45,7 +49,11 @@ export async function writeReportSnapshot(db: Firestore, gymId: string, input: R
         name: trainer.name,
         totalSessions: trainer.totalSessions,
         completedSessions: trainer.completedSessions,
+        cancelledSessions: trainer.cancelledSessions,
       })),
+      packages: input.packages,
+      groupSessions: input.groupSessions,
+      events: input.events,
       createdAt: Timestamp.now(),
     });
 }

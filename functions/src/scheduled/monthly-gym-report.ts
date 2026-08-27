@@ -3,37 +3,24 @@ import { RemoteConfigTemplate } from "firebase-admin/remote-config";
 import { onSchedule } from "firebase-functions/v2/scheduler";
 import * as logger from "firebase-functions/logger";
 
-import { formatMonthLabelTr, formatTl } from "../shared/format";
+import { currentMonthRange, isMonthlyReportDue } from "../shared/monthly-schedule";
+import { REPORTS_DEEP_LINK } from "../shared/deep-links";
 import { withFailureAlerting } from "../shared/function-health";
 import { queueEmail } from "../shared/mail";
-import { currentMonthRange, isMonthlyReportDue } from "../shared/monthly-schedule";
+import { safeTimeZone, resolveNotificationLocale } from "../shared/notification-locale";
+import { buildReportEmailHtml } from "../shared/report-email-template";
+import { fetchEventOccupancy, fetchGroupSessionOccupancy, fetchPackageSalesBreakdown } from "../shared/report-extras-stats";
 import { getCachedRemoteConfigTemplate } from "../shared/remote-config-cache";
 import { writeReportSnapshot } from "../shared/report-snapshots";
+import { formatMonthInZone } from "../shared/timezone-math";
 import { fetchGymTrainerPerformance, fetchGymWeeklyStats } from "../shared/weekly-report-stats";
 
-function buildHtml(gymName: string, monthLabel: string, stats: Awaited<ReturnType<typeof fetchGymWeeklyStats>>): string {
-  const completionPct = stats.totalSessions === 0 ? 0 : Math.round((stats.completedSessions / stats.totalSessions) * 100);
-  return `
-    <h2>${gymName} · Aylık Özet</h2>
-    <p>${monthLabel}</p>
-    <table cellpadding="8" style="border-collapse: collapse;">
-      <tr><td>Toplam ders</td><td><b>${stats.totalSessions}</b></td></tr>
-      <tr><td>Tamamlanan</td><td><b>${stats.completedSessions}</b> (%${completionPct})</td></tr>
-      <tr><td>İptal edilen</td><td><b>${stats.cancelledSessions}</b></td></tr>
-      <tr><td>Tahmini ciro</td><td><b>${formatTl(stats.revenueTl)}</b></td></tr>
-      <tr><td>Gider</td><td><b>${formatTl(stats.expensesTl)}</b></td></tr>
-      <tr><td>Net</td><td><b>${formatTl(stats.revenueTl - stats.expensesTl)}</b></td></tr>
-    </table>
-  `;
-}
-
 /**
- * F5-8 — RC'deki `cfg_monthly_report_day_of_month`/`cfg_monthly_report_hour`
+ * F5-8/F5-11 — RC'deki `cfg_monthly_report_day_of_month`/`cfg_monthly_report_hour`
  * zamanı geldiğinde (varsayılan ayın son günü 06:00, İstanbul saati) her
- * salonun aylık özetini `gyms/{gymId}.reportEmails.gym`'e gönderir ve
- * F5-7'deki gibi bir `period: 'monthly'` snapshot yazar. Hesaplama, F5-7'de
- * haftalık rapor için yazılan aynı fonksiyonlarla (`fetchGymWeeklyStats`/
- * `fetchGymTrainerPerformance`) — sadece ay aralığı verilerek — paylaşılıyor.
+ * salonun aylık özetini `weekly-gym-report.ts` ile AYNI zengin template'le
+ * gönderir — tek fark kapsanan tarih aralığı. Hesaplama, aynı aggregation
+ * fonksiyonlarıyla (F5-7) ay aralığı verilerek paylaşılıyor.
  */
 export const monthlyGymReport = onSchedule("every 60 minutes", withFailureAlerting("monthlyGymReport", async () => {
   const db = getFirestore();
@@ -50,7 +37,6 @@ export const monthlyGymReport = onSchedule("every 60 minutes", withFailureAlerti
   if (!isMonthlyReportDue(template, now)) return;
 
   const { monthStart, monthEnd } = currentMonthRange(now);
-  const monthLabel = formatMonthLabelTr(monthStart);
 
   const gymsSnapshot = await db.collection("gyms").get();
   for (const gymDoc of gymsSnapshot.docs) {
@@ -61,21 +47,48 @@ export const monthlyGymReport = onSchedule("every 60 minutes", withFailureAlerti
       continue;
     }
 
-    const stats = await fetchGymWeeklyStats(db, gymDoc.id, monthStart, monthEnd);
-    await queueEmail({
-      to: email,
-      subject: `${(data.name as string | undefined) ?? "Salon"} · Aylık Özet (${monthLabel})`,
-      html: buildHtml((data.name as string | undefined) ?? "Salonunuz", monthLabel, stats),
+    const timeZone = safeTimeZone(data.timeZone as string | undefined);
+    const locale = resolveNotificationLocale(timeZone);
+    const periodLabel = formatMonthInZone(monthStart, timeZone, locale);
+    const gymName = (data.name as string | undefined) ?? "Salonunuz";
+
+    const [stats, trainerPerformance, packages, groupSessions, events] = await Promise.all([
+      fetchGymWeeklyStats(db, gymDoc.id, monthStart, monthEnd),
+      fetchGymTrainerPerformance(db, gymDoc.id, monthStart, monthEnd),
+      fetchPackageSalesBreakdown(db, gymDoc.id, monthStart, monthEnd),
+      fetchGroupSessionOccupancy(db, gymDoc.id, monthStart, monthEnd),
+      fetchEventOccupancy(db, gymDoc.id, monthStart, monthEnd),
+    ]);
+
+    const html = buildReportEmailHtml({
+      gymName,
+      kind: "monthly",
+      periodLabel,
+      locale,
+      sessions: stats,
+      trainers: trainerPerformance,
+      packages,
+      groupSessions,
+      events,
+      deepLinkUrl: REPORTS_DEEP_LINK,
     });
 
-    const trainerPerformance = await fetchGymTrainerPerformance(db, gymDoc.id, monthStart, monthEnd);
+    await queueEmail({
+      to: email,
+      subject: `${gymName} · ${locale === "tr" ? "Aylık Özet" : "Monthly Summary"} (${periodLabel})`,
+      html,
+    });
+
     await writeReportSnapshot(db, gymDoc.id, {
       period: "monthly",
       periodStart: monthStart,
       periodEnd: monthEnd,
-      periodLabel: monthLabel,
+      periodLabel,
       stats,
       trainerPerformance,
+      packages,
+      groupSessions,
+      events,
     });
   }
 }));
