@@ -612,13 +612,7 @@ abstract final class RemoteConfigKeys {
       'lbl_gyms_gym_info_gym_report_email_label';
   static const gymsGymInfoGymReportEmailHint =
       'lbl_gyms_gym_info_gym_report_email_hint';
-  static const gymsGymInfoAccountingReportEmailLabel =
-      'lbl_gyms_gym_info_accounting_report_email_label';
-  static const gymsGymInfoAccountingReportEmailHint =
-      'lbl_gyms_gym_info_accounting_report_email_hint';
   static const gymsGymInfoSavingLabel = 'lbl_gyms_gym_info_saving_label';
-  static const gymsGymInfoSaveReportEmailsButton =
-      'lbl_gyms_gym_info_save_report_emails_button';
   static const gymsGymInfoLogoUploadFailedError =
       'lbl_gyms_gym_info_logo_upload_failed_error';
   static const gymsGymInfoNameRequiredError =
@@ -1706,17 +1700,12 @@ class RemoteConfigService {
         'Logodan renkler çıkarılıyor…',
     'lbl_gyms_gym_info_theme_color_note_tr':
         'Seçtiğiniz renk üyelerin uygulamasında da birincil renk olur; koyu zemin ve durum renkleri değişmez.',
-    'lbl_gyms_gym_info_report_emails_section_tr': 'RAPOR E-POSTALARI',
+    'lbl_gyms_gym_info_report_emails_section_tr': 'RAPOR E-POSTASI',
     'lbl_gyms_gym_info_report_emails_description_tr':
-        'Haftalık salon ve muhasebe özeti bu adreslere e-posta ile gönderilir.',
-    'lbl_gyms_gym_info_gym_report_email_label_tr': 'Salon raporu e-postası',
+        'Haftalık ve aylık salon özeti (ciro/gider dahil) bu adrese e-posta ile gönderilir.',
+    'lbl_gyms_gym_info_gym_report_email_label_tr': 'Rapor e-postası',
     'lbl_gyms_gym_info_gym_report_email_hint_tr': 'admin@stüdyo.com',
-    'lbl_gyms_gym_info_accounting_report_email_label_tr':
-        'Muhasebe raporu e-postası',
-    'lbl_gyms_gym_info_accounting_report_email_hint_tr': 'muhasebe@stüdyo.com',
     'lbl_gyms_gym_info_saving_label_tr': 'Kaydediliyor…',
-    'lbl_gyms_gym_info_save_report_emails_button_tr':
-        'Rapor e-postalarını kaydet',
     'lbl_gyms_gym_info_logo_upload_failed_error_tr':
         'Logo yüklenemedi, tekrar dene.',
     'lbl_gyms_gym_info_name_required_error_tr': 'Salon adı boş olamaz.',
@@ -2479,17 +2468,12 @@ class RemoteConfigService {
         'Extracting colors from logo…',
     'lbl_gyms_gym_info_theme_color_note_en':
         "The color you choose also becomes the primary color in members' app; the dark background and status colors stay unchanged.",
-    'lbl_gyms_gym_info_report_emails_section_en': 'REPORT EMAILS',
+    'lbl_gyms_gym_info_report_emails_section_en': 'REPORT EMAIL',
     'lbl_gyms_gym_info_report_emails_description_en':
-        'The weekly gym and accounting summary is emailed to these addresses.',
-    'lbl_gyms_gym_info_gym_report_email_label_en': 'Gym report email',
+        'The weekly and monthly gym summary (including revenue/expenses) is emailed to this address.',
+    'lbl_gyms_gym_info_gym_report_email_label_en': 'Report email',
     'lbl_gyms_gym_info_gym_report_email_hint_en': 'admin@studio.com',
-    'lbl_gyms_gym_info_accounting_report_email_label_en':
-        'Accounting report email',
-    'lbl_gyms_gym_info_accounting_report_email_hint_en':
-        'accounting@studio.com',
     'lbl_gyms_gym_info_saving_label_en': 'Saving…',
-    'lbl_gyms_gym_info_save_report_emails_button_en': 'Save report emails',
     'lbl_gyms_gym_info_logo_upload_failed_error_en':
         'Logo could not be uploaded, try again.',
     'lbl_gyms_gym_info_name_required_error_en': 'Gym name cannot be empty.',

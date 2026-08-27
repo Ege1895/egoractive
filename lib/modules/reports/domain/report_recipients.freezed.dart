@@ -18,7 +18,6 @@ final _privateConstructorUsedError = UnsupportedError(
 /// @nodoc
 mixin _$ReportRecipients {
   String get gymReportEmail => throw _privateConstructorUsedError;
-  String get accountingReportEmail => throw _privateConstructorUsedError;
   bool get isSaving => throw _privateConstructorUsedError;
   String? get errorMessage => throw _privateConstructorUsedError;
 
@@ -36,12 +35,7 @@ abstract class $ReportRecipientsCopyWith<$Res> {
     $Res Function(ReportRecipients) then,
   ) = _$ReportRecipientsCopyWithImpl<$Res, ReportRecipients>;
   @useResult
-  $Res call({
-    String gymReportEmail,
-    String accountingReportEmail,
-    bool isSaving,
-    String? errorMessage,
-  });
+  $Res call({String gymReportEmail, bool isSaving, String? errorMessage});
 }
 
 /// @nodoc
@@ -60,7 +54,6 @@ class _$ReportRecipientsCopyWithImpl<$Res, $Val extends ReportRecipients>
   @override
   $Res call({
     Object? gymReportEmail = null,
-    Object? accountingReportEmail = null,
     Object? isSaving = null,
     Object? errorMessage = freezed,
   }) {
@@ -69,10 +62,6 @@ class _$ReportRecipientsCopyWithImpl<$Res, $Val extends ReportRecipients>
             gymReportEmail: null == gymReportEmail
                 ? _value.gymReportEmail
                 : gymReportEmail // ignore: cast_nullable_to_non_nullable
-                      as String,
-            accountingReportEmail: null == accountingReportEmail
-                ? _value.accountingReportEmail
-                : accountingReportEmail // ignore: cast_nullable_to_non_nullable
                       as String,
             isSaving: null == isSaving
                 ? _value.isSaving
@@ -97,12 +86,7 @@ abstract class _$$ReportRecipientsImplCopyWith<$Res>
   ) = __$$ReportRecipientsImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({
-    String gymReportEmail,
-    String accountingReportEmail,
-    bool isSaving,
-    String? errorMessage,
-  });
+  $Res call({String gymReportEmail, bool isSaving, String? errorMessage});
 }
 
 /// @nodoc
@@ -120,7 +104,6 @@ class __$$ReportRecipientsImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? gymReportEmail = null,
-    Object? accountingReportEmail = null,
     Object? isSaving = null,
     Object? errorMessage = freezed,
   }) {
@@ -129,10 +112,6 @@ class __$$ReportRecipientsImplCopyWithImpl<$Res>
         gymReportEmail: null == gymReportEmail
             ? _value.gymReportEmail
             : gymReportEmail // ignore: cast_nullable_to_non_nullable
-                  as String,
-        accountingReportEmail: null == accountingReportEmail
-            ? _value.accountingReportEmail
-            : accountingReportEmail // ignore: cast_nullable_to_non_nullable
                   as String,
         isSaving: null == isSaving
             ? _value.isSaving
@@ -152,7 +131,6 @@ class __$$ReportRecipientsImplCopyWithImpl<$Res>
 class _$ReportRecipientsImpl implements _ReportRecipients {
   const _$ReportRecipientsImpl({
     this.gymReportEmail = '',
-    this.accountingReportEmail = '',
     this.isSaving = false,
     this.errorMessage,
   });
@@ -162,16 +140,13 @@ class _$ReportRecipientsImpl implements _ReportRecipients {
   final String gymReportEmail;
   @override
   @JsonKey()
-  final String accountingReportEmail;
-  @override
-  @JsonKey()
   final bool isSaving;
   @override
   final String? errorMessage;
 
   @override
   String toString() {
-    return 'ReportRecipients(gymReportEmail: $gymReportEmail, accountingReportEmail: $accountingReportEmail, isSaving: $isSaving, errorMessage: $errorMessage)';
+    return 'ReportRecipients(gymReportEmail: $gymReportEmail, isSaving: $isSaving, errorMessage: $errorMessage)';
   }
 
   @override
@@ -181,8 +156,6 @@ class _$ReportRecipientsImpl implements _ReportRecipients {
             other is _$ReportRecipientsImpl &&
             (identical(other.gymReportEmail, gymReportEmail) ||
                 other.gymReportEmail == gymReportEmail) &&
-            (identical(other.accountingReportEmail, accountingReportEmail) ||
-                other.accountingReportEmail == accountingReportEmail) &&
             (identical(other.isSaving, isSaving) ||
                 other.isSaving == isSaving) &&
             (identical(other.errorMessage, errorMessage) ||
@@ -190,13 +163,8 @@ class _$ReportRecipientsImpl implements _ReportRecipients {
   }
 
   @override
-  int get hashCode => Object.hash(
-    runtimeType,
-    gymReportEmail,
-    accountingReportEmail,
-    isSaving,
-    errorMessage,
-  );
+  int get hashCode =>
+      Object.hash(runtimeType, gymReportEmail, isSaving, errorMessage);
 
   /// Create a copy of ReportRecipients
   /// with the given fields replaced by the non-null parameter values.
@@ -213,15 +181,12 @@ class _$ReportRecipientsImpl implements _ReportRecipients {
 abstract class _ReportRecipients implements ReportRecipients {
   const factory _ReportRecipients({
     final String gymReportEmail,
-    final String accountingReportEmail,
     final bool isSaving,
     final String? errorMessage,
   }) = _$ReportRecipientsImpl;
 
   @override
   String get gymReportEmail;
-  @override
-  String get accountingReportEmail;
   @override
   bool get isSaving;
   @override

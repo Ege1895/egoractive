@@ -5,31 +5,33 @@ import '../domain/report_recipients.dart';
 
 part 'report_recipients_service.g.dart';
 
-/// F5-2 — `gyms/{gymId}.reportEmails` alanı. Haftalık rapor Cloud
-/// Function'ları (`weekly-gym-report`, `weekly-accounting-report`) bu
-/// alanı okuyup e-postayı buradan alır.
+/// F5-2/F5-15 — `gyms/{gymId}.reportEmails.gym` alanı. Haftalık/aylık rapor
+/// Cloud Function'ları (`weekly-gym-report`, `monthly-gym-report`) bu alanı
+/// okuyup e-postayı buradan alır.
 class ReportRecipientsService {
   const ReportRecipientsService();
 
   Stream<ReportRecipients> watchRecipients(String gymId) {
-    return FirebaseFirestore.instance.collection('gyms').doc(gymId).snapshots().map((doc) {
-      final data = doc.data()?['reportEmails'] as Map<String, dynamic>?;
-      return ReportRecipients(
-        gymReportEmail: (data?['gym'] as String?) ?? '',
-        accountingReportEmail: (data?['accounting'] as String?) ?? '',
-      );
-    });
+    return FirebaseFirestore.instance
+        .collection('gyms')
+        .doc(gymId)
+        .snapshots()
+        .map((doc) {
+          final data = doc.data()?['reportEmails'] as Map<String, dynamic>?;
+          return ReportRecipients(
+            gymReportEmail: (data?['gym'] as String?) ?? '',
+          );
+        });
   }
 
   Future<void> saveRecipients(String gymId, ReportRecipients recipients) {
     return FirebaseFirestore.instance.collection('gyms').doc(gymId).set({
-      'reportEmails': {
-        'gym': recipients.gymReportEmail,
-        'accounting': recipients.accountingReportEmail,
-      },
+      'reportEmails': {'gym': recipients.gymReportEmail},
     }, SetOptions(merge: true));
   }
 }
 
 @riverpod
-ReportRecipientsService reportRecipientsService(ReportRecipientsServiceRef ref) => const ReportRecipientsService();
+ReportRecipientsService reportRecipientsService(
+  ReportRecipientsServiceRef ref,
+) => const ReportRecipientsService();

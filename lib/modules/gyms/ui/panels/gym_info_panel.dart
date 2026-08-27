@@ -38,7 +38,6 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
   late final TextEditingController _addressController;
   late final TextEditingController _phoneController;
   late final TextEditingController _gymReportEmailController;
-  late final TextEditingController _accountingReportEmailController;
 
   bool _isSaving = false;
   bool _hydratedFromProfile = false;
@@ -73,9 +72,6 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
     final recipients = ref.read(reportRecipientsControllerProvider);
     _gymReportEmailController = TextEditingController(
       text: recipients.gymReportEmail,
-    );
-    _accountingReportEmailController = TextEditingController(
-      text: recipients.accountingReportEmail,
     );
 
     // `GymThemeController`, kendi altındaki `_themeStateForGymProvider`
@@ -556,25 +552,8 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
                           keyboardType: TextInputType.emailAddress,
                           controller: _gymReportEmailController,
                         ),
-                        const SizedBox(height: AppSpacing.md),
-                        AppTextField(
-                          label: ref.watch(
-                            rcTextProvider(
-                              RemoteConfigKeys
-                                  .gymsGymInfoAccountingReportEmailLabel,
-                            ),
-                          ),
-                          hint: ref.watch(
-                            rcTextProvider(
-                              RemoteConfigKeys
-                                  .gymsGymInfoAccountingReportEmailHint,
-                            ),
-                          ),
-                          keyboardType: TextInputType.emailAddress,
-                          controller: _accountingReportEmailController,
-                        ),
-                        const SizedBox(height: AppSpacing.md),
                         if (recipientsState.errorMessage != null) ...[
+                          const SizedBox(height: AppSpacing.md),
                           Text(
                             recipientsState.errorMessage!,
                             style: typography.bodyMedium.copyWith(
@@ -582,60 +561,7 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
                               fontSize: 13,
                             ),
                           ),
-                          const SizedBox(height: AppSpacing.sm),
                         ],
-                        Material(
-                          color: Colors.transparent,
-                          borderRadius: BorderRadius.circular(
-                            AppSpacing.radiusInner,
-                          ),
-                          child: InkWell(
-                            borderRadius: BorderRadius.circular(
-                              AppSpacing.radiusInner,
-                            ),
-                            onTap: recipientsState.isSaving
-                                ? null
-                                : () => ref
-                                      .read(
-                                        reportRecipientsControllerProvider
-                                            .notifier,
-                                      )
-                                      .save(
-                                        ReportRecipients(
-                                          gymReportEmail:
-                                              _gymReportEmailController.text
-                                                  .trim(),
-                                          accountingReportEmail:
-                                              _accountingReportEmailController
-                                                  .text
-                                                  .trim(),
-                                        ),
-                                      ),
-                            child: Container(
-                              constraints: const BoxConstraints(minHeight: 44),
-                              alignment: Alignment.centerLeft,
-                              child: Text(
-                                recipientsState.isSaving
-                                    ? ref.watch(
-                                        rcTextProvider(
-                                          RemoteConfigKeys
-                                              .gymsGymInfoSavingLabel,
-                                        ),
-                                      )
-                                    : ref.watch(
-                                        rcTextProvider(
-                                          RemoteConfigKeys
-                                              .gymsGymInfoSaveReportEmailsButton,
-                                        ),
-                                      ),
-                                style: typography.headingSmall.copyWith(
-                                  fontSize: 14,
-                                  color: colors.onPrimaryContainer,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
                       ],
                     ),
                   ),
@@ -856,6 +782,24 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
       }
       await ref.read(gymProfileControllerProvider.notifier).save();
       if (_previewColor != null) await _saveTheme();
+      await ref
+          .read(reportRecipientsControllerProvider.notifier)
+          .save(
+            ReportRecipients(
+              gymReportEmail: _gymReportEmailController.text.trim(),
+            ),
+          );
+      if (!mounted) return;
+      final recipientsError = ref
+          .read(reportRecipientsControllerProvider)
+          .errorMessage;
+      if (recipientsError != null) {
+        setState(() {
+          _isSaving = false;
+          _saveErrorMessage = recipientsError;
+        });
+        return;
+      }
     } catch (_) {
       if (!mounted) return;
       setState(() {
@@ -876,7 +820,6 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
     _addressController.dispose();
     _phoneController.dispose();
     _gymReportEmailController.dispose();
-    _accountingReportEmailController.dispose();
     super.dispose();
   }
 }

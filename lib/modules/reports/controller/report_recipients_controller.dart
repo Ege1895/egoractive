@@ -14,7 +14,7 @@ Stream<ReportRecipients> _recipientsForGym(
   return ref.watch(reportRecipientsRepositoryProvider).watchRecipients(gymId);
 }
 
-/// F5-2 — haftalık salon/muhasebe raporlarının gönderileceği e-postalar.
+/// F5-2/F5-15 — haftalık/aylık salon raporunun gönderileceği e-posta.
 @riverpod
 class ReportRecipientsController extends _$ReportRecipientsController {
   @override
@@ -33,16 +33,7 @@ class ReportRecipientsController extends _$ReportRecipientsController {
   Future<void> save(ReportRecipients recipients) async {
     if (recipients.gymReportEmail.isNotEmpty &&
         !_emailPattern.hasMatch(recipients.gymReportEmail)) {
-      state = state.copyWith(
-        errorMessage: 'Salon raporu e-postası geçerli değil.',
-      );
-      return;
-    }
-    if (recipients.accountingReportEmail.isNotEmpty &&
-        !_emailPattern.hasMatch(recipients.accountingReportEmail)) {
-      state = state.copyWith(
-        errorMessage: 'Muhasebe raporu e-postası geçerli değil.',
-      );
+      state = state.copyWith(errorMessage: 'Rapor e-postası geçerli değil.');
       return;
     }
 

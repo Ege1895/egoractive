@@ -22,11 +22,6 @@ export interface TrainerPerformance {
   cancelledSessions: number;
 }
 
-export interface ExpenseCategoryTotal {
-  category: string;
-  amountTl: number;
-}
-
 /** F5-1'deki dashboard ile aynı yaklaşım: sayımlar `count()`/`sum()`
  * aggregation query'leriyle, hiçbir doküman client'a (fonksiyona) çekilmeden
  * hesaplanır. */
@@ -132,33 +127,4 @@ export async function fetchGymTrainerPerformance(
   );
 
   return trainerPerformance.sort((a, b) => b.completedSessions - a.completedSessions);
-}
-
-/** Muhasebe raporu kategori kırılımı için — haftalık gider hacmi düşük
- * olduğundan (F5-1'in 10.000+ seans endişesinin aksine) dokümanları
- * doğrudan okumak burada güvenli. */
-export async function fetchExpenseCategoryTotals(
-  db: Firestore,
-  gymId: string,
-  weekStart: Date,
-  weekEnd: Date,
-): Promise<ExpenseCategoryTotal[]> {
-  const snapshot = await db
-    .collection("expenses")
-    .where("gymId", "==", gymId)
-    .where("date", ">=", Timestamp.fromDate(weekStart))
-    .where("date", "<", Timestamp.fromDate(weekEnd))
-    .get();
-
-  const totals = new Map<string, number>();
-  for (const doc of snapshot.docs) {
-    const data = doc.data();
-    const category = (data.category as string | undefined) ?? "Diğer";
-    const amount = (data.amountTl as number | undefined) ?? 0;
-    totals.set(category, (totals.get(category) ?? 0) + amount);
-  }
-
-  return [...totals.entries()]
-    .map(([category, amountTl]) => ({ category, amountTl }))
-    .sort((a, b) => b.amountTl - a.amountTl);
 }

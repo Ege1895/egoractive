@@ -283,6 +283,10 @@ Sıralama, store review sürecini en hızlı şekilde başlatacak şekilde tasar
 **Prompt:** "Mail'deki 'Uygulamada Gör' butonu `egoractive://reports` özel URL şemasını açsın. `ios/Runner/Info.plist`'e `CFBundleURLTypes` (`egoractive` şeması), `android/.../AndroidManifest.xml`'e `android.intent.action.VIEW` intent-filter (`scheme=egoractive`) ekle. `app_links` paketiyle `core/deep_links/app_deep_link_service.dart` — gelen `egoractive://reports` linkini dinler, `currentRoleProvider` ile admin olduğunu doğrulayıp `PanelStackController` üzerinden `AdminDashboardPanel`'i açar (admin değilse sessizce yok sayılır — `push_notification_service.dart`'taki aynı yaklaşım). `main.dart`'ta `PushNotificationService` ile aynı yerde, aynı try/catch güvenliğiyle başlatılır."
 **Kabul kriterleri:** Uygulama kapalıyken/arka plandayken/açıkken `egoractive://reports` linkine dokununca uygulama açılıp doğrudan Raporlar paneline gidiyor; admin olmayan bir hesapta link sessizce yok sayılıyor (crash/permission-denied hatası yok).
 
+### F5-15 — Rapor e-postasını tek alana indir, ayrı muhasebe maili/kaydet butonunu kaldır
+**Prompt:** "F5-11'deki zengin rapor maili ciro/gider/net'i zaten içerdiğinden `weekly-accounting-report.ts` (ayrı bir muhasebe özeti maili) artık gereksiz — sil, `index.ts`'teki export'unu kaldır. `GymInfoPanel`'deki 'RAPOR E-POSTALARI' bölümünü tek alana indir: 'Muhasebe raporu e-postası' input'unu ve o karttaki ayrı 'Rapor e-postalarını kaydet' butonunu kaldır. `ReportRecipients` domain modelinden `accountingReportEmail`'i sil. Panelin en altındaki genel 'Kaydet' butonu artık salon bilgileri + tema + logo ile birlikte bu tek rapor e-postasını da kaydetsin (`_save()` akışına ekle, geçersiz e-postada genel kaydetme hatası olarak göster)."
+**Kabul kriterleri:** Salon Bilgileri ekranında tek bir 'Rapor e-postası' alanı var, ayrı bir kaydet butonu yok; en alttaki 'Kaydet'e basınca hem profil hem rapor e-postası tek seferde kaydediliyor; `gyms/{gymId}.reportEmails.gym` boşsa hem haftalık hem aylık rapor fonksiyonu o salonu atlıyor (F5-11/F5-13'teki davranış korunuyor).
+
 ---
 
 ## FAZ 6 — Monetizasyon ve Çoklu Salon SaaS

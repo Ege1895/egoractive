@@ -21,7 +21,6 @@ export { sendEventReminderTask } from "./tasks/send-event-reminder-task";
 export { sendGroupSessionReminderTask } from "./tasks/send-group-session-reminder-task";
 export { badgeCheck } from "./scheduled/badge-check";
 export { weeklyGymReport } from "./scheduled/weekly-gym-report";
-export { weeklyAccountingReport } from "./scheduled/weekly-accounting-report";
 export { monthlyGymReport } from "./scheduled/monthly-gym-report";
 export { feedbackReminderCheck } from "./scheduled/feedback-reminder-check";
 export { monthlyFeedbackSummary } from "./scheduled/monthly-feedback-summary";

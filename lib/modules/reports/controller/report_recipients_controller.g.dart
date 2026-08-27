@@ -149,9 +149,9 @@ class _RecipientsForGymProviderElement
 }
 
 String _$reportRecipientsControllerHash() =>
-    r'4a89ff03c03a054fa99e883441400e95c848ef8c';
+    r'b3e7c15be25cb140c2f251f45a9f983f721b4349';
 
-/// F5-2 — haftalık salon/muhasebe raporlarının gönderileceği e-postalar.
+/// F5-2/F5-15 — haftalık/aylık salon raporunun gönderileceği e-posta.
 ///
 /// Copied from [ReportRecipientsController].
 @ProviderFor(ReportRecipientsController)

@@ -3228,37 +3228,37 @@
     },
     "lbl_gyms_gym_info_report_emails_section_tr": {
       "defaultValue": {
-        "value": "RAPOR E-POSTALARI"
+        "value": "RAPOR E-POSTASI"
       },
       "valueType": "STRING"
     },
     "lbl_gyms_gym_info_report_emails_section_en": {
       "defaultValue": {
-        "value": "REPORT EMAILS"
+        "value": "REPORT EMAIL"
       },
       "valueType": "STRING"
     },
     "lbl_gyms_gym_info_report_emails_description_tr": {
       "defaultValue": {
-        "value": "Haftalık salon ve muhasebe özeti bu adreslere e-posta ile gönderilir."
+        "value": "Haftalık ve aylık salon özeti (ciro/gider dahil) bu adrese e-posta ile gönderilir."
       },
       "valueType": "STRING"
     },
     "lbl_gyms_gym_info_report_emails_description_en": {
       "defaultValue": {
-        "value": "The weekly gym and accounting summary is emailed to these addresses."
+        "value": "The weekly and monthly gym summary (including revenue/expenses) is emailed to this address."
       },
       "valueType": "STRING"
     },
     "lbl_gyms_gym_info_gym_report_email_label_tr": {
       "defaultValue": {
-        "value": "Salon raporu e-postası"
+        "value": "Rapor e-postası"
       },
       "valueType": "STRING"
     },
     "lbl_gyms_gym_info_gym_report_email_label_en": {
       "defaultValue": {
-        "value": "Gym report email"
+        "value": "Report email"
       },
       "valueType": "STRING"
     },
@@ -3274,30 +3274,6 @@
       },
       "valueType": "STRING"
     },
-    "lbl_gyms_gym_info_accounting_report_email_label_tr": {
-      "defaultValue": {
-        "value": "Muhasebe raporu e-postası"
-      },
-      "valueType": "STRING"
-    },
-    "lbl_gyms_gym_info_accounting_report_email_label_en": {
-      "defaultValue": {
-        "value": "Accounting report email"
-      },
-      "valueType": "STRING"
-    },
-    "lbl_gyms_gym_info_accounting_report_email_hint_tr": {
-      "defaultValue": {
-        "value": "muhasebe@stüdyo.com"
-      },
-      "valueType": "STRING"
-    },
-    "lbl_gyms_gym_info_accounting_report_email_hint_en": {
-      "defaultValue": {
-        "value": "accounting@studio.com"
-      },
-      "valueType": "STRING"
-    },
     "lbl_gyms_gym_info_saving_label_tr": {
       "defaultValue": {
         "value": "Kaydediliyor…"
@@ -3307,18 +3283,6 @@
     "lbl_gyms_gym_info_saving_label_en": {
       "defaultValue": {
         "value": "Saving…"
-      },
-      "valueType": "STRING"
-    },
-    "lbl_gyms_gym_info_save_report_emails_button_tr": {
-      "defaultValue": {
-        "value": "Rapor e-postalarını kaydet"
-      },
-      "valueType": "STRING"
-    },
-    "lbl_gyms_gym_info_save_report_emails_button_en": {
-      "defaultValue": {
-        "value": "Save report emails"
       },
       "valueType": "STRING"
     },

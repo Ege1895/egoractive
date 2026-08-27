@@ -16,7 +16,3 @@ export function formatWeekRangeTr(weekStart: Date, weekEnd: Date): string {
   const lastDay = new Date(weekEnd.getTime() - 24 * 60 * 60 * 1000);
   return `${formatDateTr(weekStart)} – ${formatDateTr(lastDay)}`;
 }
-
-export function formatTl(amount: number): string {
-  return `₺${amount.toLocaleString("tr-TR")}`;
-}
