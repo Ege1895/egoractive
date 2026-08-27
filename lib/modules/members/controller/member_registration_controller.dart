@@ -14,6 +14,7 @@ class MemberRegistrationState {
     this.phoneError,
     this.trainerError,
     this.createdMemberId,
+    this.isRenewal = false,
   });
 
   final bool isSubmitting;
@@ -29,16 +30,25 @@ class MemberRegistrationState {
   /// bağlamak için kullanır.
   final String? createdMemberId;
 
+  /// F5-17 — [AdminMemberDetailPanel]'deki "Paketi Yenile" butonundan
+  /// mevcut bir üye için başlatıldıysa `true`. `NewMembershipPackagePanel`/
+  /// `NewMembershipPaymentPanel` bu bayrağa göre "Vazgeç"/kaydetme sonrası
+  /// tüm sihirbazı (`popToRoot`) değil, sadece kendi üstüne eklenen adımları
+  /// (`pop`) kapatıp üye detayına döner.
+  final bool isRenewal;
+
   MemberRegistrationState copyWith({
     bool? isSubmitting,
     String? errorMessage,
     String? createdMemberId,
     bool clearError = false,
+    bool? isRenewal,
   }) {
     return MemberRegistrationState(
       isSubmitting: isSubmitting ?? this.isSubmitting,
       errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
       createdMemberId: createdMemberId ?? this.createdMemberId,
+      isRenewal: isRenewal ?? this.isRenewal,
     );
   }
 }
@@ -104,7 +114,11 @@ class MemberRegistrationController extends _$MemberRegistrationController {
         gender: form.gender,
         canConfirmAttendance: form.canConfirmAttendance,
       );
-      state = state.copyWith(isSubmitting: false, createdMemberId: memberId);
+      state = state.copyWith(
+        isSubmitting: false,
+        createdMemberId: memberId,
+        isRenewal: false,
+      );
       return true;
     } catch (_) {
       state = state.copyWith(
@@ -160,4 +174,13 @@ class MemberRegistrationController extends _$MemberRegistrationController {
       return false;
     }
   }
+
+  /// [AdminMemberDetailPanel]'deki "Paketi Yenile" butonu — 1. adımı (üye
+  /// bilgileri) atlayıp doğrudan `NewMembershipPackagePanel`'e (2. adım)
+  /// geçmeden önce bu üyeyi paket akışının yazma hedefi olarak işaretler.
+  void beginRenewal(String memberId) {
+    state = MemberRegistrationState(createdMemberId: memberId, isRenewal: true);
+  }
+
+  void reset() => state = const MemberRegistrationState();
 }

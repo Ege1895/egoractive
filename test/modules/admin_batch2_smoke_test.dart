@@ -224,6 +224,14 @@ void main() {
       ),
     );
     await tester.pump();
+    // F5-17 — "Paketi Yenile" butonu (+ borç varken görünen uyarı notu)
+    // eklendiği için metrik satırı artık varsayılan test viewport'unun
+    // altında kalabiliyor — dokunmadan önce görünür hale getirilmeli.
+    await tester.scrollUntilVisible(
+      find.text('Kilo'),
+      200,
+      scrollable: find.byType(Scrollable),
+    );
     await tester.tap(find.text('Kilo'));
     await tester.pump();
     expect(tester.takeException(), isNull);

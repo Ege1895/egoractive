@@ -4366,6 +4366,30 @@
       },
       "valueType": "STRING"
     },
+    "lbl_members_detail_renew_package_button_tr": {
+      "defaultValue": {
+        "value": "Paketi Yenile"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_detail_renew_package_button_en": {
+      "defaultValue": {
+        "value": "Renew Package"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_detail_renew_package_blocked_note_tr": {
+      "defaultValue": {
+        "value": "Yeni paket tanımlamadan önce mevcut paketin borcu kapatılmalı."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_detail_renew_package_blocked_note_en": {
+      "defaultValue": {
+        "value": "Settle the current package's balance before defining a new one."
+      },
+      "valueType": "STRING"
+    },
     "lbl_members_detail_phone_trainer_line_tr": {
       "defaultValue": {
         "value": "{phone} · Antrenör: {trainerName}"

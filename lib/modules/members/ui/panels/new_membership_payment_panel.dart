@@ -376,9 +376,10 @@ class _NewMembershipPaymentPanelState
                     onPressed: package == null || membership.isSaving
                         ? null
                         : () async {
-                            final memberId = ref
-                                .read(memberRegistrationControllerProvider)
-                                .createdMemberId;
+                            final registration = ref.read(
+                              memberRegistrationControllerProvider,
+                            );
+                            final memberId = registration.createdMemberId;
                             if (memberId == null) return;
                             if (!await ensureSubscriptionAllowsWrite(
                               context,
@@ -386,6 +387,7 @@ class _NewMembershipPaymentPanelState
                             )) {
                               return;
                             }
+                            final isRenewal = registration.isRenewal;
                             final success = await membershipController.save(
                               memberId,
                             );
@@ -396,6 +398,11 @@ class _NewMembershipPaymentPanelState
                             ref
                                 .read(newMembershipControllerProvider.notifier)
                                 .reset();
+                            ref
+                                .read(
+                                  memberRegistrationControllerProvider.notifier,
+                                )
+                                .reset();
                             // F7-2 — AdminMemberListController artık canlı dinlemiyor
                             // (sayfalı), yeni üyenin listede görünmesi için elle yenile.
                             unawaited(
@@ -405,9 +412,17 @@ class _NewMembershipPaymentPanelState
                                   )
                                   .refresh(),
                             );
-                            ref
-                                .read(panelStackControllerProvider.notifier)
-                                .popToRoot();
+                            final panelStack = ref.read(
+                              panelStackControllerProvider.notifier,
+                            );
+                            if (isRenewal) {
+                              // F5-17 — 1. adım hiç eklenmemişti: bu adım +
+                              // paket adımını kapatmak üye detayına döner.
+                              panelStack.pop();
+                              panelStack.pop();
+                            } else {
+                              panelStack.popToRoot();
+                            }
                           },
                   ),
                 ],

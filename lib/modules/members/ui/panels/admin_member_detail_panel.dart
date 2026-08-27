@@ -16,10 +16,15 @@ import '../../../measurements/ui/panels/measurements_panel.dart';
 import '../../../trainers/domain/trainer_member_detail.dart';
 import '../../../trainers/domain/trainer_metric.dart';
 import '../../controller/admin_member_detail_controller.dart';
+import '../../controller/member_registration_controller.dart';
+import '../../controller/new_member_controller.dart';
+import '../../controller/new_membership_controller.dart';
+import '../../domain/admin_member_detail.dart';
 import '../../domain/admin_member_summary.dart';
 import '../widgets/installment_row.dart';
 import 'edit_member_payment_panel.dart';
 import 'member_info_panel.dart';
+import 'new_membership_package_panel.dart';
 
 /// Admin 21 · Üye Detayı — yönetici görünümü, ödeme bilgisi dahil.
 class AdminMemberDetailPanel extends BasePanel {
@@ -82,6 +87,29 @@ class _AdminMemberDetailPanelState
         ),
       ),
     );
+  }
+
+  /// F5-17 — "Paketi Yenile": Yeni Üyelik sihirbazının 1. adımını (üye
+  /// bilgileri, bu üye zaten var) atlayıp doğrudan 2. adıma (paket seçimi)
+  /// geçer. Başlık kartında görünsün diye ad/soyad ve antrenör adı önceden
+  /// dolduruluyor — bunlar sadece görüntü amaçlı, yazma anında kullanılan
+  /// tek şey `memberId` (`MemberRegistrationController.beginRenewal`).
+  void _startRenewal(AdminMemberDetail detail) {
+    final nameParts = detail.name.trim().split(RegExp(r'\s+'));
+    final firstName = nameParts.isEmpty ? '' : nameParts.first;
+    final lastName = nameParts.length > 1 ? nameParts.sublist(1).join(' ') : '';
+    final newMemberController = ref.read(newMemberControllerProvider.notifier)
+      ..reset()
+      ..updateFirstName(firstName)
+      ..updateLastName(lastName);
+    newMemberController.selectTrainer('', detail.trainerName);
+    ref.read(newMembershipControllerProvider.notifier).reset();
+    ref
+        .read(memberRegistrationControllerProvider.notifier)
+        .beginRenewal(widget.memberId);
+    ref
+        .read(panelStackControllerProvider.notifier)
+        .push(const NewMembershipPackagePanel());
   }
 
   @override
@@ -478,6 +506,32 @@ class _AdminMemberDetailPanelState
                       ),
                     ),
                   ),
+                  const SizedBox(height: AppSpacing.md),
+                  AppButton(
+                    label: ref.watch(
+                      rcTextProvider(
+                        RemoteConfigKeys.membersDetailRenewPackageButton,
+                      ),
+                    ),
+                    variant: AppButtonVariant.secondary,
+                    onPressed: detail.paymentDueTl > 0
+                        ? null
+                        : () => _startRenewal(detail),
+                  ),
+                  if (detail.paymentDueTl > 0) ...[
+                    const SizedBox(height: AppSpacing.xs),
+                    Text(
+                      ref.watch(
+                        rcTextProvider(
+                          RemoteConfigKeys.membersDetailRenewPackageBlockedNote,
+                        ),
+                      ),
+                      style: typography.caption.copyWith(
+                        color: colors.onSurfaceMuted,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
                   const SizedBox(height: AppSpacing.lg),
                   Text(
                     ref.watch(

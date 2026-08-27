@@ -11,6 +11,7 @@ import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/native_date_picker.dart';
 import '../../../packages/controller/studio_packages_controller.dart';
 import '../../../packages/domain/studio_package.dart';
+import '../../controller/member_registration_controller.dart';
 import '../../controller/new_member_controller.dart';
 import '../../controller/new_membership_controller.dart';
 import 'new_membership_payment_panel.dart';
@@ -105,9 +106,22 @@ class _NewMembershipPackagePanelState
                         ),
                       ),
                       GestureDetector(
-                        onTap: () => ref
-                            .read(panelStackControllerProvider.notifier)
-                            .popToRoot(),
+                        onTap: () {
+                          final panelStack = ref.read(
+                            panelStackControllerProvider.notifier,
+                          );
+                          // F5-17 — "Paketi Yenile" ile başlatılan akışta 1.
+                          // adım (üye bilgileri) atlanmıştı, bu yüzden
+                          // vazgeçmek tüm sihirbazı değil sadece bu adımı
+                          // kapatıp üye detayına dönmeli.
+                          if (ref
+                              .read(memberRegistrationControllerProvider)
+                              .isRenewal) {
+                            panelStack.pop();
+                          } else {
+                            panelStack.popToRoot();
+                          }
+                        },
                         child: Text(
                           ref.watch(
                             rcTextProvider(RemoteConfigKeys.commonVazgec),

@@ -800,6 +800,10 @@ abstract final class RemoteConfigKeys {
       'lbl_members_detail_last_payment_label';
   static const membersDetailViewMeasurementsButton =
       'lbl_members_detail_view_measurements_button';
+  static const membersDetailRenewPackageButton =
+      'lbl_members_detail_renew_package_button';
+  static const membersDetailRenewPackageBlockedNote =
+      'lbl_members_detail_renew_package_blocked_note';
   static const membersDetailPhoneTrainerLine =
       'lbl_members_detail_phone_trainer_line';
   static const membersListSearchHint = 'lbl_members_list_search_hint';
@@ -1847,6 +1851,9 @@ class RemoteConfigService {
     'lbl_members_detail_not_found_tr': 'Üye bulunamadı.',
     'lbl_members_detail_last_payment_label_tr': 'Son ödeme {date}',
     'lbl_members_detail_view_measurements_button_tr': 'Ölçüm ekranını gör',
+    'lbl_members_detail_renew_package_button_tr': 'Paketi Yenile',
+    'lbl_members_detail_renew_package_blocked_note_tr':
+        'Yeni paket tanımlamadan önce mevcut paketin borcu kapatılmalı.',
     'lbl_members_detail_phone_trainer_line_tr':
         '{phone} · Antrenör: {trainerName}',
     'lbl_members_list_search_hint_tr': 'İsim ara',
@@ -2620,6 +2627,9 @@ class RemoteConfigService {
     'lbl_members_detail_last_payment_label_en': 'Last payment {date}',
     'lbl_members_detail_view_measurements_button_en':
         'View measurements screen',
+    'lbl_members_detail_renew_package_button_en': 'Renew Package',
+    'lbl_members_detail_renew_package_blocked_note_en':
+        'Settle the current package\'s balance before defining a new one.',
     'lbl_members_detail_phone_trainer_line_en':
         '{phone} · Trainer: {trainerName}',
     'lbl_members_list_search_hint_en': 'Search by name',
