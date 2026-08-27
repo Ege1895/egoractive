@@ -7752,6 +7752,78 @@
       },
       "valueType": "STRING"
     },
+    "lbl_reports_past_reports_section_title_tr": {
+      "defaultValue": {
+        "value": "GEÇMİŞ RAPORLAR"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_reports_past_reports_section_title_en": {
+      "defaultValue": {
+        "value": "PAST REPORTS"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_reports_period_weekly_label_tr": {
+      "defaultValue": {
+        "value": "Haftalık"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_reports_period_weekly_label_en": {
+      "defaultValue": {
+        "value": "Weekly"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_reports_period_monthly_label_tr": {
+      "defaultValue": {
+        "value": "Aylık"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_reports_period_monthly_label_en": {
+      "defaultValue": {
+        "value": "Monthly"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_reports_snapshot_list_load_error_tr": {
+      "defaultValue": {
+        "value": "Geçmiş raporlar yüklenemedi, lütfen daha sonra tekrar deneyin."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_reports_snapshot_list_load_error_en": {
+      "defaultValue": {
+        "value": "Past reports could not be loaded, please try again later."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_reports_snapshot_list_empty_state_tr": {
+      "defaultValue": {
+        "value": "Bu periyot için henüz oluşturulmuş bir rapor yok."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_reports_snapshot_list_empty_state_en": {
+      "defaultValue": {
+        "value": "No reports generated yet for this period."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_reports_snapshot_detail_title_tr": {
+      "defaultValue": {
+        "value": "Rapor Detayı"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_reports_snapshot_detail_title_en": {
+      "defaultValue": {
+        "value": "Report Detail"
+      },
+      "valueType": "STRING"
+    },
     "lbl_subscription_yearly_plan_fallback_tr": {
       "defaultValue": {
         "value": "Yıllık"

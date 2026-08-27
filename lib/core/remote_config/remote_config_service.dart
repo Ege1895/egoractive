@@ -991,6 +991,15 @@ abstract final class RemoteConfigKeys {
       'lbl_reports_trainer_performance_load_error';
   static const reportsTrainerPerformanceEmptyState =
       'lbl_reports_trainer_performance_empty_state';
+  static const reportsPastReportsSectionTitle =
+      'lbl_reports_past_reports_section_title';
+  static const reportsPeriodWeeklyLabel = 'lbl_reports_period_weekly_label';
+  static const reportsPeriodMonthlyLabel = 'lbl_reports_period_monthly_label';
+  static const reportsSnapshotListLoadError =
+      'lbl_reports_snapshot_list_load_error';
+  static const reportsSnapshotListEmptyState =
+      'lbl_reports_snapshot_list_empty_state';
+  static const reportsSnapshotDetailTitle = 'lbl_reports_snapshot_detail_title';
 
   static const sessionsCalendarTitle = 'lbl_sessions_calendar_title';
   static const sessionsCalendarSlotTimeLabel =
@@ -1953,6 +1962,14 @@ class RemoteConfigService {
         'Antrenör verileri yüklenemedi.',
     'lbl_reports_trainer_performance_empty_state_tr':
         'Bu ay için antrenör verisi yok.',
+    'lbl_reports_past_reports_section_title_tr': 'GEÇMİŞ RAPORLAR',
+    'lbl_reports_period_weekly_label_tr': 'Haftalık',
+    'lbl_reports_period_monthly_label_tr': 'Aylık',
+    'lbl_reports_snapshot_list_load_error_tr':
+        'Geçmiş raporlar yüklenemedi, lütfen daha sonra tekrar deneyin.',
+    'lbl_reports_snapshot_list_empty_state_tr':
+        'Bu periyot için henüz oluşturulmuş bir rapor yok.',
+    'lbl_reports_snapshot_detail_title_tr': 'Rapor Detayı',
     'lbl_sessions_calendar_title_tr': 'Takvim',
     'lbl_sessions_calendar_slot_time_label_tr': 'Saat',
     'lbl_sessions_calendar_slot_status_label_tr': 'Durum',
@@ -2714,6 +2731,14 @@ class RemoteConfigService {
         'Trainer data failed to load.',
     'lbl_reports_trainer_performance_empty_state_en':
         'No trainer data for this month.',
+    'lbl_reports_past_reports_section_title_en': 'PAST REPORTS',
+    'lbl_reports_period_weekly_label_en': 'Weekly',
+    'lbl_reports_period_monthly_label_en': 'Monthly',
+    'lbl_reports_snapshot_list_load_error_en':
+        'Past reports could not be loaded, please try again later.',
+    'lbl_reports_snapshot_list_empty_state_en':
+        'No reports generated yet for this period.',
+    'lbl_reports_snapshot_detail_title_en': 'Report Detail',
     'lbl_sessions_calendar_title_en': 'Calendar',
     'lbl_sessions_calendar_slot_time_label_en': 'Time',
     'lbl_sessions_calendar_slot_status_label_en': 'Status',
