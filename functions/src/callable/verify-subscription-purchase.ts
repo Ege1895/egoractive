@@ -1,15 +1,17 @@
 import { defineSecret } from "firebase-functions/params";
 import { HttpsError, onCall } from "firebase-functions/v2/https";
+import * as logger from "firebase-functions/logger";
 
 import { applySubscriptionUpdate } from "../shared/apply-subscription-update";
 import { isKnownSubscriptionProductId } from "../shared/subscription-constants";
-import { verifyAppleReceipt, verifyGooglePurchase } from "../shared/subscription-verification";
+import { verifyAppleTransaction, verifyGooglePurchase } from "../shared/subscription-verification";
 
 /**
- * App Store Connect > Subscriptions > "App-Specific Shared Secret".
- * `firebase functions:secrets:set APPLE_SUBSCRIPTION_SHARED_SECRET`
+ * Apple PKI sitesinden indirilen kök sertifikalar, base64 + virgülle
+ * birleştirilmiş — `verifyAppleTransaction`'ın JWS imza doğrulaması için.
+ * `firebase functions:secrets:set APPLE_ROOT_CA_CERTIFICATES_BASE64`
  */
-const appleSharedSecret = defineSecret("APPLE_SUBSCRIPTION_SHARED_SECRET");
+const appleRootCertificatesBase64 = defineSecret("APPLE_ROOT_CA_CERTIFICATES_BASE64");
 /**
  * Play Console'da "Play Android Developer API" erişimi verilmiş bir servis
  * hesabının indirilen JSON anahtarı, tek satır string olarak.
@@ -25,7 +27,7 @@ const googlePlayServiceAccountJson = defineSecret("GOOGLE_PLAY_SERVICE_ACCOUNT_J
  * yazamaz (bkz. firestore.rules `subscriptionFields()`).
  */
 export const verifySubscriptionPurchase = onCall(
-  { secrets: [appleSharedSecret, googlePlayServiceAccountJson] },
+  { secrets: [appleRootCertificatesBase64, googlePlayServiceAccountJson] },
   async (request) => {
     const uid = request.auth?.uid;
     const role = request.auth?.token?.role as string | undefined;
@@ -56,10 +58,10 @@ export const verifySubscriptionPurchase = onCall(
     try {
       verified =
         platform === "ios"
-          ? await verifyAppleReceipt({
-              receiptData: verificationData,
+          ? await verifyAppleTransaction({
+              signedTransactionInfo: verificationData,
               productId,
-              sharedSecret: appleSharedSecret.value(),
+              rootCertificatesBase64: appleRootCertificatesBase64.value(),
             })
           : await verifyGooglePurchase({
               purchaseToken: verificationData,
@@ -68,6 +70,16 @@ export const verifySubscriptionPurchase = onCall(
             });
     } catch (error) {
       const message = error instanceof Error ? error.message : "Bilinmeyen hata.";
+      // NOT: veri objesinde `message` anahtarı KULLANMA — firebase-functions
+      // logger'ı bunu kendi log satırının metniyle çakıştırıp üzerine
+      // yazıyor (bir kere yaşandı, gerçek Apple/Google hata metni stack
+      // trace'le değişmişti). Ayrı bir isim (`verificationErrorMessage`) kullan.
+      logger.error("verifySubscriptionPurchase: makbuz doğrulanamadı", {
+        gymId,
+        productId,
+        platform,
+        verificationErrorMessage: message,
+      });
       throw new HttpsError("failed-precondition", `Makbuz doğrulanamadı: ${message}`);
     }
 

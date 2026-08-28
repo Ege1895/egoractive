@@ -54,6 +54,15 @@ class SubscriptionProduct with _$SubscriptionProduct {
     required String title,
     required String description,
     required String price,
+
+    /// Mağazadan (App Store Connect'teki Introductory Offer → Free Trial)
+    /// okunan gerçek ücretsiz deneme süresi (gün) — bkz.
+    /// `SubscriptionPurchaseService.fetchProducts`. Mağazada bu ürün için
+    /// ücretsiz deneme tanımlı değilse (ya da henüz okunamıyorsa, örn.
+    /// Android/Play Console kurulumu tamamlanmadan) `null` kalır; ekran bu
+    /// durumda Remote Config'teki sabit metne düşer — hardcode edilmiş bir
+    /// süre asla gösterilmez.
+    int? trialDays,
   }) = _SubscriptionProduct;
 }
 
@@ -75,12 +84,14 @@ List<SubscriptionProduct> mockSubscriptionProducts(String locale) {
       title: isTr ? 'Aylık' : 'Monthly',
       description: isTr ? 'Her ay yenilenir' : 'Renews every month',
       price: isTr ? '₺999,00' : '\$19.99',
+      trialDays: 14,
     ),
     SubscriptionProduct(
       id: gymYearlySubscriptionProductId,
       title: isTr ? 'Yıllık' : 'Yearly',
       description: isTr ? '2 ay bedava' : '2 months free',
       price: isTr ? '₺9.990,00' : '\$199.99',
+      trialDays: 14,
     ),
   ];
 }

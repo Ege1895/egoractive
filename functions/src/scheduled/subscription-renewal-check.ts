@@ -5,9 +5,9 @@ import * as logger from "firebase-functions/logger";
 
 import { applySubscriptionUpdate } from "../shared/apply-subscription-update";
 import { withFailureAlerting } from "../shared/function-health";
-import { verifyAppleReceipt, verifyGooglePurchase } from "../shared/subscription-verification";
+import { verifyAppleTransaction, verifyGooglePurchase } from "../shared/subscription-verification";
 
-const appleSharedSecret = defineSecret("APPLE_SUBSCRIPTION_SHARED_SECRET");
+const appleRootCertificatesBase64 = defineSecret("APPLE_ROOT_CA_CERTIFICATES_BASE64");
 const googlePlayServiceAccountJson = defineSecret("GOOGLE_PLAY_SERVICE_ACCOUNT_JSON");
 
 const LOOKAHEAD_MS = 24 * 60 * 60 * 1000;
@@ -27,7 +27,7 @@ const LOOKAHEAD_MS = 24 * 60 * 60 * 1000;
  * kullanabilir" kararı vermemeli — store ne diyorsa o).
  */
 export const subscriptionRenewalCheck = onSchedule(
-  { schedule: "every 24 hours", secrets: [appleSharedSecret, googlePlayServiceAccountJson] },
+  { schedule: "every 24 hours", secrets: [appleRootCertificatesBase64, googlePlayServiceAccountJson] },
   withFailureAlerting("subscriptionRenewalCheck", async () => {
     const db = getFirestore();
     const cutoff = Timestamp.fromMillis(Date.now() + LOOKAHEAD_MS);
@@ -53,10 +53,10 @@ export const subscriptionRenewalCheck = onSchedule(
       try {
         const verified =
           platform === "ios"
-            ? await verifyAppleReceipt({
-                receiptData: rawVerificationData,
+            ? await verifyAppleTransaction({
+                signedTransactionInfo: rawVerificationData,
                 productId,
-                sharedSecret: appleSharedSecret.value(),
+                rootCertificatesBase64: appleRootCertificatesBase64.value(),
               })
             : await verifyGooglePurchase({
                 purchaseToken: rawVerificationData,

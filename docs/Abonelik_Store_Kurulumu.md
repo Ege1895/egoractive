@@ -11,8 +11,8 @@ Kod tarafı hazır, aşağıdakiler tamamlanmadan bu ekran boş/işlevsiz kalır
 - **Ürün ID'leri** (`lib/core/constants/subscription_constants.dart` /
   `functions/src/shared/subscription-constants.ts`) — her iki mağazada da
   **birebir bu ID'lerle** oluşturulmalı:
-  - `egoractive_gym_monthly`
-  - `egoractive_gym_yearly`
+  - `egoractive_business_monthly`
+  - `egoractive_business_yearly`
 - **Bundle ID / paket adı:** `com.egoragames.egoractive`
 - **Deneme süresi:** şu an 14 gün (`cfg_trial_duration_days`, Remote Config).
   Mağazadaki "Free Trial" introductory offer süresini de bununla aynı tut.
@@ -20,7 +20,7 @@ Kod tarafı hazır, aşağıdakiler tamamlanmadan bu ekran boş/işlevsiz kalır
 ## 1) App Store Connect (iOS)
 
 - [ ] Uygulama altında bir **Subscription Group** oluştur (öneri: "Egoractive Gym Plans") — aylık/yıllık aynı grupta olmalı ki kullanıcı ikisi arasında geçiş yapabilsin.
-- [ ] Grup içine iki auto-renewable subscription ekle: `egoractive_gym_monthly`, `egoractive_gym_yearly` (Product ID alanına birebir bunlar).
+- [ ] Grup içine iki auto-renewable subscription ekle: `egoractive_business_monthly`, `egoractive_business_yearly` (Product ID alanına birebir bunlar).
 - [ ] Her ikisine de fiyat, süre (1 ay / 1 yıl), yerelleştirilmiş başlık/açıklama gir.
 - [ ] Her ikisine **Introductory Offer → Free Trial** ekle, süre: **2 Weeks** (14 gün ile eşleşen en yakın hazır seçenek) — bölge/fiyat listesi seçimini kontrol et.
 - [ ] **App-Specific Shared Secret** üret (App Store Connect → uygulama → App Information, ya da Subscriptions sayfasından) — bu değeri bana ver, `APPLE_SUBSCRIPTION_SHARED_SECRET` secret'ına işleyeceğim.
@@ -31,7 +31,7 @@ Kod tarafı hazır, aşağıdakiler tamamlanmadan bu ekran boş/işlevsiz kalır
 
 ## 2) Google Play Console (Android)
 
-- [ ] İki ayrı **klasik subscription** oluştur (Base plan'lı tek ürün DEĞİL — mevcut backend kodu `purchases.subscriptions.get` legacy API'yi kullanıyor, bu yalnızca klasik/çoklu-SKU modeliyle uyumlu): `egoractive_gym_monthly`, `egoractive_gym_yearly`.
+- [ ] İki ayrı **klasik subscription** oluştur (Base plan'lı tek ürün DEĞİL — mevcut backend kodu `purchases.subscriptions.get` legacy API'yi kullanıyor, bu yalnızca klasik/çoklu-SKU modeliyle uyumlu): `egoractive_business_monthly`, `egoractive_business_yearly`.
   - Eğer Play Console sende yeni "tek subscription + birden çok base plan" akışını zorunlu kılıyorsa (yeni projelerde bazen öyle), bana haber ver — o zaman backend'i `purchases.subscriptionsv2.get`'e taşımam gerekecek, kod değişikliği bende.
 - [ ] Her ikisine fiyat, süre gir; **Free trial** offer'ı ekle, süre 14 gün.
 - [ ] **API access** (Play Console → Setup → API access) altında bir servis hesabı oluştur, "Play Android Developer API" için erişim ver (finansal veri görüntüleme yeterli), JSON anahtarını indir — bu dosyayı bana ver, `GOOGLE_PLAY_SERVICE_ACCOUNT_JSON` secret'ına (tek satır string olarak) işleyeceğim.

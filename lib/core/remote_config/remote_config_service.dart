@@ -1287,6 +1287,11 @@ abstract final class RemoteConfigKeys {
       'lbl_subscription_store_row_subtitle';
   static const subscriptionManageCta = 'lbl_subscription_manage_cta';
   static const subscriptionManageCaption = 'lbl_subscription_manage_caption';
+
+  /// Aylık abone olan kullanıcıya "Aktif abone" ekranında gösterilen
+  /// yıllığa geçiş kartının üstündeki başlık.
+  static const subscriptionUpgradeToYearlyTitle =
+      'lbl_subscription_upgrade_to_yearly_title';
   static const subscriptionStoreNote = 'lbl_subscription_store_note';
   static const subscriptionStoreNoteExpired =
       'lbl_subscription_store_note_expired';
@@ -1306,6 +1311,12 @@ abstract final class RemoteConfigKeys {
   static const subscriptionYearlyBadge = 'lbl_subscription_yearly_badge';
   static const subscriptionYearlySub = 'lbl_subscription_yearly_sub';
   static const subscriptionMonthlySub = 'lbl_subscription_monthly_sub';
+
+  /// `{days}` yer tutucusu, mağazadan okunan gerçek ücretsiz deneme
+  /// süresiyle (bkz. `SubscriptionProduct.trialDays`) değiştirilir — sadece
+  /// mağaza bu bilgiyi döndürdüğünde kullanılır, aksi halde
+  /// [subscriptionYearlySub]/[subscriptionMonthlySub]'a düşülür.
+  static const subscriptionTrialSubLabel = 'lbl_subscription_trial_sub_label';
   static const subscriptionNoProducts = 'lbl_subscription_no_products';
   static const subscriptionYearlyPlanFallback =
       'lbl_subscription_yearly_plan_fallback';
@@ -3059,6 +3070,8 @@ class RemoteConfigService {
     'lbl_subscription_manage_caption_tr': '{store} abonelik ayarları açılır',
     'lbl_subscription_manage_caption_en':
         '{store} subscription settings will open',
+    'lbl_subscription_upgrade_to_yearly_title_tr': 'Yıllığa geç',
+    'lbl_subscription_upgrade_to_yearly_title_en': 'Switch to yearly',
     'lbl_subscription_store_note_tr':
         "Satın alma uygulama içinde yapılmaz. Devam ettiğinizde {store} açılır; ödeme, iptal ve faturalar {storeAccount} hesabınız üzerinden yürür. Dönem bitiminden 24 saat önce iptal edilmezse abonelik kendini yeniler.",
     'lbl_subscription_store_note_en':
@@ -3102,6 +3115,8 @@ class RemoteConfigService {
     'lbl_subscription_yearly_sub_en': '2 months free',
     'lbl_subscription_monthly_sub_tr': 'aylık',
     'lbl_subscription_monthly_sub_en': 'monthly',
+    'lbl_subscription_trial_sub_label_tr': '{days} gün ücretsiz',
+    'lbl_subscription_trial_sub_label_en': '{days}-day free trial',
     'lbl_subscription_no_products_tr':
         'Şu an satın alınabilir bir abonelik ürünü bulunamadı.',
     'lbl_subscription_no_products_en':

@@ -58,6 +58,28 @@ const _monthNamesShortEn = {
   12: 'Dec',
 };
 
+/// Mağazadan gerçek ücretsiz deneme süresi okunabildiyse (bkz.
+/// `SubscriptionProduct.trialDays`) onu gösterir — hardcode "aylık"/"2 ay
+/// bedava" metinleri sadece mağaza bu bilgiyi döndürmediğinde (fallback)
+/// kullanılır. `_PlanList` ve aktif abone ekranındaki yıllığa geçiş kartı
+/// aynı mantığı paylaşır.
+String _planSubLabel(
+  SubscriptionProduct product,
+  bool isYearly,
+  RemoteConfigService rc,
+  String locale,
+) {
+  final days = product.trialDays;
+  if (days != null) {
+    return rc
+        .getText(RemoteConfigKeys.subscriptionTrialSubLabel, locale)
+        .replaceAll('{days}', '$days');
+  }
+  return isYearly
+      ? rc.getText(RemoteConfigKeys.subscriptionYearlySub, locale)
+      : rc.getText(RemoteConfigKeys.subscriptionMonthlySub, locale);
+}
+
 /// F6-1 — Admin · Ayarlar > Abonelik. Sadece admin hesapları bu panele
 /// ulaşabilir (girişi `AdminSettingsPanel`/`subscription_write_gate.dart`/
 /// `subscription_status_banner.dart` — hepsi admin akışına ait).
@@ -77,6 +99,13 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
   Future<List<SubscriptionProduct>>? _productsFuture;
   String? _selectedProductId;
 
+  /// Aktif abone ekranında (aylık planı olan kullanıcıya) sunulan yıllığa
+  /// geçiş kartının seçili olup olmadığı — panel bu ekranın üstüne başka
+  /// bir panel push edilip geri dönüldüğünde bile canlı kaldığından
+  /// (`BasePanel` state'i dispose etmiyor), her yeniden gösterimde
+  /// [onPanelShow] ile bilerek sıfırlanıyor.
+  bool _yearlyUpgradeSelected = false;
+
   static String get _storeName => Platform.isIOS ? 'App Store' : 'Google Play';
   static String get _storeAccountName => Platform.isIOS ? 'Apple' : 'Google';
 
@@ -88,8 +117,27 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
         .fetchProducts();
   }
 
+  @override
+  void onPanelShow() {
+    if (_yearlyUpgradeSelected) {
+      setState(() => _yearlyUpgradeSelected = false);
+    }
+  }
+
   bool _isYearly(String productId) =>
       productId == gymYearlySubscriptionProductId;
+
+  /// Satın alma CTA'sındaki `{plan}` yer tutucusu için — mağazadan gelen ham
+  /// ürün başlığı ("Egoractive Business — Yıllık" gibi) yerine sadece
+  /// "Yıllık"/"Aylık" kısa kelimesi kullanılır, aksi halde buton metni
+  /// ("Egoractive Business — Yıllık planla App Store'a git") taşıyordu.
+  String _planWord(String productId) => ref.watch(
+    rcTextProvider(
+      _isYearly(productId)
+          ? RemoteConfigKeys.subscriptionYearlyPlanFallback
+          : RemoteConfigKeys.subscriptionMonthlyPlanFallback,
+    ),
+  );
 
   void _ensureSelection(List<SubscriptionProduct> products) {
     if (_selectedProductId != null &&
@@ -212,15 +260,6 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
   ) {
     final colors = context.appColors;
     final locale = ref.watch(localeControllerProvider);
-    final trialEndsAt = subscription.trialEndsAt;
-    final trialStartedAt = subscription.trialStartedAt;
-    final totalDays = rc.trialDurationDays;
-    final daysRemaining = trialEndsAt == null
-        ? 0
-        : trialEndsAt.difference(DateTime.now()).inDays.clamp(0, totalDays);
-    final currentDay = trialStartedAt == null
-        ? totalDays
-        : (totalDays - daysRemaining).clamp(1, totalDays);
     final selected = products
         .where((p) => p.id == _selectedProductId)
         .firstOrNull;
@@ -233,53 +272,6 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
         AppSpacing.xl,
       ),
       children: [
-        _Banner(
-          accent: colors.warning,
-          leading: _BadgeCircle(
-            color: colors.warning,
-            fg: colors.onPrimary,
-            child: Text('$daysRemaining'),
-          ),
-          title: _fill(
-            rc.getText(RemoteConfigKeys.subscriptionTrialBannerTitle, locale),
-            {'days': '$daysRemaining'},
-          ),
-          titleColor: colors.warning,
-          body: trialEndsAt == null
-              ? ''
-              : _fill(
-                  rc.getText(
-                    RemoteConfigKeys.subscriptionTrialBannerBody,
-                    locale,
-                  ),
-                  {'date': _dateLong(trialEndsAt, locale)},
-                ),
-          extra: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: AppSpacing.sm),
-              _ProgressBar(
-                value: currentDay / totalDays,
-                color: colors.warning,
-              ),
-              const SizedBox(height: AppSpacing.xs),
-              Text(
-                _fill(
-                  rc.getText(
-                    RemoteConfigKeys.subscriptionTrialProgress,
-                    locale,
-                  ),
-                  {'total': '$totalDays', 'current': '$currentDay'},
-                ),
-                style: context.appTypography.caption.copyWith(
-                  color: colors.onSurfaceMuted,
-                  fontSize: 12,
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: AppSpacing.lg),
         if (products.isEmpty)
           Text(
             rc.getText(RemoteConfigKeys.subscriptionNoProducts, locale),
@@ -323,7 +315,7 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
               ? '…'
               : _fill(
                   rc.getText(RemoteConfigKeys.subscriptionPurchaseCta, locale),
-                  {'plan': selected.title, 'store': _storeName},
+                  {'plan': _planWord(selected.id), 'store': _storeName},
                 ),
           caption: _fill(
             rc.getText(RemoteConfigKeys.subscriptionPurchaseCaption, locale),
@@ -368,6 +360,11 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
             : RemoteConfigKeys.subscriptionMonthlyPeriodWord,
       ),
     );
+    // Zaten yıllık plana abone olan kullanıcıya "yıllığa geç" teklifi
+    // gösterilmez — sadece aylık abonelere, ve mağazada gerçekten yıllık
+    // ürün dönüyorsa (mock/Android henüz kurulmadıysa gösterilmez).
+    final yearlyProduct = products.where((p) => _isYearly(p.id)).firstOrNull;
+    final showYearlyUpgrade = !isYearly && yearlyProduct != null;
 
     return ListView(
       padding: const EdgeInsets.fromLTRB(
@@ -549,15 +546,52 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
         ),
         const SizedBox(height: AppSpacing.lg),
         _IncludedFeaturesCard(rc: rc, locale: locale),
-        const SizedBox(height: AppSpacing.lg),
-        _SecondaryCta(
-          label: rc.getText(RemoteConfigKeys.subscriptionManageCta, locale),
-          caption: _fill(
-            rc.getText(RemoteConfigKeys.subscriptionManageCaption, locale),
-            {'store': _storeName},
+        if (showYearlyUpgrade) ...[
+          const SizedBox(height: AppSpacing.lg),
+          Text(
+            rc.getText(
+              RemoteConfigKeys.subscriptionUpgradeToYearlyTitle,
+              locale,
+            ),
+            style: typography.caption.copyWith(
+              color: colors.onSurfaceMuted,
+              letterSpacing: 1.2,
+            ),
           ),
-          onTap: _openStoreSubscriptionManagement,
-        ),
+          const SizedBox(height: AppSpacing.sm),
+          _PlanCard(
+            product: yearlyProduct,
+            selected: _yearlyUpgradeSelected,
+            enabled: true,
+            badge: rc.getText(RemoteConfigKeys.subscriptionYearlyBadge, locale),
+            subLabel: _planSubLabel(yearlyProduct, true, rc, locale),
+            onTap: () => setState(
+              () => _yearlyUpgradeSelected = !_yearlyUpgradeSelected,
+            ),
+          ),
+        ],
+        const SizedBox(height: AppSpacing.lg),
+        if (showYearlyUpgrade && _yearlyUpgradeSelected)
+          _PrimaryCta(
+            label: _fill(
+              rc.getText(RemoteConfigKeys.subscriptionPurchaseCta, locale),
+              {'plan': _planWord(yearlyProduct.id), 'store': _storeName},
+            ),
+            caption: _fill(
+              rc.getText(RemoteConfigKeys.subscriptionPurchaseCaption, locale),
+              {'store': _storeName},
+            ),
+            onTap: () => _purchaseOrMockStart(yearlyProduct.id),
+          )
+        else
+          _SecondaryCta(
+            label: rc.getText(RemoteConfigKeys.subscriptionManageCta, locale),
+            caption: _fill(
+              rc.getText(RemoteConfigKeys.subscriptionManageCaption, locale),
+              {'store': _storeName},
+            ),
+            onTap: _openStoreSubscriptionManagement,
+          ),
       ],
     );
   }
@@ -721,7 +755,7 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
                     RemoteConfigKeys.subscriptionPurchaseCtaExpired,
                     locale,
                   ),
-                  {'plan': selected.title, 'store': _storeName},
+                  {'plan': _planWord(selected.id), 'store': _storeName},
                 ),
           caption: _fill(
             rc.getText(RemoteConfigKeys.subscriptionPurchaseCaption, locale),
@@ -982,30 +1016,6 @@ class _BadgeCircle extends StatelessWidget {
   }
 }
 
-class _ProgressBar extends StatelessWidget {
-  const _ProgressBar({required this.value, required this.color});
-
-  final double value;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = context.appColors;
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
-      child: Container(
-        height: 6,
-        color: colors.outlineStrong,
-        alignment: Alignment.centerLeft,
-        child: FractionallySizedBox(
-          widthFactor: value.clamp(0.0, 1.0),
-          child: Container(color: color),
-        ),
-      ),
-    );
-  }
-}
-
 class _PlanList extends StatelessWidget {
   const _PlanList({
     required this.products,
@@ -1043,9 +1053,12 @@ class _PlanList extends StatelessWidget {
               badge: isYearly(product.id)
                   ? rc.getText(RemoteConfigKeys.subscriptionYearlyBadge, locale)
                   : null,
-              subLabel: isYearly(product.id)
-                  ? rc.getText(RemoteConfigKeys.subscriptionYearlySub, locale)
-                  : rc.getText(RemoteConfigKeys.subscriptionMonthlySub, locale),
+              subLabel: _planSubLabel(
+                product,
+                isYearly(product.id),
+                rc,
+                locale,
+              ),
               onTap: enabled ? () => onSelect(product.id) : null,
               pendingLabel: product.id == pendingId ? pendingLabel : null,
             ),

@@ -1,4 +1,8 @@
+import 'dart:io' show Platform;
+
 import 'package:in_app_purchase/in_app_purchase.dart';
+import 'package:in_app_purchase_storekit/in_app_purchase_storekit.dart';
+import 'package:in_app_purchase_storekit/store_kit_2_wrappers.dart' as sk2;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/constants/subscription_constants.dart';
@@ -43,16 +47,73 @@ class SubscriptionPurchaseService {
     }
 
     return response.productDetails
-        .map((p) => SubscriptionProduct(id: p.id, title: p.title, description: p.description, price: p.price))
+        .map(
+          (p) => SubscriptionProduct(
+            id: p.id,
+            title: p.title,
+            description: p.description,
+            price: p.price,
+            trialDays: _freeTrialDays(p),
+          ),
+        )
         .toList();
   }
 
-  Future<void> buySubscription(String productId) async {
+  /// Mağazada bu ürün için tanımlı ücretsiz deneme (Introductory Offer →
+  /// Free Trial) varsa gün cinsinden süresini döner — bulunamazsa `null`
+  /// (ekran bu durumda RC'deki sabit metne düşer, bkz. `SubscriptionProduct`
+  /// yorumu). Şu an sadece iOS/StoreKit2 destekleniyor: Android/Play
+  /// Billing tarafı, Play Console kurulumu tamamlanmadan (henüz gerçek
+  /// ürün dönmediği için) test edilemiyor — kurulum bittiğinde
+  /// `GooglePlayProductDetails.productDetails.subscriptionOfferDetails`
+  /// üzerinden (sıfır fiyatlı `pricingPhase`) benzer şekilde eklenmeli.
+  int? _freeTrialDays(ProductDetails product) {
+    if (product is! AppStoreProduct2Details) return null;
+    final offers = product.sk2Product.subscription?.promotionalOffers ?? const [];
+    final freeTrial = offers
+        .where(
+          (o) =>
+              o.type == sk2.SK2SubscriptionOfferType.introductory &&
+              o.paymentMode == sk2.SK2SubscriptionOfferPaymentMode.freeTrial,
+        )
+        .firstOrNull;
+    if (freeTrial == null) return null;
+    final unitDays = switch (freeTrial.period.unit) {
+      sk2.SK2SubscriptionPeriodUnit.day => 1,
+      sk2.SK2SubscriptionPeriodUnit.week => 7,
+      sk2.SK2SubscriptionPeriodUnit.month => 30,
+      sk2.SK2SubscriptionPeriodUnit.year => 365,
+    };
+    return freeTrial.period.value * unitDays;
+  }
+
+  /// `true` dönerse kullanıcı mağaza sayfasını iptal etmiştir (çağıran taraf
+  /// bekleme durumunu hemen sıfırlayabilir); `false` ise satın alma
+  /// sürüyordur/tamamlanmıştır — sonucu her zamanki gibi [purchaseUpdates]
+  /// akışından bekle.
+  Future<bool> buySubscription(String productId) async {
     final details = _cache[productId];
     if (details == null) {
       throw StateError('Ürün bilgisi bulunamadı, önce fetchProducts() çağrılmalı: $productId');
     }
+    if (Platform.isIOS) {
+      // `InAppPurchase.buyNonConsumable`, StoreKit2 altyapısında native
+      // `Product.purchase()` çağrısının gerçek sonucunu (userCancelled/
+      // pending/success) tamamen atıp her zaman `true` döner — StoreKit2'de
+      // bir Transaction sadece gerçek satın almada oluştuğundan, kullanıcı
+      // mağaza sayfasını iptal ettiğinde [purchaseUpdates]'e HİÇ olay
+      // düşmez. Bu yüzden StoreKit2 API'sini burada doğrudan çağırıp gerçek
+      // sonucu okuyoruz — bu, `buyNonConsumable`'ın kendi içinde zaten
+      // yaptığı native çağrının birebir aynısı (paketin transaction
+      // observer'ı ayrı bir mekanizma, native `Transaction.updates`
+      // sequence'ini dinliyor; burada ikinci bir satın alma BAŞLATMIYORUZ,
+      // sadece aynı çağrının sonucunu okuyoruz), o yüzden çift satın alma
+      // riski yok.
+      final result = await sk2.SK2Product.purchase(productId);
+      return result == sk2.SK2ProductPurchaseResult.userCancelled;
+    }
     await _iap.buyNonConsumable(purchaseParam: PurchaseParam(productDetails: details));
+    return false;
   }
 
   Future<void> completePurchase(PurchaseDetails purchase) => _iap.completePurchase(purchase);

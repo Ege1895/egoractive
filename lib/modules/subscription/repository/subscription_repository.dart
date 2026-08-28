@@ -13,7 +13,9 @@ abstract interface class SubscriptionRepository {
   Stream<List<PurchaseDetails>> get purchaseUpdates;
   Future<bool> isAvailable();
   Future<List<SubscriptionProduct>> fetchProducts({required String locale});
-  Future<void> buySubscription(String productId);
+  /// `true` dönerse kullanıcı mağaza sayfasını iptal etmiştir — bkz.
+  /// `SubscriptionPurchaseService.buySubscription`.
+  Future<bool> buySubscription(String productId);
   Future<void> completePurchase(PurchaseDetails purchase);
   Future<void> verifyPurchase({required String gymId, required PurchaseDetails purchase});
 
@@ -45,7 +47,7 @@ class SubscriptionRepositoryImpl implements SubscriptionRepository {
       _purchaseService.fetchProducts(locale: locale);
 
   @override
-  Future<void> buySubscription(String productId) => _purchaseService.buySubscription(productId);
+  Future<bool> buySubscription(String productId) => _purchaseService.buySubscription(productId);
 
   @override
   Future<void> completePurchase(PurchaseDetails purchase) => _purchaseService.completePurchase(purchase);

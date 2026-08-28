@@ -123,7 +123,24 @@ class SubscriptionController extends _$SubscriptionController {
       purchaseErrorMessage: null,
     );
     try {
-      await ref.read(subscriptionRepositoryProvider).buySubscription(productId);
+      // `buySubscription` iOS'ta artık gerçek StoreKit2 sonucunu dönüyor
+      // (bkz. `SubscriptionPurchaseService.buySubscription`) — `true`,
+      // kullanıcının mağaza sayfasını iptal ettiği anlamına gelir. StoreKit2
+      // iptalde hiçbir Transaction oluşturmadığından bu durumda
+      // `purchaseStream`'e hiç olay düşmeyecektir; o yüzden burada hemen
+      // sessizce sıfırlıyoruz (tıpkı `_onPurchaseUpdate`'teki
+      // `PurchaseStatus.canceled` dalı gibi — kullanıcının kendi kararı,
+      // hata mesajı gösterilmiyor). Android'de (ve StoreKit1 fallback'inde)
+      // her zaman `false` döner, sonuç her zamanki gibi `purchaseStream`
+      // üzerinden `_onPurchaseUpdate`'e gelir.
+      final userCanceled = await ref
+          .read(subscriptionRepositoryProvider)
+          .buySubscription(productId);
+      if (userCanceled && _isPurchasing && _pendingProductId == productId) {
+        _isPurchasing = false;
+        _pendingProductId = null;
+        state = state.copyWith(isPurchasing: false, pendingProductId: null);
+      }
     } catch (_) {
       _isPurchasing = false;
       _pendingProductId = null;

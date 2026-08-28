@@ -1,6 +1,7 @@
+import { Environment, OfferType, SignedDataVerifier, VerificationException, VerificationStatus } from "@apple/app-store-server-library";
 import { GoogleAuth } from "google-auth-library";
 
-import { ANDROID_PACKAGE_NAME } from "./subscription-constants";
+import { ANDROID_PACKAGE_NAME, APPLE_APP_ID, IOS_BUNDLE_ID } from "./subscription-constants";
 
 export interface VerifiedSubscription {
   expiresAtMs: number;
@@ -23,65 +24,56 @@ export interface VerifiedSubscription {
   transactionKey: string;
 }
 
-const APPLE_PRODUCTION_VERIFY_URL = "https://buy.itunes.apple.com/verifyReceipt";
-const APPLE_SANDBOX_VERIFY_URL = "https://sandbox.itunes.apple.com/verifyReceipt";
-/** Apple'ın sandbox makbuzu prod endpoint'ine gönderildiğinde döndürdüğü kod — bu durumda sandbox'a tekrar denenir. */
-const APPLE_STATUS_SANDBOX_RECEIPT = 21007;
-
 /**
- * F6-1d — `verificationData` App Store'dan gelen base64 App Store receipt'i.
- * Apple'ın (hâlâ desteklenen) klasik `verifyReceipt` uç noktasına, App
- * Store Connect'teki "App-Specific Shared Secret" ile gönderilir.
+ * F6-1d (2026-08-28 revizyonu) — `verificationData` artık StoreKit2'nin
+ * verdiği JWS imzalı transaction verisi (`Transaction.jsonRepresentation`'ın
+ * DEĞİL, `signedTransactionInfo`/`serverVerificationData`'sı) — Apple'ın
+ * klasik `verifyReceipt` REST uç noktası (eski `verifyAppleReceipt`) bu
+ * formatı anlamıyordu, "receipt-data malformed" (status 21002) hatası
+ * veriyordu. `in_app_purchase_storekit` paketi varsayılan olarak StoreKit2
+ * kullandığından (bkz. `SubscriptionPurchaseService`) client hep bu formatı
+ * gönderiyor — App-Specific Shared Secret artık iOS doğrulaması için
+ * kullanılmıyor (sadece Apple Root CA sertifikaları gerekiyor, aynı
+ * `appleServerNotifications` webhook'unun kullandığı `SignedDataVerifier`).
+ *
+ * Bir işlem hangi ortamdan (Production/Sandbox) geldiğini önceden
+ * bilemediğimiz için önce Production, `INVALID_ENVIRONMENT` hatası alırsak
+ * Sandbox ile tekrar deneriz (klasik `verifyReceipt`'teki 21007 sandbox
+ * retry mantığının JWS karşılığı).
  */
-export async function verifyAppleReceipt(params: {
-  receiptData: string;
+export async function verifyAppleTransaction(params: {
+  signedTransactionInfo: string;
   productId: string;
-  sharedSecret: string;
+  rootCertificatesBase64: string;
 }): Promise<VerifiedSubscription> {
-  const body = JSON.stringify({
-    "receipt-data": params.receiptData,
-    password: params.sharedSecret,
-    "exclude-old-transactions": true,
-  });
+  const rootCertificates = params.rootCertificatesBase64.split(",").map((b64) => Buffer.from(b64.trim(), "base64"));
 
-  let response = await fetchAppleVerify(APPLE_PRODUCTION_VERIFY_URL, body);
-  if (response.status === APPLE_STATUS_SANDBOX_RECEIPT) {
-    response = await fetchAppleVerify(APPLE_SANDBOX_VERIFY_URL, body);
+  let transaction;
+  try {
+    const productionVerifier = new SignedDataVerifier(rootCertificates, true, Environment.PRODUCTION, IOS_BUNDLE_ID, APPLE_APP_ID);
+    transaction = await productionVerifier.verifyAndDecodeTransaction(params.signedTransactionInfo);
+  } catch (error) {
+    if (!(error instanceof VerificationException) || error.status !== VerificationStatus.INVALID_ENVIRONMENT) {
+      throw error;
+    }
+    const sandboxVerifier = new SignedDataVerifier(rootCertificates, true, Environment.SANDBOX, IOS_BUNDLE_ID);
+    transaction = await sandboxVerifier.verifyAndDecodeTransaction(params.signedTransactionInfo);
   }
 
-  if (response.status !== 0) {
-    throw new Error(`Apple receipt doğrulaması başarısız (status: ${response.status}).`);
+  if (transaction.productId !== params.productId) {
+    throw new Error(`Transaction'da ${params.productId} yerine ${transaction.productId} bulundu.`);
+  }
+  if (transaction.expiresDate === undefined || transaction.originalPurchaseDate === undefined || !transaction.originalTransactionId) {
+    throw new Error("Transaction eksik alanlar içeriyor (expiresDate/originalPurchaseDate/originalTransactionId).");
   }
 
-  const latestReceipts = (response.latest_receipt_info ?? []) as Array<{
-    product_id: string;
-    expires_date_ms: string;
-    original_purchase_date_ms: string;
-    is_trial_period?: string;
-    original_transaction_id: string;
-  }>;
-  const matching = latestReceipts
-    .filter((entry) => entry.product_id === params.productId)
-    .sort((a, b) => Number(b.expires_date_ms) - Number(a.expires_date_ms))[0];
-
-  if (!matching) {
-    throw new Error(`Makbuzda ${params.productId} ürünü bulunamadı.`);
-  }
-
-  const expiresAtMs = Number(matching.expires_date_ms);
-  const startAtMs = Number(matching.original_purchase_date_ms);
   return {
-    expiresAtMs,
-    isActive: expiresAtMs > Date.now(),
-    startAtMs,
-    isTrialPeriod: matching.is_trial_period === "true",
-    transactionKey: matching.original_transaction_id,
+    expiresAtMs: transaction.expiresDate,
+    isActive: transaction.expiresDate > Date.now(),
+    startAtMs: transaction.originalPurchaseDate,
+    isTrialPeriod: transaction.offerType === OfferType.INTRODUCTORY_OFFER,
+    transactionKey: transaction.originalTransactionId,
   };
-}
-
-async function fetchAppleVerify(url: string, body: string): Promise<{ status: number; latest_receipt_info?: unknown }> {
-  const res = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body });
-  return (await res.json()) as { status: number; latest_receipt_info?: unknown };
 }
 
 /**

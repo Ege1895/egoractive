@@ -450,6 +450,15 @@ mixin _$SubscriptionProduct {
   String get description => throw _privateConstructorUsedError;
   String get price => throw _privateConstructorUsedError;
 
+  /// Mağazadan (App Store Connect'teki Introductory Offer → Free Trial)
+  /// okunan gerçek ücretsiz deneme süresi (gün) — bkz.
+  /// `SubscriptionPurchaseService.fetchProducts`. Mağazada bu ürün için
+  /// ücretsiz deneme tanımlı değilse (ya da henüz okunamıyorsa, örn.
+  /// Android/Play Console kurulumu tamamlanmadan) `null` kalır; ekran bu
+  /// durumda Remote Config'teki sabit metne düşer — hardcode edilmiş bir
+  /// süre asla gösterilmez.
+  int? get trialDays => throw _privateConstructorUsedError;
+
   /// Create a copy of SubscriptionProduct
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -464,7 +473,13 @@ abstract class $SubscriptionProductCopyWith<$Res> {
     $Res Function(SubscriptionProduct) then,
   ) = _$SubscriptionProductCopyWithImpl<$Res, SubscriptionProduct>;
   @useResult
-  $Res call({String id, String title, String description, String price});
+  $Res call({
+    String id,
+    String title,
+    String description,
+    String price,
+    int? trialDays,
+  });
 }
 
 /// @nodoc
@@ -486,6 +501,7 @@ class _$SubscriptionProductCopyWithImpl<$Res, $Val extends SubscriptionProduct>
     Object? title = null,
     Object? description = null,
     Object? price = null,
+    Object? trialDays = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -505,6 +521,10 @@ class _$SubscriptionProductCopyWithImpl<$Res, $Val extends SubscriptionProduct>
                 ? _value.price
                 : price // ignore: cast_nullable_to_non_nullable
                       as String,
+            trialDays: freezed == trialDays
+                ? _value.trialDays
+                : trialDays // ignore: cast_nullable_to_non_nullable
+                      as int?,
           )
           as $Val,
     );
@@ -520,7 +540,13 @@ abstract class _$$SubscriptionProductImplCopyWith<$Res>
   ) = __$$SubscriptionProductImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String id, String title, String description, String price});
+  $Res call({
+    String id,
+    String title,
+    String description,
+    String price,
+    int? trialDays,
+  });
 }
 
 /// @nodoc
@@ -541,6 +567,7 @@ class __$$SubscriptionProductImplCopyWithImpl<$Res>
     Object? title = null,
     Object? description = null,
     Object? price = null,
+    Object? trialDays = freezed,
   }) {
     return _then(
       _$SubscriptionProductImpl(
@@ -560,6 +587,10 @@ class __$$SubscriptionProductImplCopyWithImpl<$Res>
             ? _value.price
             : price // ignore: cast_nullable_to_non_nullable
                   as String,
+        trialDays: freezed == trialDays
+            ? _value.trialDays
+            : trialDays // ignore: cast_nullable_to_non_nullable
+                  as int?,
       ),
     );
   }
@@ -573,6 +604,7 @@ class _$SubscriptionProductImpl implements _SubscriptionProduct {
     required this.title,
     required this.description,
     required this.price,
+    this.trialDays,
   });
 
   @override
@@ -584,9 +616,19 @@ class _$SubscriptionProductImpl implements _SubscriptionProduct {
   @override
   final String price;
 
+  /// Mağazadan (App Store Connect'teki Introductory Offer → Free Trial)
+  /// okunan gerçek ücretsiz deneme süresi (gün) — bkz.
+  /// `SubscriptionPurchaseService.fetchProducts`. Mağazada bu ürün için
+  /// ücretsiz deneme tanımlı değilse (ya da henüz okunamıyorsa, örn.
+  /// Android/Play Console kurulumu tamamlanmadan) `null` kalır; ekran bu
+  /// durumda Remote Config'teki sabit metne düşer — hardcode edilmiş bir
+  /// süre asla gösterilmez.
+  @override
+  final int? trialDays;
+
   @override
   String toString() {
-    return 'SubscriptionProduct(id: $id, title: $title, description: $description, price: $price)';
+    return 'SubscriptionProduct(id: $id, title: $title, description: $description, price: $price, trialDays: $trialDays)';
   }
 
   @override
@@ -598,11 +640,14 @@ class _$SubscriptionProductImpl implements _SubscriptionProduct {
             (identical(other.title, title) || other.title == title) &&
             (identical(other.description, description) ||
                 other.description == description) &&
-            (identical(other.price, price) || other.price == price));
+            (identical(other.price, price) || other.price == price) &&
+            (identical(other.trialDays, trialDays) ||
+                other.trialDays == trialDays));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, id, title, description, price);
+  int get hashCode =>
+      Object.hash(runtimeType, id, title, description, price, trialDays);
 
   /// Create a copy of SubscriptionProduct
   /// with the given fields replaced by the non-null parameter values.
@@ -622,6 +667,7 @@ abstract class _SubscriptionProduct implements SubscriptionProduct {
     required final String title,
     required final String description,
     required final String price,
+    final int? trialDays,
   }) = _$SubscriptionProductImpl;
 
   @override
@@ -632,6 +678,16 @@ abstract class _SubscriptionProduct implements SubscriptionProduct {
   String get description;
   @override
   String get price;
+
+  /// Mağazadan (App Store Connect'teki Introductory Offer → Free Trial)
+  /// okunan gerçek ücretsiz deneme süresi (gün) — bkz.
+  /// `SubscriptionPurchaseService.fetchProducts`. Mağazada bu ürün için
+  /// ücretsiz deneme tanımlı değilse (ya da henüz okunamıyorsa, örn.
+  /// Android/Play Console kurulumu tamamlanmadan) `null` kalır; ekran bu
+  /// durumda Remote Config'teki sabit metne düşer — hardcode edilmiş bir
+  /// süre asla gösterilmez.
+  @override
+  int? get trialDays;
 
   /// Create a copy of SubscriptionProduct
   /// with the given fields replaced by the non-null parameter values.

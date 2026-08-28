@@ -6664,6 +6664,18 @@
       },
       "valueType": "STRING"
     },
+    "lbl_subscription_upgrade_to_yearly_title_tr": {
+      "defaultValue": {
+        "value": "Yıllığa geç"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_upgrade_to_yearly_title_en": {
+      "defaultValue": {
+        "value": "Switch to yearly"
+      },
+      "valueType": "STRING"
+    },
     "lbl_subscription_store_note_tr": {
       "defaultValue": {
         "value": "Satın alma uygulama içinde yapılmaz. Devam ettiğinizde {store} açılır; ödeme, iptal ve faturalar {storeAccount} hesabınız üzerinden yürür. Dönem bitiminden 24 saat önce iptal edilmezse abonelik kendini yeniler."
@@ -6829,6 +6841,19 @@
     "lbl_subscription_monthly_sub_en": {
       "defaultValue": {
         "value": "monthly"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_trial_sub_label_tr": {
+      "defaultValue": {
+        "value": "{days} gün ücretsiz"
+      },
+      "description": "F6-1 — mağazadan okunan gerçek ücretsiz deneme süresiyle dolduruluyor (bkz. SubscriptionProduct.trialDays); mağaza bu bilgiyi döndürmezse lbl_subscription_yearly_sub/lbl_subscription_monthly_sub'a düşülür.",
+      "valueType": "STRING"
+    },
+    "lbl_subscription_trial_sub_label_en": {
+      "defaultValue": {
+        "value": "{days}-day free trial"
       },
       "valueType": "STRING"
     },
