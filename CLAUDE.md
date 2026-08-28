@@ -213,6 +213,30 @@ functions/                # Cloud Functions (TypeScript)
 - **Manager:** Controller ile eşanlamlı, bazı task açıklamalarında bu isim geçebilir
 - **RC:** Remote Config
 
+## 7. Sürüm ve Build Numaralandırma (Google Play Store)
+
+Google Play Store için alınan **her build**, `pubspec.yaml`'daki `version:` alanında şu formatı takip etmeli:
+
+```
+version: <versionName>+<buildNumber>
+```
+
+Play Console'da bu, otomatik olarak **`<buildNumber> (<versionName>)`** şeklinde gösterilir — örn. `1 (1.0.0)`. Yani:
+
+- `versionName` (nokta ile ayrılmış, örn. `1.0.0`) — kullanıcıya görünen sürüm, semver mantığıyla ilerler (özellik/düzeltme kapsamına göre sen karar verirsin).
+- `buildNumber` (tam sayı, örn. `1`) — Play Console'a her yeni yükleme öncesi **kesinlikle bir artırılmalı** (aynı buildNumber ile ikinci bir yükleme Play Console tarafından reddedilir).
+
+Yeni bir Play Store build'i alınırken (hangi session olursa olsun):
+1. `pubspec.yaml`'daki `version:` satırını güncelle — `buildNumber`'ı bir artır, `versionName`'i gerekirse (görev/kapsam gerektiriyorsa) değiştir.
+2. `flutter build appbundle --release` ile `.aab` üret.
+3. Bu kural her zaman geçerli — kullanıcı ayrıca hatırlatmasa bile uygulanır.
+
+**Çıktı dosyasının adı da bu formatta olmalı.** `flutter build appbundle --release` her zaman sabit `build/app/outputs/bundle/release/app-release.aab` adını üretir — bu, pubspec'teki `version:` alanına göre otomatik değişmez. Build tamamlandıktan sonra dosyayı **aynı klasörde**, `<buildNumber> (<versionName>).aab` adıyla (örn. `2 (1.0.0).aab`) kopyala:
+
+```
+cp build/app/outputs/bundle/release/app-release.aab "build/app/outputs/bundle/release/<buildNumber> (<versionName>).aab"
+```
+
 ## graphify
 
 Bu projede `graphify-out/graph.json` mevcut ve **kurulu** (`~/.local/bin/graphify`). Kod tabanı, mimari veya dosyalar arası ilişkilerle ilgili herhangi bir soruda — yeni bir görev/oturuma başlarken "önce kodu okuyup anlamaya çalışayım" refleksi yerine:
