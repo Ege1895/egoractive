@@ -8,7 +8,6 @@ import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/progress_ring.dart';
-import '../../../notifications/ui/panels/admin_notifications_panel.dart';
 import '../../../trainers/ui/panels/admin_trainer_management_panel.dart';
 import '../../controller/admin_home_controller.dart';
 import '../../controller/gym_profile_controller.dart';
@@ -101,26 +100,6 @@ class AdminHomePanel extends ConsumerWidget {
                         ),
                       ),
                     ],
-                  ),
-                ),
-                const Spacer(),
-                InkWell(
-                  borderRadius: BorderRadius.circular(999),
-                  onTap: () => panelStack.push(const AdminNotificationsPanel()),
-                  child: Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(
-                      color: colors.surface,
-                      shape: BoxShape.circle,
-                      border: Border.all(color: colors.outlineStrong),
-                    ),
-                    alignment: Alignment.center,
-                    child: Icon(
-                      Icons.notifications_outlined,
-                      size: 18,
-                      color: colors.onSurfaceVariant,
-                    ),
                   ),
                 ),
               ],

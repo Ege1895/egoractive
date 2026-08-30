@@ -7,9 +7,6 @@ import 'package:egoractive/core/theme/app_color_scheme.dart';
 import 'package:egoractive/core/theme/app_theme.dart';
 import 'package:egoractive/core/theme/app_typography.dart';
 import 'package:egoractive/modules/group_sessions/ui/panels/create_group_session_panel.dart';
-import 'package:egoractive/modules/sessions/ui/panels/attendance_notification_detail_panel.dart';
-import 'package:egoractive/modules/sessions/ui/panels/trainer_notifications_panel.dart';
-import 'package:egoractive/modules/sessions/domain/trainer_notification.dart';
 import 'package:egoractive/modules/trainers/ui/panels/trainer_calendar_panel.dart';
 import 'package:egoractive/modules/trainers/ui/panels/trainer_home_panel.dart';
 import 'package:egoractive/modules/trainers/ui/panels/trainer_member_detail_panel.dart';
@@ -56,19 +53,6 @@ final _fakeRcOverrides = [
   ),
 ];
 
-const _sampleNotification = TrainerNotification(
-  id: 'notif-test',
-  title: 'Ayşe Yılmaz geleceğini bildirdi',
-  body: '4 Ağustos 18:30 · Birebir · Stüdyo 2',
-  memberInitials: 'AY',
-  memberName: 'Ayşe Yılmaz',
-  sessionMeta: '4 Ağustos 18:30 · Birebir · Stüdyo 2',
-  answerLabel: 'Gelicem',
-  answerIsPositive: true,
-  answeredAt: '3 Ağu 21:04',
-  note: '5 dakika gecikebilirim, trafik yoğun.',
-);
-
 void main() {
   final panels = <String, Widget>{
     'TrainerHomePanel': const TrainerHomePanel(),
@@ -80,11 +64,6 @@ void main() {
     'TrainerReportPanel': const TrainerReportPanel(),
     'TrainerProfilePanel': const TrainerProfilePanel(),
     'CreateGroupSessionPanel': const CreateGroupSessionPanel(),
-    'TrainerNotificationsPanel': const TrainerNotificationsPanel(),
-    'AttendanceNotificationDetailPanel':
-        const AttendanceNotificationDetailPanel(
-          notification: _sampleNotification,
-        ),
   };
 
   for (final entry in panels.entries) {
