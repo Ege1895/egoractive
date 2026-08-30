@@ -226,6 +226,10 @@ class _AdminMemberDetailPanelState
                                   phone: detail.phone,
                                   trainerName: '',
                                   remainingSessions: detail.remainingSessions,
+                                  // MemberInfoPanel edit modunda kullanılmıyor
+                                  // (sadece id/isim/telefon okunuyor), gerçek
+                                  // bir değer gerekmiyor.
+                                  unplannedSessions: detail.remainingSessions,
                                   packageEndDate: detail.packageEndDate,
                                   status: MemberPackageStatus.none,
                                 ),

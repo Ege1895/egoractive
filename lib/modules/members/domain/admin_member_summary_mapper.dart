@@ -34,6 +34,7 @@ AdminMemberSummary adminMemberSummaryFromDoc(
     phone: (data['phoneNumber'] as String?) ?? '',
     trainerName: (data['trainerName'] as String?) ?? '',
     remainingSessions: totalRemaining,
+    unplannedSessions: unplanned,
     packageEndDate: packageEndDate == null
         ? '—'
         : '${packageEndDate.day}.${packageEndDate.month}.${packageEndDate.year}',

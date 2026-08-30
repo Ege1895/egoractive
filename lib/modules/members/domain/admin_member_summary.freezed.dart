@@ -23,6 +23,14 @@ mixin _$AdminMemberSummary {
   String get phone => throw _privateConstructorUsedError;
   String get trainerName => throw _privateConstructorUsedError;
   int get remainingSessions => throw _privateConstructorUsedError;
+
+  /// Henüz takvime hiç girilmemiş, gerçekten yeni bir seans için
+  /// kullanılabilir hak — `remainingSessions` (planlanmış + planlanmamış
+  /// toplamı, "Üyeler" listesinde gösterilen) ile KARIŞTIRILMAMALI. Seans
+  /// oluşturma ekranı (`create_session_sheet.dart`) bu alanı kullanır;
+  /// aksi halde zaten tamamı takvime girilmiş bir üyeye "hakkı var" diye
+  /// yeni seans atanmaya çalışılıp `InsufficientSessionsException` alınır.
+  int get unplannedSessions => throw _privateConstructorUsedError;
   String get packageEndDate => throw _privateConstructorUsedError;
   MemberPackageStatus get status => throw _privateConstructorUsedError;
 
@@ -47,6 +55,7 @@ abstract class $AdminMemberSummaryCopyWith<$Res> {
     String phone,
     String trainerName,
     int remainingSessions,
+    int unplannedSessions,
     String packageEndDate,
     MemberPackageStatus status,
   });
@@ -73,6 +82,7 @@ class _$AdminMemberSummaryCopyWithImpl<$Res, $Val extends AdminMemberSummary>
     Object? phone = null,
     Object? trainerName = null,
     Object? remainingSessions = null,
+    Object? unplannedSessions = null,
     Object? packageEndDate = null,
     Object? status = null,
   }) {
@@ -101,6 +111,10 @@ class _$AdminMemberSummaryCopyWithImpl<$Res, $Val extends AdminMemberSummary>
             remainingSessions: null == remainingSessions
                 ? _value.remainingSessions
                 : remainingSessions // ignore: cast_nullable_to_non_nullable
+                      as int,
+            unplannedSessions: null == unplannedSessions
+                ? _value.unplannedSessions
+                : unplannedSessions // ignore: cast_nullable_to_non_nullable
                       as int,
             packageEndDate: null == packageEndDate
                 ? _value.packageEndDate
@@ -132,6 +146,7 @@ abstract class _$$AdminMemberSummaryImplCopyWith<$Res>
     String phone,
     String trainerName,
     int remainingSessions,
+    int unplannedSessions,
     String packageEndDate,
     MemberPackageStatus status,
   });
@@ -157,6 +172,7 @@ class __$$AdminMemberSummaryImplCopyWithImpl<$Res>
     Object? phone = null,
     Object? trainerName = null,
     Object? remainingSessions = null,
+    Object? unplannedSessions = null,
     Object? packageEndDate = null,
     Object? status = null,
   }) {
@@ -186,6 +202,10 @@ class __$$AdminMemberSummaryImplCopyWithImpl<$Res>
             ? _value.remainingSessions
             : remainingSessions // ignore: cast_nullable_to_non_nullable
                   as int,
+        unplannedSessions: null == unplannedSessions
+            ? _value.unplannedSessions
+            : unplannedSessions // ignore: cast_nullable_to_non_nullable
+                  as int,
         packageEndDate: null == packageEndDate
             ? _value.packageEndDate
             : packageEndDate // ignore: cast_nullable_to_non_nullable
@@ -209,6 +229,7 @@ class _$AdminMemberSummaryImpl implements _AdminMemberSummary {
     required this.phone,
     required this.trainerName,
     required this.remainingSessions,
+    required this.unplannedSessions,
     required this.packageEndDate,
     required this.status,
   });
@@ -225,6 +246,15 @@ class _$AdminMemberSummaryImpl implements _AdminMemberSummary {
   final String trainerName;
   @override
   final int remainingSessions;
+
+  /// Henüz takvime hiç girilmemiş, gerçekten yeni bir seans için
+  /// kullanılabilir hak — `remainingSessions` (planlanmış + planlanmamış
+  /// toplamı, "Üyeler" listesinde gösterilen) ile KARIŞTIRILMAMALI. Seans
+  /// oluşturma ekranı (`create_session_sheet.dart`) bu alanı kullanır;
+  /// aksi halde zaten tamamı takvime girilmiş bir üyeye "hakkı var" diye
+  /// yeni seans atanmaya çalışılıp `InsufficientSessionsException` alınır.
+  @override
+  final int unplannedSessions;
   @override
   final String packageEndDate;
   @override
@@ -232,7 +262,7 @@ class _$AdminMemberSummaryImpl implements _AdminMemberSummary {
 
   @override
   String toString() {
-    return 'AdminMemberSummary(id: $id, initials: $initials, name: $name, phone: $phone, trainerName: $trainerName, remainingSessions: $remainingSessions, packageEndDate: $packageEndDate, status: $status)';
+    return 'AdminMemberSummary(id: $id, initials: $initials, name: $name, phone: $phone, trainerName: $trainerName, remainingSessions: $remainingSessions, unplannedSessions: $unplannedSessions, packageEndDate: $packageEndDate, status: $status)';
   }
 
   @override
@@ -249,6 +279,8 @@ class _$AdminMemberSummaryImpl implements _AdminMemberSummary {
                 other.trainerName == trainerName) &&
             (identical(other.remainingSessions, remainingSessions) ||
                 other.remainingSessions == remainingSessions) &&
+            (identical(other.unplannedSessions, unplannedSessions) ||
+                other.unplannedSessions == unplannedSessions) &&
             (identical(other.packageEndDate, packageEndDate) ||
                 other.packageEndDate == packageEndDate) &&
             (identical(other.status, status) || other.status == status));
@@ -263,6 +295,7 @@ class _$AdminMemberSummaryImpl implements _AdminMemberSummary {
     phone,
     trainerName,
     remainingSessions,
+    unplannedSessions,
     packageEndDate,
     status,
   );
@@ -287,6 +320,7 @@ abstract class _AdminMemberSummary implements AdminMemberSummary {
     required final String phone,
     required final String trainerName,
     required final int remainingSessions,
+    required final int unplannedSessions,
     required final String packageEndDate,
     required final MemberPackageStatus status,
   }) = _$AdminMemberSummaryImpl;
@@ -303,6 +337,15 @@ abstract class _AdminMemberSummary implements AdminMemberSummary {
   String get trainerName;
   @override
   int get remainingSessions;
+
+  /// Henüz takvime hiç girilmemiş, gerçekten yeni bir seans için
+  /// kullanılabilir hak — `remainingSessions` (planlanmış + planlanmamış
+  /// toplamı, "Üyeler" listesinde gösterilen) ile KARIŞTIRILMAMALI. Seans
+  /// oluşturma ekranı (`create_session_sheet.dart`) bu alanı kullanır;
+  /// aksi halde zaten tamamı takvime girilmiş bir üyeye "hakkı var" diye
+  /// yeni seans atanmaya çalışılıp `InsufficientSessionsException` alınır.
+  @override
+  int get unplannedSessions;
   @override
   String get packageEndDate;
   @override

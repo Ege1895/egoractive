@@ -17,6 +17,7 @@ class AdminMembersService {
         phone: '0532 418 76 05',
         trainerName: 'Berk Aydın',
         remainingSessions: 6,
+        unplannedSessions: 6,
         packageEndDate: '12 Eyl 2026',
         status: MemberPackageStatus.active,
       ),
@@ -27,6 +28,7 @@ class AdminMembersService {
         phone: '0533 219 84 40',
         trainerName: 'Berk Aydın',
         remainingSessions: 2,
+        unplannedSessions: 2,
         packageEndDate: '19 Ağu 2026',
         status: MemberPackageStatus.endingSoon,
       ),
@@ -37,6 +39,7 @@ class AdminMembersService {
         phone: '0505 762 30 18',
         trainerName: 'Berk Aydın',
         remainingSessions: 9,
+        unplannedSessions: 9,
         packageEndDate: '3 Eki 2026',
         status: MemberPackageStatus.active,
       ),
@@ -47,6 +50,7 @@ class AdminMembersService {
         phone: '0542 887 15 62',
         trainerName: 'Berk Aydın',
         remainingSessions: 0,
+        unplannedSessions: 0,
         packageEndDate: '15 Ağu 2026',
         status: MemberPackageStatus.none,
       ),
@@ -57,6 +61,7 @@ class AdminMembersService {
         phone: '0536 220 41 77',
         trainerName: 'Selin Kara',
         remainingSessions: 5,
+        unplannedSessions: 5,
         packageEndDate: '28 Ağu 2026',
         status: MemberPackageStatus.active,
       ),
@@ -67,6 +72,7 @@ class AdminMembersService {
         phone: '0538 904 12 63',
         trainerName: 'Ayşe Demir',
         remainingSessions: 1,
+        unplannedSessions: 1,
         packageEndDate: '9 Ağu 2026',
         status: MemberPackageStatus.endingSoon,
       ),
@@ -75,4 +81,5 @@ class AdminMembersService {
 }
 
 @riverpod
-AdminMembersService adminMembersService(AdminMembersServiceRef ref) => const AdminMembersService();
+AdminMembersService adminMembersService(AdminMembersServiceRef ref) =>
+    const AdminMembersService();

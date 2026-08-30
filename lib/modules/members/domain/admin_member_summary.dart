@@ -13,6 +13,14 @@ class AdminMemberSummary with _$AdminMemberSummary {
     required String phone,
     required String trainerName,
     required int remainingSessions,
+
+    /// Henüz takvime hiç girilmemiş, gerçekten yeni bir seans için
+    /// kullanılabilir hak — `remainingSessions` (planlanmış + planlanmamış
+    /// toplamı, "Üyeler" listesinde gösterilen) ile KARIŞTIRILMAMALI. Seans
+    /// oluşturma ekranı (`create_session_sheet.dart`) bu alanı kullanır;
+    /// aksi halde zaten tamamı takvime girilmiş bir üyeye "hakkı var" diye
+    /// yeni seans atanmaya çalışılıp `InsufficientSessionsException` alınır.
+    required int unplannedSessions,
     required String packageEndDate,
     required MemberPackageStatus status,
   }) = _AdminMemberSummary;
