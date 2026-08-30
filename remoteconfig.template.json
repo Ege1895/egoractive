@@ -126,6 +126,13 @@
       "description": "F6-3 — yeni bir salona trialStartedAt'ten itibaren tanınan ücretsiz deneme süresi (gün).",
       "valueType": "NUMBER"
     },
+    "cfg_gym_rules_max_chars": {
+      "defaultValue": {
+        "value": "6000"
+      },
+      "description": "F7-x — salon kuralları editöründe izin verilen azami düz metin karakter sayısı. Yalnızca Flutter tarafından okunur.",
+      "valueType": "NUMBER"
+    },
     "cfg_require_subscription_onboarding": {
       "defaultValue": {
         "value": "true"
@@ -3632,6 +3639,22 @@
       "defaultValue": {
         "value": "Last updated {date}"
       },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_rules_editor_char_count_template_tr": {
+      "defaultValue": { "value": "{count} / {max}" },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_rules_editor_char_count_template_en": {
+      "defaultValue": { "value": "{count} / {max}" },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_rules_editor_max_length_error_tr": {
+      "defaultValue": { "value": "Kurallar metni çok uzun — en fazla {max} karakter olabilir." },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_rules_editor_max_length_error_en": {
+      "defaultValue": { "value": "Rules text is too long — the limit is {max} characters." },
       "valueType": "STRING"
     },
     "lbl_gyms_themes_description_tr": {

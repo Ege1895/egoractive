@@ -153,17 +153,26 @@ class _GymRulesViewPanelState extends BasePanelState<GymRulesViewPanel> {
                           ),
                           border: Border.all(color: colors.outline),
                         ),
-                        // readOnly:true Quill'de hâlâ dokununca imleç/odak
+                        // Kaydırma, dıştaki SingleChildScrollView'a bırakılıyor
+                        // — Quill'in kendi iç kaydırması (expands+scrollable)
+                        // IgnorePointer'ın İÇİNDE kalınca hiç çalışmıyordu,
+                        // uzun bir kural metni kutunun içinde kırpılıp
+                        // aşağı kaydırılamıyordu. IgnorePointer sadece
+                        // QuillEditor'ı sarmalıyor (dokununca imleç/odak
                         // gösterip düzenlenebilir bir alanmış izlenimi
-                        // yaratıyor — salt-okunur görüntüleme için tamamen
-                        // etkileşimsiz olması gerekiyor.
-                        child: IgnorePointer(
-                          child: QuillEditor.basic(
-                            controller: _controller,
-                            config: const QuillEditorConfig(
-                              expands: true,
-                              padding: EdgeInsets.zero,
-                              showCursor: false,
+                        // yaratmasın diye) — dıştaki scroll view bundan
+                        // etkilenmiyor, sürükleme onun kendi gesture
+                        // detector'ına düşüyor.
+                        child: SingleChildScrollView(
+                          child: IgnorePointer(
+                            child: QuillEditor.basic(
+                              controller: _controller,
+                              config: const QuillEditorConfig(
+                                expands: false,
+                                scrollable: false,
+                                padding: EdgeInsets.zero,
+                                showCursor: false,
+                              ),
                             ),
                           ),
                         ),

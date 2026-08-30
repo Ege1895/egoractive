@@ -25,16 +25,38 @@ class GymRulesEditorPanel extends BasePanel {
 class _GymRulesEditorPanelState extends BasePanelState<GymRulesEditorPanel> {
   late final QuillController _controller;
   final _editorFocusNode = FocusNode();
+  late final int _maxChars;
   bool _isSaving = false;
   String? _errorMessage;
+
+  // Quill'in dokümanı her zaman sondaki bir '\n' ile bitirdiğinden, gerçek
+  // karakter sayımında bu sondaki satır sonu düşülüyor — kullanıcı tek bir
+  // karakter bile yazmasa sayaç hâlâ 0 göstermeli.
+  int get _charCount {
+    final text = _controller.document.toPlainText();
+    return text.endsWith('\n') ? text.length - 1 : text.length;
+  }
+
+  bool get _isOverLimit => _charCount > _maxChars;
 
   @override
   void initState() {
     super.initState();
+    // RC henüz Firebase ile fetch edilmemişse (ör. widget test ortamı)
+    // getInt çağrısı fırlatabilir — bu durumda mock/varsayılan üst sınırla
+    // devam edilir (bkz. CreateGroupSessionController'daki aynı desen).
+    try {
+      _maxChars = ref.read(remoteConfigServiceProvider).gymRulesMaxChars;
+    } catch (_) {
+      _maxChars = 6000;
+    }
     _controller = QuillController(
       document: Document.fromJson(ref.read(gymRulesControllerProvider).delta),
       selection: const TextSelection.collapsed(offset: 0),
     );
+    // Karakter sayacının canlı güncellenmesi (ve limit aşımında Kaydet
+    // butonunun devre dışı kalması) için doküman değişikliklerini dinliyor.
+    _controller.addListener(() => setState(() {}));
   }
 
   /// Önceki sürüm yazma işlemini `await` etmeden paneli kapatıyordu — kayıt
@@ -42,6 +64,14 @@ class _GymRulesEditorPanelState extends BasePanelState<GymRulesEditorPanel> {
   /// yazma tamamlanana kadar bekleniyor, hata olursa panelde kalınıp
   /// gösteriliyor.
   Future<void> _save() async {
+    if (_isOverLimit) {
+      setState(
+        () => _errorMessage = ref
+            .read(rcTextProvider(RemoteConfigKeys.gymsRulesEditorMaxLengthError))
+            .replaceAll('{max}', '$_maxChars'),
+      );
+      return;
+    }
     setState(() {
       _isSaving = true;
       _errorMessage = null;
@@ -243,6 +273,26 @@ class _GymRulesEditorPanelState extends BasePanelState<GymRulesEditorPanel> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: Text(
+                      ref
+                          .watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.gymsRulesEditorCharCountTemplate,
+                            ),
+                          )
+                          .replaceAll('{count}', '$_charCount')
+                          .replaceAll('{max}', '$_maxChars'),
+                      style: typography.caption.copyWith(
+                        color: _isOverLimit
+                            ? colors.error
+                            : colors.onSurfaceMuted,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
                   if (_errorMessage != null) ...[
                     Text(
                       _errorMessage!,
@@ -263,7 +313,7 @@ class _GymRulesEditorPanelState extends BasePanelState<GymRulesEditorPanel> {
                         : ref.watch(
                             rcTextProvider(RemoteConfigKeys.commonKaydet),
                           ),
-                    onPressed: _isSaving ? null : _save,
+                    onPressed: _isSaving || _isOverLimit ? null : _save,
                   ),
                 ],
               ),

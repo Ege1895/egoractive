@@ -61,6 +61,13 @@ abstract final class RemoteConfigKeys {
   /// kaç gün ücretsiz deneme süresi tanınır.
   static const trialDurationDays = 'cfg_trial_duration_days';
 
+  /// F7-x — salon kuralları editöründe (Quill zengin metin) izin verilen
+  /// azami düz metin karakter sayısı. Sınır olmadan bir admin teorik olarak
+  /// Firestore'un 1 MB doküman sınırına yaklaşan bir içerik yazabilirdi —
+  /// bu hem doküman boyutunu hem her açılışta okunan veri miktarını
+  /// gereksiz büyütür.
+  static const gymRulesMaxChars = 'cfg_gym_rules_max_chars';
+
   /// `true` iken yeni oluşturulan bir salonun admin'i, girişten hemen sonra
   /// zorunlu [SubscriptionOnboardingPanel]'e (geri butonu yok, pakete abone
   /// olmadan atlanamaz) yönlendirilir. Mağaza ürünleri (App Store Connect/
@@ -666,6 +673,10 @@ abstract final class RemoteConfigKeys {
       'lbl_gyms_rules_editor_save_failed_error';
   static const gymsRulesViewLastUpdatedTemplate =
       'lbl_gyms_rules_view_last_updated_template';
+  static const gymsRulesEditorCharCountTemplate =
+      'lbl_gyms_rules_editor_char_count_template';
+  static const gymsRulesEditorMaxLengthError =
+      'lbl_gyms_rules_editor_max_length_error';
   static const gymsThemesDescription = 'lbl_gyms_themes_description';
   static const gymsThemesAddThemeButton = 'lbl_gyms_themes_add_theme_button';
   static const gymsTrainerPermissionsReminderQuestion =
@@ -1404,6 +1415,7 @@ class RemoteConfigService {
     RemoteConfigKeys.feedbackReminderDayOfMonth: -1,
     RemoteConfigKeys.freeVersionAdsEnabled: true,
     RemoteConfigKeys.trialDurationDays: 14,
+    RemoteConfigKeys.gymRulesMaxChars: 6000,
     RemoteConfigKeys.requireSubscriptionOnboarding: true,
     RemoteConfigKeys.featureFlags: '{"group_sessions_enabled": true}',
     RemoteConfigKeys.badgeCriteria: _defaultBadgeCriteriaJson,
@@ -1795,6 +1807,9 @@ class RemoteConfigService {
     'lbl_gyms_rules_editor_save_failed_error_tr':
         'Kurallar kaydedilemedi, bağlantını kontrol edip tekrar dene.',
     'lbl_gyms_rules_view_last_updated_template_tr': 'Son güncelleme {date}',
+    'lbl_gyms_rules_editor_char_count_template_tr': '{count} / {max}',
+    'lbl_gyms_rules_editor_max_length_error_tr':
+        'Kurallar metni çok uzun — en fazla {max} karakter olabilir.',
     'lbl_gyms_themes_description_tr':
         'Seçtiğiniz tema salonunuzdaki tüm üye ve antrenörlerin uygulamasında görünür. Koyu zemin ve durum renkleri sabit kalır, değişen tek şey vurgu rengi.',
     'lbl_gyms_themes_add_theme_button_tr': '+ Tema ekle',
@@ -2595,6 +2610,9 @@ class RemoteConfigService {
     'lbl_gyms_rules_editor_save_failed_error_en':
         'Rules could not be saved, check your connection and try again.',
     'lbl_gyms_rules_view_last_updated_template_en': 'Last updated {date}',
+    'lbl_gyms_rules_editor_char_count_template_en': '{count} / {max}',
+    'lbl_gyms_rules_editor_max_length_error_en':
+        'Rules text is too long — the limit is {max} characters.',
     'lbl_gyms_themes_description_en':
         "The theme you choose appears in the app for all your gym's members and trainers. The dark background and status colors stay fixed — only the accent color changes.",
     'lbl_gyms_themes_add_theme_button_en': '+ Add theme',
@@ -3174,6 +3192,8 @@ class RemoteConfigService {
 
   int get groupSessionCapacityMax =>
       getInt(RemoteConfigKeys.groupSessionCapacityMax);
+
+  int get gymRulesMaxChars => getInt(RemoteConfigKeys.gymRulesMaxChars);
 
   int get installmentDueSoonDays =>
       getInt(RemoteConfigKeys.installmentDueSoonDays);
