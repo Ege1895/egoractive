@@ -3811,6 +3811,70 @@
       },
       "valueType": "STRING"
     },
+    "lbl_measurements_metric_bel_tr": {
+      "defaultValue": { "value": "Bel" },
+      "valueType": "STRING"
+    },
+    "lbl_measurements_metric_bel_en": {
+      "defaultValue": { "value": "Waist" },
+      "valueType": "STRING"
+    },
+    "lbl_measurements_metric_gogus_tr": {
+      "defaultValue": { "value": "Göğüs" },
+      "valueType": "STRING"
+    },
+    "lbl_measurements_metric_gogus_en": {
+      "defaultValue": { "value": "Chest" },
+      "valueType": "STRING"
+    },
+    "lbl_measurements_metric_kalca_tr": {
+      "defaultValue": { "value": "Kalça" },
+      "valueType": "STRING"
+    },
+    "lbl_measurements_metric_kalca_en": {
+      "defaultValue": { "value": "Hip" },
+      "valueType": "STRING"
+    },
+    "lbl_measurements_metric_kol_tr": {
+      "defaultValue": { "value": "Kol" },
+      "valueType": "STRING"
+    },
+    "lbl_measurements_metric_kol_en": {
+      "defaultValue": { "value": "Arm" },
+      "valueType": "STRING"
+    },
+    "lbl_measurements_metric_bacak_tr": {
+      "defaultValue": { "value": "Bacak" },
+      "valueType": "STRING"
+    },
+    "lbl_measurements_metric_bacak_en": {
+      "defaultValue": { "value": "Leg" },
+      "valueType": "STRING"
+    },
+    "lbl_measurements_metric_kilo_tr": {
+      "defaultValue": { "value": "Kilo" },
+      "valueType": "STRING"
+    },
+    "lbl_measurements_metric_kilo_en": {
+      "defaultValue": { "value": "Weight" },
+      "valueType": "STRING"
+    },
+    "lbl_measurements_metric_yag_orani_tr": {
+      "defaultValue": { "value": "Yağ oranı" },
+      "valueType": "STRING"
+    },
+    "lbl_measurements_metric_yag_orani_en": {
+      "defaultValue": { "value": "Body fat" },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_metric_bel_cevresi_tr": {
+      "defaultValue": { "value": "Bel çevresi" },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_metric_bel_cevresi_en": {
+      "defaultValue": { "value": "Waist circumference" },
+      "valueType": "STRING"
+    },
     "lbl_measurements_title_tr": {
       "defaultValue": {
         "value": "Ölçümlerim"

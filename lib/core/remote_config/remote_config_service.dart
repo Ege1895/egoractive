@@ -701,6 +701,20 @@ abstract final class RemoteConfigKeys {
   static const measurementsMeasurementsSection =
       'lbl_measurements_measurements_section';
   static const measurementsUnitCm = 'lbl_measurements_unit_cm';
+  // F7-x — vücut noktası etiketleri ("Bel"/"Göğüs" vb.) önceden
+  // `MeasurementMetric.label`'da hardcoded Türkçe idi, app İngilizce iken
+  // de Türkçe kalıyordu. Artık RC'den okunuyor (bkz. measurement_metric.dart).
+  static const measurementsMetricBel = 'lbl_measurements_metric_bel';
+  static const measurementsMetricGogus = 'lbl_measurements_metric_gogus';
+  static const measurementsMetricKalca = 'lbl_measurements_metric_kalca';
+  static const measurementsMetricKol = 'lbl_measurements_metric_kol';
+  static const measurementsMetricBacak = 'lbl_measurements_metric_bacak';
+  static const measurementsMetricKilo = 'lbl_measurements_metric_kilo';
+  static const measurementsMetricYagOrani = 'lbl_measurements_metric_yag_orani';
+  // F7-x — antrenör/admin'in üye kartındaki basit 3'lü metrik seçici
+  // (`TrainerMetric`) kilo/yağ oranı için yukarıdaki aynı RC anahtarlarını
+  // paylaşır; sadece "Bel çevresi" bu ekrana özel, o yüzden ayrı bir key.
+  static const trainersMetricBelCevresi = 'lbl_trainers_metric_bel_cevresi';
   static const measurementsTitle = 'lbl_measurements_title';
   static const measurementsSelectedPointLabel =
       'lbl_measurements_selected_point_label';
@@ -1834,6 +1848,14 @@ class RemoteConfigService {
     'lbl_measurements_measurement_date_label_tr': 'Ölçüm tarihi',
     'lbl_measurements_measurements_section_tr': 'ÖLÇÜLER',
     'lbl_measurements_unit_cm_tr': 'cm',
+    'lbl_measurements_metric_bel_tr': 'Bel',
+    'lbl_measurements_metric_gogus_tr': 'Göğüs',
+    'lbl_measurements_metric_kalca_tr': 'Kalça',
+    'lbl_measurements_metric_kol_tr': 'Kol',
+    'lbl_measurements_metric_bacak_tr': 'Bacak',
+    'lbl_measurements_metric_kilo_tr': 'Kilo',
+    'lbl_measurements_metric_yag_orani_tr': 'Yağ oranı',
+    'lbl_trainers_metric_bel_cevresi_tr': 'Bel çevresi',
     'lbl_measurements_title_tr': 'Ölçümlerim',
     'lbl_measurements_selected_point_label_tr': 'Seçili nokta',
     'lbl_measurements_history_section_tr': 'ÖLÇÜM GEÇMİŞİ',
@@ -2637,6 +2659,14 @@ class RemoteConfigService {
     'lbl_measurements_measurement_date_label_en': 'Measurement date',
     'lbl_measurements_measurements_section_en': 'MEASUREMENTS',
     'lbl_measurements_unit_cm_en': 'cm',
+    'lbl_measurements_metric_bel_en': 'Waist',
+    'lbl_measurements_metric_gogus_en': 'Chest',
+    'lbl_measurements_metric_kalca_en': 'Hip',
+    'lbl_measurements_metric_kol_en': 'Arm',
+    'lbl_measurements_metric_bacak_en': 'Leg',
+    'lbl_measurements_metric_kilo_en': 'Weight',
+    'lbl_measurements_metric_yag_orani_en': 'Body fat',
+    'lbl_trainers_metric_bel_cevresi_en': 'Waist circumference',
     'lbl_measurements_title_en': 'My Measurements',
     'lbl_measurements_selected_point_label_en': 'Selected point',
     'lbl_measurements_history_section_en': 'MEASUREMENT HISTORY',
