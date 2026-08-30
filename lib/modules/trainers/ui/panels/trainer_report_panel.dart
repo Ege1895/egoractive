@@ -2,20 +2,30 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/app_spacing.dart';
+import '../../../../core/panels/base_panel.dart';
+import '../../../../core/panels/panel_stack_controller.dart';
 import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../shared/widgets/app_back_button.dart';
 import '../../../../shared/widgets/native_date_picker.dart';
 import '../../controller/trainer_report_controller.dart';
 import '../../domain/trainer_report_state.dart';
 
-/// Antrenör 2 · Seans Raporum (Raporum sekmesi kökü) — dönem seçici
-/// (haftalık/aylık/tüm zamanlar/özel) + tarih aralığı + Birebir/Grup
-/// kırılımı. Uygulamada bir prim/komisyon sistemi yok.
-class TrainerReportPanel extends ConsumerWidget {
+/// Antrenör 2 · Seans Raporum — dönem seçici (haftalık/aylık/tüm
+/// zamanlar/özel) + tarih aralığı + Birebir/Grup kırılımı. Uygulamada bir
+/// prim/komisyon sistemi yok. Önceden alt navigasyonda kendi sekmesiydi;
+/// navigasyon çubuğu kalabalıklaştığı için Profil ekranındaki bir nav
+/// satırından push edilen bir alt ekrana taşındı.
+class TrainerReportPanel extends BasePanel {
   const TrainerReportPanel({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<TrainerReportPanel> createState() => _TrainerReportPanelState();
+}
+
+class _TrainerReportPanelState extends BasePanelState<TrainerReportPanel> {
+  @override
+  Widget build(BuildContext context) {
     final colors = context.appColors;
     final typography = context.appTypography;
     final report = ref.watch(trainerReportControllerProvider);
@@ -33,126 +43,157 @@ class TrainerReportPanel extends ConsumerWidget {
 
     return Scaffold(
       body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(
-            AppSpacing.screenEdge,
-            AppSpacing.lg,
-            AppSpacing.screenEdge,
-            AppSpacing.lg,
-          ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              ref.watch(rcTextProvider(RemoteConfigKeys.trainersReportTitle)),
-              style: typography.headingLarge.copyWith(color: colors.onSurface),
-            ),
-            const SizedBox(height: AppSpacing.lg),
-            SizedBox(
-              height: 40,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.screenEdge,
+                AppSpacing.md,
+                AppSpacing.screenEdge,
+                0,
+              ),
+              child: Row(
                 children: [
-                  _PeriodChip(
-                    label: ref.watch(
-                      rcTextProvider(
-                        RemoteConfigKeys.trainersReportPeriodWeekly,
-                      ),
-                    ),
-                    selected: report.period == TrainerReportPeriod.weekly,
+                  AppBackButton(
                     onTap: () =>
-                        controller.setPeriod(TrainerReportPeriod.weekly),
+                        ref.read(panelStackControllerProvider.notifier).pop(),
                   ),
-                  const SizedBox(width: AppSpacing.sm),
-                  _PeriodChip(
-                    label: ref.watch(
-                      rcTextProvider(
-                        RemoteConfigKeys.trainersReportPeriodMonthly,
-                      ),
+                  const SizedBox(width: AppSpacing.md),
+                  Text(
+                    ref.watch(
+                      rcTextProvider(RemoteConfigKeys.trainersReportTitle),
                     ),
-                    selected: report.period == TrainerReportPeriod.monthly,
-                    onTap: () =>
-                        controller.setPeriod(TrainerReportPeriod.monthly),
-                  ),
-                  const SizedBox(width: AppSpacing.sm),
-                  _PeriodChip(
-                    label: ref.watch(
-                      rcTextProvider(
-                        RemoteConfigKeys.trainersReportPeriodAllTime,
-                      ),
+                    style: typography.headingSmall.copyWith(
+                      color: colors.onSurface,
+                      fontSize: 18,
                     ),
-                    selected: report.period == TrainerReportPeriod.allTime,
-                    onTap: () =>
-                        controller.setPeriod(TrainerReportPeriod.allTime),
-                  ),
-                  const SizedBox(width: AppSpacing.sm),
-                  _PeriodChip(
-                    label: ref.watch(
-                      rcTextProvider(
-                        RemoteConfigKeys.trainersReportPeriodCustom,
-                      ),
-                    ),
-                    selected: isCustom,
-                    onTap: () =>
-                        controller.setPeriod(TrainerReportPeriod.custom),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: AppSpacing.lg),
-            Row(
-              children: [
-                Expanded(
-                  child: _DateTile(
-                    label: ref.watch(
-                      rcTextProvider(
-                        RemoteConfigKeys.trainersReportStartDateFieldLabel,
-                      ),
-                    ),
-                    value: report.startDate,
-                    onTap: !isCustom
-                        ? null
-                        : () => showNativeDatePicker(
-                            context: context,
-                            initial: report.periodStart,
-                            firstDate: report.gymJoinedAt,
-                            lastDate: report.periodEnd,
-                            onSelected: (date) =>
-                                controller.setCustomRange(start: date),
-                          ),
-                  ),
+            Expanded(
+              child: ListView(
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.screenEdge,
+                  AppSpacing.lg,
+                  AppSpacing.screenEdge,
+                  AppSpacing.lg,
                 ),
-                const SizedBox(width: AppSpacing.sm),
-                Expanded(
-                  child: _DateTile(
-                    label: ref.watch(
-                      rcTextProvider(
-                        RemoteConfigKeys.trainersReportEndDateFieldLabel,
-                      ),
-                    ),
-                    value: report.endDate,
-                    onTap: !isCustom
-                        ? null
-                        : () => showNativeDatePicker(
-                            context: context,
-                            initial: report.periodEnd,
-                            firstDate: report.periodStart,
-                            lastDate: DateTime.now(),
-                            onSelected: (date) =>
-                                controller.setCustomRange(end: date),
+                children: [
+                  SizedBox(
+                    height: 40,
+                    child: ListView(
+                      scrollDirection: Axis.horizontal,
+                      children: [
+                        _PeriodChip(
+                          label: ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.trainersReportPeriodWeekly,
+                            ),
                           ),
+                          selected: report.period == TrainerReportPeriod.weekly,
+                          onTap: () =>
+                              controller.setPeriod(TrainerReportPeriod.weekly),
+                        ),
+                        const SizedBox(width: AppSpacing.sm),
+                        _PeriodChip(
+                          label: ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.trainersReportPeriodMonthly,
+                            ),
+                          ),
+                          selected:
+                              report.period == TrainerReportPeriod.monthly,
+                          onTap: () =>
+                              controller.setPeriod(TrainerReportPeriod.monthly),
+                        ),
+                        const SizedBox(width: AppSpacing.sm),
+                        _PeriodChip(
+                          label: ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.trainersReportPeriodAllTime,
+                            ),
+                          ),
+                          selected:
+                              report.period == TrainerReportPeriod.allTime,
+                          onTap: () =>
+                              controller.setPeriod(TrainerReportPeriod.allTime),
+                        ),
+                        const SizedBox(width: AppSpacing.sm),
+                        _PeriodChip(
+                          label: ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.trainersReportPeriodCustom,
+                            ),
+                          ),
+                          selected: isCustom,
+                          onTap: () =>
+                              controller.setPeriod(TrainerReportPeriod.custom),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: AppSpacing.lg),
-            for (final b in report.breakdown) ...[
-              _BreakdownCard(
-                breakdown: b,
-                soloLabel: soloLabel,
-                groupLabel: groupLabel,
-                duetLabel: duetLabel,
+                  const SizedBox(height: AppSpacing.lg),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _DateTile(
+                          label: ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys
+                                  .trainersReportStartDateFieldLabel,
+                            ),
+                          ),
+                          value: report.startDate,
+                          onTap: !isCustom
+                              ? null
+                              : () => showNativeDatePicker(
+                                  context: context,
+                                  initial: report.periodStart,
+                                  firstDate: report.gymJoinedAt,
+                                  lastDate: report.periodEnd,
+                                  onSelected: (date) =>
+                                      controller.setCustomRange(start: date),
+                                ),
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.sm),
+                      Expanded(
+                        child: _DateTile(
+                          label: ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.trainersReportEndDateFieldLabel,
+                            ),
+                          ),
+                          value: report.endDate,
+                          onTap: !isCustom
+                              ? null
+                              : () => showNativeDatePicker(
+                                  context: context,
+                                  initial: report.periodEnd,
+                                  firstDate: report.periodStart,
+                                  lastDate: DateTime.now(),
+                                  onSelected: (date) =>
+                                      controller.setCustomRange(end: date),
+                                ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: AppSpacing.lg),
+                  for (final b in report.breakdown) ...[
+                    _BreakdownCard(
+                      breakdown: b,
+                      soloLabel: soloLabel,
+                      groupLabel: groupLabel,
+                      duetLabel: duetLabel,
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                  ],
+                ],
               ),
-              const SizedBox(height: AppSpacing.md),
-            ],
+            ),
           ],
         ),
       ),
