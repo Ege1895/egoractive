@@ -56,3 +56,7 @@ graphify-out/.graphify_root
 extensions/*.env
 extensions/*.env.local
 extensions/*.secret.*
+
+# Android Gradle build output (root /build/ is already ignored above, but
+# android/build/ isn't matched by that pattern since it's a subdirectory).
+/android/build/
