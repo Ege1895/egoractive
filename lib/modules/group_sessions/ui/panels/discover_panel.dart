@@ -243,138 +243,140 @@ class _DiscoverCard extends ConsumerWidget {
       );
     }
 
-    return Material(
-      color: colors.surface,
-      borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
-      child: InkWell(
-        onTap: onTap,
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.md),
+      child: Material(
+        color: colors.surface,
         borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
-        child: Container(
-          margin: const EdgeInsets.only(bottom: AppSpacing.md),
-          padding: const EdgeInsets.all(AppSpacing.lg),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
-            border: Border.all(color: colors.outline),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    width: 48,
-                    padding: const EdgeInsets.symmetric(
-                      vertical: AppSpacing.sm,
-                    ),
-                    decoration: BoxDecoration(
-                      color: colors.surfaceRaised,
-                      borderRadius: BorderRadius.circular(
-                        AppSpacing.radiusInner,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
+          child: Container(
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
+              border: Border.all(color: colors.outline),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: 48,
+                      padding: const EdgeInsets.symmetric(
+                        vertical: AppSpacing.sm,
+                      ),
+                      decoration: BoxDecoration(
+                        color: colors.surfaceRaised,
+                        borderRadius: BorderRadius.circular(
+                          AppSpacing.radiusInner,
+                        ),
+                      ),
+                      child: Column(
+                        children: [
+                          Text(
+                            item.day,
+                            style: typography.dataMedium.copyWith(
+                              color: colors.onSurface,
+                              fontSize: 20,
+                            ),
+                          ),
+                          Text(
+                            item.month,
+                            style: typography.caption.copyWith(
+                              color: colors.onSurfaceMuted,
+                              fontSize: 11,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    child: Column(
-                      children: [
-                        Text(
-                          item.day,
-                          style: typography.dataMedium.copyWith(
-                            color: colors.onSurface,
-                            fontSize: 20,
+                    const SizedBox(width: AppSpacing.md),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            item.title,
+                            style: typography.headingSmall.copyWith(
+                              color: colors.onSurface,
+                            ),
                           ),
-                        ),
-                        Text(
-                          item.month,
-                          style: typography.caption.copyWith(
-                            color: colors.onSurfaceMuted,
-                            fontSize: 11,
+                          Text(
+                            item.meta,
+                            style: typography.bodyMedium.copyWith(
+                              color: colors.onSurfaceVariant,
+                              fontSize: 13,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: AppSpacing.md),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          item.title,
-                          style: typography.headingSmall.copyWith(
-                            color: colors.onSurface,
-                          ),
-                        ),
-                        Text(
-                          item.meta,
-                          style: typography.bodyMedium.copyWith(
-                            color: colors.onSurfaceVariant,
-                            fontSize: 13,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  if (onTap != null) ...[
-                    const SizedBox(width: AppSpacing.sm),
-                    Icon(
-                      Icons.chevron_right,
-                      color: colors.onSurfaceMuted,
-                      size: 22,
-                    ),
+                    if (onTap != null) ...[
+                      const SizedBox(width: AppSpacing.sm),
+                      Icon(
+                        Icons.chevron_right,
+                        color: colors.onSurfaceMuted,
+                        size: 22,
+                      ),
+                    ],
                   ],
-                ],
-              ),
-              const SizedBox(height: AppSpacing.md),
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      capacity == null
-                          ? ref
-                                .watch(
-                                  rcTextProvider(
-                                    RemoteConfigKeys
-                                        .groupSessionsAttendingCountNoCapacity,
-                                  ),
-                                )
-                                .replaceAll('{taken}', '${item.taken}')
-                          : ref
-                                .watch(
-                                  rcTextProvider(
-                                    RemoteConfigKeys
-                                        .groupSessionsAttendingCountWithCapacity,
-                                  ),
-                                )
-                                .replaceAll('{taken}', '${item.taken}')
-                                .replaceAll('{capacity}', '$capacity'),
-                      style: typography.bodyMedium.copyWith(
-                        color: colors.onSurfaceVariant,
+                ),
+                const SizedBox(height: AppSpacing.md),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        capacity == null
+                            ? ref
+                                  .watch(
+                                    rcTextProvider(
+                                      RemoteConfigKeys
+                                          .groupSessionsAttendingCountNoCapacity,
+                                    ),
+                                  )
+                                  .replaceAll('{taken}', '${item.taken}')
+                            : ref
+                                  .watch(
+                                    rcTextProvider(
+                                      RemoteConfigKeys
+                                          .groupSessionsAttendingCountWithCapacity,
+                                    ),
+                                  )
+                                  .replaceAll('{taken}', '${item.taken}')
+                                  .replaceAll('{capacity}', '$capacity'),
+                        style: typography.bodyMedium.copyWith(
+                          color: colors.onSurfaceVariant,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: AppSpacing.sm),
+                    Text(
+                      capNote,
+                      style: typography.headingSmall.copyWith(
+                        color: capFg,
                         fontSize: 13,
                       ),
                     ),
-                  ),
-                  const SizedBox(width: AppSpacing.sm),
-                  Text(
-                    capNote,
-                    style: typography.headingSmall.copyWith(
-                      color: capFg,
-                      fontSize: 13,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: AppSpacing.xs),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
-                child: LinearProgressIndicator(
-                  value: capacity == null
-                      ? 0
-                      : (item.taken / capacity).clamp(0, 1),
-                  minHeight: 6,
-                  backgroundColor: colors.surfaceRaised,
-                  valueColor: AlwaysStoppedAnimation(barColor),
+                  ],
                 ),
-              ),
-            ],
+                const SizedBox(height: AppSpacing.xs),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
+                  child: LinearProgressIndicator(
+                    value: capacity == null
+                        ? 0
+                        : (item.taken / capacity).clamp(0, 1),
+                    minHeight: 6,
+                    backgroundColor: colors.surfaceRaised,
+                    valueColor: AlwaysStoppedAnimation(barColor),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

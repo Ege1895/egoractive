@@ -161,131 +161,144 @@ class _GroupCard extends ConsumerWidget {
             ),
           );
 
-    return Material(
-      color: colors.surface,
-      borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
-      child: InkWell(
-        onTap: onTap,
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.md),
+      child: Material(
+        color: colors.surface,
         borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
-        child: Container(
-          margin: const EdgeInsets.only(bottom: AppSpacing.md),
-          padding: const EdgeInsets.all(AppSpacing.lg),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
-            border: Border.all(color: colors.outline),
-          ),
-          child: Opacity(
-            opacity: group.isCancelled ? 0.55 : 1,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            group.name,
-                            style: typography.headingSmall.copyWith(
-                              color: colors.onSurface,
-                              fontSize: 17,
-                            ),
-                          ),
-                          Text(
-                            group.meta,
-                            style: typography.bodyMedium.copyWith(
-                              color: colors.onSurfaceMuted,
-                              fontSize: 13,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    if (group.isCancelled)
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: AppSpacing.sm,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: colors.errorContainer,
-                          borderRadius: BorderRadius.circular(
-                            AppSpacing.radiusPill,
-                          ),
-                        ),
-                        child: Text(
-                          ref.watch(
-                            rcTextProvider(
-                              RemoteConfigKeys.groupSessionsCancelledBadge,
-                            ),
-                          ),
-                          style: typography.caption.copyWith(
-                            color: colors.error,
-                            fontSize: 11,
-                          ),
-                        ),
-                      )
-                    else
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Text(
-                            '${group.taken}/${group.capacity}',
-                            style: typography.dataMedium.copyWith(
-                              color: capFg,
-                              fontSize: 19,
-                            ),
-                          ),
-                          Text(
-                            ref.watch(
-                              rcTextProvider(
-                                RemoteConfigKeys
-                                    .groupSessionsCapacitySuffixLabel,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
+          child: Container(
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
+              border: Border.all(color: colors.outline),
+            ),
+            child: Opacity(
+              opacity: group.isCancelled ? 0.55 : 1,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    group.name,
+                                    style: typography.headingSmall.copyWith(
+                                      color: colors.onSurface,
+                                      fontSize: 17,
+                                    ),
+                                  ),
+                                  Text(
+                                    group.meta,
+                                    style: typography.bodyMedium.copyWith(
+                                      color: colors.onSurfaceMuted,
+                                      fontSize: 13,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                            style: typography.caption.copyWith(
-                              color: colors.onSurfaceMuted,
-                              fontSize: 11,
+                            if (group.isCancelled)
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: AppSpacing.sm,
+                                  vertical: 4,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: colors.errorContainer,
+                                  borderRadius: BorderRadius.circular(
+                                    AppSpacing.radiusPill,
+                                  ),
+                                ),
+                                child: Text(
+                                  ref.watch(
+                                    rcTextProvider(
+                                      RemoteConfigKeys
+                                          .groupSessionsCancelledBadge,
+                                    ),
+                                  ),
+                                  style: typography.caption.copyWith(
+                                    color: colors.error,
+                                    fontSize: 11,
+                                  ),
+                                ),
+                              )
+                            else
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  Text(
+                                    '${group.taken}/${group.capacity}',
+                                    style: typography.dataMedium.copyWith(
+                                      color: capFg,
+                                      fontSize: 17,
+                                    ),
+                                  ),
+                                  Text(
+                                    ref.watch(
+                                      rcTextProvider(
+                                        RemoteConfigKeys
+                                            .groupSessionsCapacitySuffixLabel,
+                                      ),
+                                    ),
+                                    style: typography.caption.copyWith(
+                                      color: colors.onSurfaceMuted,
+                                      fontSize: 11,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                          ],
+                        ),
+                        if (!group.isCancelled) ...[
+                          const SizedBox(height: AppSpacing.md),
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(
+                              AppSpacing.radiusPill,
+                            ),
+                            child: LinearProgressIndicator(
+                              value: ratio.clamp(0, 1),
+                              minHeight: 8,
+                              backgroundColor: colors.surfaceRaised,
+                              valueColor: AlwaysStoppedAnimation(barColor),
                             ),
                           ),
+                          const SizedBox(height: AppSpacing.md),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  note,
+                                  style: typography.bodyMedium.copyWith(
+                                    color: capFg,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ],
-                      ),
-                    Icon(
-                      Icons.chevron_right,
-                      color: colors.onSurfaceMuted,
-                      size: 20,
-                    ),
-                  ],
-                ),
-                if (!group.isCancelled) ...[
-                  const SizedBox(height: AppSpacing.md),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
-                    child: LinearProgressIndicator(
-                      value: ratio.clamp(0, 1),
-                      minHeight: 8,
-                      backgroundColor: colors.surfaceRaised,
-                      valueColor: AlwaysStoppedAnimation(barColor),
+                      ],
                     ),
                   ),
-                  const SizedBox(height: AppSpacing.md),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          note,
-                          style: typography.bodyMedium.copyWith(
-                            color: capFg,
-                            fontSize: 13,
-                          ),
-                        ),
-                      ),
-                    ],
+                  const SizedBox(width: AppSpacing.sm),
+                  Icon(
+                    Icons.chevron_right,
+                    color: colors.onSurfaceMuted,
+                    size: 26,
                   ),
                 ],
-              ],
+              ),
             ),
           ),
         ),
