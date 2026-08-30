@@ -26,6 +26,11 @@ const _weekdayNames = {
 /// kartına dokunulunca açılır. `group_session_detail_panel.dart` ile aynı
 /// desen: katılım [DiscoverController.toggleJoin] üzerinden, kendi ayrı bir
 /// kontenjan mantığı yok.
+///
+/// UX güncellemesi — [GroupSessionDetailPanel] ile aynı görsel dil: kontenjan
+/// durumu liste kartlarındaki doluluk çubuğu + renk kodlamasıyla kendi
+/// kartında öne çıkarılıyor, bilgi satırları ikonlu, açıklama kendi
+/// kartında. İki detay ekranı artık tutarlı bir çift.
 class EventDetailPanel extends BasePanel {
   const EventDetailPanel({super.key, required this.eventId});
 
@@ -103,8 +108,21 @@ class _EventDetailPanelState extends BasePanelState<EventDetailPanel> {
                           ),
                         ),
                         const SizedBox(height: AppSpacing.lg),
+                        _CapacityCard(
+                          ref: ref,
+                          taken: item.taken,
+                          capacity: item.capacity,
+                          capacityLabel: ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.eventsCapacityLabel,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: AppSpacing.lg),
                         Container(
-                          padding: const EdgeInsets.all(AppSpacing.lg),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: AppSpacing.lg,
+                          ),
                           decoration: BoxDecoration(
                             color: colors.surface,
                             borderRadius: BorderRadius.circular(
@@ -113,19 +131,9 @@ class _EventDetailPanelState extends BasePanelState<EventDetailPanel> {
                             border: Border.all(color: colors.outline),
                           ),
                           child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              _DetailRow(
-                                label: ref.watch(
-                                  rcTextProvider(
-                                    RemoteConfigKeys.eventsLocationFieldLabel,
-                                  ),
-                                ),
-                                value: item.location?.isNotEmpty == true
-                                    ? item.location!
-                                    : '—',
-                              ),
-                              _DetailRow(
+                              _IconDetailRow(
+                                icon: Icons.calendar_today_rounded,
                                 label: ref.watch(
                                   rcTextProvider(
                                     RemoteConfigKeys.eventsDateFieldLabel,
@@ -134,7 +142,8 @@ class _EventDetailPanelState extends BasePanelState<EventDetailPanel> {
                                 value:
                                     '${_weekdayNames[item.startTime!.weekday]}, ${item.day} ${item.month}',
                               ),
-                              _DetailRow(
+                              _IconDetailRow(
+                                icon: Icons.access_time_rounded,
                                 label: ref.watch(
                                   rcTextProvider(
                                     RemoteConfigKeys.eventsTimeFieldLabel,
@@ -143,55 +152,32 @@ class _EventDetailPanelState extends BasePanelState<EventDetailPanel> {
                                 value:
                                     '${item.startTime!.hour.toString().padLeft(2, '0')}:${item.startTime!.minute.toString().padLeft(2, '0')}',
                               ),
-                              _DetailRow(
+                              _IconDetailRow(
+                                icon: Icons.place_rounded,
                                 label: ref.watch(
                                   rcTextProvider(
-                                    RemoteConfigKeys.eventsCapacityLabel,
+                                    RemoteConfigKeys.eventsLocationFieldLabel,
                                   ),
                                 ),
-                                value: item.capacity == null
-                                    ? ref
-                                          .watch(
-                                            rcTextProvider(
-                                              RemoteConfigKeys
-                                                  .groupSessionsAttendingCountNoCapacity,
-                                            ),
-                                          )
-                                          .replaceAll(
-                                            '{taken}',
-                                            '${item.taken}',
-                                          )
-                                    : ref
-                                          .watch(
-                                            rcTextProvider(
-                                              RemoteConfigKeys
-                                                  .groupSessionsAttendingCountWithCapacity,
-                                            ),
-                                          )
-                                          .replaceAll(
-                                            '{taken}',
-                                            '${item.taken}',
-                                          )
-                                          .replaceAll(
-                                            '{capacity}',
-                                            '${item.capacity}',
-                                          ),
-                                isLast: item.description.isEmpty,
+                                value: item.location?.isNotEmpty == true
+                                    ? item.location!
+                                    : '—',
+                                isLast: true,
                               ),
-                              if (item.description.isNotEmpty)
-                                _DetailRow(
-                                  label: ref.watch(
-                                    rcTextProvider(
-                                      RemoteConfigKeys
-                                          .eventsDescriptionFieldLabel,
-                                    ),
-                                  ),
-                                  value: item.description,
-                                  isLast: true,
-                                ),
                             ],
                           ),
                         ),
+                        if (item.description.isNotEmpty) ...[
+                          const SizedBox(height: AppSpacing.lg),
+                          _DescriptionCard(
+                            label: ref.watch(
+                              rcTextProvider(
+                                RemoteConfigKeys.eventsDescriptionFieldLabel,
+                              ),
+                            ),
+                            text: item.description,
+                          ),
+                        ],
                       ],
                     ),
                   ),
@@ -262,13 +248,117 @@ class _EventDetailPanelState extends BasePanelState<EventDetailPanel> {
       ref.read(panelStackControllerProvider.notifier).pop();
 }
 
-class _DetailRow extends StatelessWidget {
-  const _DetailRow({
+/// Kontenjan durumunu liste kartlarıyla BİREBİR aynı renk mantığıyla (dolu →
+/// kırmızı, son birkaç yer → sarı, uygun → primary) öne çıkaran kart — bkz.
+/// `group_session_detail_panel.dart`'taki eşleniği.
+class _CapacityCard extends StatelessWidget {
+  const _CapacityCard({
+    required this.ref,
+    required this.taken,
+    required this.capacity,
+    required this.capacityLabel,
+  });
+
+  final WidgetRef ref;
+  final int taken;
+  final int? capacity;
+  final String capacityLabel;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+    final typography = context.appTypography;
+    final remaining = capacity == null ? null : capacity! - taken;
+    final isFull = capacity != null && taken >= capacity!;
+    final ratio = capacity == null ? 0.0 : taken / capacity!;
+
+    final Color capFg;
+    final Color barColor;
+    final String note;
+    if (isFull) {
+      capFg = colors.error;
+      barColor = colors.error;
+      note = ref.watch(
+        rcTextProvider(RemoteConfigKeys.groupSessionsCapacityFullNote),
+      );
+    } else if (remaining != null && remaining <= 2) {
+      capFg = colors.onWarningContainer;
+      barColor = colors.warning;
+      note = ref
+          .watch(rcTextProvider(RemoteConfigKeys.groupSessionsCapacityLowNote))
+          .replaceAll('{remaining}', '$remaining');
+    } else {
+      capFg = colors.onSurfaceVariant;
+      barColor = colors.primary;
+      note = ref.watch(
+        rcTextProvider(RemoteConfigKeys.groupSessionsCapacityAvailableNote),
+      );
+    }
+
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.lg),
+      decoration: BoxDecoration(
+        color: colors.surface,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
+        border: Border.all(color: colors.outline),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Expanded(
+                child: Text(
+                  capacityLabel,
+                  style: typography.caption.copyWith(
+                    color: colors.onSurfaceMuted,
+                  ),
+                ),
+              ),
+              Text(
+                capacity == null ? '$taken' : '$taken/$capacity',
+                style: typography.dataLarge.copyWith(
+                  color: capFg,
+                  fontSize: 26,
+                ),
+              ),
+            ],
+          ),
+          if (capacity != null) ...[
+            const SizedBox(height: AppSpacing.md),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
+              child: LinearProgressIndicator(
+                value: ratio.clamp(0, 1),
+                minHeight: 8,
+                backgroundColor: colors.surfaceRaised,
+                valueColor: AlwaysStoppedAnimation(barColor),
+              ),
+            ),
+          ],
+          const SizedBox(height: AppSpacing.sm),
+          Text(
+            note,
+            style: typography.bodyMedium.copyWith(color: capFg, fontSize: 13),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Sol tarafta küçük bir ikon rozeti + sağda label/değer — bkz.
+/// `group_session_detail_panel.dart`'taki eşleniği.
+class _IconDetailRow extends StatelessWidget {
+  const _IconDetailRow({
+    required this.icon,
     required this.label,
     required this.value,
     this.isLast = false,
   });
 
+  final IconData icon;
   final String label;
   final String value;
   final bool isLast;
@@ -278,13 +368,72 @@ class _DetailRow extends StatelessWidget {
     final colors = context.appColors;
     final typography = context.appTypography;
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
       decoration: BoxDecoration(
         border: isLast
             ? null
             : Border(bottom: BorderSide(color: colors.outline)),
       ),
-      margin: EdgeInsets.only(bottom: isLast ? 0 : AppSpacing.sm),
+      child: Row(
+        children: [
+          Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: colors.surfaceRaised,
+              borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+            ),
+            alignment: Alignment.center,
+            child: Icon(icon, size: 18, color: colors.primary),
+          ),
+          const SizedBox(width: AppSpacing.md),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: typography.caption.copyWith(
+                    color: colors.onSurfaceMuted,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  value,
+                  style: typography.bodyLarge.copyWith(
+                    color: colors.onSurface,
+                    fontSize: 15,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Açıklama serbest metindir — bkz. `group_session_detail_panel.dart`'taki
+/// eşleniği.
+class _DescriptionCard extends StatelessWidget {
+  const _DescriptionCard({required this.label, required this.text});
+
+  final String label;
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+    final typography = context.appTypography;
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(AppSpacing.lg),
+      decoration: BoxDecoration(
+        color: colors.surface,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
+        border: Border.all(color: colors.outline),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -292,12 +441,13 @@ class _DetailRow extends StatelessWidget {
             label,
             style: typography.caption.copyWith(color: colors.onSurfaceMuted),
           ),
-          const SizedBox(height: 2),
+          const SizedBox(height: AppSpacing.sm),
           Text(
-            value,
+            text,
             style: typography.bodyLarge.copyWith(
               color: colors.onSurface,
               fontSize: 15,
+              height: 1.4,
             ),
           ),
         ],
