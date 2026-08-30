@@ -741,10 +741,17 @@ void _pickTrainers(
 ) {
   final colors = context.appColors;
   final typography = context.appTypography;
-  final allTrainers = ref.read(adminTrainersControllerProvider);
-  final selected = allTrainers
-      .where((t) => form.trainerIds.contains(t.id))
-      .toList();
+  // `adminTrainersControllerProvider`, salon antrenörlerini bir Firestore
+  // stream'inden besliyor — bu sheet açıldığı anda stream henüz ilk
+  // snapshot'ını vermemiş olabilir (soğuk başlangıç). Önceden burada TEK
+  // SEFERLİK `ref.read` yapılıyordu: o anki (genelde boş) listeyi kalıcı
+  // olarak yakalayıp sheet kapanana kadar hiç güncellemiyordu — antrenör
+  // seçme sheet'i "swipe up açılıyor ama antrenörler listelenmiyor" bugının
+  // kök nedeni buydu. Artık liste, sheet'in kendi build'i içinde `Consumer`
+  // ile CANLI izleniyor; veri gelir gelmez sheet otomatik güncelleniyor.
+  // Seçim durumu id bazlı bir `Set` olarak tutuluyor ki liste yeniden
+  // geldiğinde (aynı id'lerle) kullanıcının seçimleri kaybolmasın.
+  final selectedIds = {...form.trainerIds};
 
   showModalBottomSheet<void>(
     context: context,
@@ -754,90 +761,109 @@ void _pickTrainers(
       borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
     ),
     builder: (sheetContext) => StatefulBuilder(
-      builder: (sheetContext, setSheetState) => SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.lg),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                ref.read(
-                  rcTextProvider(
-                    RemoteConfigKeys.groupSessionsTrainerPickerTitle,
+      builder: (sheetContext, setSheetState) => Consumer(
+        builder: (consumerContext, consumerRef, _) {
+          final allTrainers = consumerRef.watch(
+            adminTrainersControllerProvider,
+          );
+          return SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    ref.read(
+                      rcTextProvider(
+                        RemoteConfigKeys.groupSessionsTrainerPickerTitle,
+                      ),
+                    ),
+                    style: typography.headingMedium.copyWith(
+                      color: colors.onSurface,
+                      fontSize: 20,
+                    ),
                   ),
-                ),
-                style: typography.headingMedium.copyWith(
-                  color: colors.onSurface,
-                  fontSize: 20,
-                ),
-              ),
-              const SizedBox(height: AppSpacing.md),
-              Flexible(
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      for (final trainer in allTrainers)
-                        InkWell(
-                          onTap: () => setSheetState(() {
-                            final index = selected.indexWhere(
-                              (t) => t.id == trainer.id,
-                            );
-                            if (index >= 0) {
-                              selected.removeAt(index);
-                            } else {
-                              selected.add(trainer);
-                            }
-                          }),
-                          child: Container(
-                            constraints: const BoxConstraints(minHeight: 52),
-                            child: Row(
-                              children: [
-                                Checkbox(
-                                  value: selected.any(
-                                    (t) => t.id == trainer.id,
-                                  ),
-                                  onChanged: (_) => setSheetState(() {
-                                    final index = selected.indexWhere(
-                                      (t) => t.id == trainer.id,
-                                    );
-                                    if (index >= 0) {
-                                      selected.removeAt(index);
-                                    } else {
-                                      selected.add(trainer);
-                                    }
-                                  }),
+                  const SizedBox(height: AppSpacing.md),
+                  Flexible(
+                    child: allTrainers.isEmpty
+                        ? Padding(
+                            padding: const EdgeInsets.symmetric(
+                              vertical: AppSpacing.lg,
+                            ),
+                            child: Text(
+                              ref.read(
+                                rcTextProvider(
+                                  RemoteConfigKeys
+                                      .gymsAdminHomeNoTrainersMessage,
                                 ),
-                                Expanded(
-                                  child: Text(
-                                    trainer.name,
-                                    style: typography.bodyLarge.copyWith(
-                                      color: colors.onSurface,
-                                      fontSize: 15,
+                              ),
+                              style: typography.bodyMedium.copyWith(
+                                color: colors.onSurfaceMuted,
+                              ),
+                            ),
+                          )
+                        : SingleChildScrollView(
+                            child: Column(
+                              children: [
+                                for (final trainer in allTrainers)
+                                  InkWell(
+                                    onTap: () => setSheetState(() {
+                                      if (!selectedIds.remove(trainer.id)) {
+                                        selectedIds.add(trainer.id);
+                                      }
+                                    }),
+                                    child: Container(
+                                      constraints: const BoxConstraints(
+                                        minHeight: 52,
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          Checkbox(
+                                            value: selectedIds.contains(
+                                              trainer.id,
+                                            ),
+                                            onChanged: (_) => setSheetState(() {
+                                              if (!selectedIds.remove(
+                                                trainer.id,
+                                              )) {
+                                                selectedIds.add(trainer.id);
+                                              }
+                                            }),
+                                          ),
+                                          Expanded(
+                                            child: Text(
+                                              trainer.name,
+                                              style: typography.bodyLarge
+                                                  .copyWith(
+                                                    color: colors.onSurface,
+                                                    fontSize: 15,
+                                                  ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ),
-                                ),
                               ],
                             ),
                           ),
-                        ),
-                    ],
                   ),
-                ),
+                  const SizedBox(height: AppSpacing.md),
+                  AppButton(
+                    label: ref.read(
+                      rcTextProvider(RemoteConfigKeys.commonTamamButton),
+                    ),
+                    onPressed: () {
+                      controller.setTrainerIds(selectedIds.toList());
+                      Navigator.of(sheetContext).pop();
+                    },
+                  ),
+                ],
               ),
-              const SizedBox(height: AppSpacing.md),
-              AppButton(
-                label: ref.read(
-                  rcTextProvider(RemoteConfigKeys.commonTamamButton),
-                ),
-                onPressed: () {
-                  controller.setTrainerIds(selected.map((t) => t.id).toList());
-                  Navigator.of(sheetContext).pop();
-                },
-              ),
-            ],
-          ),
-        ),
+            ),
+          );
+        },
       ),
     ),
   );
