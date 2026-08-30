@@ -36,15 +36,51 @@ class TrainerHomeService {
         ),
       ],
       todaySchedule: [
-        ScheduleSlot(id: 's-1', time: '09:00', name: 'Zeynep Kaya', meta: 'Birebir · Stüdyo 1', state: ScheduleSlotState.completed, startTime: DateTime(2026, 8, 3, 9, 0)),
-        ScheduleSlot(id: 's-2', time: '11:30', name: 'Mert Arslan', meta: 'Birebir · Stüdyo 2', state: ScheduleSlotState.completed, startTime: DateTime(2026, 8, 3, 11, 30)),
-        ScheduleSlot(id: 's-3', time: '14:00', name: 'Reformer Grup', meta: '6/8 kişi · Stüdyo 1', state: ScheduleSlotState.current, startTime: DateTime(2026, 8, 3, 14, 0)),
-        ScheduleSlot(id: 's-4', time: '18:30', name: 'Ayşe Yılmaz', meta: 'Birebir · Stüdyo 2', state: ScheduleSlotState.planned, startTime: DateTime(2026, 8, 3, 18, 30)),
-        ScheduleSlot(id: 's-5', time: '20:00', name: 'Cem Demir', meta: 'Birebir · Stüdyo 1', state: ScheduleSlotState.planned, startTime: DateTime(2026, 8, 3, 20, 0)),
+        ScheduleSlot(
+          id: 's-1',
+          time: '09:00',
+          name: 'Zeynep Kaya',
+          meta: 'Birebir · Stüdyo 1',
+          state: ScheduleSlotState.completed,
+          startTime: DateTime(2026, 8, 3, 9, 0),
+        ),
+        ScheduleSlot(
+          id: 's-2',
+          time: '11:30',
+          name: 'Mert Arslan',
+          meta: 'Birebir · Stüdyo 2',
+          state: ScheduleSlotState.completed,
+          startTime: DateTime(2026, 8, 3, 11, 30),
+        ),
+        ScheduleSlot(
+          id: 's-3',
+          time: '14:00',
+          name: 'Reformer Grup',
+          meta: '6/8 kişi · Stüdyo 1',
+          state: ScheduleSlotState.current,
+          startTime: DateTime(2026, 8, 3, 14, 0),
+        ),
+        ScheduleSlot(
+          id: 's-4',
+          time: '18:30',
+          name: 'Ayşe Yılmaz',
+          meta: 'Birebir · Stüdyo 2',
+          state: ScheduleSlotState.planned,
+          startTime: DateTime(2026, 8, 3, 18, 30),
+        ),
+        ScheduleSlot(
+          id: 's-5',
+          time: '20:00',
+          name: 'Cem Demir',
+          meta: 'Birebir · Stüdyo 1',
+          state: ScheduleSlotState.planned,
+          startTime: DateTime(2026, 8, 3, 20, 0),
+        ),
       ],
     );
   }
 }
 
 @riverpod
-TrainerHomeService trainerHomeService(TrainerHomeServiceRef ref) => const TrainerHomeService();
+TrainerHomeService trainerHomeService(TrainerHomeServiceRef ref) =>
+    const TrainerHomeService();

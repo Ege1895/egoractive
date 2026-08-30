@@ -7,7 +7,7 @@ part of 'discover_controller.dart';
 // **************************************************************************
 
 String _$groupSessionsForGymHash() =>
-    r'9d23798f2319f38ec24cee6b358a3c2e7828ad25';
+    r'88ace2c736481a78c4256086c8e80f25152849e4';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -165,7 +165,7 @@ class _GroupSessionsForGymProviderElement
   String get myUid => (origin as _GroupSessionsForGymProvider).myUid;
 }
 
-String _$eventsForGymHash() => r'dfd6ba64c592503b6142e4dff09965573ba40c32';
+String _$eventsForGymHash() => r'3bafb58053e9d90deb975ae87d05069d0b3d7bf7';
 
 /// See also [_eventsForGym].
 @ProviderFor(_eventsForGym)

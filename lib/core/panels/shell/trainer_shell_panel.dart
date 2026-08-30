@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../base_panel.dart';
 import 'app_tab_shell.dart';
+import '../../../modules/group_sessions/ui/panels/discover_panel.dart';
 import '../../../modules/trainers/ui/panels/trainer_calendar_panel.dart';
 import '../../../modules/trainers/ui/panels/trainer_home_panel.dart';
 import '../../../modules/trainers/ui/panels/trainer_members_list_panel.dart';
@@ -10,7 +11,10 @@ import '../../../modules/trainers/ui/panels/trainer_profile_panel.dart';
 import '../../../modules/trainers/ui/panels/trainer_report_panel.dart';
 
 /// Antrenör rolü kök shell'i — tasarımdaki `trTabs()` sekme setinin karşılığı
-/// (Ana Sayfa · Takvimim · Üyelerim · Raporum · Profil).
+/// (Ana Sayfa · Takvimim · Üyelerim · Keşfet · Raporum · Profil). "Keşfet",
+/// üyenin gördüğü aynı [DiscoverPanel] — antrenör grup dersi/etkinlikleri
+/// sadece görüntüler, panel kendi içinde role göre katılım butonunu/kontenjan
+/// kısıtını gizliyor (bkz. `discover_panel.dart`'taki `isTrainer`).
 class TrainerShellPanel extends BasePanel {
   const TrainerShellPanel({super.key});
 
@@ -37,6 +41,11 @@ class _TrainerShellPanelState extends BasePanelState<TrainerShellPanel> {
           icon: Icons.groups_rounded,
           label: 'Üyelerim',
           builder: (_) => const TrainerMembersListPanel(),
+        ),
+        AppTabItem(
+          icon: Icons.explore_rounded,
+          label: 'Keşfet',
+          builder: (_) => const DiscoverPanel(),
         ),
         AppTabItem(
           icon: Icons.insights_rounded,

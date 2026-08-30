@@ -31,10 +31,30 @@ mixin _$CreateGroupSessionForm {
   int get capacityMax => throw _privateConstructorUsedError;
   bool get onlineBookingEnabled => throw _privateConstructorUsedError;
   String get studioName => throw _privateConstructorUsedError;
+  String get description => throw _privateConstructorUsedError;
+
+  /// RC'den (`groupSessionDescriptionMaxChars`, varsayılan 500) okunur —
+  /// [description] bunu aşınca sayaç kırmızıya döner, "Grup dersi
+  /// oluştur" butonu devre dışı kalır.
+  int get descriptionMaxChars => throw _privateConstructorUsedError;
+
+  /// Atanan antrenör(ler) — opsiyonel, boş bırakılabilir. Çoklu seçime
+  /// izin verir (bkz. `create_group_session_panel.dart`'taki antrenör
+  /// seçim sheet'i).
+  List<String> get trainerIds => throw _privateConstructorUsedError;
   bool get isSubmitting => throw _privateConstructorUsedError;
   String? get titleError => throw _privateConstructorUsedError;
   String? get dateError => throw _privateConstructorUsedError;
   String? get errorMessage => throw _privateConstructorUsedError;
+
+  /// Admin'in düzenleme ekranından (bkz. `create_group_session_panel.dart`)
+  /// var olan bir dersi açtığını gösterir — dolu ise `submit()` "Tekrarla"
+  /// olmadan TEK dokümanı günceller, boşsa (yeni oluşturma) mevcut
+  /// davranış (ana tarih + tekrar tarihleri için ayrı ayrı oluşturma)
+  /// aynen çalışır.
+  String? get editingId => throw _privateConstructorUsedError;
+  bool get isLoadingForEdit => throw _privateConstructorUsedError;
+  bool get isCancelling => throw _privateConstructorUsedError;
 
   /// Create a copy of CreateGroupSessionForm
   /// with the given fields replaced by the non-null parameter values.
@@ -60,10 +80,16 @@ abstract class $CreateGroupSessionFormCopyWith<$Res> {
     int capacityMax,
     bool onlineBookingEnabled,
     String studioName,
+    String description,
+    int descriptionMaxChars,
+    List<String> trainerIds,
     bool isSubmitting,
     String? titleError,
     String? dateError,
     String? errorMessage,
+    String? editingId,
+    bool isLoadingForEdit,
+    bool isCancelling,
   });
 }
 
@@ -94,10 +120,16 @@ class _$CreateGroupSessionFormCopyWithImpl<
     Object? capacityMax = null,
     Object? onlineBookingEnabled = null,
     Object? studioName = null,
+    Object? description = null,
+    Object? descriptionMaxChars = null,
+    Object? trainerIds = null,
     Object? isSubmitting = null,
     Object? titleError = freezed,
     Object? dateError = freezed,
     Object? errorMessage = freezed,
+    Object? editingId = freezed,
+    Object? isLoadingForEdit = null,
+    Object? isCancelling = null,
   }) {
     return _then(
       _value.copyWith(
@@ -137,6 +169,18 @@ class _$CreateGroupSessionFormCopyWithImpl<
                 ? _value.studioName
                 : studioName // ignore: cast_nullable_to_non_nullable
                       as String,
+            description: null == description
+                ? _value.description
+                : description // ignore: cast_nullable_to_non_nullable
+                      as String,
+            descriptionMaxChars: null == descriptionMaxChars
+                ? _value.descriptionMaxChars
+                : descriptionMaxChars // ignore: cast_nullable_to_non_nullable
+                      as int,
+            trainerIds: null == trainerIds
+                ? _value.trainerIds
+                : trainerIds // ignore: cast_nullable_to_non_nullable
+                      as List<String>,
             isSubmitting: null == isSubmitting
                 ? _value.isSubmitting
                 : isSubmitting // ignore: cast_nullable_to_non_nullable
@@ -153,6 +197,18 @@ class _$CreateGroupSessionFormCopyWithImpl<
                 ? _value.errorMessage
                 : errorMessage // ignore: cast_nullable_to_non_nullable
                       as String?,
+            editingId: freezed == editingId
+                ? _value.editingId
+                : editingId // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            isLoadingForEdit: null == isLoadingForEdit
+                ? _value.isLoadingForEdit
+                : isLoadingForEdit // ignore: cast_nullable_to_non_nullable
+                      as bool,
+            isCancelling: null == isCancelling
+                ? _value.isCancelling
+                : isCancelling // ignore: cast_nullable_to_non_nullable
+                      as bool,
           )
           as $Val,
     );
@@ -178,10 +234,16 @@ abstract class _$$CreateGroupSessionFormImplCopyWith<$Res>
     int capacityMax,
     bool onlineBookingEnabled,
     String studioName,
+    String description,
+    int descriptionMaxChars,
+    List<String> trainerIds,
     bool isSubmitting,
     String? titleError,
     String? dateError,
     String? errorMessage,
+    String? editingId,
+    bool isLoadingForEdit,
+    bool isCancelling,
   });
 }
 
@@ -209,10 +271,16 @@ class __$$CreateGroupSessionFormImplCopyWithImpl<$Res>
     Object? capacityMax = null,
     Object? onlineBookingEnabled = null,
     Object? studioName = null,
+    Object? description = null,
+    Object? descriptionMaxChars = null,
+    Object? trainerIds = null,
     Object? isSubmitting = null,
     Object? titleError = freezed,
     Object? dateError = freezed,
     Object? errorMessage = freezed,
+    Object? editingId = freezed,
+    Object? isLoadingForEdit = null,
+    Object? isCancelling = null,
   }) {
     return _then(
       _$CreateGroupSessionFormImpl(
@@ -252,6 +320,18 @@ class __$$CreateGroupSessionFormImplCopyWithImpl<$Res>
             ? _value.studioName
             : studioName // ignore: cast_nullable_to_non_nullable
                   as String,
+        description: null == description
+            ? _value.description
+            : description // ignore: cast_nullable_to_non_nullable
+                  as String,
+        descriptionMaxChars: null == descriptionMaxChars
+            ? _value.descriptionMaxChars
+            : descriptionMaxChars // ignore: cast_nullable_to_non_nullable
+                  as int,
+        trainerIds: null == trainerIds
+            ? _value._trainerIds
+            : trainerIds // ignore: cast_nullable_to_non_nullable
+                  as List<String>,
         isSubmitting: null == isSubmitting
             ? _value.isSubmitting
             : isSubmitting // ignore: cast_nullable_to_non_nullable
@@ -268,6 +348,18 @@ class __$$CreateGroupSessionFormImplCopyWithImpl<$Res>
             ? _value.errorMessage
             : errorMessage // ignore: cast_nullable_to_non_nullable
                   as String?,
+        editingId: freezed == editingId
+            ? _value.editingId
+            : editingId // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        isLoadingForEdit: null == isLoadingForEdit
+            ? _value.isLoadingForEdit
+            : isLoadingForEdit // ignore: cast_nullable_to_non_nullable
+                  as bool,
+        isCancelling: null == isCancelling
+            ? _value.isCancelling
+            : isCancelling // ignore: cast_nullable_to_non_nullable
+                  as bool,
       ),
     );
   }
@@ -286,11 +378,18 @@ class _$CreateGroupSessionFormImpl implements _CreateGroupSessionForm {
     required this.capacityMax,
     required this.onlineBookingEnabled,
     required this.studioName,
+    this.description = '',
+    this.descriptionMaxChars = 500,
+    final List<String> trainerIds = const <String>[],
     this.isSubmitting = false,
     this.titleError,
     this.dateError,
     this.errorMessage,
-  }) : _repeatDates = repeatDates;
+    this.editingId,
+    this.isLoadingForEdit = false,
+    this.isCancelling = false,
+  }) : _repeatDates = repeatDates,
+       _trainerIds = trainerIds;
 
   @override
   final String title;
@@ -329,6 +428,33 @@ class _$CreateGroupSessionFormImpl implements _CreateGroupSessionForm {
   final String studioName;
   @override
   @JsonKey()
+  final String description;
+
+  /// RC'den (`groupSessionDescriptionMaxChars`, varsayılan 500) okunur —
+  /// [description] bunu aşınca sayaç kırmızıya döner, "Grup dersi
+  /// oluştur" butonu devre dışı kalır.
+  @override
+  @JsonKey()
+  final int descriptionMaxChars;
+
+  /// Atanan antrenör(ler) — opsiyonel, boş bırakılabilir. Çoklu seçime
+  /// izin verir (bkz. `create_group_session_panel.dart`'taki antrenör
+  /// seçim sheet'i).
+  final List<String> _trainerIds;
+
+  /// Atanan antrenör(ler) — opsiyonel, boş bırakılabilir. Çoklu seçime
+  /// izin verir (bkz. `create_group_session_panel.dart`'taki antrenör
+  /// seçim sheet'i).
+  @override
+  @JsonKey()
+  List<String> get trainerIds {
+    if (_trainerIds is EqualUnmodifiableListView) return _trainerIds;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_trainerIds);
+  }
+
+  @override
+  @JsonKey()
   final bool isSubmitting;
   @override
   final String? titleError;
@@ -337,9 +463,23 @@ class _$CreateGroupSessionFormImpl implements _CreateGroupSessionForm {
   @override
   final String? errorMessage;
 
+  /// Admin'in düzenleme ekranından (bkz. `create_group_session_panel.dart`)
+  /// var olan bir dersi açtığını gösterir — dolu ise `submit()` "Tekrarla"
+  /// olmadan TEK dokümanı günceller, boşsa (yeni oluşturma) mevcut
+  /// davranış (ana tarih + tekrar tarihleri için ayrı ayrı oluşturma)
+  /// aynen çalışır.
+  @override
+  final String? editingId;
+  @override
+  @JsonKey()
+  final bool isLoadingForEdit;
+  @override
+  @JsonKey()
+  final bool isCancelling;
+
   @override
   String toString() {
-    return 'CreateGroupSessionForm(title: $title, startTime: $startTime, durationMinutes: $durationMinutes, selectedDate: $selectedDate, repeatDates: $repeatDates, capacity: $capacity, capacityMax: $capacityMax, onlineBookingEnabled: $onlineBookingEnabled, studioName: $studioName, isSubmitting: $isSubmitting, titleError: $titleError, dateError: $dateError, errorMessage: $errorMessage)';
+    return 'CreateGroupSessionForm(title: $title, startTime: $startTime, durationMinutes: $durationMinutes, selectedDate: $selectedDate, repeatDates: $repeatDates, capacity: $capacity, capacityMax: $capacityMax, onlineBookingEnabled: $onlineBookingEnabled, studioName: $studioName, description: $description, descriptionMaxChars: $descriptionMaxChars, trainerIds: $trainerIds, isSubmitting: $isSubmitting, titleError: $titleError, dateError: $dateError, errorMessage: $errorMessage, editingId: $editingId, isLoadingForEdit: $isLoadingForEdit, isCancelling: $isCancelling)';
   }
 
   @override
@@ -366,6 +506,14 @@ class _$CreateGroupSessionFormImpl implements _CreateGroupSessionForm {
                 other.onlineBookingEnabled == onlineBookingEnabled) &&
             (identical(other.studioName, studioName) ||
                 other.studioName == studioName) &&
+            (identical(other.description, description) ||
+                other.description == description) &&
+            (identical(other.descriptionMaxChars, descriptionMaxChars) ||
+                other.descriptionMaxChars == descriptionMaxChars) &&
+            const DeepCollectionEquality().equals(
+              other._trainerIds,
+              _trainerIds,
+            ) &&
             (identical(other.isSubmitting, isSubmitting) ||
                 other.isSubmitting == isSubmitting) &&
             (identical(other.titleError, titleError) ||
@@ -373,11 +521,17 @@ class _$CreateGroupSessionFormImpl implements _CreateGroupSessionForm {
             (identical(other.dateError, dateError) ||
                 other.dateError == dateError) &&
             (identical(other.errorMessage, errorMessage) ||
-                other.errorMessage == errorMessage));
+                other.errorMessage == errorMessage) &&
+            (identical(other.editingId, editingId) ||
+                other.editingId == editingId) &&
+            (identical(other.isLoadingForEdit, isLoadingForEdit) ||
+                other.isLoadingForEdit == isLoadingForEdit) &&
+            (identical(other.isCancelling, isCancelling) ||
+                other.isCancelling == isCancelling));
   }
 
   @override
-  int get hashCode => Object.hash(
+  int get hashCode => Object.hashAll([
     runtimeType,
     title,
     startTime,
@@ -388,11 +542,17 @@ class _$CreateGroupSessionFormImpl implements _CreateGroupSessionForm {
     capacityMax,
     onlineBookingEnabled,
     studioName,
+    description,
+    descriptionMaxChars,
+    const DeepCollectionEquality().hash(_trainerIds),
     isSubmitting,
     titleError,
     dateError,
     errorMessage,
-  );
+    editingId,
+    isLoadingForEdit,
+    isCancelling,
+  ]);
 
   /// Create a copy of CreateGroupSessionForm
   /// with the given fields replaced by the non-null parameter values.
@@ -418,10 +578,16 @@ abstract class _CreateGroupSessionForm implements CreateGroupSessionForm {
     required final int capacityMax,
     required final bool onlineBookingEnabled,
     required final String studioName,
+    final String description,
+    final int descriptionMaxChars,
+    final List<String> trainerIds,
     final bool isSubmitting,
     final String? titleError,
     final String? dateError,
     final String? errorMessage,
+    final String? editingId,
+    final bool isLoadingForEdit,
+    final bool isCancelling,
   }) = _$CreateGroupSessionFormImpl;
 
   @override
@@ -448,6 +614,20 @@ abstract class _CreateGroupSessionForm implements CreateGroupSessionForm {
   @override
   String get studioName;
   @override
+  String get description;
+
+  /// RC'den (`groupSessionDescriptionMaxChars`, varsayılan 500) okunur —
+  /// [description] bunu aşınca sayaç kırmızıya döner, "Grup dersi
+  /// oluştur" butonu devre dışı kalır.
+  @override
+  int get descriptionMaxChars;
+
+  /// Atanan antrenör(ler) — opsiyonel, boş bırakılabilir. Çoklu seçime
+  /// izin verir (bkz. `create_group_session_panel.dart`'taki antrenör
+  /// seçim sheet'i).
+  @override
+  List<String> get trainerIds;
+  @override
   bool get isSubmitting;
   @override
   String? get titleError;
@@ -455,6 +635,18 @@ abstract class _CreateGroupSessionForm implements CreateGroupSessionForm {
   String? get dateError;
   @override
   String? get errorMessage;
+
+  /// Admin'in düzenleme ekranından (bkz. `create_group_session_panel.dart`)
+  /// var olan bir dersi açtığını gösterir — dolu ise `submit()` "Tekrarla"
+  /// olmadan TEK dokümanı günceller, boşsa (yeni oluşturma) mevcut
+  /// davranış (ana tarih + tekrar tarihleri için ayrı ayrı oluşturma)
+  /// aynen çalışır.
+  @override
+  String? get editingId;
+  @override
+  bool get isLoadingForEdit;
+  @override
+  bool get isCancelling;
 
   /// Create a copy of CreateGroupSessionForm
   /// with the given fields replaced by the non-null parameter values.

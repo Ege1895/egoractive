@@ -68,6 +68,11 @@ abstract final class RemoteConfigKeys {
   /// gereksiz büyütür.
   static const gymRulesMaxChars = 'cfg_gym_rules_max_chars';
 
+  /// Grup dersi oluşturma ekranındaki "Açıklama" alanının azami karakter
+  /// sayısı — `gymRulesMaxChars` ile aynı desen (bkz. `gymsRulesEditorPanel`).
+  static const groupSessionDescriptionMaxChars =
+      'cfg_group_session_description_max_chars';
+
   /// `true` iken yeni oluşturulan bir salonun admin'i, girişten hemen sonra
   /// zorunlu [SubscriptionOnboardingPanel]'e (geri butonu yok, pakete abone
   /// olmadan atlanamaz) yönlendirilir. Mağaza ürünleri (App Store Connect/
@@ -317,6 +322,35 @@ abstract final class RemoteConfigKeys {
   static const authPhoneLoginTitle = 'lbl_auth_phone_login_title';
   static const authPhoneLoginSubtitle = 'lbl_auth_phone_login_subtitle';
   static const authPhoneLoginHint = 'lbl_auth_phone_login_hint';
+  static const authSwitchToEmailLink = 'lbl_auth_switch_to_email_link';
+
+  /// Egoractive Authentication Sistemi — email ile giriş ekranı.
+  static const authEmailLoginTitle = 'lbl_auth_email_login_title';
+  static const authEmailLoginSubtitle = 'lbl_auth_email_login_subtitle';
+  static const authSwitchToPhoneLink = 'lbl_auth_switch_to_phone_link';
+  static const authEmailAddressLabel = 'lbl_auth_email_address_label';
+
+  /// Egoractive Authentication Sistemi — OTP doğrulama ekranı (§7/§8).
+  static const authOtpTitle = 'lbl_auth_otp_title';
+  static const authOtpSubtitle = 'lbl_auth_otp_subtitle';
+  static const authOtpVerifyButton = 'lbl_auth_otp_verify_button';
+  static const authOtpResendButton = 'lbl_auth_otp_resend_button';
+  static const authOtpResendCountdownTemplate =
+      'lbl_auth_otp_resend_countdown_template';
+  static const authOtpInvalidCodeError = 'lbl_auth_otp_invalid_code_error';
+  static const authOtpExpiredError = 'lbl_auth_otp_expired_error';
+  static const authOtpTooManyAttemptsError =
+      'lbl_auth_otp_too_many_attempts_error';
+  static const authOtpGenericError = 'lbl_auth_otp_generic_error';
+
+  /// Egoractive Authentication Sistemi §5/§6 — email eksik hesap aktivasyonu.
+  static const authEmailSetupTitle = 'lbl_auth_email_setup_title';
+  static const authEmailSetupSubtitle = 'lbl_auth_email_setup_subtitle';
+  static const authEmailSetupSendButton = 'lbl_auth_email_setup_send_button';
+  static const authEmailSetupInvalidEmailError =
+      'lbl_auth_email_setup_invalid_email_error';
+  static const authEmailSetupEmailTakenError =
+      'lbl_auth_email_setup_email_taken_error';
 
   /// Profil ekranı — kalan (henüz migrate edilmemiş) metinler.
   static const authProfileMemberCaption = 'lbl_auth_profile_member_caption';
@@ -354,6 +388,11 @@ abstract final class RemoteConfigKeys {
   static const eventsDescriptionFieldLabel =
       'lbl_events_description_field_label';
   static const eventsCreateSubmitButton = 'lbl_events_create_submit_button';
+
+  /// Admin düzenleme ekranı (bkz. `create_event_panel.dart` edit modu,
+  /// `admin_events_panel.dart`'ta karta dokununca açılır).
+  static const eventsEditTitle = 'lbl_events_edit_title';
+  static const eventsEditSubmitButton = 'lbl_events_edit_submit_button';
   static const eventsDateFieldHint = 'lbl_events_date_field_hint';
   static const eventsTimeFieldHint = 'lbl_events_time_field_hint';
   static const eventsNameRequiredError = 'lbl_events_name_required_error';
@@ -459,6 +498,15 @@ abstract final class RemoteConfigKeys {
   static const groupSessionsCreateSubmitButton =
       'lbl_group_sessions_create_submit_button';
 
+  /// Admin düzenleme ekranı (bkz. `create_group_session_panel.dart` edit
+  /// modu, `admin_group_sessions_panel.dart`'ta karta dokununca açılır).
+  static const groupSessionsEditTitle = 'lbl_group_sessions_edit_title';
+  static const groupSessionsEditSubmitButton =
+      'lbl_group_sessions_edit_submit_button';
+  static const groupSessionsCancelButton = 'lbl_group_sessions_cancel_button';
+  static const groupSessionsCancelledBadge =
+      'lbl_group_sessions_cancelled_badge';
+
   /// `{minutes}` yer tutucusu ders süresiyle değiştirilir.
   static const groupSessionsDurationSuffix =
       'lbl_group_sessions_duration_suffix';
@@ -477,18 +525,35 @@ abstract final class RemoteConfigKeys {
       'lbl_group_sessions_location_field_helper';
   static const groupSessionsDurationPickerTitle =
       'lbl_group_sessions_duration_picker_title';
+  static const groupSessionsDescriptionFieldLabel =
+      'lbl_group_sessions_description_field_label';
+  static const groupSessionsDescriptionCharCountTemplate =
+      'lbl_group_sessions_description_char_count_template';
+  static const groupSessionsTrainerFieldLabel =
+      'lbl_group_sessions_trainer_field_label';
+  static const groupSessionsTrainerFieldPlaceholder =
+      'lbl_group_sessions_trainer_field_placeholder';
+  static const groupSessionsTrainerCountSelected =
+      'lbl_group_sessions_trainer_count_selected';
+  static const groupSessionsTrainerPickerTitle =
+      'lbl_group_sessions_trainer_picker_title';
   static const groupSessionsDiscoverEmptyState =
       'lbl_group_sessions_discover_empty_state';
   static const groupSessionsJoinFullErrorSnackbar =
       'lbl_group_sessions_join_full_error_snackbar';
   static const groupSessionsJoinFailedSnackbar =
       'lbl_group_sessions_join_failed_snackbar';
-  static const groupSessionsWaitlistJoinButton =
-      'lbl_group_sessions_waitlist_join_button';
-  static const groupSessionsJoinedLockedButton =
-      'lbl_group_sessions_joined_locked_button';
   static const groupSessionsJoinedLeaveButton =
       'lbl_group_sessions_joined_leave_button';
+
+  /// Grup dersi / etkinlik detay sayfaları (bkz.
+  /// `group_session_detail_panel.dart`/`event_detail_panel.dart`) —
+  /// [DiscoverPanel] kartlarındaki katıl/vazgeç düğmesi kaldırılıp detay
+  /// sayfasına taşındı.
+  static const groupSessionsDetailTitle = 'lbl_group_sessions_detail_title';
+  static const eventsDetailTitle = 'lbl_events_detail_title';
+  static const eventsJoinButton = 'lbl_events_join_button';
+  static const eventsJoinedLeaveButton = 'lbl_events_joined_leave_button';
   static const groupSessionsJoinButton = 'lbl_group_sessions_join_button';
 
   /// `{taken}` yer tutucusu katılımcı sayısıyla değiştirilir.
@@ -611,14 +676,15 @@ abstract final class RemoteConfigKeys {
   static const gymsGymInfoPaletteExtractingLabel =
       'lbl_gyms_gym_info_palette_extracting_label';
   static const gymsGymInfoThemeColorNote = 'lbl_gyms_gym_info_theme_color_note';
-  static const gymsGymInfoReportEmailsSection =
-      'lbl_gyms_gym_info_report_emails_section';
-  static const gymsGymInfoReportEmailsDescription =
-      'lbl_gyms_gym_info_report_emails_description';
   static const gymsGymInfoGymReportEmailLabel =
       'lbl_gyms_gym_info_gym_report_email_label';
   static const gymsGymInfoGymReportEmailHint =
       'lbl_gyms_gym_info_gym_report_email_hint';
+
+  /// Egoractive Authentication Sistemi §9/§10 — "Login ve rapor e-postası",
+  /// eski opsiyonel rapor e-postası alanının yerine geçen zorunlu tek alan.
+  static const gymsGymInfoLoginReportEmailLabel =
+      'lbl_gyms_gym_info_login_report_email_label';
   static const gymsGymInfoSavingLabel = 'lbl_gyms_gym_info_saving_label';
   static const gymsGymInfoLogoUploadFailedError =
       'lbl_gyms_gym_info_logo_upload_failed_error';
@@ -640,8 +706,6 @@ abstract final class RemoteConfigKeys {
   static const gymsGymSetupPhoneHint = 'lbl_gyms_gym_setup_phone_hint';
   static const gymsGymSetupPhoneHelperNote =
       'lbl_gyms_gym_setup_phone_helper_note';
-  static const gymsGymSetupReportEmailLabel =
-      'lbl_gyms_gym_setup_report_email_label';
   static const gymsGymSetupReportEmailDescription =
       'lbl_gyms_gym_setup_report_email_description';
   static const gymsGymSetupLogoOptionalLabel =
@@ -849,6 +913,8 @@ abstract final class RemoteConfigKeys {
   static const membersSelfInfoPhoneTakenError =
       'lbl_members_self_info_phone_taken_error';
   static const membersSelfInfoSaveError = 'lbl_members_self_info_save_error';
+  static const membersSelfInfoEmailFieldLabel =
+      'lbl_members_self_info_email_field_label';
   static const membersInfoNewTitle = 'lbl_members_info_new_title';
   static const membersInfoEditTitle = 'lbl_members_info_edit_title';
   static const membersInfoPhoneHint = 'lbl_members_info_phone_hint';
@@ -1200,6 +1266,19 @@ abstract final class RemoteConfigKeys {
       'lbl_sessions_create_no_active_gym_error';
   static const sessionsCreateSkippedDaysSnackbar =
       'lbl_sessions_create_skipped_days_snackbar';
+
+  /// Atlanan her günün yanında parantez içinde gösterilen kısa sebep etiketi
+  /// (bkz. `create_session_sheet.dart`'taki `_skippedDayEntry`) — hepsi tek
+  /// bir "antrenör dolu" mesajına indirgenmesin diye günün GERÇEK sebebi
+  /// ayrı ayrı gösteriliyor.
+  static const sessionsSkipReasonTrainerBusy =
+      'lbl_sessions_skip_reason_trainer_busy';
+  static const sessionsSkipReasonPastDatetime =
+      'lbl_sessions_skip_reason_past_datetime';
+  static const sessionsSkipReasonInsufficientSessions =
+      'lbl_sessions_skip_reason_insufficient_sessions';
+  static const sessionsSkipReasonUnknownError =
+      'lbl_sessions_skip_reason_unknown_error';
   static const sessionsCreateTitle = 'lbl_sessions_create_title';
   static const sessionsCreateSelectPlaceholder =
       'lbl_sessions_create_select_placeholder';
@@ -1287,6 +1366,7 @@ abstract final class RemoteConfigKeys {
       'lbl_trainers_report_period_all_time';
   static const trainersReportPeriodCustom = 'lbl_trainers_report_period_custom';
   static const trainersProfileFooterText = 'lbl_trainers_profile_footer_text';
+  static const trainersInfoTitle = 'lbl_trainers_info_title';
   static const trainersDetailTitle = 'lbl_trainers_detail_title';
   static const trainersMemberCountSuffix = 'lbl_trainers_member_count_suffix';
   static const trainersDetailAllTimeSection =
@@ -1465,6 +1545,7 @@ class RemoteConfigService {
     RemoteConfigKeys.freeVersionAdsEnabled: true,
     RemoteConfigKeys.trialDurationDays: 14,
     RemoteConfigKeys.gymRulesMaxChars: 6000,
+    RemoteConfigKeys.groupSessionDescriptionMaxChars: 500,
     RemoteConfigKeys.requireSubscriptionOnboarding: true,
     RemoteConfigKeys.featureFlags: '{"group_sessions_enabled": true}',
     RemoteConfigKeys.badgeCriteria: _defaultBadgeCriteriaJson,
@@ -3297,6 +3378,9 @@ class RemoteConfigService {
 
   int get groupSessionCapacityMax =>
       getInt(RemoteConfigKeys.groupSessionCapacityMax);
+
+  int get groupSessionDescriptionMaxChars =>
+      getInt(RemoteConfigKeys.groupSessionDescriptionMaxChars);
 
   int get gymRulesMaxChars => getInt(RemoteConfigKeys.gymRulesMaxChars);
 

@@ -7,14 +7,14 @@ extension TrainerMetricLabel on TrainerMetric {
   /// Türkçe kalıyordu. Artık RC anahtarı döner, çağıran taraf
   /// `ref.watch(rcTextProvider(metric.rcKey))` ile çözer.
   String get rcKey => switch (this) {
-        TrainerMetric.kilo => RemoteConfigKeys.measurementsMetricKilo,
-        TrainerMetric.belCevresi => RemoteConfigKeys.trainersMetricBelCevresi,
-        TrainerMetric.yagOrani => RemoteConfigKeys.measurementsMetricYagOrani,
-      };
+    TrainerMetric.kilo => RemoteConfigKeys.measurementsMetricKilo,
+    TrainerMetric.belCevresi => RemoteConfigKeys.trainersMetricBelCevresi,
+    TrainerMetric.yagOrani => RemoteConfigKeys.measurementsMetricYagOrani,
+  };
 
   String get unit => switch (this) {
-        TrainerMetric.kilo => 'kg',
-        TrainerMetric.belCevresi => 'cm',
-        TrainerMetric.yagOrani => '%',
-      };
+    TrainerMetric.kilo => 'kg',
+    TrainerMetric.belCevresi => 'cm',
+    TrainerMetric.yagOrani => '%',
+  };
 }

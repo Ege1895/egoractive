@@ -23,9 +23,24 @@ Stream<Map<String, dynamic>?> _trainerProfileDocForUid(
 @riverpod
 class TrainerProfileController extends _$TrainerProfileController {
   @override
-  ({String name, String initials, String specialty}) build() {
+  ({
+    String name,
+    String initials,
+    String specialty,
+    String phoneDigits,
+    String email,
+  })
+  build() {
     final uid = ref.watch(authStateProvider).valueOrNull?.uid;
-    if (uid == null) return (name: '', initials: '?', specialty: '');
+    if (uid == null) {
+      return (
+        name: '',
+        initials: '?',
+        specialty: '',
+        phoneDigits: '',
+        email: '',
+      );
+    }
 
     final data = ref.watch(_trainerProfileDocForUidProvider(uid)).valueOrNull;
     final name = (data?['name'] as String?) ?? '';
@@ -36,7 +51,19 @@ class TrainerProfileController extends _$TrainerProfileController {
       name: name,
       initials: _initialsFor(name),
       specialty: specialties.isEmpty ? '' : specialties.first,
+      phoneDigits: _digitsOnly((data?['phoneNumber'] as String?) ?? ''),
+      email: (data?['email'] as String?) ?? '',
     );
+  }
+
+  String _digitsOnly(String raw) {
+    final digits = raw.replaceAll(RegExp(r'[^0-9]'), '');
+    final withoutCountryCode = digits.startsWith('90') && digits.length > 10
+        ? digits.substring(2)
+        : digits;
+    return withoutCountryCode.length > 10
+        ? withoutCountryCode.substring(withoutCountryCode.length - 10)
+        : withoutCountryCode;
   }
 
   String _initialsFor(String name) {

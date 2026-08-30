@@ -24,4 +24,5 @@ class TrainerMembersService {
 }
 
 @riverpod
-TrainerMembersService trainerMembersService(TrainerMembersServiceRef ref) => const TrainerMembersService();
+TrainerMembersService trainerMembersService(TrainerMembersServiceRef ref) =>
+    const TrainerMembersService();

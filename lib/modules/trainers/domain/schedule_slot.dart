@@ -12,6 +12,7 @@ class ScheduleSlot with _$ScheduleSlot {
     required String name,
     required String meta,
     required ScheduleSlotState state,
+
     /// Seansın gerçek başlangıç zamanı — antrenörün "Dersi onayla"
     /// sheet'inin 24 saatlik onay penceresini hesaplamak için gerekli
     /// (bkz. `trainer_calendar_panel.dart`, `_showSlotDetail`).

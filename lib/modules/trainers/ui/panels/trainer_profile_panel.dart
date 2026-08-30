@@ -10,6 +10,7 @@ import '../../../auth/ui/panels/delete_account_confirm_panel.dart';
 import '../../../auth/ui/panels/language_select_panel.dart';
 import '../../../gyms/ui/panels/gym_rules_view_panel.dart';
 import '../../controller/trainer_profile_controller.dart';
+import 'trainer_info_panel.dart';
 
 /// Antrenör · Profil (Profil sekmesi kökü) — üye Profilim'in sade antrenör
 /// karşılığı, rozet/geri bildirim gibi üyeye özgü bölümler içermez.
@@ -38,70 +39,79 @@ class TrainerProfilePanel extends ConsumerWidget {
               style: typography.headingLarge.copyWith(color: colors.onSurface),
             ),
             const SizedBox(height: AppSpacing.lg),
-            Container(
-              padding: const EdgeInsets.all(AppSpacing.xl),
-              decoration: BoxDecoration(
-                color: colors.surface,
-                borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
-                border: Border.all(color: colors.outline),
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    width: 64,
-                    height: 64,
-                    decoration: BoxDecoration(
-                      color: colors.primaryContainer,
-                      shape: BoxShape.circle,
-                    ),
-                    alignment: Alignment.center,
-                    child: Text(
-                      profile.initials,
-                      style: typography.headingMedium.copyWith(
-                        color: colors.onPrimaryContainer,
-                        fontSize: 20,
+            InkWell(
+              borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
+              onTap: () => panelStack.push(const TrainerInfoPanel()),
+              child: Container(
+                padding: const EdgeInsets.all(AppSpacing.xl),
+                decoration: BoxDecoration(
+                  color: colors.surface,
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
+                  border: Border.all(color: colors.outline),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 64,
+                      height: 64,
+                      decoration: BoxDecoration(
+                        color: colors.primaryContainer,
+                        shape: BoxShape.circle,
+                      ),
+                      alignment: Alignment.center,
+                      child: Text(
+                        profile.initials,
+                        style: typography.headingMedium.copyWith(
+                          color: colors.onPrimaryContainer,
+                          fontSize: 20,
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(width: AppSpacing.md),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          profile.name.isEmpty ? '—' : profile.name,
-                          style: typography.headingMedium.copyWith(
-                            color: colors.onSurface,
-                            fontSize: 19,
+                    const SizedBox(width: AppSpacing.md),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            profile.name.isEmpty ? '—' : profile.name,
+                            style: typography.headingMedium.copyWith(
+                              color: colors.onSurface,
+                              fontSize: 19,
+                            ),
                           ),
-                        ),
-                        Text(
-                          profile.specialty.isEmpty
-                              ? ref.watch(
-                                  rcTextProvider(
-                                    RemoteConfigKeys.membersTrainerFieldLabel,
-                                  ),
-                                )
-                              : ref
-                                    .watch(
-                                      rcTextProvider(
-                                        RemoteConfigKeys
-                                            .trainersProfileSpecialtyRole,
-                                      ),
-                                    )
-                                    .replaceAll(
-                                      '{specialty}',
-                                      profile.specialty,
+                          Text(
+                            profile.specialty.isEmpty
+                                ? ref.watch(
+                                    rcTextProvider(
+                                      RemoteConfigKeys.membersTrainerFieldLabel,
                                     ),
-                          style: typography.bodyMedium.copyWith(
-                            color: colors.onSurfaceVariant,
-                            fontSize: 14,
+                                  )
+                                : ref
+                                      .watch(
+                                        rcTextProvider(
+                                          RemoteConfigKeys
+                                              .trainersProfileSpecialtyRole,
+                                        ),
+                                      )
+                                      .replaceAll(
+                                        '{specialty}',
+                                        profile.specialty,
+                                      ),
+                            style: typography.bodyMedium.copyWith(
+                              color: colors.onSurfaceVariant,
+                              fontSize: 14,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                    Icon(
+                      Icons.chevron_right,
+                      color: colors.onSurfaceMuted,
+                      size: 20,
+                    ),
+                  ],
+                ),
               ),
             ),
             const SizedBox(height: AppSpacing.lg),

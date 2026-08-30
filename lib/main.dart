@@ -25,6 +25,7 @@ import 'core/theme/app_theme.dart';
 import 'core/theme/app_typography.dart';
 import 'core/theme/theme_controller.dart';
 import 'firebase_options.dart';
+import 'modules/auth/ui/panels/email_setup_panel.dart';
 import 'modules/auth/ui/panels/phone_login_panel.dart';
 import 'modules/auth/ui/panels/splash_panel.dart';
 import 'modules/notifications/service/push_notification_service.dart';
@@ -170,6 +171,13 @@ class _AppRootState extends ConsumerState<_AppRoot> {
           await FirebaseAuth.instance.signOut();
         }
         panelStack.replaceRoot(const PhoneLoginPanel());
+      case AppAccessKind.emailSetupRequired:
+        final uid = FirebaseAuth.instance.currentUser?.uid;
+        if (uid == null) {
+          panelStack.replaceRoot(const PhoneLoginPanel());
+          return;
+        }
+        panelStack.replaceRoot(EmailSetupPanel(uid: uid));
       case AppAccessKind.blocked:
         final message = ref
             .read(remoteConfigServiceProvider)

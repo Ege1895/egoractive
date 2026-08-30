@@ -22,6 +22,7 @@ mixin _$AdminGroupSession {
   String get meta => throw _privateConstructorUsedError;
   int get taken => throw _privateConstructorUsedError;
   int get capacity => throw _privateConstructorUsedError;
+  bool get isCancelled => throw _privateConstructorUsedError;
 
   /// Create a copy of AdminGroupSession
   /// with the given fields replaced by the non-null parameter values.
@@ -37,7 +38,14 @@ abstract class $AdminGroupSessionCopyWith<$Res> {
     $Res Function(AdminGroupSession) then,
   ) = _$AdminGroupSessionCopyWithImpl<$Res, AdminGroupSession>;
   @useResult
-  $Res call({String id, String name, String meta, int taken, int capacity});
+  $Res call({
+    String id,
+    String name,
+    String meta,
+    int taken,
+    int capacity,
+    bool isCancelled,
+  });
 }
 
 /// @nodoc
@@ -60,6 +68,7 @@ class _$AdminGroupSessionCopyWithImpl<$Res, $Val extends AdminGroupSession>
     Object? meta = null,
     Object? taken = null,
     Object? capacity = null,
+    Object? isCancelled = null,
   }) {
     return _then(
       _value.copyWith(
@@ -83,6 +92,10 @@ class _$AdminGroupSessionCopyWithImpl<$Res, $Val extends AdminGroupSession>
                 ? _value.capacity
                 : capacity // ignore: cast_nullable_to_non_nullable
                       as int,
+            isCancelled: null == isCancelled
+                ? _value.isCancelled
+                : isCancelled // ignore: cast_nullable_to_non_nullable
+                      as bool,
           )
           as $Val,
     );
@@ -98,7 +111,14 @@ abstract class _$$AdminGroupSessionImplCopyWith<$Res>
   ) = __$$AdminGroupSessionImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String id, String name, String meta, int taken, int capacity});
+  $Res call({
+    String id,
+    String name,
+    String meta,
+    int taken,
+    int capacity,
+    bool isCancelled,
+  });
 }
 
 /// @nodoc
@@ -120,6 +140,7 @@ class __$$AdminGroupSessionImplCopyWithImpl<$Res>
     Object? meta = null,
     Object? taken = null,
     Object? capacity = null,
+    Object? isCancelled = null,
   }) {
     return _then(
       _$AdminGroupSessionImpl(
@@ -143,6 +164,10 @@ class __$$AdminGroupSessionImplCopyWithImpl<$Res>
             ? _value.capacity
             : capacity // ignore: cast_nullable_to_non_nullable
                   as int,
+        isCancelled: null == isCancelled
+            ? _value.isCancelled
+            : isCancelled // ignore: cast_nullable_to_non_nullable
+                  as bool,
       ),
     );
   }
@@ -157,6 +182,7 @@ class _$AdminGroupSessionImpl extends _AdminGroupSession {
     required this.meta,
     required this.taken,
     required this.capacity,
+    this.isCancelled = false,
   }) : super._();
 
   @override
@@ -169,10 +195,13 @@ class _$AdminGroupSessionImpl extends _AdminGroupSession {
   final int taken;
   @override
   final int capacity;
+  @override
+  @JsonKey()
+  final bool isCancelled;
 
   @override
   String toString() {
-    return 'AdminGroupSession(id: $id, name: $name, meta: $meta, taken: $taken, capacity: $capacity)';
+    return 'AdminGroupSession(id: $id, name: $name, meta: $meta, taken: $taken, capacity: $capacity, isCancelled: $isCancelled)';
   }
 
   @override
@@ -185,11 +214,14 @@ class _$AdminGroupSessionImpl extends _AdminGroupSession {
             (identical(other.meta, meta) || other.meta == meta) &&
             (identical(other.taken, taken) || other.taken == taken) &&
             (identical(other.capacity, capacity) ||
-                other.capacity == capacity));
+                other.capacity == capacity) &&
+            (identical(other.isCancelled, isCancelled) ||
+                other.isCancelled == isCancelled));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, id, name, meta, taken, capacity);
+  int get hashCode =>
+      Object.hash(runtimeType, id, name, meta, taken, capacity, isCancelled);
 
   /// Create a copy of AdminGroupSession
   /// with the given fields replaced by the non-null parameter values.
@@ -210,6 +242,7 @@ abstract class _AdminGroupSession extends AdminGroupSession {
     required final String meta,
     required final int taken,
     required final int capacity,
+    final bool isCancelled,
   }) = _$AdminGroupSessionImpl;
   const _AdminGroupSession._() : super._();
 
@@ -223,6 +256,8 @@ abstract class _AdminGroupSession extends AdminGroupSession {
   int get taken;
   @override
   int get capacity;
+  @override
+  bool get isCancelled;
 
   /// Create a copy of AdminGroupSession
   /// with the given fields replaced by the non-null parameter values.

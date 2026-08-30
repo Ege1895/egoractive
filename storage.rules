@@ -17,5 +17,13 @@ service firebase.storage {
                    && request.resource.contentType == 'image/png'
                    && request.resource.size < 300 * 1024;
     }
+
+    // Egoractive marka varlıkları (ör. OTP email şablonundaki logo,
+    // bkz. shared/otp-email-template.ts) — sadece Admin SDK (Cloud
+    // Console/gcloud) yazabilir, client'tan hiçbir zaman yazılmaz.
+    match /branding/{fileName} {
+      allow read: if true;
+      allow write: if false;
+    }
   }
 }

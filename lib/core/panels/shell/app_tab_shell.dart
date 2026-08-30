@@ -20,7 +20,13 @@ class AppTabItem {
 /// Flutter karşılığı: aktif sekme [AppColorScheme.onPrimaryContainer],
 /// pasif sekme [AppColorScheme.onSurfaceMuted] rengini alır.
 class AppTabShell extends StatefulWidget {
-  const AppTabShell({required this.items, this.bottomAdSlot, this.topBanner, this.onTabSelected, super.key});
+  const AppTabShell({
+    required this.items,
+    this.bottomAdSlot,
+    this.topBanner,
+    this.onTabSelected,
+    super.key,
+  });
 
   final List<AppTabItem> items;
 
@@ -60,7 +66,8 @@ class _AppTabShellState extends State<AppTabShell> {
               child: IndexedStack(
                 index: _index,
                 children: [
-                  for (final item in widget.items) Builder(builder: item.builder),
+                  for (final item in widget.items)
+                    Builder(builder: item.builder),
                 ],
               ),
             ),
@@ -105,7 +112,11 @@ class _AppTabShellState extends State<AppTabShell> {
 }
 
 class _TabButton extends StatelessWidget {
-  const _TabButton({required this.item, required this.selected, required this.onTap});
+  const _TabButton({
+    required this.item,
+    required this.selected,
+    required this.onTap,
+  });
 
   final AppTabItem item;
   final bool selected;
@@ -121,7 +132,9 @@ class _TabButton extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         child: ConstrainedBox(
-          constraints: const BoxConstraints(minHeight: AppSpacing.minTouchTarget),
+          constraints: const BoxConstraints(
+            minHeight: AppSpacing.minTouchTarget,
+          ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -129,7 +142,10 @@ class _TabButton extends StatelessWidget {
               const SizedBox(height: AppSpacing.xs),
               Text(
                 item.label,
-                style: context.appTypography.caption.copyWith(color: tint, fontSize: 11),
+                style: context.appTypography.caption.copyWith(
+                  color: tint,
+                  fontSize: 11,
+                ),
               ),
             ],
           ),

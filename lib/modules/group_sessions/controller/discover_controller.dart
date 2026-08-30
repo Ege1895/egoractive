@@ -56,6 +56,10 @@ Stream<List<DiscoverItem>> _groupSessionsForGym(
             .where(
               (doc) => (doc.data()['onlineBookingEnabled'] as bool?) ?? true,
             )
+            // İptal edilen bir ders üye/antrenör Keşfet akışından hiç
+            // görünmez — admin ekranında ise rozetle listelenmeye devam
+            // eder (bkz. admin_group_sessions_controller.dart).
+            .where((doc) => (doc.data()['status'] as String?) != 'cancelled')
             .map((doc) => _toGroupSessionItem(doc, myUid, leaveLockHours))
             .toList(),
       );
@@ -87,6 +91,12 @@ DiscoverItem _toGroupSessionItem(
     joined: attendeeIds.contains(myUid),
     startTime: startTime,
     leaveLockHoursBefore: leaveLockHours,
+    description: (data['description'] as String?) ?? '',
+    location: data['studioName'] as String?,
+    trainerNames:
+        (data['trainerNames'] as List?)?.whereType<String>().toList() ??
+        const [],
+    durationMinutes: durationMinutes,
   );
 }
 
@@ -108,6 +118,7 @@ Stream<List<DiscoverItem>> _eventsForGym(
       .snapshots()
       .map(
         (snapshot) => snapshot.docs
+            .where((doc) => (doc.data()['status'] as String?) != 'cancelled')
             .map((doc) => _toEventItem(doc, myUid, leaveLockHours))
             .toList(),
       );
@@ -144,6 +155,8 @@ DiscoverItem _toEventItem(
     joined: attendeeIds.contains(myUid),
     startTime: dateTime,
     leaveLockHoursBefore: leaveLockHours,
+    description: (data['description'] as String?) ?? '',
+    location: data['location'] as String?,
   );
 }
 

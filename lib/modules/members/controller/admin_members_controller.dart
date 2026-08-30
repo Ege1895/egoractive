@@ -18,7 +18,10 @@ part 'admin_members_controller.g.dart';
 /// bunun yerine sayfalı [AdminMemberListController]'ı kullanıyor — bu
 /// provider sadece o üç tüketici için hâlâ geçerli.
 @riverpod
-Stream<List<AdminMemberSummary>> _membersForGym(_MembersForGymRef ref, String gymId) {
+Stream<List<AdminMemberSummary>> _membersForGym(
+  _MembersForGymRef ref,
+  String gymId,
+) {
   final endingSoonThreshold = ref
       .watch(remoteConfigServiceProvider)
       .memberEndingSoonSessionsThreshold;

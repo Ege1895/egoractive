@@ -6,7 +6,7 @@ part of 'app_access.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$appAccessHash() => r'e833bba760d22269369af488ccd6584991b5a871';
+String _$appAccessHash() => r'29671077bcc5633b0308987c2593615107bd967d';
 
 /// Salon Abonelik ve Erişim Akışı — tek reaktif erişim kararı kaynağı.
 /// Önceki tek seferlik (Future tabanlı) rol kontrolünün yerini alır: rol

@@ -21,6 +21,13 @@
       "description": "Grup dersi oluşturma ekranındaki kontenjan stepper'ının üst sınırı.",
       "valueType": "NUMBER"
     },
+    "cfg_group_session_description_max_chars": {
+      "defaultValue": {
+        "value": "500"
+      },
+      "description": "Grup dersi oluşturma ekranındaki Açıklama alanının azami karakter sayısı.",
+      "valueType": "NUMBER"
+    },
     "cfg_installment_due_soon_days": {
       "defaultValue": {
         "value": "3"
@@ -1795,6 +1802,30 @@
       },
       "valueType": "STRING"
     },
+    "lbl_events_edit_title_tr": {
+      "defaultValue": {
+        "value": "Etkinliği Düzenle"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_events_edit_title_en": {
+      "defaultValue": {
+        "value": "Edit Event"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_events_edit_submit_button_tr": {
+      "defaultValue": {
+        "value": "Kaydet"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_events_edit_submit_button_en": {
+      "defaultValue": {
+        "value": "Save"
+      },
+      "valueType": "STRING"
+    },
     "lbl_expenses_list_title_tr": {
       "defaultValue": {
         "value": "Giderler"
@@ -2205,6 +2236,54 @@
       },
       "valueType": "STRING"
     },
+    "lbl_group_sessions_edit_title_tr": {
+      "defaultValue": {
+        "value": "Grup Dersini Düzenle"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_edit_title_en": {
+      "defaultValue": {
+        "value": "Edit Group Session"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_edit_submit_button_tr": {
+      "defaultValue": {
+        "value": "Kaydet"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_edit_submit_button_en": {
+      "defaultValue": {
+        "value": "Save"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_cancel_button_tr": {
+      "defaultValue": {
+        "value": "İptal Et"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_cancel_button_en": {
+      "defaultValue": {
+        "value": "Cancel"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_cancelled_badge_tr": {
+      "defaultValue": {
+        "value": "İptal Edildi"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_cancelled_badge_en": {
+      "defaultValue": {
+        "value": "Cancelled"
+      },
+      "valueType": "STRING"
+    },
     "lbl_group_sessions_duration_suffix_tr": {
       "description": "{minutes} yer tutucusu ders süresiyle değiştirilir.",
       "defaultValue": {
@@ -2280,6 +2359,78 @@
       },
       "valueType": "STRING"
     },
+    "lbl_group_sessions_description_field_label_tr": {
+      "defaultValue": {
+        "value": "Açıklama (opsiyonel)"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_description_field_label_en": {
+      "defaultValue": {
+        "value": "Description (optional)"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_description_char_count_template_tr": {
+      "defaultValue": {
+        "value": "{count}/{max}"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_description_char_count_template_en": {
+      "defaultValue": {
+        "value": "{count}/{max}"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_trainer_field_label_tr": {
+      "defaultValue": {
+        "value": "Antrenör"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_trainer_field_label_en": {
+      "defaultValue": {
+        "value": "Trainer"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_trainer_field_placeholder_tr": {
+      "defaultValue": {
+        "value": "Antrenör seç (opsiyonel)"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_trainer_field_placeholder_en": {
+      "defaultValue": {
+        "value": "Select trainer (optional)"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_trainer_count_selected_tr": {
+      "defaultValue": {
+        "value": "{count} antrenör seçildi"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_trainer_count_selected_en": {
+      "defaultValue": {
+        "value": "{count} trainers selected"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_trainer_picker_title_tr": {
+      "defaultValue": {
+        "value": "Antrenör seç"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_trainer_picker_title_en": {
+      "defaultValue": {
+        "value": "Select trainers"
+      },
+      "valueType": "STRING"
+    },
     "lbl_group_sessions_discover_empty_state_tr": {
       "description": "Keşfet ekranında hiç açık kayıt olmadığında gösterilir.",
       "defaultValue": {
@@ -2295,13 +2446,13 @@
     },
     "lbl_group_sessions_join_full_error_snackbar_tr": {
       "defaultValue": {
-        "value": "Bu ders az önce doldu."
+        "value": "Acele etmelisin, kontenjan dolmuş."
       },
       "valueType": "STRING"
     },
     "lbl_group_sessions_join_full_error_snackbar_en": {
       "defaultValue": {
-        "value": "This session just filled up."
+        "value": "You'll need to hurry — this just filled up."
       },
       "valueType": "STRING"
     },
@@ -2317,18 +2468,6 @@
       },
       "valueType": "STRING"
     },
-    "lbl_group_sessions_waitlist_join_button_tr": {
-      "defaultValue": {
-        "value": "Yedek listesine yaz"
-      },
-      "valueType": "STRING"
-    },
-    "lbl_group_sessions_waitlist_join_button_en": {
-      "defaultValue": {
-        "value": "Join waitlist"
-      },
-      "valueType": "STRING"
-    },
     "lbl_group_sessions_joined_leave_button_tr": {
       "defaultValue": {
         "value": "Katılmaktan Vazgeç"
@@ -2338,6 +2477,54 @@
     "lbl_group_sessions_joined_leave_button_en": {
       "defaultValue": {
         "value": "Cancel attendance"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_detail_title_tr": {
+      "defaultValue": {
+        "value": "Grup Dersi"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_detail_title_en": {
+      "defaultValue": {
+        "value": "Group Session"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_events_detail_title_tr": {
+      "defaultValue": {
+        "value": "Etkinlik"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_events_detail_title_en": {
+      "defaultValue": {
+        "value": "Event"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_events_join_button_tr": {
+      "defaultValue": {
+        "value": "Katılıyorum"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_events_join_button_en": {
+      "defaultValue": {
+        "value": "Join"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_events_joined_leave_button_tr": {
+      "defaultValue": {
+        "value": "Katılmaktan Vazgeçtim"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_events_joined_leave_button_en": {
+      "defaultValue": {
+        "value": "I'm no longer attending"
       },
       "valueType": "STRING"
     },
@@ -5886,13 +6073,61 @@
     },
     "lbl_sessions_create_skipped_days_snackbar_tr": {
       "defaultValue": {
-        "value": "Şu günler için antrenör dolu, atlandı: {days}."
+        "value": "{name} antrenörü için (saat {time}) şu seanslar oluşturulamadı: {days}"
       },
       "valueType": "STRING"
     },
     "lbl_sessions_create_skipped_days_snackbar_en": {
       "defaultValue": {
-        "value": "Skipped, trainer busy on: {days}."
+        "value": "These sessions with {name} at {time} couldn't be created: {days}"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_skip_reason_trainer_busy_tr": {
+      "defaultValue": {
+        "value": "antrenör dolu"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_skip_reason_trainer_busy_en": {
+      "defaultValue": {
+        "value": "trainer busy"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_skip_reason_past_datetime_tr": {
+      "defaultValue": {
+        "value": "geçmiş tarih"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_skip_reason_past_datetime_en": {
+      "defaultValue": {
+        "value": "past date"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_skip_reason_insufficient_sessions_tr": {
+      "defaultValue": {
+        "value": "seans hakkı bitti"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_skip_reason_insufficient_sessions_en": {
+      "defaultValue": {
+        "value": "no sessions left"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_skip_reason_unknown_error_tr": {
+      "defaultValue": {
+        "value": "hata oluştu"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_skip_reason_unknown_error_en": {
+      "defaultValue": {
+        "value": "error"
       },
       "valueType": "STRING"
     },
@@ -8708,18 +8943,6 @@
       },
       "description": "Etkinlikte katılım sonrası \"Katılmaktan Vazgeç\" başlangıca kaç saat kalana kadar aktif.",
       "valueType": "NUMBER"
-    },
-    "lbl_group_sessions_joined_locked_button_tr": {
-      "defaultValue": {
-        "value": "Katılıyorsun"
-      },
-      "valueType": "STRING"
-    },
-    "lbl_group_sessions_joined_locked_button_en": {
-      "defaultValue": {
-        "value": "Attending"
-      },
-      "valueType": "STRING"
     },
     "cfg_group_session_leave_lock_hours_before": {
       "defaultValue": {

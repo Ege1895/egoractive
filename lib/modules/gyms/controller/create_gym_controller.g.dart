@@ -7,7 +7,7 @@ part of 'create_gym_controller.dart';
 // **************************************************************************
 
 String _$createGymControllerHash() =>
-    r'6a462991330a0484bf4e7ef94740c624db861968';
+    r'a01b298089fc5cb57ace641b4f2fe0982244523b';
 
 /// F2-1 — [GymSetupPanel]'in "Salonu oluştur" aksiyonu. Metin alanları
 /// hâlâ [GymProfileController]/[GymThemeController] üzerinden bağlı; bu

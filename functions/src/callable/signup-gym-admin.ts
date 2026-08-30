@@ -61,10 +61,12 @@ export const signupGymAdmin = onCall(async (request) => {
   const themeColorHex = requireNonEmptyString(data.themeColorHex, "Tema rengi");
   const logoBase64 = optionalNonEmptyString(data.logoBase64);
   const timeZone = resolveTimeZone(data.timeZone);
-  // F5-16 — rapor e-postası opsiyonel; salon kurulumu sırasında sorulur ama
-  // boş bırakılabilir (girilmezse haftalık/aylık rapor mailleri o salon için
-  // hiç çalışmaz, bkz. weekly-gym-report.ts/monthly-gym-report.ts).
-  const reportEmail = optionalNonEmptyString(data.reportEmails?.gym);
+  // Egoractive Authentication Sistemi §9 — "Login ve rapor e-postası" artık
+  // zorunlu tek alan: hem admin'in email OTP ile giriş yapacağı hem
+  // haftalık/aylık rapor maillerinin gideceği adres (bkz.
+  // weekly-gym-report.ts/monthly-gym-report.ts).
+  const email = requireNonEmptyString(data.email, "Login ve rapor e-postası");
+  const emailLower = email.toLowerCase();
 
   let logoBuffer: Buffer | undefined;
   if (logoBase64 !== undefined) {
@@ -75,13 +77,21 @@ export const signupGymAdmin = onCall(async (request) => {
   }
 
   const firestore = getFirestore();
-  const existing = await firestore
+  const existingPhone = await firestore
     .collection(usersCollection())
     .where("phoneNumber", "==", phoneNumber)
     .limit(1)
     .get();
-  if (!existing.empty) {
+  if (!existingPhone.empty) {
     throw new HttpsError("already-exists", "Bu telefon numarasıyla kayıtlı bir kullanıcı zaten var.");
+  }
+  const existingEmail = await firestore
+    .collection(usersCollection())
+    .where("emailLower", "==", emailLower)
+    .limit(1)
+    .get();
+  if (!existingEmail.empty) {
+    throw new HttpsError("already-exists", "Bu email adresiyle kayıtlı bir kullanıcı zaten var.");
   }
 
   const gymRef = firestore.collection(gymsCollection()).doc();
@@ -109,7 +119,7 @@ export const signupGymAdmin = onCall(async (request) => {
     address,
     timeZone,
     ...(logoUrl !== undefined ? { logoUrl } : {}),
-    ...(reportEmail !== undefined ? { reportEmails: { gym: reportEmail } } : {}),
+    reportEmails: { gym: email },
     themeColors: { primary: themeColorHex },
     // subscriptionStatus artık burada otomatik "trial" yazılmıyor — admin,
     // girişten hemen sonra zorunlu SubscriptionOnboardingPanel'de gerçek bir
@@ -128,6 +138,8 @@ export const signupGymAdmin = onCall(async (request) => {
     role: "admin",
     gymId: gymRef.id,
     phoneNumber,
+    email,
+    emailLower,
   });
 
   return { gymId: gymRef.id };

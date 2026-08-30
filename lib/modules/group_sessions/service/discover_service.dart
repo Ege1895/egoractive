@@ -66,4 +66,5 @@ class DiscoverService {
 }
 
 @riverpod
-DiscoverService discoverService(DiscoverServiceRef ref) => const DiscoverService();
+DiscoverService discoverService(DiscoverServiceRef ref) =>
+    const DiscoverService();

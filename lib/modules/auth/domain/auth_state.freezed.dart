@@ -18,12 +18,14 @@ final _privateConstructorUsedError = UnsupportedError(
 /// @nodoc
 mixin _$AuthState {
   String get phoneDigits => throw _privateConstructorUsedError;
+  String get emailInput => throw _privateConstructorUsedError;
   bool get isRequestingLogin => throw _privateConstructorUsedError;
   String? get loginErrorMessage => throw _privateConstructorUsedError;
 
-  /// Hatanın telefon alanına mı (notFound) yoksa genele mi (rate limit,
-  /// network) ait olduğunu ayırt eder — [PhoneLoginPanel] buna göre
-  /// hatayı field-seviyeli mi yoksa genel bir satır olarak mı gösterir.
+  /// Hatanın identifier alanına mı (notFound — telefon ya da email) yoksa
+  /// genele mi (rate limit, network) ait olduğunu ayırt eder —
+  /// [PhoneLoginPanel]/[EmailLoginPanel] buna göre hatayı field-seviyeli
+  /// mi yoksa genel bir satır olarak mı gösterir.
   AuthLoginErrorReason? get loginErrorReason =>
       throw _privateConstructorUsedError;
   bool get deleteAccountAcknowledged => throw _privateConstructorUsedError;
@@ -44,6 +46,7 @@ abstract class $AuthStateCopyWith<$Res> {
   @useResult
   $Res call({
     String phoneDigits,
+    String emailInput,
     bool isRequestingLogin,
     String? loginErrorMessage,
     AuthLoginErrorReason? loginErrorReason,
@@ -69,6 +72,7 @@ class _$AuthStateCopyWithImpl<$Res, $Val extends AuthState>
   @override
   $Res call({
     Object? phoneDigits = null,
+    Object? emailInput = null,
     Object? isRequestingLogin = null,
     Object? loginErrorMessage = freezed,
     Object? loginErrorReason = freezed,
@@ -81,6 +85,10 @@ class _$AuthStateCopyWithImpl<$Res, $Val extends AuthState>
             phoneDigits: null == phoneDigits
                 ? _value.phoneDigits
                 : phoneDigits // ignore: cast_nullable_to_non_nullable
+                      as String,
+            emailInput: null == emailInput
+                ? _value.emailInput
+                : emailInput // ignore: cast_nullable_to_non_nullable
                       as String,
             isRequestingLogin: null == isRequestingLogin
                 ? _value.isRequestingLogin
@@ -123,6 +131,7 @@ abstract class _$$AuthStateImplCopyWith<$Res>
   @useResult
   $Res call({
     String phoneDigits,
+    String emailInput,
     bool isRequestingLogin,
     String? loginErrorMessage,
     AuthLoginErrorReason? loginErrorReason,
@@ -147,6 +156,7 @@ class __$$AuthStateImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? phoneDigits = null,
+    Object? emailInput = null,
     Object? isRequestingLogin = null,
     Object? loginErrorMessage = freezed,
     Object? loginErrorReason = freezed,
@@ -159,6 +169,10 @@ class __$$AuthStateImplCopyWithImpl<$Res>
         phoneDigits: null == phoneDigits
             ? _value.phoneDigits
             : phoneDigits // ignore: cast_nullable_to_non_nullable
+                  as String,
+        emailInput: null == emailInput
+            ? _value.emailInput
+            : emailInput // ignore: cast_nullable_to_non_nullable
                   as String,
         isRequestingLogin: null == isRequestingLogin
             ? _value.isRequestingLogin
@@ -194,6 +208,7 @@ class __$$AuthStateImplCopyWithImpl<$Res>
 class _$AuthStateImpl extends _AuthState {
   const _$AuthStateImpl({
     this.phoneDigits = '',
+    this.emailInput = '',
     this.isRequestingLogin = false,
     this.loginErrorMessage,
     this.loginErrorReason,
@@ -207,13 +222,17 @@ class _$AuthStateImpl extends _AuthState {
   final String phoneDigits;
   @override
   @JsonKey()
+  final String emailInput;
+  @override
+  @JsonKey()
   final bool isRequestingLogin;
   @override
   final String? loginErrorMessage;
 
-  /// Hatanın telefon alanına mı (notFound) yoksa genele mi (rate limit,
-  /// network) ait olduğunu ayırt eder — [PhoneLoginPanel] buna göre
-  /// hatayı field-seviyeli mi yoksa genel bir satır olarak mı gösterir.
+  /// Hatanın identifier alanına mı (notFound — telefon ya da email) yoksa
+  /// genele mi (rate limit, network) ait olduğunu ayırt eder —
+  /// [PhoneLoginPanel]/[EmailLoginPanel] buna göre hatayı field-seviyeli
+  /// mi yoksa genel bir satır olarak mı gösterir.
   @override
   final AuthLoginErrorReason? loginErrorReason;
   @override
@@ -227,7 +246,7 @@ class _$AuthStateImpl extends _AuthState {
 
   @override
   String toString() {
-    return 'AuthState(phoneDigits: $phoneDigits, isRequestingLogin: $isRequestingLogin, loginErrorMessage: $loginErrorMessage, loginErrorReason: $loginErrorReason, deleteAccountAcknowledged: $deleteAccountAcknowledged, isDeletingAccount: $isDeletingAccount, deleteAccountErrorMessage: $deleteAccountErrorMessage)';
+    return 'AuthState(phoneDigits: $phoneDigits, emailInput: $emailInput, isRequestingLogin: $isRequestingLogin, loginErrorMessage: $loginErrorMessage, loginErrorReason: $loginErrorReason, deleteAccountAcknowledged: $deleteAccountAcknowledged, isDeletingAccount: $isDeletingAccount, deleteAccountErrorMessage: $deleteAccountErrorMessage)';
   }
 
   @override
@@ -237,6 +256,8 @@ class _$AuthStateImpl extends _AuthState {
             other is _$AuthStateImpl &&
             (identical(other.phoneDigits, phoneDigits) ||
                 other.phoneDigits == phoneDigits) &&
+            (identical(other.emailInput, emailInput) ||
+                other.emailInput == emailInput) &&
             (identical(other.isRequestingLogin, isRequestingLogin) ||
                 other.isRequestingLogin == isRequestingLogin) &&
             (identical(other.loginErrorMessage, loginErrorMessage) ||
@@ -261,6 +282,7 @@ class _$AuthStateImpl extends _AuthState {
   int get hashCode => Object.hash(
     runtimeType,
     phoneDigits,
+    emailInput,
     isRequestingLogin,
     loginErrorMessage,
     loginErrorReason,
@@ -281,6 +303,7 @@ class _$AuthStateImpl extends _AuthState {
 abstract class _AuthState extends AuthState {
   const factory _AuthState({
     final String phoneDigits,
+    final String emailInput,
     final bool isRequestingLogin,
     final String? loginErrorMessage,
     final AuthLoginErrorReason? loginErrorReason,
@@ -293,13 +316,16 @@ abstract class _AuthState extends AuthState {
   @override
   String get phoneDigits;
   @override
+  String get emailInput;
+  @override
   bool get isRequestingLogin;
   @override
   String? get loginErrorMessage;
 
-  /// Hatanın telefon alanına mı (notFound) yoksa genele mi (rate limit,
-  /// network) ait olduğunu ayırt eder — [PhoneLoginPanel] buna göre
-  /// hatayı field-seviyeli mi yoksa genel bir satır olarak mı gösterir.
+  /// Hatanın identifier alanına mı (notFound — telefon ya da email) yoksa
+  /// genele mi (rate limit, network) ait olduğunu ayırt eder —
+  /// [PhoneLoginPanel]/[EmailLoginPanel] buna göre hatayı field-seviyeli
+  /// mi yoksa genel bir satır olarak mı gösterir.
   @override
   AuthLoginErrorReason? get loginErrorReason;
   @override

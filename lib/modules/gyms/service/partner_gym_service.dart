@@ -17,9 +17,7 @@ class PartnerGymService {
     final result = await callable.call<Map<String, dynamic>>();
     final rawGyms = (result.data['gyms'] as List<dynamic>?) ?? const [];
     return rawGyms
-        .map(
-          (raw) => _fromMap(Map<String, dynamic>.from(raw as Map)),
-        )
+        .map((raw) => _fromMap(Map<String, dynamic>.from(raw as Map)))
         .toList();
   }
 

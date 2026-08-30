@@ -36,4 +36,5 @@ class FeatureFlags {
 }
 
 @riverpod
-FeatureFlags featureFlags(FeatureFlagsRef ref) => FeatureFlags(ref.watch(remoteConfigServiceProvider));
+FeatureFlags featureFlags(FeatureFlagsRef ref) =>
+    FeatureFlags(ref.watch(remoteConfigServiceProvider));

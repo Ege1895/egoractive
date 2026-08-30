@@ -15,6 +15,39 @@ import '../../../trainers/domain/admin_trainer_summary.dart';
 import '../../service/sessions_write_service.dart';
 import 'repeat_session_calendar_sheet.dart';
 
+const _weekdayShort = {
+  1: 'Pzt',
+  2: 'Sal',
+  3: 'Çar',
+  4: 'Per',
+  5: 'Cum',
+  6: 'Cmt',
+  7: 'Paz',
+};
+
+const _monthShort = {
+  1: 'Oca',
+  2: 'Şub',
+  3: 'Mar',
+  4: 'Nis',
+  5: 'May',
+  6: 'Haz',
+  7: 'Tem',
+  8: 'Ağu',
+  9: 'Eyl',
+  10: 'Eki',
+  11: 'Kas',
+  12: 'Ara',
+};
+
+/// Atlanan günleri bildirimde "3.9" gibi belirsiz bir formatla değil, hangi
+/// gün olduğu tek bakışta anlaşılsın diye "3 Eyl Per" şeklinde gösterir.
+String _formatSkippedDay(DateTime date) =>
+    '${date.day} ${_monthShort[date.month]} ${_weekdayShort[date.weekday]}';
+
+String _formatTimeOfDay(TimeOfDay time) =>
+    '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
+
 /// F3-3 — "+ Seans": üye + antrenör + tarih/saat seçip `sessions`
 /// koleksiyonuna gerçek bir doküman yazar.
 ///
@@ -195,6 +228,13 @@ class _CreateSessionSheetState extends ConsumerState<_CreateSessionSheet> {
     return _member?.unplannedSessions ?? 0;
   }
 
+  /// "3 Eyl Per (antrenör dolu)" gibi — her atlanan günün yanına GERÇEK
+  /// sebebini yazar, hepsini tek bir "antrenör dolu" etiketine indirgemez.
+  String _skippedDayEntry(DateTime date, String reasonKey) {
+    final reason = ref.read(rcTextProvider(reasonKey));
+    return '${_formatSkippedDay(date)} ($reason)';
+  }
+
   void _setDuet(bool value) {
     if (_isDuet == value) return;
     setState(() {
@@ -237,7 +277,11 @@ class _CreateSessionSheetState extends ConsumerState<_CreateSessionSheet> {
 
     // "Tekrarla"dan eklenen ek günler de aynı saatle, ana tarihle birlikte
     // ayrı ayrı oluşturulur — her biri kendi antrenör çakışma kontrolünden
-    // geçer, biri çakışırsa diğerleri yine de oluşturulur.
+    // geçer, biri çakışırsa diğerleri yine de oluşturulur. Her atlanan gün,
+    // KENDİ gerçek sebebiyle birlikte kaydediliyor — önceden hepsi tek bir
+    // "antrenör dolu" mesajına düşüyordu, geçmiş tarih ya da üyenin seans
+    // hakkının bitmesi gibi antrenörle ilgisi olmayan sebepler de yanlışlıkla
+    // "antrenör dolu" gösteriliyordu.
     final allDates = [_date, ..._repeatDates];
     final failedDays = <String>[];
     var anySucceeded = false;
@@ -254,7 +298,12 @@ class _CreateSessionSheetState extends ConsumerState<_CreateSessionSheet> {
         _time.minute,
       );
       if (isPastDatetimeCreationBlocked(ref, startTime)) {
-        failedDays.add('${date.day}.${date.month}');
+        failedDays.add(
+          _skippedDayEntry(
+            date,
+            RemoteConfigKeys.sessionsSkipReasonPastDatetime,
+          ),
+        );
         hasPastDatetime = true;
         continue;
       }
@@ -283,12 +332,22 @@ class _CreateSessionSheetState extends ConsumerState<_CreateSessionSheet> {
         }
         anySucceeded = true;
       } on TrainerConflictException {
-        failedDays.add('${date.day}.${date.month}');
+        failedDays.add(
+          _skippedDayEntry(
+            date,
+            RemoteConfigKeys.sessionsSkipReasonTrainerBusy,
+          ),
+        );
         hasTrainerConflict = true;
       } on InsufficientSessionsException {
         // Bu tarihten itibaren üyenin hakkı bitti — döngünün devamı da
         // aynı sebeple başarısız olacak, o yüzden burada kesiliyor.
-        failedDays.add('${date.day}.${date.month}');
+        failedDays.add(
+          _skippedDayEntry(
+            date,
+            RemoteConfigKeys.sessionsSkipReasonInsufficientSessions,
+          ),
+        );
         ranOutOfSessions = true;
         break;
       } catch (error) {
@@ -297,7 +356,12 @@ class _CreateSessionSheetState extends ConsumerState<_CreateSessionSheet> {
         // sessizce "antrenör dolu" mesajına düşüyordu, gerçek sebebi
         // gizliyordu. debugPrint ile en azından konsolda görünür kalıyor.
         debugPrint('Seans oluşturulamadı ($date): $error');
-        failedDays.add('${date.day}.${date.month}');
+        failedDays.add(
+          _skippedDayEntry(
+            date,
+            RemoteConfigKeys.sessionsSkipReasonUnknownError,
+          ),
+        );
         hasUnknownError = true;
       }
     }
@@ -320,6 +384,8 @@ class _CreateSessionSheetState extends ConsumerState<_CreateSessionSheet> {
                     RemoteConfigKeys.sessionsCreateSkippedDaysSnackbar,
                   ),
                 )
+                .replaceAll('{name}', trainer.name)
+                .replaceAll('{time}', _formatTimeOfDay(_time))
                 .replaceAll('{days}', failedDays.join(', ')),
           ),
           duration: const Duration(seconds: 5),

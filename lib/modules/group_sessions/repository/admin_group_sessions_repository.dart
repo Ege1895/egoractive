@@ -19,6 +19,10 @@ class AdminGroupSessionsRepositoryImpl implements AdminGroupSessionsRepository {
 }
 
 @riverpod
-AdminGroupSessionsRepository adminGroupSessionsRepository(AdminGroupSessionsRepositoryRef ref) {
-  return AdminGroupSessionsRepositoryImpl(ref.watch(adminGroupSessionsServiceProvider));
+AdminGroupSessionsRepository adminGroupSessionsRepository(
+  AdminGroupSessionsRepositoryRef ref,
+) {
+  return AdminGroupSessionsRepositoryImpl(
+    ref.watch(adminGroupSessionsServiceProvider),
+  );
 }

@@ -36,7 +36,8 @@ AppRole? roleFromClaims(Map<String, dynamic>? claims) {
 }
 
 @riverpod
-Stream<User?> authState(AuthStateRef ref) => FirebaseAuth.instance.authStateChanges();
+Stream<User?> authState(AuthStateRef ref) =>
+    FirebaseAuth.instance.authStateChanges();
 
 /// `role` (bu dosyada) ve `gymId` (`theme_controller.dart`'taki
 /// `activeGymIdProvider`) aynı custom claim map'inin iki farklı alanı —

@@ -47,9 +47,8 @@ class _PartnerGymsPanelState extends BasePanelState<PartnerGymsPanel> {
                   Align(
                     alignment: Alignment.centerLeft,
                     child: AppBackButton(
-                      onTap: () => ref
-                          .read(panelStackControllerProvider.notifier)
-                          .pop(),
+                      onTap: () =>
+                          ref.read(panelStackControllerProvider.notifier).pop(),
                     ),
                   ),
                   const SizedBox(height: AppSpacing.lg),
@@ -67,8 +66,7 @@ class _PartnerGymsPanelState extends BasePanelState<PartnerGymsPanel> {
             ),
             Expanded(
               child: gymsAsync.when(
-                loading: () =>
-                    const Center(child: AppLoadingIndicator()),
+                loading: () => const Center(child: AppLoadingIndicator()),
                 error: (error, stackTrace) => Center(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(

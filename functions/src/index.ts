@@ -2,7 +2,12 @@ import { initializeApp } from "firebase-admin/app";
 
 initializeApp();
 
-export { requestCustomToken } from "./callable/request-custom-token";
+export { startLogin } from "./callable/start-login";
+export { verifyLoginOtp } from "./callable/verify-login-otp";
+export { sendEmailSetupOtp } from "./callable/send-email-setup-otp";
+export { verifyEmailSetupOtp } from "./callable/verify-email-setup-otp";
+export { sendEmailChangeOtp } from "./callable/send-email-change-otp";
+export { verifyEmailChangeOtp } from "./callable/verify-email-change-otp";
 export { signupGymAdmin } from "./callable/signup-gym-admin";
 export { deleteAccount } from "./callable/delete-account";
 export { checkPhoneAvailable } from "./callable/check-phone-available";
@@ -12,6 +17,7 @@ export { startMockSubscription } from "./callable/start-mock-subscription";
 export { sendManualNotification } from "./callable/send-manual-notification";
 export { onUserRoleAssigned } from "./triggers/on-user-role-assigned";
 export { onSessionWriteScheduleNotifications } from "./triggers/on-session-write-schedule-notifications";
+export { onSessionWriteUpdateTrainerStats } from "./triggers/on-session-write-update-trainer-stats";
 export { onEventCreated } from "./triggers/on-event-created";
 export { onGroupSessionCreated } from "./triggers/on-group-session-created";
 export { notifyMemberPackageQuota } from "./callable/notify-member-package-quota";

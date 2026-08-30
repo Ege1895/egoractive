@@ -10,6 +10,7 @@ class AdminGroupSession with _$AdminGroupSession {
     required String meta,
     required int taken,
     required int capacity,
+    @Default(false) bool isCancelled,
   }) = _AdminGroupSession;
 
   const AdminGroupSession._();

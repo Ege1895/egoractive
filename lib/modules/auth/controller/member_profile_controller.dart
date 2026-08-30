@@ -27,10 +27,16 @@ Stream<Map<String, dynamic>?> _profileDocForUid(
 @riverpod
 class MemberProfileController extends _$MemberProfileController {
   @override
-  ({String name, String phoneDigits, bool sessionReminderEnabled}) build() {
+  ({String name, String phoneDigits, String email, bool sessionReminderEnabled})
+  build() {
     final uid = ref.watch(authStateProvider).valueOrNull?.uid;
     if (uid == null) {
-      return (name: '', phoneDigits: '', sessionReminderEnabled: true);
+      return (
+        name: '',
+        phoneDigits: '',
+        email: '',
+        sessionReminderEnabled: true,
+      );
     }
 
     final data = ref.watch(_profileDocForUidProvider(uid)).valueOrNull;
@@ -39,6 +45,7 @@ class MemberProfileController extends _$MemberProfileController {
     return (
       name: name,
       phoneDigits: phoneDigits,
+      email: (data?['email'] as String?) ?? '',
       sessionReminderEnabled:
           (data?['sessionReminderEnabled'] as bool?) ?? true,
     );

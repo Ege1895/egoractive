@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../modules/auth/repository/auth_repository.dart';
 import '../../modules/subscription/controller/subscription_controller.dart';
 import '../../modules/subscription/domain/subscription_state.dart';
 import '../remote_config/remote_config_service.dart';
@@ -14,6 +15,12 @@ part 'app_access.g.dart';
 enum AppAccessKind {
   /// Oturum yok (ya da rol/claim geçersiz) — girişe dönülür.
   signedOut,
+
+  /// Egoractive Authentication Sistemi §6 — oturum açık ama
+  /// `users/{uid}.email` boş (admin tarafından oluşturulmuş, hiç aktive
+  /// olmamış bir hesap ya da email eklenmemiş eski bir hesap). Role/salon
+  /// kontrolünden ÖNCE gelir — email zorunlu kimlik parçası olduğu için.
+  emailSetupRequired,
 
   /// Antrenör/üye, salonun aboneliği `trial`/`active` değilken oturumu
   /// açık kalmış (ör. uygulama açıkken abonelik sona erdi) — çıkış
@@ -55,6 +62,18 @@ Stream<AppAccess> appAccess(AppAccessRef ref) async* {
   debugPrint('[appAccess] role=$role');
   if (role == null) {
     yield (kind: AppAccessKind.signedOut, role: null);
+    return;
+  }
+
+  // Egoractive Authentication Sistemi §6 — email custom claim olmadığı için
+  // (sadece OTP doğrulaması sonrası Cloud Function tarafından yazılan bir
+  // Firestore alanı) tek seferlik bir okuma yeterli; `EmailSetupPanel`
+  // doğrulama başarılı olunca bu provider'ı `ref.invalidate` ile elle
+  // tazeler (bkz. `otp_verification_panel.dart`).
+  final email = await ref.watch(currentUserEmailProvider.future);
+  debugPrint('[appAccess] email=${email == null ? null : "set"}');
+  if (email == null) {
+    yield (kind: AppAccessKind.emailSetupRequired, role: role);
     return;
   }
 

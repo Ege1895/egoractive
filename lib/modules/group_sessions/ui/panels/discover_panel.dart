@@ -2,11 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/app_spacing.dart';
+import '../../../../core/panels/panel_stack_controller.dart';
 import '../../../../core/remote_config/feature_flags.dart';
 import '../../../../core/remote_config/remote_config_service.dart';
+import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../events/ui/panels/event_detail_panel.dart';
 import '../../controller/discover_controller.dart';
 import '../../domain/discover_item.dart';
+import 'group_session_detail_panel.dart';
 
 /// Üye 5 · Keşfet — grup dersleri / etkinlikler.
 class DiscoverPanel extends ConsumerStatefulWidget {
@@ -18,7 +22,6 @@ class DiscoverPanel extends ConsumerStatefulWidget {
 
 class _DiscoverPanelState extends ConsumerState<DiscoverPanel> {
   DiscoverCategory _category = DiscoverCategory.groupSessions;
-  final Set<String> _pendingIds = {};
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +35,10 @@ class _DiscoverPanelState extends ConsumerState<DiscoverPanel> {
         .watch(discoverControllerProvider)
         .where((i) => i.category == category)
         .toList();
-    final controller = ref.read(discoverControllerProvider.notifier);
+    // Antrenörler sadece görüntüler — kontenjan dolu olsa bile detay sayfası
+    // her zaman açılabilir, sadece katılım akışı yok (bkz. detay panelleri).
+    final isTrainer =
+        ref.watch(currentRoleProvider).valueOrNull == AppRole.trainer;
 
     return Scaffold(
       body: SafeArea(
@@ -134,9 +140,9 @@ class _DiscoverPanelState extends ConsumerState<DiscoverPanel> {
                         for (final item in items)
                           _DiscoverCard(
                             item: item,
-                            isPending: _pendingIds.contains(item.id),
-                            onToggleJoin: () =>
-                                _onToggleJoin(item.id, controller),
+                            onTap: (!isTrainer && item.isFull)
+                                ? null
+                                : () => _openDetail(item),
                           ),
                       ],
                     ),
@@ -147,46 +153,17 @@ class _DiscoverPanelState extends ConsumerState<DiscoverPanel> {
     );
   }
 
-  /// Firestore yazması bitene kadar (network gecikmesi dahil) düğme
-  /// gösterge olmadan öylece duruyordu — üye "hiçbir şey olmadı" sanıp
-  /// birden fazla kez dokunuyordu. `_pendingIds`, sadece dokunulan
-  /// kartın düğmesini geçici olarak devre dışı bırakıp bir spinner
-  /// gösteriyor.
-  Future<void> _onToggleJoin(
-    String itemId,
-    DiscoverController controller,
-  ) async {
-    setState(() => _pendingIds.add(itemId));
-    try {
-      await _handleToggleJoin(context, () => controller.toggleJoin(itemId));
-    } finally {
-      if (mounted) setState(() => _pendingIds.remove(itemId));
+  /// Üye için dolu kontenjanlı bir öğenin detay sayfası hiç açılmaz —
+  /// [_DiscoverCard]'a `onTap: null` geçilerek engellenir, buraya hiç
+  /// gelinmez. Antrenör için bu kısıtlama yok (bkz. `isTrainer`) — sadece
+  /// görüntüler, kontenjan doluluğundan bağımsız her zaman açabilir.
+  void _openDetail(DiscoverItem item) {
+    final panelStack = ref.read(panelStackControllerProvider.notifier);
+    if (item.category == DiscoverCategory.groupSessions) {
+      panelStack.push(GroupSessionDetailPanel(groupSessionId: item.id));
+    } else {
+      panelStack.push(EventDetailPanel(eventId: item.id));
     }
-  }
-}
-
-/// Katıl/ayrıl hatası (kontenjan dolu, network) daha önce sessizce
-/// yutuluyordu — üye butona basıyor, hiçbir şey olmuyordu. Artık kısa bir
-/// snackbar ile açıklanıyor.
-Future<void> _handleToggleJoin(
-  BuildContext context,
-  Future<void> Function() action,
-) async {
-  try {
-    await action();
-  } catch (error) {
-    if (!context.mounted) return;
-    final container = ProviderScope.containerOf(context);
-    final message = error is StateError && error.message == 'Kontenjan doldu.'
-        ? container.read(
-            rcTextProvider(RemoteConfigKeys.groupSessionsJoinFullErrorSnackbar),
-          )
-        : container.read(
-            rcTextProvider(RemoteConfigKeys.groupSessionsJoinFailedSnackbar),
-          );
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(message)));
   }
 }
 
@@ -226,16 +203,15 @@ class _CategoryTab extends StatelessWidget {
   }
 }
 
+/// Egoractive Keşfet ekranı — kart artık katıl/vazgeç düğmesi içermiyor,
+/// sadece özet bilgi + detay sayfasına giden bir ok. Katılım işlemi
+/// [GroupSessionDetailPanel]/[EventDetailPanel]'e taşındı. Kontenjanı dolu
+/// bir öğenin oku gösterilmez, kart tıklanamaz — detay sayfası hiç açılmaz.
 class _DiscoverCard extends ConsumerWidget {
-  const _DiscoverCard({
-    required this.item,
-    required this.isPending,
-    required this.onToggleJoin,
-  });
+  const _DiscoverCard({required this.item, required this.onTap});
 
   final DiscoverItem item;
-  final bool isPending;
-  final VoidCallback onToggleJoin;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -267,180 +243,140 @@ class _DiscoverCard extends ConsumerWidget {
       );
     }
 
-    final String btnLabel;
-    final Color btnBg;
-    final Color btnFg;
-    if (item.isFull && !item.joined) {
-      btnLabel = ref.watch(
-        rcTextProvider(RemoteConfigKeys.groupSessionsWaitlistJoinButton),
-      );
-      btnBg = colors.surfaceRaised;
-      btnFg = colors.onSurfaceVariant;
-    } else if (item.joined && !item.canLeave) {
-      btnLabel = ref.watch(
-        rcTextProvider(RemoteConfigKeys.groupSessionsJoinedLockedButton),
-      );
-      btnBg = colors.primaryContainer;
-      btnFg = colors.onPrimaryContainer;
-    } else if (item.joined) {
-      btnLabel = ref.watch(
-        rcTextProvider(RemoteConfigKeys.groupSessionsJoinedLeaveButton),
-      );
-      btnBg = colors.primaryContainer;
-      btnFg = colors.onPrimaryContainer;
-    } else {
-      btnLabel = ref.watch(
-        rcTextProvider(RemoteConfigKeys.groupSessionsJoinButton),
-      );
-      btnBg = colors.primary;
-      btnFg = colors.onPrimary;
-    }
-
-    return Container(
-      margin: const EdgeInsets.only(bottom: AppSpacing.md),
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      decoration: BoxDecoration(
-        color: colors.surface,
+    return Material(
+      color: colors.surface,
+      borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
+      child: InkWell(
+        onTap: onTap,
         borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
-        border: Border.all(color: colors.outline),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+        child: Container(
+          margin: const EdgeInsets.only(bottom: AppSpacing.md),
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
+            border: Border.all(color: colors.outline),
+          ),
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                width: 48,
-                padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
-                decoration: BoxDecoration(
-                  color: colors.surfaceRaised,
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
-                ),
-                child: Column(
-                  children: [
-                    Text(
-                      item.day,
-                      style: typography.dataMedium.copyWith(
-                        color: colors.onSurface,
-                        fontSize: 20,
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    width: 48,
+                    padding: const EdgeInsets.symmetric(
+                      vertical: AppSpacing.sm,
+                    ),
+                    decoration: BoxDecoration(
+                      color: colors.surfaceRaised,
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusInner,
                       ),
                     ),
-                    Text(
-                      item.month,
-                      style: typography.caption.copyWith(
-                        color: colors.onSurfaceMuted,
-                        fontSize: 11,
-                      ),
+                    child: Column(
+                      children: [
+                        Text(
+                          item.day,
+                          style: typography.dataMedium.copyWith(
+                            color: colors.onSurface,
+                            fontSize: 20,
+                          ),
+                        ),
+                        Text(
+                          item.month,
+                          style: typography.caption.copyWith(
+                            color: colors.onSurfaceMuted,
+                            fontSize: 11,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.md),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          item.title,
+                          style: typography.headingSmall.copyWith(
+                            color: colors.onSurface,
+                          ),
+                        ),
+                        Text(
+                          item.meta,
+                          style: typography.bodyMedium.copyWith(
+                            color: colors.onSurfaceVariant,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  if (onTap != null) ...[
+                    const SizedBox(width: AppSpacing.sm),
+                    Icon(
+                      Icons.chevron_right,
+                      color: colors.onSurfaceMuted,
+                      size: 22,
                     ),
                   ],
-                ),
+                ],
               ),
-              const SizedBox(width: AppSpacing.md),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      item.title,
-                      style: typography.headingSmall.copyWith(
-                        color: colors.onSurface,
-                      ),
-                    ),
-                    Text(
-                      item.meta,
+              const SizedBox(height: AppSpacing.md),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      capacity == null
+                          ? ref
+                                .watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys
+                                        .groupSessionsAttendingCountNoCapacity,
+                                  ),
+                                )
+                                .replaceAll('{taken}', '${item.taken}')
+                          : ref
+                                .watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys
+                                        .groupSessionsAttendingCountWithCapacity,
+                                  ),
+                                )
+                                .replaceAll('{taken}', '${item.taken}')
+                                .replaceAll('{capacity}', '$capacity'),
                       style: typography.bodyMedium.copyWith(
                         color: colors.onSurfaceVariant,
                         fontSize: 13,
                       ),
                     ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.md),
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  capacity == null
-                      ? ref
-                            .watch(
-                              rcTextProvider(
-                                RemoteConfigKeys
-                                    .groupSessionsAttendingCountNoCapacity,
-                              ),
-                            )
-                            .replaceAll('{taken}', '${item.taken}')
-                      : ref
-                            .watch(
-                              rcTextProvider(
-                                RemoteConfigKeys
-                                    .groupSessionsAttendingCountWithCapacity,
-                              ),
-                            )
-                            .replaceAll('{taken}', '${item.taken}')
-                            .replaceAll('{capacity}', '$capacity'),
-                  style: typography.bodyMedium.copyWith(
-                    color: colors.onSurfaceVariant,
-                    fontSize: 13,
                   ),
-                ),
+                  const SizedBox(width: AppSpacing.sm),
+                  Text(
+                    capNote,
+                    style: typography.headingSmall.copyWith(
+                      color: capFg,
+                      fontSize: 13,
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(width: AppSpacing.sm),
-              Text(
-                capNote,
-                style: typography.headingSmall.copyWith(
-                  color: capFg,
-                  fontSize: 13,
+              const SizedBox(height: AppSpacing.xs),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
+                child: LinearProgressIndicator(
+                  value: capacity == null
+                      ? 0
+                      : (item.taken / capacity).clamp(0, 1),
+                  minHeight: 6,
+                  backgroundColor: colors.surfaceRaised,
+                  valueColor: AlwaysStoppedAnimation(barColor),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: AppSpacing.xs),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
-            child: LinearProgressIndicator(
-              value: capacity == null ? 0 : (item.taken / capacity).clamp(0, 1),
-              minHeight: 6,
-              backgroundColor: colors.surfaceRaised,
-              valueColor: AlwaysStoppedAnimation(barColor),
-            ),
-          ),
-          const SizedBox(height: AppSpacing.md),
-          Material(
-            color: btnBg,
-            borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
-            child: InkWell(
-              onTap: (isPending || (item.joined && !item.canLeave))
-                  ? null
-                  : onToggleJoin,
-              borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
-              child: Container(
-                width: double.infinity,
-                constraints: const BoxConstraints(minHeight: 48),
-                alignment: Alignment.center,
-                child: isPending
-                    ? SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation(btnFg),
-                        ),
-                      )
-                    : Text(
-                        btnLabel,
-                        style: typography.headingSmall.copyWith(
-                          fontSize: 15,
-                          color: btnFg,
-                        ),
-                      ),
-              ),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }

@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -14,9 +15,13 @@ import '../../../../shared/widgets/app_text_field.dart';
 import '../../../../shared/widgets/native_date_picker.dart';
 import '../../service/events_write_service.dart';
 
-/// Admin 13 · Etkinlik Oluştur — lokasyon, tarih/saat, kontenjan.
+/// Admin 13 · Etkinlik Oluştur — lokasyon, tarih/saat, kontenjan. [eventId]
+/// verilirse düzenleme moduna geçer: mevcut etkinlik yüklenir, en altta
+/// "İptal Et" görünür.
 class CreateEventPanel extends BasePanel {
-  const CreateEventPanel({super.key});
+  const CreateEventPanel({super.key, this.eventId});
+
+  final String? eventId;
 
   @override
   ConsumerState<CreateEventPanel> createState() => _CreateEventPanelState();
@@ -33,9 +38,59 @@ class _CreateEventPanelState extends BasePanelState<CreateEventPanel> {
   TimeOfDay? _selectedTime;
   int? _capacity;
   bool _isSaving = false;
+  bool _isCancelling = false;
+  bool _isLoadingForEdit = false;
   String? _nameError;
   String? _dateError;
   String? _errorMessage;
+
+  bool get _isEditing => widget.eventId != null;
+
+  @override
+  void initState() {
+    super.initState();
+    final id = widget.eventId;
+    if (id != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _loadForEdit(id));
+    }
+  }
+
+  Future<void> _loadForEdit(String eventId) async {
+    setState(() => _isLoadingForEdit = true);
+    try {
+      final doc = await FirebaseFirestore.instance
+          .collection('events')
+          .doc(eventId)
+          .get();
+      final data = doc.data();
+      if (!mounted) return;
+      if (data == null) {
+        setState(() {
+          _isLoadingForEdit = false;
+          _errorMessage = 'Etkinlik bulunamadı.';
+        });
+        return;
+      }
+      final dateTime = (data['dateTime'] as Timestamp).toDate();
+      _nameController.text = (data['name'] as String?) ?? '';
+      _locationController.text = (data['location'] as String?) ?? '';
+      _descriptionController.text = (data['description'] as String?) ?? '';
+      _selectedDate = DateTime(dateTime.year, dateTime.month, dateTime.day);
+      _selectedTime = TimeOfDay.fromDateTime(dateTime);
+      _dateController.text = _formatDate(_selectedDate!);
+      _timeController.text = _formatTime(_selectedTime!);
+      setState(() {
+        _capacity = (data['capacity'] as num?)?.toInt();
+        _isLoadingForEdit = false;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _isLoadingForEdit = false;
+        _errorMessage = 'Etkinlik yüklenemedi, tekrar dene.';
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -59,7 +114,11 @@ class _CreateEventPanelState extends BasePanelState<CreateEventPanel> {
                   Expanded(
                     child: Text(
                       ref.watch(
-                        rcTextProvider(RemoteConfigKeys.eventsCreateTitle),
+                        rcTextProvider(
+                          _isEditing
+                              ? RemoteConfigKeys.eventsEditTitle
+                              : RemoteConfigKeys.eventsCreateTitle,
+                        ),
                       ),
                       style: typography.headingSmall.copyWith(
                         color: colors.onSurface,
@@ -318,10 +377,12 @@ class _CreateEventPanelState extends BasePanelState<CreateEventPanel> {
                           )
                         : ref.watch(
                             rcTextProvider(
-                              RemoteConfigKeys.eventsCreateSubmitButton,
+                              _isEditing
+                                  ? RemoteConfigKeys.eventsEditSubmitButton
+                                  : RemoteConfigKeys.eventsCreateSubmitButton,
                             ),
                           ),
-                    onPressed: _isSaving
+                    onPressed: _isSaving || _isCancelling || _isLoadingForEdit
                         ? null
                         : () async {
                             final name = _nameController.text.trim();
@@ -397,17 +458,31 @@ class _CreateEventPanelState extends BasePanelState<CreateEventPanel> {
                                 });
                                 return;
                               }
-                              await ref
-                                  .read(eventsWriteServiceProvider)
-                                  .createEvent(
-                                    gymId: gymId,
-                                    name: name,
-                                    location: _locationController.text.trim(),
-                                    dateTime: dateTime!,
-                                    description: _descriptionController.text
-                                        .trim(),
-                                    capacity: _capacity,
-                                  );
+                              final service = ref.read(
+                                eventsWriteServiceProvider,
+                              );
+                              final editingId = widget.eventId;
+                              if (editingId != null) {
+                                await service.updateEvent(
+                                  eventId: editingId,
+                                  name: name,
+                                  location: _locationController.text.trim(),
+                                  dateTime: dateTime!,
+                                  description: _descriptionController.text
+                                      .trim(),
+                                  capacity: _capacity,
+                                );
+                              } else {
+                                await service.createEvent(
+                                  gymId: gymId,
+                                  name: name,
+                                  location: _locationController.text.trim(),
+                                  dateTime: dateTime!,
+                                  description: _descriptionController.text
+                                      .trim(),
+                                  capacity: _capacity,
+                                );
+                              }
                               if (mounted) {
                                 ref
                                     .read(panelStackControllerProvider.notifier)
@@ -427,6 +502,50 @@ class _CreateEventPanelState extends BasePanelState<CreateEventPanel> {
                             }
                           },
                   ),
+                  if (_isEditing) ...[
+                    const SizedBox(height: AppSpacing.sm),
+                    _CancelButton(
+                      label: _isCancelling
+                          ? ref.watch(
+                              rcTextProvider(
+                                RemoteConfigKeys.gymsGymSetupSubmittingLabel,
+                              ),
+                            )
+                          : ref.watch(
+                              rcTextProvider(
+                                RemoteConfigKeys.groupSessionsCancelButton,
+                              ),
+                            ),
+                      onPressed: _isSaving || _isCancelling || _isLoadingForEdit
+                          ? null
+                          : () async {
+                              setState(() {
+                                _isCancelling = true;
+                                _errorMessage = null;
+                              });
+                              try {
+                                await ref
+                                    .read(eventsWriteServiceProvider)
+                                    .cancelEvent(widget.eventId!);
+                                if (mounted) {
+                                  ref
+                                      .read(
+                                        panelStackControllerProvider.notifier,
+                                      )
+                                      .pop();
+                                }
+                              } catch (_) {
+                                if (mounted) {
+                                  setState(() {
+                                    _isCancelling = false;
+                                    _errorMessage =
+                                        'İptal edilemedi, tekrar dene.';
+                                  });
+                                }
+                              }
+                            },
+                    ),
+                  ],
                 ],
               ),
             ),
@@ -489,6 +608,45 @@ class _StepButton extends StatelessWidget {
             icon,
             color: filled ? colors.onPrimary : colors.onSurfaceVariant,
             size: 18,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Sadece düzenleme modunda görünür — etkinliği listeden kaldırmaz, `status:
+/// cancelled` ile işaretler (bkz. `EventsWriteService.cancelEvent`).
+class _CancelButton extends StatelessWidget {
+  const _CancelButton({required this.label, required this.onPressed});
+
+  final String label;
+  final VoidCallback? onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+    final typography = context.appTypography;
+    final disabled = onPressed == null;
+
+    return Material(
+      color: colors.errorContainer,
+      borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+      child: InkWell(
+        onTap: onPressed,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+        child: Container(
+          constraints: const BoxConstraints(
+            minHeight: AppSpacing.primaryActionHeight,
+          ),
+          width: double.infinity,
+          alignment: Alignment.center,
+          child: Text(
+            label,
+            style: typography.headingSmall.copyWith(
+              fontSize: 15,
+              color: disabled ? colors.onSurfaceMuted : colors.error,
+            ),
           ),
         ),
       ),

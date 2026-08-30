@@ -51,6 +51,7 @@ GymEvent _toGymEvent(QueryDocumentSnapshot<Map<String, dynamic>> doc) {
     meta: '${(data['location'] as String?) ?? ''} · $time',
     joined: attendeeIds.length,
     capacity: (data['capacity'] as num?)?.toInt(),
+    isCancelled: (data['status'] as String?) == 'cancelled',
   );
 }
 

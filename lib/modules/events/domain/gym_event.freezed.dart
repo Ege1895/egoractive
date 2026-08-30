@@ -25,6 +25,7 @@ mixin _$GymEvent {
   String get meta => throw _privateConstructorUsedError;
   int get joined => throw _privateConstructorUsedError;
   int? get capacity => throw _privateConstructorUsedError;
+  bool get isCancelled => throw _privateConstructorUsedError;
 
   /// Create a copy of GymEvent
   /// with the given fields replaced by the non-null parameter values.
@@ -47,6 +48,7 @@ abstract class $GymEventCopyWith<$Res> {
     String meta,
     int joined,
     int? capacity,
+    bool isCancelled,
   });
 }
 
@@ -73,6 +75,7 @@ class _$GymEventCopyWithImpl<$Res, $Val extends GymEvent>
     Object? meta = null,
     Object? joined = null,
     Object? capacity = freezed,
+    Object? isCancelled = null,
   }) {
     return _then(
       _value.copyWith(
@@ -108,6 +111,10 @@ class _$GymEventCopyWithImpl<$Res, $Val extends GymEvent>
                 ? _value.capacity
                 : capacity // ignore: cast_nullable_to_non_nullable
                       as int?,
+            isCancelled: null == isCancelled
+                ? _value.isCancelled
+                : isCancelled // ignore: cast_nullable_to_non_nullable
+                      as bool,
           )
           as $Val,
     );
@@ -132,6 +139,7 @@ abstract class _$$GymEventImplCopyWith<$Res>
     String meta,
     int joined,
     int? capacity,
+    bool isCancelled,
   });
 }
 
@@ -157,6 +165,7 @@ class __$$GymEventImplCopyWithImpl<$Res>
     Object? meta = null,
     Object? joined = null,
     Object? capacity = freezed,
+    Object? isCancelled = null,
   }) {
     return _then(
       _$GymEventImpl(
@@ -192,6 +201,10 @@ class __$$GymEventImplCopyWithImpl<$Res>
             ? _value.capacity
             : capacity // ignore: cast_nullable_to_non_nullable
                   as int?,
+        isCancelled: null == isCancelled
+            ? _value.isCancelled
+            : isCancelled // ignore: cast_nullable_to_non_nullable
+                  as bool,
       ),
     );
   }
@@ -209,6 +222,7 @@ class _$GymEventImpl extends _GymEvent {
     required this.meta,
     required this.joined,
     this.capacity,
+    this.isCancelled = false,
   }) : super._();
 
   @override
@@ -227,10 +241,13 @@ class _$GymEventImpl extends _GymEvent {
   final int joined;
   @override
   final int? capacity;
+  @override
+  @JsonKey()
+  final bool isCancelled;
 
   @override
   String toString() {
-    return 'GymEvent(id: $id, name: $name, location: $location, day: $day, month: $month, meta: $meta, joined: $joined, capacity: $capacity)';
+    return 'GymEvent(id: $id, name: $name, location: $location, day: $day, month: $month, meta: $meta, joined: $joined, capacity: $capacity, isCancelled: $isCancelled)';
   }
 
   @override
@@ -247,7 +264,9 @@ class _$GymEventImpl extends _GymEvent {
             (identical(other.meta, meta) || other.meta == meta) &&
             (identical(other.joined, joined) || other.joined == joined) &&
             (identical(other.capacity, capacity) ||
-                other.capacity == capacity));
+                other.capacity == capacity) &&
+            (identical(other.isCancelled, isCancelled) ||
+                other.isCancelled == isCancelled));
   }
 
   @override
@@ -261,6 +280,7 @@ class _$GymEventImpl extends _GymEvent {
     meta,
     joined,
     capacity,
+    isCancelled,
   );
 
   /// Create a copy of GymEvent
@@ -282,6 +302,7 @@ abstract class _GymEvent extends GymEvent {
     required final String meta,
     required final int joined,
     final int? capacity,
+    final bool isCancelled,
   }) = _$GymEventImpl;
   const _GymEvent._() : super._();
 
@@ -301,6 +322,8 @@ abstract class _GymEvent extends GymEvent {
   int get joined;
   @override
   int? get capacity;
+  @override
+  bool get isCancelled;
 
   /// Create a copy of GymEvent
   /// with the given fields replaced by the non-null parameter values.

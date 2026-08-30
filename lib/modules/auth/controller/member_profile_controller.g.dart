@@ -152,7 +152,7 @@ class _ProfileDocForUidProviderElement
 }
 
 String _$memberProfileControllerHash() =>
-    r'e4c1686f8a8ffccc6adfd4c4ec18f47f0215fcb7';
+    r'4043beb30882bce6515f601e6b6cab23953c986e';
 
 /// [ProfilePanel]'in üst kartındaki gerçek kullanıcı adı/telefonu —
 /// önceden `MemberMockProfile`'dan sabit ("Ayşe Yılmaz") değer geliyordu,
@@ -167,7 +167,12 @@ String _$memberProfileControllerHash() =>
 final memberProfileControllerProvider =
     AutoDisposeNotifierProvider<
       MemberProfileController,
-      ({String name, String phoneDigits, bool sessionReminderEnabled})
+      ({
+        String name,
+        String phoneDigits,
+        String email,
+        bool sessionReminderEnabled,
+      })
     >.internal(
       MemberProfileController.new,
       name: r'memberProfileControllerProvider',
@@ -180,7 +185,12 @@ final memberProfileControllerProvider =
 
 typedef _$MemberProfileController =
     AutoDisposeNotifier<
-      ({String name, String phoneDigits, bool sessionReminderEnabled})
+      ({
+        String name,
+        String phoneDigits,
+        String email,
+        bool sessionReminderEnabled,
+      })
     >;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

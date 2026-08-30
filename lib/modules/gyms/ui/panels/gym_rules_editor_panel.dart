@@ -67,7 +67,9 @@ class _GymRulesEditorPanelState extends BasePanelState<GymRulesEditorPanel> {
     if (_isOverLimit) {
       setState(
         () => _errorMessage = ref
-            .read(rcTextProvider(RemoteConfigKeys.gymsRulesEditorMaxLengthError))
+            .read(
+              rcTextProvider(RemoteConfigKeys.gymsRulesEditorMaxLengthError),
+            )
             .replaceAll('{max}', '$_maxChars'),
       );
       return;

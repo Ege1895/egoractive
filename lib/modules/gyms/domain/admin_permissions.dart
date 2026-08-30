@@ -6,16 +6,17 @@ enum TrainerReminderDelay { fifteenMinutes, thirtyMinutes, oneHour }
 
 extension TrainerReminderDelayLabel on TrainerReminderDelay {
   String get label => switch (this) {
-        TrainerReminderDelay.fifteenMinutes => '15 dakika',
-        TrainerReminderDelay.thirtyMinutes => '30 dakika',
-        TrainerReminderDelay.oneHour => '1 saat',
-      };
+    TrainerReminderDelay.fifteenMinutes => '15 dakika',
+    TrainerReminderDelay.thirtyMinutes => '30 dakika',
+    TrainerReminderDelay.oneHour => '1 saat',
+  };
 }
 
 @freezed
 class AdminPermissions with _$AdminPermissions {
   const factory AdminPermissions({
-    @Default(TrainerReminderDelay.thirtyMinutes) TrainerReminderDelay trainerReminderDelay,
+    @Default(TrainerReminderDelay.thirtyMinutes)
+    TrainerReminderDelay trainerReminderDelay,
 
     /// Antrenör, üyelerinin seanslarını iptal edebilir mi —
     /// `firestore.rules`'taki `trainerPermission('canCancelMemberSessions')`

@@ -19,6 +19,10 @@ class CreateGroupSessionRepositoryImpl implements CreateGroupSessionRepository {
 }
 
 @riverpod
-CreateGroupSessionRepository createGroupSessionRepository(CreateGroupSessionRepositoryRef ref) {
-  return CreateGroupSessionRepositoryImpl(ref.watch(createGroupSessionServiceProvider));
+CreateGroupSessionRepository createGroupSessionRepository(
+  CreateGroupSessionRepositoryRef ref,
+) {
+  return CreateGroupSessionRepositoryImpl(
+    ref.watch(createGroupSessionServiceProvider),
+  );
 }

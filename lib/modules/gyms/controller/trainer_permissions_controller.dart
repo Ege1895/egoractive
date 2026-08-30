@@ -71,15 +71,14 @@ class TrainerPermissionsController extends _$TrainerPermissionsController {
     optimistic: state.copyWith(trainerReminderDelay: delay),
   );
 
-  Future<void> toggleCanCancelMemberSessions(List<String> trainerIds) =>
-      _apply(
-        trainerIds,
-        field: 'canCancelMemberSessions',
-        value: !state.canCancelMemberSessions,
-        optimistic: state.copyWith(
-          canCancelMemberSessions: !state.canCancelMemberSessions,
-        ),
-      );
+  Future<void> toggleCanCancelMemberSessions(List<String> trainerIds) => _apply(
+    trainerIds,
+    field: 'canCancelMemberSessions',
+    value: !state.canCancelMemberSessions,
+    optimistic: state.copyWith(
+      canCancelMemberSessions: !state.canCancelMemberSessions,
+    ),
+  );
 
   Future<void> toggleCanRescheduleMemberSessions(List<String> trainerIds) =>
       _apply(

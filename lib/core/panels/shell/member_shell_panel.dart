@@ -32,7 +32,8 @@ class _MemberShellPanelState extends BasePanelState<MemberShellPanel> {
           // F6-2 — "Ana Sayfa"ya dokunmak, interstitial reklam için doğal
           // bir geçiş anı sayılır (politika: timer ile değil geçiş anında).
           onTabSelected: (index) {
-            if (index == 0) ref.read(homeReturnSignalProvider.notifier).notify();
+            if (index == 0)
+              ref.read(homeReturnSignalProvider.notifier).notify();
           },
         ),
         const AdInterstitialGate(),

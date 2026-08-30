@@ -49,6 +49,7 @@ AdminGroupSession _toAdminGroupSession(
         '${(data['trainerName'] as String?) ?? ''} · ${_weekdayNames[startTime.weekday]} $time',
     taken: attendeeIds.length,
     capacity: (data['capacity'] as num?)?.toInt() ?? 0,
+    isCancelled: (data['status'] as String?) == 'cancelled',
   );
 }
 

@@ -19,6 +19,10 @@ class TrainerCalendarRepositoryImpl implements TrainerCalendarRepository {
 }
 
 @riverpod
-TrainerCalendarRepository trainerCalendarRepository(TrainerCalendarRepositoryRef ref) {
-  return TrainerCalendarRepositoryImpl(ref.watch(trainerCalendarServiceProvider));
+TrainerCalendarRepository trainerCalendarRepository(
+  TrainerCalendarRepositoryRef ref,
+) {
+  return TrainerCalendarRepositoryImpl(
+    ref.watch(trainerCalendarServiceProvider),
+  );
 }

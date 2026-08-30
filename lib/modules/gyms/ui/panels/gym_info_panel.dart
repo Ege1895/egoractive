@@ -17,6 +17,9 @@ import '../../../../shared/utils/phone_number_formatter.dart';
 import '../../../../shared/widgets/app_back_button.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_text_field.dart';
+import '../../../auth/domain/otp_purpose.dart';
+import '../../../auth/repository/auth_repository.dart';
+import '../../../auth/ui/panels/otp_verification_panel.dart';
 import '../../../reports/controller/report_recipients_controller.dart';
 import '../../../reports/domain/report_recipients.dart';
 import '../../controller/gym_profile_controller.dart';
@@ -37,14 +40,16 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
   late final TextEditingController _nameController;
   late final TextEditingController _addressController;
   late final TextEditingController _phoneController;
-  late final TextEditingController _gymReportEmailController;
+  late final TextEditingController _emailController;
 
   bool _isSaving = false;
   bool _hydratedFromProfile = false;
   bool _hydratedFromRecipients = false;
+  String _originalEmail = '';
   String? _nameError;
   String? _addressError;
   String? _phoneError;
+  String? _emailError;
   String? _saveErrorMessage;
 
   XFile? _pickedLogoFile;
@@ -71,9 +76,8 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
     );
 
     final recipients = ref.read(reportRecipientsControllerProvider);
-    _gymReportEmailController = TextEditingController(
-      text: recipients.gymReportEmail,
-    );
+    _emailController = TextEditingController(text: recipients.gymReportEmail);
+    _originalEmail = recipients.gymReportEmail;
 
     // `GymThemeController`, kendi altındaki `_themeStateForGymProvider`
     // stream'i (autoDispose, bu panel ilk açıldığında soğuk başlıyor) henüz
@@ -120,7 +124,8 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
     // her zaman boş görünüyordu. Gerçek veri geldiğinde bir kez doldurulur.
     if (!_hydratedFromRecipients && recipientsState.gymReportEmail.isNotEmpty) {
       _hydratedFromRecipients = true;
-      _gymReportEmailController.text = recipientsState.gymReportEmail;
+      _emailController.text = recipientsState.gymReportEmail;
+      _originalEmail = recipientsState.gymReportEmail;
     }
 
     if (_pickedLogoFile == null &&
@@ -215,6 +220,27 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
                           inputFormatters: [TrPhoneNumberInputFormatter()],
                           errorText: _phoneError,
                           onChanged: profileController.updatePhone,
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+                        AppTextField(
+                          label: ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.gymsGymInfoLoginReportEmailLabel,
+                            ),
+                          ),
+                          hint: ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.gymsGymInfoGymReportEmailHint,
+                            ),
+                          ),
+                          keyboardType: TextInputType.emailAddress,
+                          controller: _emailController,
+                          errorText: _emailError,
+                          onChanged: (_) {
+                            if (_emailError != null) {
+                              setState(() => _emailError = null);
+                            }
+                          },
                         ),
                       ],
                     ),
@@ -511,71 +537,16 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: AppSpacing.lg),
-                  Text(
-                    ref.watch(
-                      rcTextProvider(
-                        RemoteConfigKeys.gymsGymInfoReportEmailsSection,
+                  if (recipientsState.errorMessage != null) ...[
+                    const SizedBox(height: AppSpacing.lg),
+                    Text(
+                      recipientsState.errorMessage!,
+                      style: typography.bodyMedium.copyWith(
+                        color: colors.error,
+                        fontSize: 13,
                       ),
                     ),
-                    style: typography.caption.copyWith(
-                      color: colors.onSurfaceMuted,
-                      letterSpacing: 1.2,
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.sm),
-                  Container(
-                    padding: const EdgeInsets.all(AppSpacing.lg),
-                    decoration: BoxDecoration(
-                      color: colors.surface,
-                      borderRadius: BorderRadius.circular(
-                        AppSpacing.radiusCard,
-                      ),
-                      border: Border.all(color: colors.outline),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          ref.watch(
-                            rcTextProvider(
-                              RemoteConfigKeys
-                                  .gymsGymInfoReportEmailsDescription,
-                            ),
-                          ),
-                          style: typography.caption.copyWith(
-                            color: colors.onSurfaceMuted,
-                            height: 1.4,
-                          ),
-                        ),
-                        const SizedBox(height: AppSpacing.md),
-                        AppTextField(
-                          label: ref.watch(
-                            rcTextProvider(
-                              RemoteConfigKeys.gymsGymInfoGymReportEmailLabel,
-                            ),
-                          ),
-                          hint: ref.watch(
-                            rcTextProvider(
-                              RemoteConfigKeys.gymsGymInfoGymReportEmailHint,
-                            ),
-                          ),
-                          keyboardType: TextInputType.emailAddress,
-                          controller: _gymReportEmailController,
-                        ),
-                        if (recipientsState.errorMessage != null) ...[
-                          const SizedBox(height: AppSpacing.md),
-                          Text(
-                            recipientsState.errorMessage!,
-                            style: typography.bodyMedium.copyWith(
-                              color: colors.error,
-                              fontSize: 13,
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
-                  ),
+                  ],
                 ],
               ),
             ),
@@ -759,6 +730,7 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
     final name = _nameController.text.trim();
     final address = _addressController.text.trim();
     final phone = _phoneController.text.trim();
+    final email = _emailController.text.trim();
     setState(() {
       _nameError = name.isEmpty
           ? ref.read(
@@ -775,12 +747,62 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
               rcTextProvider(RemoteConfigKeys.gymsGymInfoPhoneRequiredError),
             )
           : null;
+      // Egoractive Authentication Sistemi §9/§10 — "Login ve rapor e-postası"
+      // zorunlu, admin OTP girişinde bununla eşleşen kaydı kullanır.
+      _emailError = (!email.contains('@') || email.length < 4)
+          ? ref.read(
+              rcTextProvider(RemoteConfigKeys.authEmailSetupInvalidEmailError),
+            )
+          : null;
       _saveErrorMessage = null;
     });
-    if (_nameError != null || _addressError != null || _phoneError != null) {
+    if (_nameError != null ||
+        _addressError != null ||
+        _phoneError != null ||
+        _emailError != null) {
       return;
     }
 
+    if (email == _originalEmail) {
+      await _continueSave();
+      return;
+    }
+
+    // Egoractive Authentication Sistemi §10 — email değiştiyse direkt
+    // kaydedilmez: önce yeni email'e OTP gönderilir, doğrulanınca (bkz.
+    // `onVerified`) geri kalan alanlar (ve email'in kendisi, backend
+    // tarafında) kaydedilir. Save'e hiç basılmadan geri çıkılırsa hiçbir
+    // şey değişmez — bu alanlar zaten sadece local TextEditingController'da.
+    setState(() => _isSaving = true);
+    try {
+      await ref.read(authRepositoryProvider).sendEmailChangeOtp(email);
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _isSaving = false;
+        _saveErrorMessage = ref.read(
+          rcTextProvider(RemoteConfigKeys.authOtpGenericError),
+        );
+      });
+      return;
+    }
+    if (!mounted) return;
+    setState(() => _isSaving = false);
+    ref
+        .read(panelStackControllerProvider.notifier)
+        .push(
+          OtpVerificationPanel(
+            purpose: OtpPurpose.emailChange,
+            email: email,
+            onVerified: () async {
+              _originalEmail = email;
+              await _continueSave();
+            },
+          ),
+        );
+  }
+
+  Future<void> _continueSave() async {
     setState(() => _isSaving = true);
     try {
       final pickedLogo = _pickedLogoFile;
@@ -795,11 +817,7 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
       if (_previewColor != null) await _saveTheme();
       await ref
           .read(reportRecipientsControllerProvider.notifier)
-          .save(
-            ReportRecipients(
-              gymReportEmail: _gymReportEmailController.text.trim(),
-            ),
-          );
+          .save(ReportRecipients(gymReportEmail: _emailController.text.trim()));
       if (!mounted) return;
       final recipientsError = ref
           .read(reportRecipientsControllerProvider)
@@ -830,7 +848,7 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
     _nameController.dispose();
     _addressController.dispose();
     _phoneController.dispose();
-    _gymReportEmailController.dispose();
+    _emailController.dispose();
     super.dispose();
   }
 }

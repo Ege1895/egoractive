@@ -28,8 +28,34 @@ class _RootPanelState extends BasePanelState<_RootPanel> {
 /// panel geçişlerini test eder, Firebase entegrasyonunu değil.
 class _FakeAuthRepository implements AuthRepository {
   @override
-  Future<void> login(String phoneDigits) =>
-      Future<void>.delayed(const Duration(seconds: 2));
+  Future<StartLoginResult> startLogin({
+    required String identifierType,
+    required String value,
+  }) async => (needsEmailSetup: false, uid: 'uid-1', email: 'a@b.com');
+
+  @override
+  Future<void> verifyLoginOtp({required String uid, required String code}) =>
+      Future<void>.delayed(const Duration(milliseconds: 1));
+
+  @override
+  Future<void> sendEmailSetupOtp({
+    required String uid,
+    required String email,
+  }) => Future<void>.delayed(const Duration(milliseconds: 1));
+
+  @override
+  Future<void> verifyEmailSetupOtp({
+    required String uid,
+    required String code,
+  }) => Future<void>.delayed(const Duration(milliseconds: 1));
+
+  @override
+  Future<void> sendEmailChangeOtp(String newEmail) =>
+      Future<void>.delayed(const Duration(milliseconds: 1));
+
+  @override
+  Future<void> verifyEmailChangeOtp(String code) =>
+      Future<void>.delayed(const Duration(milliseconds: 1));
 
   @override
   Future<void> deleteAccount() =>

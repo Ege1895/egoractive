@@ -39,4 +39,5 @@ class AdminTrainersService {
 }
 
 @riverpod
-AdminTrainersService adminTrainersService(AdminTrainersServiceRef ref) => const AdminTrainersService();
+AdminTrainersService adminTrainersService(AdminTrainersServiceRef ref) =>
+    const AdminTrainersService();

@@ -19,6 +19,8 @@ class AdminTrainersRepositoryImpl implements AdminTrainersRepository {
 }
 
 @riverpod
-AdminTrainersRepository adminTrainersRepository(AdminTrainersRepositoryRef ref) {
+AdminTrainersRepository adminTrainersRepository(
+  AdminTrainersRepositoryRef ref,
+) {
   return AdminTrainersRepositoryImpl(ref.watch(adminTrainersServiceProvider));
 }

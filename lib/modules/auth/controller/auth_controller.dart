@@ -27,22 +27,46 @@ class AuthController extends _$AuthController {
     );
   }
 
-  Future<void> requestLogin() async {
-    if (!state.isPhoneComplete || state.isRequestingLogin) return;
+  void setEmailInput(String value) {
+    state = state.copyWith(
+      emailInput: value,
+      loginErrorMessage: null,
+      loginErrorReason: null,
+    );
+  }
+
+  /// Egoractive Authentication Sistemi §3/§4 — telefon ya da email ile
+  /// giriş akışının ilk adımı. `null` dönerse hata zaten [state]'e yazılmış
+  /// demektir (çağıran panel field/genel hatayı gösterir); değer dönerse
+  /// çağıran panel `needsEmailSetup`'a göre [EmailSetupPanel] ya da
+  /// [OtpVerificationPanel]'i push eder — navigasyon kararı burada değil,
+  /// panelde verilir (Controller UI'dan habersiz kalır).
+  Future<StartLoginResult?> startLogin({required String identifierType}) async {
+    if (state.isRequestingLogin) return null;
+    if (identifierType == 'phone' && !state.isPhoneComplete) return null;
+    if (identifierType == 'email' && !state.isEmailComplete) return null;
+
     state = state.copyWith(
       isRequestingLogin: true,
       loginErrorMessage: null,
       loginErrorReason: null,
     );
+    final value = identifierType == 'phone'
+        ? '+90${state.phoneDigits}'
+        : state.emailInput.trim();
     try {
-      await ref.read(authRepositoryProvider).login(state.phoneDigits);
+      final result = await ref
+          .read(authRepositoryProvider)
+          .startLogin(identifierType: identifierType, value: value);
       state = state.copyWith(isRequestingLogin: false);
+      return result;
     } on AuthLoginException catch (e) {
       state = state.copyWith(
         isRequestingLogin: false,
         loginErrorMessage: _messageFor(e.reason),
         loginErrorReason: e.reason,
       );
+      return null;
     }
   }
 

@@ -4,7 +4,8 @@
   "scripts": {
     "seed": "tsx seed_load_test_data.ts",
     "measure": "tsx measure_query_latency.ts",
-    "backfill-planned-sessions": "tsx backfill_planned_sessions_count.ts"
+    "backfill-planned-sessions": "tsx backfill_planned_sessions_count.ts",
+    "backfill-trainer-stats": "tsx backfill_monthly_trainer_stats.ts"
   },
   "dependencies": {
     "firebase-admin": "^13.10.0"

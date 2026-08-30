@@ -316,111 +316,107 @@ class _PendingCard extends StatelessWidget {
     final typography = context.appTypography;
 
     return Container(
-        margin: const EdgeInsets.only(bottom: AppSpacing.sm),
-        padding: const EdgeInsets.all(AppSpacing.md),
-        decoration: BoxDecoration(
-          color: colors.surfaceRaised,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
-          border: Border.all(color: colors.warning.withValues(alpha: 0.4)),
-        ),
-        child: Column(
-          children: [
-            Row(
-              children: [
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: colors.surface,
-                    shape: BoxShape.circle,
-                  ),
-                  alignment: Alignment.center,
-                  child: Text(
-                    pending.memberInitials,
-                    style: typography.headingSmall.copyWith(
-                      color: colors.onSurfaceVariant,
-                      fontSize: 14,
-                    ),
+      margin: const EdgeInsets.only(bottom: AppSpacing.sm),
+      padding: const EdgeInsets.all(AppSpacing.md),
+      decoration: BoxDecoration(
+        color: colors.surfaceRaised,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
+        border: Border.all(color: colors.warning.withValues(alpha: 0.4)),
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: colors.surface,
+                  shape: BoxShape.circle,
+                ),
+                alignment: Alignment.center,
+                child: Text(
+                  pending.memberInitials,
+                  style: typography.headingSmall.copyWith(
+                    color: colors.onSurfaceVariant,
+                    fontSize: 14,
                   ),
                 ),
-                const SizedBox(width: AppSpacing.md),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        pending.memberName,
+              ),
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      pending.memberName,
+                      style: typography.headingSmall.copyWith(
+                        color: colors.onSurface,
+                        fontSize: 16,
+                      ),
+                    ),
+                    Text(
+                      '${pending.time} ${pending.meta}',
+                      style: typography.bodyMedium.copyWith(
+                        color: colors.onSurfaceVariant,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.md),
+          Row(
+            children: [
+              Expanded(
+                child: Material(
+                  color: colors.primary,
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+                  child: InkWell(
+                    onTap: onDone,
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+                    child: Container(
+                      constraints: const BoxConstraints(minHeight: 44),
+                      alignment: Alignment.center,
+                      child: Text(
+                        doneLabel,
                         style: typography.headingSmall.copyWith(
-                          color: colors.onSurface,
-                          fontSize: 16,
+                          fontSize: 15,
+                          color: colors.onPrimary,
                         ),
                       ),
-                      Text(
-                        '${pending.time} ${pending.meta}',
-                        style: typography.bodyMedium.copyWith(
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              Expanded(
+                child: Material(
+                  color: colors.surface,
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+                  child: InkWell(
+                    onTap: onAbsent,
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+                    child: Container(
+                      constraints: const BoxConstraints(minHeight: 44),
+                      alignment: Alignment.center,
+                      child: Text(
+                        absentLabel,
+                        style: typography.headingSmall.copyWith(
+                          fontSize: 15,
                           color: colors.onSurfaceVariant,
-                          fontSize: 13,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: AppSpacing.md),
-            Row(
-              children: [
-                Expanded(
-                  child: Material(
-                    color: colors.primary,
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
-                    child: InkWell(
-                      onTap: onDone,
-                      borderRadius: BorderRadius.circular(
-                        AppSpacing.radiusInner,
-                      ),
-                      child: Container(
-                        constraints: const BoxConstraints(minHeight: 44),
-                        alignment: Alignment.center,
-                        child: Text(
-                          doneLabel,
-                          style: typography.headingSmall.copyWith(
-                            fontSize: 15,
-                            color: colors.onPrimary,
-                          ),
                         ),
                       ),
                     ),
                   ),
                 ),
-                const SizedBox(width: AppSpacing.sm),
-                Expanded(
-                  child: Material(
-                    color: colors.surface,
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
-                    child: InkWell(
-                      onTap: onAbsent,
-                      borderRadius: BorderRadius.circular(
-                        AppSpacing.radiusInner,
-                      ),
-                      child: Container(
-                        constraints: const BoxConstraints(minHeight: 44),
-                        alignment: Alignment.center,
-                        child: Text(
-                          absentLabel,
-                          style: typography.headingSmall.copyWith(
-                            fontSize: 15,
-                            color: colors.onSurfaceVariant,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

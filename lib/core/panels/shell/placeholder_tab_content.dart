@@ -23,13 +23,17 @@ class PlaceholderTabContent extends StatelessWidget {
             children: [
               Text(
                 title,
-                style: typography.headingLarge.copyWith(color: colors.onSurface),
+                style: typography.headingLarge.copyWith(
+                  color: colors.onSurface,
+                ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: AppSpacing.sm),
               Text(
                 'Bu sekme henüz doldurulmadı — ilgili panel görevi tamamlanınca burada gerçek içerik olacak.',
-                style: typography.bodyMedium.copyWith(color: colors.onSurfaceMuted),
+                style: typography.bodyMedium.copyWith(
+                  color: colors.onSurfaceMuted,
+                ),
                 textAlign: TextAlign.center,
               ),
             ],

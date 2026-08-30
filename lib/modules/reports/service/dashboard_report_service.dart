@@ -11,16 +11,18 @@ const _monthNamesLong = {
 };
 
 /// F5-1/F7-2 — büyük veri setlerinde (10.000+ seans) dashboard'ı hızlı
-/// tutmak için hiçbir yerde tüm dokümanlar client'a çekilmiyor: sayımlar
+/// tutmak için hiçbir yerde tüm dokümanlar client'a çekilmiyor: [loadSummary]
 /// Firestore `count()`/`sum()` aggregation query'leriyle sunucu tarafında
-/// hesaplanıyor. [loadSummary] ve [loadTrainerPerformance] BİLEREK ayrı
-/// metotlar: antrenör dökümü, antrenör başına 2 `count()` sorgusu
-/// gerektirdiğinden (N antrenörde 2N round-trip) salon büyüdükçe asıl
-/// maliyeti bu taşıyor — yük testinde (`scripts/measure_query_latency.ts`)
-/// 20 antrenörlü bir salonda tek başına ~5 saniyeye çıktığı ölçüldü. Ayrı
-/// tutulunca `DashboardReportController` özet metrikleri antrenör
-/// dökümünü beklemeden gösterebiliyor (bkz. controller'daki iki ayrı
-/// provider).
+/// hesaplanıyor. [loadTrainerPerformance] ise ESKİDEN antrenör başına 2
+/// `count()` sorgusu yapıyordu (N antrenörde 2N round-trip; yük testinde
+/// 20 antrenörlü bir salonda tek başına ~5 saniyeye çıktığı ölçüldü) — artık
+/// bunun yerine her seans yazımında `functions/src/triggers/on-session-write-update-trainer-stats.ts`
+/// trigger'ının canlı tuttuğu TEK bir özet dokümanı (`gyms/{gymId}/monthlyTrainerStats/{yearMonth}`)
+/// okuyor: antrenör sayısından ve toplam seans hacminden tamamen bağımsız,
+/// sabit maliyetli TEK bir okuma. [loadSummary]/[loadTrainerPerformance]
+/// yine de ayrı metotlar — `DashboardReportController` özet metrikleri
+/// antrenör dökümünü beklemeden gösterebilsin diye (bkz. controller'daki
+/// iki ayrı provider).
 class DashboardReportService {
   const DashboardReportService();
 
@@ -57,35 +59,43 @@ class DashboardReportService {
     );
   }
 
+  /// TEK doküman okuması — `stats` map'i zaten antrenör adını da taşıdığı
+  /// için (trigger, seansın kendi denormalize `trainerName` alanından
+  /// yazıyor) ayrıca bir `users` sorgusu de gerekmiyor. Bu ay hiç seansı
+  /// olmayan bir antrenör kovada hiç yer almaz — "performans" listesinde
+  /// zaten gösterecek bir şeyi yok, bu BİLEREK kabul edilen bir davranış
+  /// (eski N+1 sorgulu sürüm onu 0/0 olarak gösteriyordu).
   Future<List<TrainerPerformance>> loadTrainerPerformance(String gymId) async {
-    final now = DateTime.now();
-    final monthStart = Timestamp.fromDate(DateTime(now.year, now.month, 1));
-    final monthSessions = _monthSessionsQuery(gymId, monthStart);
-
-    final trainersSnapshot = await FirebaseFirestore.instance
-        .collection('users')
-        .where('gymId', isEqualTo: gymId)
-        .where('role', isEqualTo: 'trainer')
+    final yearMonth = _yearMonthUtc(DateTime.now().toUtc());
+    final snapshot = await FirebaseFirestore.instance
+        .collection('gyms')
+        .doc(gymId)
+        .collection('monthlyTrainerStats')
+        .doc(yearMonth)
         .get();
 
-    final counts = await Future.wait(trainersSnapshot.docs.expand((trainer) => [
-          monthSessions.where('trainerId', isEqualTo: trainer.id).count().get(),
-          monthSessions.where('trainerId', isEqualTo: trainer.id).where('status', isEqualTo: 'completed').count().get(),
-        ]));
+    final stats = snapshot.data()?['stats'] as Map<String, dynamic>? ?? const {};
+    final trainerPerformance = stats.entries.map((entry) {
+      final trainerId = entry.key;
+      final data = entry.value as Map<String, dynamic>? ?? const {};
+      return TrainerPerformance(
+        trainerId: trainerId,
+        name: (data['name'] as String?) ?? '—',
+        completedSessions: (data['completed'] as num?)?.toInt() ?? 0,
+        totalSessions: (data['total'] as num?)?.toInt() ?? 0,
+      );
+    }).toList();
 
-    final trainerPerformance = <TrainerPerformance>[];
-    for (var i = 0; i < trainersSnapshot.docs.length; i++) {
-      final trainer = trainersSnapshot.docs[i];
-      trainerPerformance.add(TrainerPerformance(
-        trainerId: trainer.id,
-        name: (trainer.data()['name'] as String?) ?? '—',
-        completedSessions: counts[i * 2 + 1].count ?? 0,
-        totalSessions: counts[i * 2].count ?? 0,
-      ));
-    }
     trainerPerformance.sort((a, b) => b.completedSessions.compareTo(a.completedSessions));
     return trainerPerformance;
   }
+
+  /// `startTime`'ın UTC takvim ayı, "2026-08" formatında — trigger'ın
+  /// (`on-session-write-update-trainer-stats.ts`'teki `yearMonthUtc`) yazdığı
+  /// anahtarla BİLEREK aynı (UTC) kural; salon saat dilimine göre
+  /// hesaplamak ikisi arasında gece yarısı civarı uyuşmazlık riski doğururdu.
+  String _yearMonthUtc(DateTime utc) =>
+      '${utc.year}-${utc.month.toString().padLeft(2, '0')}';
 
   Query<Map<String, dynamic>> _monthSessionsQuery(String gymId, Timestamp monthStart) {
     return FirebaseFirestore.instance

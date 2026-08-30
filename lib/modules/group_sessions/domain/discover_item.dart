@@ -26,6 +26,22 @@ class DiscoverItem with _$DiscoverItem {
     /// başlangıca kaç saat kalana kadar aktif; kategoriye göre ayrı RC
     /// anahtarından gelir (bkz. discover_controller.dart).
     @Default(24) int leaveLockHoursBefore,
+
+    /// Aşağıdakiler sadece detay sayfasında (bkz.
+    /// `group_session_detail_panel.dart`/`event_detail_panel.dart`)
+    /// gösterilir, liste kartında kullanılmaz — admin'in oluştururken
+    /// girdiği tüm bilgiler.
+    @Default('') String description,
+
+    /// Grup dersleri — admin'in girdiği ders yeri (opsiyonel).
+    /// Etkinlikler — etkinlik lokasyonu (zorunlu).
+    String? location,
+
+    /// Sadece grup dersleri — atanan antrenör(ler), boş liste = atanmamış.
+    @Default(<String>[]) List<String> trainerNames,
+
+    /// Sadece grup dersleri.
+    int? durationMinutes,
   }) = _DiscoverItem;
 
   const DiscoverItem._();

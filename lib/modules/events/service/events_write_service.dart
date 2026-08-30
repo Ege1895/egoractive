@@ -29,7 +29,36 @@ class EventsWriteService {
       'description': description,
       'capacity': capacity,
       'attendeeIds': <String>[],
+      'status': 'active',
       'createdAt': FieldValue.serverTimestamp(),
+    });
+  }
+
+  /// Admin'in düzenleme ekranından (bkz. `create_event_panel.dart` edit
+  /// modu) mevcut bir etkinliği günceller.
+  Future<void> updateEvent({
+    required String eventId,
+    required String name,
+    required String location,
+    required DateTime dateTime,
+    required String description,
+    int? capacity,
+  }) {
+    return FirebaseFirestore.instance.collection('events').doc(eventId).update({
+      'name': name,
+      'location': location,
+      'dateTime': Timestamp.fromDate(dateTime),
+      'description': description,
+      'capacity': capacity,
+    });
+  }
+
+  /// Etkinlik listeden kaldırılmaz — `status: cancelled` ile işaretlenir,
+  /// admin ekranında iptal rozetiyle listelenmeye devam eder; üye/antrenör
+  /// Keşfet akışından filtrelenir (bkz. `discover_controller.dart`).
+  Future<void> cancelEvent(String eventId) {
+    return FirebaseFirestore.instance.collection('events').doc(eventId).update({
+      'status': 'cancelled',
     });
   }
 

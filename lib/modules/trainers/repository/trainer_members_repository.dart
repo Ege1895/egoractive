@@ -19,6 +19,8 @@ class TrainerMembersRepositoryImpl implements TrainerMembersRepository {
 }
 
 @riverpod
-TrainerMembersRepository trainerMembersRepository(TrainerMembersRepositoryRef ref) {
+TrainerMembersRepository trainerMembersRepository(
+  TrainerMembersRepositoryRef ref,
+) {
   return TrainerMembersRepositoryImpl(ref.watch(trainerMembersServiceProvider));
 }

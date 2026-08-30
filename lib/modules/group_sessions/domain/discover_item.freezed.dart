@@ -37,6 +37,22 @@ mixin _$DiscoverItem {
   /// anahtarından gelir (bkz. discover_controller.dart).
   int get leaveLockHoursBefore => throw _privateConstructorUsedError;
 
+  /// Aşağıdakiler sadece detay sayfasında (bkz.
+  /// `group_session_detail_panel.dart`/`event_detail_panel.dart`)
+  /// gösterilir, liste kartında kullanılmaz — admin'in oluştururken
+  /// girdiği tüm bilgiler.
+  String get description => throw _privateConstructorUsedError;
+
+  /// Grup dersleri — admin'in girdiği ders yeri (opsiyonel).
+  /// Etkinlikler — etkinlik lokasyonu (zorunlu).
+  String? get location => throw _privateConstructorUsedError;
+
+  /// Sadece grup dersleri — atanan antrenör(ler), boş liste = atanmamış.
+  List<String> get trainerNames => throw _privateConstructorUsedError;
+
+  /// Sadece grup dersleri.
+  int? get durationMinutes => throw _privateConstructorUsedError;
+
   /// Create a copy of DiscoverItem
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -63,6 +79,10 @@ abstract class $DiscoverItemCopyWith<$Res> {
     bool joined,
     DateTime? startTime,
     int leaveLockHoursBefore,
+    String description,
+    String? location,
+    List<String> trainerNames,
+    int? durationMinutes,
   });
 }
 
@@ -92,6 +112,10 @@ class _$DiscoverItemCopyWithImpl<$Res, $Val extends DiscoverItem>
     Object? joined = null,
     Object? startTime = freezed,
     Object? leaveLockHoursBefore = null,
+    Object? description = null,
+    Object? location = freezed,
+    Object? trainerNames = null,
+    Object? durationMinutes = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -139,6 +163,22 @@ class _$DiscoverItemCopyWithImpl<$Res, $Val extends DiscoverItem>
                 ? _value.leaveLockHoursBefore
                 : leaveLockHoursBefore // ignore: cast_nullable_to_non_nullable
                       as int,
+            description: null == description
+                ? _value.description
+                : description // ignore: cast_nullable_to_non_nullable
+                      as String,
+            location: freezed == location
+                ? _value.location
+                : location // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            trainerNames: null == trainerNames
+                ? _value.trainerNames
+                : trainerNames // ignore: cast_nullable_to_non_nullable
+                      as List<String>,
+            durationMinutes: freezed == durationMinutes
+                ? _value.durationMinutes
+                : durationMinutes // ignore: cast_nullable_to_non_nullable
+                      as int?,
           )
           as $Val,
     );
@@ -166,6 +206,10 @@ abstract class _$$DiscoverItemImplCopyWith<$Res>
     bool joined,
     DateTime? startTime,
     int leaveLockHoursBefore,
+    String description,
+    String? location,
+    List<String> trainerNames,
+    int? durationMinutes,
   });
 }
 
@@ -194,6 +238,10 @@ class __$$DiscoverItemImplCopyWithImpl<$Res>
     Object? joined = null,
     Object? startTime = freezed,
     Object? leaveLockHoursBefore = null,
+    Object? description = null,
+    Object? location = freezed,
+    Object? trainerNames = null,
+    Object? durationMinutes = freezed,
   }) {
     return _then(
       _$DiscoverItemImpl(
@@ -241,6 +289,22 @@ class __$$DiscoverItemImplCopyWithImpl<$Res>
             ? _value.leaveLockHoursBefore
             : leaveLockHoursBefore // ignore: cast_nullable_to_non_nullable
                   as int,
+        description: null == description
+            ? _value.description
+            : description // ignore: cast_nullable_to_non_nullable
+                  as String,
+        location: freezed == location
+            ? _value.location
+            : location // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        trainerNames: null == trainerNames
+            ? _value._trainerNames
+            : trainerNames // ignore: cast_nullable_to_non_nullable
+                  as List<String>,
+        durationMinutes: freezed == durationMinutes
+            ? _value.durationMinutes
+            : durationMinutes // ignore: cast_nullable_to_non_nullable
+                  as int?,
       ),
     );
   }
@@ -261,7 +325,12 @@ class _$DiscoverItemImpl extends _DiscoverItem {
     this.joined = false,
     this.startTime,
     this.leaveLockHoursBefore = 24,
-  }) : super._();
+    this.description = '',
+    this.location,
+    final List<String> trainerNames = const <String>[],
+    this.durationMinutes,
+  }) : _trainerNames = trainerNames,
+       super._();
 
   @override
   final String id;
@@ -296,9 +365,38 @@ class _$DiscoverItemImpl extends _DiscoverItem {
   @JsonKey()
   final int leaveLockHoursBefore;
 
+  /// Aşağıdakiler sadece detay sayfasında (bkz.
+  /// `group_session_detail_panel.dart`/`event_detail_panel.dart`)
+  /// gösterilir, liste kartında kullanılmaz — admin'in oluştururken
+  /// girdiği tüm bilgiler.
+  @override
+  @JsonKey()
+  final String description;
+
+  /// Grup dersleri — admin'in girdiği ders yeri (opsiyonel).
+  /// Etkinlikler — etkinlik lokasyonu (zorunlu).
+  @override
+  final String? location;
+
+  /// Sadece grup dersleri — atanan antrenör(ler), boş liste = atanmamış.
+  final List<String> _trainerNames;
+
+  /// Sadece grup dersleri — atanan antrenör(ler), boş liste = atanmamış.
+  @override
+  @JsonKey()
+  List<String> get trainerNames {
+    if (_trainerNames is EqualUnmodifiableListView) return _trainerNames;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_trainerNames);
+  }
+
+  /// Sadece grup dersleri.
+  @override
+  final int? durationMinutes;
+
   @override
   String toString() {
-    return 'DiscoverItem(id: $id, category: $category, day: $day, month: $month, title: $title, meta: $meta, taken: $taken, capacity: $capacity, joined: $joined, startTime: $startTime, leaveLockHoursBefore: $leaveLockHoursBefore)';
+    return 'DiscoverItem(id: $id, category: $category, day: $day, month: $month, title: $title, meta: $meta, taken: $taken, capacity: $capacity, joined: $joined, startTime: $startTime, leaveLockHoursBefore: $leaveLockHoursBefore, description: $description, location: $location, trainerNames: $trainerNames, durationMinutes: $durationMinutes)';
   }
 
   @override
@@ -320,7 +418,17 @@ class _$DiscoverItemImpl extends _DiscoverItem {
             (identical(other.startTime, startTime) ||
                 other.startTime == startTime) &&
             (identical(other.leaveLockHoursBefore, leaveLockHoursBefore) ||
-                other.leaveLockHoursBefore == leaveLockHoursBefore));
+                other.leaveLockHoursBefore == leaveLockHoursBefore) &&
+            (identical(other.description, description) ||
+                other.description == description) &&
+            (identical(other.location, location) ||
+                other.location == location) &&
+            const DeepCollectionEquality().equals(
+              other._trainerNames,
+              _trainerNames,
+            ) &&
+            (identical(other.durationMinutes, durationMinutes) ||
+                other.durationMinutes == durationMinutes));
   }
 
   @override
@@ -337,6 +445,10 @@ class _$DiscoverItemImpl extends _DiscoverItem {
     joined,
     startTime,
     leaveLockHoursBefore,
+    description,
+    location,
+    const DeepCollectionEquality().hash(_trainerNames),
+    durationMinutes,
   );
 
   /// Create a copy of DiscoverItem
@@ -361,6 +473,10 @@ abstract class _DiscoverItem extends DiscoverItem {
     final bool joined,
     final DateTime? startTime,
     final int leaveLockHoursBefore,
+    final String description,
+    final String? location,
+    final List<String> trainerNames,
+    final int? durationMinutes,
   }) = _$DiscoverItemImpl;
   const _DiscoverItem._() : super._();
 
@@ -394,6 +510,26 @@ abstract class _DiscoverItem extends DiscoverItem {
   /// anahtarından gelir (bkz. discover_controller.dart).
   @override
   int get leaveLockHoursBefore;
+
+  /// Aşağıdakiler sadece detay sayfasında (bkz.
+  /// `group_session_detail_panel.dart`/`event_detail_panel.dart`)
+  /// gösterilir, liste kartında kullanılmaz — admin'in oluştururken
+  /// girdiği tüm bilgiler.
+  @override
+  String get description;
+
+  /// Grup dersleri — admin'in girdiği ders yeri (opsiyonel).
+  /// Etkinlikler — etkinlik lokasyonu (zorunlu).
+  @override
+  String? get location;
+
+  /// Sadece grup dersleri — atanan antrenör(ler), boş liste = atanmamış.
+  @override
+  List<String> get trainerNames;
+
+  /// Sadece grup dersleri.
+  @override
+  int? get durationMinutes;
 
   /// Create a copy of DiscoverItem
   /// with the given fields replaced by the non-null parameter values.

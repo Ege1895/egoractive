@@ -14,11 +14,17 @@ import { usersCollection } from "../shared/firestore-paths";
  * reddedilir (admin başka salonların üye verisini göremez). Bu callable
  * Admin SDK ile kuralları atlayıp sadece bir boolean döner, başka salonun
  * üye verisini client'a hiç sızdırmaz.
+ *
+ * Admin üye/antrenör eklerken KULLANICININ girdiği bir numarayı kontrol
+ * eder; member/trainer kendi profilini düzenlerken (bkz.
+ * `member_self_info_panel.dart`/`trainer_info_panel.dart`) KENDİ yeni
+ * numarasını kontrol eder — ikisi de sadece oturum açmış olmayı gerektirir,
+ * role'e özel bir kısıtlama yok (sonuç sadece bir boolean, hiçbir kullanıcı
+ * verisi sızdırmıyor).
  */
 export const checkPhoneAvailable = onCall(async (request) => {
-  const role = request.auth?.token?.role as string | undefined;
-  if (!request.auth?.uid || role !== "admin") {
-    throw new HttpsError("permission-denied", "Bu işlem için salon admin'i olarak oturum açmış olman gerekiyor.");
+  if (!request.auth?.uid) {
+    throw new HttpsError("unauthenticated", "Bu işlem için oturum açmış olman gerekiyor.");
   }
 
   const phoneNumber = typeof request.data?.phoneNumber === "string" ? request.data.phoneNumber.trim() : "";

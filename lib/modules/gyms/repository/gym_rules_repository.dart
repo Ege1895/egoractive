@@ -19,7 +19,8 @@ class GymRulesRepositoryImpl implements GymRulesRepository {
   Stream<GymRules> watchRules(String gymId) => _service.watchRules(gymId);
 
   @override
-  Future<void> saveRules(String gymId, List<dynamic> delta) => _service.saveRules(gymId, delta);
+  Future<void> saveRules(String gymId, List<dynamic> delta) =>
+      _service.saveRules(gymId, delta);
 }
 
 @riverpod

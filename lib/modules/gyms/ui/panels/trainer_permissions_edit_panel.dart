@@ -199,8 +199,7 @@ class _TrainerPermissionsEditPanelState
                           ),
                           note: ref.watch(
                             rcTextProvider(
-                              RemoteConfigKeys
-                                  .gymsTrainerPermissionsCancelNote,
+                              RemoteConfigKeys.gymsTrainerPermissionsCancelNote,
                             ),
                           ),
                           value: permissions.canCancelMemberSessions,

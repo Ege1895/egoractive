@@ -19,6 +19,8 @@ class TrainerReportRepositoryImpl implements TrainerReportRepository {
 }
 
 @riverpod
-TrainerReportRepository trainerReportRepository(TrainerReportRepositoryRef ref) {
+TrainerReportRepository trainerReportRepository(
+  TrainerReportRepositoryRef ref,
+) {
   return TrainerReportRepositoryImpl(ref.watch(trainerReportServiceProvider));
 }

@@ -25,6 +25,7 @@ class CreateGymState {
     this.cityError,
     this.addressError,
     this.phoneError,
+    this.emailError,
     this.isExtractingPalette = false,
     this.logoPalette = const [],
     this.selectedPaletteColor,
@@ -40,6 +41,7 @@ class CreateGymState {
   final String? cityError;
   final String? addressError;
   final String? phoneError;
+  final String? emailError;
 
   /// Logo seçildikten sonra `palette_generator` ile renk çıkarımı sürüyor mu.
   final bool isExtractingPalette;
@@ -61,6 +63,7 @@ class CreateGymState {
     String? cityError,
     String? addressError,
     String? phoneError,
+    String? emailError,
     bool clearFieldErrors = false,
     bool? isExtractingPalette,
     List<Color>? logoPalette,
@@ -77,6 +80,7 @@ class CreateGymState {
           ? null
           : (addressError ?? this.addressError),
       phoneError: clearFieldErrors ? null : (phoneError ?? this.phoneError),
+      emailError: clearFieldErrors ? null : (emailError ?? this.emailError),
       isExtractingPalette: isExtractingPalette ?? this.isExtractingPalette,
       logoPalette: logoPalette ?? this.logoPalette,
       selectedPaletteColor: clearSelectedPaletteColor
@@ -158,13 +162,14 @@ class CreateGymController extends _$CreateGymController {
   /// önceki sürüm tüm hataları ("zaten kayıtlı" dahil) tek bir genel
   /// banner'da gösteriyordu, kullanıcı hangi alanın sorunlu olduğunu
   /// görmeden alanlara tek tek bakmak zorunda kalıyordu. Başarılıysa
-  /// oluşturulan `gymId`'yi döner. Logo ve [reportEmail] (F5-16 — rapor
-  /// e-postası) opsiyoneldir, boş geçilirse salon yine oluşturulur.
-  Future<String?> submit({String? reportEmail}) async {
+  /// oluşturulan `gymId`'yi döner. [email] — Egoractive Authentication
+  /// Sistemi §9: "Login ve rapor e-postası", zorunlu; hem admin OTP
+  /// girişinde hem salon raporlarında kullanılır. Logo opsiyoneldir.
+  Future<String?> submit({required String email}) async {
     if (state.isSubmitting) return null;
 
     final profile = ref.read(gymProfileControllerProvider);
-    if (!_validate(profile)) return null;
+    if (!_validate(profile, email)) return null;
 
     state = state.copyWith(
       isSubmitting: true,
@@ -180,16 +185,21 @@ class CreateGymController extends _$CreateGymController {
           .createGym(
             profile: profile,
             themeColor: themeColor,
+            email: email.trim(),
             logoFile: state.logoFile,
-            reportEmail: reportEmail?.trim(),
           );
       state = state.copyWith(isSubmitting: false);
       return gymId;
     } on FirebaseFunctionsException catch (e) {
+      final isEmailConflict =
+          e.code == 'already-exists' && (e.message ?? '').contains('email');
       state = state.copyWith(
         isSubmitting: false,
-        phoneError: e.code == 'already-exists'
+        phoneError: e.code == 'already-exists' && !isEmailConflict
             ? 'Bu numarayla kayıtlı bir hesap zaten var. Giriş yapmayı dene.'
+            : null,
+        emailError: isEmailConflict
+            ? 'Bu email adresiyle kayıtlı bir hesap zaten var. Giriş yapmayı dene.'
             : null,
         errorMessage: e.code == 'already-exists'
             ? null
@@ -208,7 +218,7 @@ class CreateGymController extends _$CreateGymController {
 
   /// Her boş/geçersiz alan için ayrı bir hata mesajı yazar, geçerliyse
   /// `true` döner.
-  bool _validate(GymProfile profile) {
+  bool _validate(GymProfile profile, String email) {
     final nameError = profile.name.trim().isEmpty ? 'Salon adı gerekli.' : null;
     final cityError = profile.city.trim().isEmpty ? 'Şehir gerekli.' : null;
     final addressError = profile.address.trim().isEmpty
@@ -221,11 +231,17 @@ class CreateGymController extends _$CreateGymController {
     final phoneError = profile.phone.length != 10
         ? 'Geçerli bir cep telefonu numarası gir.'
         : null;
+    // Egoractive Authentication Sistemi §9 — "Login ve rapor e-postası"
+    // zorunlu, admin bununla OTP alıp giriş yapacak.
+    final emailError = !email.contains('@') || email.trim().length < 4
+        ? 'Geçerli bir email adresi gir.'
+        : null;
 
     if (nameError == null &&
         cityError == null &&
         addressError == null &&
-        phoneError == null) {
+        phoneError == null &&
+        emailError == null) {
       return true;
     }
     // copyWith'in `x ?? this.x` deseni "null geç" ile "hiç geçme"yi ayırt
@@ -240,6 +256,7 @@ class CreateGymController extends _$CreateGymController {
       cityError: cityError,
       addressError: addressError,
       phoneError: phoneError,
+      emailError: emailError,
     );
     return false;
   }

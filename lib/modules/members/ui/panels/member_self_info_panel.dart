@@ -12,6 +12,9 @@ import '../../../../shared/widgets/app_back_button.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_text_field.dart';
 import '../../../auth/controller/member_profile_controller.dart';
+import '../../../auth/domain/otp_purpose.dart';
+import '../../../auth/repository/auth_repository.dart';
+import '../../../auth/ui/panels/otp_verification_panel.dart';
 import '../../service/member_registration_service.dart';
 
 /// Üye · Bilgilerim — üyenin kendi ad/soyad/telefon bilgisini görüntüleyip
@@ -28,11 +31,14 @@ class _MemberSelfInfoPanelState extends BasePanelState<MemberSelfInfoPanel> {
   late final TextEditingController _firstNameController;
   late final TextEditingController _lastNameController;
   late final TextEditingController _phoneController;
+  late final TextEditingController _emailController;
 
   bool _isSaving = false;
   String? _nameError;
   String? _phoneError;
+  String? _emailError;
   String? _saveErrorMessage;
+  late String _originalEmail;
 
   @override
   void initState() {
@@ -48,6 +54,8 @@ class _MemberSelfInfoPanelState extends BasePanelState<MemberSelfInfoPanel> {
     _phoneController = TextEditingController(
       text: formatTrPhoneDigits(profile.phoneDigits),
     );
+    _emailController = TextEditingController(text: profile.email);
+    _originalEmail = profile.email;
   }
 
   @override
@@ -159,6 +167,22 @@ class _MemberSelfInfoPanelState extends BasePanelState<MemberSelfInfoPanel> {
                             }
                           },
                         ),
+                        const SizedBox(height: AppSpacing.md),
+                        AppTextField(
+                          label: ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.membersSelfInfoEmailFieldLabel,
+                            ),
+                          ),
+                          keyboardType: TextInputType.emailAddress,
+                          controller: _emailController,
+                          errorText: _emailError,
+                          onChanged: (_) {
+                            if (_emailError != null) {
+                              setState(() => _emailError = null);
+                            }
+                          },
+                        ),
                       ],
                     ),
                   ),
@@ -210,6 +234,7 @@ class _MemberSelfInfoPanelState extends BasePanelState<MemberSelfInfoPanel> {
     final lastName = _lastNameController.text.trim();
     final name = [firstName, lastName].where((p) => p.isNotEmpty).join(' ');
     final phoneDigits = _phoneController.text.replaceAll(RegExp(r'[^0-9]'), '');
+    final email = _emailController.text.trim();
 
     setState(() {
       _nameError = name.isEmpty
@@ -222,10 +247,56 @@ class _MemberSelfInfoPanelState extends BasePanelState<MemberSelfInfoPanel> {
               rcTextProvider(RemoteConfigKeys.membersSelfInfoPhoneInvalidError),
             )
           : null;
+      _emailError = (!email.contains('@') || email.length < 4)
+          ? ref.read(
+              rcTextProvider(RemoteConfigKeys.authEmailSetupInvalidEmailError),
+            )
+          : null;
       _saveErrorMessage = null;
     });
-    if (_nameError != null || _phoneError != null) return;
+    if (_nameError != null || _phoneError != null || _emailError != null)
+      return;
 
+    if (email == _originalEmail) {
+      await _continueSave(name: name, phoneDigits: phoneDigits);
+      return;
+    }
+
+    // Egoractive Authentication Sistemi §11 — email değiştiyse direkt
+    // kaydedilmez, önce yeni email'e OTP gönderilir.
+    setState(() => _isSaving = true);
+    try {
+      await ref.read(authRepositoryProvider).sendEmailChangeOtp(email);
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _isSaving = false;
+        _saveErrorMessage = ref.read(
+          rcTextProvider(RemoteConfigKeys.authOtpGenericError),
+        );
+      });
+      return;
+    }
+    if (!mounted) return;
+    setState(() => _isSaving = false);
+    ref
+        .read(panelStackControllerProvider.notifier)
+        .push(
+          OtpVerificationPanel(
+            purpose: OtpPurpose.emailChange,
+            email: email,
+            onVerified: () async {
+              _originalEmail = email;
+              await _continueSave(name: name, phoneDigits: phoneDigits);
+            },
+          ),
+        );
+  }
+
+  Future<void> _continueSave({
+    required String name,
+    required String phoneDigits,
+  }) async {
     final uid = ref.read(authStateProvider).valueOrNull?.uid;
     if (uid == null) return;
     final phoneNumber = '+90$phoneDigits';
@@ -270,6 +341,7 @@ class _MemberSelfInfoPanelState extends BasePanelState<MemberSelfInfoPanel> {
     _firstNameController.dispose();
     _lastNameController.dispose();
     _phoneController.dispose();
+    _emailController.dispose();
     super.dispose();
   }
 }

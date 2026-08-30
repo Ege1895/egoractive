@@ -154,7 +154,7 @@ class _TrainerProfileDocForUidProviderElement
 }
 
 String _$trainerProfileControllerHash() =>
-    r'4d6d6db1ad14c1c941a72b8878b892d46c40f0e5';
+    r'77dbbea6e85e4baea318e8ed4305906cbf0e8b09';
 
 /// [TrainerProfilePanel]'in üst kartındaki gerçek antrenör adı/uzmanlığı —
 /// önceden `TrainerMockData`'dan sabit ("Berk Aydın") değer geliyordu,
@@ -165,7 +165,13 @@ String _$trainerProfileControllerHash() =>
 final trainerProfileControllerProvider =
     AutoDisposeNotifierProvider<
       TrainerProfileController,
-      ({String name, String initials, String specialty})
+      ({
+        String name,
+        String initials,
+        String specialty,
+        String phoneDigits,
+        String email,
+      })
     >.internal(
       TrainerProfileController.new,
       name: r'trainerProfileControllerProvider',
@@ -177,6 +183,14 @@ final trainerProfileControllerProvider =
     );
 
 typedef _$TrainerProfileController =
-    AutoDisposeNotifier<({String name, String initials, String specialty})>;
+    AutoDisposeNotifier<
+      ({
+        String name,
+        String initials,
+        String specialty,
+        String phoneDigits,
+        String email,
+      })
+    >;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

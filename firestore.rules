@@ -100,6 +100,15 @@ service cloud.firestore {
         allow read: if isSignedIn() && myRole() == 'admin' && myGymId() == gymId;
         allow write: if false;
       }
+
+      // monthlyTrainerStats/{yearMonth} — F5-1/F7-2 dashboard antrenör
+      // performansı için önceden hesaplanmış özet (bkz.
+      // `on-session-write-update-trainer-stats.ts`). Sadece bu trigger
+      // (Admin SDK, kurallara tabi değil) yazar; salonun admin'i okur.
+      match /monthlyTrainerStats/{yearMonth} {
+        allow read: if isSignedIn() && myRole() == 'admin' && myGymId() == gymId;
+        allow write: if false;
+      }
     }
 
     // subscriptionTransactions/{transactionKey} — store transaction/purchase
@@ -127,7 +136,13 @@ service cloud.firestore {
       );
 
       allow update: if isSignedIn() && (
-        request.auth.uid == uid ||
+        // Egoractive Authentication Sistemi — email/emailLower SADECE Admin
+        // SDK (Cloud Functions, kuralları atlar) üzerinden yazılabilir; yani
+        // sadece OTP doğrulaması sonrası (verifyEmailSetupOtp/
+        // verifyEmailChangeOtp). Client kendi dokümanını güncellerken
+        // (ör. updateOwnInfo — ad/telefon) bu iki alana dokunamaz.
+        (request.auth.uid == uid &&
+          !request.resource.data.diff(resource.data).affectedKeys().hasAny(['email', 'emailLower'])) ||
         (myRole() == 'admin' &&
           resource.data.gymId == myGymId() &&
           request.resource.data.gymId == myGymId()) ||
@@ -335,10 +350,13 @@ service cloud.firestore {
       // bu kural client atlatılsa bile geçerli olan gerçek sınır).
       allow create: if isSignedIn() && myRole() == 'admin' &&
         request.resource.data.gymId == myGymId() && gymSubscriptionActive(myGymId());
+      // Antrenör bu koleksiyona (grup dersi/etkinlik) sadece görüntüleyici —
+      // düzenleme/iptal SADECE admin'e ait. Üyenin kendi katılım/ayrılma
+      // yazması `isOwnAttendeeChange()` ile ayrıca izinli.
       allow update: if isSignedIn() && resource.data.gymId == myGymId() && (
-        myRole() == 'admin' || myRole() == 'trainer' || isOwnAttendeeChange()
+        myRole() == 'admin' || isOwnAttendeeChange()
       );
-      allow delete: if isSignedIn() && resource.data.gymId == myGymId() && (myRole() == 'admin' || myRole() == 'trainer');
+      allow delete: if isSignedIn() && resource.data.gymId == myGymId() && myRole() == 'admin';
     }
 
     // events/{id} — F4-3. groupSessions ile aynı kontenjan kuralları.
@@ -347,9 +365,9 @@ service cloud.firestore {
       allow create: if isSignedIn() && myRole() == 'admin' &&
         request.resource.data.gymId == myGymId() && gymSubscriptionActive(myGymId());
       allow update: if isSignedIn() && resource.data.gymId == myGymId() && (
-        myRole() == 'admin' || myRole() == 'trainer' || isOwnAttendeeChange()
+        myRole() == 'admin' || isOwnAttendeeChange()
       );
-      allow delete: if isSignedIn() && resource.data.gymId == myGymId() && (myRole() == 'admin' || myRole() == 'trainer');
+      allow delete: if isSignedIn() && resource.data.gymId == myGymId() && myRole() == 'admin';
     }
 
     // expenses/{id} — F5-1 dashboard'ının gider toplamı okuduğu koleksiyon

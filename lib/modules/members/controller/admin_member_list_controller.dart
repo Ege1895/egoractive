@@ -135,7 +135,12 @@ class AdminMemberListController extends _$AdminMemberListController {
       // (görünürde boş liste) vermeli — kullanıcıya korkutucu bir "yüklenemedi"
       // mesajı yerine normal boş durumu gösteriyoruz.
       if (e.code == 'permission-denied') {
-        state = state.copyWith(items: const [], isLoading: false, hasMore: false, errorMessage: null);
+        state = state.copyWith(
+          items: const [],
+          isLoading: false,
+          hasMore: false,
+          errorMessage: null,
+        );
       } else {
         state = state.copyWith(
           isLoading: false,

@@ -8,12 +8,14 @@ part 'auth_state.freezed.dart';
 class AuthState with _$AuthState {
   const factory AuthState({
     @Default('') String phoneDigits,
+    @Default('') String emailInput,
     @Default(false) bool isRequestingLogin,
     String? loginErrorMessage,
 
-    /// Hatanın telefon alanına mı (notFound) yoksa genele mi (rate limit,
-    /// network) ait olduğunu ayırt eder — [PhoneLoginPanel] buna göre
-    /// hatayı field-seviyeli mi yoksa genel bir satır olarak mı gösterir.
+    /// Hatanın identifier alanına mı (notFound — telefon ya da email) yoksa
+    /// genele mi (rate limit, network) ait olduğunu ayırt eder —
+    /// [PhoneLoginPanel]/[EmailLoginPanel] buna göre hatayı field-seviyeli
+    /// mi yoksa genel bir satır olarak mı gösterir.
     AuthLoginErrorReason? loginErrorReason,
     @Default(false) bool deleteAccountAcknowledged,
     @Default(false) bool isDeletingAccount,
@@ -24,4 +26,9 @@ class AuthState with _$AuthState {
 
   /// Türkiye numarası 10 hane (5XX XXX XX XX) — +90 ayrı gösteriliyor.
   bool get isPhoneComplete => phoneDigits.length == 10;
+
+  bool get isEmailComplete =>
+      emailInput.contains('@') &&
+      emailInput.trim().length == emailInput.length &&
+      emailInput.length > 3;
 }

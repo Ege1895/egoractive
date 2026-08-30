@@ -31,7 +31,7 @@ class _GymSetupPanelState extends BasePanelState<GymSetupPanel> {
   late final TextEditingController _cityController;
   late final TextEditingController _phoneController;
   late final TextEditingController _addressController;
-  late final TextEditingController _reportEmailController;
+  late final TextEditingController _emailController;
   final _phoneFieldKey = GlobalKey();
 
   @override
@@ -47,10 +47,11 @@ class _GymSetupPanelState extends BasePanelState<GymSetupPanel> {
     _cityController = TextEditingController();
     _phoneController = TextEditingController();
     _addressController = TextEditingController();
-    // F5-16 — opsiyonel, GymProfile'a dahil değil (o model sadece zorunlu
-    // iletişim alanlarını tutuyor); bu yüzden diğerlerinin aksine bir
-    // provider'a senkronize edilmiyor, submit anında doğrudan okunuyor.
-    _reportEmailController = TextEditingController();
+    // Egoractive Authentication Sistemi §9 — "Login ve rapor e-postası",
+    // GymProfile'a dahil değil (o model sadece zorunlu iletişim alanlarını
+    // tutuyor); bu yüzden diğerlerinin aksine bir provider'a senkronize
+    // edilmiyor, submit anında doğrudan okunuyor.
+    _emailController = TextEditingController();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       ref.read(gymProfileControllerProvider.notifier).reset();
@@ -235,39 +236,18 @@ class _GymSetupPanelState extends BasePanelState<GymSetupPanel> {
                           AppTextField(
                             label: ref.watch(
                               rcTextProvider(
-                                RemoteConfigKeys.gymsGymInfoAddressFieldLabel,
+                                RemoteConfigKeys
+                                    .gymsGymInfoLoginReportEmailLabel,
                               ),
                             ),
-                            controller: _addressController,
-                            errorText: createGymState.addressError,
-                            onChanged: profileController.updateAddress,
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacing.lg),
-                    Container(
-                      padding: const EdgeInsets.all(AppSpacing.lg),
-                      decoration: BoxDecoration(
-                        color: colors.surface,
-                        borderRadius: BorderRadius.circular(
-                          AppSpacing.radiusCard,
-                        ),
-                        border: Border.all(color: colors.outline),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            ref.watch(
+                            hint: ref.watch(
                               rcTextProvider(
-                                RemoteConfigKeys.gymsGymSetupReportEmailLabel,
+                                RemoteConfigKeys.gymsGymInfoGymReportEmailHint,
                               ),
                             ),
-                            style: typography.headingSmall.copyWith(
-                              color: colors.onSurface,
-                              fontSize: 16,
-                            ),
+                            keyboardType: TextInputType.emailAddress,
+                            controller: _emailController,
+                            errorText: createGymState.emailError,
                           ),
                           const SizedBox(height: AppSpacing.xs),
                           Text(
@@ -277,25 +257,21 @@ class _GymSetupPanelState extends BasePanelState<GymSetupPanel> {
                                     .gymsGymSetupReportEmailDescription,
                               ),
                             ),
-                            style: typography.bodyMedium.copyWith(
+                            style: typography.caption.copyWith(
                               color: colors.onSurfaceMuted,
-                              fontSize: 13,
+                              fontSize: 12,
                             ),
                           ),
                           const SizedBox(height: AppSpacing.md),
                           AppTextField(
                             label: ref.watch(
                               rcTextProvider(
-                                RemoteConfigKeys.gymsGymInfoGymReportEmailLabel,
+                                RemoteConfigKeys.gymsGymInfoAddressFieldLabel,
                               ),
                             ),
-                            hint: ref.watch(
-                              rcTextProvider(
-                                RemoteConfigKeys.gymsGymInfoGymReportEmailHint,
-                              ),
-                            ),
-                            keyboardType: TextInputType.emailAddress,
-                            controller: _reportEmailController,
+                            controller: _addressController,
+                            errorText: createGymState.addressError,
+                            onChanged: profileController.updateAddress,
                           ),
                         ],
                       ),
@@ -557,13 +533,9 @@ class _GymSetupPanelState extends BasePanelState<GymSetupPanel> {
                           ? null
                           : () async {
                               final gymId = await createGymController.submit(
-                                reportEmail: _reportEmailController.text,
+                                email: _emailController.text,
                               );
                               if (gymId != null && mounted) {
-                                // `push` (replaceRoot değil) — kullanıcı numarayı
-                                // yanlış girdiyse ya da fikrini değiştirirse geri
-                                // dönebilsin diye (PhoneLoginPanel'in `canPop`
-                                // koşullu geri butonu bu durumda görünür olur).
                                 ref
                                     .read(panelStackControllerProvider.notifier)
                                     .push(
@@ -598,7 +570,7 @@ class _GymSetupPanelState extends BasePanelState<GymSetupPanel> {
     _cityController.dispose();
     _phoneController.dispose();
     _addressController.dispose();
-    _reportEmailController.dispose();
+    _emailController.dispose();
     super.dispose();
   }
 }

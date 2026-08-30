@@ -13,6 +13,7 @@ class GymEvent with _$GymEvent {
     required String meta,
     required int joined,
     int? capacity,
+    @Default(false) bool isCancelled,
   }) = _GymEvent;
 
   const GymEvent._();

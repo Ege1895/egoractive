@@ -7,11 +7,13 @@ import '../../../../core/panels/panel_stack_controller.dart';
 import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/utils/phone_number_formatter.dart';
-import '../../../../shared/widgets/app_back_button.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../controller/auth_controller.dart';
 import '../../domain/auth_login_exception.dart';
-import 'login_waiting_panel.dart';
+import '../../domain/otp_purpose.dart';
+import 'email_login_panel.dart';
+import 'email_setup_panel.dart';
+import 'otp_verification_panel.dart';
 
 /// Ortak 2 · Telefon Numarası Girişi.
 ///
@@ -20,12 +22,9 @@ import 'login_waiting_panel.dart';
 /// ekrana, az önce girdiği numara önceden dolu ve bir başarı mesajıyla
 /// yönlendirilir.
 ///
-/// Geri butonu sadece bu panel `push` ile açıldıysa (ör. F2-9 onboarding
-/// akışından gelindiyse) gösterilir — panel `replaceRoot` ile (çıkış yapma,
-/// hesap silme, oturum süresi dolma) açıldığında stack'te tek panel kalır ve
-/// geri dönülecek bir ekran olmaz. Bu durumu merkezi `PanelStackController`
-/// stack uzunluğundan okuyoruz — CLAUDE.md §2.3'teki "tek navigasyon
-/// sistemi" kuralına uygun olarak.
+/// Egoractive Authentication Sistemi §2/§8 — bu panelde (ve email eşleniği
+/// [EmailLoginPanel]'de) geri butonu HİÇBİR ZAMAN gösterilmez; sadece OTP
+/// ekranının kendi geri butonu var.
 class PhoneLoginPanel extends BasePanel {
   const PhoneLoginPanel({
     super.key,
@@ -70,7 +69,6 @@ class _PhoneLoginPanelState extends BasePanelState<PhoneLoginPanel> {
     final typography = context.appTypography;
     final authState = ref.watch(authControllerProvider);
     final authController = ref.read(authControllerProvider.notifier);
-    final canPop = ref.watch(panelStackControllerProvider).length > 1;
 
     final formatted = formatTrPhoneDigits(authState.phoneDigits);
     if (_phoneController.text != formatted) {
@@ -92,13 +90,6 @@ class _PhoneLoginPanelState extends BasePanelState<PhoneLoginPanel> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (canPop) ...[
-                AppBackButton(
-                  onTap: () =>
-                      ref.read(panelStackControllerProvider.notifier).pop(),
-                ),
-                const SizedBox(height: AppSpacing.lg),
-              ],
               if (widget.successBanner != null) ...[
                 Container(
                   width: double.infinity,
@@ -127,7 +118,9 @@ class _PhoneLoginPanelState extends BasePanelState<PhoneLoginPanel> {
                   decoration: BoxDecoration(
                     color: colors.errorContainer,
                     borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
-                    border: Border.all(color: colors.error.withValues(alpha: 0.3)),
+                    border: Border.all(
+                      color: colors.error.withValues(alpha: 0.3),
+                    ),
                   ),
                   child: Text(
                     widget.errorBanner!,
@@ -237,23 +230,58 @@ class _PhoneLoginPanelState extends BasePanelState<PhoneLoginPanel> {
               ),
               const SizedBox(height: AppSpacing.xl),
               AppButton(
-                label: ref.watch(
-                  rcTextProvider(RemoteConfigKeys.authLoginButton),
-                ),
-                onPressed: authState.isPhoneComplete
-                    ? () {
-                        authController.requestLogin();
-                        ref
-                            .read(panelStackControllerProvider.notifier)
-                            .push(const LoginWaitingPanel());
-                      }
+                label: authState.isRequestingLogin
+                    ? ref.watch(
+                        rcTextProvider(
+                          RemoteConfigKeys.authLoginWaitingHeading,
+                        ),
+                      )
+                    : ref.watch(
+                        rcTextProvider(RemoteConfigKeys.authLoginButton),
+                      ),
+                onPressed:
+                    authState.isPhoneComplete && !authState.isRequestingLogin
+                    ? () => _submit(authController)
                     : null,
+              ),
+              const SizedBox(height: AppSpacing.lg),
+              Center(
+                child: TextButton(
+                  onPressed: () => ref
+                      .read(panelStackControllerProvider.notifier)
+                      .replaceTop(const EmailLoginPanel()),
+                  child: Text(
+                    ref.watch(
+                      rcTextProvider(RemoteConfigKeys.authSwitchToEmailLink),
+                    ),
+                    style: typography.bodyMedium.copyWith(
+                      color: colors.onPrimaryContainer,
+                    ),
+                  ),
+                ),
               ),
             ],
           ),
         ),
       ),
     );
+  }
+
+  Future<void> _submit(AuthController authController) async {
+    final result = await authController.startLogin(identifierType: 'phone');
+    if (result == null || !mounted) return;
+    final panelStack = ref.read(panelStackControllerProvider.notifier);
+    if (result.needsEmailSetup) {
+      panelStack.push(EmailSetupPanel(uid: result.uid));
+    } else {
+      panelStack.push(
+        OtpVerificationPanel(
+          purpose: OtpPurpose.login,
+          uid: result.uid,
+          email: result.email!,
+        ),
+      );
+    }
   }
 
   @override

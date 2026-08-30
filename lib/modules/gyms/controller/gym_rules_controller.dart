@@ -20,7 +20,8 @@ class GymRulesController extends _$GymRulesController {
   GymRules build() {
     final gymId = ref.watch(activeGymIdProvider).valueOrNull;
     if (gymId == null) return const GymRules(delta: GymRules.empty);
-    return ref.watch(_rulesForGymProvider(gymId)).valueOrNull ?? const GymRules(delta: GymRules.empty);
+    return ref.watch(_rulesForGymProvider(gymId)).valueOrNull ??
+        const GymRules(delta: GymRules.empty);
   }
 
   Future<void> saveRules(List<dynamic> delta) async {

@@ -10,13 +10,18 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_text_field.dart';
 import '../../../../shared/widgets/native_date_picker.dart';
+import '../../../trainers/controller/admin_trainers_controller.dart';
 import '../../controller/create_group_session_controller.dart';
 import '../../domain/create_group_session_form.dart';
 import '../widgets/repeat_group_session_calendar_sheet.dart';
 
-/// Antrenör 7 · Grup Dersi Oluştur — kontenjan ve gün seçimi.
+/// Antrenör 7 · Grup Dersi Oluştur — kontenjan ve gün seçimi. [groupSessionId]
+/// verilirse düzenleme moduna geçer: mevcut ders yüklenir, "Tekrarla" kalkar,
+/// en altta "İptal Et" görünür (bkz. `_isEditing`).
 class CreateGroupSessionPanel extends BasePanel {
-  const CreateGroupSessionPanel({super.key});
+  const CreateGroupSessionPanel({super.key, this.groupSessionId});
+
+  final String? groupSessionId;
 
   @override
   ConsumerState<CreateGroupSessionPanel> createState() =>
@@ -27,6 +32,11 @@ class _CreateGroupSessionPanelState
     extends BasePanelState<CreateGroupSessionPanel> {
   late final TextEditingController _titleController;
   late final TextEditingController _studioNameController;
+  late final TextEditingController _descriptionController;
+  final _descriptionScrollController = ScrollController();
+  bool _hydratedForEdit = false;
+
+  bool get _isEditing => widget.groupSessionId != null;
 
   @override
   void initState() {
@@ -34,12 +44,21 @@ class _CreateGroupSessionPanelState
     // Önceki sürümde bu alanın `controller` parametresi hiç verilmemişti —
     // TextField kendi iç state'ini tutuyordu, provider'daki `form.title` ile
     // senkron değildi (ör. panel yeniden build olunca alan sıfırlanabilirdi).
-    _titleController = TextEditingController(
-      text: ref.read(createGroupSessionControllerProvider).title,
-    );
-    _studioNameController = TextEditingController(
-      text: ref.read(createGroupSessionControllerProvider).studioName,
-    );
+    _titleController = TextEditingController();
+    _studioNameController = TextEditingController();
+    _descriptionController = TextEditingController();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final controller = ref.read(
+        createGroupSessionControllerProvider.notifier,
+      );
+      final id = widget.groupSessionId;
+      if (id != null) {
+        controller.loadForEdit(id);
+      } else {
+        controller.resetForCreate();
+      }
+    });
   }
 
   @override
@@ -49,6 +68,19 @@ class _CreateGroupSessionPanelState
     final form = ref.watch(createGroupSessionControllerProvider);
     final controller = ref.read(createGroupSessionControllerProvider.notifier);
     final panelStack = ref.read(panelStackControllerProvider.notifier);
+
+    // `resetForCreate()`/`loadForEdit()` postFrame'de çalışıyor (initState
+    // senkron değil) — gerçek veri geldiğinde text controller'lar BİR KEZ
+    // dolduruluyor, sonrasında kullanıcı yazarken üzerine yazılmıyor.
+    final readyForHydration = _isEditing
+        ? form.editingId == widget.groupSessionId
+        : form.editingId == null && !form.isLoadingForEdit;
+    if (!_hydratedForEdit && readyForHydration) {
+      _hydratedForEdit = true;
+      _titleController.text = form.title;
+      _studioNameController.text = form.studioName;
+      _descriptionController.text = form.description;
+    }
 
     return Scaffold(
       body: SafeArea(
@@ -68,7 +100,9 @@ class _CreateGroupSessionPanelState
                     child: Text(
                       ref.watch(
                         rcTextProvider(
-                          RemoteConfigKeys.groupSessionsCreateTitle,
+                          _isEditing
+                              ? RemoteConfigKeys.groupSessionsEditTitle
+                              : RemoteConfigKeys.groupSessionsCreateTitle,
                         ),
                       ),
                       style: typography.headingSmall.copyWith(
@@ -198,48 +232,51 @@ class _CreateGroupSessionPanelState
                                 ),
                               ),
                             ),
-                            const SizedBox(width: AppSpacing.sm),
-                            Expanded(
-                              child: _InfoField(
-                                label: ref.watch(
-                                  rcTextProvider(
-                                    RemoteConfigKeys.sessionsCreateRepeatLabel,
+                            if (!_isEditing) ...[
+                              const SizedBox(width: AppSpacing.sm),
+                              Expanded(
+                                child: _InfoField(
+                                  label: ref.watch(
+                                    rcTextProvider(
+                                      RemoteConfigKeys
+                                          .sessionsCreateRepeatLabel,
+                                    ),
                                   ),
-                                ),
-                                value: form.repeatDates.isEmpty
-                                    ? ref.watch(
-                                        rcTextProvider(
-                                          RemoteConfigKeys
-                                              .sessionsCreateSelectPlaceholder,
-                                        ),
-                                      )
-                                    : ref
-                                          .watch(
-                                            rcTextProvider(
-                                              RemoteConfigKeys
-                                                  .sessionsCreateRepeatDaysSelected,
-                                            ),
-                                          )
-                                          .replaceAll(
-                                            '{count}',
-                                            '${form.repeatDates.length}',
+                                  value: form.repeatDates.isEmpty
+                                      ? ref.watch(
+                                          rcTextProvider(
+                                            RemoteConfigKeys
+                                                .sessionsCreateSelectPlaceholder,
                                           ),
-                                onTap: form.selectedDate == null
-                                    ? null
-                                    : () async {
-                                        final result =
-                                            await showRepeatGroupSessionCalendarSheet(
-                                              context,
-                                              baseDate: form.selectedDate!,
-                                              initiallySelected:
-                                                  form.repeatDates,
-                                            );
-                                        if (result != null) {
-                                          controller.setRepeatDates(result);
-                                        }
-                                      },
+                                        )
+                                      : ref
+                                            .watch(
+                                              rcTextProvider(
+                                                RemoteConfigKeys
+                                                    .sessionsCreateRepeatDaysSelected,
+                                              ),
+                                            )
+                                            .replaceAll(
+                                              '{count}',
+                                              '${form.repeatDates.length}',
+                                            ),
+                                  onTap: form.selectedDate == null
+                                      ? null
+                                      : () async {
+                                          final result =
+                                              await showRepeatGroupSessionCalendarSheet(
+                                                context,
+                                                baseDate: form.selectedDate!,
+                                                initiallySelected:
+                                                    form.repeatDates,
+                                              );
+                                          if (result != null) {
+                                            controller.setRepeatDates(result);
+                                          }
+                                        },
+                                ),
                               ),
-                            ),
+                            ],
                           ],
                         ),
                         if (form.dateError != null) ...[
@@ -252,6 +289,82 @@ class _CreateGroupSessionPanelState
                             ),
                           ),
                         ],
+                        const SizedBox(height: AppSpacing.md),
+                        _InfoField(
+                          label: ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.groupSessionsTrainerFieldLabel,
+                            ),
+                          ),
+                          value: form.trainerIds.isEmpty
+                              ? ref.watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys
+                                        .groupSessionsTrainerFieldPlaceholder,
+                                  ),
+                                )
+                              : ref
+                                    .watch(
+                                      rcTextProvider(
+                                        RemoteConfigKeys
+                                            .groupSessionsTrainerCountSelected,
+                                      ),
+                                    )
+                                    .replaceAll(
+                                      '{count}',
+                                      '${form.trainerIds.length}',
+                                    ),
+                          onTap: () =>
+                              _pickTrainers(context, ref, controller, form),
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+                        Scrollbar(
+                          controller: _descriptionScrollController,
+                          thumbVisibility: true,
+                          interactive: true,
+                          thickness: 4,
+                          radius: const Radius.circular(4),
+                          child: AppTextField(
+                            label: ref.watch(
+                              rcTextProvider(
+                                RemoteConfigKeys
+                                    .groupSessionsDescriptionFieldLabel,
+                              ),
+                            ),
+                            controller: _descriptionController,
+                            scrollController: _descriptionScrollController,
+                            minLines: 1,
+                            maxLines: 5,
+                            onChanged: controller.setDescription,
+                          ),
+                        ),
+                        const SizedBox(height: AppSpacing.xs),
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: Text(
+                            ref
+                                .watch(
+                                  rcTextProvider(
+                                    RemoteConfigKeys
+                                        .groupSessionsDescriptionCharCountTemplate,
+                                  ),
+                                )
+                                .replaceAll(
+                                  '{count}',
+                                  '${form.description.length}',
+                                )
+                                .replaceAll(
+                                  '{max}',
+                                  '${form.descriptionMaxChars}',
+                                ),
+                            style: typography.caption.copyWith(
+                              color: controller.isDescriptionOverLimit
+                                  ? colors.error
+                                  : colors.onSurfaceMuted,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -514,10 +627,17 @@ class _CreateGroupSessionPanelState
                           )
                         : ref.watch(
                             rcTextProvider(
-                              RemoteConfigKeys.groupSessionsCreateSubmitButton,
+                              _isEditing
+                                  ? RemoteConfigKeys
+                                        .groupSessionsEditSubmitButton
+                                  : RemoteConfigKeys
+                                        .groupSessionsCreateSubmitButton,
                             ),
                           ),
-                    onPressed: form.isSubmitting
+                    onPressed:
+                        form.isSubmitting ||
+                            form.isCancelling ||
+                            controller.isDescriptionOverLimit
                         ? null
                         : () async {
                             if (!await ensureSubscriptionAllowsWrite(
@@ -527,9 +647,31 @@ class _CreateGroupSessionPanelState
                               return;
                             }
                             final success = await controller.submit();
-                            if (success) panelStack.pop();
+                            if (success && mounted) panelStack.pop();
                           },
                   ),
+                  if (_isEditing) ...[
+                    const SizedBox(height: AppSpacing.sm),
+                    _CancelButton(
+                      label: form.isCancelling
+                          ? ref.watch(
+                              rcTextProvider(
+                                RemoteConfigKeys.gymsGymSetupSubmittingLabel,
+                              ),
+                            )
+                          : ref.watch(
+                              rcTextProvider(
+                                RemoteConfigKeys.groupSessionsCancelButton,
+                              ),
+                            ),
+                      onPressed: form.isSubmitting || form.isCancelling
+                          ? null
+                          : () async {
+                              final success = await controller.cancel();
+                              if (success && mounted) panelStack.pop();
+                            },
+                    ),
+                  ],
                 ],
               ),
             ),
@@ -543,8 +685,162 @@ class _CreateGroupSessionPanelState
   void dispose() {
     _titleController.dispose();
     _studioNameController.dispose();
+    _descriptionController.dispose();
+    _descriptionScrollController.dispose();
     super.dispose();
   }
+}
+
+/// Sadece düzenleme modunda görünür — dersi listeden kaldırmaz, `status:
+/// cancelled` ile işaretler (bkz. `CreateGroupSessionController.cancel`).
+class _CancelButton extends StatelessWidget {
+  const _CancelButton({required this.label, required this.onPressed});
+
+  final String label;
+  final VoidCallback? onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+    final typography = context.appTypography;
+    final disabled = onPressed == null;
+
+    return Material(
+      color: colors.errorContainer,
+      borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+      child: InkWell(
+        onTap: onPressed,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+        child: Container(
+          constraints: const BoxConstraints(
+            minHeight: AppSpacing.primaryActionHeight,
+          ),
+          width: double.infinity,
+          alignment: Alignment.center,
+          child: Text(
+            label,
+            style: typography.headingSmall.copyWith(
+              fontSize: 15,
+              color: disabled ? colors.onSurfaceMuted : colors.error,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Antrenör atama — opsiyonel, çoklu seçim. `create_session_sheet.dart`'taki
+/// düet üye seçim sheet'inin (`_pickMultipleFromList`) aynı deseni,
+/// antrenörler için.
+void _pickTrainers(
+  BuildContext context,
+  WidgetRef ref,
+  CreateGroupSessionController controller,
+  CreateGroupSessionForm form,
+) {
+  final colors = context.appColors;
+  final typography = context.appTypography;
+  final allTrainers = ref.read(adminTrainersControllerProvider);
+  final selected = allTrainers
+      .where((t) => form.trainerIds.contains(t.id))
+      .toList();
+
+  showModalBottomSheet<void>(
+    context: context,
+    backgroundColor: colors.surface,
+    isScrollControlled: true,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+    ),
+    builder: (sheetContext) => StatefulBuilder(
+      builder: (sheetContext, setSheetState) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                ref.read(
+                  rcTextProvider(
+                    RemoteConfigKeys.groupSessionsTrainerPickerTitle,
+                  ),
+                ),
+                style: typography.headingMedium.copyWith(
+                  color: colors.onSurface,
+                  fontSize: 20,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.md),
+              Flexible(
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      for (final trainer in allTrainers)
+                        InkWell(
+                          onTap: () => setSheetState(() {
+                            final index = selected.indexWhere(
+                              (t) => t.id == trainer.id,
+                            );
+                            if (index >= 0) {
+                              selected.removeAt(index);
+                            } else {
+                              selected.add(trainer);
+                            }
+                          }),
+                          child: Container(
+                            constraints: const BoxConstraints(minHeight: 52),
+                            child: Row(
+                              children: [
+                                Checkbox(
+                                  value: selected.any(
+                                    (t) => t.id == trainer.id,
+                                  ),
+                                  onChanged: (_) => setSheetState(() {
+                                    final index = selected.indexWhere(
+                                      (t) => t.id == trainer.id,
+                                    );
+                                    if (index >= 0) {
+                                      selected.removeAt(index);
+                                    } else {
+                                      selected.add(trainer);
+                                    }
+                                  }),
+                                ),
+                                Expanded(
+                                  child: Text(
+                                    trainer.name,
+                                    style: typography.bodyLarge.copyWith(
+                                      color: colors.onSurface,
+                                      fontSize: 15,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: AppSpacing.md),
+              AppButton(
+                label: ref.read(
+                  rcTextProvider(RemoteConfigKeys.commonTamamButton),
+                ),
+                onPressed: () {
+                  controller.setTrainerIds(selected.map((t) => t.id).toList());
+                  Navigator.of(sheetContext).pop();
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+    ),
+  );
 }
 
 String _formatDate(WidgetRef ref, DateTime date) {

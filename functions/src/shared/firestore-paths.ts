@@ -16,6 +16,15 @@ export function userDoc(uid: string) {
   return `${usersCollection()}/${uid}`;
 }
 
+/** Email OTP sistemi — bkz. `shared/otp.ts`. Doküman id'si `{purpose}_{uid}` şeklinde. */
+export function otpRequestsCollection() {
+  return "otpRequests";
+}
+
+export function otpRequestDoc(id: string) {
+  return `${otpRequestsCollection()}/${id}`;
+}
+
 export function gymsCollection() {
   return "gyms";
 }
@@ -116,4 +125,22 @@ export function subscriptionTransactionsCollection() {
 
 export function subscriptionTransactionDoc(transactionKey: string) {
   return `${subscriptionTransactionsCollection()}/${transactionKey}`;
+}
+
+/**
+ * F5-1/F7-2 — dashboard'daki antrenör performans dökümü artık antrenör
+ * başına 2 `count()` sorgusu (N antrenörde 2N round-trip) yerine, her seans
+ * yazımında `on-session-write-update-trainer-stats.ts` trigger'ının canlı
+ * tuttuğu TEK bir özet dokümanı okuyor. `{yearMonth}` UTC takvim ayı,
+ * "2026-08" formatında — trigger'ın yazdığı anahtarla `dashboard_report_service.dart`'ın
+ * okuduğu anahtar BİLEREK aynı (UTC) kuralla üretiliyor, salon saat dilimine
+ * göre hesaplamak ikisi arasında gece yarısı civarı uyuşmazlık riski
+ * doğururdu. Sadece Admin SDK (trigger) yazar, salon admin'i okur.
+ */
+export function monthlyTrainerStatsCollection(gymId: string) {
+  return `${gymDoc(gymId)}/monthlyTrainerStats`;
+}
+
+export function monthlyTrainerStatsDoc(gymId: string, yearMonth: string) {
+  return `${monthlyTrainerStatsCollection(gymId)}/${yearMonth}`;
 }

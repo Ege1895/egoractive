@@ -31,6 +31,18 @@ class PanelStackController extends _$PanelStackController {
   /// sıfırlanması (F1-11) bu metodu kullanır.
   void replaceRoot(BasePanel panel) => _updateStack([panel]);
 
+  /// Sadece en üstteki paneli değiştirir, altındaki stack'e dokunmaz —
+  /// `push` gibi stack'i büyütmez, `replaceRoot` gibi altını da silmez.
+  /// Telefon↔Email giriş panelleri arasında geçiş bunu kullanır (Egoractive
+  /// Authentication Sistemi §2 — "navigation stack oluşturulmamalı").
+  void replaceTop(BasePanel panel) {
+    if (state.isEmpty) {
+      _updateStack([panel]);
+      return;
+    }
+    _updateStack([...state.sublist(0, state.length - 1), panel]);
+  }
+
   void registerActiveBackHandler(bool Function()? handler) {
     _activeBackHandler = handler;
   }

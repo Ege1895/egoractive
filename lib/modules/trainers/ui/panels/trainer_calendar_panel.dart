@@ -407,9 +407,7 @@ class _TrainerCalendarPanelState extends BasePanelState<TrainerCalendarPanel> {
         slot.state == ScheduleSlotState.current;
     final isExpired =
         isActionable &&
-        DateTime.now().isAfter(
-          slot.startTime.add(const Duration(hours: 24)),
-        );
+        DateTime.now().isAfter(slot.startTime.add(const Duration(hours: 24)));
     final markCompletedLabel = ref.read(
       rcTextProvider(RemoteConfigKeys.trainersCalendarMarkCompletedAction),
     );
@@ -620,9 +618,7 @@ class _TrainerCalendarPanelState extends BasePanelState<TrainerCalendarPanel> {
                       isExpired ? expiredNote : timeLimitNote,
                       textAlign: TextAlign.center,
                       style: typography.caption.copyWith(
-                        color: isExpired
-                            ? colors.error
-                            : colors.onSurfaceMuted,
+                        color: isExpired ? colors.error : colors.onSurfaceMuted,
                       ),
                     ),
                   ],
@@ -793,7 +789,8 @@ class _AgendaRow extends ConsumerWidget {
         colors.onErrorContainer,
         ref.watch(rcTextProvider(RemoteConfigKeys.commonIptalLabel)),
       ),
-      ScheduleSlotState.planned || ScheduleSlotState.current => (null, null, null),
+      ScheduleSlotState.planned ||
+      ScheduleSlotState.current => (null, null, null),
     };
     if (label == null) return null;
     return Container(

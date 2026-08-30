@@ -6,12 +6,41 @@ import 'package:egoractive/core/remote_config/remote_config_service.dart';
 import 'package:egoractive/main.dart';
 import 'package:egoractive/modules/auth/repository/auth_repository.dart';
 
-/// Gerçek Firebase çağrısı (F1-10) yapmayan sahte repository — bu dosya
-/// panel geçişlerini test eder, Firebase entegrasyonunu değil.
+/// Gerçek Firebase çağrısı yapmayan sahte repository — bu dosya panel
+/// geçişlerini test eder, Firebase entegrasyonunu değil.
 class _FakeAuthRepository implements AuthRepository {
   @override
-  Future<void> login(String phoneDigits) =>
-      Future<void>.delayed(const Duration(seconds: 2));
+  Future<StartLoginResult> startLogin({
+    required String identifierType,
+    required String value,
+  }) async {
+    await Future<void>.delayed(const Duration(seconds: 2));
+    return (needsEmailSetup: false, uid: 'uid-1', email: 'a@b.com');
+  }
+
+  @override
+  Future<void> verifyLoginOtp({required String uid, required String code}) =>
+      Future<void>.delayed(const Duration(milliseconds: 1));
+
+  @override
+  Future<void> sendEmailSetupOtp({
+    required String uid,
+    required String email,
+  }) => Future<void>.delayed(const Duration(milliseconds: 1));
+
+  @override
+  Future<void> verifyEmailSetupOtp({
+    required String uid,
+    required String code,
+  }) => Future<void>.delayed(const Duration(milliseconds: 1));
+
+  @override
+  Future<void> sendEmailChangeOtp(String newEmail) =>
+      Future<void>.delayed(const Duration(milliseconds: 1));
+
+  @override
+  Future<void> verifyEmailChangeOtp(String code) =>
+      Future<void>.delayed(const Duration(milliseconds: 1));
 
   @override
   Future<void> deleteAccount() =>
@@ -38,8 +67,11 @@ class _FakeRemoteConfigService extends RemoteConfigService {
     'lbl_auth_phone_login_title': 'Telefonunla giriş yap',
     'lbl_auth_login_button': 'Giriş yap',
     'lbl_auth_login_waiting_heading': 'Seni tanıyoruz…',
-    'lbl_auth_login_waiting_body': '+90 {phone} numarası stüdyoda aranıyor.',
-    'lbl_auth_login_waiting_cancel_button': 'İptal',
+    'lbl_auth_otp_title': 'Doğrulama kodu',
+    'lbl_auth_otp_subtitle': 'Kod {email} adresine gönderildi.',
+    'lbl_auth_otp_verify_button': 'Doğrula',
+    'lbl_auth_otp_resend_button': 'Tekrar gönder',
+    'lbl_auth_otp_resend_countdown_template': 'Tekrar gönder ({seconds}s)',
   };
 
   @override
@@ -66,9 +98,10 @@ Future<void> _navigateToPhoneLogin(WidgetTester tester) async {
 
 void main() {
   testWidgets(
-    'Splash auto-transitions to onboarding role picker, "Üyeyim" leads to phone '
-    'login, native keyboard input fills the number, login pushes the waiting '
-    'screen, and cancel returns while still loading',
+    'Splash auto-transitions to onboarding role picker, "Üyeyim" leads to '
+    'phone login, native keyboard input fills the number, login shows a '
+    'loading state on the button and then pushes the OTP screen; OTP screen '
+    'back button returns to phone login with the number preserved',
     (tester) async {
       await tester.pumpWidget(
         ProviderScope(
@@ -93,56 +126,21 @@ void main() {
       expect(find.text('532 418 76 05'), findsOneWidget);
 
       await tester.tap(loginButtonFinder);
-      // Bekleme ekranında sürekli dönen bir gösterge var, pumpAndSettle asla
-      // durmaz — tek kare basıp geçişin gerçekleştiğini doğruluyoruz.
       await tester.pump();
+      // Fake startLogin (2sn) sürerken buton "Seni tanıyoruz…" durumuna geçer.
       expect(find.text('Seni tanıyoruz…'), findsOneWidget);
-      expect(
-        find.text('+90 532 418 76 05 numarası stüdyoda aranıyor.'),
-        findsOneWidget,
-      );
 
-      // Fake login isteği (2sn) hâlâ sürerken iptal edilebiliyor.
-      await tester.tap(find.text('İptal'));
+      await tester.pump(const Duration(seconds: 2));
+      await tester.pumpAndSettle();
+      expect(find.text('Doğrulama kodu'), findsOneWidget);
+
+      // OTP ekranının geri butonu telefon giriş ekranına döner, numara
+      // (AuthController state'i, Visibility(maintainState:true) sayesinde
+      // TextField'ın kendi local state'i de) korunmuş olur.
+      await tester.tap(find.byIcon(Icons.chevron_left).first);
       await tester.pumpAndSettle();
       expect(find.text('Telefonunla giriş yap'), findsOneWidget);
-
-      // Fake isteğin zamanlayıcısı hâlâ ayakta — testin "pending timer"
-      // hatasıyla bitmemesi için tamamlanmasını bekle.
-      await tester.pump(const Duration(seconds: 2));
-    },
-  );
-
-  testWidgets(
-    'Successful mock login shows no error and leaves waiting-for-role state to the '
-    'global router (F1-11, only exercised against real Firebase — see app_router_test.dart)',
-    (tester) async {
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            authRepositoryProvider.overrideWith((ref) => _FakeAuthRepository()),
-            remoteConfigServiceProvider.overrideWithValue(
-              const _FakeRemoteConfigService(),
-            ),
-          ],
-          child: const EgoractiveApp(),
-        ),
-      );
-      await _navigateToPhoneLogin(tester);
-
-      await tester.enterText(find.byType(TextField), '5324187605');
-      await tester.pump();
-      await tester.tap(find.text('Giriş yap'));
-      await tester.pump();
-      expect(find.text('Seni tanıyoruz…'), findsOneWidget);
-
-      // Fake repository başarıyla "giriş yapar" ama gerçek bir Firebase Auth
-      // oturumu açmaz — bu yüzden main.dart'taki rol dinleyicisi tetiklenmez
-      // ve panel hata göstermeden bekleme ekranında kalır (F1-11'in asıl
-      // yönlendirme mantığı app_router_test.dart'ta Firebase'siz test ediliyor).
-      await tester.pump(const Duration(seconds: 2));
-      await tester.pump();
-      expect(find.text('Seni tanıyoruz…'), findsOneWidget);
+      expect(find.text('532 418 76 05'), findsOneWidget);
     },
   );
 
