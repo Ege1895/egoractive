@@ -468,7 +468,7 @@
     },
     "lbl_common_studyo_kurallari_nav_tr": {
       "defaultValue": {
-        "value": "Stüdyo kuralları"
+        "value": "Salon kuralları"
       },
       "valueType": "STRING"
     },
@@ -1060,7 +1060,7 @@
     },
     "lbl_auth_login_error_not_found_tr": {
       "defaultValue": {
-        "value": "Bu numarayla kayıtlı bir hesap bulunamadı. Stüdyo yönetimi seni eklemeli."
+        "value": "Bu numarayla kayıtlı bir hesap bulunamadı. Salon yönetimi seni eklemeli."
       },
       "valueType": "STRING"
     },
@@ -1156,7 +1156,7 @@
     },
     "lbl_auth_delete_account_item_feedback_tr": {
       "defaultValue": {
-        "value": "Stüdyona bıraktığın geri bildirimler"
+        "value": "Salonuna bıraktığın geri bildirimler"
       },
       "valueType": "STRING"
     },
@@ -1228,7 +1228,7 @@
     },
     "lbl_auth_login_waiting_body_tr": {
       "defaultValue": {
-        "value": "+90 {phone} numarası stüdyoda aranıyor."
+        "value": "+90 {phone} numarası salonda aranıyor."
       },
       "valueType": "STRING"
     },
@@ -1336,7 +1336,7 @@
     },
     "lbl_auth_onboarding_role_member_note_tr": {
       "defaultValue": {
-        "value": "Bir salona/stüdyoya kayıtlıyım"
+        "value": "Bir salona kayıtlıyım"
       },
       "valueType": "STRING"
     },
@@ -1360,7 +1360,7 @@
     },
     "lbl_auth_onboarding_role_hint_member_tr": {
       "defaultValue": {
-        "value": "Stüdyona kayıtlı telefon numaranla giriş yapacaksın."
+        "value": "Salonuna kayıtlı telefon numaranla giriş yapacaksın."
       },
       "valueType": "STRING"
     },
@@ -1456,7 +1456,7 @@
     },
     "lbl_auth_trainer_path_subtitle_tr": {
       "defaultValue": {
-        "value": "Zaten çalıştığın bir stüdyo varsa oraya bağlan; yoksa kendi salonunu sen oluştur."
+        "value": "Zaten çalıştığın bir salon varsa oraya bağlan; yoksa kendi salonunu sen oluştur."
       },
       "valueType": "STRING"
     },
@@ -1504,7 +1504,7 @@
     },
     "lbl_auth_trainer_path_new_gym_note_tr": {
       "defaultValue": {
-        "value": "Kendi stüdyomu/salonumu ilk kez kaydediyorum"
+        "value": "Kendi salonumu ilk kez kaydediyorum"
       },
       "valueType": "STRING"
     },
@@ -1564,7 +1564,7 @@
     },
     "lbl_auth_phone_login_subtitle_tr": {
       "defaultValue": {
-        "value": "Stüdyona kayıtlı numaranı gir; şifre yok, tek dokunuşla girersin."
+        "value": "Salonuna kayıtlı numaranı gir; şifre yok, tek dokunuşla girersin."
       },
       "valueType": "STRING"
     },
@@ -1576,7 +1576,7 @@
     },
     "lbl_auth_phone_login_hint_tr": {
       "defaultValue": {
-        "value": "Numaran kayıtlı değilse stüdyo yönetimi seni eklemeli."
+        "value": "Numaran kayıtlı değilse salon yönetimi seni eklemeli."
       },
       "valueType": "STRING"
     },
@@ -2556,7 +2556,7 @@
     },
     "lbl_gyms_settings_nav_studio_packages_tr": {
       "defaultValue": {
-        "value": "Stüdyo paketleri"
+        "value": "Salon paketleri"
       },
       "valueType": "STRING"
     },
@@ -3024,7 +3024,7 @@
     },
     "lbl_gyms_studio_rules_title_tr": {
       "defaultValue": {
-        "value": "Stüdyo kuralları"
+        "value": "Salon kuralları"
       },
       "valueType": "STRING"
     },
@@ -3264,7 +3264,7 @@
     },
     "lbl_gyms_gym_info_gym_report_email_hint_tr": {
       "defaultValue": {
-        "value": "admin@stüdyo.com"
+        "value": "admin@salon.com"
       },
       "valueType": "STRING"
     },
@@ -6498,7 +6498,7 @@
     },
     "lbl_subscription_trial_banner_body_tr": {
       "defaultValue": {
-        "value": "{date} tarihine kadar tüm özellikler açık. Bir plan seçerseniz stüdyonuz kesintisiz çalışmaya devam eder."
+        "value": "{date} tarihine kadar tüm özellikler açık. Bir plan seçerseniz salonunuz kesintisiz çalışmaya devam eder."
       },
       "valueType": "STRING"
     },
@@ -7431,7 +7431,7 @@
     },
     "lbl_feedback_privacy_note_with_trainer_tr": {
       "defaultValue": {
-        "value": "{trainer} ile birebir · Yalnızca stüdyo yönetimi görür, antrenörüne isimsiz iletilir."
+        "value": "{trainer} ile birebir · Yalnızca salon yönetimi görür, antrenörüne isimsiz iletilir."
       },
       "valueType": "STRING"
     },
@@ -7443,7 +7443,7 @@
     },
     "lbl_feedback_privacy_note_tr": {
       "defaultValue": {
-        "value": "Yalnızca stüdyo yönetimi görür, antrenörüne isimsiz iletilir."
+        "value": "Yalnızca salon yönetimi görür, antrenörüne isimsiz iletilir."
       },
       "valueType": "STRING"
     },

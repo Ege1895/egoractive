@@ -1430,7 +1430,7 @@ class RemoteConfigService {
     'lbl_common_degistir_tr': 'Değiştir',
     'lbl_common_cikis_yap_tr': 'Çıkış yap',
     'lbl_common_hesabimi_sil_tr': 'Hesabımı sil',
-    'lbl_common_studyo_kurallari_nav_tr': 'Stüdyo kuralları',
+    'lbl_common_studyo_kurallari_nav_tr': 'Salon kuralları',
     'lbl_common_seansi_ertele_tr': 'Seansı ertele',
     'lbl_common_gelicem_tr': 'Gelicem',
     'lbl_common_gelmeyecegim_tr': 'Gelmeyeceğim',
@@ -1481,7 +1481,7 @@ class RemoteConfigService {
         'Dersinden 2 saat önce bildirim',
     'lbl_auth_delete_account_confirm_title_tr': 'Profilim',
     'lbl_auth_login_error_not_found_tr':
-        'Bu numarayla kayıtlı bir hesap bulunamadı. Stüdyo yönetimi seni eklemeli.',
+        'Bu numarayla kayıtlı bir hesap bulunamadı. Salon yönetimi seni eklemeli.',
     'lbl_auth_login_error_rate_limited_tr':
         'Çok fazla deneme yapıldı. Bir dakika sonra tekrar dene.',
     'lbl_auth_login_error_generic_tr':
@@ -1496,7 +1496,7 @@ class RemoteConfigService {
     'lbl_auth_delete_account_item_measurements_badges_tr':
         'Ölçüm geçmişin ve rozetlerin',
     'lbl_auth_delete_account_item_feedback_tr':
-        'Stüdyona bıraktığın geri bildirimler',
+        'Salonuna bıraktığın geri bildirimler',
     'lbl_auth_delete_account_confirm_heading_tr':
         'Hesabını silmek geri alınamaz',
     'lbl_auth_delete_account_confirm_body_tr':
@@ -1506,7 +1506,7 @@ class RemoteConfigService {
         'Anladım, hesabım ve tüm verilerim silinsin.',
     'lbl_auth_delete_account_in_progress_button_tr': 'Siliniyor…',
     'lbl_auth_login_waiting_heading_tr': 'Seni tanıyoruz…',
-    'lbl_auth_login_waiting_body_tr': '+90 {phone} numarası stüdyoda aranıyor.',
+    'lbl_auth_login_waiting_body_tr': '+90 {phone} numarası salonda aranıyor.',
     'lbl_auth_login_waiting_hint_tr':
         '30 saniyeden uzun sürerse bağlantını kontrol edip tekrar dene.',
     'lbl_auth_login_waiting_cancel_button_tr': 'İptal',
@@ -1516,11 +1516,11 @@ class RemoteConfigService {
     'lbl_auth_onboarding_role_trainer_title_tr': 'Antrenörüm',
     'lbl_auth_onboarding_role_trainer_note_tr': 'Antrenörlük belgem var',
     'lbl_auth_onboarding_role_member_title_tr': 'Üyeyim',
-    'lbl_auth_onboarding_role_member_note_tr': 'Bir salona/stüdyoya kayıtlıyım',
+    'lbl_auth_onboarding_role_member_note_tr': 'Bir salona kayıtlıyım',
     'lbl_auth_onboarding_role_hint_trainer_tr':
         'Sonraki adımda bir salona bağlı mı olduğunu soracağız.',
     'lbl_auth_onboarding_role_hint_member_tr':
-        'Stüdyona kayıtlı telefon numaranla giriş yapacaksın.',
+        'Salonuna kayıtlı telefon numaranla giriş yapacaksın.',
     'lbl_auth_onboarding_role_continue_button_tr': 'Devam et',
     'lbl_auth_onboarding_role_go_to_login_button_tr': 'Girişe geç',
     'lbl_auth_onboarding_role_partner_gyms_button_tr': 'Anlaşmalı Salonlar',
@@ -1529,13 +1529,13 @@ class RemoteConfigService {
     'lbl_partner_gyms_error_tr': 'Salonlar yüklenemedi, tekrar dene.',
     'lbl_auth_trainer_path_title_tr': 'Bir salona bağlı mısın?',
     'lbl_auth_trainer_path_subtitle_tr':
-        'Zaten çalıştığın bir stüdyo varsa oraya bağlan; yoksa kendi salonunu sen oluştur.',
+        'Zaten çalıştığın bir salon varsa oraya bağlan; yoksa kendi salonunu sen oluştur.',
     'lbl_auth_trainer_path_linked_title_tr': 'Bir salona bağlı çalışıyorum',
     'lbl_auth_trainer_path_linked_note_tr':
         'Salon yönetimi beni zaten sisteme eklemiş olmalı',
     'lbl_auth_trainer_path_new_gym_title_tr': 'Yeni bir salon açmak istiyorum',
     'lbl_auth_trainer_path_new_gym_note_tr':
-        'Kendi stüdyomu/salonumu ilk kez kaydediyorum',
+        'Kendi salonumu ilk kez kaydediyorum',
     'lbl_auth_trainer_path_hint_linked_tr':
         'Numaran sistemde yoksa salon yönetiminden seni eklemesini isteyebilirsin.',
     'lbl_auth_trainer_path_hint_new_gym_tr':
@@ -1543,9 +1543,9 @@ class RemoteConfigService {
     'lbl_auth_trainer_path_create_gym_button_tr': 'Salon oluşturmaya geç',
     'lbl_auth_phone_login_title_tr': 'Telefonunla giriş yap',
     'lbl_auth_phone_login_subtitle_tr':
-        'Stüdyona kayıtlı numaranı gir; şifre yok, tek dokunuşla girersin.',
+        'Salonuna kayıtlı numaranı gir; şifre yok, tek dokunuşla girersin.',
     'lbl_auth_phone_login_hint_tr':
-        'Numaran kayıtlı değilse stüdyo yönetimi seni eklemeli.',
+        'Numaran kayıtlı değilse salon yönetimi seni eklemeli.',
     'lbl_auth_profile_member_caption_tr': '+90 {phone} · Üye',
     'lbl_auth_profile_session_reminder_description_tr':
         'Dersinden {minutes} dakika önce bildirim',
@@ -1608,9 +1608,9 @@ class RemoteConfigService {
     'lbl_feedback_total_reviews_caption_tr': '{count} değerlendirme',
     'lbl_feedback_how_was_session_title_tr': 'Dersin nasıl geçti?',
     'lbl_feedback_privacy_note_with_trainer_tr':
-        '{trainer} ile birebir · Yalnızca stüdyo yönetimi görür, antrenörüne isimsiz iletilir.',
+        '{trainer} ile birebir · Yalnızca salon yönetimi görür, antrenörüne isimsiz iletilir.',
     'lbl_feedback_privacy_note_tr':
-        'Yalnızca stüdyo yönetimi görür, antrenörüne isimsiz iletilir.',
+        'Yalnızca salon yönetimi görür, antrenörüne isimsiz iletilir.',
     'lbl_feedback_comment_field_hint_tr':
         'Isınma bölümü bu hafta çok iyiydi, esneme için 5 dakika daha olsa harika olur.',
     'lbl_feedback_submit_button_tr': 'Gönder',
@@ -1681,7 +1681,7 @@ class RemoteConfigService {
     'lbl_gyms_settings_title_tr': 'Ayarlar',
     'lbl_gyms_settings_nav_gym_info_tr': 'Salon bilgileri',
     'lbl_gyms_settings_nav_trainer_management_tr': 'Antrenör yönetimi',
-    'lbl_gyms_settings_nav_studio_packages_tr': 'Stüdyo paketleri',
+    'lbl_gyms_settings_nav_studio_packages_tr': 'Salon paketleri',
     'lbl_gyms_settings_nav_session_management_tr': 'Ders / seans yönetimi',
     'lbl_gyms_settings_nav_group_sessions_tr': 'Grup dersleri',
     'lbl_gyms_settings_nav_events_tr': 'Etkinlikler',
@@ -1723,7 +1723,7 @@ class RemoteConfigService {
     'lbl_gyms_add_theme_flat_background_option_tr': 'Hayır, düz zemin',
     'lbl_gyms_add_theme_submit_button_tr': 'Temayı kaydet ve uygula',
     'lbl_gyms_add_theme_name_field_label_tr': 'Tema adı',
-    'lbl_gyms_studio_rules_title_tr': 'Stüdyo kuralları',
+    'lbl_gyms_studio_rules_title_tr': 'Salon kuralları',
     'lbl_gyms_edit_studio_rules_title_tr': 'Kuralları düzenle',
     'lbl_gyms_settings_nav_subscription_tr': 'Abonelik',
     'lbl_gyms_settings_nav_reports_tr': 'Raporlar',
@@ -1750,7 +1750,7 @@ class RemoteConfigService {
     'lbl_gyms_gym_info_report_emails_description_tr':
         'Haftalık ve aylık salon özeti (ciro/gider dahil) bu adrese e-posta ile gönderilir.',
     'lbl_gyms_gym_info_gym_report_email_label_tr': 'Rapor e-postası',
-    'lbl_gyms_gym_info_gym_report_email_hint_tr': 'admin@stüdyo.com',
+    'lbl_gyms_gym_info_gym_report_email_hint_tr': 'admin@salon.com',
     'lbl_gyms_gym_info_saving_label_tr': 'Kaydediliyor…',
     'lbl_gyms_gym_info_logo_upload_failed_error_tr':
         'Logo yüklenemedi, tekrar dene.',
@@ -3026,7 +3026,7 @@ class RemoteConfigService {
         'Deneme süreniz {days} gün sonra doluyor',
     'lbl_subscription_trial_banner_title_en': 'Your trial ends in {days} days',
     'lbl_subscription_trial_banner_body_tr':
-        '{date} tarihine kadar tüm özellikler açık. Bir plan seçerseniz stüdyonuz kesintisiz çalışmaya devam eder.',
+        '{date} tarihine kadar tüm özellikler açık. Bir plan seçerseniz salonunuz kesintisiz çalışmaya devam eder.',
     'lbl_subscription_trial_banner_body_en':
         'All features are open until {date}. If you choose a plan, your studio keeps running without interruption.',
     'lbl_subscription_trial_progress_tr':
