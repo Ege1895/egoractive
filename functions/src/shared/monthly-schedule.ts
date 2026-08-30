@@ -1,7 +1,5 @@
 import { RemoteConfigTemplate } from "firebase-admin/remote-config";
 
-import { istanbulDayAndHour } from "./weekly-schedule";
-
 const ISTANBUL_TIME_ZONE = "Europe/Istanbul";
 
 /** İstanbul yerel takvim tarihi (yıl/ay/gün). */
@@ -49,25 +47,23 @@ export function isFeedbackReminderDue(template: RemoteConfigTemplate, now: Date)
   return istanbulYearMonthDay(now).day === dayOfMonth;
 }
 
-/**
- * F5-8 — `cfg_monthly_report_day_of_month`/`cfg_monthly_report_hour` RC
- * değerlerine göre "şimdi" aylık salon raporu gönderme zamanı mı kontrol
- * eder. -1 = ayın son günü. Fonksiyon saatte bir çalışıp bu kontrolü yapar
- * (weekly-gym-report'taki gibi), RC değeri değiştiğinde yeniden deploy
- * gerekmez.
- */
-export function isMonthlyReportDue(template: RemoteConfigTemplate, now: Date): boolean {
-  const dayOfMonth = readIntParam(template, "cfg_monthly_report_day_of_month", -1);
-  const hour = readIntParam(template, "cfg_monthly_report_hour", 6);
-  if (istanbulDayAndHour(now).hour !== hour) return false;
-  if (dayOfMonth === -1) return isLastDayOfMonth(now);
-  return istanbulYearMonthDay(now).day === dayOfMonth;
-}
-
 /** İlgili ayın İstanbul takvimine göre başlangıcı (dahil) - bitişi (hariç). */
 export function currentMonthRange(now: Date): { monthStart: Date; monthEnd: Date } {
   const { year, month } = istanbulYearMonthDay(now);
   const monthStart = new Date(Date.UTC(year, month - 1, 1));
   const monthEnd = new Date(Date.UTC(year, month, 1));
+  return { monthStart, monthEnd };
+}
+
+/**
+ * F5-8 — `monthlyGymReport` artık her ayın 1'inde 06:00'da (İstanbul) sabit
+ * cron ile tetikleniyor (RC kontrolü kaldırıldı — bkz. `monthly-gym-report.ts`
+ * dokümantasyonu) ve o ANDA biten önceki ayı raporluyor: örn. 1 Şubat'ta
+ * çalışınca Ocak'ı kapsar. `currentMonthRange`'den farkı bu kaydırma.
+ */
+export function previousMonthRange(now: Date): { monthStart: Date; monthEnd: Date } {
+  const { year, month } = istanbulYearMonthDay(now);
+  const monthStart = new Date(Date.UTC(year, month - 2, 1));
+  const monthEnd = new Date(Date.UTC(year, month - 1, 1));
   return { monthStart, monthEnd };
 }

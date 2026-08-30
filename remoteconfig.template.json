@@ -84,20 +84,6 @@
       "description": "F5-2 — haftalık raporların gönderileceği saat (İstanbul yerel saati, 0-23). Yalnızca Cloud Functions tarafından okunur.",
       "valueType": "NUMBER"
     },
-    "cfg_monthly_report_day_of_month": {
-      "defaultValue": {
-        "value": "-1"
-      },
-      "description": "F5-8 — aylık salon raporunun gönderileceği gün. -1 = ayın son günü. Yalnızca Cloud Functions tarafından okunur.",
-      "valueType": "NUMBER"
-    },
-    "cfg_monthly_report_hour": {
-      "defaultValue": {
-        "value": "6"
-      },
-      "description": "F5-8 — aylık raporların gönderileceği saat (İstanbul yerel saati, 0-23). Yalnızca Cloud Functions tarafından okunur.",
-      "valueType": "NUMBER"
-    },
     "cfg_manual_notification_hourly_limit": {
       "defaultValue": {
         "value": "10"
