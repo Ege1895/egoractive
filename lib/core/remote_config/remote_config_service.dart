@@ -1688,6 +1688,31 @@ class RemoteConfigService {
         'Salonuna kayıtlı numaranı gir; şifre yok, tek dokunuşla girersin.',
     'lbl_auth_phone_login_hint_tr':
         'Numaran kayıtlı değilse salon yönetimi seni eklemeli.',
+    'lbl_auth_email_login_title_tr': 'Email ile giriş yap',
+    'lbl_auth_email_login_subtitle_tr':
+        'Salonuna kayıtlı email adresini gir; şifre yok, tek dokunuşla girersin.',
+    'lbl_auth_email_address_label_tr': 'Email adresi',
+    'lbl_auth_switch_to_phone_link_tr': 'Telefon numarası ile giriş yap',
+    'lbl_auth_switch_to_email_link_tr': 'Email ile giriş yap',
+    'lbl_auth_otp_title_tr': 'Doğrulama kodu',
+    'lbl_auth_otp_subtitle_tr': '{email} adresine gönderilen kodu gir.',
+    'lbl_auth_otp_verify_button_tr': 'Doğrula',
+    'lbl_auth_otp_resend_button_tr': 'Tekrar kod gönder',
+    'lbl_auth_otp_resend_countdown_template_tr': 'Tekrar gönder ({seconds}sn)',
+    'lbl_auth_otp_generic_error_tr':
+        'Kod doğrulanamadı. Bağlantını kontrol edip tekrar dene.',
+    'lbl_auth_email_setup_title_tr': 'Email adresini ekle',
+    'lbl_auth_email_setup_subtitle_tr':
+        'Girişlerinde kullanılacak email adresini gir, sana bir doğrulama kodu gönderelim.',
+    'lbl_auth_email_setup_send_button_tr': 'Kod gönder',
+    'lbl_auth_email_setup_invalid_email_error_tr':
+        'Geçerli bir email adresi gir.',
+    'lbl_auth_email_setup_email_taken_error_tr':
+        'Bu email adresi başka bir hesapta kayıtlı.',
+    'lbl_gyms_gym_info_login_report_email_label_tr':
+        'Login ve rapor e-postası *',
+    'lbl_members_self_info_email_field_label_tr': 'Email',
+    'lbl_trainers_info_title_tr': 'Bilgilerim',
     'lbl_auth_profile_member_caption_tr': '+90 {phone} · Üye',
     'lbl_auth_profile_session_reminder_description_tr':
         'Dersinden {minutes} dakika önce bildirim',
@@ -2516,6 +2541,31 @@ class RemoteConfigService {
         "Enter the number registered at your studio; no password, one tap and you're in.",
     'lbl_auth_phone_login_hint_en':
         "If your number isn't registered, the studio management needs to add you.",
+    'lbl_auth_email_login_title_en': 'Log in with email',
+    'lbl_auth_email_login_subtitle_en':
+        "Enter the email registered at your studio; no password, one tap and you're in.",
+    'lbl_auth_email_address_label_en': 'Email address',
+    'lbl_auth_switch_to_phone_link_en': 'Log in with phone number',
+    'lbl_auth_switch_to_email_link_en': 'Log in with email',
+    'lbl_auth_otp_title_en': 'Verification code',
+    'lbl_auth_otp_subtitle_en': 'Enter the code sent to {email}.',
+    'lbl_auth_otp_verify_button_en': 'Verify',
+    'lbl_auth_otp_resend_button_en': 'Resend code',
+    'lbl_auth_otp_resend_countdown_template_en': 'Resend ({seconds}s)',
+    'lbl_auth_otp_generic_error_en':
+        'Could not verify the code. Check your connection and try again.',
+    'lbl_auth_email_setup_title_en': 'Add your email',
+    'lbl_auth_email_setup_subtitle_en':
+        "Enter the email you'll use to log in, and we'll send you a verification code.",
+    'lbl_auth_email_setup_send_button_en': 'Send code',
+    'lbl_auth_email_setup_invalid_email_error_en':
+        'Enter a valid email address.',
+    'lbl_auth_email_setup_email_taken_error_en':
+        'This email is already registered to another account.',
+    'lbl_gyms_gym_info_login_report_email_label_en':
+        'Login & report email *',
+    'lbl_members_self_info_email_field_label_en': 'Email',
+    'lbl_trainers_info_title_en': 'My Info',
     'lbl_auth_profile_member_caption_en': '+90 {phone} · Member',
     'lbl_auth_profile_session_reminder_description_en':
         'Notification {minutes} minutes before your session',
