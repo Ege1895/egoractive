@@ -10,9 +10,10 @@ import '../../../../shared/utils/phone_number_formatter.dart';
 import '../../../../shared/widgets/app_back_button.dart';
 import '../../controller/admin_trainer_detail_controller.dart';
 import '../../controller/admin_trainers_controller.dart';
-import '../../controller/trainer_report_controller.dart';
+import '../../controller/trainer_activity_breakdown_controller.dart';
 import '../../domain/admin_trainer_detail_stats.dart';
 import '../../domain/admin_trainer_summary.dart';
+import '../../domain/trainer_activity_breakdown.dart';
 import 'admin_trainer_management_panel.dart' show showTrainerFormSheet;
 
 /// Admin 4 · Antrenör Detayı — [AdminTrainerManagementPanel]'deki listeden
@@ -47,7 +48,7 @@ class _AdminTrainerDetailPanelState
     final stats =
         ref.watch(adminTrainerDetailStatsProvider(trainer.id)).valueOrNull ??
         AdminTrainerDetailStats.empty;
-    final monthly = ref.watch(reportForTrainerProvider(trainer.id));
+    final activity = ref.watch(trainerActivityBreakdownProvider(trainer.id));
     final memberCountText = ref
         .watch(rcTextProvider(RemoteConfigKeys.trainersMemberCountSuffix))
         .replaceAll('{count}', '${trainer.memberCount}');
@@ -89,7 +90,8 @@ class _AdminTrainerDetailPanelState
                       borderRadius: BorderRadius.circular(
                         AppSpacing.radiusInner,
                       ),
-                      onTap: () => showTrainerFormSheet(context, existing: trainer),
+                      onTap: () =>
+                          showTrainerFormSheet(context, existing: trainer),
                       child: Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: AppSpacing.md,
@@ -270,70 +272,158 @@ class _AdminTrainerDetailPanelState
                     ),
                   ),
                   const SizedBox(height: AppSpacing.sm),
-                  Container(
-                    padding: const EdgeInsets.all(AppSpacing.lg),
-                    decoration: BoxDecoration(
-                      color: colors.surface,
-                      borderRadius: BorderRadius.circular(
-                        AppSpacing.radiusCard,
-                      ),
-                      border: Border.all(color: colors.outline),
-                    ),
-                    child: monthly.when(
-                      loading: () => const Padding(
-                        padding: EdgeInsets.symmetric(vertical: AppSpacing.md),
-                        child: Center(child: CircularProgressIndicator()),
-                      ),
-                      error: (_, _) => Text(
-                        ref.watch(
-                          rcTextProvider(
-                            RemoteConfigKeys.trainersDetailMonthLoadError,
-                          ),
-                        ),
-                        style: typography.bodyMedium.copyWith(
-                          color: colors.onSurfaceMuted,
-                        ),
-                      ),
-                      data: (report) => Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          for (var i = 0; i < report.breakdown.length; i++)
-                            Padding(
-                              padding: EdgeInsets.only(
-                                bottom: i < report.breakdown.length - 1
-                                    ? AppSpacing.sm
-                                    : 0,
-                              ),
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      report.breakdown[i].title,
-                                      style: typography.bodyLarge.copyWith(
-                                        color: colors.onSurfaceVariant,
-                                        fontSize: 15,
-                                      ),
-                                    ),
-                                  ),
-                                  Text(
-                                    '${report.breakdown[i].total}',
-                                    style: typography.headingSmall.copyWith(
-                                      color: colors.onSurface,
-                                      fontSize: 16,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                        ],
+                  _ActivityBreakdownCard(
+                    activity: activity,
+                    counts: (b) => b.monthly,
+                  ),
+                  const SizedBox(height: AppSpacing.lg),
+                  Text(
+                    ref.watch(
+                      rcTextProvider(
+                        RemoteConfigKeys.trainersDetailThisWeekSection,
                       ),
                     ),
+                    style: typography.caption.copyWith(
+                      color: colors.onSurfaceMuted,
+                      letterSpacing: 1.2,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                  _ActivityBreakdownCard(
+                    activity: activity,
+                    counts: (b) => b.weekly,
                   ),
                 ],
               ),
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// "BU AY"/"BU HAFTA" kartı — [counts] ile aynı [activity] snapshot'ından
+/// aylık ya da haftalık kırılımı seçip Tamamlanan/Planlanan alt
+/// başlıklarıyla (birebir seans + düet ders) render eder. Grup dersleri şu
+/// an bir antrenöre atanmadığından (bkz. `TrainerActivityCounts` yorumu)
+/// burada gösterilmiyor.
+class _ActivityBreakdownCard extends ConsumerWidget {
+  const _ActivityBreakdownCard({required this.activity, required this.counts});
+
+  final AsyncValue<TrainerActivityBreakdown> activity;
+  final TrainerActivityCounts Function(TrainerActivityBreakdown) counts;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final colors = context.appColors;
+    final typography = context.appTypography;
+
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.lg),
+      decoration: BoxDecoration(
+        color: colors.surface,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
+        border: Border.all(color: colors.outline),
+      ),
+      child: activity.when(
+        loading: () => const Padding(
+          padding: EdgeInsets.symmetric(vertical: AppSpacing.md),
+          child: Center(child: CircularProgressIndicator()),
+        ),
+        error: (_, _) => Text(
+          ref.watch(
+            rcTextProvider(RemoteConfigKeys.trainersDetailMonthLoadError),
+          ),
+          style: typography.bodyMedium.copyWith(color: colors.onSurfaceMuted),
+        ),
+        data: (breakdown) {
+          final c = counts(breakdown);
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                ref.watch(
+                  rcTextProvider(RemoteConfigKeys.trainersHomeCompletedLabel),
+                ),
+                style: typography.caption.copyWith(
+                  color: colors.onSurfaceMuted,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.xs),
+              _ActivityRow(
+                label: ref.watch(
+                  rcTextProvider(RemoteConfigKeys.sessionsCreateKindIndividual),
+                ),
+                value: c.individualCompleted,
+              ),
+              _ActivityRow(
+                label: ref.watch(
+                  rcTextProvider(RemoteConfigKeys.sessionsCreateKindDuet),
+                ),
+                value: c.duetCompleted,
+              ),
+              const SizedBox(height: AppSpacing.md),
+              Text(
+                ref.watch(
+                  rcTextProvider(RemoteConfigKeys.trainersDetailPlannedLabel),
+                ),
+                style: typography.caption.copyWith(
+                  color: colors.onSurfaceMuted,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.xs),
+              _ActivityRow(
+                label: ref.watch(
+                  rcTextProvider(RemoteConfigKeys.sessionsCreateKindIndividual),
+                ),
+                value: c.individualPlanned,
+              ),
+              _ActivityRow(
+                label: ref.watch(
+                  rcTextProvider(RemoteConfigKeys.sessionsCreateKindDuet),
+                ),
+                value: c.duetPlanned,
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _ActivityRow extends StatelessWidget {
+  const _ActivityRow({required this.label, required this.value});
+
+  final String label;
+  final int value;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+    final typography = context.appTypography;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              label,
+              style: typography.bodyLarge.copyWith(
+                color: colors.onSurfaceVariant,
+                fontSize: 15,
+              ),
+            ),
+          ),
+          Text(
+            '$value',
+            style: typography.headingSmall.copyWith(
+              color: colors.onSurface,
+              fontSize: 16,
+            ),
+          ),
+        ],
       ),
     );
   }

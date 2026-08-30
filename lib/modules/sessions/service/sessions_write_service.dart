@@ -43,6 +43,48 @@ class SessionsWriteService {
     required String memberId,
     required String memberName,
     required DateTime startTime,
+  }) {
+    return _createSessions(
+      gymId: gymId,
+      trainerId: trainerId,
+      trainerName: trainerName,
+      members: [(id: memberId, name: memberName)],
+      startTime: startTime,
+    );
+  }
+
+  /// Düet ders — aynı antrenör/saat için birden fazla üyeye AYNI ANDA
+  /// (tek transaction'da, hep ya da hiç) seans atar; her üyenin kendi
+  /// `sessions/{sessionId}` dokümanı olur (mevcut tüm okuma tarafı —
+  /// katılım onayı, tamamlama, raporlar — tek üyeli şemayı zaten
+  /// bekliyor, o yüzden şema değişmiyor), ama hepsi aynı `duetGroupId`'yi
+  /// taşır ve birbirinin adını `duetMemberNames`'te görür ki takvim/liste
+  /// ekranları isterse grup olarak gösterebilsin.
+  Future<void> createDuetSession({
+    required String gymId,
+    required String trainerId,
+    required String trainerName,
+    required List<({String id, String name})> members,
+    required DateTime startTime,
+  }) {
+    if (members.length < 2) {
+      throw ArgumentError('Düet ders en az 2 üye gerektirir.');
+    }
+    return _createSessions(
+      gymId: gymId,
+      trainerId: trainerId,
+      trainerName: trainerName,
+      members: members,
+      startTime: startTime,
+    );
+  }
+
+  Future<void> _createSessions({
+    required String gymId,
+    required String trainerId,
+    required String trainerName,
+    required List<({String id, String name})> members,
+    required DateTime startTime,
   }) async {
     if (await _trainerHasConflict(gymId, trainerId, startTime)) {
       throw TrainerConflictException(trainerName);
@@ -51,13 +93,24 @@ class SessionsWriteService {
       const Duration(minutes: sessionDefaultDurationMinutes),
     );
     final firestore = FirebaseFirestore.instance;
-    final memberRef = firestore.collection('users').doc(memberId);
-    final sessionRef = firestore.collection('sessions').doc();
+    final isDuet = members.length > 1;
+    // Grubu birbirine bağlamak için paylaşılan bir id — henüz yazılmamış
+    // bir doc referansının id'si, gerçek bir seans dokümanına karşılık
+    // gelmiyor, sadece ortak anahtar olarak kullanılıyor.
+    final duetGroupId = isDuet
+        ? firestore.collection('sessions').doc().id
+        : null;
+    final memberNames = members.map((m) => m.name).toList(growable: false);
+    final memberRefs = members
+        .map((m) => firestore.collection('users').doc(m.id))
+        .toList(growable: false);
 
     // Seans hakkı, seans OLUŞTURULDUĞUNDA düşülür (tamamlanma onayında
     // değil) — üyenin kotası her zaman "rezerve edilmiş" seans sayısını
     // yansıtmalı. Aynı transaction içinde okunup düşülüyor ki eşzamanlı
-    // iki oluşturma isteği aynı son hakkı iki kez tüketemesin.
+    // iki oluşturma isteği aynı son hakkı iki kez tüketemesin. Düet ders
+    // için TÜM üyelerin hakkı yeterli olmalı — biri yetersizse grubun
+    // tamamı (hiçbiri) oluşturulmaz (transaction atomik).
     //
     // `plannedSessionsCount`, `remainingSessions`'ın tam tersi bir sayaç:
     // henüz planlanmamış "havuz" değil, ŞU AN takvimde duran (planned,
@@ -65,32 +118,53 @@ class SessionsWriteService {
     // gösterilen "Kalan ders" ikisinin toplamı — sadece gerçekten
     // tamamlanmış dersler düşülüyor (bkz. admin_member_summary_mapper.dart).
     await firestore.runTransaction((transaction) async {
-      final memberSnapshot = await transaction.get(memberRef);
-      final remaining =
-          (memberSnapshot.data()?['remainingSessions'] as num?)?.toInt() ?? 0;
-      if (remaining <= 0) {
-        throw InsufficientSessionsException(memberName);
+      // Firestore transaction kuralı: tüm okumalar yazmalardan önce olmalı
+      // — bu yüzden önce hepsi okunuyor, kota kontrolü ve yazmalar sonra.
+      final memberSnapshots = await Future.wait(
+        memberRefs.map(transaction.get),
+      );
+
+      for (var i = 0; i < members.length; i++) {
+        final remaining =
+            (memberSnapshots[i].data()?['remainingSessions'] as num?)
+                ?.toInt() ??
+            0;
+        if (remaining <= 0) {
+          throw InsufficientSessionsException(members[i].name);
+        }
       }
-      final planned =
-          (memberSnapshot.data()?['plannedSessionsCount'] as num?)?.toInt() ??
-          0;
-      transaction.set(sessionRef, {
-        'gymId': gymId,
-        'trainerId': trainerId,
-        'trainerName': trainerName,
-        'memberId': memberId,
-        'memberName': memberName,
-        'startTime': Timestamp.fromDate(startTime),
-        'endTime': Timestamp.fromDate(endTime),
-        'status': 'planned',
-        'confirmationRequested': false,
-        'completionPushSent': false,
-        'createdAt': FieldValue.serverTimestamp(),
-      });
-      transaction.update(memberRef, {
-        'remainingSessions': remaining - 1,
-        'plannedSessionsCount': planned + 1,
-      });
+
+      for (var i = 0; i < members.length; i++) {
+        final remaining =
+            (memberSnapshots[i].data()?['remainingSessions'] as num?)
+                ?.toInt() ??
+            0;
+        final planned =
+            (memberSnapshots[i].data()?['plannedSessionsCount'] as num?)
+                ?.toInt() ??
+            0;
+        final sessionRef = firestore.collection('sessions').doc();
+        transaction.set(sessionRef, {
+          'gymId': gymId,
+          'trainerId': trainerId,
+          'trainerName': trainerName,
+          'memberId': members[i].id,
+          'memberName': members[i].name,
+          'startTime': Timestamp.fromDate(startTime),
+          'endTime': Timestamp.fromDate(endTime),
+          'status': 'planned',
+          'confirmationRequested': false,
+          'completionPushSent': false,
+          'createdAt': FieldValue.serverTimestamp(),
+          'sessionType': isDuet ? 'duet' : 'individual',
+          if (isDuet) 'duetGroupId': duetGroupId,
+          if (isDuet) 'duetMemberNames': memberNames,
+        });
+        transaction.update(memberRefs[i], {
+          'remainingSessions': remaining - 1,
+          'plannedSessionsCount': planned + 1,
+        });
+      }
     });
   }
 
@@ -111,7 +185,7 @@ class SessionsWriteService {
           gymId,
           trainerId,
           newStartTime,
-          excludeSessionId: sessionId,
+          excludeSessionIds: {sessionId},
         )) {
       throw TrainerConflictException(trainerName);
     }
@@ -129,6 +203,49 @@ class SessionsWriteService {
         });
   }
 
+  /// F7-x — takvimde tek bir slota indirgenen bir düet dersin TÜM üye
+  /// dokümanlarını birlikte erteler. Çakışma kontrolü kendi düet
+  /// grubundaki diğer üyelerin dokümanlarını (aynı antrenör, aynı eski
+  /// saat) yanlışlıkla "çakışma" saymasın diye hepsi `excludeSessionIds`'e
+  /// veriliyor.
+  Future<void> rescheduleDuetSession(
+    List<String> sessionIds,
+    DateTime newStartTime,
+  ) async {
+    if (sessionIds.isEmpty) return;
+    final firestore = FirebaseFirestore.instance;
+    final currentDoc = await firestore
+        .collection('sessions')
+        .doc(sessionIds.first)
+        .get();
+    final gymId = currentDoc.data()?['gymId'] as String?;
+    final trainerId = currentDoc.data()?['trainerId'] as String?;
+    final trainerName = currentDoc.data()?['trainerName'] as String? ?? '';
+    if (gymId != null &&
+        trainerId != null &&
+        await _trainerHasConflict(
+          gymId,
+          trainerId,
+          newStartTime,
+          excludeSessionIds: sessionIds.toSet(),
+        )) {
+      throw TrainerConflictException(trainerName);
+    }
+    final newEndTime = newStartTime.add(
+      const Duration(minutes: sessionDefaultDurationMinutes),
+    );
+    final batch = firestore.batch();
+    for (final id in sessionIds) {
+      batch.update(firestore.collection('sessions').doc(id), {
+        'startTime': Timestamp.fromDate(newStartTime),
+        'endTime': Timestamp.fromDate(newEndTime),
+        'confirmationRequested': false,
+        'completionPushSent': false,
+      });
+    }
+    await batch.commit();
+  }
+
   /// Bir antrenörün aynı gün aynı saatte ikinci bir seansa atanmasını
   /// engeller — önceden bu kontrol hiç yapılmıyordu, aynı antrenöre aynı
   /// saatte birden fazla seans atanabiliyordu.
@@ -142,7 +259,7 @@ class SessionsWriteService {
     String gymId,
     String trainerId,
     DateTime startTime, {
-    String? excludeSessionId,
+    Set<String> excludeSessionIds = const {},
   }) async {
     final snapshot = await FirebaseFirestore.instance
         .collection('sessions')
@@ -152,7 +269,7 @@ class SessionsWriteService {
         .get();
     return snapshot.docs.any(
       (doc) =>
-          doc.id != excludeSessionId &&
+          !excludeSessionIds.contains(doc.id) &&
           (doc.data()['status'] as String?) != 'cancelled',
     );
   }
@@ -179,11 +296,9 @@ class SessionsWriteService {
         memberRef = firestore.collection('users').doc(memberId);
         final memberSnapshot = await transaction.get(memberRef);
         remaining =
-            (memberSnapshot.data()?['remainingSessions'] as num?)?.toInt() ??
-            0;
+            (memberSnapshot.data()?['remainingSessions'] as num?)?.toInt() ?? 0;
         planned =
-            (memberSnapshot.data()?['plannedSessionsCount'] as num?)
-                ?.toInt() ??
+            (memberSnapshot.data()?['plannedSessionsCount'] as num?)?.toInt() ??
             0;
       }
 
@@ -200,6 +315,62 @@ class SessionsWriteService {
       AnalyticsEvent.sessionCancelled,
       parameters: {'session_id': sessionId},
     );
+  }
+
+  /// F7-x — takvimde tek bir slota indirgenen bir düet dersin TÜM üye
+  /// dokümanlarını birlikte iptal eder, her üyenin paketine hakkını geri
+  /// verir. Firestore transaction kuralı gereği (tüm okumalar tüm
+  /// yazmalardan önce olmalı) önce hepsi okunuyor, sonra hepsi yazılıyor.
+  Future<void> cancelDuetSession(List<String> sessionIds) async {
+    if (sessionIds.isEmpty) return;
+    final firestore = FirebaseFirestore.instance;
+
+    await firestore.runTransaction((transaction) async {
+      final sessionRefs = sessionIds
+          .map((id) => firestore.collection('sessions').doc(id))
+          .toList();
+      final sessionSnapshots = await Future.wait(
+        sessionRefs.map(transaction.get),
+      );
+
+      final memberRefunds = <String, ({int remaining, int planned})>{};
+      for (final snapshot in sessionSnapshots) {
+        final status = snapshot.data()?['status'] as String?;
+        final memberId = snapshot.data()?['memberId'] as String?;
+        if (status != 'planned' || memberId == null) continue;
+        if (memberRefunds.containsKey(memberId)) continue;
+        final memberSnapshot = await transaction.get(
+          firestore.collection('users').doc(memberId),
+        );
+        memberRefunds[memberId] = (
+          remaining:
+              (memberSnapshot.data()?['remainingSessions'] as num?)
+                  ?.toInt() ??
+              0,
+          planned:
+              (memberSnapshot.data()?['plannedSessionsCount'] as num?)
+                  ?.toInt() ??
+              0,
+        );
+      }
+
+      for (final snapshot in sessionSnapshots) {
+        transaction.update(snapshot.reference, {'status': 'cancelled'});
+      }
+      memberRefunds.forEach((memberId, counts) {
+        transaction.update(firestore.collection('users').doc(memberId), {
+          'remainingSessions': counts.remaining + 1,
+          'plannedSessionsCount': counts.planned > 0 ? counts.planned - 1 : 0,
+        });
+      });
+    });
+
+    for (final sessionId in sessionIds) {
+      await _analytics.logEvent(
+        AnalyticsEvent.sessionCancelled,
+        parameters: {'session_id': sessionId},
+      );
+    }
   }
 }
 

@@ -199,6 +199,12 @@ class _ReportSnapshotDetailPanelState
       sessionsTitle: ref.read(
         rcTextProvider(RemoteConfigKeys.reportsPdfSessionsTitle),
       ),
+      individualSessionsLabel: ref.read(
+        rcTextProvider(RemoteConfigKeys.reportsPdfIndividualSessionsLabel),
+      ),
+      duetSessionsLabel: ref.read(
+        rcTextProvider(RemoteConfigKeys.reportsPdfDuetSessionsLabel),
+      ),
       totalSessions: ref.read(
         rcTextProvider(RemoteConfigKeys.reportsTotalSessionsLabel),
       ),
@@ -239,6 +245,15 @@ class _ReportSnapshotDetailPanelState
       ),
       totalShort: ref.read(
         rcTextProvider(RemoteConfigKeys.reportsPdfTotalShortLabel),
+      ),
+      soloPillLabel: ref.read(
+        rcTextProvider(RemoteConfigKeys.reportsPdfSoloPillLabel),
+      ),
+      duetPillLabel: ref.read(
+        rcTextProvider(RemoteConfigKeys.reportsPdfDuetPillLabel),
+      ),
+      groupPillLabel: ref.read(
+        rcTextProvider(RemoteConfigKeys.reportsPdfGroupPillLabel),
       ),
       completionRateTemplate: ref.read(
         rcTextProvider(RemoteConfigKeys.reportsPdfCompletionRateTemplate),

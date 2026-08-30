@@ -46,6 +46,9 @@ class ReportSnapshotService {
         completedSessions: (trainer['completedSessions'] as num?)?.toInt() ?? 0,
         totalSessions: (trainer['totalSessions'] as num?)?.toInt() ?? 0,
         cancelledSessions: (trainer['cancelledSessions'] as num?)?.toInt() ?? 0,
+        soloSessions: (trainer['soloSessions'] as num?)?.toInt() ?? 0,
+        duetSessions: (trainer['duetSessions'] as num?)?.toInt() ?? 0,
+        groupSessions: (trainer['groupSessions'] as num?)?.toInt() ?? 0,
       );
     }).toList();
     final packagesRaw = data['packages'] as List<dynamic>? ?? const [];
@@ -70,10 +73,22 @@ class ReportSnapshotService {
         trainerPerformance: trainerPerformance,
         estimatedRevenueTl: (data['estimatedRevenueTl'] as num?)?.toInt() ?? 0,
         totalExpensesTl: (data['totalExpensesTl'] as num?)?.toInt() ?? 0,
+        individualSessions: _sessionTypeBreakdownFrom(data['individualSessions']),
+        duetSessions: _sessionTypeBreakdownFrom(data['duetSessions']),
       ),
       packages: packages,
       groupSessions: _occupancyFrom(data['groupSessions']),
       events: _occupancyFrom(data['events']),
+    );
+  }
+
+  SessionTypeBreakdown _sessionTypeBreakdownFrom(Object? raw) {
+    final map = raw as Map<String, dynamic>?;
+    if (map == null) return SessionTypeBreakdown.empty;
+    return SessionTypeBreakdown(
+      total: (map['total'] as num?)?.toInt() ?? 0,
+      completed: (map['completed'] as num?)?.toInt() ?? 0,
+      cancelled: (map['cancelled'] as num?)?.toInt() ?? 0,
     );
   }
 

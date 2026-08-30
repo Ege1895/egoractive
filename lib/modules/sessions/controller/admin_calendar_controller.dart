@@ -36,11 +36,38 @@ Stream<Map<int, List<AdminSessionSlot>>> _sessionsForGymMonth(
       .orderBy('startTime')
       .snapshots()
       .map((snapshot) {
-        final byDay = <int, List<AdminSessionSlot>>{};
+        // Bir düet dersin her üyesi kendi dokümanına sahip (aynı
+        // `duetGroupId`'yi paylaşırlar) — takvimde her üye için ayrı bir
+        // satır göstermemek için önce düet dokümanları grup id'ye göre
+        // toplanıp TEK bir slota indirgeniyor (bkz. `_toDuetAdminSlot`).
+        final duetGroups =
+            <String, List<QueryDocumentSnapshot<Map<String, dynamic>>>>{};
+        final individualDocs = <QueryDocumentSnapshot<Map<String, dynamic>>>[];
         for (final doc in snapshot.docs) {
+          final data = doc.data();
+          final duetGroupId = data['duetGroupId'] as String?;
+          if (data['sessionType'] == 'duet' && duetGroupId != null) {
+            (duetGroups[duetGroupId] ??= []).add(doc);
+          } else {
+            individualDocs.add(doc);
+          }
+        }
+
+        final byDay = <int, List<AdminSessionSlot>>{};
+        for (final doc in individualDocs) {
           final slot = _toAdminSlot(doc);
           final day = (doc.data()['startTime'] as Timestamp).toDate().day;
           (byDay[day] ??= []).add(slot);
+        }
+        for (final groupDocs in duetGroups.values) {
+          final slot = _toDuetAdminSlot(groupDocs);
+          final day = (groupDocs.first.data()['startTime'] as Timestamp)
+              .toDate()
+              .day;
+          (byDay[day] ??= []).add(slot);
+        }
+        for (final slots in byDay.values) {
+          slots.sort((a, b) => a.time.compareTo(b.time));
         }
         return byDay;
       });
@@ -81,13 +108,13 @@ Stream<Map<int, List<ExpenseEntry>>> _expensesForGymMonth(
       });
 }
 
-AdminSessionSlot _toAdminSlot(QueryDocumentSnapshot<Map<String, dynamic>> doc) {
-  final data = doc.data();
-  final startTime = (data['startTime'] as Timestamp).toDate();
-  final statusStr = data['status'] as String? ?? 'planned';
+AdminSessionState _slotStateFrom(
+  String statusStr,
+  DateTime startTime,
+  bool? attended,
+) {
   final now = DateTime.now();
-  final attended = data['attended'] as bool?;
-  final state = switch (statusStr) {
+  return switch (statusStr) {
     'cancelled' => AdminSessionState.cancelled,
     'completed' =>
       attended == false
@@ -99,14 +126,56 @@ AdminSessionSlot _toAdminSlot(QueryDocumentSnapshot<Map<String, dynamic>> doc) {
           ? AdminSessionState.current
           : AdminSessionState.planned,
   };
+}
+
+String _formatSlotTime(DateTime startTime) =>
+    '${startTime.hour.toString().padLeft(2, '0')}:${startTime.minute.toString().padLeft(2, '0')}';
+
+AdminSessionSlot _toAdminSlot(QueryDocumentSnapshot<Map<String, dynamic>> doc) {
+  final data = doc.data();
+  final startTime = (data['startTime'] as Timestamp).toDate();
+  final statusStr = data['status'] as String? ?? 'planned';
+  final attended = data['attended'] as bool?;
   return AdminSessionSlot(
     id: doc.id,
-    time:
-        '${startTime.hour.toString().padLeft(2, '0')}:${startTime.minute.toString().padLeft(2, '0')}',
+    time: _formatSlotTime(startTime),
     title: (data['memberName'] as String?) ?? '',
-    meta: '${(data['trainerName'] as String?) ?? ''} · Birebir',
-    state: state,
+    // Tür etiketi ("Birebir"/"Düet") burada değil, UI katmanında RC'den
+    // ekleniyor (bkz. admin_calendar_panel.dart) — bu katman metin
+    // içermemeli.
+    meta: (data['trainerName'] as String?) ?? '',
+    state: _slotStateFrom(statusStr, startTime, attended),
     memberId: (data['memberId'] as String?) ?? '',
+    sessionIds: [doc.id],
+  );
+}
+
+/// F7-x — bir düet dersin tüm üye dokümanlarını (aynı `duetGroupId`) TEK
+/// bir slota indirger. Zaman/durum/antrenör bilgisi tüm üyelerde aynı
+/// olduğundan ilk dokümandan okunur; üye adları [AdminSessionSlot.title]'da
+/// virgülle birleştirilir, ayrıca [AdminSessionSlot.duetMemberNames]'te
+/// ayrı ayrı da tutulur (detay popup'ında liste olarak göstermek için).
+AdminSessionSlot _toDuetAdminSlot(
+  List<QueryDocumentSnapshot<Map<String, dynamic>>> docs,
+) {
+  final first = docs.first.data();
+  final startTime = (first['startTime'] as Timestamp).toDate();
+  final statusStr = first['status'] as String? ?? 'planned';
+  final attended = first['attended'] as bool?;
+  final memberNames = docs
+      .map((doc) => (doc.data()['memberName'] as String?) ?? '')
+      .where((name) => name.isNotEmpty)
+      .toList();
+  return AdminSessionSlot(
+    id: docs.first.id,
+    time: _formatSlotTime(startTime),
+    title: memberNames.join(', '),
+    meta: (first['trainerName'] as String?) ?? '',
+    state: _slotStateFrom(statusStr, startTime, attended),
+    memberId: (first['memberId'] as String?) ?? '',
+    sessionType: 'duet',
+    duetMemberNames: memberNames,
+    sessionIds: docs.map((doc) => doc.id).toList(),
   );
 }
 

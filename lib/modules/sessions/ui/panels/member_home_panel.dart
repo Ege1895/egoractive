@@ -130,22 +130,6 @@ class MemberHomePanel extends ConsumerWidget {
                     ],
                   ),
                 ),
-                const Spacer(),
-                Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(
-                    color: colors.surface,
-                    shape: BoxShape.circle,
-                    border: Border.all(color: colors.outlineStrong),
-                  ),
-                  alignment: Alignment.center,
-                  child: Icon(
-                    Icons.notifications_outlined,
-                    size: 18,
-                    color: colors.onSurfaceVariant,
-                  ),
-                ),
               ],
             ),
             const SizedBox(height: AppSpacing.lg),

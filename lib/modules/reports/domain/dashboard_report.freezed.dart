@@ -24,7 +24,15 @@ mixin _$TrainerPerformance {
       throw _privateConstructorUsedError; // F5-11 rapor snapshot'larında var; canlı dashboard özetinde henüz
   // hesaplanmıyor (bkz. DashboardReportService.loadTrainerPerformance),
   // o yüzden varsayılan 0.
-  int get cancelledSessions => throw _privateConstructorUsedError;
+  int get cancelledSessions =>
+      throw _privateConstructorUsedError; // F7-x — rapor mail'i/PDF'indeki antrenör satırı için birebir/düet/grup
+  // kırılımı. Grup dersleri hangi antrenöre ait olduğunu tutmadığından
+  // (bkz. `groupSessions` — sadece admin oluşturabiliyor, gerçek bir
+  // antrenör seçici yok) `groupSessions` her zaman 0. Canlı dashboard
+  // özetinde henüz hesaplanmıyor, o yüzden üçü de varsayılan 0.
+  int get soloSessions => throw _privateConstructorUsedError;
+  int get duetSessions => throw _privateConstructorUsedError;
+  int get groupSessions => throw _privateConstructorUsedError;
 
   /// Create a copy of TrainerPerformance
   /// with the given fields replaced by the non-null parameter values.
@@ -46,6 +54,9 @@ abstract class $TrainerPerformanceCopyWith<$Res> {
     int completedSessions,
     int totalSessions,
     int cancelledSessions,
+    int soloSessions,
+    int duetSessions,
+    int groupSessions,
   });
 }
 
@@ -69,6 +80,9 @@ class _$TrainerPerformanceCopyWithImpl<$Res, $Val extends TrainerPerformance>
     Object? completedSessions = null,
     Object? totalSessions = null,
     Object? cancelledSessions = null,
+    Object? soloSessions = null,
+    Object? duetSessions = null,
+    Object? groupSessions = null,
   }) {
     return _then(
       _value.copyWith(
@@ -92,6 +106,18 @@ class _$TrainerPerformanceCopyWithImpl<$Res, $Val extends TrainerPerformance>
                 ? _value.cancelledSessions
                 : cancelledSessions // ignore: cast_nullable_to_non_nullable
                       as int,
+            soloSessions: null == soloSessions
+                ? _value.soloSessions
+                : soloSessions // ignore: cast_nullable_to_non_nullable
+                      as int,
+            duetSessions: null == duetSessions
+                ? _value.duetSessions
+                : duetSessions // ignore: cast_nullable_to_non_nullable
+                      as int,
+            groupSessions: null == groupSessions
+                ? _value.groupSessions
+                : groupSessions // ignore: cast_nullable_to_non_nullable
+                      as int,
           )
           as $Val,
     );
@@ -113,6 +139,9 @@ abstract class _$$TrainerPerformanceImplCopyWith<$Res>
     int completedSessions,
     int totalSessions,
     int cancelledSessions,
+    int soloSessions,
+    int duetSessions,
+    int groupSessions,
   });
 }
 
@@ -135,6 +164,9 @@ class __$$TrainerPerformanceImplCopyWithImpl<$Res>
     Object? completedSessions = null,
     Object? totalSessions = null,
     Object? cancelledSessions = null,
+    Object? soloSessions = null,
+    Object? duetSessions = null,
+    Object? groupSessions = null,
   }) {
     return _then(
       _$TrainerPerformanceImpl(
@@ -158,6 +190,18 @@ class __$$TrainerPerformanceImplCopyWithImpl<$Res>
             ? _value.cancelledSessions
             : cancelledSessions // ignore: cast_nullable_to_non_nullable
                   as int,
+        soloSessions: null == soloSessions
+            ? _value.soloSessions
+            : soloSessions // ignore: cast_nullable_to_non_nullable
+                  as int,
+        duetSessions: null == duetSessions
+            ? _value.duetSessions
+            : duetSessions // ignore: cast_nullable_to_non_nullable
+                  as int,
+        groupSessions: null == groupSessions
+            ? _value.groupSessions
+            : groupSessions // ignore: cast_nullable_to_non_nullable
+                  as int,
       ),
     );
   }
@@ -172,6 +216,9 @@ class _$TrainerPerformanceImpl extends _TrainerPerformance {
     required this.completedSessions,
     required this.totalSessions,
     this.cancelledSessions = 0,
+    this.soloSessions = 0,
+    this.duetSessions = 0,
+    this.groupSessions = 0,
   }) : super._();
 
   @override
@@ -188,10 +235,24 @@ class _$TrainerPerformanceImpl extends _TrainerPerformance {
   @override
   @JsonKey()
   final int cancelledSessions;
+  // F7-x — rapor mail'i/PDF'indeki antrenör satırı için birebir/düet/grup
+  // kırılımı. Grup dersleri hangi antrenöre ait olduğunu tutmadığından
+  // (bkz. `groupSessions` — sadece admin oluşturabiliyor, gerçek bir
+  // antrenör seçici yok) `groupSessions` her zaman 0. Canlı dashboard
+  // özetinde henüz hesaplanmıyor, o yüzden üçü de varsayılan 0.
+  @override
+  @JsonKey()
+  final int soloSessions;
+  @override
+  @JsonKey()
+  final int duetSessions;
+  @override
+  @JsonKey()
+  final int groupSessions;
 
   @override
   String toString() {
-    return 'TrainerPerformance(trainerId: $trainerId, name: $name, completedSessions: $completedSessions, totalSessions: $totalSessions, cancelledSessions: $cancelledSessions)';
+    return 'TrainerPerformance(trainerId: $trainerId, name: $name, completedSessions: $completedSessions, totalSessions: $totalSessions, cancelledSessions: $cancelledSessions, soloSessions: $soloSessions, duetSessions: $duetSessions, groupSessions: $groupSessions)';
   }
 
   @override
@@ -207,7 +268,13 @@ class _$TrainerPerformanceImpl extends _TrainerPerformance {
             (identical(other.totalSessions, totalSessions) ||
                 other.totalSessions == totalSessions) &&
             (identical(other.cancelledSessions, cancelledSessions) ||
-                other.cancelledSessions == cancelledSessions));
+                other.cancelledSessions == cancelledSessions) &&
+            (identical(other.soloSessions, soloSessions) ||
+                other.soloSessions == soloSessions) &&
+            (identical(other.duetSessions, duetSessions) ||
+                other.duetSessions == duetSessions) &&
+            (identical(other.groupSessions, groupSessions) ||
+                other.groupSessions == groupSessions));
   }
 
   @override
@@ -218,6 +285,9 @@ class _$TrainerPerformanceImpl extends _TrainerPerformance {
     completedSessions,
     totalSessions,
     cancelledSessions,
+    soloSessions,
+    duetSessions,
+    groupSessions,
   );
 
   /// Create a copy of TrainerPerformance
@@ -239,6 +309,9 @@ abstract class _TrainerPerformance extends TrainerPerformance {
     required final int completedSessions,
     required final int totalSessions,
     final int cancelledSessions,
+    final int soloSessions,
+    final int duetSessions,
+    final int groupSessions,
   }) = _$TrainerPerformanceImpl;
   const _TrainerPerformance._() : super._();
 
@@ -253,7 +326,17 @@ abstract class _TrainerPerformance extends TrainerPerformance {
   // hesaplanmıyor (bkz. DashboardReportService.loadTrainerPerformance),
   // o yüzden varsayılan 0.
   @override
-  int get cancelledSessions;
+  int get cancelledSessions; // F7-x — rapor mail'i/PDF'indeki antrenör satırı için birebir/düet/grup
+  // kırılımı. Grup dersleri hangi antrenöre ait olduğunu tutmadığından
+  // (bkz. `groupSessions` — sadece admin oluşturabiliyor, gerçek bir
+  // antrenör seçici yok) `groupSessions` her zaman 0. Canlı dashboard
+  // özetinde henüz hesaplanmıyor, o yüzden üçü de varsayılan 0.
+  @override
+  int get soloSessions;
+  @override
+  int get duetSessions;
+  @override
+  int get groupSessions;
 
   /// Create a copy of TrainerPerformance
   /// with the given fields replaced by the non-null parameter values.
@@ -261,6 +344,192 @@ abstract class _TrainerPerformance extends TrainerPerformance {
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$TrainerPerformanceImplCopyWith<_$TrainerPerformanceImpl> get copyWith =>
       throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+mixin _$SessionTypeBreakdown {
+  int get total => throw _privateConstructorUsedError;
+  int get completed => throw _privateConstructorUsedError;
+  int get cancelled => throw _privateConstructorUsedError;
+
+  /// Create a copy of SessionTypeBreakdown
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $SessionTypeBreakdownCopyWith<SessionTypeBreakdown> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $SessionTypeBreakdownCopyWith<$Res> {
+  factory $SessionTypeBreakdownCopyWith(
+    SessionTypeBreakdown value,
+    $Res Function(SessionTypeBreakdown) then,
+  ) = _$SessionTypeBreakdownCopyWithImpl<$Res, SessionTypeBreakdown>;
+  @useResult
+  $Res call({int total, int completed, int cancelled});
+}
+
+/// @nodoc
+class _$SessionTypeBreakdownCopyWithImpl<
+  $Res,
+  $Val extends SessionTypeBreakdown
+>
+    implements $SessionTypeBreakdownCopyWith<$Res> {
+  _$SessionTypeBreakdownCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of SessionTypeBreakdown
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? total = null,
+    Object? completed = null,
+    Object? cancelled = null,
+  }) {
+    return _then(
+      _value.copyWith(
+            total: null == total
+                ? _value.total
+                : total // ignore: cast_nullable_to_non_nullable
+                      as int,
+            completed: null == completed
+                ? _value.completed
+                : completed // ignore: cast_nullable_to_non_nullable
+                      as int,
+            cancelled: null == cancelled
+                ? _value.cancelled
+                : cancelled // ignore: cast_nullable_to_non_nullable
+                      as int,
+          )
+          as $Val,
+    );
+  }
+}
+
+/// @nodoc
+abstract class _$$SessionTypeBreakdownImplCopyWith<$Res>
+    implements $SessionTypeBreakdownCopyWith<$Res> {
+  factory _$$SessionTypeBreakdownImplCopyWith(
+    _$SessionTypeBreakdownImpl value,
+    $Res Function(_$SessionTypeBreakdownImpl) then,
+  ) = __$$SessionTypeBreakdownImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({int total, int completed, int cancelled});
+}
+
+/// @nodoc
+class __$$SessionTypeBreakdownImplCopyWithImpl<$Res>
+    extends _$SessionTypeBreakdownCopyWithImpl<$Res, _$SessionTypeBreakdownImpl>
+    implements _$$SessionTypeBreakdownImplCopyWith<$Res> {
+  __$$SessionTypeBreakdownImplCopyWithImpl(
+    _$SessionTypeBreakdownImpl _value,
+    $Res Function(_$SessionTypeBreakdownImpl) _then,
+  ) : super(_value, _then);
+
+  /// Create a copy of SessionTypeBreakdown
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? total = null,
+    Object? completed = null,
+    Object? cancelled = null,
+  }) {
+    return _then(
+      _$SessionTypeBreakdownImpl(
+        total: null == total
+            ? _value.total
+            : total // ignore: cast_nullable_to_non_nullable
+                  as int,
+        completed: null == completed
+            ? _value.completed
+            : completed // ignore: cast_nullable_to_non_nullable
+                  as int,
+        cancelled: null == cancelled
+            ? _value.cancelled
+            : cancelled // ignore: cast_nullable_to_non_nullable
+                  as int,
+      ),
+    );
+  }
+}
+
+/// @nodoc
+
+class _$SessionTypeBreakdownImpl extends _SessionTypeBreakdown {
+  const _$SessionTypeBreakdownImpl({
+    required this.total,
+    required this.completed,
+    required this.cancelled,
+  }) : super._();
+
+  @override
+  final int total;
+  @override
+  final int completed;
+  @override
+  final int cancelled;
+
+  @override
+  String toString() {
+    return 'SessionTypeBreakdown(total: $total, completed: $completed, cancelled: $cancelled)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$SessionTypeBreakdownImpl &&
+            (identical(other.total, total) || other.total == total) &&
+            (identical(other.completed, completed) ||
+                other.completed == completed) &&
+            (identical(other.cancelled, cancelled) ||
+                other.cancelled == cancelled));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, total, completed, cancelled);
+
+  /// Create a copy of SessionTypeBreakdown
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$SessionTypeBreakdownImplCopyWith<_$SessionTypeBreakdownImpl>
+  get copyWith =>
+      __$$SessionTypeBreakdownImplCopyWithImpl<_$SessionTypeBreakdownImpl>(
+        this,
+        _$identity,
+      );
+}
+
+abstract class _SessionTypeBreakdown extends SessionTypeBreakdown {
+  const factory _SessionTypeBreakdown({
+    required final int total,
+    required final int completed,
+    required final int cancelled,
+  }) = _$SessionTypeBreakdownImpl;
+  const _SessionTypeBreakdown._() : super._();
+
+  @override
+  int get total;
+  @override
+  int get completed;
+  @override
+  int get cancelled;
+
+  /// Create a copy of SessionTypeBreakdown
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$SessionTypeBreakdownImplCopyWith<_$SessionTypeBreakdownImpl>
+  get copyWith => throw _privateConstructorUsedError;
 }
 
 /// @nodoc
@@ -534,7 +803,14 @@ mixin _$DashboardReport {
   List<TrainerPerformance> get trainerPerformance =>
       throw _privateConstructorUsedError;
   int get estimatedRevenueTl => throw _privateConstructorUsedError;
-  int get totalExpensesTl => throw _privateConstructorUsedError;
+  int get totalExpensesTl =>
+      throw _privateConstructorUsedError; // F7-x — mail/PDF rapor şablonundaki "Ders Özeti" bölümünün birebir/düet
+  // kırılımı (bkz. `SessionTypeBreakdown`). Canlı dashboard özetinde
+  // (`DashboardReportService`) henüz hesaplanmadığından varsayılan boş —
+  // bu alanlar sadece geçmiş rapor snapshot'larında (F5-9) dolu gelir.
+  SessionTypeBreakdown get individualSessions =>
+      throw _privateConstructorUsedError;
+  SessionTypeBreakdown get duetSessions => throw _privateConstructorUsedError;
 
   /// Create a copy of DashboardReport
   /// with the given fields replaced by the non-null parameter values.
@@ -558,7 +834,12 @@ abstract class $DashboardReportCopyWith<$Res> {
     List<TrainerPerformance> trainerPerformance,
     int estimatedRevenueTl,
     int totalExpensesTl,
+    SessionTypeBreakdown individualSessions,
+    SessionTypeBreakdown duetSessions,
   });
+
+  $SessionTypeBreakdownCopyWith<$Res> get individualSessions;
+  $SessionTypeBreakdownCopyWith<$Res> get duetSessions;
 }
 
 /// @nodoc
@@ -583,6 +864,8 @@ class _$DashboardReportCopyWithImpl<$Res, $Val extends DashboardReport>
     Object? trainerPerformance = null,
     Object? estimatedRevenueTl = null,
     Object? totalExpensesTl = null,
+    Object? individualSessions = null,
+    Object? duetSessions = null,
   }) {
     return _then(
       _value.copyWith(
@@ -614,9 +897,39 @@ class _$DashboardReportCopyWithImpl<$Res, $Val extends DashboardReport>
                 ? _value.totalExpensesTl
                 : totalExpensesTl // ignore: cast_nullable_to_non_nullable
                       as int,
+            individualSessions: null == individualSessions
+                ? _value.individualSessions
+                : individualSessions // ignore: cast_nullable_to_non_nullable
+                      as SessionTypeBreakdown,
+            duetSessions: null == duetSessions
+                ? _value.duetSessions
+                : duetSessions // ignore: cast_nullable_to_non_nullable
+                      as SessionTypeBreakdown,
           )
           as $Val,
     );
+  }
+
+  /// Create a copy of DashboardReport
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $SessionTypeBreakdownCopyWith<$Res> get individualSessions {
+    return $SessionTypeBreakdownCopyWith<$Res>(_value.individualSessions, (
+      value,
+    ) {
+      return _then(_value.copyWith(individualSessions: value) as $Val);
+    });
+  }
+
+  /// Create a copy of DashboardReport
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $SessionTypeBreakdownCopyWith<$Res> get duetSessions {
+    return $SessionTypeBreakdownCopyWith<$Res>(_value.duetSessions, (value) {
+      return _then(_value.copyWith(duetSessions: value) as $Val);
+    });
   }
 }
 
@@ -637,7 +950,14 @@ abstract class _$$DashboardReportImplCopyWith<$Res>
     List<TrainerPerformance> trainerPerformance,
     int estimatedRevenueTl,
     int totalExpensesTl,
+    SessionTypeBreakdown individualSessions,
+    SessionTypeBreakdown duetSessions,
   });
+
+  @override
+  $SessionTypeBreakdownCopyWith<$Res> get individualSessions;
+  @override
+  $SessionTypeBreakdownCopyWith<$Res> get duetSessions;
 }
 
 /// @nodoc
@@ -661,6 +981,8 @@ class __$$DashboardReportImplCopyWithImpl<$Res>
     Object? trainerPerformance = null,
     Object? estimatedRevenueTl = null,
     Object? totalExpensesTl = null,
+    Object? individualSessions = null,
+    Object? duetSessions = null,
   }) {
     return _then(
       _$DashboardReportImpl(
@@ -692,6 +1014,14 @@ class __$$DashboardReportImplCopyWithImpl<$Res>
             ? _value.totalExpensesTl
             : totalExpensesTl // ignore: cast_nullable_to_non_nullable
                   as int,
+        individualSessions: null == individualSessions
+            ? _value.individualSessions
+            : individualSessions // ignore: cast_nullable_to_non_nullable
+                  as SessionTypeBreakdown,
+        duetSessions: null == duetSessions
+            ? _value.duetSessions
+            : duetSessions // ignore: cast_nullable_to_non_nullable
+                  as SessionTypeBreakdown,
       ),
     );
   }
@@ -708,6 +1038,8 @@ class _$DashboardReportImpl extends _DashboardReport {
     required final List<TrainerPerformance> trainerPerformance,
     required this.estimatedRevenueTl,
     required this.totalExpensesTl,
+    this.individualSessions = SessionTypeBreakdown.empty,
+    this.duetSessions = SessionTypeBreakdown.empty,
   }) : _trainerPerformance = trainerPerformance,
        super._();
 
@@ -732,10 +1064,20 @@ class _$DashboardReportImpl extends _DashboardReport {
   final int estimatedRevenueTl;
   @override
   final int totalExpensesTl;
+  // F7-x — mail/PDF rapor şablonundaki "Ders Özeti" bölümünün birebir/düet
+  // kırılımı (bkz. `SessionTypeBreakdown`). Canlı dashboard özetinde
+  // (`DashboardReportService`) henüz hesaplanmadığından varsayılan boş —
+  // bu alanlar sadece geçmiş rapor snapshot'larında (F5-9) dolu gelir.
+  @override
+  @JsonKey()
+  final SessionTypeBreakdown individualSessions;
+  @override
+  @JsonKey()
+  final SessionTypeBreakdown duetSessions;
 
   @override
   String toString() {
-    return 'DashboardReport(monthLabel: $monthLabel, totalSessions: $totalSessions, completedSessions: $completedSessions, cancelledSessions: $cancelledSessions, trainerPerformance: $trainerPerformance, estimatedRevenueTl: $estimatedRevenueTl, totalExpensesTl: $totalExpensesTl)';
+    return 'DashboardReport(monthLabel: $monthLabel, totalSessions: $totalSessions, completedSessions: $completedSessions, cancelledSessions: $cancelledSessions, trainerPerformance: $trainerPerformance, estimatedRevenueTl: $estimatedRevenueTl, totalExpensesTl: $totalExpensesTl, individualSessions: $individualSessions, duetSessions: $duetSessions)';
   }
 
   @override
@@ -758,7 +1100,11 @@ class _$DashboardReportImpl extends _DashboardReport {
             (identical(other.estimatedRevenueTl, estimatedRevenueTl) ||
                 other.estimatedRevenueTl == estimatedRevenueTl) &&
             (identical(other.totalExpensesTl, totalExpensesTl) ||
-                other.totalExpensesTl == totalExpensesTl));
+                other.totalExpensesTl == totalExpensesTl) &&
+            (identical(other.individualSessions, individualSessions) ||
+                other.individualSessions == individualSessions) &&
+            (identical(other.duetSessions, duetSessions) ||
+                other.duetSessions == duetSessions));
   }
 
   @override
@@ -771,6 +1117,8 @@ class _$DashboardReportImpl extends _DashboardReport {
     const DeepCollectionEquality().hash(_trainerPerformance),
     estimatedRevenueTl,
     totalExpensesTl,
+    individualSessions,
+    duetSessions,
   );
 
   /// Create a copy of DashboardReport
@@ -794,6 +1142,8 @@ abstract class _DashboardReport extends DashboardReport {
     required final List<TrainerPerformance> trainerPerformance,
     required final int estimatedRevenueTl,
     required final int totalExpensesTl,
+    final SessionTypeBreakdown individualSessions,
+    final SessionTypeBreakdown duetSessions,
   }) = _$DashboardReportImpl;
   const _DashboardReport._() : super._();
 
@@ -810,7 +1160,14 @@ abstract class _DashboardReport extends DashboardReport {
   @override
   int get estimatedRevenueTl;
   @override
-  int get totalExpensesTl;
+  int get totalExpensesTl; // F7-x — mail/PDF rapor şablonundaki "Ders Özeti" bölümünün birebir/düet
+  // kırılımı (bkz. `SessionTypeBreakdown`). Canlı dashboard özetinde
+  // (`DashboardReportService`) henüz hesaplanmadığından varsayılan boş —
+  // bu alanlar sadece geçmiş rapor snapshot'larında (F5-9) dolu gelir.
+  @override
+  SessionTypeBreakdown get individualSessions;
+  @override
+  SessionTypeBreakdown get duetSessions;
 
   /// Create a copy of DashboardReport
   /// with the given fields replaced by the non-null parameter values.

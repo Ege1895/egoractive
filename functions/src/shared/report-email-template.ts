@@ -1,5 +1,5 @@
 import { OccupancyStats, PackageSaleCount } from "./report-extras-stats";
-import { GymWeeklyStats, TrainerPerformance } from "./weekly-report-stats";
+import { GymWeeklyStats, SessionTypeBreakdown, TrainerPerformance } from "./weekly-report-stats";
 
 export type ReportEmailLocale = "tr" | "en";
 export type ReportEmailKind = "weekly" | "monthly";
@@ -10,6 +10,8 @@ export interface ReportEmailData {
   periodLabel: string;
   locale: ReportEmailLocale;
   sessions: GymWeeklyStats;
+  individualSessions: SessionTypeBreakdown;
+  duetSessions: SessionTypeBreakdown;
   trainers: TrainerPerformance[];
   packages: PackageSaleCount[];
   groupSessions: OccupancyStats;
@@ -42,6 +44,8 @@ const COPY: Record<ReportEmailLocale, {
   heroSubPositive: string;
   heroSubNegative: string;
   sessionsTitle: string;
+  individualSessionsLabel: string;
+  duetSessionsLabel: string;
   totalSessions: string;
   completed: string;
   cancelled: string;
@@ -57,6 +61,9 @@ const COPY: Record<ReportEmailLocale, {
   completedShort: string;
   cancelledShort: string;
   totalShort: string;
+  soloPillLabel: string;
+  duetPillLabel: string;
+  groupPillLabel: string;
   completionRateLine: (completedPct: number, cancelledPct: number) => string;
   packagesTitle: string;
   packagesEmpty: string;
@@ -77,7 +84,9 @@ const COPY: Record<ReportEmailLocale, {
     heroSubPositive: "Detaylar aşağıda — antrenör performansı ve en çok satan paketleri incelemeyi unutma.",
     heroSubNegative: "Aşağıdaki gider ve paket satış dökümü, nereden tasarruf edebileceğini görmene yardımcı olabilir.",
     sessionsTitle: "📊&nbsp; Ders Özeti",
-    totalSessions: "Toplam Ders",
+    individualSessionsLabel: "🧍&nbsp; Birebir Seans",
+    duetSessionsLabel: "👯&nbsp; Düet Dersi",
+    totalSessions: "Toplam",
     completed: "Tamamlanan",
     cancelled: "İptal Edilen",
     other: "Diğer",
@@ -92,6 +101,9 @@ const COPY: Record<ReportEmailLocale, {
     completedShort: "tamamlandı",
     cancelledShort: "iptal",
     totalShort: "toplam",
+    soloPillLabel: "🧍&nbsp;Seans",
+    duetPillLabel: "👯&nbsp;Düet",
+    groupPillLabel: "👥&nbsp;Grup",
     completionRateLine: (c, x) => `%${c} tamamlanma · %${x} iptal oranı`,
     packagesTitle: "📦&nbsp; Satın Alınan Paketler",
     packagesEmpty: "Bu dönemde paket satışı olmadı.",
@@ -112,7 +124,9 @@ const COPY: Record<ReportEmailLocale, {
     heroSubPositive: "See the details below — check trainer performance and your best-selling packages.",
     heroSubNegative: "The expense and package breakdown below can help you spot where to save.",
     sessionsTitle: "📊&nbsp; Session Overview",
-    totalSessions: "Total Sessions",
+    individualSessionsLabel: "🧍&nbsp; Individual Sessions",
+    duetSessionsLabel: "👯&nbsp; Duet Classes",
+    totalSessions: "Total",
     completed: "Completed",
     cancelled: "Cancelled",
     other: "Other",
@@ -127,6 +141,9 @@ const COPY: Record<ReportEmailLocale, {
     completedShort: "completed",
     cancelledShort: "cancelled",
     totalShort: "total",
+    soloPillLabel: "🧍&nbsp;Solo",
+    duetPillLabel: "👯&nbsp;Duet",
+    groupPillLabel: "👥&nbsp;Group",
     completionRateLine: (c, x) => `%${c} completion · %${x} cancellation rate`,
     packagesTitle: "📦&nbsp; Packages Sold",
     packagesEmpty: "No packages were sold this period.",
@@ -216,28 +233,48 @@ function statBox(label: string, value: string, color: string): string {
   );
 }
 
-function sessionsSection(s: GymWeeklyStats, locale: ReportEmailLocale): string {
+function sessionTypeBlock(title: string, breakdown: SessionTypeBreakdown, locale: ReportEmailLocale): string {
   const t = COPY[locale];
-  const completedPct = pct(s.completedSessions, s.totalSessions);
-  const cancelledPct = pct(s.cancelledSessions, s.totalSessions);
-  const otherCount = Math.max(s.totalSessions - s.completedSessions - s.cancelledSessions, 0);
+  const completedPct = pct(breakdown.completed, breakdown.total);
+  const cancelledPct = pct(breakdown.cancelled, breakdown.total);
+  const otherCount = Math.max(breakdown.total - breakdown.completed - breakdown.cancelled, 0);
   const otherPct = Math.max(0, Math.round((100 - completedPct - cancelledPct) * 10) / 10);
-  const inner =
-    `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="width:100%;border-collapse:collapse;margin-bottom:16px;"><tr>` +
-    statBox(t.totalSessions, fmtInt(s.totalSessions, locale), COLOR.ink) +
-    statBox(t.completed, fmtInt(s.completedSessions, locale), COLOR.good) +
-    statBox(t.cancelled, fmtInt(s.cancelledSessions, locale), COLOR.bad) +
+  return (
+    `<div style="font-family:Arial,Helvetica,sans-serif;font-weight:700;font-size:12.5px;color:${COLOR.ink};margin-bottom:10px;">${title}</div>` +
+    `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="width:100%;border-collapse:collapse;margin-bottom:14px;"><tr>` +
+    statBox(t.totalSessions, fmtInt(breakdown.total, locale), COLOR.ink) +
+    statBox(t.completed, fmtInt(breakdown.completed, locale), COLOR.good) +
+    statBox(t.cancelled, fmtInt(breakdown.cancelled, locale), COLOR.bad) +
     `</tr></table>` +
     segBar([
-      { value: s.completedSessions, color: COLOR.good },
-      { value: s.cancelledSessions, color: COLOR.bad },
+      { value: breakdown.completed, color: COLOR.good },
+      { value: breakdown.cancelled, color: COLOR.bad },
       { value: otherCount, color: COLOR.other },
     ]) +
     legend([
       { color: COLOR.good, pct: completedPct, label: t.completed },
       { color: COLOR.bad, pct: cancelledPct, label: t.cancelled },
       { color: COLOR.other, pct: otherPct, label: t.other },
-    ]);
+    ])
+  );
+}
+
+/** F7-x — "Ders Özeti" bölümü artık tek bir genel toplam yerine Birebir
+ * Seans ve Düet Dersi'ni ayrı bloklar olarak, her biri kendi tamamlanan/
+ * iptal kırılımıyla gösteriyor. Grup dersleri burada değil, aşağıdaki
+ * [groupEventsSection]'da kalıyor (kendi doluluk/kontenjan verisiyle bir
+ * arada anlamlı).
+ */
+function sessionsSection(
+  individualSessions: SessionTypeBreakdown,
+  duetSessions: SessionTypeBreakdown,
+  locale: ReportEmailLocale,
+): string {
+  const t = COPY[locale];
+  const inner =
+    sessionTypeBlock(t.individualSessionsLabel, individualSessions, locale) +
+    `<div style="height:6px;"></div>` +
+    sessionTypeBlock(t.duetSessionsLabel, duetSessions, locale);
   return card(t.sessionsTitle, inner);
 }
 
@@ -247,6 +284,12 @@ function occupancyBlock(
   unit: string,
   stats: OccupancyStats,
   locale: ReportEmailLocale,
+  // F7-x — Grup Dersleri kartına eklenen tamamlanan/iptal satırı.
+  // `groupSessions` koleksiyonunda bir iptal durumu tutulmadığından
+  // (dersi iptal etme akışı yok) "tamamlanan" dönemde gerçekleşen tüm
+  // dersler, "iptal" her zaman 0 — bkz. `weekly-gym-report.ts` çağrı
+  // noktası. Etkinlikler kartında bu satır hiç gösterilmiyor.
+  completedCancelled?: { completed: number; cancelled: number },
 ): string {
   const t = COPY[locale];
   const occPct = pct(stats.attendance, stats.capacity);
@@ -260,6 +303,11 @@ function occupancyBlock(
       { value: Math.max(stats.capacity - stats.attendance, 0), color: COLOR.fill },
     ], 10) +
     `<div style="font-size:11.5px;color:${COLOR.muted};margin-top:8px;">${t.attendanceLine(fmtInt(stats.attendance, locale), fmtInt(stats.capacity, locale), occPct)}</div>` +
+    (completedCancelled
+      ? `<div style="font-size:11px;color:${COLOR.muted};margin-top:8px;padding-top:8px;border-top:1px dashed ${COLOR.line};">` +
+        `<b style="color:${COLOR.good};">${fmtInt(completedCancelled.completed, locale)}</b> ${t.completedShort} &nbsp;·&nbsp; ` +
+        `<b style="color:${COLOR.bad};">${fmtInt(completedCancelled.cancelled, locale)}</b> ${t.cancelledShort}</div>`
+      : "") +
     `</div></td>`
   );
 }
@@ -268,10 +316,21 @@ function groupEventsSection(groupSessions: OccupancyStats, events: OccupancyStat
   const t = COPY[locale];
   const inner =
     `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="width:100%;border-collapse:collapse;"><tr>` +
-    occupancyBlock(t.groupSessionsLabel, groupSessions.count, t.sessionsUnit, groupSessions, locale) +
+    occupancyBlock(t.groupSessionsLabel, groupSessions.count, t.sessionsUnit, groupSessions, locale, {
+      completed: groupSessions.count,
+      cancelled: 0,
+    }) +
     occupancyBlock(t.eventsLabel, events.count, t.eventsUnit, events, locale) +
     `</tr></table>`;
   return card(t.groupEventsTitle, inner);
+}
+
+function pill(label: string, value: number, locale: ReportEmailLocale): string {
+  return (
+    `<td style="padding-right:8px;">` +
+    `<span style="display:inline-block;font-size:11px;color:${COLOR.brandDark};background:${COLOR.lineSoft};border-radius:20px;padding:3px 10px;white-space:nowrap;">` +
+    `${label} <b>${fmtInt(value, locale)}</b></span></td>`
+  );
 }
 
 function trainerRow(trainer: TrainerPerformance, rankIcon: string | undefined, locale: ReportEmailLocale): string {
@@ -294,7 +353,12 @@ function trainerRow(trainer: TrainerPerformance, rankIcon: string | undefined, l
       { value: otherCount, color: COLOR.other },
     ], 8) +
     `</td></tr>` +
-    `<tr><td colspan="2" style="font-size:11px;color:${COLOR.faint};padding-top:4px;">${t.completionRateLine(completedPct, cancelledPct)}</td></tr>` +
+    `<tr><td colspan="2" style="font-size:11px;color:${COLOR.faint};padding-top:4px;padding-bottom:8px;">${t.completionRateLine(completedPct, cancelledPct)}</td></tr>` +
+    `<tr><td colspan="2"><table role="presentation" cellpadding="0" cellspacing="0"><tr>` +
+    pill(t.soloPillLabel, trainer.soloSessions, locale) +
+    pill(t.duetPillLabel, trainer.duetSessions, locale) +
+    pill(t.groupPillLabel, trainer.groupSessions, locale) +
+    `</tr></table></td></tr>` +
     `</table>`
   );
 }
@@ -413,7 +477,7 @@ export function buildReportEmailHtml(data: ReportEmailData): string {
     `</td></tr></table>` +
     `<div style="padding:22px 22px 4px;background:#ffffff;border-radius:0 0 18px 18px;">` +
     heroBanner(net, data.locale) +
-    sessionsSection(data.sessions, data.locale) +
+    sessionsSection(data.individualSessions, data.duetSessions, data.locale) +
     groupEventsSection(data.groupSessions, data.events, data.locale) +
     trainersSection(data.trainers, data.locale) +
     packagesSection(data.packages, data.locale) +

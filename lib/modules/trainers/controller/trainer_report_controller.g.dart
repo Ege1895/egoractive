@@ -6,7 +6,7 @@ part of 'trainer_report_controller.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$reportForTrainerHash() => r'0e388e284f5e35ec1b9394de6b6efffb07377ad0';
+String _$reportForTrainerHash() => r'e0bd7f37ce2c762f1e73a864737bfa7cd233b730';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -203,7 +203,7 @@ final _trainerReportCustomEndProvider =
 
 typedef _$TrainerReportCustomEnd = AutoDisposeNotifier<DateTime>;
 String _$trainerReportControllerHash() =>
-    r'cda0532319adadda6177ee79f42afc1ea02f782a';
+    r'fd7e15d8b1fd74a7e46effb6192f815608ffae5a';
 
 /// Antrenörün kendi (`trainerId == uid`) seçili dönem içindeki seans özeti
 /// gerçek zamanlı hesaplanır. Oturum yoksa (test ortamı vb.) mock

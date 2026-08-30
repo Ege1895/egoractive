@@ -11,6 +11,7 @@ class TrainerReportBreakdown with _$TrainerReportBreakdown {
     required int total,
     required int solo,
     required int group,
+    required int duet,
   }) = _TrainerReportBreakdown;
 }
 

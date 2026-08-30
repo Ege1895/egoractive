@@ -21,6 +21,7 @@ mixin _$TrainerReportBreakdown {
   int get total => throw _privateConstructorUsedError;
   int get solo => throw _privateConstructorUsedError;
   int get group => throw _privateConstructorUsedError;
+  int get duet => throw _privateConstructorUsedError;
 
   /// Create a copy of TrainerReportBreakdown
   /// with the given fields replaced by the non-null parameter values.
@@ -36,7 +37,7 @@ abstract class $TrainerReportBreakdownCopyWith<$Res> {
     $Res Function(TrainerReportBreakdown) then,
   ) = _$TrainerReportBreakdownCopyWithImpl<$Res, TrainerReportBreakdown>;
   @useResult
-  $Res call({String title, int total, int solo, int group});
+  $Res call({String title, int total, int solo, int group, int duet});
 }
 
 /// @nodoc
@@ -61,6 +62,7 @@ class _$TrainerReportBreakdownCopyWithImpl<
     Object? total = null,
     Object? solo = null,
     Object? group = null,
+    Object? duet = null,
   }) {
     return _then(
       _value.copyWith(
@@ -80,6 +82,10 @@ class _$TrainerReportBreakdownCopyWithImpl<
                 ? _value.group
                 : group // ignore: cast_nullable_to_non_nullable
                       as int,
+            duet: null == duet
+                ? _value.duet
+                : duet // ignore: cast_nullable_to_non_nullable
+                      as int,
           )
           as $Val,
     );
@@ -95,7 +101,7 @@ abstract class _$$TrainerReportBreakdownImplCopyWith<$Res>
   ) = __$$TrainerReportBreakdownImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String title, int total, int solo, int group});
+  $Res call({String title, int total, int solo, int group, int duet});
 }
 
 /// @nodoc
@@ -117,6 +123,7 @@ class __$$TrainerReportBreakdownImplCopyWithImpl<$Res>
     Object? total = null,
     Object? solo = null,
     Object? group = null,
+    Object? duet = null,
   }) {
     return _then(
       _$TrainerReportBreakdownImpl(
@@ -136,6 +143,10 @@ class __$$TrainerReportBreakdownImplCopyWithImpl<$Res>
             ? _value.group
             : group // ignore: cast_nullable_to_non_nullable
                   as int,
+        duet: null == duet
+            ? _value.duet
+            : duet // ignore: cast_nullable_to_non_nullable
+                  as int,
       ),
     );
   }
@@ -149,6 +160,7 @@ class _$TrainerReportBreakdownImpl implements _TrainerReportBreakdown {
     required this.total,
     required this.solo,
     required this.group,
+    required this.duet,
   });
 
   @override
@@ -159,10 +171,12 @@ class _$TrainerReportBreakdownImpl implements _TrainerReportBreakdown {
   final int solo;
   @override
   final int group;
+  @override
+  final int duet;
 
   @override
   String toString() {
-    return 'TrainerReportBreakdown(title: $title, total: $total, solo: $solo, group: $group)';
+    return 'TrainerReportBreakdown(title: $title, total: $total, solo: $solo, group: $group, duet: $duet)';
   }
 
   @override
@@ -173,11 +187,12 @@ class _$TrainerReportBreakdownImpl implements _TrainerReportBreakdown {
             (identical(other.title, title) || other.title == title) &&
             (identical(other.total, total) || other.total == total) &&
             (identical(other.solo, solo) || other.solo == solo) &&
-            (identical(other.group, group) || other.group == group));
+            (identical(other.group, group) || other.group == group) &&
+            (identical(other.duet, duet) || other.duet == duet));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, title, total, solo, group);
+  int get hashCode => Object.hash(runtimeType, title, total, solo, group, duet);
 
   /// Create a copy of TrainerReportBreakdown
   /// with the given fields replaced by the non-null parameter values.
@@ -198,6 +213,7 @@ abstract class _TrainerReportBreakdown implements TrainerReportBreakdown {
     required final int total,
     required final int solo,
     required final int group,
+    required final int duet,
   }) = _$TrainerReportBreakdownImpl;
 
   @override
@@ -208,6 +224,8 @@ abstract class _TrainerReportBreakdown implements TrainerReportBreakdown {
   int get solo;
   @override
   int get group;
+  @override
+  int get duet;
 
   /// Create a copy of TrainerReportBreakdown
   /// with the given fields replaced by the non-null parameter values.

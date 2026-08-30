@@ -7,7 +7,7 @@ part of 'admin_calendar_controller.dart';
 // **************************************************************************
 
 String _$sessionsForGymMonthHash() =>
-    r'850a49cb56eba26fdb98d90e5dd7cec4e86d2296';
+    r'd176215bfc74b83df9f7914a1eda373bc95fec92';
 
 /// Copied from Dart SDK
 class _SystemHash {

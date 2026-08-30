@@ -7,7 +7,7 @@ part of 'admin_trainer_detail_controller.dart';
 // **************************************************************************
 
 String _$adminTrainerDetailStatsHash() =>
-    r'0f11538abe253d7f11755e519ca3396baa8894ab';
+    r'aba1629c89ec5c485947a788cce1aa4899076596';
 
 /// Copied from Dart SDK
 class _SystemHash {

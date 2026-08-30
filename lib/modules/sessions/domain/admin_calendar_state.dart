@@ -15,7 +15,19 @@ class AdminSessionSlot with _$AdminSessionSlot {
     required String meta,
     required AdminSessionState state,
     @Default('') String memberId,
+    // F7-x — düet dersler her üye için ayrı bir `sessions` dokümanı
+    // olduğundan (aynı `duetGroupId`'yi paylaşırlar), takvimde tek satır
+    // olarak gösterilebilmesi için birden fazla doküman id'si taşıyabilir.
+    // `sessionType == 'individual'` olan slotlarda tek elemanlı, `id` ile
+    // aynıdır.
+    @Default('individual') String sessionType,
+    @Default(<String>[]) List<String> duetMemberNames,
+    @Default(<String>[]) List<String> sessionIds,
   }) = _AdminSessionSlot;
+
+  const AdminSessionSlot._();
+
+  bool get isDuet => sessionType == 'duet';
 }
 
 @freezed

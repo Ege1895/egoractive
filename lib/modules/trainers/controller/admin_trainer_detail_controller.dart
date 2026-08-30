@@ -14,30 +14,42 @@ part 'admin_trainer_detail_controller.g.dart';
 Stream<AdminTrainerDetailStats> adminTrainerDetailStats(
   AdminTrainerDetailStatsRef ref,
   String trainerId,
-) {
-  return FirebaseFirestore.instance
+) async* {
+  // `gymId` filtresi olmadan admin bağlamında `firestore.rules`'taki
+  // `sessions` okuma kuralı bu sorguyu reddedebilir — bkz.
+  // `trainer_report_controller.dart`'taki aynı düzeltmenin yorumu.
+  final trainerDoc = await FirebaseFirestore.instance
+      .collection('users')
+      .doc(trainerId)
+      .get();
+  final gymId = trainerDoc.data()?['gymId'] as String?;
+
+  var query = FirebaseFirestore.instance
       .collection('sessions')
-      .where('trainerId', isEqualTo: trainerId)
-      .snapshots()
-      .map((snapshot) {
-        var completed = 0;
-        var cancelled = 0;
-        var planned = 0;
-        for (final doc in snapshot.docs) {
-          switch (doc.data()['status'] as String? ?? 'planned') {
-            case 'completed':
-              completed++;
-            case 'cancelled':
-              cancelled++;
-            default:
-              planned++;
-          }
-        }
-        return AdminTrainerDetailStats(
-          totalSessions: snapshot.docs.length,
-          completedSessions: completed,
-          cancelledSessions: cancelled,
-          plannedSessions: planned,
-        );
-      });
+      .where('trainerId', isEqualTo: trainerId);
+  if (gymId != null) {
+    query = query.where('gymId', isEqualTo: gymId);
+  }
+
+  yield* query.snapshots().map((snapshot) {
+    var completed = 0;
+    var cancelled = 0;
+    var planned = 0;
+    for (final doc in snapshot.docs) {
+      switch (doc.data()['status'] as String? ?? 'planned') {
+        case 'completed':
+          completed++;
+        case 'cancelled':
+          cancelled++;
+        default:
+          planned++;
+      }
+    }
+    return AdminTrainerDetailStats(
+      totalSessions: snapshot.docs.length,
+      completedSessions: completed,
+      cancelledSessions: cancelled,
+      plannedSessions: planned,
+    );
+  });
 }

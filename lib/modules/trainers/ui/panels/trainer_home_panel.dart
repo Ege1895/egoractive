@@ -2,10 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/app_spacing.dart';
-import '../../../../core/panels/panel_stack_controller.dart';
 import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../../sessions/ui/panels/trainer_notifications_panel.dart';
 import '../../controller/trainer_home_controller.dart';
 import '../../controller/trainer_profile_controller.dart';
 import '../../domain/pending_confirmation.dart';
@@ -51,7 +49,6 @@ class TrainerHomePanel extends ConsumerWidget {
     final typography = context.appTypography;
     final state = ref.watch(trainerHomeControllerProvider);
     final controller = ref.read(trainerHomeControllerProvider.notifier);
-    final panelStack = ref.read(panelStackControllerProvider.notifier);
     final profile = ref.watch(trainerProfileControllerProvider);
 
     return Scaffold(
@@ -116,47 +113,6 @@ class TrainerHomePanel extends ConsumerWidget {
                         ),
                       ),
                     ],
-                  ),
-                ),
-                InkWell(
-                  borderRadius: BorderRadius.circular(999),
-                  onTap: () =>
-                      panelStack.push(const TrainerNotificationsPanel()),
-                  child: Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(
-                      color: colors.surface,
-                      shape: BoxShape.circle,
-                      border: Border.all(color: colors.outlineStrong),
-                    ),
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        Icon(
-                          Icons.notifications_outlined,
-                          size: 18,
-                          color: colors.onSurfaceVariant,
-                        ),
-                        if (state.pendingConfirmations.isNotEmpty)
-                          Positioned(
-                            top: 10,
-                            right: 11,
-                            child: Container(
-                              width: 8,
-                              height: 8,
-                              decoration: BoxDecoration(
-                                color: colors.warning,
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: colors.background,
-                                  width: 2,
-                                ),
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
                   ),
                 ),
               ],

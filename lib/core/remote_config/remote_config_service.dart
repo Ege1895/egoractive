@@ -1032,6 +1032,15 @@ abstract final class RemoteConfigKeys {
   static const reportsPdfDocumentTitle = 'lbl_reports_pdf_document_title';
   static const reportsPdfExportError = 'lbl_reports_pdf_export_error';
   static const reportsPdfSessionsTitle = 'lbl_reports_pdf_sessions_title';
+  // F7-x — "Ders Özeti" bölümünün birebir/düet kırılımı ve antrenör
+  // satırındaki tür rozetleri (mail template'iyle birebir aynı).
+  static const reportsPdfIndividualSessionsLabel =
+      'lbl_reports_pdf_individual_sessions_label';
+  static const reportsPdfDuetSessionsLabel =
+      'lbl_reports_pdf_duet_sessions_label';
+  static const reportsPdfSoloPillLabel = 'lbl_reports_pdf_solo_pill_label';
+  static const reportsPdfDuetPillLabel = 'lbl_reports_pdf_duet_pill_label';
+  static const reportsPdfGroupPillLabel = 'lbl_reports_pdf_group_pill_label';
   // F5-21 — mail template'iyle (report-email-template.ts) birebir aynı
   // yapı/metinler için PDF'e özel RC key'leri.
   static const reportsPdfHeroPositiveTemplate =
@@ -1070,6 +1079,13 @@ abstract final class RemoteConfigKeys {
       'lbl_sessions_calendar_slot_time_label';
   static const sessionsCalendarSlotStatusLabel =
       'lbl_sessions_calendar_slot_status_label';
+  // F7-x — takvim gündem satırı/detayında antrenör adının yanına eklenen
+  // kısa tür etiketi ve düet dersin katılan üyeler listesi başlığı.
+  static const sessionsCalendarTypeIndividual =
+      'lbl_sessions_calendar_type_individual';
+  static const sessionsCalendarTypeDuet = 'lbl_sessions_calendar_type_duet';
+  static const sessionsCalendarDuetMembersLabel =
+      'lbl_sessions_calendar_duet_members_label';
   static const sessionsAttendanceAnswerLabel =
       'lbl_sessions_attendance_answer_label';
   static const sessionsAttendanceAnswerTimeLabel =
@@ -1195,6 +1211,21 @@ abstract final class RemoteConfigKeys {
       'lbl_sessions_create_member_sessions_suffix';
   static const sessionsCreatePickTrainerTitle =
       'lbl_sessions_create_pick_trainer_title';
+
+  /// Seans oluşturma sheet'inin en üstündeki "Birebir Seans"/"Düet Ders"
+  /// toggle'ı — düet seçilince üye alanı çoklu seçime döner.
+  static const sessionsCreateKindLabel = 'lbl_sessions_create_kind_label';
+  static const sessionsCreateKindIndividual =
+      'lbl_sessions_create_kind_individual';
+  static const sessionsCreateKindDuet = 'lbl_sessions_create_kind_duet';
+  static const sessionsCreateMembersFieldLabel =
+      'lbl_sessions_create_members_field_label';
+  static const sessionsCreatePickMembersTitle =
+      'lbl_sessions_create_pick_members_title';
+  static const sessionsCreateDuetMembersSummary =
+      'lbl_sessions_create_duet_members_summary';
+  static const sessionsCreateDuetMinMembersError =
+      'lbl_sessions_create_duet_min_members_error';
   static const sessionsCreateRepeatLabel = 'lbl_sessions_create_repeat_label';
   static const sessionsCreateRepeatDaysSelected =
       'lbl_sessions_create_repeat_days_selected';
@@ -1248,6 +1279,7 @@ abstract final class RemoteConfigKeys {
   static const trainersReportOneOnOneToggle =
       'lbl_trainers_report_one_on_one_toggle';
   static const trainersReportGroupToggle = 'lbl_trainers_report_group_toggle';
+  static const trainersReportDuetToggle = 'lbl_trainers_report_duet_toggle';
   static const trainersReportPeriodWeekly = 'lbl_trainers_report_period_weekly';
   static const trainersReportPeriodMonthly =
       'lbl_trainers_report_period_monthly';
@@ -1262,6 +1294,8 @@ abstract final class RemoteConfigKeys {
   static const trainersDetailPlannedLabel = 'lbl_trainers_detail_planned_label';
   static const trainersDetailThisMonthSection =
       'lbl_trainers_detail_this_month_section';
+  static const trainersDetailThisWeekSection =
+      'lbl_trainers_detail_this_week_section';
   static const trainersDetailMonthLoadError =
       'lbl_trainers_detail_month_load_error';
   static const trainersAddTrainerNameRequiredError =
@@ -2089,12 +2123,20 @@ class RemoteConfigService {
     'lbl_reports_pdf_completion_rate_template_tr':
         '%{completed} tamamlanma · %{cancelled} iptal oranı',
     'lbl_reports_pdf_sessions_title_tr': 'Ders Özeti',
+    'lbl_reports_pdf_individual_sessions_label_tr': 'Birebir Seans',
+    'lbl_reports_pdf_duet_sessions_label_tr': 'Düet Dersi',
+    'lbl_reports_pdf_solo_pill_label_tr': 'Seans',
+    'lbl_reports_pdf_duet_pill_label_tr': 'Düet',
+    'lbl_reports_pdf_group_pill_label_tr': 'Grup',
     'lbl_reports_pdf_other_label_tr': 'Diğer',
     'lbl_reports_pdf_footer_tr':
         'Bu rapor Egoractive tarafından otomatik oluşturuldu.',
     'lbl_sessions_calendar_title_tr': 'Takvim',
     'lbl_sessions_calendar_slot_time_label_tr': 'Saat',
     'lbl_sessions_calendar_slot_status_label_tr': 'Durum',
+    'lbl_sessions_calendar_type_individual_tr': 'Birebir',
+    'lbl_sessions_calendar_type_duet_tr': 'Düet',
+    'lbl_sessions_calendar_duet_members_label_tr': 'Katılan Üyeler',
     'lbl_sessions_attendance_answer_label_tr': 'Cevabı',
     'lbl_sessions_attendance_answer_time_label_tr': 'Cevap saati',
     'lbl_sessions_attendance_member_note_label_tr': 'Üyenin notu',
@@ -2185,6 +2227,14 @@ class RemoteConfigService {
     'lbl_sessions_create_pick_member_title_tr': 'Üye seç',
     'lbl_sessions_create_member_sessions_suffix_tr': '{count} seans',
     'lbl_sessions_create_pick_trainer_title_tr': 'Antrenör seç',
+    'lbl_sessions_create_kind_label_tr': 'Seans türü',
+    'lbl_sessions_create_kind_individual_tr': 'Birebir Seans',
+    'lbl_sessions_create_kind_duet_tr': 'Düet Ders',
+    'lbl_sessions_create_members_field_label_tr': 'Üyeler',
+    'lbl_sessions_create_pick_members_title_tr': 'Üyeleri seç',
+    'lbl_sessions_create_duet_members_summary_tr': '{count} üye seçildi',
+    'lbl_sessions_create_duet_min_members_error_tr':
+        'Düet ders için en az 2 üye seçmelisin.',
     'lbl_sessions_create_repeat_label_tr': 'Tekrarla',
     'lbl_sessions_create_repeat_days_selected_tr': '{count} gün seçildi',
     'lbl_sessions_create_submit_button_tr': 'Oluştur',
@@ -2218,6 +2268,7 @@ class RemoteConfigService {
     'lbl_trainers_report_end_date_field_label_tr': 'Bitiş t.',
     'lbl_trainers_report_one_on_one_toggle_tr': 'Birebir',
     'lbl_trainers_report_group_toggle_tr': 'Grup',
+    'lbl_trainers_report_duet_toggle_tr': 'Düet',
     'lbl_trainers_report_period_weekly_tr': 'Haftalık',
     'lbl_trainers_report_period_monthly_tr': 'Aylık',
     'lbl_trainers_report_period_all_time_tr': 'Tüm zamanlar',
@@ -2229,6 +2280,7 @@ class RemoteConfigService {
     'lbl_trainers_detail_all_time_section_tr': 'TÜM ZAMANLAR',
     'lbl_trainers_detail_planned_label_tr': 'Planlanan',
     'lbl_trainers_detail_this_month_section_tr': 'BU AY',
+    'lbl_trainers_detail_this_week_section_tr': 'BU HAFTA',
     'lbl_trainers_detail_month_load_error_tr': 'Bu ayın verileri yüklenemedi.',
     'lbl_trainers_add_trainer_name_required_error_tr': 'Ad soyad boş olamaz.',
     'lbl_trainers_add_trainer_error_tr': 'Antrenör eklenemedi, tekrar dene.',
@@ -2903,6 +2955,11 @@ class RemoteConfigService {
     'lbl_reports_pdf_completion_rate_template_en':
         '%{completed} completion · %{cancelled} cancellation rate',
     'lbl_reports_pdf_sessions_title_en': 'Session Overview',
+    'lbl_reports_pdf_individual_sessions_label_en': 'Individual Sessions',
+    'lbl_reports_pdf_duet_sessions_label_en': 'Duet Classes',
+    'lbl_reports_pdf_solo_pill_label_en': 'Solo',
+    'lbl_reports_pdf_duet_pill_label_en': 'Duet',
+    'lbl_reports_pdf_group_pill_label_en': 'Group',
     'lbl_reports_pdf_other_label_en': 'Other',
     'lbl_reports_pdf_footer_en':
         'This report was generated automatically by Egoractive.',
@@ -2911,6 +2968,9 @@ class RemoteConfigService {
     'lbl_sessions_calendar_title_en': 'Calendar',
     'lbl_sessions_calendar_slot_time_label_en': 'Time',
     'lbl_sessions_calendar_slot_status_label_en': 'Status',
+    'lbl_sessions_calendar_type_individual_en': 'Individual',
+    'lbl_sessions_calendar_type_duet_en': 'Duet',
+    'lbl_sessions_calendar_duet_members_label_en': 'Participating Members',
     'lbl_sessions_attendance_answer_label_en': 'Answer',
     'lbl_sessions_attendance_answer_time_label_en': 'Answer time',
     'lbl_sessions_attendance_member_note_label_en': 'Member\'s note',
@@ -3002,6 +3062,14 @@ class RemoteConfigService {
     'lbl_sessions_create_pick_member_title_en': 'Select member',
     'lbl_sessions_create_member_sessions_suffix_en': '{count} sessions',
     'lbl_sessions_create_pick_trainer_title_en': 'Select trainer',
+    'lbl_sessions_create_kind_label_en': 'Session type',
+    'lbl_sessions_create_kind_individual_en': '1-on-1 Session',
+    'lbl_sessions_create_kind_duet_en': 'Duet Class',
+    'lbl_sessions_create_members_field_label_en': 'Members',
+    'lbl_sessions_create_pick_members_title_en': 'Select members',
+    'lbl_sessions_create_duet_members_summary_en': '{count} members selected',
+    'lbl_sessions_create_duet_min_members_error_en':
+        'Select at least 2 members for a duet class.',
     'lbl_sessions_create_repeat_label_en': 'Repeat',
     'lbl_sessions_create_repeat_days_selected_en': '{count} days selected',
     'lbl_sessions_create_submit_button_en': 'Create',
@@ -3037,6 +3105,7 @@ class RemoteConfigService {
     'lbl_trainers_report_end_date_field_label_en': 'End',
     'lbl_trainers_report_one_on_one_toggle_en': 'One-on-one',
     'lbl_trainers_report_group_toggle_en': 'Group',
+    'lbl_trainers_report_duet_toggle_en': 'Duet',
     'lbl_trainers_report_period_weekly_en': 'Weekly',
     'lbl_trainers_report_period_monthly_en': 'Monthly',
     'lbl_trainers_report_period_all_time_en': 'All time',
@@ -3048,6 +3117,7 @@ class RemoteConfigService {
     'lbl_trainers_detail_all_time_section_en': 'ALL TIME',
     'lbl_trainers_detail_planned_label_en': 'Planned',
     'lbl_trainers_detail_this_month_section_en': 'THIS MONTH',
+    'lbl_trainers_detail_this_week_section_en': 'THIS WEEK',
     'lbl_trainers_detail_month_load_error_en':
         'This month\'s data could not be loaded.',
     'lbl_trainers_add_trainer_name_required_error_en':

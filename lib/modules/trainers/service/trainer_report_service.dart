@@ -19,21 +19,24 @@ class TrainerReportService {
       breakdown: const [
         TrainerReportBreakdown(
           title: 'Toplam seanslar',
-          total: 61,
+          total: 66,
           solo: 44,
           group: 17,
+          duet: 5,
         ),
         TrainerReportBreakdown(
           title: 'Tamamlanan seanslar',
-          total: 54,
+          total: 58,
           solo: 39,
           group: 15,
+          duet: 4,
         ),
         TrainerReportBreakdown(
           title: 'İptal edilen seanslar',
-          total: 7,
+          total: 8,
           solo: 5,
           group: 2,
+          duet: 1,
         ),
       ],
     );

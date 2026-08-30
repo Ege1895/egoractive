@@ -506,7 +506,7 @@ class AdminCalendarPanel extends ConsumerWidget {
                             ),
                           ),
                           Text(
-                            slot.meta,
+                            _slotMetaWithType(ref, slot),
                             style: typography.bodyMedium.copyWith(
                               color: colors.onSurfaceVariant,
                               fontSize: 13,
@@ -567,6 +567,46 @@ class AdminCalendarPanel extends ConsumerWidget {
                     ],
                   ),
                 ),
+                if (slot.isDuet) ...[
+                  const SizedBox(height: AppSpacing.lg),
+                  Text(
+                    ref.read(
+                      rcTextProvider(
+                        RemoteConfigKeys.sessionsCalendarDuetMembersLabel,
+                      ),
+                    ),
+                    style: typography.caption.copyWith(
+                      color: colors.onSurfaceMuted,
+                      letterSpacing: 1.2,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.md,
+                    ),
+                    decoration: BoxDecoration(
+                      color: colors.surfaceRaised,
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusInner,
+                      ),
+                    ),
+                    child: Column(
+                      children: [
+                        for (
+                          var i = 0;
+                          i < slot.duetMemberNames.length;
+                          i++
+                        )
+                          _PopupRow(
+                            label: slot.duetMemberNames[i],
+                            value: '',
+                            showDivider: i < slot.duetMemberNames.length - 1,
+                          ),
+                      ],
+                    ),
+                  ),
+                ],
                 const SizedBox(height: AppSpacing.lg),
                 if (cancelError != null) ...[
                   Text(
@@ -600,6 +640,9 @@ class AdminCalendarPanel extends ConsumerWidget {
                             ref,
                             sessionId: slot.id,
                             currentStart: currentStart,
+                            groupSessionIds: slot.isDuet
+                                ? slot.sessionIds
+                                : null,
                           );
                         },
                       ),
@@ -636,11 +679,18 @@ class AdminCalendarPanel extends ConsumerWidget {
                                           cancelError = null;
                                         });
                                         try {
-                                          await ref
-                                              .read(
-                                                sessionsWriteServiceProvider,
-                                              )
-                                              .cancelSession(slot.id);
+                                          final service = ref.read(
+                                            sessionsWriteServiceProvider,
+                                          );
+                                          if (slot.isDuet) {
+                                            await service.cancelDuetSession(
+                                              slot.sessionIds,
+                                            );
+                                          } else {
+                                            await service.cancelSession(
+                                              slot.id,
+                                            );
+                                          }
                                           if (sheetContext.mounted) {
                                             Navigator.of(sheetContext).pop();
                                           }
@@ -796,7 +846,20 @@ class _PopupRow extends StatelessWidget {
   }
 }
 
-class _AgendaRow extends StatelessWidget {
+/// F7-x — [slot]'un `meta` alanı (antrenör adı) yanına, [slot.sessionType]'a
+/// göre RC'den okunan kısa tür etiketini ("Birebir"/"Düet") ekler.
+String _slotMetaWithType(WidgetRef ref, AdminSessionSlot slot) {
+  final typeLabel = ref.watch(
+    rcTextProvider(
+      slot.isDuet
+          ? RemoteConfigKeys.sessionsCalendarTypeDuet
+          : RemoteConfigKeys.sessionsCalendarTypeIndividual,
+    ),
+  );
+  return '${slot.meta} · $typeLabel';
+}
+
+class _AgendaRow extends ConsumerWidget {
   const _AgendaRow({
     required this.slot,
     required this.showDivider,
@@ -808,7 +871,7 @@ class _AgendaRow extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.appColors;
     final typography = context.appTypography;
 
@@ -845,7 +908,7 @@ class _AgendaRow extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    slot.meta,
+                    _slotMetaWithType(ref, slot),
                     style: typography.caption.copyWith(
                       color: colors.onSurfaceMuted,
                     ),

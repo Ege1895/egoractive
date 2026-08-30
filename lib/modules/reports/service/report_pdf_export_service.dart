@@ -39,6 +39,8 @@ class ReportPdfLabels {
     required this.heroSubPositive,
     required this.heroSubNegative,
     required this.sessionsTitle,
+    required this.individualSessionsLabel,
+    required this.duetSessionsLabel,
     required this.totalSessions,
     required this.completed,
     required this.cancelled,
@@ -54,6 +56,9 @@ class ReportPdfLabels {
     required this.completedShort,
     required this.cancelledShort,
     required this.totalShort,
+    required this.soloPillLabel,
+    required this.duetPillLabel,
+    required this.groupPillLabel,
     required this.completionRateTemplate,
     required this.packagesTitle,
     required this.packagesEmpty,
@@ -72,6 +77,8 @@ class ReportPdfLabels {
   final String heroSubPositive;
   final String heroSubNegative;
   final String sessionsTitle;
+  final String individualSessionsLabel;
+  final String duetSessionsLabel;
   final String totalSessions;
   final String completed;
   final String cancelled;
@@ -87,6 +94,9 @@ class ReportPdfLabels {
   final String completedShort;
   final String cancelledShort;
   final String totalShort;
+  final String soloPillLabel;
+  final String duetPillLabel;
+  final String groupPillLabel;
   final String completionRateTemplate;
   final String packagesTitle;
   final String packagesEmpty;
@@ -345,39 +355,71 @@ class ReportPdfExportService {
     );
   }
 
-  pw.Widget _sessionsSection(DashboardReport report, ReportPdfLabels labels) {
-    final completedPct = _pct(report.completedSessions, report.totalSessions);
-    final cancelledPct = _pct(report.cancelledSessions, report.totalSessions);
-    final otherCount =
-        (report.totalSessions -
-                report.completedSessions -
-                report.cancelledSessions)
-            .clamp(0, 1 << 30);
+  pw.Widget _sessionTypeBlock(
+    String title,
+    SessionTypeBreakdown breakdown,
+    ReportPdfLabels labels,
+  ) {
+    final completedPct = _pct(breakdown.completed, breakdown.total);
+    final cancelledPct = _pct(breakdown.cancelled, breakdown.total);
+    final otherCount = (breakdown.total - breakdown.completed - breakdown.cancelled)
+        .clamp(0, 1 << 30);
     final otherPct = (100 - completedPct - cancelledPct).clamp(0, 100);
+    return pw.Column(
+      crossAxisAlignment: pw.CrossAxisAlignment.start,
+      children: [
+        pw.Text(
+          title,
+          style: pw.TextStyle(
+            fontSize: 10.5,
+            fontWeight: pw.FontWeight.bold,
+            color: _ink,
+          ),
+        ),
+        pw.SizedBox(height: 8),
+        pw.Row(
+          children: [
+            _statBox(labels.totalSessions, '${breakdown.total}', _ink),
+            _statBox(labels.completed, '${breakdown.completed}', _good),
+            _statBox(labels.cancelled, '${breakdown.cancelled}', _bad),
+          ],
+        ),
+        pw.SizedBox(height: 12),
+        _segBar([
+          _Segment(breakdown.completed.toDouble(), _good),
+          _Segment(breakdown.cancelled.toDouble(), _bad),
+          _Segment(otherCount.toDouble(), _other),
+        ]),
+        pw.SizedBox(height: 8),
+        _legend([
+          (_good, completedPct, labels.completed),
+          (_bad, cancelledPct, labels.cancelled),
+          (_other, otherPct, labels.other),
+        ]),
+      ],
+    );
+  }
+
+  /// F7-x — "Ders Özeti" bölümü Birebir Seans ve Düet Dersi'ni ayrı
+  /// bloklar olarak, her biri kendi tamamlanan/iptal kırılımıyla gösterir.
+  /// Grup dersleri burada değil, `_groupEventsSection`'da kalır.
+  pw.Widget _sessionsSection(DashboardReport report, ReportPdfLabels labels) {
     return _card(
       labels.sessionsTitle,
       pw.Column(
         crossAxisAlignment: pw.CrossAxisAlignment.start,
         children: [
-          pw.Row(
-            children: [
-              _statBox(labels.totalSessions, '${report.totalSessions}', _ink),
-              _statBox(labels.completed, '${report.completedSessions}', _good),
-              _statBox(labels.cancelled, '${report.cancelledSessions}', _bad),
-            ],
+          _sessionTypeBlock(
+            labels.individualSessionsLabel,
+            report.individualSessions,
+            labels,
           ),
-          pw.SizedBox(height: 12),
-          _segBar([
-            _Segment(report.completedSessions.toDouble(), _good),
-            _Segment(report.cancelledSessions.toDouble(), _bad),
-            _Segment(otherCount.toDouble(), _other),
-          ]),
-          pw.SizedBox(height: 8),
-          _legend([
-            (_good, completedPct, labels.completed),
-            (_bad, cancelledPct, labels.cancelled),
-            (_other, otherPct, labels.other),
-          ]),
+          pw.SizedBox(height: 14),
+          _sessionTypeBlock(
+            labels.duetSessionsLabel,
+            report.duetSessions,
+            labels,
+          ),
         ],
       ),
     );
@@ -388,8 +430,13 @@ class ReportPdfExportService {
     int count,
     String unit,
     ReportOccupancy stats,
-    ReportPdfLabels labels,
-  ) {
+    ReportPdfLabels labels, {
+    // F7-x — Grup Dersleri kartına eklenen tamamlanan/iptal satırı.
+    // `groupSessions` koleksiyonunda bir iptal durumu tutulmadığından
+    // (dersi iptal etme akışı yok) "tamamlanan" dönemde gerçekleşen tüm
+    // dersler, "iptal" her zaman 0 — bkz. `_groupEventsSection`.
+    (int completed, int cancelled)? completedCancelled,
+  }) {
     final occPct = _pct(stats.attendance, stats.capacity);
     return pw.Expanded(
       child: pw.Container(
@@ -433,6 +480,20 @@ class ReportPdfExportService {
                   .replaceAll('{pct}', '$occPct'),
               style: const pw.TextStyle(fontSize: 8, color: _muted),
             ),
+            if (completedCancelled != null) ...[
+              pw.SizedBox(height: 8),
+              pw.Container(
+                width: double.infinity,
+                padding: const pw.EdgeInsets.only(top: 8),
+                decoration: const pw.BoxDecoration(
+                  border: pw.Border(top: pw.BorderSide(color: _line)),
+                ),
+                child: pw.Text(
+                  '${completedCancelled.$1} ${labels.completedShort} · ${completedCancelled.$2} ${labels.cancelledShort}',
+                  style: const pw.TextStyle(fontSize: 8, color: _muted),
+                ),
+              ),
+            ],
           ],
         ),
       ),
@@ -454,6 +515,7 @@ class ReportPdfExportService {
             labels.sessionsUnit,
             snapshot.groupSessions,
             labels,
+            completedCancelled: (snapshot.groupSessions.count, 0),
           ),
           _occupancyBlock(
             labels.eventsLabel,
@@ -463,6 +525,21 @@ class ReportPdfExportService {
             labels,
           ),
         ],
+      ),
+    );
+  }
+
+  pw.Widget _pill(String label, int value, PdfColor color) {
+    return pw.Container(
+      margin: const pw.EdgeInsets.only(right: 6),
+      padding: const pw.EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: pw.BoxDecoration(
+        color: _lineSoft,
+        borderRadius: const pw.BorderRadius.all(pw.Radius.circular(20)),
+      ),
+      child: pw.Text(
+        '$label $value',
+        style: pw.TextStyle(fontSize: 7.5, color: color),
       ),
     );
   }
@@ -509,6 +586,14 @@ class ReportPdfExportService {
                 .replaceAll('{completed}', '$completedPct')
                 .replaceAll('{cancelled}', '$cancelledPct'),
             style: const pw.TextStyle(fontSize: 7.5, color: _faint),
+          ),
+          pw.SizedBox(height: 6),
+          pw.Row(
+            children: [
+              _pill(labels.soloPillLabel, trainer.soloSessions, _brand),
+              _pill(labels.duetPillLabel, trainer.duetSessions, _brand),
+              _pill(labels.groupPillLabel, trainer.groupSessions, _brand),
+            ],
           ),
         ],
       ),

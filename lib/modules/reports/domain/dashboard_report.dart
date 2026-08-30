@@ -13,12 +13,40 @@ class TrainerPerformance with _$TrainerPerformance {
     // hesaplanmıyor (bkz. DashboardReportService.loadTrainerPerformance),
     // o yüzden varsayılan 0.
     @Default(0) int cancelledSessions,
+    // F7-x — rapor mail'i/PDF'indeki antrenör satırı için birebir/düet/grup
+    // kırılımı. Grup dersleri hangi antrenöre ait olduğunu tutmadığından
+    // (bkz. `groupSessions` — sadece admin oluşturabiliyor, gerçek bir
+    // antrenör seçici yok) `groupSessions` her zaman 0. Canlı dashboard
+    // özetinde henüz hesaplanmıyor, o yüzden üçü de varsayılan 0.
+    @Default(0) int soloSessions,
+    @Default(0) int duetSessions,
+    @Default(0) int groupSessions,
   }) = _TrainerPerformance;
 
   const TrainerPerformance._();
 
   double get completionRatio =>
       totalSessions == 0 ? 0 : completedSessions / totalSessions;
+}
+
+/// F7-x — mail/PDF rapor şablonundaki "Ders Özeti" bölümünün birebir/düet
+/// kırılımı için tek bir tip/tamamlanan/iptal üçlüsü. Canlı dashboard
+/// özetinde henüz hesaplanmıyor, o yüzden [DashboardReport]/[DashboardSummary]
+/// üzerinde varsayılanı [empty].
+@freezed
+class SessionTypeBreakdown with _$SessionTypeBreakdown {
+  const factory SessionTypeBreakdown({
+    required int total,
+    required int completed,
+    required int cancelled,
+  }) = _SessionTypeBreakdown;
+
+  const SessionTypeBreakdown._();
+
+  static const empty = SessionTypeBreakdown(total: 0, completed: 0, cancelled: 0);
+
+  double get completionRatio => total == 0 ? 0 : completed / total;
+  double get cancellationRatio => total == 0 ? 0 : cancelled / total;
 }
 
 /// F7-2 — antrenör performans dökümü (`trainerPerformance`) ayrı, daha
@@ -65,6 +93,12 @@ class DashboardReport with _$DashboardReport {
     required List<TrainerPerformance> trainerPerformance,
     required int estimatedRevenueTl,
     required int totalExpensesTl,
+    // F7-x — mail/PDF rapor şablonundaki "Ders Özeti" bölümünün birebir/düet
+    // kırılımı (bkz. `SessionTypeBreakdown`). Canlı dashboard özetinde
+    // (`DashboardReportService`) henüz hesaplanmadığından varsayılan boş —
+    // bu alanlar sadece geçmiş rapor snapshot'larında (F5-9) dolu gelir.
+    @Default(SessionTypeBreakdown.empty) SessionTypeBreakdown individualSessions,
+    @Default(SessionTypeBreakdown.empty) SessionTypeBreakdown duetSessions,
   }) = _DashboardReport;
 
   const DashboardReport._();

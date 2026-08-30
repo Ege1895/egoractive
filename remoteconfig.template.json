@@ -5236,6 +5236,30 @@
       },
       "valueType": "STRING"
     },
+    "lbl_sessions_calendar_type_individual_tr": {
+      "defaultValue": { "value": "Birebir" },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_calendar_type_individual_en": {
+      "defaultValue": { "value": "Individual" },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_calendar_type_duet_tr": {
+      "defaultValue": { "value": "Düet" },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_calendar_type_duet_en": {
+      "defaultValue": { "value": "Duet" },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_calendar_duet_members_label_tr": {
+      "defaultValue": { "value": "Katılan Üyeler" },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_calendar_duet_members_label_en": {
+      "defaultValue": { "value": "Participating Members" },
+      "valueType": "STRING"
+    },
     "lbl_sessions_attendance_answer_label_tr": {
       "defaultValue": {
         "value": "Cevabı"
@@ -5944,6 +5968,90 @@
       },
       "valueType": "STRING"
     },
+    "lbl_sessions_create_kind_label_tr": {
+      "defaultValue": {
+        "value": "Seans türü"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_create_kind_label_en": {
+      "defaultValue": {
+        "value": "Session type"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_create_kind_individual_tr": {
+      "defaultValue": {
+        "value": "Birebir Seans"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_create_kind_individual_en": {
+      "defaultValue": {
+        "value": "1-on-1 Session"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_create_kind_duet_tr": {
+      "defaultValue": {
+        "value": "Düet Ders"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_create_kind_duet_en": {
+      "defaultValue": {
+        "value": "Duet Class"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_create_members_field_label_tr": {
+      "defaultValue": {
+        "value": "Üyeler"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_create_members_field_label_en": {
+      "defaultValue": {
+        "value": "Members"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_create_pick_members_title_tr": {
+      "defaultValue": {
+        "value": "Üyeleri seç"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_create_pick_members_title_en": {
+      "defaultValue": {
+        "value": "Select members"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_create_duet_members_summary_tr": {
+      "defaultValue": {
+        "value": "{count} üye seçildi"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_create_duet_members_summary_en": {
+      "defaultValue": {
+        "value": "{count} members selected"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_create_duet_min_members_error_tr": {
+      "defaultValue": {
+        "value": "Düet ders için en az 2 üye seçmelisin."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_sessions_create_duet_min_members_error_en": {
+      "defaultValue": {
+        "value": "Select at least 2 members for a duet class."
+      },
+      "valueType": "STRING"
+    },
     "lbl_sessions_create_repeat_label_tr": {
       "defaultValue": {
         "value": "Tekrarla"
@@ -6328,6 +6436,18 @@
       },
       "valueType": "STRING"
     },
+    "lbl_trainers_report_duet_toggle_tr": {
+      "defaultValue": {
+        "value": "Düet"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_report_duet_toggle_en": {
+      "defaultValue": {
+        "value": "Duet"
+      },
+      "valueType": "STRING"
+    },
     "lbl_trainers_profile_footer_text_tr": {
       "defaultValue": {
         "value": "Egoractive · Egora Games · Sürüm 1.0"
@@ -6399,6 +6519,18 @@
     "lbl_trainers_detail_this_month_section_en": {
       "defaultValue": {
         "value": "THIS MONTH"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_detail_this_week_section_tr": {
+      "defaultValue": {
+        "value": "BU HAFTA"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_detail_this_week_section_en": {
+      "defaultValue": {
+        "value": "THIS WEEK"
       },
       "valueType": "STRING"
     },
@@ -8148,6 +8280,46 @@
     },
     "lbl_reports_pdf_sessions_title_en": {
       "defaultValue": { "value": "Session Overview" },
+      "valueType": "STRING"
+    },
+    "lbl_reports_pdf_individual_sessions_label_tr": {
+      "defaultValue": { "value": "Birebir Seans" },
+      "valueType": "STRING"
+    },
+    "lbl_reports_pdf_individual_sessions_label_en": {
+      "defaultValue": { "value": "Individual Sessions" },
+      "valueType": "STRING"
+    },
+    "lbl_reports_pdf_duet_sessions_label_tr": {
+      "defaultValue": { "value": "Düet Dersi" },
+      "valueType": "STRING"
+    },
+    "lbl_reports_pdf_duet_sessions_label_en": {
+      "defaultValue": { "value": "Duet Classes" },
+      "valueType": "STRING"
+    },
+    "lbl_reports_pdf_solo_pill_label_tr": {
+      "defaultValue": { "value": "Seans" },
+      "valueType": "STRING"
+    },
+    "lbl_reports_pdf_solo_pill_label_en": {
+      "defaultValue": { "value": "Solo" },
+      "valueType": "STRING"
+    },
+    "lbl_reports_pdf_duet_pill_label_tr": {
+      "defaultValue": { "value": "Düet" },
+      "valueType": "STRING"
+    },
+    "lbl_reports_pdf_duet_pill_label_en": {
+      "defaultValue": { "value": "Duet" },
+      "valueType": "STRING"
+    },
+    "lbl_reports_pdf_group_pill_label_tr": {
+      "defaultValue": { "value": "Grup" },
+      "valueType": "STRING"
+    },
+    "lbl_reports_pdf_group_pill_label_en": {
+      "defaultValue": { "value": "Group" },
       "valueType": "STRING"
     },
     "lbl_reports_pdf_other_label_tr": {

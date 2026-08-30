@@ -42,11 +42,15 @@ Future<void> showCreateSessionSheet(
 }
 
 /// F3-3 — "Seansı ertele": mevcut bir seansın `startTime`'ını değiştirir.
+///
+/// F7-x — [groupSessionIds] verilirse (takvimde tek slota indirgenmiş bir
+/// düet dersi) tüm üye dokümanları birlikte, tek bir yeni saate ertelenir.
 Future<void> showRescheduleSessionSheet(
   BuildContext context,
   WidgetRef ref, {
   required String sessionId,
   required DateTime currentStart,
+  List<String>? groupSessionIds,
 }) async {
   final date = await showDatePicker(
     context: context,
@@ -85,9 +89,16 @@ Future<void> showRescheduleSessionSheet(
     builder: (_) => const Center(child: CircularProgressIndicator()),
   );
   try {
-    await ref
-        .read(sessionsWriteServiceProvider)
-        .rescheduleSession(sessionId, newStartTime);
+    final ids = groupSessionIds;
+    if (ids != null && ids.length > 1) {
+      await ref
+          .read(sessionsWriteServiceProvider)
+          .rescheduleDuetSession(ids, newStartTime);
+    } else {
+      await ref
+          .read(sessionsWriteServiceProvider)
+          .rescheduleSession(sessionId, newStartTime);
+    }
   } on TrainerConflictException catch (e) {
     if (context.mounted) {
       Navigator.of(context, rootNavigator: true).pop();
@@ -138,7 +149,9 @@ class _CreateSessionSheet extends ConsumerStatefulWidget {
 class _CreateSessionSheetState extends ConsumerState<_CreateSessionSheet> {
   late DateTime _date;
   TimeOfDay _time = const TimeOfDay(hour: 18, minute: 0);
+  bool _isDuet = false;
   AdminMemberSummary? _member;
+  List<AdminMemberSummary> _duetMembers = [];
   AdminTrainerSummary? _trainer;
   List<DateTime> _repeatDates = [];
   bool _isCreating = false;
@@ -163,10 +176,48 @@ class _CreateSessionSheetState extends ConsumerState<_CreateSessionSheet> {
     return _trainer;
   }
 
+  /// Düet modda en az 2 üye seçilmiş olmalı; birebir modda tek üye yeter.
+  bool get _hasValidMemberSelection =>
+      _isDuet ? _duetMembers.length >= 2 : _member != null;
+
+  /// "Tekrarla" seçicisinin izin verdiği üst sınır — düet'te grup, en az
+  /// hakka sahip üyenin kotasından fazla tekrar edemez. Toplam
+  /// `remainingSessions` (planlanmış + planlanmamış) DEĞİL, henüz takvime
+  /// hiç girilmemiş `unplannedSessions` kullanılıyor — aksi halde zaten
+  /// tamamı planlanmış bir üyeye yeni seans atanabilirmiş gibi görünürdü.
+  int get _effectiveRemainingSessions {
+    if (_isDuet) {
+      if (_duetMembers.isEmpty) return 0;
+      return _duetMembers
+          .map((m) => m.unplannedSessions)
+          .reduce((a, b) => a < b ? a : b);
+    }
+    return _member?.unplannedSessions ?? 0;
+  }
+
+  void _setDuet(bool value) {
+    if (_isDuet == value) return;
+    setState(() {
+      _isDuet = value;
+      _member = null;
+      _duetMembers = [];
+      _repeatDates = [];
+      _errorMessage = null;
+    });
+  }
+
   Future<void> _create() async {
     if (!await ensureSubscriptionAllowsWrite(context, ref)) return;
     final trainer = _resolveTrainer(ref.read(adminTrainersControllerProvider));
     if (trainer == null) return;
+    if (_isDuet && _duetMembers.length < 2) {
+      setState(() {
+        _errorMessage = ref.read(
+          rcTextProvider(RemoteConfigKeys.sessionsCreateDuetMinMembersError),
+        );
+      });
+      return;
+    }
     setState(() {
       _isCreating = true;
       _errorMessage = null;
@@ -208,16 +259,28 @@ class _CreateSessionSheetState extends ConsumerState<_CreateSessionSheet> {
         continue;
       }
       try {
-        await ref
-            .read(sessionsWriteServiceProvider)
-            .createSession(
-              gymId: gymId,
-              trainerId: trainer.id,
-              trainerName: trainer.name,
-              memberId: _member!.id,
-              memberName: _member!.name,
-              startTime: startTime,
-            );
+        final service = ref.read(sessionsWriteServiceProvider);
+        if (_isDuet) {
+          await service.createDuetSession(
+            gymId: gymId,
+            trainerId: trainer.id,
+            trainerName: trainer.name,
+            members: [
+              for (final member in _duetMembers)
+                (id: member.id, name: member.name),
+            ],
+            startTime: startTime,
+          );
+        } else {
+          await service.createSession(
+            gymId: gymId,
+            trainerId: trainer.id,
+            trainerName: trainer.name,
+            memberId: _member!.id,
+            memberName: _member!.name,
+            startTime: startTime,
+          );
+        }
         anySucceeded = true;
       } on TrainerConflictException {
         failedDays.add('${date.day}.${date.month}');
@@ -269,21 +332,29 @@ class _CreateSessionSheetState extends ConsumerState<_CreateSessionSheet> {
       _isCreating = false;
       _errorMessage = ranOutOfSessions
           ? ref.read(
-              rcTextProvider(RemoteConfigKeys.sessionsRepeatCalendarExhaustedError),
+              rcTextProvider(
+                RemoteConfigKeys.sessionsRepeatCalendarExhaustedError,
+              ),
             )
           : hasPastDatetime
           ? ref.read(rcTextProvider(RemoteConfigKeys.commonPastDatetimeError))
           : hasTrainerConflict
           ? ref
                 .read(
-                  rcTextProvider(RemoteConfigKeys.sessionsCreateTrainerBusyError),
+                  rcTextProvider(
+                    RemoteConfigKeys.sessionsCreateTrainerBusyError,
+                  ),
                 )
                 .replaceAll('{name}', trainer.name)
           : hasUnknownError
-          ? ref.read(rcTextProvider(RemoteConfigKeys.sessionsCreateGenericError))
+          ? ref.read(
+              rcTextProvider(RemoteConfigKeys.sessionsCreateGenericError),
+            )
           : ref
                 .read(
-                  rcTextProvider(RemoteConfigKeys.sessionsCreateTrainerBusyError),
+                  rcTextProvider(
+                    RemoteConfigKeys.sessionsCreateTrainerBusyError,
+                  ),
                 )
                 .replaceAll('{name}', trainer.name);
     });
@@ -317,44 +388,111 @@ class _CreateSessionSheetState extends ConsumerState<_CreateSessionSheet> {
             ),
           ),
           const SizedBox(height: AppSpacing.lg),
+          Text(
+            ref.watch(rcTextProvider(RemoteConfigKeys.sessionsCreateKindLabel)),
+            style: typography.caption.copyWith(
+              color: colors.onSurfaceMuted,
+              letterSpacing: 1.2,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          _SessionKindToggle(
+            isDuet: _isDuet,
+            individualLabel: ref.watch(
+              rcTextProvider(RemoteConfigKeys.sessionsCreateKindIndividual),
+            ),
+            duetLabel: ref.watch(
+              rcTextProvider(RemoteConfigKeys.sessionsCreateKindDuet),
+            ),
+            onChanged: _setDuet,
+          ),
+          const SizedBox(height: AppSpacing.lg),
           _PickerRow(
             label: ref.watch(
-              rcTextProvider(RemoteConfigKeys.shellRolePickerMemberButton),
-            ),
-            value: _member == null
-                ? ref.watch(
-                    rcTextProvider(
-                      RemoteConfigKeys.sessionsCreateSelectPlaceholder,
-                    ),
-                  )
-                : ref
-                      .watch(
-                        rcTextProvider(
-                          RemoteConfigKeys.sessionsCreateMemberSummary,
-                        ),
-                      )
-                      .replaceAll('{name}', _member!.name)
-                      .replaceAll('{count}', '${_member!.remainingSessions}'),
-            onTap: () => _pickFromList<AdminMemberSummary>(
-              title: ref.read(
-                rcTextProvider(RemoteConfigKeys.sessionsCreatePickMemberTitle),
+              rcTextProvider(
+                _isDuet
+                    ? RemoteConfigKeys.sessionsCreateMembersFieldLabel
+                    : RemoteConfigKeys.shellRolePickerMemberButton,
               ),
-              items: members,
-              labelOf: (m) => m.name,
-              subtitleOf: (m) => ref
-                  .read(
-                    rcTextProvider(
-                      RemoteConfigKeys.sessionsCreateMemberSessionsSuffix,
-                    ),
-                  )
-                  .replaceAll('{count}', '${m.remainingSessions}'),
-              onSelected: (m) => setState(() {
-                _member = m;
-                // Kalan seans sayısı üyeye özel — üye değişince önceki
-                // seçimler yeni üyenin kotasını hiç yansıtmıyor olur.
-                _repeatDates = [];
-              }),
             ),
+            value: _isDuet
+                ? (_duetMembers.isEmpty
+                      ? ref.watch(
+                          rcTextProvider(
+                            RemoteConfigKeys.sessionsCreateSelectPlaceholder,
+                          ),
+                        )
+                      : ref
+                            .watch(
+                              rcTextProvider(
+                                RemoteConfigKeys
+                                    .sessionsCreateDuetMembersSummary,
+                              ),
+                            )
+                            .replaceAll('{count}', '${_duetMembers.length}'))
+                : (_member == null
+                      ? ref.watch(
+                          rcTextProvider(
+                            RemoteConfigKeys.sessionsCreateSelectPlaceholder,
+                          ),
+                        )
+                      : ref
+                            .watch(
+                              rcTextProvider(
+                                RemoteConfigKeys.sessionsCreateMemberSummary,
+                              ),
+                            )
+                            .replaceAll('{name}', _member!.name)
+                            .replaceAll(
+                              '{count}',
+                              '${_member!.unplannedSessions}',
+                            )),
+            onTap: _isDuet
+                ? () => _pickMultipleFromList(
+                    title: ref.read(
+                      rcTextProvider(
+                        RemoteConfigKeys.sessionsCreatePickMembersTitle,
+                      ),
+                    ),
+                    items: members,
+                    initiallySelected: _duetMembers,
+                    labelOf: (m) => m.name,
+                    subtitleOf: (m) => ref
+                        .read(
+                          rcTextProvider(
+                            RemoteConfigKeys.sessionsCreateMemberSessionsSuffix,
+                          ),
+                        )
+                        .replaceAll('{count}', '${m.unplannedSessions}'),
+                    onConfirm: (selected) => setState(() {
+                      _duetMembers = selected;
+                      // Kalan seans sayısı üyeye özel — seçim değişince
+                      // önceki tekrar günleri yeni kotayı yansıtmıyor olur.
+                      _repeatDates = [];
+                    }),
+                  )
+                : () => _pickFromList<AdminMemberSummary>(
+                    title: ref.read(
+                      rcTextProvider(
+                        RemoteConfigKeys.sessionsCreatePickMemberTitle,
+                      ),
+                    ),
+                    items: members,
+                    labelOf: (m) => m.name,
+                    subtitleOf: (m) => ref
+                        .read(
+                          rcTextProvider(
+                            RemoteConfigKeys.sessionsCreateMemberSessionsSuffix,
+                          ),
+                        )
+                        .replaceAll('{count}', '${m.unplannedSessions}'),
+                    onSelected: (m) => setState(() {
+                      _member = m;
+                      // Kalan seans sayısı üyeye özel — üye değişince önceki
+                      // seçimler yeni üyenin kotasını hiç yansıtmıyor olur.
+                      _repeatDates = [];
+                    }),
+                  ),
           ),
           const SizedBox(height: AppSpacing.sm),
           _PickerRow(
@@ -436,13 +574,13 @@ class _CreateSessionSheetState extends ConsumerState<_CreateSessionSheet> {
                         ),
                       )
                       .replaceAll('{count}', '${_repeatDates.length}'),
-            onTap: _member == null
+            onTap: !_hasValidMemberSelection
                 ? null
                 : () async {
                     final result = await showRepeatSessionCalendarSheet(
                       context,
                       baseDate: _date,
-                      remainingSessions: _member!.remainingSessions,
+                      remainingSessions: _effectiveRemainingSessions,
                       initiallySelected: _repeatDates,
                     );
                     if (result != null) {
@@ -471,7 +609,8 @@ class _CreateSessionSheetState extends ConsumerState<_CreateSessionSheet> {
                 : ref.watch(
                     rcTextProvider(RemoteConfigKeys.sessionsCreateSubmitButton),
                   ),
-            onPressed: _member == null || trainer == null || _isCreating
+            onPressed:
+                !_hasValidMemberSelection || trainer == null || _isCreating
                 ? null
                 : _create,
           ),
@@ -540,6 +679,200 @@ class _CreateSessionSheetState extends ConsumerState<_CreateSessionSheet> {
                   ),
                 ),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Düet ders üye seçimi — [_pickFromList]'in çoklu seçim versiyonu.
+  /// Onay verilene kadar sheet kapanmaz, her satır bir checkbox ile
+  /// işaretlenip kaldırılabilir.
+  void _pickMultipleFromList({
+    required String title,
+    required List<AdminMemberSummary> items,
+    required List<AdminMemberSummary> initiallySelected,
+    required String Function(AdminMemberSummary) labelOf,
+    required void Function(List<AdminMemberSummary>) onConfirm,
+    String Function(AdminMemberSummary)? subtitleOf,
+  }) {
+    final colors = context.appColors;
+    final selected = [...initiallySelected];
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: colors.surface,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      builder: (sheetContext) => StatefulBuilder(
+        builder: (sheetContext, setSheetState) => SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: context.appTypography.headingMedium.copyWith(
+                    color: colors.onSurface,
+                    fontSize: 20,
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.md),
+                Flexible(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        for (final item in items)
+                          InkWell(
+                            onTap: () => setSheetState(() {
+                              final index = selected.indexWhere(
+                                (m) => m.id == item.id,
+                              );
+                              if (index >= 0) {
+                                selected.removeAt(index);
+                              } else {
+                                selected.add(item);
+                              }
+                            }),
+                            child: Container(
+                              constraints: const BoxConstraints(minHeight: 52),
+                              child: Row(
+                                children: [
+                                  Checkbox(
+                                    value: selected.any((m) => m.id == item.id),
+                                    onChanged: (_) => setSheetState(() {
+                                      final index = selected.indexWhere(
+                                        (m) => m.id == item.id,
+                                      );
+                                      if (index >= 0) {
+                                        selected.removeAt(index);
+                                      } else {
+                                        selected.add(item);
+                                      }
+                                    }),
+                                  ),
+                                  Expanded(
+                                    child: Text(
+                                      labelOf(item),
+                                      style: context.appTypography.bodyLarge
+                                          .copyWith(
+                                            color: colors.onSurface,
+                                            fontSize: 15,
+                                          ),
+                                    ),
+                                  ),
+                                  if (subtitleOf != null)
+                                    Text(
+                                      subtitleOf(item),
+                                      style: context.appTypography.caption
+                                          .copyWith(
+                                            color: colors.onSurfaceMuted,
+                                          ),
+                                    ),
+                                ],
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.md),
+                AppButton(
+                  label: ref.read(
+                    rcTextProvider(RemoteConfigKeys.commonTamamButton),
+                  ),
+                  onPressed: () {
+                    onConfirm(selected);
+                    Navigator.of(sheetContext).pop();
+                  },
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SessionKindToggle extends StatelessWidget {
+  const _SessionKindToggle({
+    required this.isDuet,
+    required this.individualLabel,
+    required this.duetLabel,
+    required this.onChanged,
+  });
+
+  final bool isDuet;
+  final String individualLabel;
+  final String duetLabel;
+  final ValueChanged<bool> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+    return Container(
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: colors.surfaceRaised,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: _SessionKindSegment(
+              label: individualLabel,
+              selected: !isDuet,
+              onTap: () => onChanged(false),
+            ),
+          ),
+          Expanded(
+            child: _SessionKindSegment(
+              label: duetLabel,
+              selected: isDuet,
+              onTap: () => onChanged(true),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SessionKindSegment extends StatelessWidget {
+  const _SessionKindSegment({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+    final typography = context.appTypography;
+    return Material(
+      color: selected ? colors.primary : Colors.transparent,
+      borderRadius: BorderRadius.circular(AppSpacing.radiusInner - 2),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusInner - 2),
+        child: Container(
+          alignment: Alignment.center,
+          constraints: const BoxConstraints(minHeight: 40),
+          child: Text(
+            label,
+            style: typography.headingSmall.copyWith(
+              fontSize: 14,
+              color: selected ? colors.onPrimary : colors.onSurfaceVariant,
+            ),
           ),
         ),
       ),

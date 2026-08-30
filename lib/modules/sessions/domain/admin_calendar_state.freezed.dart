@@ -22,7 +22,15 @@ mixin _$AdminSessionSlot {
   String get title => throw _privateConstructorUsedError;
   String get meta => throw _privateConstructorUsedError;
   AdminSessionState get state => throw _privateConstructorUsedError;
-  String get memberId => throw _privateConstructorUsedError;
+  String get memberId =>
+      throw _privateConstructorUsedError; // F7-x — düet dersler her üye için ayrı bir `sessions` dokümanı
+  // olduğundan (aynı `duetGroupId`'yi paylaşırlar), takvimde tek satır
+  // olarak gösterilebilmesi için birden fazla doküman id'si taşıyabilir.
+  // `sessionType == 'individual'` olan slotlarda tek elemanlı, `id` ile
+  // aynıdır.
+  String get sessionType => throw _privateConstructorUsedError;
+  List<String> get duetMemberNames => throw _privateConstructorUsedError;
+  List<String> get sessionIds => throw _privateConstructorUsedError;
 
   /// Create a copy of AdminSessionSlot
   /// with the given fields replaced by the non-null parameter values.
@@ -45,6 +53,9 @@ abstract class $AdminSessionSlotCopyWith<$Res> {
     String meta,
     AdminSessionState state,
     String memberId,
+    String sessionType,
+    List<String> duetMemberNames,
+    List<String> sessionIds,
   });
 }
 
@@ -69,6 +80,9 @@ class _$AdminSessionSlotCopyWithImpl<$Res, $Val extends AdminSessionSlot>
     Object? meta = null,
     Object? state = null,
     Object? memberId = null,
+    Object? sessionType = null,
+    Object? duetMemberNames = null,
+    Object? sessionIds = null,
   }) {
     return _then(
       _value.copyWith(
@@ -96,6 +110,18 @@ class _$AdminSessionSlotCopyWithImpl<$Res, $Val extends AdminSessionSlot>
                 ? _value.memberId
                 : memberId // ignore: cast_nullable_to_non_nullable
                       as String,
+            sessionType: null == sessionType
+                ? _value.sessionType
+                : sessionType // ignore: cast_nullable_to_non_nullable
+                      as String,
+            duetMemberNames: null == duetMemberNames
+                ? _value.duetMemberNames
+                : duetMemberNames // ignore: cast_nullable_to_non_nullable
+                      as List<String>,
+            sessionIds: null == sessionIds
+                ? _value.sessionIds
+                : sessionIds // ignore: cast_nullable_to_non_nullable
+                      as List<String>,
           )
           as $Val,
     );
@@ -118,6 +144,9 @@ abstract class _$$AdminSessionSlotImplCopyWith<$Res>
     String meta,
     AdminSessionState state,
     String memberId,
+    String sessionType,
+    List<String> duetMemberNames,
+    List<String> sessionIds,
   });
 }
 
@@ -141,6 +170,9 @@ class __$$AdminSessionSlotImplCopyWithImpl<$Res>
     Object? meta = null,
     Object? state = null,
     Object? memberId = null,
+    Object? sessionType = null,
+    Object? duetMemberNames = null,
+    Object? sessionIds = null,
   }) {
     return _then(
       _$AdminSessionSlotImpl(
@@ -168,6 +200,18 @@ class __$$AdminSessionSlotImplCopyWithImpl<$Res>
             ? _value.memberId
             : memberId // ignore: cast_nullable_to_non_nullable
                   as String,
+        sessionType: null == sessionType
+            ? _value.sessionType
+            : sessionType // ignore: cast_nullable_to_non_nullable
+                  as String,
+        duetMemberNames: null == duetMemberNames
+            ? _value._duetMemberNames
+            : duetMemberNames // ignore: cast_nullable_to_non_nullable
+                  as List<String>,
+        sessionIds: null == sessionIds
+            ? _value._sessionIds
+            : sessionIds // ignore: cast_nullable_to_non_nullable
+                  as List<String>,
       ),
     );
   }
@@ -175,7 +219,7 @@ class __$$AdminSessionSlotImplCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$AdminSessionSlotImpl implements _AdminSessionSlot {
+class _$AdminSessionSlotImpl extends _AdminSessionSlot {
   const _$AdminSessionSlotImpl({
     required this.id,
     required this.time,
@@ -183,7 +227,12 @@ class _$AdminSessionSlotImpl implements _AdminSessionSlot {
     required this.meta,
     required this.state,
     this.memberId = '',
-  });
+    this.sessionType = 'individual',
+    final List<String> duetMemberNames = const <String>[],
+    final List<String> sessionIds = const <String>[],
+  }) : _duetMemberNames = duetMemberNames,
+       _sessionIds = sessionIds,
+       super._();
 
   @override
   final String id;
@@ -198,10 +247,35 @@ class _$AdminSessionSlotImpl implements _AdminSessionSlot {
   @override
   @JsonKey()
   final String memberId;
+  // F7-x — düet dersler her üye için ayrı bir `sessions` dokümanı
+  // olduğundan (aynı `duetGroupId`'yi paylaşırlar), takvimde tek satır
+  // olarak gösterilebilmesi için birden fazla doküman id'si taşıyabilir.
+  // `sessionType == 'individual'` olan slotlarda tek elemanlı, `id` ile
+  // aynıdır.
+  @override
+  @JsonKey()
+  final String sessionType;
+  final List<String> _duetMemberNames;
+  @override
+  @JsonKey()
+  List<String> get duetMemberNames {
+    if (_duetMemberNames is EqualUnmodifiableListView) return _duetMemberNames;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_duetMemberNames);
+  }
+
+  final List<String> _sessionIds;
+  @override
+  @JsonKey()
+  List<String> get sessionIds {
+    if (_sessionIds is EqualUnmodifiableListView) return _sessionIds;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_sessionIds);
+  }
 
   @override
   String toString() {
-    return 'AdminSessionSlot(id: $id, time: $time, title: $title, meta: $meta, state: $state, memberId: $memberId)';
+    return 'AdminSessionSlot(id: $id, time: $time, title: $title, meta: $meta, state: $state, memberId: $memberId, sessionType: $sessionType, duetMemberNames: $duetMemberNames, sessionIds: $sessionIds)';
   }
 
   @override
@@ -215,12 +289,32 @@ class _$AdminSessionSlotImpl implements _AdminSessionSlot {
             (identical(other.meta, meta) || other.meta == meta) &&
             (identical(other.state, state) || other.state == state) &&
             (identical(other.memberId, memberId) ||
-                other.memberId == memberId));
+                other.memberId == memberId) &&
+            (identical(other.sessionType, sessionType) ||
+                other.sessionType == sessionType) &&
+            const DeepCollectionEquality().equals(
+              other._duetMemberNames,
+              _duetMemberNames,
+            ) &&
+            const DeepCollectionEquality().equals(
+              other._sessionIds,
+              _sessionIds,
+            ));
   }
 
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, id, time, title, meta, state, memberId);
+  int get hashCode => Object.hash(
+    runtimeType,
+    id,
+    time,
+    title,
+    meta,
+    state,
+    memberId,
+    sessionType,
+    const DeepCollectionEquality().hash(_duetMemberNames),
+    const DeepCollectionEquality().hash(_sessionIds),
+  );
 
   /// Create a copy of AdminSessionSlot
   /// with the given fields replaced by the non-null parameter values.
@@ -234,7 +328,7 @@ class _$AdminSessionSlotImpl implements _AdminSessionSlot {
       );
 }
 
-abstract class _AdminSessionSlot implements AdminSessionSlot {
+abstract class _AdminSessionSlot extends AdminSessionSlot {
   const factory _AdminSessionSlot({
     required final String id,
     required final String time,
@@ -242,7 +336,11 @@ abstract class _AdminSessionSlot implements AdminSessionSlot {
     required final String meta,
     required final AdminSessionState state,
     final String memberId,
+    final String sessionType,
+    final List<String> duetMemberNames,
+    final List<String> sessionIds,
   }) = _$AdminSessionSlotImpl;
+  const _AdminSessionSlot._() : super._();
 
   @override
   String get id;
@@ -255,7 +353,17 @@ abstract class _AdminSessionSlot implements AdminSessionSlot {
   @override
   AdminSessionState get state;
   @override
-  String get memberId;
+  String get memberId; // F7-x — düet dersler her üye için ayrı bir `sessions` dokümanı
+  // olduğundan (aynı `duetGroupId`'yi paylaşırlar), takvimde tek satır
+  // olarak gösterilebilmesi için birden fazla doküman id'si taşıyabilir.
+  // `sessionType == 'individual'` olan slotlarda tek elemanlı, `id` ile
+  // aynıdır.
+  @override
+  String get sessionType;
+  @override
+  List<String> get duetMemberNames;
+  @override
+  List<String> get sessionIds;
 
   /// Create a copy of AdminSessionSlot
   /// with the given fields replaced by the non-null parameter values.

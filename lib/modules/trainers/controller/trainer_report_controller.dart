@@ -53,6 +53,7 @@ Future<TrainerReportState> reportForTrainer(
   final gymJoinedAt =
       (trainerDoc.data()?['createdAt'] as Timestamp?)?.toDate() ??
       _defaultGymJoinedAt;
+  final gymId = trainerDoc.data()?['gymId'] as String?;
 
   final now = DateTime.now();
   final DateTime start;
@@ -85,23 +86,52 @@ Future<TrainerReportState> reportForTrainer(
   // trainerId+startTime sorgusuyla (mevcut index) dokümanlar çekilip
   // durum sayımı client tarafında yapılıyor; tek bir antrenörün seçili
   // aralıktaki seans sayısı küçük olduğu için bu maliyetli değil.
-  final snapshot = await FirebaseFirestore.instance
+  // `gymId` filtresi olmadan bu sorgu, admin (kendi seansı olmayan, sadece
+  // `resource.data.gymId == myGymId()` şartını sağlayan) bir antrenörün
+  // detayına girdiğinde `firestore.rules`'taki `sessions` okuma kuralı
+  // yüzünden her zaman permission-denied ile reddediliyordu (aynı kalıp
+  // daha önce `_trainerHasConflict`'te de yaşanmıştı) — "Bu ayın verileri
+  // yüklenemedi." hatasının kaynağı buydu.
+  var query = FirebaseFirestore.instance
       .collection('sessions')
       .where('trainerId', isEqualTo: trainerId)
       .where('startTime', isGreaterThanOrEqualTo: Timestamp.fromDate(start))
-      .where('startTime', isLessThanOrEqualTo: Timestamp.fromDate(endOfDay))
-      .get();
-  final total = snapshot.docs.length;
-  final completed = snapshot.docs
-      .where((doc) => doc.data()['status'] == 'completed')
-      .length;
-  final cancelled = snapshot.docs
-      .where((doc) => doc.data()['status'] == 'cancelled')
-      .length;
+      .where('startTime', isLessThanOrEqualTo: Timestamp.fromDate(endOfDay));
+  if (gymId != null) {
+    query = query.where('gymId', isEqualTo: gymId);
+  }
+  final snapshot = await query.get();
 
-  // `sessions` koleksiyonu hâlâ sadece birebir dersleri tutuyor (grup
-  // dersleri ayrı bir `groupSessions` koleksiyonunda) — bu yüzden birebir/
-  // grup kırılımı yerine tüm sayı `solo`'ya yazılıyor.
+  // `sessions` koleksiyonu birebir VE düet dersleri birlikte tutuyor
+  // (`sessionType`); grup dersleri hâlâ ayrı `groupSessions`
+  // koleksiyonunda ve şu an hiçbir antrenöre atanmadığından (sadece admin
+  // oluşturabiliyor, `trainerName` her zaman oluşturan admin'in adı) grup
+  // kırılımı hesaplanamıyor, `group` her zaman 0. Bir düet dersin her
+  // üyesi kendi dokümanına sahip (aynı `duetGroupId`'yi paylaşıyor) — çift
+  // saymamak için grup id'ye göre tekilleştiriliyor.
+  var soloTotal = 0;
+  var soloCompleted = 0;
+  var soloCancelled = 0;
+  final duetTotalGroups = <String>{};
+  final duetCompletedGroups = <String>{};
+  final duetCancelledGroups = <String>{};
+
+  for (final doc in snapshot.docs) {
+    final data = doc.data();
+    final status = data['status'] as String?;
+    if (data['sessionType'] == 'duet') {
+      final groupId = data['duetGroupId'] as String?;
+      if (groupId == null) continue;
+      duetTotalGroups.add(groupId);
+      if (status == 'completed') duetCompletedGroups.add(groupId);
+      if (status == 'cancelled') duetCancelledGroups.add(groupId);
+    } else {
+      soloTotal++;
+      if (status == 'completed') soloCompleted++;
+      if (status == 'cancelled') soloCancelled++;
+    }
+  }
+
   return TrainerReportState(
     startDate: formatTrDate(start),
     endDate: formatTrDate(end),
@@ -112,21 +142,24 @@ Future<TrainerReportState> reportForTrainer(
     breakdown: [
       TrainerReportBreakdown(
         title: 'Toplam seanslar',
-        total: total,
-        solo: total,
+        total: soloTotal + duetTotalGroups.length,
+        solo: soloTotal,
         group: 0,
+        duet: duetTotalGroups.length,
       ),
       TrainerReportBreakdown(
         title: 'Tamamlanan seanslar',
-        total: completed,
-        solo: completed,
+        total: soloCompleted + duetCompletedGroups.length,
+        solo: soloCompleted,
         group: 0,
+        duet: duetCompletedGroups.length,
       ),
       TrainerReportBreakdown(
         title: 'İptal edilen seanslar',
-        total: cancelled,
-        solo: cancelled,
+        total: soloCancelled + duetCancelledGroups.length,
+        solo: soloCancelled,
         group: 0,
+        duet: duetCancelledGroups.length,
       ),
     ],
   );
@@ -180,18 +213,21 @@ class TrainerReportController extends _$TrainerReportController {
           total: 0,
           solo: 0,
           group: 0,
+          duet: 0,
         ),
         TrainerReportBreakdown(
           title: 'Tamamlanan seanslar',
           total: 0,
           solo: 0,
           group: 0,
+          duet: 0,
         ),
         TrainerReportBreakdown(
           title: 'İptal edilen seanslar',
           total: 0,
           solo: 0,
           group: 0,
+          duet: 0,
         ),
       ],
     );

@@ -26,6 +26,9 @@ class TrainerReportPanel extends ConsumerWidget {
     final groupLabel = ref.watch(
       rcTextProvider(RemoteConfigKeys.trainersReportGroupToggle),
     );
+    final duetLabel = ref.watch(
+      rcTextProvider(RemoteConfigKeys.trainersReportDuetToggle),
+    );
     final isCustom = report.period == TrainerReportPeriod.custom;
 
     return Scaffold(
@@ -146,6 +149,7 @@ class TrainerReportPanel extends ConsumerWidget {
                 breakdown: b,
                 soloLabel: soloLabel,
                 groupLabel: groupLabel,
+                duetLabel: duetLabel,
               ),
               const SizedBox(height: AppSpacing.md),
             ],
@@ -258,11 +262,13 @@ class _BreakdownCard extends StatelessWidget {
     required this.breakdown,
     required this.soloLabel,
     required this.groupLabel,
+    required this.duetLabel,
   });
 
   final TrainerReportBreakdown breakdown;
   final String soloLabel;
   final String groupLabel;
+  final String duetLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -306,6 +312,10 @@ class _BreakdownCard extends StatelessWidget {
             children: [
               Expanded(
                 child: _MiniStat(label: soloLabel, value: '${breakdown.solo}'),
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              Expanded(
+                child: _MiniStat(label: duetLabel, value: '${breakdown.duet}'),
               ),
               const SizedBox(width: AppSpacing.sm),
               Expanded(

@@ -1,42 +1,39 @@
 import { getFirestore } from "firebase-admin/firestore";
-import { RemoteConfigTemplate } from "firebase-admin/remote-config";
 import { onSchedule } from "firebase-functions/v2/scheduler";
 import * as logger from "firebase-functions/logger";
 
-import { currentMonthRange, isMonthlyReportDue } from "../shared/monthly-schedule";
+import { previousMonthRange } from "../shared/monthly-schedule";
 import { REPORTS_DEEP_LINK } from "../shared/deep-links";
 import { withFailureAlerting } from "../shared/function-health";
 import { queueEmail } from "../shared/mail";
 import { safeTimeZone, resolveNotificationLocale } from "../shared/notification-locale";
 import { buildReportEmailHtml } from "../shared/report-email-template";
 import { fetchEventOccupancy, fetchGroupSessionOccupancy, fetchPackageSalesBreakdown } from "../shared/report-extras-stats";
-import { getCachedRemoteConfigTemplate } from "../shared/remote-config-cache";
 import { writeReportSnapshot } from "../shared/report-snapshots";
 import { formatMonthInZone } from "../shared/timezone-math";
-import { fetchGymTrainerPerformance, fetchGymWeeklyStats } from "../shared/weekly-report-stats";
+import {
+  buildSessionTypeBreakdown,
+  fetchDuetSessionDocs,
+  fetchGymTrainerPerformance,
+  fetchGymWeeklyStats,
+} from "../shared/weekly-report-stats";
 
 /**
- * F5-8/F5-11 — RC'deki `cfg_monthly_report_day_of_month`/`cfg_monthly_report_hour`
- * zamanı geldiğinde (varsayılan ayın son günü 06:00, İstanbul saati) her
- * salonun aylık özetini `weekly-gym-report.ts` ile AYNI zengin template'le
- * gönderir — tek fark kapsanan tarih aralığı. Hesaplama, aynı aggregation
- * fonksiyonlarıyla (F5-7) ay aralığı verilerek paylaşılıyor.
+ * F5-8/F5-11/F7-x — her ayın 1'inde 06:00'da (İstanbul saati, sabit cron —
+ * artık Remote Config'ten okunmuyor, bkz. `weekly-gym-report.ts`'teki aynı
+ * gerekçe) bir önceki ayı raporlar: örn. 1 Şubat'ta çalışınca Ocak raporu
+ * gider (`previousMonthRange`). Her salonun aylık özetini
+ * `weekly-gym-report.ts` ile AYNI zengin template'le gönderir — tek fark
+ * kapsanan tarih aralığı. Hesaplama, aynı aggregation fonksiyonlarıyla
+ * (F5-7) ay aralığı verilerek paylaşılıyor.
  */
-export const monthlyGymReport = onSchedule("every 60 minutes", withFailureAlerting("monthlyGymReport", async () => {
+export const monthlyGymReport = onSchedule(
+  { schedule: "0 6 1 * *", timeZone: "Europe/Istanbul" },
+  withFailureAlerting("monthlyGymReport", async () => {
   const db = getFirestore();
   const now = new Date();
 
-  let template: RemoteConfigTemplate;
-  try {
-    template = await getCachedRemoteConfigTemplate();
-  } catch (error) {
-    logger.warn("Remote Config cache okunamadı, aylık salon raporu atlandı.", error);
-    return;
-  }
-
-  if (!isMonthlyReportDue(template, now)) return;
-
-  const { monthStart, monthEnd } = currentMonthRange(now);
+  const { monthStart, monthEnd } = previousMonthRange(now);
 
   const gymsSnapshot = await db.collection("gyms").get();
   for (const gymDoc of gymsSnapshot.docs) {
@@ -52,13 +49,15 @@ export const monthlyGymReport = onSchedule("every 60 minutes", withFailureAlerti
     const periodLabel = formatMonthInZone(monthStart, timeZone, locale);
     const gymName = (data.name as string | undefined) ?? "Salonunuz";
 
-    const [stats, trainerPerformance, packages, groupSessions, events] = await Promise.all([
+    const [stats, packages, groupSessions, events, duetDocs] = await Promise.all([
       fetchGymWeeklyStats(db, gymDoc.id, monthStart, monthEnd),
-      fetchGymTrainerPerformance(db, gymDoc.id, monthStart, monthEnd),
       fetchPackageSalesBreakdown(db, gymDoc.id, monthStart, monthEnd),
       fetchGroupSessionOccupancy(db, gymDoc.id, monthStart, monthEnd),
       fetchEventOccupancy(db, gymDoc.id, monthStart, monthEnd),
+      fetchDuetSessionDocs(db, gymDoc.id, monthStart, monthEnd),
     ]);
+    const trainerPerformance = await fetchGymTrainerPerformance(db, gymDoc.id, monthStart, monthEnd, duetDocs);
+    const { individualSessions, duetSessions } = buildSessionTypeBreakdown(stats, duetDocs);
 
     const html = buildReportEmailHtml({
       gymName,
@@ -66,6 +65,8 @@ export const monthlyGymReport = onSchedule("every 60 minutes", withFailureAlerti
       periodLabel,
       locale,
       sessions: stats,
+      individualSessions,
+      duetSessions,
       trainers: trainerPerformance,
       packages,
       groupSessions,
@@ -85,6 +86,8 @@ export const monthlyGymReport = onSchedule("every 60 minutes", withFailureAlerti
       periodEnd: monthEnd,
       periodLabel,
       stats,
+      individualSessions,
+      duetSessions,
       trainerPerformance,
       packages,
       groupSessions,
