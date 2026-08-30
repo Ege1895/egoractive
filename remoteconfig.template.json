@@ -9262,6 +9262,42 @@
         "value": "My Info"
       },
       "valueType": "STRING"
+    },
+    "lbl_auth_otp_invalid_code_error_tr": {
+      "defaultValue": {
+        "value": "Girdiğin kod yanlış. Kontrol edip tekrar dene."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_otp_invalid_code_error_en": {
+      "defaultValue": {
+        "value": "That code isn't right. Check it and try again."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_otp_expired_error_tr": {
+      "defaultValue": {
+        "value": "Bu kodun süresi doldu. \"Kodu tekrar gönder\" ile yeni bir kod iste."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_otp_expired_error_en": {
+      "defaultValue": {
+        "value": "This code has expired. Tap \"Resend code\" to get a new one."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_otp_too_many_attempts_error_tr": {
+      "defaultValue": {
+        "value": "Çok fazla yanlış deneme yaptın. \"Kodu tekrar gönder\" ile yeni bir kod iste."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_otp_too_many_attempts_error_en": {
+      "defaultValue": {
+        "value": "Too many wrong attempts. Tap \"Resend code\" to get a new one."
+      },
+      "valueType": "STRING"
     }
   }
 }

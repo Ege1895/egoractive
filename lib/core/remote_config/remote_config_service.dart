@@ -1706,6 +1706,13 @@ class RemoteConfigService {
     'lbl_auth_otp_generic_error_tr':
         'Bir şeyler ters gitti. İnternet bağlantını kontrol edip tekrar '
         'dene.',
+    'lbl_auth_otp_invalid_code_error_tr':
+        'Girdiğin kod yanlış. Kontrol edip tekrar dene.',
+    'lbl_auth_otp_expired_error_tr':
+        'Bu kodun süresi doldu. "Kodu tekrar gönder" ile yeni bir kod iste.',
+    'lbl_auth_otp_too_many_attempts_error_tr':
+        'Çok fazla yanlış deneme yaptın. "Kodu tekrar gönder" ile yeni bir '
+        'kod iste.',
     'lbl_auth_email_setup_title_tr': 'E-posta adresini ekle',
     'lbl_auth_email_setup_subtitle_tr':
         'Girişlerinde kullanacağın e-posta adresini gir; sana 6 haneli bir '
@@ -2561,10 +2568,15 @@ class RemoteConfigService {
         "We sent a 6-digit verification code to {email}. Enter it below.",
     'lbl_auth_otp_verify_button_en': 'Verify and continue',
     'lbl_auth_otp_resend_button_en': 'Resend code',
-    'lbl_auth_otp_resend_countdown_template_en':
-        'You can resend in {seconds}s',
+    'lbl_auth_otp_resend_countdown_template_en': 'You can resend in {seconds}s',
     'lbl_auth_otp_generic_error_en':
         'Something went wrong. Check your connection and try again.',
+    'lbl_auth_otp_invalid_code_error_en':
+        "That code isn't right. Check it and try again.",
+    'lbl_auth_otp_expired_error_en':
+        'This code has expired. Tap "Resend code" to get a new one.',
+    'lbl_auth_otp_too_many_attempts_error_en':
+        'Too many wrong attempts. Tap "Resend code" to get a new one.',
     'lbl_auth_email_setup_title_en': 'Add your email',
     'lbl_auth_email_setup_subtitle_en':
         "Enter the email you'll use to log in — we'll send a 6-digit "
@@ -2576,8 +2588,7 @@ class RemoteConfigService {
     'lbl_auth_email_setup_email_taken_error_en':
         'This email is already used by another account. Try a different '
         'one.',
-    'lbl_gyms_gym_info_login_report_email_label_en':
-        'Login & report email *',
+    'lbl_gyms_gym_info_login_report_email_label_en': 'Login & report email *',
     'lbl_members_self_info_email_field_label_en': 'Email address',
     'lbl_trainers_info_title_en': 'My Info',
     'lbl_auth_profile_member_caption_en': '+90 {phone} · Member',
