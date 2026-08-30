@@ -101,6 +101,7 @@ class _FakeRemoteConfigService extends RemoteConfigService {
   static const _values = <String, String>{
     'lbl_common_tamamlandi': 'Tamamlandı',
     'lbl_notifications_target_selected_members_option': 'Seçili üyeler',
+    'lbl_measurements_metric_kilo': 'Kilo',
   };
 
   @override
@@ -118,6 +119,9 @@ final _adminMemberDetailOverrides = [
   adminMemberDetailControllerProvider(
     'ayse-yilmaz',
   ).overrideWith(_FixedAdminMemberDetailController.new),
+  remoteConfigServiceProvider.overrideWithValue(
+    const _FakeRemoteConfigService(),
+  ),
 ];
 
 void main() {

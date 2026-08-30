@@ -500,7 +500,9 @@ class _AvatarViewState extends ConsumerState<_AvatarView> {
                             ),
                           ),
                           Text(
-                            state.selectedMetric.label,
+                            ref.watch(
+                              rcTextProvider(state.selectedMetric.rcKey),
+                            ),
                             style: typography.headingMedium.copyWith(
                               color: colors.onSurface,
                               fontSize: 19,
@@ -715,7 +717,7 @@ class _ChartView extends ConsumerWidget {
                 Padding(
                   padding: const EdgeInsets.only(right: AppSpacing.sm),
                   child: _MetricChip(
-                    label: metric.label,
+                    label: ref.watch(rcTextProvider(metric.rcKey)),
                     selected: metric == state.selectedMetric,
                     onTap: () => controller.selectPoint(metric),
                   ),
@@ -739,7 +741,10 @@ class _ChartView extends ConsumerWidget {
                       RemoteConfigKeys.measurementsNoDataForMetric,
                     ),
                   )
-                  .replaceAll('{metric}', state.selectedMetric.label),
+                  .replaceAll(
+                    '{metric}',
+                    ref.watch(rcTextProvider(state.selectedMetric.rcKey)),
+                  ),
               style: typography.bodyMedium.copyWith(
                 color: colors.onSurfaceMuted,
               ),
@@ -778,7 +783,12 @@ class _ChartView extends ConsumerWidget {
                                           .measurementsMetricLatestLabel,
                                     ),
                                   )
-                                  .replaceAll('{metric}', series.metric.label),
+                                  .replaceAll(
+                                    '{metric}',
+                                    ref.watch(
+                                      rcTextProvider(series.metric.rcKey),
+                                    ),
+                                  ),
                               style: typography.caption.copyWith(
                                 color: colors.onSurfaceMuted,
                               ),

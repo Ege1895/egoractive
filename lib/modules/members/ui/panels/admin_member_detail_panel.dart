@@ -75,7 +75,7 @@ class _AdminMemberDetailPanelState
               const SizedBox(height: AppSpacing.lg),
               for (final metric in TrainerMetric.values)
                 _MetricPickerRow(
-                  label: metric.label,
+                  label: ref.watch(rcTextProvider(metric.rcKey)),
                   selected: metric == selected,
                   onTap: () {
                     onSelect(metric);
@@ -613,7 +613,9 @@ class _AdminMemberDetailPanelState
                                 ),
                               ),
                               Text(
-                                detail.selectedMetric.label,
+                                ref.watch(
+                                  rcTextProvider(detail.selectedMetric.rcKey),
+                                ),
                                 style: typography.headingSmall.copyWith(
                                   color: colors.onSurface,
                                   fontSize: 15,

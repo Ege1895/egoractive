@@ -56,6 +56,10 @@ class MeasurementAvatar extends ConsumerWidget {
     final addMetricLabel = ref.watch(
       rcTextProvider(RemoteConfigKeys.measurementsAddMetricLabel),
     );
+    final metricLabels = <MeasurementMetric, String>{
+      for (final metric in MeasurementMetric.values)
+        metric: ref.watch(rcTextProvider(metric.rcKey)),
+    };
 
     return SizedBox(
       width: _boxWidth,
@@ -84,11 +88,13 @@ class MeasurementAvatar extends ConsumerWidget {
               active: entry.key == selected,
               colors: colors,
               addMetricLabel: addMetricLabel,
+              metricLabels: metricLabels,
             ),
           ..._buildFooterRow(
             context,
             colors: colors,
             addMetricLabel: addMetricLabel,
+            metricLabels: metricLabels,
           ),
         ],
       ),
@@ -99,6 +105,7 @@ class MeasurementAvatar extends ConsumerWidget {
     BuildContext context, {
     required AppColorScheme colors,
     required String addMetricLabel,
+    required Map<MeasurementMetric, String> metricLabels,
   }) {
     return [
       Positioned(
@@ -113,6 +120,7 @@ class MeasurementAvatar extends ConsumerWidget {
         isLeft: true,
         colors: colors,
         addMetricLabel: addMetricLabel,
+        metricLabels: metricLabels,
       ),
       _buildFooterPill(
         context,
@@ -120,6 +128,7 @@ class MeasurementAvatar extends ConsumerWidget {
         isLeft: false,
         colors: colors,
         addMetricLabel: addMetricLabel,
+        metricLabels: metricLabels,
       ),
     ];
   }
@@ -130,13 +139,15 @@ class MeasurementAvatar extends ConsumerWidget {
     required bool isLeft,
     required AppColorScheme colors,
     required String addMetricLabel,
+    required Map<MeasurementMetric, String> metricLabels,
   }) {
     final typography = context.appTypography;
     final point = points[metric];
     final active = metric == selected;
+    final metricLabel = metricLabels[metric]!;
     final label = point == null
-        ? addMetricLabel.replaceAll('{metric}', metric.label)
-        : '${metric.label} ${point.value}';
+        ? addMetricLabel.replaceAll('{metric}', metricLabel)
+        : '$metricLabel ${point.value}';
 
     return Positioned(
       top: _footerY - 14,
@@ -173,14 +184,16 @@ class MeasurementAvatar extends ConsumerWidget {
     required bool active,
     required AppColorScheme colors,
     required String addMetricLabel,
+    required Map<MeasurementMetric, String> metricLabels,
   }) {
     final x = _imgX + layout.fx * _imgWidth;
     final y = _imgY + layout.fy * _imgHeight;
     final isLeft = layout.side == AvatarSide.left;
     final typography = context.appTypography;
+    final metricLabel = metricLabels[metric]!;
     final label = point == null
-        ? addMetricLabel.replaceAll('{metric}', metric.label)
-        : '${metric.label} ${point.value}';
+        ? addMetricLabel.replaceAll('{metric}', metricLabel)
+        : '$metricLabel ${point.value}';
 
     return [
       Positioned(

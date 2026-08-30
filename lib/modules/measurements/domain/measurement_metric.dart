@@ -1,14 +1,21 @@
+import '../../../core/remote_config/remote_config_service.dart';
+
 enum MeasurementMetric { bel, gogus, kalca, kol, bacak, kilo, yagOrani }
 
 extension MeasurementMetricLabel on MeasurementMetric {
-  String get label => switch (this) {
-    MeasurementMetric.bel => 'Bel',
-    MeasurementMetric.gogus => 'Göğüs',
-    MeasurementMetric.kalca => 'Kalça',
-    MeasurementMetric.kol => 'Kol',
-    MeasurementMetric.bacak => 'Bacak',
-    MeasurementMetric.kilo => 'Kilo',
-    MeasurementMetric.yagOrani => 'Yağ oranı',
+  /// F7-x — görüntülenecek etiketin kendisi değil, RC anahtarı döner;
+  /// çağıran taraf `ref.watch(rcTextProvider(metric.rcKey))` ile çözer
+  /// (bkz. measurements_panel.dart/measurement_avatar.dart). Önceden bu
+  /// getter doğrudan hardcoded Türkçe metin dönüyordu — app İngilizce iken
+  /// de "Bel"/"Göğüs" gibi Türkçe kalıyordu.
+  String get rcKey => switch (this) {
+    MeasurementMetric.bel => RemoteConfigKeys.measurementsMetricBel,
+    MeasurementMetric.gogus => RemoteConfigKeys.measurementsMetricGogus,
+    MeasurementMetric.kalca => RemoteConfigKeys.measurementsMetricKalca,
+    MeasurementMetric.kol => RemoteConfigKeys.measurementsMetricKol,
+    MeasurementMetric.bacak => RemoteConfigKeys.measurementsMetricBacak,
+    MeasurementMetric.kilo => RemoteConfigKeys.measurementsMetricKilo,
+    MeasurementMetric.yagOrani => RemoteConfigKeys.measurementsMetricYagOrani,
   };
 
   /// Çevre ölçüleri (bel/göğüs/kalça/kol/bacak) cm, kilo kg, yağ oranı %
