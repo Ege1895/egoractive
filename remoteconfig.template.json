@@ -6639,6 +6639,18 @@
       },
       "valueType": "STRING"
     },
+    "lbl_subscription_exempt_note_tr": {
+      "defaultValue": {
+        "value": "Salonunuz için abonelik ücreti alınmıyor — tüm özellikler sınırsız kullanımınıza açık."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_exempt_note_en": {
+      "defaultValue": {
+        "value": "Your gym is not billed for a subscription — every feature is available to you without limits."
+      },
+      "valueType": "STRING"
+    },
     "lbl_subscription_store_row_title_tr": {
       "defaultValue": {
         "value": "{store} üzerinden"

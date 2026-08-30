@@ -1341,6 +1341,7 @@ abstract final class RemoteConfigKeys {
       'lbl_subscription_store_badge_label';
   static const subscriptionManagementOpenError =
       'lbl_subscription_management_open_error';
+  static const subscriptionExemptNote = 'lbl_subscription_exempt_note';
 
   /// `[{label_tr, label_en}]` — abonelikte dahil olan özellik listesi.
   static const subscriptionIncludedFeatures =
@@ -3077,6 +3078,10 @@ class RemoteConfigService {
         'Aboneliğiniz {period} kendini yeniler. Plan değişikliği, duraklatma ve iptal uygulama içinde değil, {store} abonelik ayarlarında yapılır.',
     'lbl_subscription_active_note_en':
         'Your subscription renews {period}. Plan changes, pausing and cancellation are done in {store} subscription settings, not in the app.',
+    'lbl_subscription_exempt_note_tr':
+        'Salonunuz için abonelik ücreti alınmıyor — tüm özellikler sınırsız kullanımınıza açık.',
+    'lbl_subscription_exempt_note_en':
+        'Your gym is not billed for a subscription — every feature is available to you without limits.',
     'lbl_subscription_store_row_title_tr': '{store} üzerinden',
     'lbl_subscription_store_row_title_en': 'Via {store}',
     'lbl_subscription_store_row_subtitle_tr':

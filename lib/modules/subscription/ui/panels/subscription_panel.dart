@@ -211,17 +211,27 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
               ),
             ),
             Expanded(
-              child: FutureBuilder<List<SubscriptionProduct>>(
-                future: _productsFuture,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-                  final products = snapshot.data ?? const [];
-                  _ensureSelection(products);
-                  return _buildForState(context, products, subscription, rc);
-                },
-              ),
+              child: subscription.subscriptionExempt
+                  ? _exemptView(context, rc)
+                  : FutureBuilder<List<SubscriptionProduct>>(
+                      future: _productsFuture,
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        }
+                        final products = snapshot.data ?? const [];
+                        _ensureSelection(products);
+                        return _buildForState(
+                          context,
+                          products,
+                          subscription,
+                          rc,
+                        );
+                      },
+                    ),
             ),
           ],
         ),
@@ -248,6 +258,90 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
       case SubscriptionStatus.none:
         return _trialView(context, products, subscription, rc);
     }
+  }
+
+  // ---- 0 · Ödeme yapmayacak salon (subscriptionExempt) ----
+
+  /// `gyms/{gymId}.subscriptionExempt == true` — sadece Firebase
+  /// Console/Admin SDK'dan elle set edilir (bkz. [SubscriptionState]).
+  /// Bu salonlar hiçbir zaman gerçek mağaza aboneliği almaz; ekran doğrudan
+  /// "mevcut plan: yıllık" görünümünü, satın alma/yönetim CTA'ları olmadan
+  /// gösterir.
+  Widget _exemptView(BuildContext context, RemoteConfigService rc) {
+    final colors = context.appColors;
+    final typography = context.appTypography;
+    final locale = ref.watch(localeControllerProvider);
+    final planName = ref.watch(
+      rcTextProvider(RemoteConfigKeys.subscriptionYearlyPlanFallback),
+    );
+
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.screenEdge,
+        AppSpacing.md,
+        AppSpacing.screenEdge,
+        AppSpacing.xl,
+      ),
+      children: [
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          decoration: BoxDecoration(
+            color: colors.primary.withValues(alpha: 0.08),
+            borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
+            border: Border.all(color: colors.primary.withValues(alpha: 0.32)),
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      rc.getText(
+                        RemoteConfigKeys.subscriptionActivePlanLabel,
+                        locale,
+                      ),
+                      style: typography.bodyMedium.copyWith(
+                        color: colors.secondary,
+                        fontSize: 13,
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.xs),
+                    Text(
+                      planName,
+                      style: typography.headingLarge.copyWith(
+                        color: colors.onSurface,
+                        fontSize: 26,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              _Pill(
+                label: rc.getText(
+                  RemoteConfigKeys.subscriptionActiveBadge,
+                  locale,
+                ),
+                bg: colors.success.withValues(alpha: 0.16),
+                fg: colors.success,
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: AppSpacing.lg),
+        _IncludedFeaturesCard(rc: rc, locale: locale),
+        const SizedBox(height: AppSpacing.lg),
+        Text(
+          rc.getText(RemoteConfigKeys.subscriptionExemptNote, locale),
+          style: typography.bodyMedium.copyWith(
+            color: colors.onSurfaceMuted,
+            fontSize: 13,
+          ),
+        ),
+      ],
+    );
   }
 
   // ---- 1 · Deneme sürümünde ----
@@ -470,75 +564,6 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
                 style: typography.bodyMedium.copyWith(
                   color: colors.onSurfaceVariant,
                   fontSize: 13,
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: AppSpacing.lg),
-        Container(
-          padding: const EdgeInsets.all(AppSpacing.lg),
-          decoration: BoxDecoration(
-            color: colors.surface,
-            borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
-            border: Border.all(color: colors.outline),
-          ),
-          child: Row(
-            children: [
-              Container(
-                width: 44,
-                height: 30,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: colors.surfaceRaised,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  ref.watch(
-                    rcTextProvider(
-                      RemoteConfigKeys.subscriptionStoreBadgeLabel,
-                    ),
-                  ),
-                  style: typography.headingSmall.copyWith(
-                    fontSize: 10,
-                    letterSpacing: 0.5,
-                    color: colors.onSurfaceVariant,
-                  ),
-                ),
-              ),
-              const SizedBox(width: AppSpacing.md),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      _fill(
-                        rc.getText(
-                          RemoteConfigKeys.subscriptionStoreRowTitle,
-                          locale,
-                        ),
-                        {'store': _storeName},
-                      ),
-                      style: typography.headingSmall.copyWith(
-                        color: colors.onSurface,
-                        fontSize: 15,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      _fill(
-                        rc.getText(
-                          RemoteConfigKeys.subscriptionStoreRowSubtitle,
-                          locale,
-                        ),
-                        {'storeAccount': _storeAccountName},
-                      ),
-                      style: typography.caption.copyWith(
-                        color: colors.onSurfaceMuted,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
                 ),
               ),
             ],
