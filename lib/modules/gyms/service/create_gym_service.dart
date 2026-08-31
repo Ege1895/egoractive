@@ -17,16 +17,17 @@ part 'create_gym_service.g.dart';
 /// `signupGymAdmin` callable'ına (Admin SDK, kurallara tabi değil) yapılır.
 /// O fonksiyon `gyms` dokümanını, logoyu ve `users/{uid}` (`role: admin`)
 /// dokümanını oluşturur — F2-5'teki trigger bunu custom claim'e çevirir,
-/// kullanıcı da girdiği telefon/email ile `startLogin`+OTP üzerinden
-/// (Egoractive Authentication Sistemi) ilk girişini yapınca gerçek Auth
-/// hesabı lazy olarak oluşur.
+/// kullanıcı da girdiği telefonla `startLogin`+OTP üzerinden (Egoractive
+/// Authentication Sistemi) ilk girişini yapınca gerçek Auth hesabı lazy
+/// olarak oluşur. Email BİLEREK burada istenmiyor (UX kararı — bkz.
+/// `signup-gym-admin.ts` dokümantasyonu); ilk girişten hemen sonra
+/// `emailSetupRequired` kapısı devreye girip tamamlatıyor.
 class CreateGymService {
   const CreateGymService();
 
   Future<String> createGym({
     required GymProfile profile,
     required Color themeColor,
-    required String email,
     required String currency,
     XFile? logoFile,
   }) async {
@@ -50,7 +51,6 @@ class CreateGymService {
           'phoneNumber': profile.phone,
           'address': profile.address,
           'themeColorHex': _toHex(themeColor),
-          'email': email,
           'currency': currency,
           if (timeZone != null) 'timeZone': timeZone,
           if (logoFile != null)

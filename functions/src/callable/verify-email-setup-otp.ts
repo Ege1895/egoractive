@@ -1,7 +1,7 @@
 import { getFirestore } from "firebase-admin/firestore";
 import { HttpsError, onCall } from "firebase-functions/v2/https";
 
-import { userDoc } from "../shared/firestore-paths";
+import { gymDoc, userDoc } from "../shared/firestore-paths";
 import { mintLoginToken } from "../shared/login-token";
 import { verifyOtp } from "../shared/otp";
 
@@ -35,9 +35,21 @@ export const verifyEmailSetupOtp = onCall(async (request) => {
     throw new HttpsError(reasonToCode(result.reason), "Kod doğrulanamadı.");
   }
 
-  await getFirestore()
-    .doc(userDoc(uid))
-    .update({ email: result.email, emailLower: result.email.toLowerCase() });
+  const firestore = getFirestore();
+  const userRef = firestore.doc(userDoc(uid));
+  const userSnap = await userRef.get();
+  await userRef.update({ email: result.email, emailLower: result.email.toLowerCase() });
+
+  // F2-9 sonrası — salon oluşturma artık email istemiyor (UX kararı, bkz.
+  // `signup-gym-admin.ts`); admin ilk email'ini burada tamamlayınca, aynı
+  // adres eskiden salon kuruluşunda olduğu gibi rapor mailinin de gideceği
+  // adres olarak otomatik ayarlanır — admin ayrıca Salon Bilgileri'nden
+  // değiştirebilir.
+  const userData = userSnap.data();
+  const gymId = typeof userData?.gymId === "string" ? userData.gymId : null;
+  if (userData?.role === "admin" && gymId !== null) {
+    await firestore.doc(gymDoc(gymId)).update({ "reportEmails.gym": result.email });
+  }
 
   const token = await mintLoginToken(uid);
   return { token };

@@ -34,7 +34,6 @@ class _GymSetupPanelState extends BasePanelState<GymSetupPanel> {
   late final TextEditingController _cityController;
   late final PhoneController _phoneController;
   late final TextEditingController _addressController;
-  late final TextEditingController _emailController;
   final _phoneFieldKey = GlobalKey();
 
   @override
@@ -50,11 +49,6 @@ class _GymSetupPanelState extends BasePanelState<GymSetupPanel> {
     _cityController = TextEditingController();
     _phoneController = PhoneController(initialValue: initialPhoneNumber());
     _addressController = TextEditingController();
-    // Egoractive Authentication Sistemi §9 — "Login ve rapor e-postası",
-    // GymProfile'a dahil değil (o model sadece zorunlu iletişim alanlarını
-    // tutuyor); bu yüzden diğerlerinin aksine bir provider'a senkronize
-    // edilmiyor, submit anında doğrudan okunuyor.
-    _emailController = TextEditingController();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       ref.read(gymProfileControllerProvider.notifier).reset();
@@ -223,36 +217,6 @@ class _GymSetupPanelState extends BasePanelState<GymSetupPanel> {
                             ref.watch(
                               rcTextProvider(
                                 RemoteConfigKeys.gymsGymSetupPhoneHelperNote,
-                              ),
-                            ),
-                            style: typography.caption.copyWith(
-                              color: colors.onSurfaceMuted,
-                              fontSize: 12,
-                            ),
-                          ),
-                          const SizedBox(height: AppSpacing.md),
-                          AppTextField(
-                            label: ref.watch(
-                              rcTextProvider(
-                                RemoteConfigKeys
-                                    .gymsGymInfoLoginReportEmailLabel,
-                              ),
-                            ),
-                            hint: ref.watch(
-                              rcTextProvider(
-                                RemoteConfigKeys.gymsGymInfoGymReportEmailHint,
-                              ),
-                            ),
-                            keyboardType: TextInputType.emailAddress,
-                            controller: _emailController,
-                            errorText: createGymState.emailError,
-                          ),
-                          const SizedBox(height: AppSpacing.xs),
-                          Text(
-                            ref.watch(
-                              rcTextProvider(
-                                RemoteConfigKeys
-                                    .gymsGymSetupReportEmailDescription,
                               ),
                             ),
                             style: typography.caption.copyWith(
@@ -553,9 +517,7 @@ class _GymSetupPanelState extends BasePanelState<GymSetupPanel> {
                       onPressed: createGymState.isSubmitting
                           ? null
                           : () async {
-                              final gymId = await createGymController.submit(
-                                email: _emailController.text,
-                              );
+                              final gymId = await createGymController.submit();
                               if (gymId != null && mounted) {
                                 ref
                                     .read(panelStackControllerProvider.notifier)
@@ -593,7 +555,6 @@ class _GymSetupPanelState extends BasePanelState<GymSetupPanel> {
     _cityController.dispose();
     _phoneController.dispose();
     _addressController.dispose();
-    _emailController.dispose();
     super.dispose();
   }
 }

@@ -67,6 +67,17 @@ function resolveTimeZone(value: unknown): string {
  * olarak üretilir — gerçek Firebase Auth hesabı, kullanıcı bu telefon
  * numarasıyla `requestCustomToken` üzerinden ilk girişini yaptığında lazy
  * olarak oluşur.
+ *
+ * Email BİLEREK burada istenmiyor (UX kararı — telefon zaten hesabın kalıcı
+ * giriş kimliği; salon oluşturma anında email de zorunlu tutup ayrıca
+ * doğrulatmak, telefon OTP'sinden ÖNCE ikinci bir doğrulama adımı ekleyip
+ * kurulumu yavaşlatıyordu, üstelik yanlış girilirse salonu hiç
+ * oluşturamama riski taşıyordu). Kullanıcı normal telefon girişini
+ * (`requestCustomToken`) yapınca `email` alanı boş kaldığından
+ * `emailSetupRequired` kapısı devreye girer, `sendEmailSetupOtp`/
+ * `verifyEmailSetupOtp` üzerinden email ilk oturumdan hemen sonra
+ * tamamlanır — `reportEmails.gym` da o an otomatik yazılır (bkz.
+ * `verify-email-setup-otp.ts`).
  */
 export const signupGymAdmin = onCall(async (request) => {
   const data = request.data ?? {};
@@ -78,12 +89,6 @@ export const signupGymAdmin = onCall(async (request) => {
   const logoBase64 = optionalNonEmptyString(data.logoBase64);
   const timeZone = resolveTimeZone(data.timeZone);
   const currency = resolveCurrency(data.currency);
-  // Egoractive Authentication Sistemi §9 — "Login ve rapor e-postası" artık
-  // zorunlu tek alan: hem admin'in email OTP ile giriş yapacağı hem
-  // haftalık/aylık rapor maillerinin gideceği adres (bkz.
-  // weekly-gym-report.ts/monthly-gym-report.ts).
-  const email = requireNonEmptyString(data.email, "Login ve rapor e-postası");
-  const emailLower = email.toLowerCase();
 
   let logoBuffer: Buffer | undefined;
   if (logoBase64 !== undefined) {
@@ -99,14 +104,6 @@ export const signupGymAdmin = onCall(async (request) => {
   const existingPhoneDoc = await findUserByPhone(firestore, phoneNumber);
   if (existingPhoneDoc !== null) {
     throw new HttpsError("already-exists", "Bu telefon numarasıyla kayıtlı bir kullanıcı zaten var.");
-  }
-  const existingEmail = await firestore
-    .collection(usersCollection())
-    .where("emailLower", "==", emailLower)
-    .limit(1)
-    .get();
-  if (!existingEmail.empty) {
-    throw new HttpsError("already-exists", "Bu email adresiyle kayıtlı bir kullanıcı zaten var.");
   }
 
   const gymRef = firestore.collection(gymsCollection()).doc();
@@ -135,7 +132,6 @@ export const signupGymAdmin = onCall(async (request) => {
     timeZone,
     currency,
     ...(logoUrl !== undefined ? { logoUrl } : {}),
-    reportEmails: { gym: email },
     themeColors: { primary: themeColorHex },
     // subscriptionStatus artık burada otomatik "trial" yazılmıyor — admin,
     // girişten hemen sonra zorunlu SubscriptionOnboardingPanel'de gerçek bir
@@ -154,8 +150,6 @@ export const signupGymAdmin = onCall(async (request) => {
     role: "admin",
     gymId: gymRef.id,
     phoneNumber,
-    email,
-    emailLower,
   });
 
   return { gymId: gymRef.id };

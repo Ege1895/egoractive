@@ -712,8 +712,6 @@ abstract final class RemoteConfigKeys {
   static const gymsGymSetupPhoneHint = 'lbl_gyms_gym_setup_phone_hint';
   static const gymsGymSetupPhoneHelperNote =
       'lbl_gyms_gym_setup_phone_helper_note';
-  static const gymsGymSetupReportEmailDescription =
-      'lbl_gyms_gym_setup_report_email_description';
   static const gymsGymSetupCurrencyFieldLabel =
       'lbl_gyms_gym_setup_currency_field_label';
   static const gymsGymSetupCurrencyHelperNote =
@@ -1962,9 +1960,6 @@ class RemoteConfigService {
     'lbl_gyms_gym_setup_phone_hint_tr': '5XX XXX XX XX',
     'lbl_gyms_gym_setup_phone_helper_note_tr':
         'Salon kaydı tamamlanınca bu numarayla admin olarak giriş yapacaksın.',
-    'lbl_gyms_gym_setup_report_email_label_tr': 'Rapor e-postası (opsiyonel)',
-    'lbl_gyms_gym_setup_report_email_description_tr':
-        'Haftalık ve aylık salon özeti (ders/ciro/gider) bu adrese gönderilir. Şimdi boş bırakabilirsin, sonra Salon Bilgileri panelinden de ekleyebilirsin.',
     'lbl_gyms_gym_setup_currency_field_label_tr': 'Para birimi',
     'lbl_gyms_gym_setup_currency_helper_note_tr':
         'Salonun tüm paket/ödeme/gider tutarları bu para biriminde tutulur — sonradan değiştirilemez.',
@@ -2831,9 +2826,6 @@ class RemoteConfigService {
     'lbl_gyms_gym_setup_phone_hint_en': '5XX XXX XX XX',
     'lbl_gyms_gym_setup_phone_helper_note_en':
         'Once gym registration is complete, you will log in as admin with this number.',
-    'lbl_gyms_gym_setup_report_email_label_en': 'Report email (optional)',
-    'lbl_gyms_gym_setup_report_email_description_en':
-        'The weekly and monthly gym summary (sessions/revenue/expenses) is emailed to this address. You can leave it blank now and add it later from Gym Info.',
     'lbl_gyms_gym_setup_currency_field_label_en': 'Currency',
     'lbl_gyms_gym_setup_currency_helper_note_en':
         'All package/payment/expense amounts for this gym are kept in this currency — it cannot be changed later.',
