@@ -148,7 +148,7 @@ class _ProfileForGymProviderElement
 }
 
 String _$gymProfileControllerHash() =>
-    r'b102344803d9212b4c3abdd2cb07db086f8ce375';
+    r'675af0078e1f1e8ca2953a9a3fd2a4290d64639b';
 
 /// See also [GymProfileController].
 @ProviderFor(GymProfileController)
