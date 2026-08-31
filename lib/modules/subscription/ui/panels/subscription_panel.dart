@@ -264,9 +264,17 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
 
   /// `gyms/{gymId}.subscriptionExempt == true` — sadece Firebase
   /// Console/Admin SDK'dan elle set edilir (bkz. [SubscriptionState]).
-  /// Bu salonlar hiçbir zaman gerçek mağaza aboneliği almaz; ekran doğrudan
-  /// "mevcut plan: yıllık" görünümünü, satın alma/yönetim CTA'ları olmadan
-  /// gösterir.
+  /// Ekran BİLEREK [_activeView]'in kart yapısını (rozet + başlık + tarih
+  /// kutuları) birebir kullanır ki bu gösterim, gerçekten abone bir salonun
+  /// ekranından görsel olarak ayırt edilemesin (ör. reklam amaçlı geçici
+  /// ücretsiz erişim verilen bir salonun panelinde) — AMA `gyms/{gymId}`'ye
+  /// asla gerçek bir abonelik yazılmıyor: tarih kutuları hep "—" gösterir,
+  /// fiyat satırı hiç yok, "Aboneliği yönet" (App Store'a giden) butonu da
+  /// yok, çünkü yönetilecek gerçek bir abonelik yok. Bu SADECE görsel bir
+  /// gösterim — `subscriptionExempt` `false`'a çekildiğinde `gyms/{gymId}`'de
+  /// hiçbir gerçek `subscriptionStatus`/`subscriptionProductId` olmadığı
+  /// için salon otomatik olarak (appAccess üzerinden) zorunlu abonelik
+  /// seçim ekranına düşer — tam istenen davranış.
   Widget _exemptView(BuildContext context, RemoteConfigService rc) {
     final colors = context.appColors;
     final typography = context.appTypography;
@@ -291,55 +299,84 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
             borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
             border: Border.all(color: colors.primary.withValues(alpha: 0.32)),
           ),
-          child: Row(
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      rc.getText(
-                        RemoteConfigKeys.subscriptionActivePlanLabel,
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          rc.getText(
+                            RemoteConfigKeys.subscriptionActivePlanLabel,
+                            locale,
+                          ),
+                          style: typography.bodyMedium.copyWith(
+                            color: colors.secondary,
+                            fontSize: 13,
+                          ),
+                        ),
+                        const SizedBox(height: AppSpacing.xs),
+                        Text(
+                          planName,
+                          style: typography.headingLarge.copyWith(
+                            color: colors.onSurface,
+                            fontSize: 26,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  _Pill(
+                    label: rc.getText(
+                      RemoteConfigKeys.subscriptionActiveBadge,
+                      locale,
+                    ),
+                    bg: colors.success.withValues(alpha: 0.16),
+                    fg: colors.success,
+                  ),
+                ],
+              ),
+              const SizedBox(height: AppSpacing.md),
+              Row(
+                children: [
+                  Expanded(
+                    child: _DateChip(
+                      label: rc.getText(
+                        RemoteConfigKeys.subscriptionRenewalLabel,
                         locale,
                       ),
-                      style: typography.bodyMedium.copyWith(
-                        color: colors.secondary,
-                        fontSize: 13,
-                      ),
+                      value: '—',
                     ),
-                    const SizedBox(height: AppSpacing.xs),
-                    Text(
-                      planName,
-                      style: typography.headingLarge.copyWith(
-                        color: colors.onSurface,
-                        fontSize: 26,
+                  ),
+                  const SizedBox(width: AppSpacing.sm),
+                  Expanded(
+                    child: _DateChip(
+                      label: rc.getText(
+                        RemoteConfigKeys.subscriptionStartedLabel,
+                        locale,
                       ),
+                      value: '—',
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-              _Pill(
-                label: rc.getText(
-                  RemoteConfigKeys.subscriptionActiveBadge,
-                  locale,
+              const SizedBox(height: AppSpacing.md),
+              Text(
+                rc.getText(RemoteConfigKeys.subscriptionExemptNote, locale),
+                style: typography.bodyMedium.copyWith(
+                  color: colors.onSurfaceVariant,
+                  fontSize: 13,
                 ),
-                bg: colors.success.withValues(alpha: 0.16),
-                fg: colors.success,
               ),
             ],
           ),
         ),
         const SizedBox(height: AppSpacing.lg),
         _IncludedFeaturesCard(rc: rc, locale: locale),
-        const SizedBox(height: AppSpacing.lg),
-        Text(
-          rc.getText(RemoteConfigKeys.subscriptionExemptNote, locale),
-          style: typography.bodyMedium.copyWith(
-            color: colors.onSurfaceMuted,
-            fontSize: 13,
-          ),
-        ),
       ],
     );
   }
