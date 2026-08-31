@@ -1,7 +1,7 @@
 import { getFirestore } from "firebase-admin/firestore";
 import { HttpsError, onCall } from "firebase-functions/v2/https";
 
-import { usersCollection } from "../shared/firestore-paths";
+import { findUserByPhone } from "../shared/phone-lookup";
 
 /**
  * Üye ekleme akışında `phoneNumber` tüm `users` koleksiyonunda global olarak
@@ -32,11 +32,9 @@ export const checkPhoneAvailable = onCall(async (request) => {
     throw new HttpsError("invalid-argument", "Telefon numarası gerekli.");
   }
 
-  const snapshot = await getFirestore()
-    .collection(usersCollection())
-    .where("phoneNumber", "==", phoneNumber)
-    .limit(1)
-    .get();
+  // F8-3 — geçiş penceresi: migrate edilmemiş eski çıplak TR kayıtlarıyla da
+  // çakışma kontrolü yapar, bkz. `shared/phone-lookup.ts`.
+  const matchedDoc = await findUserByPhone(getFirestore(), phoneNumber);
 
-  return { available: snapshot.empty };
+  return { available: matchedDoc === null };
 });

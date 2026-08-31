@@ -3,6 +3,7 @@ import { getStorage } from "firebase-admin/storage";
 import { HttpsError, onCall } from "firebase-functions/v2/https";
 
 import { gymsCollection, usersCollection } from "../shared/firestore-paths";
+import { findUserByPhone } from "../shared/phone-lookup";
 
 const MAX_LOGO_BYTES = 300 * 1024;
 
@@ -77,12 +78,10 @@ export const signupGymAdmin = onCall(async (request) => {
   }
 
   const firestore = getFirestore();
-  const existingPhone = await firestore
-    .collection(usersCollection())
-    .where("phoneNumber", "==", phoneNumber)
-    .limit(1)
-    .get();
-  if (!existingPhone.empty) {
+  // F8-3 — geçiş penceresi: migrate edilmemiş eski çıplak TR kayıtlarıyla da
+  // çakışma kontrolü yapar, bkz. `shared/phone-lookup.ts`.
+  const existingPhoneDoc = await findUserByPhone(firestore, phoneNumber);
+  if (existingPhoneDoc !== null) {
     throw new HttpsError("already-exists", "Bu telefon numarasıyla kayıtlı bir kullanıcı zaten var.");
   }
   const existingEmail = await firestore
