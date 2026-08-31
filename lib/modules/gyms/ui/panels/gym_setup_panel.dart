@@ -66,6 +66,18 @@ class _GymSetupPanelState extends BasePanelState<GymSetupPanel> {
   Widget build(BuildContext context) {
     final colors = context.appColors;
     final typography = context.appTypography;
+    // `GymProfileController` autoDispose'dur ve bu ekranda SADECE `.notifier`
+    // üzerinden `ref.read` ile yazılıyordu — hiçbir yerde `ref.watch`
+    // edilmediği için provider'ı canlı tutan bir dinleyici yoktu. Sonuç:
+    // Firestore'a bağlı `GymInfoPanel` gibi bu provider'ı `ref.watch` eden
+    // başka bir panel panel stack'te canlı DEĞİLSE (tam da bu ekranın kendi
+    // akışı — hesap açılışında ilk salon kurulumu), her `ref.read` arasında
+    // provider disposed olup yeniden `build()`'a düşüyor, yazılan
+    // ad/şehir/adres/telefon sessizce kayboluyordu — kullanıcı alanları dolu
+    // görse bile submit "gerekli" hatalarını gösterip duruyordu (gerçek
+    // rapor edilen hata). `ref.watch` burada provider'ı bu panelin ömrü
+    // boyunca canlı tutuyor (bkz. `gym_info_panel.dart`'taki aynı desen).
+    ref.watch(gymProfileControllerProvider);
     final profileController = ref.read(gymProfileControllerProvider.notifier);
     final themeState = ref.watch(gymThemeControllerProvider);
     final themeController = ref.read(gymThemeControllerProvider.notifier);

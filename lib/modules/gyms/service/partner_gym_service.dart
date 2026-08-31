@@ -11,8 +11,13 @@ class PartnerGymService {
   const PartnerGymService();
 
   Future<List<PartnerGym>> fetchAll() async {
+    // Varsayılan 60s timeout girişten önceki bu ekranda kullanıcıyı süresiz
+    // bir spinner'da bırakabiliyordu (kullanıcı raporu: uygulamayı zorla
+    // kapatmak zorunda kaldı) — 15s'e indirilip `PartnerGymsPanel`'e bir
+    // "tekrar dene" aksiyonu eklendi, en azından takılma süresiz olmuyor.
     final callable = FirebaseFunctions.instance.httpsCallable(
       'listPartnerGyms',
+      options: HttpsCallableOptions(timeout: const Duration(seconds: 15)),
     );
     final result = await callable.call<Map<String, dynamic>>();
     final rawGyms = (result.data['gyms'] as List<dynamic>?) ?? const [];

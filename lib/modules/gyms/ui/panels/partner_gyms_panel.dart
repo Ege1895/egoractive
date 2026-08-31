@@ -8,6 +8,7 @@ import '../../../../core/panels/panel_stack_controller.dart';
 import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_back_button.dart';
+import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_loading_indicator.dart';
 import '../../controller/partner_gyms_controller.dart';
 import '../../domain/partner_gym.dart';
@@ -72,14 +73,28 @@ class _PartnerGymsPanelState extends BasePanelState<PartnerGymsPanel> {
                     padding: const EdgeInsets.symmetric(
                       horizontal: AppSpacing.screenEdge,
                     ),
-                    child: Text(
-                      ref.watch(
-                        rcTextProvider(RemoteConfigKeys.partnerGymsError),
-                      ),
-                      textAlign: TextAlign.center,
-                      style: typography.bodyMedium.copyWith(
-                        color: colors.onSurfaceMuted,
-                      ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          ref.watch(
+                            rcTextProvider(RemoteConfigKeys.partnerGymsError),
+                          ),
+                          textAlign: TextAlign.center,
+                          style: typography.bodyMedium.copyWith(
+                            color: colors.onSurfaceMuted,
+                          ),
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+                        AppButton(
+                          label: ref.watch(
+                            rcTextProvider(RemoteConfigKeys.authRetryButton),
+                          ),
+                          expand: false,
+                          variant: AppButtonVariant.secondary,
+                          onPressed: () => ref.invalidate(partnerGymsProvider),
+                        ),
+                      ],
                     ),
                   ),
                 ),
