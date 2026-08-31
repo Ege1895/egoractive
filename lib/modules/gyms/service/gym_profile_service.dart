@@ -19,13 +19,14 @@ class GymProfileService {
         .snapshots()
         .map((doc) {
           final data = doc.data();
+          final phone = (data?['phone'] as String?) ?? '';
           return GymProfile(
             name: (data?['name'] as String?) ?? '',
             city: (data?['city'] as String?) ?? '',
-            // Firestore'da '+90' önekiyle tutuluyor (signupGymAdmin) —
-            // GymProfileController.updatePhone ile aynı temsili (sadece rakam,
-            // en fazla 10 hane) korumak için önek burada soyuluyor.
-            phone: _stripToDigits((data?['phone'] as String?) ?? ''),
+            // F8-4 — Firestore'da artık tam E.164 tutuluyor
+            // (AppPhoneField/signupGymAdmin), TR'ye özel bir dönüşüm yok.
+            phone: phone,
+            isPhoneValid: phone.isNotEmpty,
             address: (data?['address'] as String?) ?? '',
             logoUrl: (data?['logoUrl'] as String?) ?? '',
           );
@@ -36,19 +37,9 @@ class GymProfileService {
     return FirebaseFirestore.instance.collection('gyms').doc(gymId).update({
       'name': profile.name,
       'city': profile.city,
-      'phone': '+90${profile.phone}',
+      'phone': profile.phone,
       'address': profile.address,
     });
-  }
-
-  String _stripToDigits(String raw) {
-    final digits = raw.replaceAll(RegExp(r'[^0-9]'), '');
-    final withoutCountryCode = digits.startsWith('90') && digits.length > 10
-        ? digits.substring(2)
-        : digits;
-    return withoutCountryCode.length > 10
-        ? withoutCountryCode.substring(0, 10)
-        : withoutCountryCode;
   }
 }
 
