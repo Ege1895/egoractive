@@ -237,6 +237,20 @@ Yeni bir Play Store build'i alınırken (hangi session olursa olsun):
 cp build/app/outputs/bundle/release/app-release.aab "build/app/outputs/bundle/release/<buildNumber> (<versionName>).aab"
 ```
 
+## Abonelik sıfırlama aracı (resetGymSubscription)
+
+Bir salonun (ör. reklam amaçlı ücretsiz erişim verilip sonra geri alınan, ya da test/sandbox kirliliği yaşamış bir salonun) **gerçek** abonelik izlerini sıfırlamak için `functions/src/http/reset-gym-subscription.ts` adında, sadece ELLE tetiklenen bir HTTP Cloud Function var (`resetGymSubscription`).
+
+**Önemli — bu bir tetikleyiciye (trigger) BAĞLI DEĞİL:** hiçbir client kodu, Firestore trigger'ı, scheduler ya da webhook bunu otomatik çağırmıyor ve ÇAĞIRMAMALI. Sadece Google Cloud Console'daki fonksiyonun "Testing" sekmesinden (`{"gymId": "...", "secret": "..."}`) ya da bir HTTP isteğiyle admin tarafından elle tetikleniyor. Secret, Secret Manager'da `RESET_GYM_SUBSCRIPTION_SECRET` adıyla tutuluyor.
+
+**Ne yapıyor:** `gyms/{gymId}` üzerindeki `subscription*` alanlarını (`subscriptionStatus`, `subscriptionProductId`, `subscriptionExpiresAt`, `subscriptionStartedAt`, `subscriptionCancelAtPeriodEnd`, `subscriptionLastVerificationData`, `subscriptionLastVerificationPlatform`, `subscriptionPlatform`) siler + `subscriptionTransactions` koleksiyonunda bu salona ait (`gymId ==` sorgusuyla bulunan) kayıt(lar)ı siler. **`subscriptionExempt` alanına DOKUNMUYOR** — o ayrı, bilinçli bir admin kararı, bu aracın kapsamı dışında.
+
+**🔴 KRİTİK — abonelik sistemiyle ilgili HERHANGİ bir değişiklik/özellik geliştirirken bunu MUTLAKA hatırlat ve kontrol et:**
+- `gyms/{gymId}` dokümanına YENİ bir abonelik alanı eklenirse (ör. `subscriptionSomethingNew`), bu fonksiyonun sildiği alan listesine de eklenmesi gerekip gerekmediğini değerlendir — eklenmezse "sıfırlama" eksik kalır, salon yarı-sıfırlanmış garip bir durumda kalabilir.
+- `subscriptionTransactions`'ın şeması/anahtar yapısı değişirse (ör. `gymId` yerine başka bir alan adı kullanılırsa), buradaki sorgu da güncellenmeli.
+- Abonelik doğrulama akışına (`apply-subscription-update.ts`, `verify-subscription-purchase.ts` vb.) yeni bir yan-etki/yeni bir koleksiyon eklenirse, bu aracın o yan-etkiyi de temizleyip temizlemediğini kontrol et.
+- Kısacası: bu dosyayı ve `docs/Abonelik_Iptal_Rehberi.docx`'ü (manuel/Console eşdeğeri) abonelik sistemine her dokunduğunda akılda tut, ikisi de güncel kalmalı.
+
 ## graphify
 
 Bu projede `graphify-out/graph.json` mevcut ve **kurulu** (`~/.local/bin/graphify`). Kod tabanı, mimari veya dosyalar arası ilişkilerle ilgili herhangi bir soruda — yeni bir görev/oturuma başlarken "önce kodu okuyup anlamaya çalışayım" refleksi yerine:
