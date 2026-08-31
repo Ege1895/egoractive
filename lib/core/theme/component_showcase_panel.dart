@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../constants/app_spacing.dart';
+import '../money/app_money_formatter.dart';
 import '../panels/base_panel.dart';
 import '../theme/app_theme.dart';
 import '../../shared/widgets/app_button.dart';
@@ -103,6 +104,27 @@ class _ComponentShowcasePanelState
             ),
             const SizedBox(height: AppSpacing.md),
             const AppPhoneField(label: 'Telefon numarası'),
+            const SizedBox(height: AppSpacing.xxl),
+            Text(
+              'AppMoneyFormatter',
+              style: typography.headingMedium.copyWith(color: colors.onSurface),
+            ),
+            const SizedBox(height: AppSpacing.md),
+            Text(
+              'TRY/tr: ${formatMoney(50000, 'TRY', 'tr')}   '
+              'USD/en: ${formatMoney(50000, 'USD', 'en')}   '
+              'EUR/en: ${formatMoney(50000, 'EUR', 'en')}',
+              style: typography.bodyMedium.copyWith(
+                color: colors.onSurfaceVariant,
+              ),
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            AppTextField(
+              label: 'Tutar (TR)',
+              hint: '50.000',
+              keyboardType: TextInputType.number,
+              inputFormatters: [AppMoneyInputFormatter(locale: 'tr')],
+            ),
             const SizedBox(height: AppSpacing.xxl),
             Text(
               'AppCard',

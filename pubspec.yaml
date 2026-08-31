@@ -75,6 +75,11 @@ dependencies:
   # 11.x Flutter >=3.47.0 istiyor, bu projedeki Flutter 3.44.5 ile
   # uyumsuz.
   phone_form_field: ^10.0.18
+  # F9-1 — global para birimi desteği: CLDR tabanlı para birimi/locale
+  # formatlama (sembol, ondalık basamak, binlik ayracı) — zaten transitive
+  # bağımlılıktı (flutter_localizations üzerinden), doğrudan bağımlılık
+  # olarak eklendi çünkü artık uygulama kodunda doğrudan import ediliyor.
+  intl: ^0.20.2
 dev_dependencies:
   flutter_test:
     sdk: flutter
