@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/app_spacing.dart';
+import '../../../../core/constants/currency_constants.dart';
 import '../../../../core/locale/locale_controller.dart';
+import '../../../../core/money/active_gym_currency_provider.dart';
 import '../../../../core/money/app_money_formatter.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
@@ -49,6 +51,9 @@ class _AddExpensePanelState extends BasePanelState<AddExpensePanel> {
     final selectedLabel = selectedMatches.isEmpty
         ? null
         : selectedMatches.first.label;
+    final currency =
+        ref.watch(activeGymCurrencyProvider).valueOrNull ??
+        defaultCurrencyCode;
 
     return Scaffold(
       body: SafeArea(
@@ -108,11 +113,13 @@ class _AddExpensePanelState extends BasePanelState<AddExpensePanel> {
                       border: Border.all(color: colors.outline),
                     ),
                     child: AppTextField(
-                      label: ref.watch(
-                        rcTextProvider(
-                          RemoteConfigKeys.expensesAmountFieldLabel,
-                        ),
-                      ),
+                      label: ref
+                          .watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.expensesAmountFieldLabel,
+                            ),
+                          )
+                          .replaceAll('{currency}', currencySymbol(currency)),
                       controller: _amountController,
                       keyboardType: TextInputType.number,
                       inputFormatters: [

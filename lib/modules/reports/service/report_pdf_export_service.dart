@@ -6,7 +6,7 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../../shared/utils/thousands_input_formatter.dart';
+import '../../../core/money/app_money_formatter.dart';
 import '../domain/dashboard_report.dart';
 import '../domain/report_snapshot.dart';
 
@@ -131,6 +131,7 @@ class ReportPdfExportService {
     ReportSnapshot snapshot,
     String gymName,
     ReportPdfLabels labels,
+    String locale,
   ) async {
     final fontData = await rootBundle.load(
       'assets/fonts/IBMPlexSans-Variable.ttf',
@@ -138,6 +139,7 @@ class ReportPdfExportService {
     final font = pw.Font.ttf(fontData);
     final report = snapshot.report;
     final net = report.netTl;
+    final currency = snapshot.currency;
 
     final doc = pw.Document();
     doc.addPage(
@@ -147,12 +149,12 @@ class ReportPdfExportService {
         build: (context) => [
           _header(gymName, report.monthLabel),
           pw.SizedBox(height: 16),
-          _heroBanner(net, labels),
+          _heroBanner(net, labels, currency, locale),
           _sessionsSection(report, labels),
           _groupEventsSection(snapshot, labels),
           _trainersSection(report.trainerPerformance, labels),
           _packagesSection(snapshot.packages, labels),
-          _financeSection(report, labels),
+          _financeSection(report, labels, currency, locale),
           pw.SizedBox(height: 8),
           pw.Center(
             child: pw.Text(
@@ -173,8 +175,9 @@ class ReportPdfExportService {
     ReportSnapshot snapshot,
     String gymName,
     ReportPdfLabels labels,
+    String locale,
   ) async {
-    final bytes = await buildPdf(snapshot, gymName, labels);
+    final bytes = await buildPdf(snapshot, gymName, labels, locale);
     final dateSuffix = snapshot.periodStart.toIso8601String().substring(0, 10);
     await Printing.sharePdf(
       bytes: bytes,
@@ -220,11 +223,16 @@ class ReportPdfExportService {
     );
   }
 
-  pw.Widget _heroBanner(int net, ReportPdfLabels labels) {
+  pw.Widget _heroBanner(
+    int net,
+    ReportPdfLabels labels,
+    String currency,
+    String locale,
+  ) {
     final positive = net >= 0;
     final headline =
         (positive ? labels.heroPositiveTemplate : labels.heroNegativeTemplate)
-            .replaceAll('{net}', _tl(net.abs()));
+            .replaceAll('{net}', formatMoney(net.abs(), currency, locale));
     final sub = positive ? labels.heroSubPositive : labels.heroSubNegative;
     return pw.Container(
       width: double.infinity,
@@ -687,7 +695,12 @@ class ReportPdfExportService {
     );
   }
 
-  pw.Widget _financeSection(DashboardReport report, ReportPdfLabels labels) {
+  pw.Widget _financeSection(
+    DashboardReport report,
+    ReportPdfLabels labels,
+    String currency,
+    String locale,
+  ) {
     final revenue = report.estimatedRevenueTl;
     final expenses = report.totalExpensesTl;
     final net = report.netTl;
@@ -706,7 +719,7 @@ class ReportPdfExportService {
                 style: const pw.TextStyle(fontSize: 10, color: _muted),
               ),
               pw.Text(
-                _tl(revenue),
+                formatMoney(revenue, currency, locale),
                 style: pw.TextStyle(
                   fontSize: 12,
                   fontWeight: pw.FontWeight.bold,
@@ -732,7 +745,7 @@ class ReportPdfExportService {
                 style: const pw.TextStyle(fontSize: 10, color: _muted),
               ),
               pw.Text(
-                _tl(expenses),
+                formatMoney(expenses, currency, locale),
                 style: pw.TextStyle(
                   fontSize: 12,
                   fontWeight: pw.FontWeight.bold,
@@ -775,7 +788,7 @@ class ReportPdfExportService {
                   ),
                 ),
                 pw.Text(
-                  '${positive ? '+' : '-'}${_tl(net.abs())}',
+                  '${positive ? '+' : '-'}${formatMoney(net.abs(), currency, locale)}',
                   style: pw.TextStyle(
                     fontSize: 15,
                     fontWeight: pw.FontWeight.bold,
@@ -789,8 +802,6 @@ class ReportPdfExportService {
       ),
     );
   }
-
-  String _tl(int amount) => '₺${formatThousands(amount)}';
 
   int _pct(int part, int total) =>
       total == 0 ? 0 : ((part / total) * 100).round();

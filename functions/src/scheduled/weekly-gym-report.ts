@@ -57,6 +57,7 @@ export const weeklyGymReport = onSchedule(
     const locale = resolveNotificationLocale(timeZone);
     const periodLabel = `${formatDateInZone(weekStart, timeZone, locale, true)} – ${formatDateInZone(lastDay, timeZone, locale, true)}`;
     const gymName = (data.name as string | undefined) ?? "Salonunuz";
+    const currency = (data.currency as string | undefined) ?? "TRY";
 
     const [stats, packages, groupSessions, events, duetDocs] = await Promise.all([
       fetchGymWeeklyStats(db, gymDoc.id, weekStart, weekEnd),
@@ -73,6 +74,7 @@ export const weeklyGymReport = onSchedule(
       kind: "weekly",
       periodLabel,
       locale,
+      currency,
       sessions: stats,
       individualSessions,
       duetSessions,
@@ -101,6 +103,7 @@ export const weeklyGymReport = onSchedule(
       packages,
       groupSessions,
       events,
+      currency,
     });
   }
 }));

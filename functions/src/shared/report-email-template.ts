@@ -9,6 +9,7 @@ export interface ReportEmailData {
   kind: ReportEmailKind;
   periodLabel: string;
   locale: ReportEmailLocale;
+  currency: string;
   sessions: GymWeeklyStats;
   individualSessions: SessionTypeBreakdown;
   duetSessions: SessionTypeBreakdown;
@@ -158,8 +159,17 @@ const COPY: Record<ReportEmailLocale, {
   },
 };
 
-function fmtTl(amount: number, locale: ReportEmailLocale): string {
-  return "₺" + Math.round(amount).toLocaleString(locale === "tr" ? "tr-TR" : "en-US");
+/** F9-4 — Dart tarafındaki `formatMoney`'nin (bkz. `app_money_formatter.dart`)
+ * TS eşdeğeri: kuruş/cent ayrımı yok, sembol/binlik ayracı `Intl`'in CLDR
+ * verisinden geliyor, kendi tablomuz yok.
+ */
+function fmtMoney(amount: number, currency: string, locale: ReportEmailLocale): string {
+  return new Intl.NumberFormat(locale === "tr" ? "tr-TR" : "en-US", {
+    style: "currency",
+    currency,
+    currencyDisplay: "narrowSymbol",
+    maximumFractionDigits: 0,
+  }).format(Math.round(amount));
 }
 
 function fmtInt(n: number, locale: ReportEmailLocale): string {
@@ -408,7 +418,12 @@ function packagesSection(packages: PackageSaleCount[], locale: ReportEmailLocale
   return card(t.packagesTitle, rows);
 }
 
-function financeSection(revenueTl: number, expensesTl: number, locale: ReportEmailLocale): string {
+function financeSection(
+  revenueTl: number,
+  expensesTl: number,
+  currency: string,
+  locale: ReportEmailLocale,
+): string {
   const t = COPY[locale];
   const net = revenueTl - expensesTl;
   const netColor = net >= 0 ? COLOR.good : COLOR.bad;
@@ -418,14 +433,14 @@ function financeSection(revenueTl: number, expensesTl: number, locale: ReportEma
   const inner =
     `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="width:100%;border-collapse:collapse;">` +
     `<tr><td style="padding:8px 0;font-size:13px;color:${COLOR.muted};">${t.revenue}</td>` +
-    `<td align="right" style="text-align:right;padding:8px 0;font-family:Arial,Helvetica,sans-serif;font-weight:700;font-size:16px;color:${COLOR.good};">${fmtTl(revenueTl, locale)}</td></tr>` +
+    `<td align="right" style="text-align:right;padding:8px 0;font-family:Arial,Helvetica,sans-serif;font-weight:700;font-size:16px;color:${COLOR.good};">${fmtMoney(revenueTl, currency, locale)}</td></tr>` +
     `<tr><td colspan="2">${segBar([
       { value: revShare, color: COLOR.good },
       { value: 1 - revShare, color: COLOR.lineSoft },
     ], 9)}</td></tr>` +
     `<tr><td colspan="2" style="height:12px;"></td></tr>` +
     `<tr><td style="padding:8px 0;font-size:13px;color:${COLOR.muted};">${t.expenses}</td>` +
-    `<td align="right" style="text-align:right;padding:8px 0;font-family:Arial,Helvetica,sans-serif;font-weight:700;font-size:16px;color:${COLOR.amber};">${fmtTl(expensesTl, locale)}</td></tr>` +
+    `<td align="right" style="text-align:right;padding:8px 0;font-family:Arial,Helvetica,sans-serif;font-weight:700;font-size:16px;color:${COLOR.amber};">${fmtMoney(expensesTl, currency, locale)}</td></tr>` +
     `<tr><td colspan="2">${segBar([
       { value: expShare, color: COLOR.amber },
       { value: 1 - expShare, color: COLOR.lineSoft },
@@ -435,15 +450,15 @@ function financeSection(revenueTl: number, expensesTl: number, locale: ReportEma
     `<tr><td style="background:${net >= 0 ? COLOR.goodWash : COLOR.badWash};border-radius:12px;padding:14px 16px;">` +
     `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="width:100%;"><tr>` +
     `<td style="font-size:13px;color:${COLOR.ink};font-weight:600;">${net >= 0 ? t.netProfit : t.netLoss}</td>` +
-    `<td align="right" style="text-align:right;font-family:Arial,Helvetica,sans-serif;font-weight:800;font-size:20px;color:${netColor};">${net >= 0 ? "+" : "−"}${fmtTl(Math.abs(net), locale)}</td>` +
+    `<td align="right" style="text-align:right;font-family:Arial,Helvetica,sans-serif;font-weight:800;font-size:20px;color:${netColor};">${net >= 0 ? "+" : "−"}${fmtMoney(Math.abs(net), currency, locale)}</td>` +
     `</tr></table></td></tr></table>`;
   return card(t.financeTitle, inner);
 }
 
-function heroBanner(net: number, locale: ReportEmailLocale): string {
+function heroBanner(net: number, currency: string, locale: ReportEmailLocale): string {
   const t = COPY[locale];
   const positive = net >= 0;
-  const netStr = fmtTl(Math.abs(net), locale);
+  const netStr = fmtMoney(Math.abs(net), currency, locale);
   const headline = positive ? t.heroPositive(netStr) : t.heroNegative(netStr);
   const sub = positive ? t.heroSubPositive : t.heroSubNegative;
   return (
@@ -476,12 +491,12 @@ export function buildReportEmailHtml(data: ReportEmailData): string {
     `<div style="font-size:13px;color:rgba(255,255,255,.85);margin-top:3px;">${t.kindLabel(data.kind)} &nbsp;·&nbsp; ${data.periodLabel}</div>` +
     `</td></tr></table>` +
     `<div style="padding:22px 22px 4px;background:#ffffff;border-radius:0 0 18px 18px;">` +
-    heroBanner(net, data.locale) +
+    heroBanner(net, data.currency, data.locale) +
     sessionsSection(data.individualSessions, data.duetSessions, data.locale) +
     groupEventsSection(data.groupSessions, data.events, data.locale) +
     trainersSection(data.trainers, data.locale) +
     packagesSection(data.packages, data.locale) +
-    financeSection(revenueTl, expensesTl, data.locale) +
+    financeSection(revenueTl, expensesTl, data.currency, data.locale) +
     `<div style="text-align:center;padding:6px 0 18px;">` +
     `<a href="${data.deepLinkUrl}" style="display:inline-block;border:1.5px solid ${COLOR.brand};color:${COLOR.brandDark};font-weight:600;font-size:13px;border-radius:10px;padding:10px 20px;text-decoration:none;font-family:Arial,Helvetica,sans-serif;">${t.ctaButton}</a>` +
     `</div>` +

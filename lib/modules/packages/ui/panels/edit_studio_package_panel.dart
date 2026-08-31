@@ -254,11 +254,16 @@ class _EditStudioPackagePanelState
                         ),
                         const SizedBox(height: AppSpacing.md),
                         AppTextField(
-                          label: ref.watch(
-                            rcTextProvider(
-                              RemoteConfigKeys.packagesEditPriceFieldLabel,
-                            ),
-                          ),
+                          label: ref
+                              .watch(
+                                rcTextProvider(
+                                  RemoteConfigKeys.packagesEditPriceFieldLabel,
+                                ),
+                              )
+                              .replaceAll(
+                                '{currency}',
+                                currencySymbol(currency),
+                              ),
                           controller: _priceController,
                           keyboardType: TextInputType.number,
                           inputFormatters: [

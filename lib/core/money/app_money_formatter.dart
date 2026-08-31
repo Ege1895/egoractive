@@ -23,6 +23,13 @@ String formatAmountGrouped(int amount, String locale) {
   return NumberFormat.decimalPattern(locale).format(amount);
 }
 
+/// F9-4 — RC'deki alan etiketlerinde ("Tutar (₺)" gibi) para birimini
+/// sabit yazmak yerine `{currency}` yer tutucusunu bununla değiştirmek
+/// için — [formatMoney] gibi tam bir tutar değil, tek başına sembol.
+String currencySymbol(String currencyCode) {
+  return NumberFormat.simpleCurrency(name: currencyCode).currencySymbol;
+}
+
 /// [formatEditUpdate] ile yazılan bir metinden ham tam sayıyı geri okumak
 /// için — hangi karakterin binlik ayracı olduğu locale'e göre değiştiğinden
 /// (TR: nokta, EN: virgül) sabit `'.'` çıkarmak yerine locale'in kendi

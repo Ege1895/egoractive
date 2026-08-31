@@ -1776,7 +1776,7 @@ class RemoteConfigService {
     'lbl_expenses_recurring_toggle_label_tr': 'Her ay tekrar et',
     'lbl_expenses_recurring_toggle_description_tr':
         'Kira ve fatura gibi sabit giderler için',
-    'lbl_expenses_amount_field_label_tr': 'Tutar (₺)',
+    'lbl_expenses_amount_field_label_tr': 'Tutar ({currency})',
     'lbl_expenses_description_field_label_tr': 'Açıklama',
     'lbl_expenses_date_field_label_tr': 'Tarih',
     'lbl_expenses_submit_button_tr': 'Gideri kaydet',
@@ -2182,7 +2182,7 @@ class RemoteConfigService {
     'lbl_packages_delete_package_button_tr': 'Paketi sil',
     'lbl_packages_edit_name_field_label_tr': 'Paket adı',
     'lbl_packages_edit_validity_days_field_label_tr': 'Geçerlilik (gün)',
-    'lbl_packages_edit_price_field_label_tr': 'Fiyat (₺)',
+    'lbl_packages_edit_price_field_label_tr': 'Fiyat ({currency})',
     'lbl_packages_member_package_title_tr': 'Paketim',
     'lbl_packages_remaining_word_tr': 'kalan',
     'lbl_packages_trainer_owner_label_tr': 'Antrenörün',
@@ -2192,7 +2192,7 @@ class RemoteConfigService {
     'lbl_packages_name_field_hint_tr': 'Birebir 12 Seans',
     'lbl_packages_session_count_field_hint_tr': 'Örn. 12',
     'lbl_packages_validity_field_hint_tr': 'Örn. 90',
-    'lbl_packages_per_session_price_caption_tr': 'seans başı ₺{price}',
+    'lbl_packages_per_session_price_caption_tr': 'seans başı {price}',
     'lbl_packages_delete_failed_error_tr': 'Paket silinemedi, tekrar dene.',
     'lbl_packages_name_required_error_tr': 'Paket adı boş bırakılamaz.',
     'lbl_packages_session_count_invalid_error_tr':
@@ -2642,7 +2642,7 @@ class RemoteConfigService {
     'lbl_expenses_recurring_toggle_label_en': 'Repeat every month',
     'lbl_expenses_recurring_toggle_description_en':
         'For fixed expenses like rent and bills',
-    'lbl_expenses_amount_field_label_en': 'Amount (₺)',
+    'lbl_expenses_amount_field_label_en': 'Amount ({currency})',
     'lbl_expenses_description_field_label_en': 'Description',
     'lbl_expenses_date_field_label_en': 'Date',
     'lbl_expenses_submit_button_en': 'Save expense',
@@ -3054,7 +3054,7 @@ class RemoteConfigService {
     'lbl_packages_delete_package_button_en': 'Delete package',
     'lbl_packages_edit_name_field_label_en': 'Package name',
     'lbl_packages_edit_validity_days_field_label_en': 'Validity (days)',
-    'lbl_packages_edit_price_field_label_en': 'Price (₺)',
+    'lbl_packages_edit_price_field_label_en': 'Price ({currency})',
     'lbl_packages_member_package_title_en': 'My Package',
     'lbl_packages_remaining_word_en': 'remaining',
     'lbl_packages_trainer_owner_label_en': 'Your trainer',
@@ -3064,7 +3064,7 @@ class RemoteConfigService {
     'lbl_packages_name_field_hint_en': 'One-on-one 12 Sessions',
     'lbl_packages_session_count_field_hint_en': 'E.g. 12',
     'lbl_packages_validity_field_hint_en': 'E.g. 90',
-    'lbl_packages_per_session_price_caption_en': '₺{price} per session',
+    'lbl_packages_per_session_price_caption_en': '{price} per session',
     'lbl_packages_delete_failed_error_en':
         'Could not delete package, try again.',
     'lbl_packages_name_required_error_en': 'Package name cannot be empty.',
