@@ -367,3 +367,29 @@ Sıralama, store review sürecini en hızlı şekilde başlatacak şekilde tasar
 ### F7-5 — Final review ve genel lansman
 **Prompt (insan görevi):** Production build, son review gönderimi, yayına alma.
 **Kabul kriterleri:** Uygulama her iki store'da da canlı ve indirilebilir.
+
+---
+
+## FAZ 8 — Global Telefon Numarası Desteği
+
+Şu an tüm telefon inputları (`shared/utils/phone_number_formatter.dart`'taki `TrPhoneNumberInputFormatter`, RC metinlerindeki literal "+90") Türkiye'ye hardcoded. Karar: `phone_form_field` paketi (Google'ın libphonenumber metadata'sının saf Dart portu — native platform bağımlılığı yok, gerçek bölgesel doğrulama + ülke seçici widget hazır geliyor). Telefon her yerde **E.164** formatında (`+<ülke kodu><numara>`) saklanacak. Riskin en yüksek olduğu auth/login akışı önce, sonra iletişim telefon formları — tek seferde her yeri değiştirmemek için kademeli.
+
+### F8-1 — Ortak `AppPhoneField` bileşeni (altyapı, henüz hiçbir ekranda kullanılmıyor)
+**Prompt:** "`phone_form_field` paketini ekle. `shared/widgets/app_phone_field.dart` — `PhoneFormField`'ı sarmalayan, projenin `AppTextField` görsel dilinde (renk/köşe/tipografi `AppColorScheme`/`AppTypography`'den) bir bileşen. Varsayılan ülke `TR`, `onChanged` E.164 (`PhoneNumber.international`) döndürsün. Henüz hiçbir ekrana bağlanmasın — sadece bileşen + component showcase'e örnek."
+**Kabul kriterleri:** `component_showcase_panel.dart`'ta bileşen görülebiliyor, ülke seçici açılıp aranabiliyor, yazarken TR için "532 418 76 05" gibi canlı formatlanıyor.
+
+### F8-2 — Auth/login akışını E.164 + ülke seçiciye taşı
+**Prompt:** "`phone_login_panel.dart` artık `AppPhoneField` kullanıyor. `AuthController.setPhoneDigits`/`requestLogin`, `auth_repository.dart`, `auth_service.dart` tam E.164 numarayla çalışacak şekilde güncellensin. `functions/src/callable/request-custom-token.ts` artık `+90` varsaymadan, gelen E.164 numarayı olduğu gibi kullanmalı. RC'deki literal '+90 {phone}' metinleri (`lbl_auth_login_waiting_body_*` vb.) `{phone}` zaten tam numarayı içerecek şekilde güncellensin."
+**Kabul kriterleri:** TR dışında bir ülke kodu seçilip gerçek bir numarayla uçtan uca OTP girişi test edilmiş (gerçek SMS gidiyor); mevcut TR kullanıcıların girişi bozulmamış.
+
+### F8-3 — Mevcut Firestore telefon kayıtlarını E.164'e migrate et
+**Prompt:** "Tek seferlik bir Cloud Function/script (`functions/src/scripts/` veya benzeri) — `users`/`members`/`trainers` vb. koleksiyonlarındaki mevcut çıplak (prefiksiz, TR varsayılan) `phoneNumber` alanlarına `+90` prepend edip E.164'e çevirsin. Migration bitene kadar okuma tarafında prefiksiz kayıtlar için TR fallback bırakılsın (geçiş penceresi güvenliği)."
+**Kabul kriterleri:** Migration script'i staging/emulator'da çalıştırılıp tüm kayıtların `+90` ile başladığı doğrulanmış; production'da manuel onaylı tek seferlik çalıştırma planı var.
+
+### F8-4 — İletişim telefon formlarını `AppPhoneField`'a geçir
+**Prompt:** "Üye (`member_info_panel.dart`), antrenör (`admin_trainer_management_panel.dart`), salon (`gym_setup_panel.dart`, `gym_info_panel.dart`) gibi ekranlardaki telefon alanları `AppPhoneField`'a geçirilsin. Eski `TrPhoneNumberInputFormatter` artık hiçbir yerden çağrılmıyorsa kaldırılsın."
+**Kabul kriterleri:** Listelenen ekranların hepsinde ülke seçici çalışıyor, kaydedilen değer E.164; `flutter analyze` temiz.
+
+### F8-5 — Son seçilen ülkeyi hatırlama + ülke ismi TR lokalizasyonu (nice-to-have)
+**Prompt:** "`AppPhoneField`, cihazda son seçilen ülkeyi (basit local storage) hatırlasın — her seferinde TR'den başlamak zorunda kalınmasın. `phone_form_field`'ın ülke isimleri sadece İngilizce geldiğinden, uygulama dili TR iken ülke seçici listesinde Türkçe isim gösterecek bir çeviri katmanı eklensin (RC'ye taşımaya gerek yok — ISO kod → TR isim eşlemesi build-time sabit)."
+**Kabul kriterleri:** Uygulama TR dilindeyken ülke seçicide "Türkiye", "Almanya" gibi Türkçe isimler görünüyor; ikinci girişte son seçilen ülke hatırlanıyor.
