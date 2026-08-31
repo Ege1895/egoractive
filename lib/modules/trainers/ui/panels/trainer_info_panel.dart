@@ -53,9 +53,7 @@ class _TrainerInfoPanelState extends BasePanelState<TrainerInfoPanel> {
       text: parts.length > 1 ? parts.skip(1).join(' ') : '',
     );
     _phoneController = PhoneController(
-      initialValue: PhoneNumber.parse(
-        profile.phoneE164.isEmpty ? '+90' : profile.phoneE164,
-      ),
+      initialValue: initialPhoneNumber(profile.phoneE164),
     );
     _emailController = TextEditingController(text: profile.email);
     _originalEmail = profile.email;

@@ -260,11 +260,7 @@ class _TrainerFormSheetState extends ConsumerState<_TrainerFormSheet> {
     text: widget.existing?.name ?? '',
   );
   late final _phoneController = PhoneController(
-    initialValue: PhoneNumber.parse(
-      widget.existing == null || widget.existing!.phone.isEmpty
-          ? '+90'
-          : widget.existing!.phone,
-    ),
+    initialValue: initialPhoneNumber(widget.existing?.phone),
   );
   late final Set<String> _selectedSpecialties = {
     ...?widget.existing?.specialties,

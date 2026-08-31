@@ -56,7 +56,7 @@ class _PhoneLoginPanelState extends BasePanelState<PhoneLoginPanel> {
   void initState() {
     super.initState();
     final prefill = widget.prefillPhoneE164;
-    final initialNumber = PhoneNumber.parse(prefill ?? '+90');
+    final initialNumber = initialPhoneNumber(prefill);
     _phoneController = PhoneController(initialValue: initialNumber);
     if (prefill != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {

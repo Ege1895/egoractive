@@ -31,6 +31,7 @@ import 'modules/auth/ui/panels/phone_login_panel.dart';
 import 'modules/auth/ui/panels/splash_panel.dart';
 import 'modules/notifications/service/push_notification_service.dart';
 import 'modules/subscription/ui/panels/subscription_onboarding_panel.dart';
+import 'shared/widgets/app_phone_field_prefs.dart';
 
 /// Widget ağacı dışından (bildirim servisi gibi) `PanelStackController`'a
 /// erişebilmek için paylaşılan container — `UncontrolledProviderScope` bunu
@@ -43,6 +44,7 @@ void main() async {
   await const RemoteConfigService().init();
   await LocalePrefs.init();
   await OnboardingPrefs.init();
+  await AppPhoneFieldPrefs.init();
   unawaited(MobileAds.instance.initialize());
   if (debugTestDeviceIds.isNotEmpty) {
     MobileAds.instance.updateRequestConfiguration(

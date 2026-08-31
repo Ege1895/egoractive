@@ -3,12 +3,32 @@ import 'package:phone_form_field/phone_form_field.dart';
 
 import '../../core/constants/app_spacing.dart';
 import '../../core/theme/app_theme.dart';
+import 'app_phone_field_prefs.dart';
+
+/// F8-5 — bir telefon girişi başlatılırken kullanılacak varsayılan değer.
+/// [existingE164] doluysa (düzenlenen bir kayıt) onu kullanır; boşsa (yeni
+/// bir giriş) kullanıcının EN SON seçtiği ülkeyle (bkz. `AppPhoneFieldPrefs`)
+/// boş bir numara döner — hiçbir kayıt yoksa TR'ye düşer. Bu uygulamadaki
+/// TÜM `PhoneController` kuruluş noktalarında hardcoded `'+90'` yerine
+/// kullanılmalı.
+PhoneNumber initialPhoneNumber([String? existingE164]) {
+  if (existingE164 != null && existingE164.isNotEmpty) {
+    return PhoneNumber.parse(existingE164);
+  }
+  final lastIso = AppPhoneFieldPrefs.lastCountryIso;
+  return PhoneNumber(
+    isoCode: lastIso == null ? IsoCode.TR : IsoCode.values.byName(lastIso),
+    nsn: '',
+  );
+}
 
 /// F8-1/F8-2 — global telefon numarası desteği. `AppTextField`'ın görsel
 /// dilini (surfaceRaised zemin, kenarlıksız/odakta primary halka)
 /// `PhoneFormField` üzerine taşıyan ortak bileşen. Varsayılan ülke TR;
 /// `onChanged` numara değiştikçe E.164 (`+905324187605`) + bölgesel
-/// doğrulama sonucuyla (`PhoneNumber.isValid()`) tetiklenir.
+/// doğrulama sonucuyla (`PhoneNumber.isValid()`) tetiklenir. Ülke seçici her
+/// kullanımda seçilen ülkeyi (`AppPhoneFieldPrefs`) hatırlar — bir sonraki
+/// YENİ girişte (bkz. [initialPhoneNumber]) oradan başlar.
 class AppPhoneField extends StatelessWidget {
   const AppPhoneField({
     this.controller,
@@ -37,7 +57,7 @@ class AppPhoneField extends StatelessWidget {
 
     return PhoneFormField(
       controller: controller,
-      initialValue: controller == null ? PhoneNumber.parse('+90') : null,
+      initialValue: controller == null ? initialPhoneNumber() : null,
       enabled: enabled,
       countrySelectorNavigator: const CountrySelectorNavigator.bottomSheet(),
       countryButtonStyle: const CountryButtonStyle(
@@ -45,10 +65,10 @@ class AppPhoneField extends StatelessWidget {
         showIsoCode: false,
       ),
       style: typography.bodyLarge.copyWith(color: colors.onSurface),
-      onChanged: onChanged == null
-          ? null
-          : (phoneNumber) =>
-                onChanged!(phoneNumber.international, phoneNumber.isValid()),
+      onChanged: (phoneNumber) {
+        AppPhoneFieldPrefs.setLastCountryIso(phoneNumber.isoCode.name);
+        onChanged?.call(phoneNumber.international, phoneNumber.isValid());
+      },
       decoration: InputDecoration(
         labelText: label,
         errorText: errorText,

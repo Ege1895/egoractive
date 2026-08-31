@@ -54,9 +54,7 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
       );
       final existingPhone = widget.existing!.phone;
       _phoneController = PhoneController(
-        initialValue: PhoneNumber.parse(
-          existingPhone.isEmpty ? '+90' : existingPhone,
-        ),
+        initialValue: initialPhoneNumber(existingPhone),
       );
       _noteController = TextEditingController();
       // Kaydet, NewMemberController'ın form state'ini okuyor — telefon
@@ -86,9 +84,7 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
       // sızmasın diye alanlar her zaman boş başlar (bkz. NewMemberController.reset).
       _firstNameController = TextEditingController();
       _lastNameController = TextEditingController();
-      _phoneController = PhoneController(
-        initialValue: PhoneNumber.parse('+90'),
-      );
+      _phoneController = PhoneController(initialValue: initialPhoneNumber());
       _noteController = TextEditingController();
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) ref.read(newMemberControllerProvider.notifier).reset();

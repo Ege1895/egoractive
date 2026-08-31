@@ -75,9 +75,7 @@ class _GymInfoPanelState extends BasePanelState<GymInfoPanel> {
       text: '${profile.address}, ${profile.city}',
     );
     _phoneController = PhoneController(
-      initialValue: PhoneNumber.parse(
-        profile.phone.isEmpty ? '+90' : profile.phone,
-      ),
+      initialValue: initialPhoneNumber(profile.phone),
     );
 
     final recipients = ref.read(reportRecipientsControllerProvider);

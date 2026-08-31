@@ -48,7 +48,7 @@ class _GymSetupPanelState extends BasePanelState<GymSetupPanel> {
     // state ataması olduğu için build fazının bitmesini (post-frame) bekler.
     _nameController = TextEditingController();
     _cityController = TextEditingController();
-    _phoneController = PhoneController(initialValue: PhoneNumber.parse('+90'));
+    _phoneController = PhoneController(initialValue: initialPhoneNumber());
     _addressController = TextEditingController();
     // Egoractive Authentication Sistemi §9 — "Login ve rapor e-postası",
     // GymProfile'a dahil değil (o model sadece zorunlu iletişim alanlarını
