@@ -27,6 +27,7 @@ class CreateGymService {
     required GymProfile profile,
     required Color themeColor,
     required String email,
+    required String currency,
     XFile? logoFile,
   }) async {
     // Seans hatırlatma push'larının salonun bulunduğu yerin saatine göre
@@ -50,6 +51,7 @@ class CreateGymService {
           'address': profile.address,
           'themeColorHex': _toHex(themeColor),
           'email': email,
+          'currency': currency,
           if (timeZone != null) 'timeZone': timeZone,
           if (logoFile != null)
             'logoBase64': base64Encode(

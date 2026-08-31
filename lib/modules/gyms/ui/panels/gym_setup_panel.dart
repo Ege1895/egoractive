@@ -5,12 +5,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phone_form_field/phone_form_field.dart';
 
 import '../../../../core/constants/app_spacing.dart';
+import '../../../../core/locale/locale_controller.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
 import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_back_button.dart';
 import '../../../../shared/widgets/app_button.dart';
+import '../../../../shared/widgets/app_currency_field.dart';
 import '../../../../shared/widgets/app_phone_field.dart';
 import '../../../../shared/widgets/app_text_field.dart';
 import '../../../auth/ui/panels/phone_login_panel.dart';
@@ -256,6 +258,29 @@ class _GymSetupPanelState extends BasePanelState<GymSetupPanel> {
                             controller: _addressController,
                             errorText: createGymState.addressError,
                             onChanged: profileController.updateAddress,
+                          ),
+                          const SizedBox(height: AppSpacing.md),
+                          AppCurrencyField(
+                            currencyCode: createGymState.currency,
+                            locale: ref.watch(localeControllerProvider),
+                            label: ref.watch(
+                              rcTextProvider(
+                                RemoteConfigKeys.gymsGymSetupCurrencyFieldLabel,
+                              ),
+                            ),
+                            onChanged: createGymController.selectCurrency,
+                          ),
+                          const SizedBox(height: AppSpacing.xs),
+                          Text(
+                            ref.watch(
+                              rcTextProvider(
+                                RemoteConfigKeys.gymsGymSetupCurrencyHelperNote,
+                              ),
+                            ),
+                            style: typography.caption.copyWith(
+                              color: colors.onSurfaceMuted,
+                              fontSize: 12,
+                            ),
                           ),
                         ],
                       ),

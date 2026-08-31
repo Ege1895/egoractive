@@ -26,6 +26,12 @@ mixin _$GymProfile {
   String get address => throw _privateConstructorUsedError;
   String get logoUrl => throw _privateConstructorUsedError;
 
+  /// F9-2 — SADECE salon kuruluşunda yazılır, sonradan değiştirilemez.
+  /// `GymProfileService.saveProfile()` bu alanı hiçbir zaman Firestore'a
+  /// geri yazmaz (bilerek) — [GymInfoPanel] burada sadece okuma amaçlı
+  /// gösterir, bir düzenleme yolu yok.
+  String get currency => throw _privateConstructorUsedError;
+
   /// Create a copy of GymProfile
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -47,6 +53,7 @@ abstract class $GymProfileCopyWith<$Res> {
     bool isPhoneValid,
     String address,
     String logoUrl,
+    String currency,
   });
 }
 
@@ -71,6 +78,7 @@ class _$GymProfileCopyWithImpl<$Res, $Val extends GymProfile>
     Object? isPhoneValid = null,
     Object? address = null,
     Object? logoUrl = null,
+    Object? currency = null,
   }) {
     return _then(
       _value.copyWith(
@@ -98,6 +106,10 @@ class _$GymProfileCopyWithImpl<$Res, $Val extends GymProfile>
                 ? _value.logoUrl
                 : logoUrl // ignore: cast_nullable_to_non_nullable
                       as String,
+            currency: null == currency
+                ? _value.currency
+                : currency // ignore: cast_nullable_to_non_nullable
+                      as String,
           )
           as $Val,
     );
@@ -120,6 +132,7 @@ abstract class _$$GymProfileImplCopyWith<$Res>
     bool isPhoneValid,
     String address,
     String logoUrl,
+    String currency,
   });
 }
 
@@ -143,6 +156,7 @@ class __$$GymProfileImplCopyWithImpl<$Res>
     Object? isPhoneValid = null,
     Object? address = null,
     Object? logoUrl = null,
+    Object? currency = null,
   }) {
     return _then(
       _$GymProfileImpl(
@@ -170,6 +184,10 @@ class __$$GymProfileImplCopyWithImpl<$Res>
             ? _value.logoUrl
             : logoUrl // ignore: cast_nullable_to_non_nullable
                   as String,
+        currency: null == currency
+            ? _value.currency
+            : currency // ignore: cast_nullable_to_non_nullable
+                  as String,
       ),
     );
   }
@@ -185,6 +203,7 @@ class _$GymProfileImpl implements _GymProfile {
     this.isPhoneValid = false,
     required this.address,
     this.logoUrl = '',
+    this.currency = defaultCurrencyCode,
   });
 
   @override
@@ -204,9 +223,17 @@ class _$GymProfileImpl implements _GymProfile {
   @JsonKey()
   final String logoUrl;
 
+  /// F9-2 — SADECE salon kuruluşunda yazılır, sonradan değiştirilemez.
+  /// `GymProfileService.saveProfile()` bu alanı hiçbir zaman Firestore'a
+  /// geri yazmaz (bilerek) — [GymInfoPanel] burada sadece okuma amaçlı
+  /// gösterir, bir düzenleme yolu yok.
+  @override
+  @JsonKey()
+  final String currency;
+
   @override
   String toString() {
-    return 'GymProfile(name: $name, city: $city, phone: $phone, isPhoneValid: $isPhoneValid, address: $address, logoUrl: $logoUrl)';
+    return 'GymProfile(name: $name, city: $city, phone: $phone, isPhoneValid: $isPhoneValid, address: $address, logoUrl: $logoUrl, currency: $currency)';
   }
 
   @override
@@ -220,7 +247,9 @@ class _$GymProfileImpl implements _GymProfile {
             (identical(other.isPhoneValid, isPhoneValid) ||
                 other.isPhoneValid == isPhoneValid) &&
             (identical(other.address, address) || other.address == address) &&
-            (identical(other.logoUrl, logoUrl) || other.logoUrl == logoUrl));
+            (identical(other.logoUrl, logoUrl) || other.logoUrl == logoUrl) &&
+            (identical(other.currency, currency) ||
+                other.currency == currency));
   }
 
   @override
@@ -232,6 +261,7 @@ class _$GymProfileImpl implements _GymProfile {
     isPhoneValid,
     address,
     logoUrl,
+    currency,
   );
 
   /// Create a copy of GymProfile
@@ -251,6 +281,7 @@ abstract class _GymProfile implements GymProfile {
     final bool isPhoneValid,
     required final String address,
     final String logoUrl,
+    final String currency,
   }) = _$GymProfileImpl;
 
   @override
@@ -267,6 +298,13 @@ abstract class _GymProfile implements GymProfile {
   String get address;
   @override
   String get logoUrl;
+
+  /// F9-2 — SADECE salon kuruluşunda yazılır, sonradan değiştirilemez.
+  /// `GymProfileService.saveProfile()` bu alanı hiçbir zaman Firestore'a
+  /// geri yazmaz (bilerek) — [GymInfoPanel] burada sadece okuma amaçlı
+  /// gösterir, bir düzenleme yolu yok.
+  @override
+  String get currency;
 
   /// Create a copy of GymProfile
   /// with the given fields replaced by the non-null parameter values.

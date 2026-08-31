@@ -22,6 +22,21 @@ function optionalNonEmptyString(value: unknown): string | undefined {
 
 const DEFAULT_TIME_ZONE = "Europe/Istanbul";
 
+const DEFAULT_CURRENCY_CODE = "TRY";
+
+/**
+ * F9-2 — para birimi sadece kuruluşta seçilir, sonradan değiştirilemez
+ * (client'ta da düzenleme UI'ı yok). Tam ISO 4217 kod listesini burada
+ * ikinci kez tutmak yerine (client'taki `currency_constants.dart` tek
+ * kaynak), sadece kabaca "3 büyük harf" formatı doğrulanır — geçersiz/eksik
+ * gelirse varsayılana düşülür.
+ */
+function resolveCurrency(value: unknown): string {
+  if (typeof value !== "string") return DEFAULT_CURRENCY_CODE;
+  const trimmed = value.trim().toUpperCase();
+  return /^[A-Z]{3}$/.test(trimmed) ? trimmed : DEFAULT_CURRENCY_CODE;
+}
+
 /**
  * Push bildirimlerinde (ör. seans hatırlatması) saatin salonun bulunduğu
  * yerin saatine göre gösterilebilmesi için — uygulama artık tek ülkeye
@@ -62,6 +77,7 @@ export const signupGymAdmin = onCall(async (request) => {
   const themeColorHex = requireNonEmptyString(data.themeColorHex, "Tema rengi");
   const logoBase64 = optionalNonEmptyString(data.logoBase64);
   const timeZone = resolveTimeZone(data.timeZone);
+  const currency = resolveCurrency(data.currency);
   // Egoractive Authentication Sistemi §9 — "Login ve rapor e-postası" artık
   // zorunlu tek alan: hem admin'in email OTP ile giriş yapacağı hem
   // haftalık/aylık rapor maillerinin gideceği adres (bkz.
@@ -117,6 +133,7 @@ export const signupGymAdmin = onCall(async (request) => {
     phone: phoneNumber,
     address,
     timeZone,
+    currency,
     ...(logoUrl !== undefined ? { logoUrl } : {}),
     reportEmails: { gym: email },
     themeColors: { primary: themeColorHex },

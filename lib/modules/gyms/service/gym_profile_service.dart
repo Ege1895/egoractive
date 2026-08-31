@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../core/constants/currency_constants.dart';
 import '../domain/gym_profile.dart';
 
 part 'gym_profile_service.g.dart';
@@ -29,6 +30,8 @@ class GymProfileService {
             isPhoneValid: phone.isNotEmpty,
             address: (data?['address'] as String?) ?? '',
             logoUrl: (data?['logoUrl'] as String?) ?? '',
+            // F9-2 — sadece okunur, saveProfile() bu alanı hiç yazmıyor.
+            currency: (data?['currency'] as String?) ?? defaultCurrencyCode,
           );
         });
   }

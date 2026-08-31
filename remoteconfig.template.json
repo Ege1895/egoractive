@@ -3622,6 +3622,42 @@
       },
       "valueType": "STRING"
     },
+    "lbl_gyms_gym_setup_currency_field_label_tr": {
+      "defaultValue": {
+        "value": "Para birimi"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_setup_currency_field_label_en": {
+      "defaultValue": {
+        "value": "Currency"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_setup_currency_helper_note_tr": {
+      "defaultValue": {
+        "value": "Salonun tüm paket/ödeme/gider tutarları bu para biriminde tutulur — sonradan değiştirilemez."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_setup_currency_helper_note_en": {
+      "defaultValue": {
+        "value": "All package/payment/expense amounts for this gym are kept in this currency — it cannot be changed later."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_info_currency_field_label_tr": {
+      "defaultValue": {
+        "value": "Para birimi"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_info_currency_field_label_en": {
+      "defaultValue": {
+        "value": "Currency"
+      },
+      "valueType": "STRING"
+    },
     "lbl_gyms_gym_setup_logo_optional_label_tr": {
       "defaultValue": {
         "value": "Salon logosu (opsiyonel)"

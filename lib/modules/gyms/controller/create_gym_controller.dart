@@ -7,6 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:palette_generator/palette_generator.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../core/constants/currency_constants.dart';
 import '../../../core/theme/theme_controller.dart';
 import '../../../shared/utils/gym_logo_image.dart';
 import '../domain/gym_profile.dart';
@@ -19,6 +20,7 @@ part 'create_gym_controller.g.dart';
 class CreateGymState {
   const CreateGymState({
     this.logoFile,
+    this.currency = defaultCurrencyCode,
     this.isSubmitting = false,
     this.errorMessage,
     this.nameError,
@@ -32,6 +34,10 @@ class CreateGymState {
   });
 
   final XFile? logoFile;
+
+  /// F9-2 — sadece salon kuruluşunda seçilir, sonradan değiştirilemez
+  /// (dönüşüm/kur mantığı yok, bilinçli kısıtlama — bkz. FAZ 9 notu).
+  final String currency;
   final bool isSubmitting;
 
   /// Alana bağlanamayan hatalar (network, sunucu) için — field-seviyeli
@@ -56,6 +62,7 @@ class CreateGymState {
 
   CreateGymState copyWith({
     XFile? logoFile,
+    String? currency,
     bool? isSubmitting,
     String? errorMessage,
     bool clearError = false,
@@ -72,6 +79,7 @@ class CreateGymState {
   }) {
     return CreateGymState(
       logoFile: logoFile ?? this.logoFile,
+      currency: currency ?? this.currency,
       isSubmitting: isSubmitting ?? this.isSubmitting,
       errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
       nameError: clearFieldErrors ? null : (nameError ?? this.nameError),
@@ -108,6 +116,10 @@ class CreateGymController extends _$CreateGymController {
     state = const CreateGymState();
     ref.read(themeControllerProvider.notifier).resetToDefault();
   }
+
+  /// F9-2 — sadece bu ekranda (salon kuruluşu) çağrılır; [GymInfoPanel]'de
+  /// bu alana dokunacak hiçbir UI yok, bilerek.
+  void selectCurrency(String code) => state = state.copyWith(currency: code);
 
   Future<void> pickLogo() async {
     try {
@@ -187,6 +199,7 @@ class CreateGymController extends _$CreateGymController {
             themeColor: themeColor,
             email: email.trim(),
             logoFile: state.logoFile,
+            currency: state.currency,
           );
       state = state.copyWith(isSubmitting: false);
       return gymId;
