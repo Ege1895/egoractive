@@ -69,6 +69,12 @@ dependencies:
   pdf: ^3.11.3
   printing: ^5.13.4
   app_links: ^6.3.3
+  # F8-1 — global telefon numarası desteği: saf Dart (native platform
+  # bağımlılığı yok), libphonenumber metadata portu üzerinden gerçek
+  # bölgesel doğrulama + hazır ülke seçici widget. 10.0.18'e sabitlendi —
+  # 11.x Flutter >=3.47.0 istiyor, bu projedeki Flutter 3.44.5 ile
+  # uyumsuz.
+  phone_form_field: ^10.0.18
 dev_dependencies:
   flutter_test:
     sdk: flutter
