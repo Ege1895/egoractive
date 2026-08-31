@@ -540,9 +540,13 @@ class _GymSetupPanelState extends BasePanelState<GymSetupPanel> {
                                     .read(panelStackControllerProvider.notifier)
                                     .push(
                                       PhoneLoginPanel(
-                                        prefillPhoneDigits: ref
-                                            .read(gymProfileControllerProvider)
-                                            .phone,
+                                        // F8-4'te bu ekran AppPhoneField'a
+                                        // geçene kadar `phone` hâlâ ham TR
+                                        // hanesi — TR varsayımı bilerek
+                                        // burada (PhoneLoginPanel artık
+                                        // temiz).
+                                        prefillPhoneE164:
+                                            '+90${ref.read(gymProfileControllerProvider).phone}',
                                         successBanner: ref.read(
                                           rcTextProvider(
                                             RemoteConfigKeys

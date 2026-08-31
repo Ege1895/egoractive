@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:phone_form_field/phone_form_field.dart';
+
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
 import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../../../shared/utils/phone_number_formatter.dart';
 import '../../../../shared/widgets/app_button.dart';
+import '../../../../shared/widgets/app_phone_field.dart';
 import '../../controller/auth_controller.dart';
-import '../../domain/auth_login_exception.dart';
 import '../../domain/otp_purpose.dart';
 import 'email_login_panel.dart';
 import 'email_setup_panel.dart';
@@ -17,10 +18,12 @@ import 'otp_verification_panel.dart';
 
 /// Ortak 2 · Telefon Numarası Girişi.
 ///
-/// [prefillPhoneDigits] ve [successBanner], F2-9'daki "yeni salon oluştur"
+/// [prefillPhoneE164] ve [successBanner], F2-9'daki "yeni salon oluştur"
 /// akışının son adımında kullanılır: salon kaydı tamamlanınca kullanıcı bu
 /// ekrana, az önce girdiği numara önceden dolu ve bir başarı mesajıyla
-/// yönlendirilir.
+/// yönlendirilir. F8-2 öncesi bu değer ham TR hanesiydi — artık tam E.164
+/// bekleniyor (bkz. `gym_setup_panel.dart`, F8-4 migrate edilene kadar
+/// orada hâlâ TR varsayımı var, ama bu ekrana E.164 olarak gönderiyor).
 ///
 /// Egoractive Authentication Sistemi §2/§8 — bu panelde (ve email eşleniği
 /// [EmailLoginPanel]'de) geri butonu HİÇBİR ZAMAN gösterilmez; sadece OTP
@@ -28,12 +31,12 @@ import 'otp_verification_panel.dart';
 class PhoneLoginPanel extends BasePanel {
   const PhoneLoginPanel({
     super.key,
-    this.prefillPhoneDigits,
+    this.prefillPhoneE164,
     this.successBanner,
     this.errorBanner,
   });
 
-  final String? prefillPhoneDigits;
+  final String? prefillPhoneE164;
   final String? successBanner;
 
   /// Salon Abonelik ve Erişim Akışı — zaten oturum açmış bir antrenör/üyenin
@@ -47,17 +50,23 @@ class PhoneLoginPanel extends BasePanel {
 }
 
 class _PhoneLoginPanelState extends BasePanelState<PhoneLoginPanel> {
-  late final TextEditingController _phoneController;
+  late final PhoneController _phoneController;
 
   @override
   void initState() {
     super.initState();
-    _phoneController = TextEditingController();
-    final prefill = widget.prefillPhoneDigits;
+    final prefill = widget.prefillPhoneE164;
+    final initialNumber = PhoneNumber.parse(prefill ?? '+90');
+    _phoneController = PhoneController(initialValue: initialNumber);
     if (prefill != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
-          ref.read(authControllerProvider.notifier).setPhoneDigits(prefill);
+          ref
+              .read(authControllerProvider.notifier)
+              .setPhone(
+                initialNumber.international,
+                isValid: initialNumber.isValid(),
+              );
         }
       });
     }
@@ -69,14 +78,6 @@ class _PhoneLoginPanelState extends BasePanelState<PhoneLoginPanel> {
     final typography = context.appTypography;
     final authState = ref.watch(authControllerProvider);
     final authController = ref.read(authControllerProvider.notifier);
-
-    final formatted = formatTrPhoneDigits(authState.phoneDigits);
-    if (_phoneController.text != formatted) {
-      _phoneController.value = TextEditingValue(
-        text: formatted,
-        selection: TextSelection.collapsed(offset: formatted.length),
-      );
-    }
 
     return Scaffold(
       body: SafeArea(
@@ -158,64 +159,10 @@ class _PhoneLoginPanelState extends BasePanelState<PhoneLoginPanel> {
                 ),
               ),
               const SizedBox(height: AppSpacing.sm),
-              Container(
-                constraints: const BoxConstraints(minHeight: 60),
-                alignment: Alignment.centerLeft,
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-                decoration: BoxDecoration(
-                  color: colors.surface,
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
-                  border: Border.all(
-                    color:
-                        authState.loginErrorReason ==
-                            AuthLoginErrorReason.notFound
-                        ? colors.error
-                        : authState.isPhoneComplete
-                        ? colors.primary.withValues(alpha: 0.5)
-                        : colors.outlineStrong,
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    Text(
-                      '+90',
-                      style: typography.headingSmall.copyWith(
-                        color: colors.onSurfaceMuted,
-                        fontSize: 18,
-                      ),
-                    ),
-                    const SizedBox(width: AppSpacing.md),
-                    Container(
-                      width: 1,
-                      height: 26,
-                      color: colors.outlineStrong,
-                    ),
-                    const SizedBox(width: AppSpacing.md),
-                    Expanded(
-                      child: TextField(
-                        controller: _phoneController,
-                        keyboardType: TextInputType.number,
-                        textInputAction: TextInputAction.done,
-                        inputFormatters: [TrPhoneNumberInputFormatter()],
-                        onChanged: authController.setPhoneDigits,
-                        style: typography.dataMedium.copyWith(
-                          fontSize: 20,
-                          color: colors.onSurface,
-                        ),
-                        decoration: InputDecoration(
-                          isDense: true,
-                          border: InputBorder.none,
-                          contentPadding: EdgeInsets.zero,
-                          hintText: '5XX XXX XX XX',
-                          hintStyle: typography.dataMedium.copyWith(
-                            fontSize: 20,
-                            color: colors.onSurfaceMuted,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+              AppPhoneField(
+                controller: _phoneController,
+                onChanged: (e164, isValid) =>
+                    authController.setPhone(e164, isValid: isValid),
               ),
               const SizedBox(height: AppSpacing.sm),
               Text(

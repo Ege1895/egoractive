@@ -15,13 +15,13 @@ class AuthController extends _$AuthController {
   @override
   AuthState build() => const AuthState();
 
-  /// Native numeric klavyeden gelen ham metni 10 haneye kırpıp state'e yazar.
+  /// F8-2 — [AppPhoneField]'dan E.164 + bölgesel doğrulama sonucu gelir.
   /// Numara düzenlenince önceki giriş hatası temizlenir — kullanıcı numarayı
   /// düzeltmeye başladığında eski "bulunamadı" mesajı ekranda asılı kalmasın.
-  void setPhoneDigits(String rawInput) {
-    final digits = rawInput.replaceAll(RegExp(r'[^0-9]'), '');
+  void setPhone(String e164, {required bool isValid}) {
     state = state.copyWith(
-      phoneDigits: digits.length > 10 ? digits.substring(0, 10) : digits,
+      phoneE164: e164,
+      isPhoneValid: isValid,
       loginErrorMessage: null,
       loginErrorReason: null,
     );
@@ -52,7 +52,7 @@ class AuthController extends _$AuthController {
       loginErrorReason: null,
     );
     final value = identifierType == 'phone'
-        ? '+90${state.phoneDigits}'
+        ? state.phoneE164
         : state.emailInput.trim();
     try {
       final result = await ref
