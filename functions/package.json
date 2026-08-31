@@ -10,7 +10,8 @@
     "start": "npm run shell",
     "deploy": "firebase deploy --only functions",
     "logs": "firebase functions:log",
-    "migrate:phone-e164": "npm run build && node lib/scripts/migrate-phone-e164.js"
+    "migrate:phone-e164": "npm run build && node lib/scripts/migrate-phone-e164.js",
+    "migrate:gym-currency": "npm run build && node lib/scripts/migrate-gym-currency.js"
   },
   "engines": {
     "node": "20"
