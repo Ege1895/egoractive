@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/app_spacing.dart';
+import '../../../../core/constants/currency_constants.dart';
+import '../../../../core/money/active_gym_currency_provider.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
 import '../../../../core/remote_config/remote_config_service.dart';
@@ -169,7 +171,12 @@ class _AdminDashboardPanelState extends BasePanelState<AdminDashboardPanel> {
                           ],
                         ),
                         const SizedBox(height: AppSpacing.lg),
-                        ReportFinanceSummaryCard(report: report),
+                        ReportFinanceSummaryCard(
+                          report: report,
+                          currency:
+                              ref.watch(activeGymCurrencyProvider).valueOrNull ??
+                              defaultCurrencyCode,
+                        ),
                         const SizedBox(height: AppSpacing.lg),
                         Text(
                           ref.watch(

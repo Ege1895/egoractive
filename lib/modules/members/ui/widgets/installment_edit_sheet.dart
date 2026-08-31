@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/app_spacing.dart';
+import '../../../../core/locale/locale_controller.dart';
+import '../../../../core/money/app_money_formatter.dart';
 import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/domain/membership_installment.dart';
-import '../../../../shared/utils/thousands_input_formatter.dart';
 import '../../../../shared/utils/tr_date_formatter.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_text_field.dart';
@@ -65,7 +66,10 @@ class _InstallmentEditSheetState extends ConsumerState<_InstallmentEditSheet> {
   void initState() {
     super.initState();
     _amountController = TextEditingController(
-      text: formatThousands(widget.installment.amountTl),
+      text: formatAmountGrouped(
+        widget.installment.amountTl,
+        ref.read(localeControllerProvider),
+      ),
     );
     _dueDate = widget.installment.dueDate;
     _paid = widget.installment.paid;
@@ -109,7 +113,11 @@ class _InstallmentEditSheetState extends ConsumerState<_InstallmentEditSheet> {
             ),
             controller: _amountController,
             keyboardType: TextInputType.number,
-            inputFormatters: [ThousandsInputFormatter()],
+            inputFormatters: [
+              AppMoneyInputFormatter(
+                locale: ref.watch(localeControllerProvider),
+              ),
+            ],
           ),
           const SizedBox(height: AppSpacing.md),
           InkWell(
@@ -216,12 +224,13 @@ class _InstallmentEditSheetState extends ConsumerState<_InstallmentEditSheet> {
           AppButton(
             label: ref.watch(rcTextProvider(RemoteConfigKeys.commonKaydet)),
             onPressed: () {
-              final digits = _amountController.text.replaceAll('.', '');
-              widget.onSave(
-                amountTl: int.tryParse(digits) ?? widget.installment.amountTl,
-                dueDate: _dueDate,
-                paid: _paid,
-              );
+              final amount = _amountController.text.isEmpty
+                  ? widget.installment.amountTl
+                  : parseMoneyInput(
+                      _amountController.text,
+                      ref.read(localeControllerProvider),
+                    );
+              widget.onSave(amountTl: amount, dueDate: _dueDate, paid: _paid);
               Navigator.of(context).pop();
             },
           ),

@@ -38,6 +38,11 @@ class _ReportSnapshotDetailPanelState
     final colors = context.appColors;
     final typography = context.appTypography;
     final report = widget.snapshot.report;
+    // F9-3/F9-4 — para birimi kilitli olduğundan (salon kurulduktan sonra
+    // değişmiyor) salonun GÜNCEL para birimiyle snapshot'ın yazıldığı
+    // andaki para birimi matematiksel olarak her zaman aynı; ayrı bir
+    // "snapshot zamanındaki currency" alanı tutmaya gerek yok.
+    final currency = ref.watch(gymProfileControllerProvider).currency;
 
     return Scaffold(
       body: SafeArea(
@@ -127,7 +132,7 @@ class _ReportSnapshotDetailPanelState
                     ],
                   ),
                   const SizedBox(height: AppSpacing.lg),
-                  ReportFinanceSummaryCard(report: report),
+                  ReportFinanceSummaryCard(report: report, currency: currency),
                   const SizedBox(height: AppSpacing.lg),
                   Text(
                     ref.watch(

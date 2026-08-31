@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/app_spacing.dart';
+import '../../../../core/constants/currency_constants.dart';
+import '../../../../core/locale/locale_controller.dart';
+import '../../../../core/money/active_gym_currency_provider.dart';
+import '../../../../core/money/app_money_formatter.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
 import '../../../../core/remote_config/remote_config_service.dart';
@@ -212,7 +216,12 @@ class _PackageCard extends ConsumerWidget {
                 ),
               ),
               Text(
-                '₺${package.priceTl}',
+                formatMoney(
+                  package.priceTl,
+                  ref.watch(activeGymCurrencyProvider).valueOrNull ??
+                      defaultCurrencyCode,
+                  ref.watch(localeControllerProvider),
+                ),
                 style: typography.dataMedium.copyWith(
                   color: colors.onSurface,
                   fontSize: 20,

@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/app_spacing.dart';
+import '../../../../core/constants/currency_constants.dart';
+import '../../../../core/locale/locale_controller.dart';
+import '../../../../core/money/active_gym_currency_provider.dart';
+import '../../../../core/money/app_money_formatter.dart';
 import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../../../shared/utils/thousands_input_formatter.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../expenses/domain/expense_state.dart';
 import '../../controller/admin_calendar_controller.dart';
@@ -37,6 +40,10 @@ class AdminCalendarPanel extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.appColors;
     final typography = context.appTypography;
+    final expenseCurrency =
+        ref.watch(activeGymCurrencyProvider).valueOrNull ??
+        defaultCurrencyCode;
+    final expenseLocale = ref.watch(localeControllerProvider);
     final state = ref.watch(adminCalendarControllerProvider);
     final controller = ref.read(adminCalendarControllerProvider.notifier);
     final month = DateTime(state.selectedDate.year, state.selectedDate.month);
@@ -385,6 +392,11 @@ class AdminCalendarPanel extends ConsumerWidget {
                                     )
                                       _ExpenseAgendaRow(
                                         entry: selectedExpenses[i],
+                                        amountText: formatMoney(
+                                          selectedExpenses[i].amountTl,
+                                          expenseCurrency,
+                                          expenseLocale,
+                                        ),
                                         showDivider:
                                             i < selectedExpenses.length - 1,
                                       ),
@@ -925,9 +937,14 @@ class _AgendaRow extends ConsumerWidget {
 }
 
 class _ExpenseAgendaRow extends StatelessWidget {
-  const _ExpenseAgendaRow({required this.entry, required this.showDivider});
+  const _ExpenseAgendaRow({
+    required this.entry,
+    required this.amountText,
+    required this.showDivider,
+  });
 
   final ExpenseEntry entry;
+  final String amountText;
   final bool showDivider;
 
   @override
@@ -955,7 +972,7 @@ class _ExpenseAgendaRow extends StatelessWidget {
             ),
           ),
           Text(
-            '₺${formatThousands(entry.amountTl)}',
+            amountText,
             style: typography.headingSmall.copyWith(
               color: colors.error,
               fontSize: 13,

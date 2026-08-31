@@ -3,6 +3,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/app_spacing.dart';
+import '../../../../core/constants/currency_constants.dart';
+import '../../../../core/locale/locale_controller.dart';
+import '../../../../core/money/active_gym_currency_provider.dart';
+import '../../../../core/money/app_money_formatter.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
 import '../../../../core/remote_config/remote_config_service.dart';
@@ -62,6 +66,10 @@ class _NewMembershipPackagePanelState
   Widget build(BuildContext context) {
     final colors = context.appColors;
     final typography = context.appTypography;
+    final currency =
+        ref.watch(activeGymCurrencyProvider).valueOrNull ??
+        defaultCurrencyCode;
+    final locale = ref.watch(localeControllerProvider);
     final memberForm = ref.watch(newMemberControllerProvider);
     final packages = ref
         .watch(studioPackagesControllerProvider)
@@ -267,6 +275,11 @@ class _NewMembershipPackagePanelState
                   for (final package in packages)
                     _PackagePick(
                       package: package,
+                      priceText: formatMoney(
+                        package.priceTl,
+                        currency,
+                        locale,
+                      ),
                       selected: membership.selectedPackage?.id == package.id,
                       onTap: () => membershipController.selectPackage(package),
                     ),
@@ -460,11 +473,13 @@ String _initialsOf(String name) {
 class _PackagePick extends StatelessWidget {
   const _PackagePick({
     required this.package,
+    required this.priceText,
     required this.selected,
     required this.onTap,
   });
 
   final StudioPackage package;
+  final String priceText;
   final bool selected;
   final VoidCallback onTap;
 
@@ -558,7 +573,7 @@ class _PackagePick extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  '₺${package.priceTl}',
+                  priceText,
                   style: typography.headingSmall.copyWith(
                     color: colors.onSurfaceVariant,
                     fontSize: 15,

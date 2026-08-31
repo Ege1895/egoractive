@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/app_spacing.dart';
+import '../../../../core/constants/currency_constants.dart';
+import '../../../../core/locale/locale_controller.dart';
+import '../../../../core/money/active_gym_currency_provider.dart';
+import '../../../../core/money/app_money_formatter.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
 import '../../../../core/remote_config/remote_config_service.dart';
@@ -54,7 +58,12 @@ class _EditStudioPackagePanelState
     _validityController = TextEditingController(
       text: existing == null ? '' : '${existing.validityDays}',
     );
-    _priceController = TextEditingController(text: '${existing?.priceTl ?? 0}');
+    _priceController = TextEditingController(
+      text: formatAmountGrouped(
+        existing?.priceTl ?? 0,
+        ref.read(localeControllerProvider),
+      ),
+    );
     _sessionType = existing?.sessionType ?? PackageSessionType.solo;
     _activeForSale = existing?.activeForSale ?? true;
   }
@@ -64,8 +73,12 @@ class _EditStudioPackagePanelState
     final colors = context.appColors;
     final typography = context.appTypography;
     final controller = ref.read(studioPackagesControllerProvider.notifier);
+    final currency =
+        ref.watch(activeGymCurrencyProvider).valueOrNull ??
+        defaultCurrencyCode;
+    final locale = ref.watch(localeControllerProvider);
     final sessionCount = int.tryParse(_sessionCountController.text) ?? 0;
-    final price = int.tryParse(_priceController.text) ?? 0;
+    final price = parseMoneyInput(_priceController.text, locale);
     final perSession = sessionCount == 0 ? 0 : (price / sessionCount).round();
 
     return Scaffold(
@@ -248,6 +261,9 @@ class _EditStudioPackagePanelState
                           ),
                           controller: _priceController,
                           keyboardType: TextInputType.number,
+                          inputFormatters: [
+                            AppMoneyInputFormatter(locale: locale),
+                          ],
                           onChanged: (_) => setState(() {}),
                         ),
                         const SizedBox(height: AppSpacing.xs),
@@ -259,7 +275,10 @@ class _EditStudioPackagePanelState
                                       .packagesPerSessionPriceCaption,
                                 ),
                               )
-                              .replaceAll('{price}', '$perSession'),
+                              .replaceAll(
+                                '{price}',
+                                formatMoney(perSession, currency, locale),
+                              ),
                           style: typography.caption.copyWith(
                             color: colors.onSurfaceMuted,
                           ),

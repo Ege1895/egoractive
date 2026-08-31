@@ -2,12 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/app_spacing.dart';
+import '../../../../core/constants/currency_constants.dart';
+import '../../../../core/locale/locale_controller.dart';
+import '../../../../core/money/active_gym_currency_provider.dart';
+import '../../../../core/money/app_money_formatter.dart';
 import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_color_scheme.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../shared/domain/membership_installment.dart';
-import '../../../../shared/utils/thousands_input_formatter.dart';
 import '../../../../shared/utils/tr_date_formatter.dart';
 
 /// Tek bir taksit satırı (admin görünümü, tutar dahil) — admin taksit
@@ -44,6 +47,10 @@ class InstallmentRow extends ConsumerWidget {
     AppColorScheme colors,
     AppTypography typography,
   ) {
+    final currency =
+        ref.watch(activeGymCurrencyProvider).valueOrNull ??
+        defaultCurrencyCode;
+    final locale = ref.watch(localeControllerProvider);
     return Container(
       constraints: const BoxConstraints(minHeight: 56),
       decoration: BoxDecoration(
@@ -72,7 +79,7 @@ class InstallmentRow extends ConsumerWidget {
                   ),
                 ),
                 Text(
-                  '₺${formatThousands(installment.amountTl)} · ${formatTrDate(installment.dueDate)}',
+                  '${formatMoney(installment.amountTl, currency, locale)} · ${formatTrDate(installment.dueDate)}',
                   style: typography.caption.copyWith(
                     color: colors.onSurfaceMuted,
                   ),

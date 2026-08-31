@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/app_spacing.dart';
+import '../../../../core/constants/currency_constants.dart';
+import '../../../../core/locale/locale_controller.dart';
+import '../../../../core/money/active_gym_currency_provider.dart';
+import '../../../../core/money/app_money_formatter.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
 import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../../../shared/utils/thousands_input_formatter.dart';
 import '../../controller/expenses_controller.dart';
 import '../../domain/expense_state.dart';
 import 'add_expense_panel.dart';
@@ -19,6 +22,10 @@ class AdminExpensesPanel extends ConsumerWidget {
     final colors = context.appColors;
     final typography = context.appTypography;
     final state = ref.watch(expensesControllerProvider);
+    final currency =
+        ref.watch(activeGymCurrencyProvider).valueOrNull ??
+        defaultCurrencyCode;
+    final locale = ref.watch(localeControllerProvider);
     final maxCategory = state.categoryTotals.isEmpty
         ? 1
         : state.categoryTotals.first.amountTl;
@@ -120,7 +127,7 @@ class AdminExpensesPanel extends ConsumerWidget {
                         ),
                         const SizedBox(height: AppSpacing.xs),
                         Text(
-                          '₺${formatThousands(state.totalTl)}',
+                          formatMoney(state.totalTl, currency, locale),
                           style: typography.dataLarge.copyWith(
                             color: colors.onSurface,
                             fontSize: 34,
@@ -173,7 +180,11 @@ class AdminExpensesPanel extends ConsumerWidget {
                           i++
                         ) ...[
                           _CategoryRow(
-                            total: state.categoryTotals[i],
+                            amountText: formatMoney(
+                              state.categoryTotals[i].amountTl,
+                              currency,
+                              locale,
+                            ),
                             label: labelFor(state.categoryTotals[i].category),
                             ratio:
                                 state.categoryTotals[i].amountTl / maxCategory,
@@ -213,6 +224,11 @@ class AdminExpensesPanel extends ConsumerWidget {
                         for (var i = 0; i < state.entries.length; i++)
                           _ExpenseRow(
                             entry: state.entries[i],
+                            amountText: formatMoney(
+                              state.entries[i].amountTl,
+                              currency,
+                              locale,
+                            ),
                             categoryLabel: labelFor(state.entries[i].category),
                             showDivider: i < state.entries.length - 1,
                           ),
@@ -231,12 +247,12 @@ class AdminExpensesPanel extends ConsumerWidget {
 
 class _CategoryRow extends StatelessWidget {
   const _CategoryRow({
-    required this.total,
+    required this.amountText,
     required this.label,
     required this.ratio,
   });
 
-  final ExpenseCategoryTotal total;
+  final String amountText;
   final String label;
   final double ratio;
 
@@ -259,7 +275,7 @@ class _CategoryRow extends StatelessWidget {
               ),
             ),
             Text(
-              '₺${formatThousands(total.amountTl)}',
+              amountText,
               style: typography.headingSmall.copyWith(
                 color: colors.onSurfaceVariant,
                 fontSize: 15,
@@ -285,11 +301,13 @@ class _CategoryRow extends StatelessWidget {
 class _ExpenseRow extends StatelessWidget {
   const _ExpenseRow({
     required this.entry,
+    required this.amountText,
     required this.categoryLabel,
     required this.showDivider,
   });
 
   final ExpenseEntry entry;
+  final String amountText;
   final String categoryLabel;
   final bool showDivider;
 
@@ -327,7 +345,7 @@ class _ExpenseRow extends StatelessWidget {
             ),
           ),
           Text(
-            '₺${formatThousands(entry.amountTl)}',
+            amountText,
             style: typography.headingSmall.copyWith(
               color: colors.onSurfaceVariant,
               fontSize: 15,

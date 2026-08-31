@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/app_spacing.dart';
+import '../../../../core/locale/locale_controller.dart';
+import '../../../../core/money/app_money_formatter.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
 import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
@@ -24,6 +26,7 @@ class AdminHomePanel extends ConsumerWidget {
     final typography = context.appTypography;
     final state = ref.watch(adminHomeControllerProvider);
     final profile = ref.watch(gymProfileControllerProvider);
+    final locale = ref.watch(localeControllerProvider);
     final panelStack = ref.read(panelStackControllerProvider.notifier);
 
     return Scaffold(
@@ -188,7 +191,11 @@ class AdminHomePanel extends ConsumerWidget {
                         RemoteConfigKeys.gymsAdminHomeEstimatedRevenueLabel,
                       ),
                     ),
-                    value: '₺${state.estimatedRevenueTl}',
+                    value: formatMoney(
+                      state.estimatedRevenueTl,
+                      profile.currency,
+                      locale,
+                    ),
                     note: ref.watch(
                       rcTextProvider(
                         RemoteConfigKeys.gymsAdminHomeThisMonthNote,
@@ -205,7 +212,11 @@ class AdminHomePanel extends ConsumerWidget {
                         RemoteConfigKeys.gymsAdminHomeExpenseLabel,
                       ),
                     ),
-                    value: '₺${state.expensesTl}',
+                    value: formatMoney(
+                      state.expensesTl,
+                      profile.currency,
+                      locale,
+                    ),
                     note: ref.watch(
                       rcTextProvider(
                         RemoteConfigKeys.gymsAdminHomeThisMonthNote,
@@ -335,7 +346,11 @@ class AdminHomePanel extends ConsumerWidget {
                           ),
                         ),
                         Text(
-                          '₺${state.duePaymentTotalTl}',
+                          formatMoney(
+                            state.duePaymentTotalTl,
+                            profile.currency,
+                            locale,
+                          ),
                           style: typography.headingSmall.copyWith(
                             color: colors.primary,
                             fontSize: 16,

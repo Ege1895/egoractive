@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/app_spacing.dart';
+import '../../../../core/constants/currency_constants.dart';
+import '../../../../core/locale/locale_controller.dart';
+import '../../../../core/money/active_gym_currency_provider.dart';
+import '../../../../core/money/app_money_formatter.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
 import '../../../../core/remote_config/remote_config_service.dart';
@@ -63,6 +67,10 @@ class _AdminMemberDetailPanelState
   Widget build(BuildContext context) {
     final colors = context.appColors;
     final typography = context.appTypography;
+    final currency =
+        ref.watch(activeGymCurrencyProvider).valueOrNull ??
+        defaultCurrencyCode;
+    final locale = ref.watch(localeControllerProvider);
     final detail = ref.watch(
       adminMemberDetailControllerProvider(widget.memberId),
     );
@@ -396,7 +404,11 @@ class _AdminMemberDetailPanelState
                                             .membersDetailTotalLabel,
                                       ),
                                     ),
-                                    value: '₺${detail.paymentTotalTl}',
+                                    value: formatMoney(
+                                      detail.paymentTotalTl,
+                                      currency,
+                                      locale,
+                                    ),
                                     valueColor: colors.onSurface,
                                   ),
                                 ),
@@ -408,7 +420,11 @@ class _AdminMemberDetailPanelState
                                         RemoteConfigKeys.membersDetailPaidLabel,
                                       ),
                                     ),
-                                    value: '₺${detail.paymentPaidTl}',
+                                    value: formatMoney(
+                                      detail.paymentPaidTl,
+                                      currency,
+                                      locale,
+                                    ),
                                     valueColor: colors.success,
                                   ),
                                 ),
@@ -421,7 +437,11 @@ class _AdminMemberDetailPanelState
                                             .membersDetailRemainingAmountLabel,
                                       ),
                                     ),
-                                    value: '₺${detail.paymentDueTl}',
+                                    value: formatMoney(
+                                      detail.paymentDueTl,
+                                      currency,
+                                      locale,
+                                    ),
                                     valueColor: colors.onWarningContainer,
                                   ),
                                 ),
