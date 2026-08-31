@@ -9,12 +9,10 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_back_button.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/utils/phone_number_formatter.dart';
-import '../../../../shared/widgets/trend_bar_chart.dart';
 import '../../../badges/controller/badges_controller.dart';
 import '../../../badges/domain/badge_item.dart';
 import '../../../measurements/ui/panels/measurements_panel.dart';
 import '../../../trainers/domain/trainer_member_detail.dart';
-import '../../../trainers/domain/trainer_metric.dart';
 import '../../controller/admin_member_detail_controller.dart';
 import '../../controller/member_registration_controller.dart';
 import '../../controller/new_member_controller.dart';
@@ -39,56 +37,6 @@ class AdminMemberDetailPanel extends BasePanel {
 
 class _AdminMemberDetailPanelState
     extends BasePanelState<AdminMemberDetailPanel> {
-  void _showMetricPicker(
-    BuildContext context,
-    TrainerMetric selected,
-    ValueChanged<TrainerMetric> onSelect,
-  ) {
-    final colors = context.appColors;
-    showModalBottomSheet<void>(
-      context: context,
-      backgroundColor: colors.surface,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
-      ),
-      builder: (sheetContext) => SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(
-            AppSpacing.screenEdge,
-            AppSpacing.lg,
-            AppSpacing.screenEdge,
-            AppSpacing.lg,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Center(
-                child: Container(
-                  width: 44,
-                  height: 5,
-                  decoration: BoxDecoration(
-                    color: colors.outlineStrong,
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
-                  ),
-                ),
-              ),
-              const SizedBox(height: AppSpacing.lg),
-              for (final metric in TrainerMetric.values)
-                _MetricPickerRow(
-                  label: ref.watch(rcTextProvider(metric.rcKey)),
-                  selected: metric == selected,
-                  onTap: () {
-                    onSelect(metric);
-                    Navigator.of(sheetContext).pop();
-                  },
-                ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
   /// F5-17 — "Paketi Yenile": Yeni Üyelik sihirbazının 1. adımını (üye
   /// bilgileri, bu üye zaten var) atlayıp doğrudan 2. adıma (paket seçimi)
   /// geçer. Başlık kartında görünsün diye ad/soyad ve antrenör adı önceden
@@ -118,9 +66,6 @@ class _AdminMemberDetailPanelState
     final typography = context.appTypography;
     final detail = ref.watch(
       adminMemberDetailControllerProvider(widget.memberId),
-    );
-    final controller = ref.read(
-      adminMemberDetailControllerProvider(widget.memberId).notifier,
     );
     // F5-17 renewal fix — `newMemberControllerProvider`/
     // `memberRegistrationControllerProvider` autoDispose: normal Yeni Üyelik
@@ -165,8 +110,6 @@ class _AdminMemberDetailPanelState
         ),
       );
     }
-
-    final series = detail.seriesByMetric[detail.selectedMetric]!;
 
     return Scaffold(
       body: SafeArea(
@@ -579,81 +522,6 @@ class _AdminMemberDetailPanelState
                         ),
                   ),
                   const SizedBox(height: AppSpacing.lg),
-                  InkWell(
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
-                    onTap: () => _showMetricPicker(
-                      context,
-                      detail.selectedMetric,
-                      controller.selectMetric,
-                    ),
-                    child: Container(
-                      constraints: const BoxConstraints(minHeight: 44),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacing.md,
-                      ),
-                      decoration: BoxDecoration(
-                        color: colors.surface,
-                        borderRadius: BorderRadius.circular(
-                          AppSpacing.radiusInner,
-                        ),
-                        border: Border.all(color: colors.outline),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                ref.watch(
-                                  rcTextProvider(
-                                    RemoteConfigKeys
-                                        .commonOlcum6AySectionHeader,
-                                  ),
-                                ),
-                                style: typography.caption.copyWith(
-                                  color: colors.onSurfaceMuted,
-                                  fontSize: 11,
-                                ),
-                              ),
-                              Text(
-                                ref.watch(
-                                  rcTextProvider(detail.selectedMetric.rcKey),
-                                ),
-                                style: typography.headingSmall.copyWith(
-                                  color: colors.onSurface,
-                                  fontSize: 15,
-                                ),
-                              ),
-                            ],
-                          ),
-                          Icon(
-                            Icons.keyboard_arrow_down,
-                            color: colors.onPrimaryContainer,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.sm),
-                  Container(
-                    padding: const EdgeInsets.all(AppSpacing.lg),
-                    decoration: BoxDecoration(
-                      color: colors.surface,
-                      borderRadius: BorderRadius.circular(
-                        AppSpacing.radiusCard,
-                      ),
-                      border: Border.all(color: colors.outline),
-                    ),
-                    child: TrendBarChart(
-                      values: series.values,
-                      labels: series.months,
-                      height: 132,
-                      valueFormatter: (v) =>
-                          v.toStringAsFixed(1).replaceAll('.', ','),
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.lg),
                   Text(
                     ref.watch(
                       rcTextProvider(
@@ -984,44 +852,6 @@ class _PaymentTile extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _MetricPickerRow extends StatelessWidget {
-  const _MetricPickerRow({
-    required this.label,
-    required this.selected,
-    required this.onTap,
-  });
-
-  final String label;
-  final bool selected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = context.appColors;
-    final typography = context.appTypography;
-    return InkWell(
-      onTap: onTap,
-      child: Container(
-        constraints: const BoxConstraints(minHeight: 56),
-        child: Row(
-          children: [
-            Expanded(
-              child: Text(
-                label,
-                style: typography.bodyLarge.copyWith(
-                  color: colors.onSurface,
-                  fontSize: 15,
-                ),
-              ),
-            ),
-            if (selected) Icon(Icons.check, color: colors.primary, size: 20),
-          ],
-        ),
       ),
     );
   }
