@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../core/theme/theme_controller.dart';
 import '../../../shared/domain/membership_installment.dart';
 import '../../trainers/domain/trainer_member_detail.dart';
 import '../../trainers/domain/trainer_metric.dart';
@@ -37,13 +38,25 @@ Stream<AdminMemberDetail> _detailStreamForId(
 
 /// Üyenin en güncel `memberPackages` kaydı — ödeme durumu/telafi hakkı bu
 /// dokümandan gerçek veriyle okunur (bkz. NewMembershipController.save).
+///
+/// `gymId` eşitliği bilerek eklendi: `firestore.rules`'taki
+/// `memberPackages` okuma kuralı `resource.data.gymId == myGymId()`'e
+/// bakıyor, ama bir LIST sorgusunda Firestore bu kuralı sorgunun KENDİSİ
+/// üzerinden (dönen dokümanlar üzerinden değil) doğruluyor — sorguda
+/// `gymId` filtresi olmadan kural `resource.data.gymId undefined` hatasıyla
+/// TÜM sorguyu reddediyordu (admin SDK bu kuralları atladığı için bu bug
+/// production'da fark edilmeden duruyordu). Aynı BUG `_sessionHistoryForAdminMember`
+/// için de geçerliydi, orada da düzeltildi.
 @riverpod
 Stream<QueryDocumentSnapshot<Map<String, dynamic>>?> _latestPackageForMember(
   _LatestPackageForMemberRef ref,
   String memberId,
 ) {
+  final gymId = ref.watch(activeGymIdProvider).valueOrNull;
+  if (gymId == null) return Stream.value(null);
   return FirebaseFirestore.instance
       .collection('memberPackages')
+      .where('gymId', isEqualTo: gymId)
       .where('memberId', isEqualTo: memberId)
       .orderBy('purchasedAt', descending: true)
       .limit(1)
@@ -51,15 +64,19 @@ Stream<QueryDocumentSnapshot<Map<String, dynamic>>?> _latestPackageForMember(
       .map((snapshot) => snapshot.docs.isEmpty ? null : snapshot.docs.first);
 }
 
-/// Tek bir index gerektirmemek için sadece `memberId` eşitliğiyle
-/// sorgulanır, durum filtresi client-side yapılır.
+/// `gymId` filtresi `_latestPackageForMember`'daki aynı sebeple eklendi —
+/// `sessions` okuma kuralı da `resource.data.gymId == myGymId()` istiyor,
+/// LIST sorgusunda bu filtre olmadan kural sorgunun tamamını reddediyordu.
 @riverpod
 Stream<List<SessionHistoryEntry>> _sessionHistoryForAdminMember(
   _SessionHistoryForAdminMemberRef ref,
   String memberId,
 ) {
+  final gymId = ref.watch(activeGymIdProvider).valueOrNull;
+  if (gymId == null) return Stream.value(const []);
   return FirebaseFirestore.instance
       .collection('sessions')
+      .where('gymId', isEqualTo: gymId)
       .where('memberId', isEqualTo: memberId)
       .orderBy('startTime', descending: true)
       .limit(50)
