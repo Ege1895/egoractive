@@ -2,7 +2,7 @@ import { defineSecret } from "firebase-functions/params";
 import { HttpsError, onCall } from "firebase-functions/v2/https";
 import * as logger from "firebase-functions/logger";
 
-import { applySubscriptionUpdate } from "../shared/apply-subscription-update";
+import { applySubscriptionUpdate, SubscriptionTransactionClaimedError } from "../shared/apply-subscription-update";
 import { isKnownSubscriptionProductId } from "../shared/subscription-constants";
 import { verifyAppleTransaction, verifyGooglePurchase } from "../shared/subscription-verification";
 
@@ -83,14 +83,25 @@ export const verifySubscriptionPurchase = onCall(
       throw new HttpsError("failed-precondition", `Makbuz doğrulanamadı: ${message}`);
     }
 
-    const status = await applySubscriptionUpdate({
-      gymId,
-      verified,
-      productId,
-      platform,
-      source: "purchase",
-      rawVerificationData: verificationData,
-    });
+    let status;
+    try {
+      status = await applySubscriptionUpdate({
+        gymId,
+        verified,
+        productId,
+        platform,
+        source: "purchase",
+        rawVerificationData: verificationData,
+      });
+    } catch (error) {
+      if (error instanceof SubscriptionTransactionClaimedError) {
+        throw new HttpsError(
+          "already-exists",
+          "Bu Apple/Google hesabıyla zaten başka bir salon abone — her salonun kendi ayrı hesabıyla abone olması gerekiyor.",
+        );
+      }
+      throw error;
+    }
 
     return { status, expiresAtMs: verified.expiresAtMs };
   },

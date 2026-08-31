@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -172,9 +173,17 @@ class SubscriptionController extends _$SubscriptionController {
         if (gymId != null) {
           try {
             await repo.verifyPurchase(gymId: gymId, purchase: purchase);
-          } catch (_) {
+          } catch (e) {
+            // Aynı Apple/Google hesabıyla önceden BAŞKA bir salon abone
+            // olunmuşsa mağaza (kullanıcıdan tekrar ödeme almadan) o aktif
+            // aboneliğin makbuzunu geri veriyor — backend bunu ayrı bir
+            // hata koduyla reddediyor (bkz. apply-subscription-update.ts),
+            // "tekrar dene" burada işe yaramaz, kullanıcının anlaması için
+            // ayrı, net bir mesaj gerekiyor.
             verifyErrorMessage =
-                'Satın alma doğrulanamadı, tekrar dene ya da destek ile iletişime geç.';
+                e is FirebaseFunctionsException && e.code == 'already-exists'
+                ? 'Bu Apple/Google hesabıyla zaten başka bir salon abone — her salonun kendi ayrı hesabıyla abone olması gerekiyor.'
+                : 'Satın alma doğrulanamadı, tekrar dene ya da destek ile iletişime geç.';
           }
         }
         await repo.completePurchase(purchase);

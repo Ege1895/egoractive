@@ -6,12 +6,35 @@ import { VerifiedSubscription } from "./subscription-verification";
 export type SubscriptionUpdateSource = "purchase" | "reverify" | "webhook";
 
 /**
+ * Bir mağaza abonelik işlemi (Apple `originalTransactionId`/Google purchase
+ * token'ı) ZATEN BAŞKA bir salona bağlıyken `verifySubscriptionPurchase`
+ * bunu yeni bir salona bağlamaya çalışırsa fırlatılır. Gerçek olay: aynı
+ * Apple ID/Google hesabıyla önceden abone olunmuş bir salon varken, o hesap
+ * yeni bir salon oluşturup satın alma akışını tekrar başlatınca mağaza
+ * (kullanıcıdan tekrar ödeme almadan) AYNI aktif aboneliğin makbuzunu geri
+ * veriyor — bir Apple/Google hesabının TEK aboneliği sonsuz sayıda salonu
+ * "ücretsiz" aktive edebiliyordu (2026-09 tespit edilen gerçek olay, bkz.
+ * Texas Gym). `resolveGymIdForTransaction`'ın webhook'lar için kullandığı
+ * AYNI `subscriptionTransactions/{transactionKey}` index'i burada tersine,
+ * satın alma anında "bu işlem zaten başka bir salonun mu?" diye sormak için
+ * kullanılıyor.
+ */
+export class SubscriptionTransactionClaimedError extends Error {
+  constructor(public readonly claimedByGymId: string) {
+    super(`Bu abonelik işlemi zaten ${claimedByGymId} salonuna bağlı.`);
+  }
+}
+
+/**
  * Salon Abonelik ve Erişim Akışı — bir mağaza doğrulamasının (yeni satın
  * alma, günlük yenileme kontrolü, ya da webhook) SONUCUNU `gyms/{gymId}`'ye
  * ve `subscriptionHistory`'ye yazan TEK ortak yer. `verifySubscriptionPurchase`,
  * `subscriptionRenewalCheck` ve store webhook handler'ları (Apple/Google)
  * hepsi bunu çağırır — durum yazma/trialUsed/history mantığı üç yerde ayrı
- * ayrı tekrarlanmasın diye.
+ * ayrı tekrarlanmasın diye. Son üçü `resolveGymIdForTransaction` ile ZATEN
+ * doğru `gymId`'yi bulup geçtiği için aşağıdaki çakışma kontrolüne hiç
+ * takılmazlar — kontrol pratikte sadece `verifySubscriptionPurchase`'ı (yeni
+ * bir salonun ilk kez bir işlemi kendine bağlamaya çalıştığı an) etkiler.
  *
  * `trialUsed` SADECE true'ya çevrilir, asla false'a döndürülmez — bir salon
  * bir kez trial kullandıktan sonra (admin hesabı silinse/değişse, abonelik
@@ -27,6 +50,14 @@ export async function applySubscriptionUpdate(params: {
   rawVerificationData: string;
 }): Promise<"active" | "trial" | "expired"> {
   const { gymId, verified, productId, platform, source, rawVerificationData } = params;
+
+  const db = getFirestore();
+  const existingTransaction = await db.doc(subscriptionTransactionDoc(verified.transactionKey)).get();
+  const claimedByGymId = existingTransaction.data()?.gymId;
+  if (typeof claimedByGymId === "string" && claimedByGymId !== gymId) {
+    throw new SubscriptionTransactionClaimedError(claimedByGymId);
+  }
+
   const status = !verified.isActive ? "expired" : verified.isTrialPeriod ? "trial" : "active";
 
   const gymUpdate: Record<string, unknown> = {
@@ -43,7 +74,6 @@ export async function applySubscriptionUpdate(params: {
     gymUpdate.trialUsed = true;
   }
 
-  const db = getFirestore();
   const batch = db.batch();
   batch.set(db.doc(gymDoc(gymId)), gymUpdate, { merge: true });
   batch.set(db.collection(subscriptionHistoryCollection(gymId)).doc(), {
