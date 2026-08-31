@@ -90,8 +90,11 @@ MeasurementsState _toState(List<_Entry> entries, {DateTime? selectedDate}) {
     final withMetric = entries.where((e) => e.$2.containsKey(metric)).toList();
     if (withMetric.isEmpty) continue;
 
+    // Aynı ay içinde birden fazla ölçüm olabildiği için (bkz. Melis
+    // örneği: 20 Ağustos + 25 Ağustos) sadece ay kısaltması çubukları
+    // ayırt edilemez hale getiriyordu — gün de eklendi.
     final months = withMetric
-        .map((e) => _monthAbbrev[e.$1.month] ?? '')
+        .map((e) => '${e.$1.day} ${_monthAbbrev[e.$1.month] ?? ''}')
         .toList();
     final values = withMetric.map((e) => e.$2[metric]!).toList();
     final totalDelta = values.last - values.first;

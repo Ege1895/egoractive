@@ -149,10 +149,19 @@ class _DetailStreamForIdProviderElement
 }
 
 String _$latestPackageForMemberHash() =>
-    r'6b642fe8bce37fe4d4256581d16f541189c3babd';
+    r'1706a8c759fd4f6af8a013e5a851da8ab8ebcf18';
 
 /// Üyenin en güncel `memberPackages` kaydı — ödeme durumu/telafi hakkı bu
 /// dokümandan gerçek veriyle okunur (bkz. NewMembershipController.save).
+///
+/// `gymId` eşitliği bilerek eklendi: `firestore.rules`'taki
+/// `memberPackages` okuma kuralı `resource.data.gymId == myGymId()`'e
+/// bakıyor, ama bir LIST sorgusunda Firestore bu kuralı sorgunun KENDİSİ
+/// üzerinden (dönen dokümanlar üzerinden değil) doğruluyor — sorguda
+/// `gymId` filtresi olmadan kural `resource.data.gymId undefined` hatasıyla
+/// TÜM sorguyu reddediyordu (admin SDK bu kuralları atladığı için bu bug
+/// production'da fark edilmeden duruyordu). Aynı BUG `_sessionHistoryForAdminMember`
+/// için de geçerliydi, orada da düzeltildi.
 ///
 /// Copied from [_latestPackageForMember].
 @ProviderFor(_latestPackageForMember)
@@ -161,17 +170,44 @@ const _latestPackageForMemberProvider = _LatestPackageForMemberFamily();
 /// Üyenin en güncel `memberPackages` kaydı — ödeme durumu/telafi hakkı bu
 /// dokümandan gerçek veriyle okunur (bkz. NewMembershipController.save).
 ///
+/// `gymId` eşitliği bilerek eklendi: `firestore.rules`'taki
+/// `memberPackages` okuma kuralı `resource.data.gymId == myGymId()`'e
+/// bakıyor, ama bir LIST sorgusunda Firestore bu kuralı sorgunun KENDİSİ
+/// üzerinden (dönen dokümanlar üzerinden değil) doğruluyor — sorguda
+/// `gymId` filtresi olmadan kural `resource.data.gymId undefined` hatasıyla
+/// TÜM sorguyu reddediyordu (admin SDK bu kuralları atladığı için bu bug
+/// production'da fark edilmeden duruyordu). Aynı BUG `_sessionHistoryForAdminMember`
+/// için de geçerliydi, orada da düzeltildi.
+///
 /// Copied from [_latestPackageForMember].
 class _LatestPackageForMemberFamily
     extends Family<AsyncValue<QueryDocumentSnapshot<Map<String, dynamic>>?>> {
   /// Üyenin en güncel `memberPackages` kaydı — ödeme durumu/telafi hakkı bu
   /// dokümandan gerçek veriyle okunur (bkz. NewMembershipController.save).
   ///
+  /// `gymId` eşitliği bilerek eklendi: `firestore.rules`'taki
+  /// `memberPackages` okuma kuralı `resource.data.gymId == myGymId()`'e
+  /// bakıyor, ama bir LIST sorgusunda Firestore bu kuralı sorgunun KENDİSİ
+  /// üzerinden (dönen dokümanlar üzerinden değil) doğruluyor — sorguda
+  /// `gymId` filtresi olmadan kural `resource.data.gymId undefined` hatasıyla
+  /// TÜM sorguyu reddediyordu (admin SDK bu kuralları atladığı için bu bug
+  /// production'da fark edilmeden duruyordu). Aynı BUG `_sessionHistoryForAdminMember`
+  /// için de geçerliydi, orada da düzeltildi.
+  ///
   /// Copied from [_latestPackageForMember].
   const _LatestPackageForMemberFamily();
 
   /// Üyenin en güncel `memberPackages` kaydı — ödeme durumu/telafi hakkı bu
   /// dokümandan gerçek veriyle okunur (bkz. NewMembershipController.save).
+  ///
+  /// `gymId` eşitliği bilerek eklendi: `firestore.rules`'taki
+  /// `memberPackages` okuma kuralı `resource.data.gymId == myGymId()`'e
+  /// bakıyor, ama bir LIST sorgusunda Firestore bu kuralı sorgunun KENDİSİ
+  /// üzerinden (dönen dokümanlar üzerinden değil) doğruluyor — sorguda
+  /// `gymId` filtresi olmadan kural `resource.data.gymId undefined` hatasıyla
+  /// TÜM sorguyu reddediyordu (admin SDK bu kuralları atladığı için bu bug
+  /// production'da fark edilmeden duruyordu). Aynı BUG `_sessionHistoryForAdminMember`
+  /// için de geçerliydi, orada da düzeltildi.
   ///
   /// Copied from [_latestPackageForMember].
   _LatestPackageForMemberProvider call(String memberId) {
@@ -203,6 +239,15 @@ class _LatestPackageForMemberFamily
 /// Üyenin en güncel `memberPackages` kaydı — ödeme durumu/telafi hakkı bu
 /// dokümandan gerçek veriyle okunur (bkz. NewMembershipController.save).
 ///
+/// `gymId` eşitliği bilerek eklendi: `firestore.rules`'taki
+/// `memberPackages` okuma kuralı `resource.data.gymId == myGymId()`'e
+/// bakıyor, ama bir LIST sorgusunda Firestore bu kuralı sorgunun KENDİSİ
+/// üzerinden (dönen dokümanlar üzerinden değil) doğruluyor — sorguda
+/// `gymId` filtresi olmadan kural `resource.data.gymId undefined` hatasıyla
+/// TÜM sorguyu reddediyordu (admin SDK bu kuralları atladığı için bu bug
+/// production'da fark edilmeden duruyordu). Aynı BUG `_sessionHistoryForAdminMember`
+/// için de geçerliydi, orada da düzeltildi.
+///
 /// Copied from [_latestPackageForMember].
 class _LatestPackageForMemberProvider
     extends
@@ -211,6 +256,15 @@ class _LatestPackageForMemberProvider
         > {
   /// Üyenin en güncel `memberPackages` kaydı — ödeme durumu/telafi hakkı bu
   /// dokümandan gerçek veriyle okunur (bkz. NewMembershipController.save).
+  ///
+  /// `gymId` eşitliği bilerek eklendi: `firestore.rules`'taki
+  /// `memberPackages` okuma kuralı `resource.data.gymId == myGymId()`'e
+  /// bakıyor, ama bir LIST sorgusunda Firestore bu kuralı sorgunun KENDİSİ
+  /// üzerinden (dönen dokümanlar üzerinden değil) doğruluyor — sorguda
+  /// `gymId` filtresi olmadan kural `resource.data.gymId undefined` hatasıyla
+  /// TÜM sorguyu reddediyordu (admin SDK bu kuralları atladığı için bu bug
+  /// production'da fark edilmeden duruyordu). Aynı BUG `_sessionHistoryForAdminMember`
+  /// için de geçerliydi, orada da düzeltildi.
   ///
   /// Copied from [_latestPackageForMember].
   _LatestPackageForMemberProvider(String memberId)
@@ -308,30 +362,34 @@ class _LatestPackageForMemberProviderElement
 }
 
 String _$sessionHistoryForAdminMemberHash() =>
-    r'07de9b81d185f67734055bce12b5dc3b16b92e20';
+    r'09927307a94c5970fab1f84da86a29b6934f58e7';
 
-/// Tek bir index gerektirmemek için sadece `memberId` eşitliğiyle
-/// sorgulanır, durum filtresi client-side yapılır.
+/// `gymId` filtresi `_latestPackageForMember`'daki aynı sebeple eklendi —
+/// `sessions` okuma kuralı da `resource.data.gymId == myGymId()` istiyor,
+/// LIST sorgusunda bu filtre olmadan kural sorgunun tamamını reddediyordu.
 ///
 /// Copied from [_sessionHistoryForAdminMember].
 @ProviderFor(_sessionHistoryForAdminMember)
 const _sessionHistoryForAdminMemberProvider =
     _SessionHistoryForAdminMemberFamily();
 
-/// Tek bir index gerektirmemek için sadece `memberId` eşitliğiyle
-/// sorgulanır, durum filtresi client-side yapılır.
+/// `gymId` filtresi `_latestPackageForMember`'daki aynı sebeple eklendi —
+/// `sessions` okuma kuralı da `resource.data.gymId == myGymId()` istiyor,
+/// LIST sorgusunda bu filtre olmadan kural sorgunun tamamını reddediyordu.
 ///
 /// Copied from [_sessionHistoryForAdminMember].
 class _SessionHistoryForAdminMemberFamily
     extends Family<AsyncValue<List<SessionHistoryEntry>>> {
-  /// Tek bir index gerektirmemek için sadece `memberId` eşitliğiyle
-  /// sorgulanır, durum filtresi client-side yapılır.
+  /// `gymId` filtresi `_latestPackageForMember`'daki aynı sebeple eklendi —
+  /// `sessions` okuma kuralı da `resource.data.gymId == myGymId()` istiyor,
+  /// LIST sorgusunda bu filtre olmadan kural sorgunun tamamını reddediyordu.
   ///
   /// Copied from [_sessionHistoryForAdminMember].
   const _SessionHistoryForAdminMemberFamily();
 
-  /// Tek bir index gerektirmemek için sadece `memberId` eşitliğiyle
-  /// sorgulanır, durum filtresi client-side yapılır.
+  /// `gymId` filtresi `_latestPackageForMember`'daki aynı sebeple eklendi —
+  /// `sessions` okuma kuralı da `resource.data.gymId == myGymId()` istiyor,
+  /// LIST sorgusunda bu filtre olmadan kural sorgunun tamamını reddediyordu.
   ///
   /// Copied from [_sessionHistoryForAdminMember].
   _SessionHistoryForAdminMemberProvider call(String memberId) {
@@ -360,14 +418,16 @@ class _SessionHistoryForAdminMemberFamily
   String? get name => r'_sessionHistoryForAdminMemberProvider';
 }
 
-/// Tek bir index gerektirmemek için sadece `memberId` eşitliğiyle
-/// sorgulanır, durum filtresi client-side yapılır.
+/// `gymId` filtresi `_latestPackageForMember`'daki aynı sebeple eklendi —
+/// `sessions` okuma kuralı da `resource.data.gymId == myGymId()` istiyor,
+/// LIST sorgusunda bu filtre olmadan kural sorgunun tamamını reddediyordu.
 ///
 /// Copied from [_sessionHistoryForAdminMember].
 class _SessionHistoryForAdminMemberProvider
     extends AutoDisposeStreamProvider<List<SessionHistoryEntry>> {
-  /// Tek bir index gerektirmemek için sadece `memberId` eşitliğiyle
-  /// sorgulanır, durum filtresi client-side yapılır.
+  /// `gymId` filtresi `_latestPackageForMember`'daki aynı sebeple eklendi —
+  /// `sessions` okuma kuralı da `resource.data.gymId == myGymId()` istiyor,
+  /// LIST sorgusunda bu filtre olmadan kural sorgunun tamamını reddediyordu.
   ///
   /// Copied from [_sessionHistoryForAdminMember].
   _SessionHistoryForAdminMemberProvider(String memberId)

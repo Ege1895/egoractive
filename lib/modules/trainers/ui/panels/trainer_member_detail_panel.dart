@@ -9,12 +9,10 @@ import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_back_button.dart';
 import '../../../../shared/utils/phone_number_formatter.dart';
-import '../../../../shared/widgets/trend_bar_chart.dart';
 import '../../../measurements/ui/panels/measurements_panel.dart';
 import '../../../sessions/ui/widgets/create_session_sheet.dart';
 import '../../controller/trainer_member_detail_controller.dart';
 import '../../domain/trainer_member_detail.dart';
-import '../../domain/trainer_metric.dart';
 
 /// Antrenör 4 · Üye Detayı — antrenör görünümü, fiyat gösterilmez.
 class TrainerMemberDetailPanel extends BasePanel {
@@ -29,65 +27,12 @@ class TrainerMemberDetailPanel extends BasePanel {
 
 class _TrainerMemberDetailPanelState
     extends BasePanelState<TrainerMemberDetailPanel> {
-  void _showMetricPicker(
-    BuildContext context,
-    TrainerMetric selected,
-    ValueChanged<TrainerMetric> onSelect,
-  ) {
-    final colors = context.appColors;
-    showModalBottomSheet<void>(
-      context: context,
-      backgroundColor: colors.surface,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
-      ),
-      builder: (sheetContext) => SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(
-            AppSpacing.screenEdge,
-            AppSpacing.lg,
-            AppSpacing.screenEdge,
-            AppSpacing.lg,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Center(
-                child: Container(
-                  width: 44,
-                  height: 5,
-                  decoration: BoxDecoration(
-                    color: colors.outlineStrong,
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
-                  ),
-                ),
-              ),
-              const SizedBox(height: AppSpacing.lg),
-              for (final metric in TrainerMetric.values)
-                _MetricPickerRow(
-                  label: ref.watch(rcTextProvider(metric.rcKey)),
-                  selected: metric == selected,
-                  onTap: () {
-                    onSelect(metric);
-                    Navigator.of(sheetContext).pop();
-                  },
-                ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
     final typography = context.appTypography;
     final detail = ref.watch(
       trainerMemberDetailControllerProvider(widget.memberId),
-    );
-    final controller = ref.read(
-      trainerMemberDetailControllerProvider(widget.memberId).notifier,
     );
 
     if (detail.isLoading) {
@@ -121,8 +66,6 @@ class _TrainerMemberDetailPanelState
         ),
       );
     }
-
-    final series = detail.seriesByMetric[detail.selectedMetric]!;
 
     return Scaffold(
       body: SafeArea(
@@ -248,168 +191,85 @@ class _TrainerMemberDetailPanelState
                           ],
                         ),
                         const SizedBox(height: AppSpacing.lg),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Material(
-                                color: colors.primary,
-                                borderRadius: BorderRadius.circular(
-                                  AppSpacing.radiusInner,
-                                ),
-                                child: InkWell(
-                                  onTap: () => showCreateSessionSheet(
-                                    context,
-                                    ref,
-                                    DateTime.now(),
-                                    lockedTrainerId: ref
-                                        .read(authStateProvider)
-                                        .valueOrNull
-                                        ?.uid,
-                                  ),
-                                  borderRadius: BorderRadius.circular(
-                                    AppSpacing.radiusInner,
-                                  ),
-                                  child: Container(
-                                    constraints: const BoxConstraints(
-                                      minHeight: 44,
-                                    ),
-                                    alignment: Alignment.center,
-                                    child: Text(
-                                      ref.watch(
-                                        rcTextProvider(
-                                          RemoteConfigKeys
-                                              .trainersMemberDetailCreateSessionButton,
-                                        ),
-                                      ),
-                                      style: typography.headingSmall.copyWith(
-                                        fontSize: 15,
-                                        color: colors.onPrimary,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
+                        Material(
+                          color: colors.primary,
+                          borderRadius: BorderRadius.circular(
+                            AppSpacing.radiusInner,
+                          ),
+                          child: InkWell(
+                            onTap: () => showCreateSessionSheet(
+                              context,
+                              ref,
+                              DateTime.now(),
+                              lockedTrainerId: ref
+                                  .read(authStateProvider)
+                                  .valueOrNull
+                                  ?.uid,
                             ),
-                            const SizedBox(width: AppSpacing.sm),
-                            Expanded(
-                              child: Material(
-                                color: colors.surfaceRaised,
-                                borderRadius: BorderRadius.circular(
-                                  AppSpacing.radiusInner,
-                                ),
-                                child: InkWell(
-                                  onTap: () => ref
-                                      .read(
-                                        panelStackControllerProvider.notifier,
-                                      )
-                                      .push(
-                                        MeasurementsPanel(
-                                          memberId: widget.memberId,
-                                          memberName: detail.name,
-                                        ),
-                                      ),
-                                  borderRadius: BorderRadius.circular(
-                                    AppSpacing.radiusInner,
-                                  ),
-                                  child: Container(
-                                    constraints: const BoxConstraints(
-                                      minHeight: 44,
-                                    ),
-                                    alignment: Alignment.center,
-                                    child: Text(
-                                      ref.watch(
-                                        rcTextProvider(
-                                          RemoteConfigKeys
-                                              .trainersMemberDetailAddMeasurementButton,
-                                        ),
-                                      ),
-                                      style: typography.headingSmall.copyWith(
-                                        fontSize: 15,
-                                        color: colors.onSurfaceVariant,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
+                            borderRadius: BorderRadius.circular(
+                              AppSpacing.radiusInner,
                             ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.lg),
-                  InkWell(
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusInner),
-                    onTap: () => _showMetricPicker(
-                      context,
-                      detail.selectedMetric,
-                      controller.selectMetric,
-                    ),
-                    child: Container(
-                      constraints: const BoxConstraints(minHeight: 44),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacing.md,
-                      ),
-                      decoration: BoxDecoration(
-                        color: colors.surface,
-                        borderRadius: BorderRadius.circular(
-                          AppSpacing.radiusInner,
-                        ),
-                        border: Border.all(color: colors.outline),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
+                            child: Container(
+                              constraints: const BoxConstraints(
+                                minHeight: 52,
+                              ),
+                              width: double.infinity,
+                              alignment: Alignment.center,
+                              child: Text(
                                 ref.watch(
                                   rcTextProvider(
                                     RemoteConfigKeys
-                                        .commonOlcum6AySectionHeader,
+                                        .trainersMemberDetailCreateSessionButton,
                                   ),
                                 ),
-                                style: typography.caption.copyWith(
-                                  color: colors.onSurfaceMuted,
-                                  fontSize: 11,
+                                style: typography.headingSmall.copyWith(
+                                  fontSize: 15,
+                                  color: colors.onPrimary,
                                 ),
                               ),
-                              Text(
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: AppSpacing.sm),
+                        Material(
+                          color: colors.surfaceRaised,
+                          borderRadius: BorderRadius.circular(
+                            AppSpacing.radiusInner,
+                          ),
+                          child: InkWell(
+                            onTap: () => ref
+                                .read(panelStackControllerProvider.notifier)
+                                .push(
+                                  MeasurementsPanel(
+                                    memberId: widget.memberId,
+                                    memberName: detail.name,
+                                  ),
+                                ),
+                            borderRadius: BorderRadius.circular(
+                              AppSpacing.radiusInner,
+                            ),
+                            child: Container(
+                              constraints: const BoxConstraints(
+                                minHeight: 52,
+                              ),
+                              width: double.infinity,
+                              alignment: Alignment.center,
+                              child: Text(
                                 ref.watch(
-                                  rcTextProvider(detail.selectedMetric.rcKey),
+                                  rcTextProvider(
+                                    RemoteConfigKeys
+                                        .membersDetailViewMeasurementsButton,
+                                  ),
                                 ),
                                 style: typography.headingSmall.copyWith(
-                                  color: colors.onSurface,
                                   fontSize: 15,
+                                  color: colors.onSurfaceVariant,
                                 ),
                               ),
-                            ],
+                            ),
                           ),
-                          Icon(
-                            Icons.keyboard_arrow_down,
-                            color: colors.onPrimaryContainer,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.sm),
-                  Container(
-                    padding: const EdgeInsets.all(AppSpacing.lg),
-                    decoration: BoxDecoration(
-                      color: colors.surface,
-                      borderRadius: BorderRadius.circular(
-                        AppSpacing.radiusCard,
-                      ),
-                      border: Border.all(color: colors.outline),
-                    ),
-                    child: TrendBarChart(
-                      values: series.values,
-                      labels: series.months,
-                      height: 132,
-                      valueFormatter: (value) =>
-                          value.toStringAsFixed(1).replaceAll('.', ','),
+                        ),
+                      ],
                     ),
                   ),
                   const SizedBox(height: AppSpacing.lg),
@@ -488,44 +348,6 @@ class _InfoTile extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _MetricPickerRow extends StatelessWidget {
-  const _MetricPickerRow({
-    required this.label,
-    required this.selected,
-    required this.onTap,
-  });
-
-  final String label;
-  final bool selected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = context.appColors;
-    final typography = context.appTypography;
-    return InkWell(
-      onTap: onTap,
-      child: Container(
-        constraints: const BoxConstraints(minHeight: 56),
-        child: Row(
-          children: [
-            Expanded(
-              child: Text(
-                label,
-                style: typography.bodyLarge.copyWith(
-                  color: colors.onSurface,
-                  fontSize: 15,
-                ),
-              ),
-            ),
-            if (selected) Icon(Icons.check, color: colors.primary, size: 20),
-          ],
-        ),
       ),
     );
   }

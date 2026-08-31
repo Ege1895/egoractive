@@ -81,6 +81,7 @@ class _EmailLoginPanelState extends BasePanelState<EmailLoginPanel> {
               const SizedBox(height: AppSpacing.sm),
               Container(
                 constraints: const BoxConstraints(minHeight: 60),
+                alignment: Alignment.centerLeft,
                 padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
                 decoration: BoxDecoration(
                   color: colors.surface,

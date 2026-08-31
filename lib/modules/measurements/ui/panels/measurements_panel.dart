@@ -198,6 +198,10 @@ const _monthNames = {
 String _formatDate(DateTime date) =>
     '${date.day} ${_monthNames[date.month]} ${date.year}';
 
+/// Grafik ekranı (çubuk grafik + altındaki liste) sadece son bu kadar
+/// ölçümü gösterir — karşılaştırma yapılabilsin diye, tüm geçmiş değil.
+const _maxHistoryPoints = 5;
+
 /// Çevre ölçüleri (bel/göğüs/kalça/kol/bacak) hâlâ RC'deki `cm` metnini
 /// kullanıyor (davranış değişmedi); kilo/yağ oranı kendi sabit birimlerini
 /// (`MeasurementMetric.unit`) döner — bunlar dile göre değişmediği için
@@ -753,6 +757,20 @@ class _ChartView extends ConsumerWidget {
         else ...[
           Builder(
             builder: (context) {
+              // Karşılaştırma yapılabilmesi için grafik ve altındaki liste
+              // sadece SON `_maxHistoryPoints` ölçümü gösterir, tüm geçmişi
+              // değil (çok sayıda ölçüm birikince çubuklar sıkışıp
+              // okunmaz hale gelmesin diye).
+              final chartValues = series.values.length > _maxHistoryPoints
+                  ? series.values.sublist(
+                      series.values.length - _maxHistoryPoints,
+                    )
+                  : series.values;
+              final chartMonths = series.months.length > _maxHistoryPoints
+                  ? series.months.sublist(
+                      series.months.length - _maxHistoryPoints,
+                    )
+                  : series.months;
               final lastValue = series.values.last;
               final prevValue = series.values.length > 1
                   ? series.values[series.values.length - 2]
@@ -875,8 +893,8 @@ class _ChartView extends ConsumerWidget {
                     ),
                     const SizedBox(height: AppSpacing.lg),
                     TrendBarChart(
-                      values: series.values,
-                      labels: series.months,
+                      values: chartValues,
+                      labels: chartMonths,
                       valueFormatter: (value) =>
                           value.toStringAsFixed(1).replaceAll('.', ','),
                     ),
@@ -907,7 +925,7 @@ class _ChartView extends ConsumerWidget {
               children: [
                 for (
                   var i = series.values.length - 1;
-                  i >= 0 && i >= series.values.length - 4;
+                  i >= 0 && i >= series.values.length - _maxHistoryPoints;
                   i--
                 )
                   _HistoryRow(
@@ -923,7 +941,8 @@ class _ChartView extends ConsumerWidget {
                     delta: i == 0
                         ? null
                         : series.values[i] - series.values[i - 1],
-                    showDivider: i > 0 && i >= series.values.length - 4,
+                    showDivider:
+                        i > 0 && i >= series.values.length - _maxHistoryPoints,
                     metric: series.metric,
                   ),
               ],

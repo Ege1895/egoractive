@@ -11,6 +11,7 @@ import '../../../auth/ui/panels/language_select_panel.dart';
 import '../../../gyms/ui/panels/gym_rules_view_panel.dart';
 import '../../controller/trainer_profile_controller.dart';
 import 'trainer_info_panel.dart';
+import 'trainer_report_panel.dart';
 
 /// Antrenör · Profil (Profil sekmesi kökü) — üye Profilim'in sade antrenör
 /// karşılığı, rozet/geri bildirim gibi üyeye özgü bölümler içermez.
@@ -124,6 +125,12 @@ class TrainerProfilePanel extends ConsumerWidget {
               ),
               child: Column(
                 children: [
+                  _NavRow(
+                    label: ref.watch(
+                      rcTextProvider(RemoteConfigKeys.shellTrainerTabRaporum),
+                    ),
+                    onTap: () => panelStack.push(const TrainerReportPanel()),
+                  ),
                   _NavRow(
                     label: ref.watch(
                       rcTextProvider(RemoteConfigKeys.commonStudyoKurallariNav),

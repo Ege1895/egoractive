@@ -28,6 +28,15 @@
       "collectionGroup": "sessions",
       "queryScope": "COLLECTION",
       "fields": [
+        { "fieldPath": "gymId", "order": "ASCENDING" },
+        { "fieldPath": "memberId", "order": "ASCENDING" },
+        { "fieldPath": "startTime", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "sessions",
+      "queryScope": "COLLECTION",
+      "fields": [
         { "fieldPath": "trainerId", "order": "ASCENDING" },
         { "fieldPath": "startTime", "order": "ASCENDING" }
       ]
@@ -102,6 +111,15 @@
       "fields": [
         { "fieldPath": "gymId", "order": "ASCENDING" },
         { "fieldPath": "purchasedAt", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "memberPackages",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "gymId", "order": "ASCENDING" },
+        { "fieldPath": "memberId", "order": "ASCENDING" },
+        { "fieldPath": "purchasedAt", "order": "DESCENDING" }
       ]
     },
     {

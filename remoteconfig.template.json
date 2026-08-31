@@ -9034,6 +9034,270 @@
         "value": "BADGES"
       },
       "valueType": "STRING"
+    },
+    "lbl_auth_email_login_title_tr": {
+      "defaultValue": {
+        "value": "E-posta ile giriş yap"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_email_login_title_en": {
+      "defaultValue": {
+        "value": "Log in with email"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_email_login_subtitle_tr": {
+      "defaultValue": {
+        "value": "Salonuna kayıtlı e-posta adresini gir, sana bir doğrulama kodu gönderelim. Şifre yok, kod ile tek dokunuşta girersin."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_email_login_subtitle_en": {
+      "defaultValue": {
+        "value": "Enter the email registered at your studio and we'll send you a verification code. No password — one code and you're in."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_email_address_label_tr": {
+      "defaultValue": {
+        "value": "E-posta adresi"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_email_address_label_en": {
+      "defaultValue": {
+        "value": "Email address"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_switch_to_phone_link_tr": {
+      "defaultValue": {
+        "value": "Telefon numarası ile giriş yap"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_switch_to_phone_link_en": {
+      "defaultValue": {
+        "value": "Log in with phone number"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_switch_to_email_link_tr": {
+      "defaultValue": {
+        "value": "E-posta ile giriş yap"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_switch_to_email_link_en": {
+      "defaultValue": {
+        "value": "Log in with email"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_otp_title_tr": {
+      "defaultValue": {
+        "value": "Kodu gir"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_otp_title_en": {
+      "defaultValue": {
+        "value": "Enter the code"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_otp_subtitle_tr": {
+      "defaultValue": {
+        "value": "{email} adresine 6 haneli bir doğrulama kodu gönderdik. Kodu aşağıya gir."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_otp_subtitle_en": {
+      "defaultValue": {
+        "value": "We sent a 6-digit verification code to {email}. Enter it below."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_otp_verify_button_tr": {
+      "defaultValue": {
+        "value": "Doğrula ve devam et"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_otp_verify_button_en": {
+      "defaultValue": {
+        "value": "Verify and continue"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_otp_resend_button_tr": {
+      "defaultValue": {
+        "value": "Kodu tekrar gönder"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_otp_resend_button_en": {
+      "defaultValue": {
+        "value": "Resend code"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_otp_resend_countdown_template_tr": {
+      "defaultValue": {
+        "value": "{seconds} saniye sonra tekrar gönderebilirsin"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_otp_resend_countdown_template_en": {
+      "defaultValue": {
+        "value": "You can resend in {seconds}s"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_otp_generic_error_tr": {
+      "defaultValue": {
+        "value": "Bir şeyler ters gitti. İnternet bağlantını kontrol edip tekrar dene."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_otp_generic_error_en": {
+      "defaultValue": {
+        "value": "Something went wrong. Check your connection and try again."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_email_setup_title_tr": {
+      "defaultValue": {
+        "value": "E-posta adresini ekle"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_email_setup_title_en": {
+      "defaultValue": {
+        "value": "Add your email"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_email_setup_subtitle_tr": {
+      "defaultValue": {
+        "value": "Girişlerinde kullanacağın e-posta adresini gir; sana 6 haneli bir doğrulama kodu göndereceğiz."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_email_setup_subtitle_en": {
+      "defaultValue": {
+        "value": "Enter the email you'll use to log in — we'll send a 6-digit verification code to it."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_email_setup_send_button_tr": {
+      "defaultValue": {
+        "value": "Doğrulama kodu gönder"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_email_setup_send_button_en": {
+      "defaultValue": {
+        "value": "Send verification code"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_email_setup_invalid_email_error_tr": {
+      "defaultValue": {
+        "value": "Bu geçerli bir e-posta adresi değil. Lütfen kontrol edip tekrar dene (örn. isim@ornek.com)."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_email_setup_invalid_email_error_en": {
+      "defaultValue": {
+        "value": "That doesn't look like a valid email address. Check it and try again (e.g. name@example.com)."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_email_setup_email_taken_error_tr": {
+      "defaultValue": {
+        "value": "Bu e-posta adresi başka bir hesapta kullanılıyor. Farklı bir adres dene."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_email_setup_email_taken_error_en": {
+      "defaultValue": {
+        "value": "This email is already used by another account. Try a different one."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_info_login_report_email_label_tr": {
+      "defaultValue": {
+        "value": "Login ve rapor e-postası *"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_gym_info_login_report_email_label_en": {
+      "defaultValue": {
+        "value": "Login & report email *"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_self_info_email_field_label_tr": {
+      "defaultValue": {
+        "value": "E-posta adresi"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_members_self_info_email_field_label_en": {
+      "defaultValue": {
+        "value": "Email address"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_info_title_tr": {
+      "defaultValue": {
+        "value": "Bilgilerim"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_info_title_en": {
+      "defaultValue": {
+        "value": "My Info"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_otp_invalid_code_error_tr": {
+      "defaultValue": {
+        "value": "Girdiğin kod yanlış. Kontrol edip tekrar dene."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_otp_invalid_code_error_en": {
+      "defaultValue": {
+        "value": "That code isn't right. Check it and try again."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_otp_expired_error_tr": {
+      "defaultValue": {
+        "value": "Bu kodun süresi doldu. \"Kodu tekrar gönder\" ile yeni bir kod iste."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_otp_expired_error_en": {
+      "defaultValue": {
+        "value": "This code has expired. Tap \"Resend code\" to get a new one."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_otp_too_many_attempts_error_tr": {
+      "defaultValue": {
+        "value": "Çok fazla yanlış deneme yaptın. \"Kodu tekrar gönder\" ile yeni bir kod iste."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_auth_otp_too_many_attempts_error_en": {
+      "defaultValue": {
+        "value": "Too many wrong attempts. Tap \"Resend code\" to get a new one."
+      },
+      "valueType": "STRING"
     }
   }
 }
