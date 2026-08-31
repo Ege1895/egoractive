@@ -70,12 +70,11 @@ class MemberRegistrationController extends _$MemberRegistrationController {
 
     final form = ref.read(newMemberControllerProvider);
     final name = '${form.firstName.trim()} ${form.lastName.trim()}'.trim();
-    final phoneDigits = form.phoneDigits.trim();
 
     final nameError = name.isEmpty ? 'Ad ve soyad gerekli.' : null;
-    final phoneError = phoneDigits.length != 10
-        ? 'Geçerli bir telefon numarası gir.'
-        : null;
+    final phoneError = form.isPhoneValid
+        ? null
+        : 'Geçerli bir telefon numarası gir.';
     final trainerError = form.trainerId == null || form.trainerName == null
         ? 'Bir antrenör seç.'
         : null;
@@ -95,7 +94,7 @@ class MemberRegistrationController extends _$MemberRegistrationController {
     }
 
     state = state.copyWith(isSubmitting: true, clearError: true);
-    final phoneNumber = '+90$phoneDigits';
+    final phoneNumber = form.phoneE164;
     final service = ref.read(memberRegistrationServiceProvider);
     try {
       if (await service.phoneNumberIsTaken(phoneNumber)) {
@@ -136,12 +135,11 @@ class MemberRegistrationController extends _$MemberRegistrationController {
 
     final form = ref.read(newMemberControllerProvider);
     final name = '${form.firstName.trim()} ${form.lastName.trim()}'.trim();
-    final phoneDigits = form.phoneDigits.trim();
 
     final nameError = name.isEmpty ? 'Ad ve soyad gerekli.' : null;
-    final phoneError = phoneDigits.length != 10
-        ? 'Geçerli bir telefon numarası gir.'
-        : null;
+    final phoneError = form.isPhoneValid
+        ? null
+        : 'Geçerli bir telefon numarası gir.';
     if (nameError != null || phoneError != null) {
       state = MemberRegistrationState(
         nameError: nameError,
@@ -157,7 +155,7 @@ class MemberRegistrationController extends _$MemberRegistrationController {
           .updateMember(
             memberId: memberId,
             name: name,
-            phoneNumber: '+90$phoneDigits',
+            phoneNumber: form.phoneE164,
             trainerId: form.trainerId,
             trainerName: form.trainerName,
             gender: form.gender,

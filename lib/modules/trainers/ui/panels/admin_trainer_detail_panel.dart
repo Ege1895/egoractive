@@ -6,7 +6,6 @@ import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
 import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../../../shared/utils/phone_number_formatter.dart';
 import '../../../../shared/widgets/app_back_button.dart';
 import '../../controller/admin_trainer_detail_controller.dart';
 import '../../controller/admin_trainers_controller.dart';
@@ -163,9 +162,7 @@ class _AdminTrainerDetailPanelState
                               ),
                               const SizedBox(height: AppSpacing.xs),
                               Text(
-                                trainer.phone.isEmpty
-                                    ? '—'
-                                    : formatTrPhoneDisplay(trainer.phone),
+                                trainer.phone.isEmpty ? '—' : trainer.phone,
                                 style: typography.bodyMedium.copyWith(
                                   color: colors.onSurfaceMuted,
                                 ),

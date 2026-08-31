@@ -19,7 +19,10 @@ final _privateConstructorUsedError = UnsupportedError(
 mixin _$GymProfile {
   String get name => throw _privateConstructorUsedError;
   String get city => throw _privateConstructorUsedError;
+
+  /// F8-4 — global telefon numarası desteği. E.164 (`+905324187605`).
   String get phone => throw _privateConstructorUsedError;
+  bool get isPhoneValid => throw _privateConstructorUsedError;
   String get address => throw _privateConstructorUsedError;
   String get logoUrl => throw _privateConstructorUsedError;
 
@@ -41,6 +44,7 @@ abstract class $GymProfileCopyWith<$Res> {
     String name,
     String city,
     String phone,
+    bool isPhoneValid,
     String address,
     String logoUrl,
   });
@@ -64,6 +68,7 @@ class _$GymProfileCopyWithImpl<$Res, $Val extends GymProfile>
     Object? name = null,
     Object? city = null,
     Object? phone = null,
+    Object? isPhoneValid = null,
     Object? address = null,
     Object? logoUrl = null,
   }) {
@@ -81,6 +86,10 @@ class _$GymProfileCopyWithImpl<$Res, $Val extends GymProfile>
                 ? _value.phone
                 : phone // ignore: cast_nullable_to_non_nullable
                       as String,
+            isPhoneValid: null == isPhoneValid
+                ? _value.isPhoneValid
+                : isPhoneValid // ignore: cast_nullable_to_non_nullable
+                      as bool,
             address: null == address
                 ? _value.address
                 : address // ignore: cast_nullable_to_non_nullable
@@ -108,6 +117,7 @@ abstract class _$$GymProfileImplCopyWith<$Res>
     String name,
     String city,
     String phone,
+    bool isPhoneValid,
     String address,
     String logoUrl,
   });
@@ -130,6 +140,7 @@ class __$$GymProfileImplCopyWithImpl<$Res>
     Object? name = null,
     Object? city = null,
     Object? phone = null,
+    Object? isPhoneValid = null,
     Object? address = null,
     Object? logoUrl = null,
   }) {
@@ -147,6 +158,10 @@ class __$$GymProfileImplCopyWithImpl<$Res>
             ? _value.phone
             : phone // ignore: cast_nullable_to_non_nullable
                   as String,
+        isPhoneValid: null == isPhoneValid
+            ? _value.isPhoneValid
+            : isPhoneValid // ignore: cast_nullable_to_non_nullable
+                  as bool,
         address: null == address
             ? _value.address
             : address // ignore: cast_nullable_to_non_nullable
@@ -167,6 +182,7 @@ class _$GymProfileImpl implements _GymProfile {
     required this.name,
     required this.city,
     required this.phone,
+    this.isPhoneValid = false,
     required this.address,
     this.logoUrl = '',
   });
@@ -175,8 +191,13 @@ class _$GymProfileImpl implements _GymProfile {
   final String name;
   @override
   final String city;
+
+  /// F8-4 — global telefon numarası desteği. E.164 (`+905324187605`).
   @override
   final String phone;
+  @override
+  @JsonKey()
+  final bool isPhoneValid;
   @override
   final String address;
   @override
@@ -185,7 +206,7 @@ class _$GymProfileImpl implements _GymProfile {
 
   @override
   String toString() {
-    return 'GymProfile(name: $name, city: $city, phone: $phone, address: $address, logoUrl: $logoUrl)';
+    return 'GymProfile(name: $name, city: $city, phone: $phone, isPhoneValid: $isPhoneValid, address: $address, logoUrl: $logoUrl)';
   }
 
   @override
@@ -196,13 +217,22 @@ class _$GymProfileImpl implements _GymProfile {
             (identical(other.name, name) || other.name == name) &&
             (identical(other.city, city) || other.city == city) &&
             (identical(other.phone, phone) || other.phone == phone) &&
+            (identical(other.isPhoneValid, isPhoneValid) ||
+                other.isPhoneValid == isPhoneValid) &&
             (identical(other.address, address) || other.address == address) &&
             (identical(other.logoUrl, logoUrl) || other.logoUrl == logoUrl));
   }
 
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, name, city, phone, address, logoUrl);
+  int get hashCode => Object.hash(
+    runtimeType,
+    name,
+    city,
+    phone,
+    isPhoneValid,
+    address,
+    logoUrl,
+  );
 
   /// Create a copy of GymProfile
   /// with the given fields replaced by the non-null parameter values.
@@ -218,6 +248,7 @@ abstract class _GymProfile implements GymProfile {
     required final String name,
     required final String city,
     required final String phone,
+    final bool isPhoneValid,
     required final String address,
     final String logoUrl,
   }) = _$GymProfileImpl;
@@ -226,8 +257,12 @@ abstract class _GymProfile implements GymProfile {
   String get name;
   @override
   String get city;
+
+  /// F8-4 — global telefon numarası desteği. E.164 (`+905324187605`).
   @override
   String get phone;
+  @override
+  bool get isPhoneValid;
   @override
   String get address;
   @override

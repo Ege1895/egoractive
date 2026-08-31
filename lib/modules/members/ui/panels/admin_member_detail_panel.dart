@@ -8,7 +8,6 @@ import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_back_button.dart';
 import '../../../../shared/widgets/app_button.dart';
-import '../../../../shared/utils/phone_number_formatter.dart';
 import '../../../badges/controller/badges_controller.dart';
 import '../../../badges/domain/badge_item.dart';
 import '../../../measurements/ui/panels/measurements_panel.dart';
@@ -259,10 +258,7 @@ class _AdminMemberDetailPanelState
                                                 .membersDetailPhoneTrainerLine,
                                           ),
                                         )
-                                        .replaceAll(
-                                          '{phone}',
-                                          formatTrPhoneDisplay(detail.phone),
-                                        )
+                                        .replaceAll('{phone}', detail.phone)
                                         .replaceAll(
                                           '{trainerName}',
                                           detail.trainerName,

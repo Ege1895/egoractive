@@ -44,10 +44,9 @@ class CreateGymService {
         .call<Map<String, dynamic>>({
           'name': profile.name,
           'city': profile.city,
-          // profile.phone sadece 10 haneli rakam (GymProfileController) — F1-10
-          // login akışıyla (AuthService) aynı '+90' + rakam formatına burada
-          // çevriliyor, yoksa requestCustomToken bu numarayı bulamaz.
-          'phoneNumber': '+90${profile.phone}',
+          // F8-4 — profile.phone artık AppPhoneField'dan gelen tam E.164
+          // (GymProfileController), başka bir dönüşüm gerekmiyor.
+          'phoneNumber': profile.phone,
           'address': profile.address,
           'themeColorHex': _toHex(themeColor),
           'email': email,

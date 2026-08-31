@@ -224,13 +224,11 @@ class CreateGymController extends _$CreateGymController {
     final addressError = profile.address.trim().isEmpty
         ? 'Adres gerekli.'
         : null;
-    // profile.phone GymProfileController.updatePhone'da zaten sadece rakam
-    // tutuluyor — bu numarayla admin girişi yapılacağı için 10 haneli
-    // geçerli bir TR cep telefonu olmalı (AuthState.isPhoneComplete ile
-    // aynı kural).
-    final phoneError = profile.phone.length != 10
-        ? 'Geçerli bir cep telefonu numarası gir.'
-        : null;
+    // F8-4 — bu numarayla admin girişi yapılacağı için geçerli olmalı
+    // (AppPhoneField'ın phone_numbers_parser tabanlı doğrulaması).
+    final phoneError = profile.isPhoneValid
+        ? null
+        : 'Geçerli bir cep telefonu numarası gir.';
     // Egoractive Authentication Sistemi §9 — "Login ve rapor e-postası"
     // zorunlu, admin bununla OTP alıp giriş yapacak.
     final emailError = !email.contains('@') || email.trim().length < 4

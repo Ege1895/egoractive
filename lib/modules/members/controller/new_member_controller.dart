@@ -13,7 +13,7 @@ class NewMemberController extends _$NewMemberController {
     return NewMemberForm(
       firstName: '',
       lastName: '',
-      phoneDigits: '',
+      phoneE164: '',
       birthYear: 1995,
       heightCm: 170,
       note: '',
@@ -26,8 +26,14 @@ class NewMemberController extends _$NewMemberController {
 
   void updateLastName(String value) => state = state.copyWith(lastName: value);
 
-  void updatePhoneDigits(String value) =>
-      state = state.copyWith(phoneDigits: value);
+  void updatePhone(String e164, {required bool isValid}) =>
+      state = state.copyWith(phoneE164: e164, isPhoneValid: isValid);
+
+  /// Düzenleme modunda mevcut üyenin E.164 numarasını forma yüklemek için —
+  /// bkz. [MemberInfoPanel.initState]. Geçerlilik ayrıca doğrulanmaz, zaten
+  /// Firestore'da kayıtlı bir numara.
+  void setInitialPhone(String e164) =>
+      state = state.copyWith(phoneE164: e164, isPhoneValid: true);
 
   void updateBirthYear(int value) => state = state.copyWith(birthYear: value);
 

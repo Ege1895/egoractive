@@ -2,15 +2,16 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:phone_form_field/phone_form_field.dart';
 
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
 import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../../../shared/utils/phone_number_formatter.dart';
 import '../../../../shared/widgets/app_back_button.dart';
 import '../../../../shared/widgets/app_button.dart';
+import '../../../../shared/widgets/app_phone_field.dart';
 import '../../../../shared/widgets/app_text_field.dart';
 import '../../../auth/ui/panels/phone_login_panel.dart';
 import '../../controller/create_gym_controller.dart';
@@ -29,7 +30,7 @@ class GymSetupPanel extends BasePanel {
 class _GymSetupPanelState extends BasePanelState<GymSetupPanel> {
   late final TextEditingController _nameController;
   late final TextEditingController _cityController;
-  late final TextEditingController _phoneController;
+  late final PhoneController _phoneController;
   late final TextEditingController _addressController;
   late final TextEditingController _emailController;
   final _phoneFieldKey = GlobalKey();
@@ -45,7 +46,7 @@ class _GymSetupPanelState extends BasePanelState<GymSetupPanel> {
     // state ataması olduğu için build fazının bitmesini (post-frame) bekler.
     _nameController = TextEditingController();
     _cityController = TextEditingController();
-    _phoneController = TextEditingController();
+    _phoneController = PhoneController(initialValue: PhoneNumber.parse('+90'));
     _addressController = TextEditingController();
     // Egoractive Authentication Sistemi §9 — "Login ve rapor e-postası",
     // GymProfile'a dahil değil (o model sadece zorunlu iletişim alanlarını
@@ -68,16 +69,6 @@ class _GymSetupPanelState extends BasePanelState<GymSetupPanel> {
     final themeController = ref.read(gymThemeControllerProvider.notifier);
     final createGymState = ref.watch(createGymControllerProvider);
     final createGymController = ref.read(createGymControllerProvider.notifier);
-    final profile = ref.watch(gymProfileControllerProvider);
-
-    final formattedPhone = formatTrPhoneDigits(profile.phone);
-    if (_phoneController.text != formattedPhone) {
-      _phoneController.value = TextEditingValue(
-        text: formattedPhone,
-        selection: TextSelection.collapsed(offset: formattedPhone.length),
-      );
-    }
-
     // "Bu numarayla kayıtlı bir hesap zaten var" gibi telefon hatası
     // ListView'de scroll'un altında kalabiliyordu — kullanıcı hatayı hiç
     // görmeden "Oluşturuluyor…" sonrası hiçbir şey olmamış gibi düşünüyordu.
@@ -201,24 +192,17 @@ class _GymSetupPanelState extends BasePanelState<GymSetupPanel> {
                             onChanged: profileController.updateCity,
                           ),
                           const SizedBox(height: AppSpacing.md),
-                          AppTextField(
+                          AppPhoneField(
                             key: _phoneFieldKey,
                             label: ref.watch(
                               rcTextProvider(
                                 RemoteConfigKeys.gymsGymSetupPhoneFieldLabel,
                               ),
                             ),
-                            hint: ref.watch(
-                              rcTextProvider(
-                                RemoteConfigKeys.gymsGymSetupPhoneHint,
-                              ),
-                            ),
-                            prefixText: '+90 ',
-                            keyboardType: TextInputType.number,
                             controller: _phoneController,
-                            inputFormatters: [TrPhoneNumberInputFormatter()],
                             errorText: createGymState.phoneError,
-                            onChanged: profileController.updatePhone,
+                            onChanged: (e164, isValid) => profileController
+                                .updatePhone(e164, isValid: isValid),
                           ),
                           const SizedBox(height: AppSpacing.xs),
                           Text(
@@ -540,13 +524,11 @@ class _GymSetupPanelState extends BasePanelState<GymSetupPanel> {
                                     .read(panelStackControllerProvider.notifier)
                                     .push(
                                       PhoneLoginPanel(
-                                        // F8-4'te bu ekran AppPhoneField'a
-                                        // geçene kadar `phone` hâlâ ham TR
-                                        // hanesi — TR varsayımı bilerek
-                                        // burada (PhoneLoginPanel artık
-                                        // temiz).
-                                        prefillPhoneE164:
-                                            '+90${ref.read(gymProfileControllerProvider).phone}',
+                                        // F8-4 — bu ekran artık AppPhoneField
+                                        // kullanıyor, `phone` zaten tam E.164.
+                                        prefillPhoneE164: ref
+                                            .read(gymProfileControllerProvider)
+                                            .phone,
                                         successBanner: ref.read(
                                           rcTextProvider(
                                             RemoteConfigKeys

@@ -19,7 +19,10 @@ final _privateConstructorUsedError = UnsupportedError(
 mixin _$NewMemberForm {
   String get firstName => throw _privateConstructorUsedError;
   String get lastName => throw _privateConstructorUsedError;
-  String get phoneDigits => throw _privateConstructorUsedError;
+
+  /// F8-4 — global telefon numarası desteği. E.164 (`+905324187605`).
+  String get phoneE164 => throw _privateConstructorUsedError;
+  bool get isPhoneValid => throw _privateConstructorUsedError;
   int get birthYear => throw _privateConstructorUsedError;
   int get heightCm => throw _privateConstructorUsedError;
   MemberGender? get gender => throw _privateConstructorUsedError;
@@ -49,7 +52,8 @@ abstract class $NewMemberFormCopyWith<$Res> {
   $Res call({
     String firstName,
     String lastName,
-    String phoneDigits,
+    String phoneE164,
+    bool isPhoneValid,
     int birthYear,
     int heightCm,
     MemberGender? gender,
@@ -78,7 +82,8 @@ class _$NewMemberFormCopyWithImpl<$Res, $Val extends NewMemberForm>
   $Res call({
     Object? firstName = null,
     Object? lastName = null,
-    Object? phoneDigits = null,
+    Object? phoneE164 = null,
+    Object? isPhoneValid = null,
     Object? birthYear = null,
     Object? heightCm = null,
     Object? gender = freezed,
@@ -98,10 +103,14 @@ class _$NewMemberFormCopyWithImpl<$Res, $Val extends NewMemberForm>
                 ? _value.lastName
                 : lastName // ignore: cast_nullable_to_non_nullable
                       as String,
-            phoneDigits: null == phoneDigits
-                ? _value.phoneDigits
-                : phoneDigits // ignore: cast_nullable_to_non_nullable
+            phoneE164: null == phoneE164
+                ? _value.phoneE164
+                : phoneE164 // ignore: cast_nullable_to_non_nullable
                       as String,
+            isPhoneValid: null == isPhoneValid
+                ? _value.isPhoneValid
+                : isPhoneValid // ignore: cast_nullable_to_non_nullable
+                      as bool,
             birthYear: null == birthYear
                 ? _value.birthYear
                 : birthYear // ignore: cast_nullable_to_non_nullable
@@ -152,7 +161,8 @@ abstract class _$$NewMemberFormImplCopyWith<$Res>
   $Res call({
     String firstName,
     String lastName,
-    String phoneDigits,
+    String phoneE164,
+    bool isPhoneValid,
     int birthYear,
     int heightCm,
     MemberGender? gender,
@@ -180,7 +190,8 @@ class __$$NewMemberFormImplCopyWithImpl<$Res>
   $Res call({
     Object? firstName = null,
     Object? lastName = null,
-    Object? phoneDigits = null,
+    Object? phoneE164 = null,
+    Object? isPhoneValid = null,
     Object? birthYear = null,
     Object? heightCm = null,
     Object? gender = freezed,
@@ -200,10 +211,14 @@ class __$$NewMemberFormImplCopyWithImpl<$Res>
             ? _value.lastName
             : lastName // ignore: cast_nullable_to_non_nullable
                   as String,
-        phoneDigits: null == phoneDigits
-            ? _value.phoneDigits
-            : phoneDigits // ignore: cast_nullable_to_non_nullable
+        phoneE164: null == phoneE164
+            ? _value.phoneE164
+            : phoneE164 // ignore: cast_nullable_to_non_nullable
                   as String,
+        isPhoneValid: null == isPhoneValid
+            ? _value.isPhoneValid
+            : isPhoneValid // ignore: cast_nullable_to_non_nullable
+                  as bool,
         birthYear: null == birthYear
             ? _value.birthYear
             : birthYear // ignore: cast_nullable_to_non_nullable
@@ -247,7 +262,8 @@ class _$NewMemberFormImpl extends _NewMemberForm {
   const _$NewMemberFormImpl({
     required this.firstName,
     required this.lastName,
-    required this.phoneDigits,
+    required this.phoneE164,
+    this.isPhoneValid = false,
     required this.birthYear,
     required this.heightCm,
     this.gender,
@@ -262,8 +278,13 @@ class _$NewMemberFormImpl extends _NewMemberForm {
   final String firstName;
   @override
   final String lastName;
+
+  /// F8-4 — global telefon numarası desteği. E.164 (`+905324187605`).
   @override
-  final String phoneDigits;
+  final String phoneE164;
+  @override
+  @JsonKey()
+  final bool isPhoneValid;
   @override
   final int birthYear;
   @override
@@ -287,7 +308,7 @@ class _$NewMemberFormImpl extends _NewMemberForm {
 
   @override
   String toString() {
-    return 'NewMemberForm(firstName: $firstName, lastName: $lastName, phoneDigits: $phoneDigits, birthYear: $birthYear, heightCm: $heightCm, gender: $gender, trainerId: $trainerId, trainerName: $trainerName, note: $note, registeredAt: $registeredAt, canConfirmAttendance: $canConfirmAttendance)';
+    return 'NewMemberForm(firstName: $firstName, lastName: $lastName, phoneE164: $phoneE164, isPhoneValid: $isPhoneValid, birthYear: $birthYear, heightCm: $heightCm, gender: $gender, trainerId: $trainerId, trainerName: $trainerName, note: $note, registeredAt: $registeredAt, canConfirmAttendance: $canConfirmAttendance)';
   }
 
   @override
@@ -299,8 +320,10 @@ class _$NewMemberFormImpl extends _NewMemberForm {
                 other.firstName == firstName) &&
             (identical(other.lastName, lastName) ||
                 other.lastName == lastName) &&
-            (identical(other.phoneDigits, phoneDigits) ||
-                other.phoneDigits == phoneDigits) &&
+            (identical(other.phoneE164, phoneE164) ||
+                other.phoneE164 == phoneE164) &&
+            (identical(other.isPhoneValid, isPhoneValid) ||
+                other.isPhoneValid == isPhoneValid) &&
             (identical(other.birthYear, birthYear) ||
                 other.birthYear == birthYear) &&
             (identical(other.heightCm, heightCm) ||
@@ -322,7 +345,8 @@ class _$NewMemberFormImpl extends _NewMemberForm {
     runtimeType,
     firstName,
     lastName,
-    phoneDigits,
+    phoneE164,
+    isPhoneValid,
     birthYear,
     heightCm,
     gender,
@@ -346,7 +370,8 @@ abstract class _NewMemberForm extends NewMemberForm {
   const factory _NewMemberForm({
     required final String firstName,
     required final String lastName,
-    required final String phoneDigits,
+    required final String phoneE164,
+    final bool isPhoneValid,
     required final int birthYear,
     required final int heightCm,
     final MemberGender? gender,
@@ -362,8 +387,12 @@ abstract class _NewMemberForm extends NewMemberForm {
   String get firstName;
   @override
   String get lastName;
+
+  /// F8-4 — global telefon numarası desteği. E.164 (`+905324187605`).
   @override
-  String get phoneDigits;
+  String get phoneE164;
+  @override
+  bool get isPhoneValid;
   @override
   int get birthYear;
   @override

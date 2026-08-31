@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:phone_form_field/phone_form_field.dart';
 
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/base_panel.dart';
@@ -9,9 +10,9 @@ import '../../../../core/panels/panel_stack_controller.dart';
 import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/subscription/subscription_write_gate.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../../../shared/utils/phone_number_formatter.dart';
 import '../../../../shared/utils/tr_date_formatter.dart';
 import '../../../../shared/widgets/app_button.dart';
+import '../../../../shared/widgets/app_phone_field.dart';
 import '../../../../shared/widgets/app_text_field.dart';
 import '../../../../shared/widgets/native_date_picker.dart';
 import '../../../trainers/controller/admin_trainers_controller.dart';
@@ -38,7 +39,7 @@ class MemberInfoPanel extends BasePanel {
 class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
   late final TextEditingController _firstNameController;
   late final TextEditingController _lastNameController;
-  late final TextEditingController _phoneController;
+  late final PhoneController _phoneController;
   late final TextEditingController _noteController;
   final _noteScrollController = ScrollController();
 
@@ -51,18 +52,22 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
       _lastNameController = TextEditingController(
         text: parts.skip(1).join(' '),
       );
-      final phoneDigits = _digitsOnly(widget.existing!.phone);
-      _phoneController = TextEditingController();
+      final existingPhone = widget.existing!.phone;
+      _phoneController = PhoneController(
+        initialValue: PhoneNumber.parse(
+          existingPhone.isEmpty ? '+90' : existingPhone,
+        ),
+      );
       _noteController = TextEditingController();
       // Kaydet, NewMemberController'ın form state'ini okuyor — telefon
       // alanına hiç dokunulmasa bile geçerli bir değer olsun diye mevcut
-      // üyenin numarası buraya da yazılıyor (aksi halde phoneDigits boş
+      // üyenin numarası buraya da yazılıyor (aksi halde phoneE164 boş
       // kalır ve validasyon "geçersiz numara" hatası verir).
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         if (!mounted) return;
         final notifier = ref.read(newMemberControllerProvider.notifier);
         notifier.reset();
-        notifier.updatePhoneDigits(phoneDigits);
+        if (existingPhone.isNotEmpty) notifier.setInitialPhone(existingPhone);
         // `AdminMemberSummary` (widget.existing) bu alanı taşımıyor —
         // yazmadan önce gerçek değeri okumazsak her "Kaydet" yetkiyi
         // sessizce false'a resetlerdi.
@@ -81,7 +86,9 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
       // sızmasın diye alanlar her zaman boş başlar (bkz. NewMemberController.reset).
       _firstNameController = TextEditingController();
       _lastNameController = TextEditingController();
-      _phoneController = TextEditingController();
+      _phoneController = PhoneController(
+        initialValue: PhoneNumber.parse('+90'),
+      );
       _noteController = TextEditingController();
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) ref.read(newMemberControllerProvider.notifier).reset();
@@ -99,17 +106,6 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
     final registrationController = ref.read(
       memberRegistrationControllerProvider.notifier,
     );
-
-    // gym_setup_panel'deki telefon alanıyla aynı deneyim: gerçek kaynak
-    // form.phoneDigits, controller sadece "5XX XXX XX XX" formatlanmış
-    // gösterimi senkron tutar.
-    final formattedPhone = formatTrPhoneDigits(form.phoneDigits);
-    if (_phoneController.text != formattedPhone) {
-      _phoneController.value = TextEditingValue(
-        text: formattedPhone,
-        selection: TextSelection.collapsed(offset: formattedPhone.length),
-      );
-    }
 
     return Scaffold(
       body: SafeArea(
@@ -269,23 +265,14 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
                           ],
                         ),
                         const SizedBox(height: AppSpacing.md),
-                        AppTextField(
+                        AppPhoneField(
                           label: ref.watch(
                             rcTextProvider(RemoteConfigKeys.commonTelefonLabel),
                           ),
-                          hint: ref.watch(
-                            rcTextProvider(
-                              RemoteConfigKeys.membersInfoPhoneHint,
-                            ),
-                          ),
-                          prefixText: '+90 ',
-                          keyboardType: TextInputType.number,
                           controller: _phoneController,
-                          inputFormatters: [TrPhoneNumberInputFormatter()],
                           errorText: registrationState.phoneError,
-                          onChanged: (value) => controller.updatePhoneDigits(
-                            value.replaceAll(RegExp(r'[^0-9]'), ''),
-                          ),
+                          onChanged: (e164, isValid) =>
+                              controller.updatePhone(e164, isValid: isValid),
                         ),
                         const SizedBox(height: AppSpacing.xs),
                         Text(
@@ -913,16 +900,6 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
         );
       },
     );
-  }
-
-  String _digitsOnly(String raw) {
-    final digits = raw.replaceAll(RegExp(r'[^0-9]'), '');
-    final withoutCountryCode = digits.startsWith('90') && digits.length > 10
-        ? digits.substring(2)
-        : digits;
-    return withoutCountryCode.length > 10
-        ? withoutCountryCode.substring(withoutCountryCode.length - 10)
-        : withoutCountryCode;
   }
 
   @override

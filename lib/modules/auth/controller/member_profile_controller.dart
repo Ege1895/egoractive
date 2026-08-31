@@ -27,24 +27,18 @@ Stream<Map<String, dynamic>?> _profileDocForUid(
 @riverpod
 class MemberProfileController extends _$MemberProfileController {
   @override
-  ({String name, String phoneDigits, String email, bool sessionReminderEnabled})
+  ({String name, String phoneE164, String email, bool sessionReminderEnabled})
   build() {
     final uid = ref.watch(authStateProvider).valueOrNull?.uid;
     if (uid == null) {
-      return (
-        name: '',
-        phoneDigits: '',
-        email: '',
-        sessionReminderEnabled: true,
-      );
+      return (name: '', phoneE164: '', email: '', sessionReminderEnabled: true);
     }
 
     final data = ref.watch(_profileDocForUidProvider(uid)).valueOrNull;
     final name = (data?['name'] as String?) ?? '';
-    final phoneDigits = _digitsOnly((data?['phoneNumber'] as String?) ?? '');
     return (
       name: name,
-      phoneDigits: phoneDigits,
+      phoneE164: (data?['phoneNumber'] as String?) ?? '',
       email: (data?['email'] as String?) ?? '',
       sessionReminderEnabled:
           (data?['sessionReminderEnabled'] as bool?) ?? true,
@@ -57,15 +51,5 @@ class MemberProfileController extends _$MemberProfileController {
     await FirebaseFirestore.instance.collection('users').doc(uid).set({
       'sessionReminderEnabled': !state.sessionReminderEnabled,
     }, SetOptions(merge: true));
-  }
-
-  String _digitsOnly(String raw) {
-    final digits = raw.replaceAll(RegExp(r'[^0-9]'), '');
-    final withoutCountryCode = digits.startsWith('90') && digits.length > 10
-        ? digits.substring(2)
-        : digits;
-    return withoutCountryCode.length > 10
-        ? withoutCountryCode.substring(withoutCountryCode.length - 10)
-        : withoutCountryCode;
   }
 }

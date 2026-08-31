@@ -8,7 +8,6 @@ import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_back_button.dart';
-import '../../../../shared/utils/phone_number_formatter.dart';
 import '../../../measurements/ui/panels/measurements_panel.dart';
 import '../../../sessions/ui/widgets/create_session_sheet.dart';
 import '../../controller/trainer_member_detail_controller.dart';
@@ -150,7 +149,7 @@ class _TrainerMemberDetailPanelState
                                     ),
                                   ),
                                   Text(
-                                    '${formatTrPhoneDisplay(detail.phone)} · ${detail.memberSince}',
+                                    '${detail.phone} · ${detail.memberSince}',
                                     style: typography.bodyMedium.copyWith(
                                       color: colors.onSurfaceMuted,
                                       fontSize: 14,
@@ -210,9 +209,7 @@ class _TrainerMemberDetailPanelState
                               AppSpacing.radiusInner,
                             ),
                             child: Container(
-                              constraints: const BoxConstraints(
-                                minHeight: 52,
-                              ),
+                              constraints: const BoxConstraints(minHeight: 52),
                               width: double.infinity,
                               alignment: Alignment.center,
                               child: Text(
@@ -249,9 +246,7 @@ class _TrainerMemberDetailPanelState
                               AppSpacing.radiusInner,
                             ),
                             child: Container(
-                              constraints: const BoxConstraints(
-                                minHeight: 52,
-                              ),
+                              constraints: const BoxConstraints(minHeight: 52),
                               width: double.infinity,
                               alignment: Alignment.center,
                               child: Text(

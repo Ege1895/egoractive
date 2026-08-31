@@ -5,7 +5,6 @@ import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
 import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../../../shared/utils/phone_number_formatter.dart';
 import '../../../badges/controller/badges_controller.dart';
 import '../../../badges/ui/panels/badges_panel.dart';
 import '../../../feedback/ui/panels/feedback_panel.dart';
@@ -99,10 +98,7 @@ class ProfilePanel extends ConsumerWidget {
                                             .authProfileMemberCaption,
                                       ),
                                     )
-                                    .replaceAll(
-                                      '{phone}',
-                                      formatTrPhoneDigits(profile.phoneDigits),
-                                    ),
+                                    .replaceAll('{phone}', profile.phoneE164),
                                 style: typography.bodyMedium.copyWith(
                                   color: colors.onSurfaceVariant,
                                   fontSize: 14,

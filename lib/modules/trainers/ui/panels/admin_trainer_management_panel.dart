@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:phone_form_field/phone_form_field.dart';
 
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/base_panel.dart';
@@ -7,9 +8,9 @@ import '../../../../core/panels/panel_stack_controller.dart';
 import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/subscription/subscription_write_gate.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../../../shared/utils/phone_number_formatter.dart';
 import '../../../../shared/widgets/app_back_button.dart';
 import '../../../../shared/widgets/app_button.dart';
+import '../../../../shared/widgets/app_phone_field.dart';
 import '../../../../shared/widgets/app_text_field.dart';
 import '../../controller/admin_trainers_controller.dart';
 import '../../domain/admin_trainer_summary.dart';
@@ -258,12 +259,12 @@ class _TrainerFormSheetState extends ConsumerState<_TrainerFormSheet> {
   late final _nameController = TextEditingController(
     text: widget.existing?.name ?? '',
   );
-  late final _phoneController = TextEditingController(
-    text: widget.existing == null
-        ? ''
-        : widget.existing!.phone
-              .replaceAll(RegExp(r'[^0-9]'), '')
-              .replaceFirst(RegExp(r'^90'), ''),
+  late final _phoneController = PhoneController(
+    initialValue: PhoneNumber.parse(
+      widget.existing == null || widget.existing!.phone.isEmpty
+          ? '+90'
+          : widget.existing!.phone,
+    ),
   );
   late final Set<String> _selectedSpecialties = {
     ...?widget.existing?.specialties,
@@ -287,7 +288,12 @@ class _TrainerFormSheetState extends ConsumerState<_TrainerFormSheet> {
       _isSaving = true;
       _errorMessage = null;
     });
-    final phoneDigits = _phoneController.text.replaceAll(RegExp(r'[^0-9]'), '');
+    // Antrenör telefonu opsiyonel — sadece ülke kodu seçilip hane
+    // girilmediyse (nsn boş) boş gönderilir.
+    final enteredNumber = _phoneController.value;
+    final phoneNumber = enteredNumber.nsn.isEmpty
+        ? ''
+        : enteredNumber.international;
     final specialties = _selectedSpecialties.isEmpty
         ? ['Fonksiyonel']
         : _selectedSpecialties.toList();
@@ -297,13 +303,13 @@ class _TrainerFormSheetState extends ConsumerState<_TrainerFormSheet> {
         await notifier.updateTrainer(
           id: widget.existing!.id,
           name: name,
-          phoneNumber: phoneDigits.isEmpty ? '' : '+90$phoneDigits',
+          phoneNumber: phoneNumber,
           specialties: specialties,
         );
       } else {
         await notifier.addTrainer(
           name: name,
-          phoneNumber: phoneDigits.isEmpty ? '' : '+90$phoneDigits',
+          phoneNumber: phoneNumber,
           specialties: specialties,
         );
       }
@@ -377,16 +383,11 @@ class _TrainerFormSheetState extends ConsumerState<_TrainerFormSheet> {
             ),
           ),
           const SizedBox(height: AppSpacing.md),
-          AppTextField(
+          AppPhoneField(
             label: ref.watch(
               rcTextProvider(RemoteConfigKeys.commonTelefonLabel),
             ),
             controller: _phoneController,
-            keyboardType: TextInputType.phone,
-            inputFormatters: [TrPhoneNumberInputFormatter()],
-            hint: ref.watch(
-              rcTextProvider(RemoteConfigKeys.membersInfoPhoneHint),
-            ),
           ),
           const SizedBox(height: AppSpacing.md),
           Text(
