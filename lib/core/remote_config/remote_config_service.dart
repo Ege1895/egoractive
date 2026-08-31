@@ -190,6 +190,12 @@ abstract final class RemoteConfigKeys {
   static const commonAnaSayfaTab = 'lbl_common_ana_sayfa_tab';
   static const commonProfilTab = 'lbl_common_profil_tab';
   static const commonTelefonLabel = 'lbl_common_telefon_label';
+  /// F8-5 sonrası bulundu — `AppPhoneField`'ın ülke seçici sheet'indeki arama
+  /// kutusu, `flutter_country_selector` paketinin kendi varsayılan metnini
+  /// ("Aramak"/"Search") gösteriyordu; bu, kullanıcıya default/placeholder
+  /// gibi görünen, doğal olmayan bir ifadeydi.
+  static const commonPhoneCountrySearchHint =
+      'lbl_common_phone_country_search_hint';
   static const commonTumuFilter = 'lbl_common_tumu_filter';
   static const commonTamamlandi = 'lbl_common_tamamlandi';
   static const commonIptalLabel = 'lbl_common_iptal_label';
@@ -1585,6 +1591,7 @@ class RemoteConfigService {
     'lbl_common_ana_sayfa_tab_tr': 'Ana Sayfa',
     'lbl_common_profil_tab_tr': 'Profil',
     'lbl_common_telefon_label_tr': 'Telefon',
+    'lbl_common_phone_country_search_hint_tr': 'Ülke ara',
     'lbl_common_tumu_filter_tr': 'Tümü',
     'lbl_common_tamamlandi_tr': 'Tamamlandı',
     'lbl_common_iptal_label_tr': 'İptal',
@@ -2456,6 +2463,7 @@ class RemoteConfigService {
     'lbl_common_ana_sayfa_tab_en': 'Home',
     'lbl_common_profil_tab_en': 'Profile',
     'lbl_common_telefon_label_en': 'Phone',
+    'lbl_common_phone_country_search_hint_en': 'Search country',
     'lbl_common_tumu_filter_en': 'All',
     'lbl_common_tamamlandi_en': 'Completed',
     'lbl_common_iptal_label_en': 'Canceled',

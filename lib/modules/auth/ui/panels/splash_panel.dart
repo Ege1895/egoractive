@@ -17,12 +17,15 @@ import 'phone_login_panel.dart';
 /// Burada aktif bir Firebase Auth oturumu varsa `main.dart`'taki
 /// `appAccessProvider` dinleyicisi zaten devreye girip ilgili role/duruma
 /// yönlendirir (bu ekranın timer'ı geçersiz kılınır). Oturum yoksa bu timer
-/// [OnboardingPrefs.hasSeenRoleOnboarding]'e bakar: cihaz bu ekranı DAHA ÖNCE
-/// hiç görmediyse (gerçek ilk kurulum) [OnboardingRolePanel]'e ("antrenör
-/// müsün, üye misin?") geçer ve bir daha görülmemek üzere işaretler;
-/// aksi halde (daha önce görülmüş — ör. kullanıcı çıkış yapıp uygulamayı
-/// kapatıp açtı) doğrudan [PhoneLoginPanel]'e gider. Bu rol seçimi gerçekten
-/// sadece cihazın hayatında bir kez gösterilsin diye.
+/// [OnboardingPrefs.hasCompletedFirstLogin]'e bakar: cihazda HİÇ tamamlanmış
+/// bir girişi yoksa (gerçek ilk kurulum, ya da rol seçilip telefon/salon
+/// kurulumu yarıda bırakılmış olması) [OnboardingRolePanel]'e ("antrenör
+/// müsün, üye misin?") geçer; aksi halde (daha önce en az bir kez başarıyla
+/// giriş yapılmış — ör. kullanıcı çıkış yapıp uygulamayı kapatıp açtı)
+/// doğrudan [PhoneLoginPanel]'e gider. Bayrak BURADA değil, `appAccess`'te
+/// (`role != null` olduğu an) işaretlenir — aksi halde rol seçilip giriş
+/// tamamlanmadan uygulama kapatılırsa kullanıcı bu ekranı bir daha
+/// GÖREMEZDİ (bkz. F8-5 sonrası bulunan gerçek hata).
 class SplashPanel extends BasePanel {
   const SplashPanel({super.key});
 
@@ -106,10 +109,9 @@ class _SplashPanelState extends BasePanelState<SplashPanel> {
     _sessionCheckTimer = Timer(const Duration(milliseconds: 1600), () {
       if (!mounted) return;
       final panelStack = ref.read(panelStackControllerProvider.notifier);
-      if (OnboardingPrefs.hasSeenRoleOnboarding) {
+      if (OnboardingPrefs.hasCompletedFirstLogin) {
         panelStack.replaceRoot(const PhoneLoginPanel());
       } else {
-        OnboardingPrefs.markRoleOnboardingSeen();
         panelStack.replaceRoot(const OnboardingRolePanel());
       }
     });

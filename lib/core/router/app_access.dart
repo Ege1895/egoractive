@@ -6,6 +6,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../modules/auth/repository/auth_repository.dart';
 import '../../modules/subscription/controller/subscription_controller.dart';
 import '../../modules/subscription/domain/subscription_state.dart';
+import '../onboarding/onboarding_prefs.dart';
 import '../remote_config/remote_config_service.dart';
 import '../theme/theme_controller.dart';
 import 'app_router.dart';
@@ -64,6 +65,11 @@ Stream<AppAccess> appAccess(AppAccessRef ref) async* {
     yield (kind: AppAccessKind.signedOut, role: null);
     return;
   }
+  // Geçerli bir role bağlanmış bir Firebase Auth oturumu — cihazın hayatında
+  // İLK KEZ burası çözülüyorsa bu, "başarılı ilk giriş" anı (bkz.
+  // `OnboardingPrefs` dokümantasyonu — kıstas rol seçim ekranını GÖRMÜŞ
+  // olmak değil, bir girişi TAMAMLAMIŞ olmak).
+  unawaited(OnboardingPrefs.markFirstLoginCompleted());
 
   // Egoractive Authentication Sistemi §6 — email custom claim olmadığı için
   // (sadece OTP doğrulaması sonrası Cloud Function tarafından yazılan bir

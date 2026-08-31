@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:phone_form_field/phone_form_field.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -11,20 +12,22 @@ import 'package:egoractive/shared/widgets/app_phone_field.dart';
 import 'package:egoractive/shared/widgets/app_phone_field_prefs.dart';
 
 Widget _wrap(Widget child, {Locale locale = const Locale('tr')}) {
-  return MaterialApp(
-    locale: locale,
-    supportedLocales: const [Locale('tr'), Locale('en')],
-    theme: AppTheme.build(
-      colors: AppColorScheme.defaultScheme(),
-      typography: AppTypography.standard(),
+  return ProviderScope(
+    child: MaterialApp(
+      locale: locale,
+      supportedLocales: const [Locale('tr'), Locale('en')],
+      theme: AppTheme.build(
+        colors: AppColorScheme.defaultScheme(),
+        typography: AppTypography.standard(),
+      ),
+      localizationsDelegates: [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+        ...PhoneFieldLocalization.delegates,
+      ],
+      home: Scaffold(body: child),
     ),
-    localizationsDelegates: [
-      GlobalMaterialLocalizations.delegate,
-      GlobalWidgetsLocalizations.delegate,
-      GlobalCupertinoLocalizations.delegate,
-      ...PhoneFieldLocalization.delegates,
-    ],
-    home: Scaffold(body: child),
   );
 }
 
@@ -91,4 +94,30 @@ void main() {
     expect(find.text('Almanya'), findsOneWidget);
     expect(find.text('Afganistan'), findsOneWidget);
   });
+
+  testWidgets(
+    'opening the country selector dismisses the phone field keyboard',
+    (tester) async {
+      await AppPhoneFieldPrefs.init();
+      await tester.pumpWidget(_wrap(const AppPhoneField()));
+      await tester.pump();
+
+      await tester.tap(find.byType(TextField).first);
+      await tester.pump();
+      expect(
+        tester.testTextInput.isVisible,
+        isTrue,
+        reason: 'tapping the number field should bring up the keyboard',
+      );
+
+      await tester.tap(find.byType(CountryButton));
+      await tester.pumpAndSettle();
+
+      expect(
+        tester.testTextInput.isVisible,
+        isFalse,
+        reason: 'opening the country picker should dismiss the keyboard',
+      );
+    },
+  );
 }

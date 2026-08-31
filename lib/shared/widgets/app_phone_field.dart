@@ -1,9 +1,34 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phone_form_field/phone_form_field.dart';
 
 import '../../core/constants/app_spacing.dart';
+import '../../core/remote_config/remote_config_service.dart';
 import '../../core/theme/app_theme.dart';
 import 'app_phone_field_prefs.dart';
+
+/// F8-5 sonrası bulundu — ülke seçici, kendi `CountrySelectorNavigator`'ının
+/// `show()`'unu doğrudan `CountryButton.onTap`'inden çağırıyor
+/// (`phone_form_field` paketi içinde, bize açık bir hook vermiyor); sheet
+/// açılırken numara alanının klavyesi açık kalıyordu. Gerçek navigator'ı
+/// SARIP `show()`'dan hemen önce klavyeyi kapatan ince bir decorator.
+/// `FocusScope.of(context).unfocus()` burada İŞE YARAMIYOR (widget testiyle
+/// doğrulandı — `context`'in scope'u beklenenden farklı bir ata scope'a
+/// çözülüyor olmalı); doğrudan `FocusManager.instance.primaryFocus` üzerinden
+/// gitmek scope çözümlemesinden bağımsız, her zaman çalışıyor.
+class _KeyboardDismissingCountrySelectorNavigator
+    extends CountrySelectorNavigator {
+  const _KeyboardDismissingCountrySelectorNavigator(this._inner)
+    : super(searchAutofocus: false);
+
+  final CountrySelectorNavigator _inner;
+
+  @override
+  Future<IsoCode?> show(BuildContext context) {
+    FocusManager.instance.primaryFocus?.unfocus();
+    return _inner.show(context);
+  }
+}
 
 /// F8-5 — bir telefon girişi başlatılırken kullanılacak varsayılan değer.
 /// [existingE164] doluysa (düzenlenen bir kayıt) onu kullanır; boşsa (yeni
@@ -29,7 +54,7 @@ PhoneNumber initialPhoneNumber([String? existingE164]) {
 /// doğrulama sonucuyla (`PhoneNumber.isValid()`) tetiklenir. Ülke seçici her
 /// kullanımda seçilen ülkeyi (`AppPhoneFieldPrefs`) hatırlar — bir sonraki
 /// YENİ girişte (bkz. [initialPhoneNumber]) oradan başlar.
-class AppPhoneField extends StatelessWidget {
+class AppPhoneField extends ConsumerWidget {
   const AppPhoneField({
     this.controller,
     this.label,
@@ -50,16 +75,32 @@ class AppPhoneField extends StatelessWidget {
   final void Function(String e164, bool isValid)? onChanged;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.appColors;
     final typography = context.appTypography;
     final radius = BorderRadius.circular(AppSpacing.radiusInner);
+    final searchHint = ref.watch(
+      rcTextProvider(RemoteConfigKeys.commonPhoneCountrySearchHint),
+    );
 
     return PhoneFormField(
       controller: controller,
       initialValue: controller == null ? initialPhoneNumber() : null,
       enabled: enabled,
-      countrySelectorNavigator: const CountrySelectorNavigator.bottomSheet(),
+      countrySelectorNavigator: _KeyboardDismissingCountrySelectorNavigator(
+        CountrySelectorNavigator.bottomSheet(
+          searchBoxDecoration: InputDecoration(
+            hintText: searchHint,
+            prefixIcon: const Icon(Icons.search, size: 24),
+            filled: true,
+            isDense: true,
+            border: OutlineInputBorder(
+              borderSide: BorderSide.none,
+              borderRadius: BorderRadius.circular(20),
+            ),
+          ),
+        ),
+      ),
       countryButtonStyle: const CountryButtonStyle(
         showDialCode: true,
         showIsoCode: false,

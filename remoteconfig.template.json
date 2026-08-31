@@ -562,6 +562,18 @@
       },
       "valueType": "STRING"
     },
+    "lbl_common_phone_country_search_hint_tr": {
+      "defaultValue": {
+        "value": "Ülke ara"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_common_phone_country_search_hint_en": {
+      "defaultValue": {
+        "value": "Search country"
+      },
+      "valueType": "STRING"
+    },
     "lbl_common_tumu_filter_tr": {
       "defaultValue": {
         "value": "Tümü"
