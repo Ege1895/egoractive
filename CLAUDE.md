@@ -213,29 +213,35 @@ functions/                # Cloud Functions (TypeScript)
 - **Manager:** Controller ile eşanlamlı, bazı task açıklamalarında bu isim geçebilir
 - **RC:** Remote Config
 
-## 7. Sürüm ve Build Numaralandırma (Google Play Store)
+## 7. Sürüm ve Build Numaralandırma (Google Play Store + App Store)
 
-Google Play Store için alınan **her build**, `pubspec.yaml`'daki `version:` alanında şu formatı takip etmeli:
+**Tek kaynak (source of truth):** `pubspec.yaml`'daki `version:` alanı:
 
 ```
 version: <versionName>+<buildNumber>
 ```
 
-Play Console'da bu, otomatik olarak **`<buildNumber> (<versionName>)`** şeklinde gösterilir — örn. `1 (1.0.0)`. Yani:
-
 - `versionName` (nokta ile ayrılmış, örn. `1.0.0`) — kullanıcıya görünen sürüm, semver mantığıyla ilerler (özellik/düzeltme kapsamına göre sen karar verirsin).
-- `buildNumber` (tam sayı, örn. `1`) — Play Console'a her yeni yükleme öncesi **kesinlikle bir artırılmalı** (aynı buildNumber ile ikinci bir yükleme Play Console tarafından reddedilir).
+- `buildNumber` (tam sayı, örn. `1`) — hem Play Console hem App Store Connect'e her yeni yükleme öncesi **kesinlikle bir artırılmalı** (aynı buildNumber ile ikinci bir yükleme ikisi tarafından da reddedilir).
 
-Yeni bir Play Store build'i alınırken (hangi session olursa olsun):
-1. `pubspec.yaml`'daki `version:` satırını güncelle — `buildNumber`'ı bir artır, `versionName`'i gerekirse (görev/kapsam gerektiriyorsa) değiştir.
-2. `flutter build appbundle --release` ile `.aab` üret.
-3. Bu kural her zaman geçerli — kullanıcı ayrıca hatırlatmasa bile uygulanır.
+Kullanıcı "build number'ı artır" dediğinde (platform belirtmeden) **her iki platform da** etkilenir — sadece `pubspec.yaml`'ı değiştirip durmak YETMEZ, aşağıdaki tüm adımlar tamamlanmalı:
 
-**Çıktı dosyasının adı da bu formatta olmalı.** `flutter build appbundle --release` her zaman sabit `build/app/outputs/bundle/release/app-release.aab` adını üretir — bu, pubspec'teki `version:` alanına göre otomatik değişmez. Build tamamlandıktan sonra dosyayı **aynı klasörde**, `<buildNumber> (<versionName>).aab` adıyla (örn. `2 (1.0.0).aab`) kopyala:
+1. `pubspec.yaml`'daki `version:` satırını güncelle — `buildNumber`'ı bir artır, `versionName`'i gerekirse (görev/kapsam gerektiriyorsa) değiştir. Bu kural her zaman geçerli — kullanıcı ayrıca hatırlatmasa bile uygulanır.
+2. `flutter pub get` çalıştır.
+3. **Android:** `flutter build appbundle --release` ile `.aab` üret.
+4. **iOS:** `flutter build ios --no-codesign --debug` (ya da gerçek bir cihaz/App Store build'i) çalıştır — **SADECE `pubspec.yaml`'ı değiştirip `flutter pub get` çalıştırmak Xcode'un gördüğü build numarasını GÜNCELLEMEZ.** `ios/Flutter/Generated.xcconfig` (Xcode projesinin `CFBundleVersion`/`CFBundleShortVersionString` için okuduğu, `$(FLUTTER_BUILD_NUMBER)`/`$(FLUTTER_BUILD_NAME)` değişkenlerini tuttuğu dosya) sadece bir **iOS build/run komutu** çalıştığında `pubspec.yaml`'dan yeniden üretiliyor — `flutter pub get` tek başına bunu tetiklemiyor. Bunu bir kere atlayıp kullanıcıya "Xcode'da hâlâ eski build number görünüyor" hatası yaşattık (2026-09-01) — Android build'i alıp iOS'u atlamıştık. **İki platformdan birini yapıp diğerini atlama, ikisi de her seferinde çalıştırılmalı.**
+5. Kullanıcı Xcode'da **yeni bir Archive** almadan eski build numarası görünmeye devam eder (Archives listesi geçmiş archive'ları gösterir, bunlar otomatik güncellenmez) — build number güncellemesi sonrası kullanıcıya "Xcode'da Product → Archive ile yeni bir archive al" hatırlatmasını unutma.
+
+**Android çıktı dosyasının adı da bu formatta olmalı.** `flutter build appbundle --release` her zaman sabit `build/app/outputs/bundle/release/app-release.aab` adını üretir — bu, pubspec'teki `version:` alanına göre otomatik değişmez. Build tamamlandıktan sonra dosyayı **aynı klasörde**, `<buildNumber> (<versionName>).aab` adıyla (örn. `2 (1.0.0).aab`) kopyala:
 
 ```
 cp build/app/outputs/bundle/release/app-release.aab "build/app/outputs/bundle/release/<buildNumber> (<versionName>).aab"
 ```
+
+**Kısacası — build number değiştiğinde dokunulması/kontrol edilmesi gereken dosyalar:**
+- `pubspec.yaml` (`version:` — asıl kaynak, elle düzenlenir)
+- `ios/Flutter/Generated.xcconfig` (`FLUTTER_BUILD_NUMBER`/`FLUTTER_BUILD_NAME` — elle düzenlenmez, `flutter build ios`/`flutter pub get` + bir iOS build adımıyla otomatik yeniden üretilir; sadece `flutter pub get` yeterli DEĞİL, gerçek bir iOS build komutu şart)
+- `build/app/outputs/bundle/release/<buildNumber> (<versionName>).aab` (Android çıktısı, elle kopyalanır — yukarıdaki `cp` komutu)
 
 ## Abonelik sıfırlama aracı (resetGymSubscription)
 
