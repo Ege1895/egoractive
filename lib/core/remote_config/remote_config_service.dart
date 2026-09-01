@@ -1391,6 +1391,7 @@ abstract final class RemoteConfigKeys {
   static const trainersAddTrainerNameRequiredError =
       'lbl_trainers_add_trainer_name_required_error';
   static const trainersAddTrainerError = 'lbl_trainers_add_trainer_error';
+  static const trainersPhoneTakenError = 'lbl_trainers_phone_taken_error';
   static const trainersAddTrainerNameHint =
       'lbl_trainers_add_trainer_name_hint';
   static const trainersManagementTrainerCountSuffix =
@@ -2417,6 +2418,7 @@ class RemoteConfigService {
     'lbl_trainers_detail_month_load_error_tr': 'Bu ayın verileri yüklenemedi.',
     'lbl_trainers_add_trainer_name_required_error_tr': 'Ad soyad boş olamaz.',
     'lbl_trainers_add_trainer_error_tr': 'Antrenör eklenemedi, tekrar dene.',
+    'lbl_trainers_phone_taken_error_tr': 'Bu telefon numarası zaten kayıtlı.',
     'lbl_trainers_add_trainer_name_hint_tr': 'Emre Kaya',
     'lbl_trainers_management_trainer_count_suffix_tr': '{count} kişi',
     'lbl_trainers_add_trainer_saving_label_tr': 'Ekleniyor…',
@@ -3294,6 +3296,7 @@ class RemoteConfigService {
         'Full name cannot be empty.',
     'lbl_trainers_add_trainer_error_en':
         'Trainer could not be added, try again.',
+    'lbl_trainers_phone_taken_error_en': 'This phone number is already registered.',
     'lbl_trainers_add_trainer_name_hint_en': 'John Smith',
     'lbl_trainers_management_trainer_count_suffix_en': '{count} people',
     'lbl_trainers_add_trainer_saving_label_en': 'Adding…',

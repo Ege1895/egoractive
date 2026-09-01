@@ -14,6 +14,7 @@ import '../../../../shared/widgets/app_phone_field.dart';
 import '../../../../shared/widgets/app_text_field.dart';
 import '../../controller/admin_trainers_controller.dart';
 import '../../domain/admin_trainer_summary.dart';
+import '../../service/trainer_registration_service.dart';
 import 'admin_trainer_detail_panel.dart';
 
 /// Admin 3 · Antrenör Yönetimi — liste + antrenör ekle (alt sayfa formu).
@@ -267,6 +268,7 @@ class _TrainerFormSheetState extends ConsumerState<_TrainerFormSheet> {
   };
   bool _isSaving = false;
   String? _nameError;
+  String? _phoneError;
   String? _errorMessage;
 
   bool get _isEditing => widget.existing != null;
@@ -276,7 +278,10 @@ class _TrainerFormSheetState extends ConsumerState<_TrainerFormSheet> {
     final nameRequiredError = ref.read(
       rcTextProvider(RemoteConfigKeys.trainersAddTrainerNameRequiredError),
     );
-    setState(() => _nameError = name.isEmpty ? nameRequiredError : null);
+    setState(() {
+      _nameError = name.isEmpty ? nameRequiredError : null;
+      _phoneError = null;
+    });
     if (_nameError != null) return;
     if (!await ensureSubscriptionAllowsWrite(context, ref)) return;
 
@@ -290,6 +295,26 @@ class _TrainerFormSheetState extends ConsumerState<_TrainerFormSheet> {
     final phoneNumber = enteredNumber.nsn.isEmpty
         ? ''
         : enteredNumber.international;
+    // F2-2 benzeri (member_registration_service.dart) — düzenlemede numara
+    // hiç değişmediyse (kendi mevcut kaydına karşı) kontrol atlanır, aksi
+    // halde antrenör kendi numarasıyla "zaten kayıtlı" hatası alırdı.
+    final phoneChanged = phoneNumber != (widget.existing?.phone ?? '');
+    if (phoneNumber.isNotEmpty && phoneChanged) {
+      final isTaken = await ref
+          .read(trainerRegistrationServiceProvider)
+          .phoneNumberIsTaken(phoneNumber);
+      if (isTaken) {
+        if (mounted) {
+          setState(() {
+            _isSaving = false;
+            _phoneError = ref.read(
+              rcTextProvider(RemoteConfigKeys.trainersPhoneTakenError),
+            );
+          });
+        }
+        return;
+      }
+    }
     final specialties = _selectedSpecialties.isEmpty
         ? ['Fonksiyonel']
         : _selectedSpecialties.toList();
@@ -384,6 +409,10 @@ class _TrainerFormSheetState extends ConsumerState<_TrainerFormSheet> {
               rcTextProvider(RemoteConfigKeys.commonTelefonLabel),
             ),
             controller: _phoneController,
+            errorText: _phoneError,
+            onChanged: (_, _) {
+              if (_phoneError != null) setState(() => _phoneError = null);
+            },
           ),
           const SizedBox(height: AppSpacing.md),
           Text(

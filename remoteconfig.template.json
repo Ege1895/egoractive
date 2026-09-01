@@ -6829,6 +6829,18 @@
       },
       "valueType": "STRING"
     },
+    "lbl_trainers_phone_taken_error_tr": {
+      "defaultValue": {
+        "value": "Bu telefon numarası zaten kayıtlı."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_phone_taken_error_en": {
+      "defaultValue": {
+        "value": "This phone number is already registered."
+      },
+      "valueType": "STRING"
+    },
     "lbl_trainers_add_trainer_name_hint_tr": {
       "description": "Antrenör ekle formundaki Ad soyad alanının örnek metni",
       "defaultValue": {
