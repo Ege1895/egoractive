@@ -1,18 +1,27 @@
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
+/// `intl`'in CLDR verisi TRY için hâlâ `TL` döndürüyor (`₺` — Türk Lirası
+/// işareti — 2012'de kabul edildi, bu paketin CLDR sürümüne hiç işlenmemiş);
+/// tüm locale/versiyonlarda böyle, `intl` sürümü güncellenmeden düzelmiyor.
+/// Sadece bu tek durum için sembolü elle eziyoruz — başka hiçbir para
+/// birimine dokunulmuyor, onlar zaten `intl`'den doğru geliyor ($, €, £, ¥
+/// gibi has bir sembolü olmayanlar için de kısa harf kısaltması, örn. AED
+/// için "dh" — kullanıcının istediği "logo yoksa kodu/kısaltmasını yaz"
+/// davranışı zaten bu).
+const _currencySymbolOverrides = {'TRY': '₺'};
+
 /// F9-1 — global para birimi desteği. Bir salonun bütün tutarları (paket
 /// fiyatı, üye ödemesi, gider, rapor toplamları) her zaman tam sayı, kuruş/
 /// cent ayrımı yok — bu davranış zaten `ThousandsInputFormatter`'ın öncülü
 /// olduğu için değişmiyor, `decimalDigits: 0` bunu her para biriminde
-/// zorluyor. Sembol/binlik ayracı `intl`'in CLDR verisinden geliyor, biz
-/// kendi tablomuzu tutmuyoruz.
+/// zorluyor. Binlik ayracı/sembol pozisyonu `intl`'in CLDR verisinden
+/// geliyor, sadece sembolün KENDİSİ [currencySymbol] üzerinden (override'lı)
+/// veriliyor.
 String formatMoney(int amount, String currencyCode, String locale) {
-  // `NumberFormat.currency` yazar ISO kodunu ("TRY50.000") — sembolü ("₺50.000")
-  // istediğimiz için `simpleCurrency` kullanılıyor.
-  return NumberFormat.simpleCurrency(
+  return NumberFormat.currency(
     locale: locale,
-    name: currencyCode,
+    symbol: currencySymbol(currencyCode),
     decimalDigits: 0,
   ).format(amount);
 }
@@ -27,7 +36,8 @@ String formatAmountGrouped(int amount, String locale) {
 /// sabit yazmak yerine `{currency}` yer tutucusunu bununla değiştirmek
 /// için — [formatMoney] gibi tam bir tutar değil, tek başına sembol.
 String currencySymbol(String currencyCode) {
-  return NumberFormat.simpleCurrency(name: currencyCode).currencySymbol;
+  return _currencySymbolOverrides[currencyCode] ??
+      NumberFormat.simpleCurrency(name: currencyCode).currencySymbol;
 }
 
 /// [formatEditUpdate] ile yazılan bir metinden ham tam sayıyı geri okumak

@@ -4,13 +4,16 @@ import 'package:egoractive/core/money/app_money_formatter.dart';
 
 void main() {
   group('formatMoney', () {
-    test('TRY / tr locale uses the Turkish grouping and symbol', () {
-      // intl'in CLDR verisi tr locale'inde TRY için "TL" kısaltmasını
-      // kullanıyor (₺ glifi değil) — bu intl'in kendi kararı, bizim
-      // elle bir sembol tablosu tutmadığımızın kanıtı.
+    test('TRY / tr locale uses the Turkish grouping and the ₺ symbol', () {
+      // intl'in CLDR verisi TRY için hâlâ "TL" döndürüyor (₺ glifi değil,
+      // hiçbir locale'de) — bu paketin CLDR sürümüne hiç işlenmemiş.
+      // Kullanıcı isteği üzerine SADECE bu para birimi için elle
+      // override edildi (bkz. `_currencySymbolOverrides`), başka hiçbir
+      // para birimine dokunulmadı.
       final result = formatMoney(50000, 'TRY', 'tr');
       expect(result, contains('50.000'));
-      expect(result, contains('TL'));
+      expect(result, contains('₺'));
+      expect(result, isNot(contains('TL')));
     });
 
     test('USD / en locale uses the English grouping and symbol', () {
@@ -48,6 +51,18 @@ void main() {
       final result = formatMoney(2500, 'GBP', 'en');
       expect(result, contains('£'));
       expect(result, contains('2,500'));
+    });
+  });
+
+  group('currencySymbol', () {
+    test('TRY returns ₺ instead of intl\'s default TL', () {
+      expect(currencySymbol('TRY'), '₺');
+    });
+
+    test('other currencies are left untouched (from intl)', () {
+      expect(currencySymbol('USD'), r'$');
+      expect(currencySymbol('EUR'), '€');
+      expect(currencySymbol('GBP'), '£');
     });
   });
 
