@@ -1936,13 +1936,13 @@
     },
     "lbl_expenses_amount_field_label_tr": {
       "defaultValue": {
-        "value": "Tutar (₺)"
+        "value": "Tutar ({currency})"
       },
       "valueType": "STRING"
     },
     "lbl_expenses_amount_field_label_en": {
       "defaultValue": {
-        "value": "Amount (₺)"
+        "value": "Amount ({currency})"
       },
       "valueType": "STRING"
     },
@@ -5181,13 +5181,13 @@
     },
     "lbl_packages_edit_price_field_label_tr": {
       "defaultValue": {
-        "value": "Fiyat (₺)"
+        "value": "Fiyat ({currency})"
       },
       "valueType": "STRING"
     },
     "lbl_packages_edit_price_field_label_en": {
       "defaultValue": {
-        "value": "Price (₺)"
+        "value": "Price ({currency})"
       },
       "valueType": "STRING"
     },
@@ -5254,13 +5254,13 @@
     "lbl_packages_per_session_price_caption_tr": {
       "description": "{price} yer tutucusu seans başı fiyatla değiştirilir.",
       "defaultValue": {
-        "value": "seans başı ₺{price}"
+        "value": "seans başı {price}"
       },
       "valueType": "STRING"
     },
     "lbl_packages_per_session_price_caption_en": {
       "defaultValue": {
-        "value": "₺{price} per session"
+        "value": "{price} per session"
       },
       "valueType": "STRING"
     },

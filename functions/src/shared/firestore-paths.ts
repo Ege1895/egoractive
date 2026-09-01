@@ -16,6 +16,28 @@ export function userDoc(uid: string) {
   return `${usersCollection()}/${uid}`;
 }
 
+/**
+ * F2-2 perf — üye/antrenör ekleme akışındaki "bu telefon zaten kayıtlı mı"
+ * kontrolü eskiden `checkPhoneAvailable` callable'ına gidiyordu; bu callable
+ * soğuk başlarsa (Cloud Run scale-to-zero) tek başına 20-30+ saniye
+ * ekleyebiliyordu ("Kaydet"e basınca ~1 dakikaya varan donma, kullanıcı
+ * raporu). `users/{uid}.phoneNumber` küresel benzersiz olmalı ama client
+ * bunu doğrudan sorgulayamaz (rules `gymId` filtresi ister, F1-10 notu) —
+ * bunun yerine `on-user-write-sync-phone-index.ts` trigger'ının canlı
+ * tuttuğu bu index client'tan DOĞRUDAN, ucuz bir point-read'le okunur
+ * (Cloud Function invocation'ı hiç yok, dolayısıyla cold start riski de
+ * yok). Doküman id'si telefon numarasının kendisi (E.164 ya da migrasyon
+ * öncesi çıplak TR hali — bkz. `phone-lookup.ts`), içeriği sadece sahibinin
+ * `uid`'i; client sadece VARLIĞINI okuyabilir, hiçbir zaman yazamaz.
+ */
+export function phoneIndexCollection() {
+  return "phoneIndex";
+}
+
+export function phoneIndexDoc(phoneNumber: string) {
+  return `${phoneIndexCollection()}/${phoneNumber}`;
+}
+
 /** Email OTP sistemi — bkz. `shared/otp.ts`. Doküman id'si `{purpose}_{uid}` şeklinde. */
 export function otpRequestsCollection() {
   return "otpRequests";
