@@ -8,6 +8,7 @@ import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_back_button.dart';
 import '../../../../shared/widgets/app_button.dart';
+import '../../../../shared/widgets/app_confirm_dialog.dart';
 import '../../controller/admin_trainer_detail_controller.dart';
 import '../../controller/admin_trainers_controller.dart';
 import '../../controller/trainer_activity_breakdown_controller.dart';
@@ -312,144 +313,39 @@ class _AdminTrainerDetailPanelState
   /// Silme geri alınamaz olduğu için önce onay alınır. Onay metni, verinin
   /// KALDIĞINI açıkça söylüyor — admin "geçmişi de siliyorum" sanmasın.
   ///
-  /// Ekranın ORTASINDA açılan onay diyaloğu (`subscription_write_gate.dart`
-  /// ile aynı `AlertDialog` deseni) — yıkıcı ve geri alınamaz bir aksiyon
-  /// olduğu için alttan açılan sheet yerine, dikkat talep eden merkezi bir
-  /// diyalog tercih edildi.
-  ///
-  /// Diyalog, yazma TAMAMLANANA kadar açık kalır (`StatefulBuilder` +
-  /// `barrierDismissible: false`), hata olursa içeride gösterilir — geri
-  /// alınamaz bir aksiyonda "kapandı, demek ki oldu" yanılgısını önlemek
-  /// için.
-  void _showDeleteDialog(String trainerId, String trainerName) {
-    var isDeleting = false;
-    String? deleteError;
-
-    showDialog<void>(
+  /// Geri alınamaz aksiyon — ortak onay diyaloğu (`showAppConfirmDialog`)
+  /// üzerinden (aynı diyalog grup dersi/etkinlik iptalinde de kullanılıyor).
+  /// Diyalog yazma tamamlanana kadar açık kalır, hata içeride gösterilir;
+  /// onay metni verinin KALDIĞINI açıkça söylüyor.
+  Future<void> _showDeleteDialog(String trainerId, String trainerName) async {
+    final deleted = await showAppConfirmDialog(
       context: context,
-      barrierDismissible: false,
-      builder: (dialogContext) {
-        final colors = dialogContext.appColors;
-        final typography = dialogContext.appTypography;
-
-        return StatefulBuilder(
-          builder: (dialogContext, setLocalState) {
-            return AlertDialog(
-              backgroundColor: colors.surface,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
-              ),
-              title: Text(
-                ref.read(
-                  rcTextProvider(RemoteConfigKeys.trainersDeleteConfirmTitle),
-                ),
-                style: typography.headingSmall.copyWith(
-                  color: colors.onSurface,
-                  fontSize: 17,
-                ),
-              ),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    ref
-                        .read(
-                          rcTextProvider(
-                            RemoteConfigKeys.trainersDeleteConfirmBody,
-                          ),
-                        )
-                        .replaceAll('{name}', trainerName),
-                    style: typography.bodyMedium.copyWith(
-                      color: colors.onSurfaceMuted,
-                      fontSize: 14,
-                    ),
-                  ),
-                  if (deleteError != null) ...[
-                    const SizedBox(height: AppSpacing.md),
-                    Text(
-                      deleteError!,
-                      style: typography.bodyMedium.copyWith(
-                        color: colors.error,
-                        fontSize: 13,
-                      ),
-                    ),
-                  ],
-                ],
-              ),
-              actions: [
-                TextButton(
-                  onPressed: isDeleting
-                      ? null
-                      : () => Navigator.of(dialogContext).pop(),
-                  child: Text(
-                    ref.read(rcTextProvider(RemoteConfigKeys.commonVazgec)),
-                    style: typography.bodyMedium.copyWith(
-                      color: colors.onSurfaceMuted,
-                    ),
-                  ),
-                ),
-                TextButton(
-                  onPressed: isDeleting
-                      ? null
-                      : () async {
-                          setLocalState(() {
-                            isDeleting = true;
-                            deleteError = null;
-                          });
-                          try {
-                            await ref
-                                .read(trainerRegistrationServiceProvider)
-                                .deactivateTrainer(trainerId);
-                          } catch (_) {
-                            setLocalState(() {
-                              isDeleting = false;
-                              deleteError = ref.read(
-                                rcTextProvider(
-                                  RemoteConfigKeys.trainersDeleteError,
-                                ),
-                              );
-                            });
-                            return;
-                          }
-                          if (!dialogContext.mounted) return;
-                          Navigator.of(dialogContext).pop();
-                          // Antrenör artık `AdminTrainersController`
-                          // listesinde yok — bu panel geçersiz bir kayda
-                          // bakıyor, listeye dönülür.
-                          if (mounted) {
-                            ref
-                                .read(panelStackControllerProvider.notifier)
-                                .pop();
-                          }
-                        },
-                  child: Text(
-                    isDeleting
-                        ? ref.read(
-                            rcTextProvider(RemoteConfigKeys.membersSavingLabel),
-                          )
-                        : ref.read(
-                            rcTextProvider(
-                              RemoteConfigKeys.trainersDeleteConfirmCta,
-                            ),
-                          ),
-                    style: typography.bodyMedium.copyWith(color: colors.error),
-                  ),
-                ),
-              ],
-            );
-          },
-        );
-      },
+      title: ref.read(
+        rcTextProvider(RemoteConfigKeys.trainersDeleteConfirmTitle),
+      ),
+      message: ref
+          .read(rcTextProvider(RemoteConfigKeys.trainersDeleteConfirmBody))
+          .replaceAll('{name}', trainerName),
+      confirmLabel: ref.read(
+        rcTextProvider(RemoteConfigKeys.trainersDeleteConfirmCta),
+      ),
+      cancelLabel: ref.read(rcTextProvider(RemoteConfigKeys.commonVazgec)),
+      busyLabel: ref.read(rcTextProvider(RemoteConfigKeys.membersSavingLabel)),
+      errorMessage: ref.read(
+        rcTextProvider(RemoteConfigKeys.trainersDeleteError),
+      ),
+      onConfirm: () => ref
+          .read(trainerRegistrationServiceProvider)
+          .deactivateTrainer(trainerId),
     );
+    // Antrenör artık `AdminTrainersController` listesinde yok — bu panel
+    // geçersiz bir kayda bakıyor, listeye dönülür.
+    if (deleted && mounted) {
+      ref.read(panelStackControllerProvider.notifier).pop();
+    }
   }
 }
 
-/// "BU AY"/"BU HAFTA" kartı — [counts] ile aynı [activity] snapshot'ından
-/// aylık ya da haftalık kırılımı seçip Tamamlanan/Planlanan alt
-/// başlıklarıyla (birebir seans + düet ders) render eder. Grup dersleri şu
-/// an bir antrenöre atanmadığından (bkz. `TrainerActivityCounts` yorumu)
-/// burada gösterilmiyor.
 class _ActivityBreakdownCard extends ConsumerWidget {
   const _ActivityBreakdownCard({required this.activity, required this.counts});
 

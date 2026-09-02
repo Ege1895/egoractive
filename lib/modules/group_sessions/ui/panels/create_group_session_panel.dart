@@ -8,6 +8,7 @@ import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/subscription/subscription_write_gate.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_button.dart';
+import '../../../../shared/widgets/app_confirm_dialog.dart';
 import '../../../../shared/widgets/app_text_field.dart';
 import '../../../../shared/widgets/native_date_picker.dart';
 import '../../../trainers/controller/admin_trainers_controller.dart';
@@ -667,8 +668,49 @@ class _CreateGroupSessionPanelState
                       onPressed: form.isSubmitting || form.isCancelling
                           ? null
                           : () async {
-                              final success = await controller.cancel();
-                              if (success && mounted) panelStack.pop();
+                              // Geri alınamaz aksiyon — önce onay.
+                              // `controller.cancel()` başarısızlıkta `false`
+                              // döndüğü için, diyaloğun hata gösterip açık
+                              // kalabilmesi adına burada hataya çevriliyor.
+                              final confirmed = await showAppConfirmDialog(
+                                context: context,
+                                title: ref.read(
+                                  rcTextProvider(
+                                    RemoteConfigKeys
+                                        .groupSessionsCancelConfirmTitle,
+                                  ),
+                                ),
+                                message: ref.read(
+                                  rcTextProvider(
+                                    RemoteConfigKeys
+                                        .groupSessionsCancelConfirmBody,
+                                  ),
+                                ),
+                                confirmLabel: ref.read(
+                                  rcTextProvider(
+                                    RemoteConfigKeys
+                                        .groupSessionsCancelConfirmCta,
+                                  ),
+                                ),
+                                cancelLabel: ref.read(
+                                  rcTextProvider(RemoteConfigKeys.commonVazgec),
+                                ),
+                                busyLabel: ref.read(
+                                  rcTextProvider(
+                                    RemoteConfigKeys.gymsGymSetupSubmittingLabel,
+                                  ),
+                                ),
+                                errorMessage: ref.read(
+                                  rcTextProvider(
+                                    RemoteConfigKeys.groupSessionsCancelError,
+                                  ),
+                                ),
+                                onConfirm: () async {
+                                  final success = await controller.cancel();
+                                  if (!success) throw Exception('cancel-failed');
+                                },
+                              );
+                              if (confirmed && mounted) panelStack.pop();
                             },
                     ),
                   ],

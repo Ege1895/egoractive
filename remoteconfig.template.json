@@ -9558,6 +9558,102 @@
         "value": "Trainer could not be deleted, try again."
       },
       "valueType": "STRING"
+    },
+    "lbl_group_sessions_cancel_confirm_title_tr": {
+      "defaultValue": {
+        "value": "Dersi iptal etmek istiyor musun?"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_cancel_confirm_title_en": {
+      "defaultValue": {
+        "value": "Cancel this class?"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_cancel_confirm_body_tr": {
+      "defaultValue": {
+        "value": "Ders listeden kaldırılmaz, \"İptal edildi\" olarak işaretlenir. Katılan üyeler dersi iptal edilmiş olarak görür."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_cancel_confirm_body_en": {
+      "defaultValue": {
+        "value": "The class stays in the list, marked as \"Cancelled\". Members who joined will see it as cancelled."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_cancel_confirm_cta_tr": {
+      "defaultValue": {
+        "value": "Evet, iptal et"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_cancel_confirm_cta_en": {
+      "defaultValue": {
+        "value": "Yes, cancel it"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_cancel_error_tr": {
+      "defaultValue": {
+        "value": "İptal edilemedi, tekrar dene."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_group_sessions_cancel_error_en": {
+      "defaultValue": {
+        "value": "Could not cancel, try again."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_events_cancel_confirm_title_tr": {
+      "defaultValue": {
+        "value": "Etkinliği iptal etmek istiyor musun?"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_events_cancel_confirm_title_en": {
+      "defaultValue": {
+        "value": "Cancel this event?"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_events_cancel_confirm_body_tr": {
+      "defaultValue": {
+        "value": "Etkinlik listeden kaldırılmaz, \"İptal edildi\" olarak işaretlenir. Katılan üyeler etkinliği iptal edilmiş olarak görür."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_events_cancel_confirm_body_en": {
+      "defaultValue": {
+        "value": "The event stays in the list, marked as \"Cancelled\". Members who joined will see it as cancelled."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_events_cancel_confirm_cta_tr": {
+      "defaultValue": {
+        "value": "Evet, iptal et"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_events_cancel_confirm_cta_en": {
+      "defaultValue": {
+        "value": "Yes, cancel it"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_events_cancel_error_tr": {
+      "defaultValue": {
+        "value": "İptal edilemedi, tekrar dene."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_events_cancel_error_en": {
+      "defaultValue": {
+        "value": "Could not cancel, try again."
+      },
+      "valueType": "STRING"
     }
   }
 }

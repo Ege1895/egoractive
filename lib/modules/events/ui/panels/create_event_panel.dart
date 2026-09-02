@@ -11,6 +11,7 @@ import '../../../../core/subscription/subscription_write_gate.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/theme/theme_controller.dart';
 import '../../../../shared/widgets/app_button.dart';
+import '../../../../shared/widgets/app_confirm_dialog.dart';
 import '../../../../shared/widgets/app_text_field.dart';
 import '../../../../shared/widgets/native_date_picker.dart';
 import '../../service/events_write_service.dart';
@@ -38,7 +39,6 @@ class _CreateEventPanelState extends BasePanelState<CreateEventPanel> {
   TimeOfDay? _selectedTime;
   int? _capacity;
   bool _isSaving = false;
-  bool _isCancelling = false;
   bool _isLoadingForEdit = false;
   String? _nameError;
   String? _dateError;
@@ -382,7 +382,7 @@ class _CreateEventPanelState extends BasePanelState<CreateEventPanel> {
                                   : RemoteConfigKeys.eventsCreateSubmitButton,
                             ),
                           ),
-                    onPressed: _isSaving || _isCancelling || _isLoadingForEdit
+                    onPressed: _isSaving || _isLoadingForEdit
                         ? null
                         : () async {
                             final name = _nameController.text.trim();
@@ -505,43 +505,55 @@ class _CreateEventPanelState extends BasePanelState<CreateEventPanel> {
                   if (_isEditing) ...[
                     const SizedBox(height: AppSpacing.sm),
                     _CancelButton(
-                      label: _isCancelling
-                          ? ref.watch(
-                              rcTextProvider(
-                                RemoteConfigKeys.gymsGymSetupSubmittingLabel,
-                              ),
-                            )
-                          : ref.watch(
-                              rcTextProvider(
-                                RemoteConfigKeys.groupSessionsCancelButton,
-                              ),
-                            ),
-                      onPressed: _isSaving || _isCancelling || _isLoadingForEdit
+                      label: ref.watch(
+                        rcTextProvider(
+                          RemoteConfigKeys.groupSessionsCancelButton,
+                        ),
+                      ),
+                      onPressed: _isSaving || _isLoadingForEdit
                           ? null
                           : () async {
-                              setState(() {
-                                _isCancelling = true;
-                                _errorMessage = null;
-                              });
-                              try {
-                                await ref
+                              // Geri alınamaz aksiyon — önce onay. İşlem
+                              // durumu ve hata gösterimi artık diyaloğun
+                              // kendisinde.
+                              final confirmed = await showAppConfirmDialog(
+                                context: context,
+                                title: ref.read(
+                                  rcTextProvider(
+                                    RemoteConfigKeys.eventsCancelConfirmTitle,
+                                  ),
+                                ),
+                                message: ref.read(
+                                  rcTextProvider(
+                                    RemoteConfigKeys.eventsCancelConfirmBody,
+                                  ),
+                                ),
+                                confirmLabel: ref.read(
+                                  rcTextProvider(
+                                    RemoteConfigKeys.eventsCancelConfirmCta,
+                                  ),
+                                ),
+                                cancelLabel: ref.read(
+                                  rcTextProvider(RemoteConfigKeys.commonVazgec),
+                                ),
+                                busyLabel: ref.read(
+                                  rcTextProvider(
+                                    RemoteConfigKeys.gymsGymSetupSubmittingLabel,
+                                  ),
+                                ),
+                                errorMessage: ref.read(
+                                  rcTextProvider(
+                                    RemoteConfigKeys.eventsCancelError,
+                                  ),
+                                ),
+                                onConfirm: () => ref
                                     .read(eventsWriteServiceProvider)
-                                    .cancelEvent(widget.eventId!);
-                                if (mounted) {
-                                  ref
-                                      .read(
-                                        panelStackControllerProvider.notifier,
-                                      )
-                                      .pop();
-                                }
-                              } catch (_) {
-                                if (mounted) {
-                                  setState(() {
-                                    _isCancelling = false;
-                                    _errorMessage =
-                                        'İptal edilemedi, tekrar dene.';
-                                  });
-                                }
+                                    .cancelEvent(widget.eventId!),
+                              );
+                              if (confirmed && mounted) {
+                                ref
+                                    .read(panelStackControllerProvider.notifier)
+                                    .pop();
                               }
                             },
                     ),

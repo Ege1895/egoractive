@@ -1397,6 +1397,17 @@ abstract final class RemoteConfigKeys {
   static const trainersDeleteConfirmBody = 'lbl_trainers_delete_confirm_body';
   static const trainersDeleteConfirmCta = 'lbl_trainers_delete_confirm_cta';
   static const trainersDeleteError = 'lbl_trainers_delete_error';
+  static const groupSessionsCancelConfirmTitle =
+      'lbl_group_sessions_cancel_confirm_title';
+  static const groupSessionsCancelConfirmBody =
+      'lbl_group_sessions_cancel_confirm_body';
+  static const groupSessionsCancelConfirmCta =
+      'lbl_group_sessions_cancel_confirm_cta';
+  static const groupSessionsCancelError = 'lbl_group_sessions_cancel_error';
+  static const eventsCancelConfirmTitle = 'lbl_events_cancel_confirm_title';
+  static const eventsCancelConfirmBody = 'lbl_events_cancel_confirm_body';
+  static const eventsCancelConfirmCta = 'lbl_events_cancel_confirm_cta';
+  static const eventsCancelError = 'lbl_events_cancel_error';
   static const trainersAddTrainerNameHint =
       'lbl_trainers_add_trainer_name_hint';
   static const trainersManagementTrainerCountSuffix =
@@ -2430,6 +2441,18 @@ class RemoteConfigService {
         '{name} artık uygulamaya giriş yapamayacak ve antrenör listesinde görünmeyecek. Geçmiş seansları, grup dersleri ve raporlardaki verileri olduğu gibi kalır.',
     'lbl_trainers_delete_confirm_cta_tr': 'Evet, sil',
     'lbl_trainers_delete_error_tr': 'Antrenör silinemedi, tekrar dene.',
+    'lbl_group_sessions_cancel_confirm_title_tr':
+        'Dersi iptal etmek istiyor musun?',
+    'lbl_group_sessions_cancel_confirm_body_tr':
+        'Ders listeden kaldırılmaz, "İptal edildi" olarak işaretlenir. Katılan üyeler dersi iptal edilmiş olarak görür.',
+    'lbl_group_sessions_cancel_confirm_cta_tr': 'Evet, iptal et',
+    'lbl_group_sessions_cancel_error_tr': 'İptal edilemedi, tekrar dene.',
+    'lbl_events_cancel_confirm_title_tr':
+        'Etkinliği iptal etmek istiyor musun?',
+    'lbl_events_cancel_confirm_body_tr':
+        'Etkinlik listeden kaldırılmaz, "İptal edildi" olarak işaretlenir. Katılan üyeler etkinliği iptal edilmiş olarak görür.',
+    'lbl_events_cancel_confirm_cta_tr': 'Evet, iptal et',
+    'lbl_events_cancel_error_tr': 'İptal edilemedi, tekrar dene.',
     'lbl_trainers_add_trainer_name_hint_tr': 'Emre Kaya',
     'lbl_trainers_management_trainer_count_suffix_tr': '{count} kişi',
     'lbl_trainers_add_trainer_saving_label_tr': 'Ekleniyor…',
@@ -3314,6 +3337,16 @@ class RemoteConfigService {
         '{name} will no longer be able to sign in and will not appear in the trainer list. Past sessions, group classes and report data remain unchanged.',
     'lbl_trainers_delete_confirm_cta_en': 'Yes, delete',
     'lbl_trainers_delete_error_en': 'Trainer could not be deleted, try again.',
+    'lbl_group_sessions_cancel_confirm_title_en': 'Cancel this class?',
+    'lbl_group_sessions_cancel_confirm_body_en':
+        'The class stays in the list, marked as "Cancelled". Members who joined will see it as cancelled.',
+    'lbl_group_sessions_cancel_confirm_cta_en': 'Yes, cancel it',
+    'lbl_group_sessions_cancel_error_en': 'Could not cancel, try again.',
+    'lbl_events_cancel_confirm_title_en': 'Cancel this event?',
+    'lbl_events_cancel_confirm_body_en':
+        'The event stays in the list, marked as "Cancelled". Members who joined will see it as cancelled.',
+    'lbl_events_cancel_confirm_cta_en': 'Yes, cancel it',
+    'lbl_events_cancel_error_en': 'Could not cancel, try again.',
     'lbl_trainers_add_trainer_name_hint_en': 'John Smith',
     'lbl_trainers_management_trainer_count_suffix_en': '{count} people',
     'lbl_trainers_add_trainer_saving_label_en': 'Adding…',
