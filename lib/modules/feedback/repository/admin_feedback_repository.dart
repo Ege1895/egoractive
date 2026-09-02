@@ -6,7 +6,7 @@ import '../service/admin_feedback_service.dart';
 part 'admin_feedback_repository.g.dart';
 
 abstract interface class AdminFeedbackRepository {
-  Stream<AdminFeedbackSummary> watchSummary(String gymId);
+  Stream<AdminFeedbackSummary> watchSummary(String gymId, DateTime month);
 }
 
 class AdminFeedbackRepositoryImpl implements AdminFeedbackRepository {
@@ -15,7 +15,8 @@ class AdminFeedbackRepositoryImpl implements AdminFeedbackRepository {
   final AdminFeedbackService _service;
 
   @override
-  Stream<AdminFeedbackSummary> watchSummary(String gymId) => _service.watchSummary(gymId);
+  Stream<AdminFeedbackSummary> watchSummary(String gymId, DateTime month) =>
+      _service.watchSummary(gymId, month);
 }
 
 @riverpod

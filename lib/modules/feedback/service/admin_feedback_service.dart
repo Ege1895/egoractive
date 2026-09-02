@@ -16,10 +16,30 @@ const _monthNamesLong = {
 class AdminFeedbackService {
   const AdminFeedbackService();
 
-  Stream<AdminFeedbackSummary> watchSummary(String gymId) {
+  /// [month] gösterilecek ayın herhangi bir günü olabilir; ayın ilk gününe
+  /// normalize edilir.
+  ///
+  /// Önceden salonun TÜM geri bildirimleri limitsiz bir canlı listener ile
+  /// çekiliyordu — yüzlerce kayıtta hem liste okunmaz hale geliyor hem her
+  /// ekran açılışında bütün koleksiyon okunuyordu (F10 performans
+  /// analizinde de işaretlenmişti). Artık sorgu tek bir ayla sınırlı;
+  /// `gymId + createdAt` composite index'i zaten mevcut.
+  ///
+  /// `average`/`starCounts`/`totalCount` de artık SEÇİLİ AYA ait — admin
+  /// ana ekranı da bu özeti kullanıyor ve orası zaten "Eylül 2026 özeti"
+  /// gibi ay bazlı, dolayısıyla tutarlı.
+  Stream<AdminFeedbackSummary> watchSummary(String gymId, DateTime month) {
+    final monthStart = DateTime(month.year, month.month, 1);
+    final monthEnd = DateTime(month.year, month.month + 1, 1);
+
     return FirebaseFirestore.instance
         .collection('feedback')
         .where('gymId', isEqualTo: gymId)
+        .where(
+          'createdAt',
+          isGreaterThanOrEqualTo: Timestamp.fromDate(monthStart),
+        )
+        .where('createdAt', isLessThan: Timestamp.fromDate(monthEnd))
         .snapshots()
         .map((snapshot) {
       final docs = snapshot.docs.toList()

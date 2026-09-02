@@ -1408,6 +1408,9 @@ abstract final class RemoteConfigKeys {
   static const eventsCancelConfirmBody = 'lbl_events_cancel_confirm_body';
   static const eventsCancelConfirmCta = 'lbl_events_cancel_confirm_cta';
   static const eventsCancelError = 'lbl_events_cancel_error';
+  static const feedbackFilterAllLabel = 'lbl_feedback_filter_all_label';
+  static const feedbackEmptyMonthLabel = 'lbl_feedback_empty_month_label';
+  static const feedbackEmptyFilterLabel = 'lbl_feedback_empty_filter_label';
   static const trainersAddTrainerNameHint =
       'lbl_trainers_add_trainer_name_hint';
   static const trainersManagementTrainerCountSuffix =
@@ -2453,6 +2456,10 @@ class RemoteConfigService {
         'Etkinlik listeden kaldırılmaz, "İptal edildi" olarak işaretlenir. Katılan üyeler etkinliği iptal edilmiş olarak görür.',
     'lbl_events_cancel_confirm_cta_tr': 'Evet, iptal et',
     'lbl_events_cancel_error_tr': 'İptal edilemedi, tekrar dene.',
+    'lbl_feedback_filter_all_label_tr': 'Tümü',
+    'lbl_feedback_empty_month_label_tr': 'Bu ay hiç geri bildirim yok.',
+    'lbl_feedback_empty_filter_label_tr':
+        'Bu puanda geri bildirim yok.',
     'lbl_trainers_add_trainer_name_hint_tr': 'Emre Kaya',
     'lbl_trainers_management_trainer_count_suffix_tr': '{count} kişi',
     'lbl_trainers_add_trainer_saving_label_tr': 'Ekleniyor…',
@@ -3347,6 +3354,9 @@ class RemoteConfigService {
         'The event stays in the list, marked as "Cancelled". Members who joined will see it as cancelled.',
     'lbl_events_cancel_confirm_cta_en': 'Yes, cancel it',
     'lbl_events_cancel_error_en': 'Could not cancel, try again.',
+    'lbl_feedback_filter_all_label_en': 'All',
+    'lbl_feedback_empty_month_label_en': 'No feedback this month.',
+    'lbl_feedback_empty_filter_label_en': 'No feedback with this rating.',
     'lbl_trainers_add_trainer_name_hint_en': 'John Smith',
     'lbl_trainers_management_trainer_count_suffix_en': '{count} people',
     'lbl_trainers_add_trainer_saving_label_en': 'Adding…',

@@ -9654,6 +9654,42 @@
         "value": "Could not cancel, try again."
       },
       "valueType": "STRING"
+    },
+    "lbl_feedback_filter_all_label_tr": {
+      "defaultValue": {
+        "value": "Tümü"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_feedback_filter_all_label_en": {
+      "defaultValue": {
+        "value": "All"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_feedback_empty_month_label_tr": {
+      "defaultValue": {
+        "value": "Bu ay hiç geri bildirim yok."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_feedback_empty_month_label_en": {
+      "defaultValue": {
+        "value": "No feedback this month."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_feedback_empty_filter_label_tr": {
+      "defaultValue": {
+        "value": "Bu puanda geri bildirim yok."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_feedback_empty_filter_label_en": {
+      "defaultValue": {
+        "value": "No feedback with this rating."
+      },
+      "valueType": "STRING"
     }
   }
 }
