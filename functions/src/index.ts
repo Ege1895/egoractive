@@ -24,6 +24,7 @@ export { onGroupSessionCreated } from "./triggers/on-group-session-created";
 export { notifyMemberPackageQuota } from "./callable/notify-member-package-quota";
 export { sendSessionReminderTask } from "./tasks/send-session-reminder-task";
 export { sendSessionCompletionTask } from "./tasks/send-session-completion-task";
+export { sendTrainerSessionReminderTask } from "./tasks/send-trainer-session-reminder-task";
 export { sendEventReminderTask } from "./tasks/send-event-reminder-task";
 export { sendGroupSessionReminderTask } from "./tasks/send-group-session-reminder-task";
 export { badgeCheck } from "./scheduled/badge-check";

@@ -7,6 +7,7 @@ import { broadcastToGymMembers } from "../shared/community-broadcast";
 import { withFailureAlerting } from "../shared/function-health";
 import { getCachedRemoteConfigTemplate } from "../shared/remote-config-cache";
 import { readLocalizedNotificationText } from "../shared/notification-text";
+import { fetchGymStaffTokens, sendPushToTokens } from "../shared/staff-notifications";
 import { resolveGymTimeZone, resolveNotificationLocale } from "../shared/notification-locale";
 import { formatTimeInZone } from "../shared/timezone-math";
 
@@ -32,6 +33,22 @@ const DEFAULT_TEXT: Record<string, { tr: string; en: string }> = {
   lbl_notif_event_invite_body_unlimited: {
     tr: "Saat {time}'te başlıyor, yer var. Katılmak için bu bildirime dokun 👉",
     en: "It starts at {time} and there's room. Tap here to join 👉",
+  },
+  // SALON PERSONELİNE (antrenörler + adminler) giden metin. Etkinliklerin
+  // grup derslerinden farkı, bir antrenöre ATANMIYOR olmaları — o yüzden
+  // "sen vereceksin" değil, salonun tamamına yönelik bilgilendirme dili.
+  lbl_notif_event_staff_reminder_title: {
+    tr: "📣 Yarın {eventName} var",
+    en: "📣 {eventName} is tomorrow",
+  },
+  lbl_notif_event_staff_reminder_body: {
+    tr: "Saat {time} · {location} · şu an {attendeeCount} kişi katılıyor",
+    en: "At {time} · {location} · {attendeeCount} people signed up so far",
+  },
+  // Yer bilgisi girilmemiş etkinliklerde boş bir ayraç ("· ·") kalmasın diye.
+  lbl_notif_event_staff_reminder_body_no_location: {
+    tr: "Saat {time} · şu an {attendeeCount} kişi katılıyor",
+    en: "At {time} · {attendeeCount} people signed up so far",
   },
 };
 
@@ -64,6 +81,7 @@ export const sendEventReminderTask = onTaskDispatched(
       attendeeIds?: string[];
       capacity?: number | null;
       status?: string;
+      location?: string;
     };
 
     if (data.dateTime?.toMillis() !== expectedDateTimeMs) return;
@@ -101,7 +119,32 @@ export const sendEventReminderTask = onTaskDispatched(
       }
     }
 
-    // 2) KATILMAYANLAR — sadece YER VARSA davet.
+    // 2) SALON PERSONELİ (antrenörler + adminler). Kontenjan kontrolünden
+    // ÖNCE: etkinlik dolu olsa bile personelin haberi olmalı.
+    const location = data.location?.trim() ?? "";
+    const staffVars = { eventName, time, location, attendeeCount: `${attendeeIds.length}` };
+    const staffTokens = [
+      ...(await fetchGymStaffTokens(data.gymId, "trainer", db)),
+      ...(await fetchGymStaffTokens(data.gymId, "admin", db)),
+    ];
+    await sendPushToTokens(
+      staffTokens,
+      {
+        title: readLocalizedNotificationText(template, "lbl_notif_event_staff_reminder_title", locale, staffVars, DEFAULT_TEXT),
+        body: readLocalizedNotificationText(
+          template,
+          location.length > 0
+            ? "lbl_notif_event_staff_reminder_body"
+            : "lbl_notif_event_staff_reminder_body_no_location",
+          locale,
+          staffVars,
+          DEFAULT_TEXT,
+        ),
+      },
+      { type: "event_staff_reminder", eventId },
+    );
+
+    // 3) KATILMAYAN ÜYELER — sadece YER VARSA davet.
     const capacity = typeof data.capacity === "number" ? data.capacity : null;
     const remaining = capacity === null ? null : capacity - attendeeIds.length;
     if (remaining !== null && remaining <= 0) {

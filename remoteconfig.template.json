@@ -9989,6 +9989,123 @@
         "value": "Could not load the event, please try again."
       },
       "valueType": "STRING"
+    },
+    "lbl_notif_trainer_session_reminder_title_tr": {
+      "defaultValue": {
+        "value": "⏰ Bugün {time} · {memberNames} ile dersin var"
+      },
+      "valueType": "STRING",
+      "description": "Antrenöre, dersinden 1 saat önce giden hatırlatmanın BAŞLIĞI. {memberNames} düet derste gruptaki TÜM üyelerin adını virgülle ayrılmış olarak taşır (üye sayısı 2 ile sınırlı değil)."
+    },
+    "lbl_notif_trainer_session_reminder_title_en": {
+      "defaultValue": {
+        "value": "⏰ Today at {time} · session with {memberNames}"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notif_trainer_session_reminder_body_tr": {
+      "defaultValue": {
+        "value": "{memberNames} saat {time}'te seni bekliyor. Hazırlanma vakti 💪"
+      },
+      "valueType": "STRING",
+      "description": "Antrenöre giden ders hatırlatmasının GÖVDESİ."
+    },
+    "lbl_notif_trainer_session_reminder_body_en": {
+      "defaultValue": {
+        "value": "{memberNames} will be there at {time}. Time to get ready 💪"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notif_group_session_trainer_reminder_title_tr": {
+      "defaultValue": {
+        "value": "⏰ Yarın {time} · {className} dersini sen vereceksin"
+      },
+      "valueType": "STRING",
+      "description": "Grup dersini verecek antrenöre, dersten bir gün önce 21:00'de giden hatırlatmanın başlığı."
+    },
+    "lbl_notif_group_session_trainer_reminder_title_en": {
+      "defaultValue": {
+        "value": "⏰ Tomorrow at {time} · you're teaching {className}"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notif_group_session_trainer_reminder_body_tr": {
+      "defaultValue": {
+        "value": "Şu an {attendeeCount} kişi katılıyor. Ders yarın saat {time}'te başlıyor."
+      },
+      "valueType": "STRING",
+      "description": "Grup dersi antrenör hatırlatmasının gövdesi."
+    },
+    "lbl_notif_group_session_trainer_reminder_body_en": {
+      "defaultValue": {
+        "value": "{attendeeCount} people are signed up so far. The class starts tomorrow at {time}."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notif_group_session_admin_reminder_title_tr": {
+      "defaultValue": {
+        "value": "📋 Yarın {className} dersi var"
+      },
+      "valueType": "STRING",
+      "description": "Salon adminine, grup dersinden bir gün önce 21:00'de giden hatırlatmanın başlığı."
+    },
+    "lbl_notif_group_session_admin_reminder_title_en": {
+      "defaultValue": {
+        "value": "📋 {className} is on tomorrow"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notif_group_session_admin_reminder_body_tr": {
+      "defaultValue": {
+        "value": "Saat {time} · Eğitmen: {trainerNames} · {attendeeCount} katılımcı"
+      },
+      "valueType": "STRING",
+      "description": "Grup dersi admin hatırlatmasının gövdesi."
+    },
+    "lbl_notif_group_session_admin_reminder_body_en": {
+      "defaultValue": {
+        "value": "At {time} · Trainer: {trainerNames} · {attendeeCount} attending"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notif_event_staff_reminder_title_tr": {
+      "defaultValue": {
+        "value": "📣 Yarın {eventName} var"
+      },
+      "valueType": "STRING",
+      "description": "Etkinlikten bir gün önce 21:00'de salonun antrenör ve adminlerine giden hatırlatmanın başlığı."
+    },
+    "lbl_notif_event_staff_reminder_title_en": {
+      "defaultValue": {
+        "value": "📣 {eventName} is tomorrow"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notif_event_staff_reminder_body_tr": {
+      "defaultValue": {
+        "value": "Saat {time} · {location} · şu an {attendeeCount} kişi katılıyor"
+      },
+      "valueType": "STRING",
+      "description": "Etkinlik personel hatırlatmasının gövdesi (yer bilgisi girilmişse)."
+    },
+    "lbl_notif_event_staff_reminder_body_en": {
+      "defaultValue": {
+        "value": "At {time} · {location} · {attendeeCount} people signed up so far"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notif_event_staff_reminder_body_no_location_tr": {
+      "defaultValue": {
+        "value": "Saat {time} · şu an {attendeeCount} kişi katılıyor"
+      },
+      "valueType": "STRING",
+      "description": "Etkinlik personel hatırlatmasının gövdesi (yer bilgisi boşsa)."
+    },
+    "lbl_notif_event_staff_reminder_body_no_location_en": {
+      "defaultValue": {
+        "value": "At {time} · {attendeeCount} people signed up so far"
+      },
+      "valueType": "STRING"
     }
   }
 }

@@ -7,6 +7,7 @@ import { broadcastToGymMembers } from "../shared/community-broadcast";
 import { withFailureAlerting } from "../shared/function-health";
 import { getCachedRemoteConfigTemplate } from "../shared/remote-config-cache";
 import { readLocalizedNotificationText } from "../shared/notification-text";
+import { fetchGymStaffTokens, fetchTokensForUids, firstName, formatNameList, sendPushToTokens } from "../shared/staff-notifications";
 import { resolveGymTimeZone, resolveNotificationLocale } from "../shared/notification-locale";
 import { formatTimeInZone } from "../shared/timezone-math";
 
@@ -34,6 +35,26 @@ const DEFAULT_TEXT: Record<string, { tr: string; en: string }> = {
   lbl_notif_group_session_invite_body_unlimited: {
     tr: "Saat {time}'te başlıyor, yer var. Katılmak için bu bildirime dokun 👉",
     en: "It starts at {time} and there's room. Tap here to join 👉",
+  },
+  // DERSİ VERECEK ANTRENÖRE giden metin — üyeninkinden farklı, çünkü
+  // antrenör için soru "katılacak mıyım" değil, "yarın ne zaman, kaç
+  // kişiye ders vereceğim".
+  lbl_notif_group_session_trainer_reminder_title: {
+    tr: "⏰ Yarın {time} · {className} dersini sen vereceksin",
+    en: "⏰ Tomorrow at {time} · you're teaching {className}",
+  },
+  lbl_notif_group_session_trainer_reminder_body: {
+    tr: "Şu an {attendeeCount} kişi katılıyor. Ders yarın saat {time}'te başlıyor.",
+    en: "{attendeeCount} people are signed up so far. The class starts tomorrow at {time}.",
+  },
+  // ADMİNE giden metin: takip amaçlı, kim veriyor + kaç kişi bilgisiyle.
+  lbl_notif_group_session_admin_reminder_title: {
+    tr: "📋 Yarın {className} dersi var",
+    en: "📋 {className} is on tomorrow",
+  },
+  lbl_notif_group_session_admin_reminder_body: {
+    tr: "Saat {time} · Eğitmen: {trainerNames} · {attendeeCount} katılımcı",
+    en: "At {time} · Trainer: {trainerNames} · {attendeeCount} attending",
   },
 };
 
@@ -68,6 +89,8 @@ export const sendGroupSessionReminderTask = onTaskDispatched(
       attendeeIds?: string[];
       capacity?: number | null;
       status?: string;
+      trainerIds?: string[];
+      trainerNames?: string[];
     };
 
     if (data.startTime?.toMillis() !== expectedStartTimeMs) return;
@@ -105,7 +128,38 @@ export const sendGroupSessionReminderTask = onTaskDispatched(
       }
     }
 
-    // 2) KATILMAYANLAR — sadece YER VARSA davet. `capacity` null ise
+    // 2) DERSİ VERECEK ANTRENÖR(LER) + SALON ADMİN(LER)İ. Kontenjan
+    // kontrolünden ÖNCE: ders dolu olsa bile personelin haberi olmalı.
+    const staffVars = {
+      className,
+      time,
+      attendeeCount: `${attendeeIds.length}`,
+      trainerNames:
+        formatNameList((data.trainerNames ?? []).map(firstName)) ||
+        (locale === "tr" ? "atanmadı" : "not assigned"),
+    };
+
+    const trainerTokens = await fetchTokensForUids(data.trainerIds ?? [], db);
+    await sendPushToTokens(
+      trainerTokens,
+      {
+        title: readLocalizedNotificationText(template, "lbl_notif_group_session_trainer_reminder_title", locale, staffVars, DEFAULT_TEXT),
+        body: readLocalizedNotificationText(template, "lbl_notif_group_session_trainer_reminder_body", locale, staffVars, DEFAULT_TEXT),
+      },
+      { type: "group_session_trainer_reminder", groupSessionId },
+    );
+
+    const adminTokens = await fetchGymStaffTokens(data.gymId, "admin", db);
+    await sendPushToTokens(
+      adminTokens,
+      {
+        title: readLocalizedNotificationText(template, "lbl_notif_group_session_admin_reminder_title", locale, staffVars, DEFAULT_TEXT),
+        body: readLocalizedNotificationText(template, "lbl_notif_group_session_admin_reminder_body", locale, staffVars, DEFAULT_TEXT),
+      },
+      { type: "group_session_admin_reminder", groupSessionId },
+    );
+
+    // 3) KATILMAYAN ÜYELER — sadece YER VARSA davet. `capacity` null ise
     // kontenjan sınırsız demektir (bkz. `CapacityService`), o durumda da
     // yer vardır ama "kaç kişilik yer kaldı" cümlesi kullanılamaz.
     const capacity = typeof data.capacity === "number" ? data.capacity : null;
