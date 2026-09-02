@@ -78,28 +78,40 @@ Stream<AppAccess> appAccess(AppAccessRef ref) async* {
   // olmak değil, bir girişi TAMAMLAMIŞ olmak).
   unawaited(OnboardingPrefs.markFirstLoginCompleted());
 
+  // F10-3 — `gymId` ARTIK email'den ÖNCE okunuyor. Bu bir davranış
+  // değişikliği değil, sadece sıralama: `currentRoleProvider` ve
+  // `activeGymIdProvider` AYNI `authIdTokenResultProvider`'ı izliyor
+  // (memoize edilmiş), yani rol çözüldüğü anda `gymId` de bedava hazır —
+  // bu `await` ek bir round-trip getirmez. Erken okumamızın sebebi,
+  // abonelik dinleyicisini email okumasıyla PARALEL başlatabilmek.
+  PerfTrace.begin('appaccess_2_gymId');
+  final gymId = await ref.watch(activeGymIdProvider.future);
+  PerfTrace.end('appaccess_2_gymId');
+  debugPrint('[appAccess] gymId=$gymId');
+
   // Egoractive Authentication Sistemi §6 — email custom claim olmadığı için
   // (sadece OTP doğrulaması sonrası Cloud Function tarafından yazılan bir
   // Firestore alanı) tek seferlik bir okuma yeterli; `EmailSetupPanel`
   // doğrulama başarılı olunca bu provider'ı `ref.invalidate` ile elle
   // tazeler (bkz. `otp_verification_panel.dart`).
-  PerfTrace.begin('appaccess_2_email');
-  final email = await ref.watch(currentUserEmailProvider.future);
-  PerfTrace.end('appaccess_2_email');
-  debugPrint('[appAccess] email=${email == null ? null : "set"}');
-  if (email == null) {
-    PerfTrace.end('appaccess_toplam');
-    yield (kind: AppAccessKind.emailSetupRequired, role: role);
-    return;
-  }
+  //
+  // F10-3 — okuma BAŞLATILIYOR ama burada `await` EDİLMİYOR: salonu olan
+  // kullanıcılarda bu Firestore okumasının, aşağıdaki abonelik
+  // dinleyicisiyle aynı anda ilerlemesini istiyoruz. Eskiden ikisi
+  // ardışıktı (email biter → abonelik başlar), bu da ana ekrana geçişte
+  // gereksiz bir round-trip demekti.
+  PerfTrace.begin('appaccess_3_email');
+  final emailFuture = ref.watch(currentUserEmailProvider.future);
 
-  PerfTrace.begin('appaccess_3_gymId');
-  final gymId = await ref.watch(activeGymIdProvider.future);
-  PerfTrace.end('appaccess_3_gymId');
-  debugPrint('[appAccess] gymId=$gymId');
   if (gymId == null) {
+    final email = await emailFuture;
+    PerfTrace.end('appaccess_3_email');
     PerfTrace.end('appaccess_toplam');
-    yield (kind: AppAccessKind.ready, role: role);
+    debugPrint('[appAccess] email=${email == null ? null : "set"}');
+    yield (
+      kind: email == null ? AppAccessKind.emailSetupRequired : AppAccessKind.ready,
+      role: role,
+    );
     return;
   }
 
@@ -151,6 +163,24 @@ Stream<AppAccess> appAccess(AppAccessRef ref) async* {
     subscription.close();
     controller.close();
   });
+
+  // F10-3 — email okuması yukarıda BAŞLATILDI, abonelik dinleyicisi
+  // kurulurken paralel ilerledi; ancak burada bekleniyor. Karar sırası
+  // değişmedi: email eksikse abonelik durumu ne olursa olsun önce
+  // `emailSetupRequired` kazanır (eski davranışla birebir aynı).
+  final email = await emailFuture;
+  PerfTrace.end('appaccess_3_email');
+  debugPrint('[appAccess] email=${email == null ? null : "set"}');
+  if (email == null) {
+    // Bu dalda abonelik dinleyicisine artık ihtiyaç yok — provider
+    // dispose edilene kadar açık kalmasın diye hemen kapatılıyor
+    // (`ref.onDispose` yine de çalışır, iki kez kapatmak güvenli).
+    subscription.close();
+    await controller.close();
+    PerfTrace.end('appaccess_toplam');
+    yield (kind: AppAccessKind.emailSetupRequired, role: role);
+    return;
+  }
 
   yield* controller.stream;
 }
