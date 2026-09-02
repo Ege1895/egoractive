@@ -298,7 +298,7 @@ class _AdminTrainerDetailPanelState
                       rcTextProvider(RemoteConfigKeys.trainersDeleteButton),
                     ),
                     variant: AppButtonVariant.secondary,
-                    onPressed: () => _showDeleteSheet(trainer.id, trainer.name),
+                    onPressed: () => _showDeleteDialog(trainer.id, trainer.name),
                   ),
                 ],
               ),
@@ -312,49 +312,46 @@ class _AdminTrainerDetailPanelState
   /// Silme geri alınamaz olduğu için önce onay alınır. Onay metni, verinin
   /// KALDIĞINI açıkça söylüyor — admin "geçmişi de siliyorum" sanmasın.
   ///
-  /// `admin_session_management_panel.dart`'taki iptal akışıyla aynı desen:
-  /// sheet, yazma TAMAMLANANA kadar açık kalır (`StatefulBuilder`), hata
-  /// olursa içeride gösterilir — geri alınamaz bir aksiyonda "kapandı, demek
-  /// ki oldu" yanılgısını önlemek için.
-  void _showDeleteSheet(String trainerId, String trainerName) {
-    final colors = context.appColors;
-    final typography = context.appTypography;
+  /// Ekranın ORTASINDA açılan onay diyaloğu (`subscription_write_gate.dart`
+  /// ile aynı `AlertDialog` deseni) — yıkıcı ve geri alınamaz bir aksiyon
+  /// olduğu için alttan açılan sheet yerine, dikkat talep eden merkezi bir
+  /// diyalog tercih edildi.
+  ///
+  /// Diyalog, yazma TAMAMLANANA kadar açık kalır (`StatefulBuilder` +
+  /// `barrierDismissible: false`), hata olursa içeride gösterilir — geri
+  /// alınamaz bir aksiyonda "kapandı, demek ki oldu" yanılgısını önlemek
+  /// için.
+  void _showDeleteDialog(String trainerId, String trainerName) {
     var isDeleting = false;
     String? deleteError;
 
-    showModalBottomSheet<void>(
+    showDialog<void>(
       context: context,
-      isDismissible: false,
-      backgroundColor: colors.surface,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
-      ),
-      builder: (sheetContext) {
+      barrierDismissible: false,
+      builder: (dialogContext) {
+        final colors = dialogContext.appColors;
+        final typography = dialogContext.appTypography;
+
         return StatefulBuilder(
-          builder: (sheetContext, setLocalState) {
-            return Padding(
-              padding: const EdgeInsets.fromLTRB(
-                AppSpacing.screenEdge,
-                AppSpacing.lg,
-                AppSpacing.screenEdge,
-                AppSpacing.xxl,
+          builder: (dialogContext, setLocalState) {
+            return AlertDialog(
+              backgroundColor: colors.surface,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
               ),
-              child: Column(
+              title: Text(
+                ref.read(
+                  rcTextProvider(RemoteConfigKeys.trainersDeleteConfirmTitle),
+                ),
+                style: typography.headingSmall.copyWith(
+                  color: colors.onSurface,
+                  fontSize: 17,
+                ),
+              ),
+              content: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    ref.read(
-                      rcTextProvider(
-                        RemoteConfigKeys.trainersDeleteConfirmTitle,
-                      ),
-                    ),
-                    style: typography.headingLarge.copyWith(
-                      color: colors.onSurface,
-                      fontSize: 20,
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.sm),
                   Text(
                     ref
                         .read(
@@ -365,6 +362,7 @@ class _AdminTrainerDetailPanelState
                         .replaceAll('{name}', trainerName),
                     style: typography.bodyMedium.copyWith(
                       color: colors.onSurfaceMuted,
+                      fontSize: 14,
                     ),
                   ),
                   if (deleteError != null) ...[
@@ -377,9 +375,56 @@ class _AdminTrainerDetailPanelState
                       ),
                     ),
                   ],
-                  const SizedBox(height: AppSpacing.lg),
-                  AppButton(
-                    label: isDeleting
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: isDeleting
+                      ? null
+                      : () => Navigator.of(dialogContext).pop(),
+                  child: Text(
+                    ref.read(rcTextProvider(RemoteConfigKeys.commonVazgec)),
+                    style: typography.bodyMedium.copyWith(
+                      color: colors.onSurfaceMuted,
+                    ),
+                  ),
+                ),
+                TextButton(
+                  onPressed: isDeleting
+                      ? null
+                      : () async {
+                          setLocalState(() {
+                            isDeleting = true;
+                            deleteError = null;
+                          });
+                          try {
+                            await ref
+                                .read(trainerRegistrationServiceProvider)
+                                .deactivateTrainer(trainerId);
+                          } catch (_) {
+                            setLocalState(() {
+                              isDeleting = false;
+                              deleteError = ref.read(
+                                rcTextProvider(
+                                  RemoteConfigKeys.trainersDeleteError,
+                                ),
+                              );
+                            });
+                            return;
+                          }
+                          if (!dialogContext.mounted) return;
+                          Navigator.of(dialogContext).pop();
+                          // Antrenör artık `AdminTrainersController`
+                          // listesinde yok — bu panel geçersiz bir kayda
+                          // bakıyor, listeye dönülür.
+                          if (mounted) {
+                            ref
+                                .read(panelStackControllerProvider.notifier)
+                                .pop();
+                          }
+                        },
+                  child: Text(
+                    isDeleting
                         ? ref.read(
                             rcTextProvider(RemoteConfigKeys.membersSavingLabel),
                           )
@@ -388,53 +433,10 @@ class _AdminTrainerDetailPanelState
                               RemoteConfigKeys.trainersDeleteConfirmCta,
                             ),
                           ),
-                    variant: AppButtonVariant.secondary,
-                    onPressed: isDeleting
-                        ? null
-                        : () async {
-                            setLocalState(() {
-                              isDeleting = true;
-                              deleteError = null;
-                            });
-                            try {
-                              await ref
-                                  .read(trainerRegistrationServiceProvider)
-                                  .deactivateTrainer(trainerId);
-                            } catch (_) {
-                              setLocalState(() {
-                                isDeleting = false;
-                                deleteError = ref.read(
-                                  rcTextProvider(
-                                    RemoteConfigKeys.trainersDeleteError,
-                                  ),
-                                );
-                              });
-                              return;
-                            }
-                            if (!sheetContext.mounted) return;
-                            Navigator.of(sheetContext).pop();
-                            // Antrenör artık `AdminTrainersController`
-                            // listesinde yok — bu panel geçersiz bir kayda
-                            // bakıyor, listeye dönülür.
-                            if (mounted) {
-                              ref
-                                  .read(panelStackControllerProvider.notifier)
-                                  .pop();
-                            }
-                          },
+                    style: typography.bodyMedium.copyWith(color: colors.error),
                   ),
-                  const SizedBox(height: AppSpacing.sm),
-                  AppButton(
-                    label: ref.read(
-                      rcTextProvider(RemoteConfigKeys.commonVazgec),
-                    ),
-                    variant: AppButtonVariant.text,
-                    onPressed: isDeleting
-                        ? null
-                        : () => Navigator.of(sheetContext).pop(),
-                  ),
-                ],
-              ),
+                ),
+              ],
             );
           },
         );
