@@ -5,6 +5,7 @@ import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/locale/locale_controller.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
+import '../../../../core/remote_config/feature_flags.dart';
 import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_back_button.dart';
@@ -294,7 +295,15 @@ class _ReportSnapshotDetailPanelState
     try {
       await ref
           .read(reportPdfExportServiceProvider)
-          .share(widget.snapshot, gymName, labels, locale);
+          .share(
+            widget.snapshot,
+            gymName,
+            labels,
+            locale,
+            showWatermark: ref
+                .read(featureFlagsProvider)
+                .isReportsPdfWatermarkEnabled,
+          );
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

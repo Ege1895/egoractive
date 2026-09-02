@@ -26,6 +26,15 @@ const _amber = PdfColor.fromInt(0xFFC97A1B);
 const _other = PdfColor.fromInt(0xFFC7CFDA);
 const _fill = PdfColor.fromInt(0xFFDCE6F2);
 
+/// Filigran — `assets/icon/app_icon.png`'den türetilmiş, saydam zeminli ve
+/// 72px'e küçültülmüş sürüm (`tool/generate_pdf_watermark.dart`). Kaynak
+/// ikon 1254x1254/1 MB: `pdf` paketi PNG'i ham piksele açıp gömdüğü için
+/// (bkz. `PdfImage.file`) büyük görsel hem uygulama boyutunu hem PDF
+/// boyutunu hem de export süresini gereksiz şişirirdi.
+const _watermarkAsset = 'assets/images/pdf_watermark.png';
+const _watermarkHeight = 20.0;
+const _watermarkOpacity = 0.55;
+
 /// F5-21'deki metin etiketleri — RC'den okunması gereken statik metinler
 /// (bkz. proje hardcode kuralı) UI katmanında toplanıp buraya taşınır; bu
 /// servis sadece render eder, RC'ye kendisi erişmez. Alanlar
@@ -131,12 +140,17 @@ class ReportPdfExportService {
     ReportSnapshot snapshot,
     String gymName,
     ReportPdfLabels labels,
-    String locale,
-  ) async {
+    String locale, {
+    required bool showWatermark,
+  }) async {
     final fontData = await rootBundle.load(
       'assets/fonts/IBMPlexSans-Variable.ttf',
     );
     final font = pw.Font.ttf(fontData);
+    // Görsel doküman başına bir kez encode edilir: aynı `MemoryImage` örneği
+    // tüm sayfalarda paylaşıldığından `pdf` paketi onu tek bir XObject olarak
+    // gömer (bkz. `ImageProvider._cache`) — sayfa başına ek boyut/süre yok.
+    final watermark = showWatermark ? await _loadWatermark() : null;
     final report = snapshot.report;
     final net = report.netTl;
     final currency = snapshot.currency;
@@ -144,8 +158,18 @@ class ReportPdfExportService {
     final doc = pw.Document();
     doc.addPage(
       pw.MultiPage(
-        theme: pw.ThemeData.withFont(base: font, bold: font),
-        margin: const pw.EdgeInsets.all(28),
+        // `theme`/`margin` ile `pageTheme` aynı anda verilemiyor (paket
+        // assert'i); filigran `buildBackground` üzerinden geldiği için ikisi
+        // tek bir `PageTheme`'de birleşti. `a4`, önceki örtük varsayılanın
+        // (`PdfPageFormat.standard`) aynısı — çıktı boyutu değişmiyor.
+        pageTheme: pw.PageTheme(
+          pageFormat: PdfPageFormat.a4,
+          theme: pw.ThemeData.withFont(base: font, bold: font),
+          margin: const pw.EdgeInsets.all(28),
+          buildBackground: watermark == null
+              ? null
+              : (context) => _watermark(watermark),
+        ),
         build: (context) => [
           _header(gymName, report.monthLabel),
           pw.SizedBox(height: 16),
@@ -175,13 +199,41 @@ class ReportPdfExportService {
     ReportSnapshot snapshot,
     String gymName,
     ReportPdfLabels labels,
-    String locale,
-  ) async {
-    final bytes = await buildPdf(snapshot, gymName, labels, locale);
+    String locale, {
+    required bool showWatermark,
+  }) async {
+    final bytes = await buildPdf(
+      snapshot,
+      gymName,
+      labels,
+      locale,
+      showWatermark: showWatermark,
+    );
     final dateSuffix = snapshot.periodStart.toIso8601String().substring(0, 10);
     await Printing.sharePdf(
       bytes: bytes,
       filename: 'rapor_${snapshot.period.name}_$dateSuffix.pdf',
+    );
+  }
+
+  Future<pw.MemoryImage> _loadWatermark() async {
+    final data = await rootBundle.load(_watermarkAsset);
+    return pw.MemoryImage(
+      data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes),
+    );
+  }
+
+  /// Her sayfanın sağ alt köşesinde, içerik alanının (margin'lerin içi)
+  /// dibinde duran filigran. `buildBackground` layout'ta yer kaplamadığı için
+  /// mevcut yerleşim ve sayfa sayısı değişmez; arkada çizildiğinden dolu bir
+  /// sayfada içeriğin altında kalır.
+  pw.Widget _watermark(pw.ImageProvider image) {
+    return pw.Align(
+      alignment: pw.Alignment.bottomRight,
+      child: pw.Opacity(
+        opacity: _watermarkOpacity,
+        child: pw.Image(image, height: _watermarkHeight),
+      ),
     );
   }
 
@@ -370,8 +422,11 @@ class ReportPdfExportService {
   ) {
     final completedPct = _pct(breakdown.completed, breakdown.total);
     final cancelledPct = _pct(breakdown.cancelled, breakdown.total);
-    final otherCount = (breakdown.total - breakdown.completed - breakdown.cancelled)
-        .clamp(0, 1 << 30);
+    final otherCount =
+        (breakdown.total - breakdown.completed - breakdown.cancelled).clamp(
+          0,
+          1 << 30,
+        );
     final otherPct = (100 - completedPct - cancelledPct).clamp(0, 100);
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
