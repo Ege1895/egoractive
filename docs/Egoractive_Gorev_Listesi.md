@@ -448,7 +448,7 @@ Gerçek cihazda mobil veriyle login ~1,5-2 dk, salon listesi ~1 dk, salon oluşt
 
 | Akış | Şu an (mobil, bildirilen) | Hedef | Hangi görev |
 |---|---|---|---|
-| Uygulama açılış → ilk kare | 5-12 sn | **< 1,5 sn** (uçak modunda: anında) | F10-2 |
+| Uygulama açılış → ilk kare | 5-12 sn | **< 1,5 sn** (uçak modunda: anında) | F10-2 → ✅ **ULAŞILDI: 457 ms** (temiz kurulumda 61.645 ms → 457 ms, bkz. ölçüm tablosu) |
 | Login → OTP ekranı | 20-120 sn | **3-10 sn** (soğuk) / **1-2 sn** (sıcak) | F10-4 + F10-2 |
 | Anlaşmalı Salonlar listesi | ~60 sn | **3-10 sn** (soğuk) / **1-2 sn** (sıcak) | F10-4 |
 | Login → ana ekran | 1-2 sn | **0,5-1 sn** | F10-3 |
@@ -461,6 +461,31 @@ Gerçek cihazda mobil veriyle login ~1,5-2 dk, salon listesi ~1 dk, salon oluşt
 **Bu görevlerle ULAŞILAMAYACAKLAR (para gerektiriyor, bilinçli kapsam dışı):**
 - Kalan ~7-9 sn'lik cold start → `minInstances` gerekir
 - Her round-trip'teki ~120 ms bölge cezası → bölge taşıma gerekir
+
+**📊 ÖLÇÜM SONUÇLARI (2026-09-02, Android emülatör / fiber WiFi, A/B testi)**
+
+A/B yöntemi: `677bfce` (F10-1 — ölçüm altyapısı var, `main()` hâlâ bloklayan) ile `a879590` (F10-2 + F10-3 uygulanmış) aynı emülatörde, aynı ağda, aynı build komutuyla (`flutter build apk --profile`) karşılaştırıldı.
+
+**Senaryo A — TEMİZ KURULUM** (`adb shell pm clear`: RC cache boş, bildirim izni henüz verilmemiş). Gerçek kullanıcının uygulamayı ilk kez açtığı durum:
+
+| Adım | ÖNCE (bloklayan) | SONRA (F10-2) |
+|---|---|---|
+| `firebase_init` | 365 ms | 396 ms |
+| Remote Config | **2.114 ms** ⛔ blokluyor | 44 ms (sadece varsayılanlar) |
+| `prefs_init` | 1 ms | 1 ms |
+| Push izni | **59.138 ms** ⛔ blokluyor | — arka planda |
+| **İLK KARE** | **61.645 ms** | **457 ms** |
+| RC fetch (arka plan) | — | 2.158 ms (ilk kareyi bloklamıyor) |
+
+**🔴 KÖK SEBEP BULUNDU — kullanıcının bildirdiği "1 dakikaya yakın açılış" tam olarak buydu.** Eski kodda `runApp()` ÖNCESİNDE `await PushNotificationService().init()` vardı; bu da `requestPermission()` çağırıp **sistem izin diyaloğunu** açıyor. Emülatörde doğrulandı: loglar `prefs_init`'te duruyor, `İLK KARE` hiç gelmiyor ve `dumpsys window` çıktısı `mCurrentFocus=GrantPermissionsActivity` gösteriyor — yani **uygulama, kullanıcı izin diyaloğuna cevap verene kadar BOMBOŞ ekranda bekliyor.** Diyalog 59 sn açık bırakıldığında ilk kare 61,6 saniyede geldi. Yeni kodda aynı test: **izin diyaloğu HÂLÂ ekranda dururken uygulama 457 ms'de açılmıştı** — diyalog artık çalışan bir arayüzün üstünde çıkıyor.
+
+**Senaryo B — ISINMIŞ AÇILIŞ** (RC cache dolu, izin verilmiş): ÖNCE 644-661 ms, SONRA ~490 ms. Fark emülatör gürültüsünün içinde kaldı — beklenen davranış: `minimumFetchInterval: 24 saat` yüzünden ısınmış durumda RC fetch throttle'a takılıp anında dönüyor, yani bloklayacak bir şey zaten yok.
+
+**F10-2'nin kazancı şu üç durumda ortaya çıkıyor:** (1) ilk kurulum → **61 sn → 0,5 sn**, (2) 24 saat sonraki ilk açılış (RC throttle sıfırlanır) → ~2 sn, (3) zayıf/tıkalı mobil ağ → RC fetch uzadıkça kazanç büyür.
+
+**Cold start (ayrıca ölçüldü, `listPartnerGyms` doğrudan çağrılarak):** soğuk 2,67 sn · sıcak 0,47 sn → ceza **~2,2 sn**. F10-4 yapılmadığı için değişmedi (zaten ~%2 kazandıracaktı, bkz. F10-4 notu). Bunu sıfırlamanın tek yolu `minInstances`.
+
+**⚠️ Bu ölçümler fiber WiFi üzerinde alındı.** Kullanıcının bildirdiği asıl senaryo (mobil veri) daha kötüdür: RC fetch ve tüm round-trip'ler uzar, dolayısıyla F10-2'nin kazancı gerçek cihazda daha da büyük olmalıdır. Gerçek cihazda mobil veriyle doğrulama hâlâ faydalı olur.
 
 ### F10-1 — Baseline performans ölçümü (İLK yapılacak, atlanmamalı)
 **Prompt:** "Herhangi bir optimizasyon yapmadan ÖNCE, gerçek bir cihazda **mobil veriyle** (WiFi değil) şu 4 akışın süresini ölç ve kaydet: (a) uygulama açılışı → ilk kare, (b) login butonuna basış → OTP ekranı, (c) Anlaşmalı Salonlar → liste görünmesi, (d) seans oluştur → tamamlanma. Ölçüm için `Stopwatch` + `debugPrint` yeterli; istersen Firebase Performance Monitoring (ücretsiz) da eklenebilir. Sonuçları bu dosyaya bir tabloya yaz. Her F10-x görevinden sonra aynı ölçüm tekrarlanacak."
