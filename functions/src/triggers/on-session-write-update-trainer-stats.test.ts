@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { Timestamp } from "firebase-admin/firestore";
 
-import { computeBucketDeltas, toBucket, yearMonthUtc } from "./on-session-write-update-trainer-stats";
+import { buildStatsPayload, computeBucketDeltas, toBucket, yearMonthUtc } from "./on-session-write-update-trainer-stats";
 
 function ts(isoUtc: string): Timestamp {
   return Timestamp.fromDate(new Date(isoUtc));
@@ -105,4 +105,43 @@ test("computeBucketDeltas: trainer reassigned to someone else → decrement old 
 
 test("computeBucketDeltas: both null (malformed doc on both sides) → no writes", () => {
   assert.deepEqual(computeBucketDeltas(null, null), []);
+});
+
+// --- buildStatsPayload: 2026-09-02'deki sessiz veri bozulmasının regresyonu ---
+// Önceki sürüm `{ "stats.<trainerId>.total": increment(1) }` üretip `set()`
+// çağırıyordu; `set()` noktalı anahtarı alan YOLU değil LİTERAL alan adı
+// olarak yazdığı için doküman `stats` haritası yerine noktalı düz alanlar
+// taşıyordu ve dashboard "Henüz antrenör yok" gösteriyordu.
+
+test("buildStatsPayload: HİÇBİR anahtarda nokta olmamalı (asıl regresyon)", () => {
+  const bucket = { gymId: "g1", trainerId: "t1", yearMonth: "2026-09", trainerName: "Umut", isCompleted: true };
+  const payload = buildStatsPayload(bucket, { total: 1, completed: 1, writeName: true });
+  const keysAtEveryLevel = (o: unknown): string[] =>
+    typeof o === "object" && o !== null && !Array.isArray(o)
+      ? Object.entries(o as Record<string, unknown>).flatMap(([k, v]) => [k, ...keysAtEveryLevel(v)])
+      : [];
+  const dotted = keysAtEveryLevel(payload).filter((k) => k.includes("."));
+  assert.deepEqual(dotted, [], `noktalı anahtar bulundu: ${dotted.join(", ")}`);
+});
+
+test("buildStatsPayload: stats -> trainerId -> alanlar şeklinde İÇ İÇE olmalı", () => {
+  const bucket = { gymId: "g1", trainerId: "t1", yearMonth: "2026-09", trainerName: "Umut", isCompleted: true };
+  const payload = buildStatsPayload(bucket, { total: 1, completed: 1, writeName: true }) as Record<string, Record<string, Record<string, unknown>>>;
+  assert.ok(payload.stats, "stats haritası yok");
+  assert.ok(payload.stats.t1, "stats altında trainerId anahtarı yok");
+  assert.equal(payload.stats.t1.name, "Umut");
+  assert.ok("total" in payload.stats.t1 && "completed" in payload.stats.t1);
+});
+
+test("buildStatsPayload: yazacak bir şey yoksa null döner", () => {
+  const bucket = { gymId: "g1", trainerId: "t1", yearMonth: "2026-09", trainerName: "", isCompleted: false };
+  assert.equal(buildStatsPayload(bucket, { total: 0, completed: 0, writeName: false }), null);
+});
+
+test("buildStatsPayload: sadece completed değiştiyse total yazılmaz", () => {
+  const bucket = { gymId: "g1", trainerId: "t1", yearMonth: "2026-09", trainerName: "Umut", isCompleted: true };
+  const payload = buildStatsPayload(bucket, { total: 0, completed: 1, writeName: false }) as Record<string, Record<string, Record<string, unknown>>>;
+  assert.ok(!("total" in payload.stats.t1), "total yazılmamalıydı");
+  assert.ok(!("name" in payload.stats.t1), "name yazılmamalıydı");
+  assert.ok("completed" in payload.stats.t1);
 });
