@@ -3556,18 +3556,19 @@ class RemoteConfigService {
   String getText(String baseKey, String locale) =>
       getString('${baseKey}_$locale');
 
-  /// Uygulama açılışında bir kez çağrılır: varsayılanları ayarlar, sonra
-  /// fetch+activate dener. İnternet yoksa/başarısız olursa varsayılanlarla
-  /// devam eder — uygulama hiçbir zaman bu yüzden çökmez.
+  /// F10-2 — `runApp()` blokajını kaldırma. Eskiden tek bir `init()` vardı
+  /// ve `main()` içinde `await` ediliyordu; içindeki `fetchAndActivate()`
+  /// AĞA çıktığı için (255 KB'lık şablon, 10 sn timeout) uygulamanın ilk
+  /// karesi ağ hızına bağımlı hale geliyordu — zayıf/tıkalı mobil bağlantıda
+  /// kullanıcı 10 saniyeye kadar boş ekran görüyordu. Artık ikiye bölündü:
+  /// [applyDefaults] ağa hiç çıkmaz ve `runApp()` öncesinde beklenir;
+  /// [fetchInBackground] ise `runApp()` SONRASINDA, kimseyi bekletmeden
+  /// çalışır.
   ///
-  /// Ayrıca `onConfigUpdated` (Remote Config Realtime) dinlenir — Console'da
-  /// bir parametre değiştirildiğinde SDK bunu anlık bir stream event'i
-  /// olarak alır (normal `minimumFetchInterval` kısıtlamasına tabi değil);
-  /// `activate()` çağrılınca yeni değerler hemen `getBool`/`getString` vb.
-  /// okumalarına yansır — kullanıcının uygulamayı kapatıp açmasına gerek
-  /// kalmaz. Bu, özellikle `cfg_allow_past_datetime_creation` gibi test
-  /// bayraklarının anında etkili olması için önemli.
-  Future<void> init() async {
+  /// Bu güvenli çünkü [_defaults] (1496 anahtar) kodun içinde gömülü —
+  /// ilk kare her zaman doğru metinlerle çizilir, fetch sadece Console'da
+  /// yapılmış değişiklikleri getirir.
+  Future<void> applyDefaults() async {
     final rc = FirebaseRemoteConfig.instance;
     await rc.setConfigSettings(
       RemoteConfigSettings(
@@ -3576,6 +3577,30 @@ class RemoteConfigService {
       ),
     );
     await rc.setDefaults(_defaults);
+  }
+
+  /// `runApp()`'ten SONRA, `unawaited` olarak çağrılır — hiçbir şeyi
+  /// bekletmez. İnternet yoksa/başarısız olursa [applyDefaults]'taki
+  /// değerler geçerliliğini korur, uygulama hiçbir zaman bu yüzden çökmez.
+  ///
+  /// Ayrıca `onConfigUpdated` (Remote Config Realtime) dinlenir — Console'da
+  /// bir parametre değiştirildiğinde SDK bunu anlık bir stream event'i
+  /// olarak alır (normal `minimumFetchInterval` kısıtlamasına tabi değil).
+  ///
+  /// ⚠️ BİLİNEN DAVRANIŞ: `activate()` sonrası ekranda ZATEN çizili olan
+  /// metinler o oturumda tazelenmez — `rcTextProvider` yalnızca
+  /// `remoteConfigServiceProvider` (const, hiç değişmez) ve
+  /// `localeControllerProvider`'ı izliyor, bu ikisi de değişmediği için
+  /// yeniden çizim tetiklenmez. Yeni değerler BİR SONRAKİ AÇILIŞTA görünür
+  /// (Firebase RC aktive edilen değerleri cihazda kalıcı tutar). Karar
+  /// anında okunan `cfg_*` bayrakları ise (ör. `ref.read(...)` ile) anında
+  /// yeni değeri alır, yani iş mantığı etkilenmez. Bu davranış F10-2'de
+  /// bilinçli olarak kabul edildi (bkz. FAZ 10 notları) — 889 widget'ı aynı
+  /// anda yeniden çizmenin frame hitch riski, kazanca değmedi. **Sonucu:**
+  /// `remoteconfig.template.json` ile buradaki [_defaults] haritasının
+  /// senkron tutulması kritik.
+  Future<void> fetchInBackground() async {
+    final rc = FirebaseRemoteConfig.instance;
     try {
       await rc.fetchAndActivate();
     } on Exception {
