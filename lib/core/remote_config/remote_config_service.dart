@@ -3760,7 +3760,14 @@ class RemoteConfigService {
     await rc.setConfigSettings(
       RemoteConfigSettings(
         fetchTimeout: const Duration(seconds: 10),
-        minimumFetchInterval: const Duration(hours: 24),
+        // Bu aralıktan daha taze bir cache varsa [fetchInBackground] ağa hiç
+        // çıkmaz. 24 saatten 2 saate çekildi: Console'da yapılan bir
+        // değişiklik artık en geç birkaç saat içinde kullanıcılara ulaşıyor.
+        // Zamanlayıcı DEĞİL — periyodik bir fetch kurmuyor; sadece açılışta
+        // yapılan fetch'in ne zaman ağa çıkacağını belirliyor. Yani bir
+        // kullanıcı günde en fazla 12 kez (12 ayrı 2 saatlik pencerede
+        // uygulamayı açarsa) fetch eder, pratikte 1-3.
+        minimumFetchInterval: const Duration(hours: 2),
       ),
     );
     await rc.setDefaults(_defaults);
@@ -3770,9 +3777,16 @@ class RemoteConfigService {
   /// bekletmez. İnternet yoksa/başarısız olursa [applyDefaults]'taki
   /// değerler geçerliliğini korur, uygulama hiçbir zaman bu yüzden çökmez.
   ///
-  /// Ayrıca `onConfigUpdated` (Remote Config Realtime) dinlenir — Console'da
-  /// bir parametre değiştirildiğinde SDK bunu anlık bir stream event'i
-  /// olarak alır (normal `minimumFetchInterval` kısıtlamasına tabi değil).
+  /// Remote Config Realtime (`onConfigUpdated`) BİLEREK kullanılmıyor:
+  /// her yayın (publish), o anda çevrimiçi olan HER istemciye
+  /// `minimumFetchInterval`'ı tanımayan otomatik bir fetch tetikliyordu —
+  /// yani "yayın sayısı × çevrimiçi kullanıcı" kadar fetch. RC 1 Eylül
+  /// 2026'dan itibaren kullandıkça-öde modeline geçtiği (günde 100.000
+  /// fetch ücretsiz) için bu çarpan kaldırıldı. Karşılığında kaybedilen
+  /// şey sınırlı: aşağıdaki bilinen davranış yüzünden realtime zaten
+  /// ekrandaki metinleri tazelemiyordu, sadece `cfg_*` bayraklarını anında
+  /// güncelliyordu. Artık bayrak değişiklikleri de en geç bir sonraki
+  /// açılışta (ve 2 saatlik fetch penceresinde) etkili oluyor.
   ///
   /// ⚠️ BİLİNEN DAVRANIŞ: `activate()` sonrası ekranda ZATEN çizili olan
   /// metinler o oturumda tazelenmez — `rcTextProvider` yalnızca
@@ -3793,14 +3807,6 @@ class RemoteConfigService {
     } on Exception {
       // Fetch başarısız oldu — setDefaults'taki değerler geçerliliğini korur.
     }
-    rc.onConfigUpdated.listen((_) async {
-      try {
-        await rc.activate();
-      } on Exception {
-        // Aktivasyon başarısız olursa mevcut değerlerle devam edilir —
-        // bir sonraki güncelleme sinyalinde tekrar denenir.
-      }
-    });
   }
 
   int getInt(String key) => FirebaseRemoteConfig.instance.getInt(key);
