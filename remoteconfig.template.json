@@ -3839,19 +3839,27 @@
       "valueType": "STRING"
     },
     "lbl_gyms_rules_editor_char_count_template_tr": {
-      "defaultValue": { "value": "{count} / {max}" },
+      "defaultValue": {
+        "value": "{count} / {max}"
+      },
       "valueType": "STRING"
     },
     "lbl_gyms_rules_editor_char_count_template_en": {
-      "defaultValue": { "value": "{count} / {max}" },
+      "defaultValue": {
+        "value": "{count} / {max}"
+      },
       "valueType": "STRING"
     },
     "lbl_gyms_rules_editor_max_length_error_tr": {
-      "defaultValue": { "value": "Kurallar metni çok uzun — en fazla {max} karakter olabilir." },
+      "defaultValue": {
+        "value": "Kurallar metni çok uzun — en fazla {max} karakter olabilir."
+      },
       "valueType": "STRING"
     },
     "lbl_gyms_rules_editor_max_length_error_en": {
-      "defaultValue": { "value": "Rules text is too long — the limit is {max} characters." },
+      "defaultValue": {
+        "value": "Rules text is too long — the limit is {max} characters."
+      },
       "valueType": "STRING"
     },
     "lbl_gyms_themes_description_tr": {
@@ -4023,67 +4031,99 @@
       "valueType": "STRING"
     },
     "lbl_measurements_metric_bel_tr": {
-      "defaultValue": { "value": "Bel" },
+      "defaultValue": {
+        "value": "Bel"
+      },
       "valueType": "STRING"
     },
     "lbl_measurements_metric_bel_en": {
-      "defaultValue": { "value": "Waist" },
+      "defaultValue": {
+        "value": "Waist"
+      },
       "valueType": "STRING"
     },
     "lbl_measurements_metric_gogus_tr": {
-      "defaultValue": { "value": "Göğüs" },
+      "defaultValue": {
+        "value": "Göğüs"
+      },
       "valueType": "STRING"
     },
     "lbl_measurements_metric_gogus_en": {
-      "defaultValue": { "value": "Chest" },
+      "defaultValue": {
+        "value": "Chest"
+      },
       "valueType": "STRING"
     },
     "lbl_measurements_metric_kalca_tr": {
-      "defaultValue": { "value": "Kalça" },
+      "defaultValue": {
+        "value": "Kalça"
+      },
       "valueType": "STRING"
     },
     "lbl_measurements_metric_kalca_en": {
-      "defaultValue": { "value": "Hip" },
+      "defaultValue": {
+        "value": "Hip"
+      },
       "valueType": "STRING"
     },
     "lbl_measurements_metric_kol_tr": {
-      "defaultValue": { "value": "Kol" },
+      "defaultValue": {
+        "value": "Kol"
+      },
       "valueType": "STRING"
     },
     "lbl_measurements_metric_kol_en": {
-      "defaultValue": { "value": "Arm" },
+      "defaultValue": {
+        "value": "Arm"
+      },
       "valueType": "STRING"
     },
     "lbl_measurements_metric_bacak_tr": {
-      "defaultValue": { "value": "Bacak" },
+      "defaultValue": {
+        "value": "Bacak"
+      },
       "valueType": "STRING"
     },
     "lbl_measurements_metric_bacak_en": {
-      "defaultValue": { "value": "Leg" },
+      "defaultValue": {
+        "value": "Leg"
+      },
       "valueType": "STRING"
     },
     "lbl_measurements_metric_kilo_tr": {
-      "defaultValue": { "value": "Kilo" },
+      "defaultValue": {
+        "value": "Kilo"
+      },
       "valueType": "STRING"
     },
     "lbl_measurements_metric_kilo_en": {
-      "defaultValue": { "value": "Weight" },
+      "defaultValue": {
+        "value": "Weight"
+      },
       "valueType": "STRING"
     },
     "lbl_measurements_metric_yag_orani_tr": {
-      "defaultValue": { "value": "Yağ oranı" },
+      "defaultValue": {
+        "value": "Yağ oranı"
+      },
       "valueType": "STRING"
     },
     "lbl_measurements_metric_yag_orani_en": {
-      "defaultValue": { "value": "Body fat" },
+      "defaultValue": {
+        "value": "Body fat"
+      },
       "valueType": "STRING"
     },
     "lbl_trainers_metric_bel_cevresi_tr": {
-      "defaultValue": { "value": "Bel çevresi" },
+      "defaultValue": {
+        "value": "Bel çevresi"
+      },
       "valueType": "STRING"
     },
     "lbl_trainers_metric_bel_cevresi_en": {
-      "defaultValue": { "value": "Waist circumference" },
+      "defaultValue": {
+        "value": "Waist circumference"
+      },
       "valueType": "STRING"
     },
     "lbl_measurements_title_tr": {
@@ -5448,27 +5488,39 @@
       "valueType": "STRING"
     },
     "lbl_sessions_calendar_type_individual_tr": {
-      "defaultValue": { "value": "Birebir" },
+      "defaultValue": {
+        "value": "Birebir"
+      },
       "valueType": "STRING"
     },
     "lbl_sessions_calendar_type_individual_en": {
-      "defaultValue": { "value": "Individual" },
+      "defaultValue": {
+        "value": "Individual"
+      },
       "valueType": "STRING"
     },
     "lbl_sessions_calendar_type_duet_tr": {
-      "defaultValue": { "value": "Düet" },
+      "defaultValue": {
+        "value": "Düet"
+      },
       "valueType": "STRING"
     },
     "lbl_sessions_calendar_type_duet_en": {
-      "defaultValue": { "value": "Duet" },
+      "defaultValue": {
+        "value": "Duet"
+      },
       "valueType": "STRING"
     },
     "lbl_sessions_calendar_duet_members_label_tr": {
-      "defaultValue": { "value": "Katılan Üyeler" },
+      "defaultValue": {
+        "value": "Katılan Üyeler"
+      },
       "valueType": "STRING"
     },
     "lbl_sessions_calendar_duet_members_label_en": {
-      "defaultValue": { "value": "Participating Members" },
+      "defaultValue": {
+        "value": "Participating Members"
+      },
       "valueType": "STRING"
     },
     "lbl_sessions_attendance_answer_label_tr": {
@@ -8386,227 +8438,339 @@
       "valueType": "STRING"
     },
     "lbl_reports_pdf_hero_positive_template_tr": {
-      "defaultValue": { "value": "Bu dönem net {net} kâr ettin" },
+      "defaultValue": {
+        "value": "Bu dönem net {net} kâr ettin"
+      },
       "valueType": "STRING"
     },
     "lbl_reports_pdf_hero_positive_template_en": {
-      "defaultValue": { "value": "You made {net} net profit this period" },
+      "defaultValue": {
+        "value": "You made {net} net profit this period"
+      },
       "valueType": "STRING"
     },
     "lbl_reports_pdf_hero_negative_template_tr": {
-      "defaultValue": { "value": "Bu dönem net {net} gider fazlası oluştu" },
+      "defaultValue": {
+        "value": "Bu dönem net {net} gider fazlası oluştu"
+      },
       "valueType": "STRING"
     },
     "lbl_reports_pdf_hero_negative_template_en": {
-      "defaultValue": { "value": "This period ended with a {net} net loss" },
+      "defaultValue": {
+        "value": "This period ended with a {net} net loss"
+      },
       "valueType": "STRING"
     },
     "lbl_reports_pdf_hero_sub_positive_tr": {
-      "defaultValue": { "value": "Detaylar aşağıda — antrenör performansı ve en çok satan paketleri incelemeyi unutma." },
+      "defaultValue": {
+        "value": "Detaylar aşağıda — antrenör performansı ve en çok satan paketleri incelemeyi unutma."
+      },
       "valueType": "STRING"
     },
     "lbl_reports_pdf_hero_sub_positive_en": {
-      "defaultValue": { "value": "See the details below — check trainer performance and your best-selling packages." },
+      "defaultValue": {
+        "value": "See the details below — check trainer performance and your best-selling packages."
+      },
       "valueType": "STRING"
     },
     "lbl_reports_pdf_hero_sub_negative_tr": {
-      "defaultValue": { "value": "Aşağıdaki gider ve paket satış dökümü, nereden tasarruf edebileceğini görmene yardımcı olabilir." },
+      "defaultValue": {
+        "value": "Aşağıdaki gider ve paket satış dökümü, nereden tasarruf edebileceğini görmene yardımcı olabilir."
+      },
       "valueType": "STRING"
     },
     "lbl_reports_pdf_hero_sub_negative_en": {
-      "defaultValue": { "value": "The expense and package breakdown below can help you spot where to save." },
+      "defaultValue": {
+        "value": "The expense and package breakdown below can help you spot where to save."
+      },
       "valueType": "STRING"
     },
     "lbl_reports_pdf_group_events_title_tr": {
-      "defaultValue": { "value": "Grup Dersleri & Etkinlikler" },
+      "defaultValue": {
+        "value": "Grup Dersleri & Etkinlikler"
+      },
       "valueType": "STRING"
     },
     "lbl_reports_pdf_group_events_title_en": {
-      "defaultValue": { "value": "Group Classes & Events" },
+      "defaultValue": {
+        "value": "Group Classes & Events"
+      },
       "valueType": "STRING"
     },
     "lbl_reports_pdf_group_sessions_label_tr": {
-      "defaultValue": { "value": "Grup Dersleri" },
+      "defaultValue": {
+        "value": "Grup Dersleri"
+      },
       "valueType": "STRING"
     },
     "lbl_reports_pdf_group_sessions_label_en": {
-      "defaultValue": { "value": "Group Classes" },
+      "defaultValue": {
+        "value": "Group Classes"
+      },
       "valueType": "STRING"
     },
     "lbl_reports_pdf_events_label_tr": {
-      "defaultValue": { "value": "Etkinlikler" },
+      "defaultValue": {
+        "value": "Etkinlikler"
+      },
       "valueType": "STRING"
     },
     "lbl_reports_pdf_events_label_en": {
-      "defaultValue": { "value": "Events" },
+      "defaultValue": {
+        "value": "Events"
+      },
       "valueType": "STRING"
     },
     "lbl_reports_pdf_sessions_unit_tr": {
-      "defaultValue": { "value": "ders" },
+      "defaultValue": {
+        "value": "ders"
+      },
       "valueType": "STRING"
     },
     "lbl_reports_pdf_sessions_unit_en": {
-      "defaultValue": { "value": "classes" },
+      "defaultValue": {
+        "value": "classes"
+      },
       "valueType": "STRING"
     },
     "lbl_reports_pdf_events_unit_tr": {
-      "defaultValue": { "value": "etkinlik" },
+      "defaultValue": {
+        "value": "etkinlik"
+      },
       "valueType": "STRING"
     },
     "lbl_reports_pdf_events_unit_en": {
-      "defaultValue": { "value": "events" },
+      "defaultValue": {
+        "value": "events"
+      },
       "valueType": "STRING"
     },
     "lbl_reports_pdf_attendance_template_tr": {
-      "defaultValue": { "value": "{attendance} / {capacity} kişi katıldı · %{pct} doluluk" },
+      "defaultValue": {
+        "value": "{attendance} / {capacity} kişi katıldı · %{pct} doluluk"
+      },
       "valueType": "STRING"
     },
     "lbl_reports_pdf_attendance_template_en": {
-      "defaultValue": { "value": "{attendance} / {capacity} attended · %{pct} full" },
+      "defaultValue": {
+        "value": "{attendance} / {capacity} attended · %{pct} full"
+      },
       "valueType": "STRING"
     },
     "lbl_reports_pdf_packages_title_tr": {
-      "defaultValue": { "value": "Satın Alınan Paketler" },
+      "defaultValue": {
+        "value": "Satın Alınan Paketler"
+      },
       "valueType": "STRING"
     },
     "lbl_reports_pdf_packages_title_en": {
-      "defaultValue": { "value": "Packages Sold" },
+      "defaultValue": {
+        "value": "Packages Sold"
+      },
       "valueType": "STRING"
     },
     "lbl_reports_pdf_packages_empty_tr": {
-      "defaultValue": { "value": "Bu dönemde paket satışı olmadı." },
+      "defaultValue": {
+        "value": "Bu dönemde paket satışı olmadı."
+      },
       "valueType": "STRING"
     },
     "lbl_reports_pdf_packages_empty_en": {
-      "defaultValue": { "value": "No packages were sold this period." },
+      "defaultValue": {
+        "value": "No packages were sold this period."
+      },
       "valueType": "STRING"
     },
     "lbl_reports_pdf_sales_unit_tr": {
-      "defaultValue": { "value": "satış" },
+      "defaultValue": {
+        "value": "satış"
+      },
       "valueType": "STRING"
     },
     "lbl_reports_pdf_sales_unit_en": {
-      "defaultValue": { "value": "sold" },
+      "defaultValue": {
+        "value": "sold"
+      },
       "valueType": "STRING"
     },
     "lbl_reports_pdf_finance_title_tr": {
-      "defaultValue": { "value": "Mali Özet" },
+      "defaultValue": {
+        "value": "Mali Özet"
+      },
       "valueType": "STRING"
     },
     "lbl_reports_pdf_finance_title_en": {
-      "defaultValue": { "value": "Financial Summary" },
+      "defaultValue": {
+        "value": "Financial Summary"
+      },
       "valueType": "STRING"
     },
     "lbl_reports_pdf_net_profit_label_tr": {
-      "defaultValue": { "value": "Net Kâr" },
+      "defaultValue": {
+        "value": "Net Kâr"
+      },
       "valueType": "STRING"
     },
     "lbl_reports_pdf_net_profit_label_en": {
-      "defaultValue": { "value": "Net Profit" },
+      "defaultValue": {
+        "value": "Net Profit"
+      },
       "valueType": "STRING"
     },
     "lbl_reports_pdf_net_loss_label_tr": {
-      "defaultValue": { "value": "Net Zarar" },
+      "defaultValue": {
+        "value": "Net Zarar"
+      },
       "valueType": "STRING"
     },
     "lbl_reports_pdf_net_loss_label_en": {
-      "defaultValue": { "value": "Net Loss" },
+      "defaultValue": {
+        "value": "Net Loss"
+      },
       "valueType": "STRING"
     },
     "lbl_reports_pdf_completed_short_label_tr": {
-      "defaultValue": { "value": "tamamlandı" },
+      "defaultValue": {
+        "value": "tamamlandı"
+      },
       "valueType": "STRING"
     },
     "lbl_reports_pdf_completed_short_label_en": {
-      "defaultValue": { "value": "completed" },
+      "defaultValue": {
+        "value": "completed"
+      },
       "valueType": "STRING"
     },
     "lbl_reports_pdf_cancelled_short_label_tr": {
-      "defaultValue": { "value": "iptal" },
+      "defaultValue": {
+        "value": "iptal"
+      },
       "valueType": "STRING"
     },
     "lbl_reports_pdf_cancelled_short_label_en": {
-      "defaultValue": { "value": "cancelled" },
+      "defaultValue": {
+        "value": "cancelled"
+      },
       "valueType": "STRING"
     },
     "lbl_reports_pdf_total_short_label_tr": {
-      "defaultValue": { "value": "toplam" },
+      "defaultValue": {
+        "value": "toplam"
+      },
       "valueType": "STRING"
     },
     "lbl_reports_pdf_total_short_label_en": {
-      "defaultValue": { "value": "total" },
+      "defaultValue": {
+        "value": "total"
+      },
       "valueType": "STRING"
     },
     "lbl_reports_pdf_completion_rate_template_tr": {
-      "defaultValue": { "value": "%{completed} tamamlanma · %{cancelled} iptal oranı" },
+      "defaultValue": {
+        "value": "%{completed} tamamlanma · %{cancelled} iptal oranı"
+      },
       "valueType": "STRING"
     },
     "lbl_reports_pdf_completion_rate_template_en": {
-      "defaultValue": { "value": "%{completed} completion · %{cancelled} cancellation rate" },
+      "defaultValue": {
+        "value": "%{completed} completion · %{cancelled} cancellation rate"
+      },
       "valueType": "STRING"
     },
     "lbl_reports_pdf_sessions_title_tr": {
-      "defaultValue": { "value": "Ders Özeti" },
+      "defaultValue": {
+        "value": "Ders Özeti"
+      },
       "valueType": "STRING"
     },
     "lbl_reports_pdf_sessions_title_en": {
-      "defaultValue": { "value": "Session Overview" },
+      "defaultValue": {
+        "value": "Session Overview"
+      },
       "valueType": "STRING"
     },
     "lbl_reports_pdf_individual_sessions_label_tr": {
-      "defaultValue": { "value": "Birebir Seans" },
+      "defaultValue": {
+        "value": "Birebir Seans"
+      },
       "valueType": "STRING"
     },
     "lbl_reports_pdf_individual_sessions_label_en": {
-      "defaultValue": { "value": "Individual Sessions" },
+      "defaultValue": {
+        "value": "Individual Sessions"
+      },
       "valueType": "STRING"
     },
     "lbl_reports_pdf_duet_sessions_label_tr": {
-      "defaultValue": { "value": "Düet Dersi" },
+      "defaultValue": {
+        "value": "Düet Dersi"
+      },
       "valueType": "STRING"
     },
     "lbl_reports_pdf_duet_sessions_label_en": {
-      "defaultValue": { "value": "Duet Classes" },
+      "defaultValue": {
+        "value": "Duet Classes"
+      },
       "valueType": "STRING"
     },
     "lbl_reports_pdf_solo_pill_label_tr": {
-      "defaultValue": { "value": "Seans" },
+      "defaultValue": {
+        "value": "Seans"
+      },
       "valueType": "STRING"
     },
     "lbl_reports_pdf_solo_pill_label_en": {
-      "defaultValue": { "value": "Solo" },
+      "defaultValue": {
+        "value": "Solo"
+      },
       "valueType": "STRING"
     },
     "lbl_reports_pdf_duet_pill_label_tr": {
-      "defaultValue": { "value": "Düet" },
+      "defaultValue": {
+        "value": "Düet"
+      },
       "valueType": "STRING"
     },
     "lbl_reports_pdf_duet_pill_label_en": {
-      "defaultValue": { "value": "Duet" },
+      "defaultValue": {
+        "value": "Duet"
+      },
       "valueType": "STRING"
     },
     "lbl_reports_pdf_group_pill_label_tr": {
-      "defaultValue": { "value": "Grup" },
+      "defaultValue": {
+        "value": "Grup"
+      },
       "valueType": "STRING"
     },
     "lbl_reports_pdf_group_pill_label_en": {
-      "defaultValue": { "value": "Group" },
+      "defaultValue": {
+        "value": "Group"
+      },
       "valueType": "STRING"
     },
     "lbl_reports_pdf_other_label_tr": {
-      "defaultValue": { "value": "Diğer" },
+      "defaultValue": {
+        "value": "Diğer"
+      },
       "valueType": "STRING"
     },
     "lbl_reports_pdf_other_label_en": {
-      "defaultValue": { "value": "Other" },
+      "defaultValue": {
+        "value": "Other"
+      },
       "valueType": "STRING"
     },
     "lbl_reports_pdf_footer_tr": {
-      "defaultValue": { "value": "Bu rapor Egoractive tarafından otomatik oluşturuldu." },
+      "defaultValue": {
+        "value": "Bu rapor Egoractive tarafından otomatik oluşturuldu."
+      },
       "valueType": "STRING"
     },
     "lbl_reports_pdf_footer_en": {
-      "defaultValue": { "value": "This report was generated automatically by Egoractive." },
+      "defaultValue": {
+        "value": "This report was generated automatically by Egoractive."
+      },
       "valueType": "STRING"
     },
     "lbl_subscription_yearly_plan_fallback_tr": {
@@ -9332,6 +9496,66 @@
     "lbl_auth_otp_too_many_attempts_error_en": {
       "defaultValue": {
         "value": "Too many wrong attempts. Tap \"Resend code\" to get a new one."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_delete_button_tr": {
+      "defaultValue": {
+        "value": "Antrenörü sil"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_delete_button_en": {
+      "defaultValue": {
+        "value": "Delete trainer"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_delete_confirm_title_tr": {
+      "defaultValue": {
+        "value": "Antrenörü silmek istiyor musun?"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_delete_confirm_title_en": {
+      "defaultValue": {
+        "value": "Delete this trainer?"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_delete_confirm_body_tr": {
+      "defaultValue": {
+        "value": "{name} artık uygulamaya giriş yapamayacak ve antrenör listesinde görünmeyecek. Geçmiş seansları, grup dersleri ve raporlardaki verileri olduğu gibi kalır."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_delete_confirm_body_en": {
+      "defaultValue": {
+        "value": "{name} will no longer be able to sign in and will not appear in the trainer list. Past sessions, group classes and report data remain unchanged."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_delete_confirm_cta_tr": {
+      "defaultValue": {
+        "value": "Evet, sil"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_delete_confirm_cta_en": {
+      "defaultValue": {
+        "value": "Yes, delete"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_delete_error_tr": {
+      "defaultValue": {
+        "value": "Antrenör silinemedi, tekrar dene."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_delete_error_en": {
+      "defaultValue": {
+        "value": "Trainer could not be deleted, try again."
       },
       "valueType": "STRING"
     }

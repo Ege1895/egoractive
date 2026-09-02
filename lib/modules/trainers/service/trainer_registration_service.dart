@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../shared/utils/phone_lookup.dart';
@@ -20,6 +21,18 @@ class TrainerRegistrationService {
       if (doc.exists) return true;
     }
     return false;
+  }
+
+  /// Admin · Antrenör Detayı > "Antrenörü sil". SOFT-DELETE: `users/{uid}`
+  /// dokümanı ve antrenörün ürettiği hiçbir veri (seanslar, grup dersleri,
+  /// üye atamaları, aylık istatistikler) SİLİNMEZ — sadece hesap giriş
+  /// yapamaz hale gelir ve antrenör listelerinden çıkar, böylece geçmiş
+  /// raporlar bozulmaz. Firebase Auth hesabını da devre dışı bırakmak
+  /// Admin SDK gerektirdiği için Cloud Function üzerinden yapılır.
+  Future<void> deactivateTrainer(String trainerId) async {
+    await FirebaseFunctions.instance
+        .httpsCallable('deactivateTrainer')
+        .call<void>({'trainerId': trainerId});
   }
 
   Future<void> updateOwnInfo({

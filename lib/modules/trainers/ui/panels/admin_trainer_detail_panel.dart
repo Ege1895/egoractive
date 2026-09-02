@@ -7,12 +7,14 @@ import '../../../../core/panels/panel_stack_controller.dart';
 import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_back_button.dart';
+import '../../../../shared/widgets/app_button.dart';
 import '../../controller/admin_trainer_detail_controller.dart';
 import '../../controller/admin_trainers_controller.dart';
 import '../../controller/trainer_activity_breakdown_controller.dart';
 import '../../domain/admin_trainer_detail_stats.dart';
 import '../../domain/admin_trainer_summary.dart';
 import '../../domain/trainer_activity_breakdown.dart';
+import '../../service/trainer_registration_service.dart';
 import 'admin_trainer_management_panel.dart' show showTrainerFormSheet;
 
 /// Admin 4 · Antrenör Detayı — [AdminTrainerManagementPanel]'deki listeden
@@ -290,12 +292,153 @@ class _AdminTrainerDetailPanelState
                     activity: activity,
                     counts: (b) => b.weekly,
                   ),
+                  const SizedBox(height: AppSpacing.xl),
+                  AppButton(
+                    label: ref.watch(
+                      rcTextProvider(RemoteConfigKeys.trainersDeleteButton),
+                    ),
+                    variant: AppButtonVariant.secondary,
+                    onPressed: () => _showDeleteSheet(trainer.id, trainer.name),
+                  ),
                 ],
               ),
             ),
           ],
         ),
       ),
+    );
+  }
+
+  /// Silme geri alınamaz olduğu için önce onay alınır. Onay metni, verinin
+  /// KALDIĞINI açıkça söylüyor — admin "geçmişi de siliyorum" sanmasın.
+  ///
+  /// `admin_session_management_panel.dart`'taki iptal akışıyla aynı desen:
+  /// sheet, yazma TAMAMLANANA kadar açık kalır (`StatefulBuilder`), hata
+  /// olursa içeride gösterilir — geri alınamaz bir aksiyonda "kapandı, demek
+  /// ki oldu" yanılgısını önlemek için.
+  void _showDeleteSheet(String trainerId, String trainerName) {
+    final colors = context.appColors;
+    final typography = context.appTypography;
+    var isDeleting = false;
+    String? deleteError;
+
+    showModalBottomSheet<void>(
+      context: context,
+      isDismissible: false,
+      backgroundColor: colors.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      builder: (sheetContext) {
+        return StatefulBuilder(
+          builder: (sheetContext, setLocalState) {
+            return Padding(
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.screenEdge,
+                AppSpacing.lg,
+                AppSpacing.screenEdge,
+                AppSpacing.xxl,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    ref.read(
+                      rcTextProvider(
+                        RemoteConfigKeys.trainersDeleteConfirmTitle,
+                      ),
+                    ),
+                    style: typography.headingLarge.copyWith(
+                      color: colors.onSurface,
+                      fontSize: 20,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                  Text(
+                    ref
+                        .read(
+                          rcTextProvider(
+                            RemoteConfigKeys.trainersDeleteConfirmBody,
+                          ),
+                        )
+                        .replaceAll('{name}', trainerName),
+                    style: typography.bodyMedium.copyWith(
+                      color: colors.onSurfaceMuted,
+                    ),
+                  ),
+                  if (deleteError != null) ...[
+                    const SizedBox(height: AppSpacing.md),
+                    Text(
+                      deleteError!,
+                      style: typography.bodyMedium.copyWith(
+                        color: colors.error,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ],
+                  const SizedBox(height: AppSpacing.lg),
+                  AppButton(
+                    label: isDeleting
+                        ? ref.read(
+                            rcTextProvider(RemoteConfigKeys.membersSavingLabel),
+                          )
+                        : ref.read(
+                            rcTextProvider(
+                              RemoteConfigKeys.trainersDeleteConfirmCta,
+                            ),
+                          ),
+                    variant: AppButtonVariant.secondary,
+                    onPressed: isDeleting
+                        ? null
+                        : () async {
+                            setLocalState(() {
+                              isDeleting = true;
+                              deleteError = null;
+                            });
+                            try {
+                              await ref
+                                  .read(trainerRegistrationServiceProvider)
+                                  .deactivateTrainer(trainerId);
+                            } catch (_) {
+                              setLocalState(() {
+                                isDeleting = false;
+                                deleteError = ref.read(
+                                  rcTextProvider(
+                                    RemoteConfigKeys.trainersDeleteError,
+                                  ),
+                                );
+                              });
+                              return;
+                            }
+                            if (!sheetContext.mounted) return;
+                            Navigator.of(sheetContext).pop();
+                            // Antrenör artık `AdminTrainersController`
+                            // listesinde yok — bu panel geçersiz bir kayda
+                            // bakıyor, listeye dönülür.
+                            if (mounted) {
+                              ref
+                                  .read(panelStackControllerProvider.notifier)
+                                  .pop();
+                            }
+                          },
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                  AppButton(
+                    label: ref.read(
+                      rcTextProvider(RemoteConfigKeys.commonVazgec),
+                    ),
+                    variant: AppButtonVariant.text,
+                    onPressed: isDeleting
+                        ? null
+                        : () => Navigator.of(sheetContext).pop(),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
     );
   }
 }

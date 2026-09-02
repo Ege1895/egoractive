@@ -1392,6 +1392,11 @@ abstract final class RemoteConfigKeys {
       'lbl_trainers_add_trainer_name_required_error';
   static const trainersAddTrainerError = 'lbl_trainers_add_trainer_error';
   static const trainersPhoneTakenError = 'lbl_trainers_phone_taken_error';
+  static const trainersDeleteButton = 'lbl_trainers_delete_button';
+  static const trainersDeleteConfirmTitle = 'lbl_trainers_delete_confirm_title';
+  static const trainersDeleteConfirmBody = 'lbl_trainers_delete_confirm_body';
+  static const trainersDeleteConfirmCta = 'lbl_trainers_delete_confirm_cta';
+  static const trainersDeleteError = 'lbl_trainers_delete_error';
   static const trainersAddTrainerNameHint =
       'lbl_trainers_add_trainer_name_hint';
   static const trainersManagementTrainerCountSuffix =
@@ -2419,6 +2424,12 @@ class RemoteConfigService {
     'lbl_trainers_add_trainer_name_required_error_tr': 'Ad soyad boş olamaz.',
     'lbl_trainers_add_trainer_error_tr': 'Antrenör eklenemedi, tekrar dene.',
     'lbl_trainers_phone_taken_error_tr': 'Bu telefon numarası zaten kayıtlı.',
+    'lbl_trainers_delete_button_tr': 'Antrenörü sil',
+    'lbl_trainers_delete_confirm_title_tr': 'Antrenörü silmek istiyor musun?',
+    'lbl_trainers_delete_confirm_body_tr':
+        '{name} artık uygulamaya giriş yapamayacak ve antrenör listesinde görünmeyecek. Geçmiş seansları, grup dersleri ve raporlardaki verileri olduğu gibi kalır.',
+    'lbl_trainers_delete_confirm_cta_tr': 'Evet, sil',
+    'lbl_trainers_delete_error_tr': 'Antrenör silinemedi, tekrar dene.',
     'lbl_trainers_add_trainer_name_hint_tr': 'Emre Kaya',
     'lbl_trainers_management_trainer_count_suffix_tr': '{count} kişi',
     'lbl_trainers_add_trainer_saving_label_tr': 'Ekleniyor…',
@@ -3297,6 +3308,12 @@ class RemoteConfigService {
     'lbl_trainers_add_trainer_error_en':
         'Trainer could not be added, try again.',
     'lbl_trainers_phone_taken_error_en': 'This phone number is already registered.',
+    'lbl_trainers_delete_button_en': 'Delete trainer',
+    'lbl_trainers_delete_confirm_title_en': 'Delete this trainer?',
+    'lbl_trainers_delete_confirm_body_en':
+        '{name} will no longer be able to sign in and will not appear in the trainer list. Past sessions, group classes and report data remain unchanged.',
+    'lbl_trainers_delete_confirm_cta_en': 'Yes, delete',
+    'lbl_trainers_delete_error_en': 'Trainer could not be deleted, try again.',
     'lbl_trainers_add_trainer_name_hint_en': 'John Smith',
     'lbl_trainers_management_trainer_count_suffix_en': '{count} people',
     'lbl_trainers_add_trainer_saving_label_en': 'Adding…',

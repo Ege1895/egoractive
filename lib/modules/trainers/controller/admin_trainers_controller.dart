@@ -19,7 +19,20 @@ Stream<List<QueryDocumentSnapshot<Map<String, dynamic>>>> _trainerDocsForGym(
       .where('gymId', isEqualTo: gymId)
       .where('role', isEqualTo: 'trainer')
       .snapshots()
-      .map((snapshot) => snapshot.docs);
+      // Admin'in pasife aldığı antrenörler (bkz. `deactivateTrainer`)
+      // listelerde görünmez — ama `users` dokümanı ve ürettiği tüm veri
+      // (seanslar, grup dersleri, üye atamaları, aylık istatistikler)
+      // yerinde durur, raporlar bozulmaz.
+      //
+      // Filtre BİLEREK client tarafında: Firestore'da `isActive != false`
+      // sorgusu, alanı HİÇ OLMAYAN dokümanları da dışarıda bırakırdı —
+      // mevcut antrenörlerin hiçbirinde bu alan yok, hepsi kaybolurdu.
+      // Alanın yokluğu "aktif" demek olduğu için karşılaştırma burada.
+      .map(
+        (snapshot) => snapshot.docs
+            .where((doc) => doc.data()['isActive'] != false)
+            .toList(),
+      );
 }
 
 /// `gyms/{gymId}` bilinmediği (henüz gerçek bir salon yoksa) çağrılmaz — bu

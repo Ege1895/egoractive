@@ -10,6 +10,7 @@ export { sendEmailChangeOtp } from "./callable/send-email-change-otp";
 export { verifyEmailChangeOtp } from "./callable/verify-email-change-otp";
 export { signupGymAdmin } from "./callable/signup-gym-admin";
 export { deleteAccount } from "./callable/delete-account";
+export { deactivateTrainer } from "./callable/deactivate-trainer";
 export { listPartnerGyms } from "./callable/list-partner-gyms";
 export { verifySubscriptionPurchase } from "./callable/verify-subscription-purchase";
 export { startMockSubscription } from "./callable/start-mock-subscription";

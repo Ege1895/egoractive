@@ -3,6 +3,7 @@ import { HttpsError, onCall } from "firebase-functions/v2/https";
 
 import { gymDoc, usersCollection } from "../shared/firestore-paths";
 import { findUserByPhone } from "../shared/phone-lookup";
+import { isDeactivated } from "../shared/user-active";
 import { sendOtpToEmail } from "../shared/otp";
 
 const RATE_LIMIT_WINDOW_MS = 60_000;
@@ -59,6 +60,15 @@ export const startLogin = onCall(async (request) => {
 
   const uid = matchedDoc.id;
   const userData = matchedDoc.data();
+
+  // Admin bu hesabı pasife aldıysa giriş yok (bkz. `deactivateTrainer`).
+  // BİLEREK "not-found" ile aynı mesaj: hesabın var olduğunu ve pasife
+  // alındığını dışarıya sızdırmamak için — kullanıcı deneyimi açısından da
+  // "bu bilgiyle kayıtlı kullanıcı yok" doğru bir ifade.
+  if (isDeactivated(userData)) {
+    throw new HttpsError("not-found", "Bu bilgiyle kayıtlı bir kullanıcı bulunamadı.");
+  }
+
   const role = typeof userData.role === "string" ? userData.role : undefined;
   const gymId = typeof userData.gymId === "string" ? userData.gymId : null;
 

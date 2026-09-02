@@ -1,4 +1,5 @@
 import { AggregateField, Firestore, Timestamp } from "firebase-admin/firestore";
+import { isDeactivated } from "./user-active";
 
 export interface GymWeeklyStats {
   totalSessions: number;
@@ -201,6 +202,11 @@ export async function fetchGymTrainerPerformance(
     .where("role", "==", "trainer")
     .get();
 
+  // Pasife alınmış antrenörler (bkz. `deactivateTrainer`) BİLEREK sorgunun
+  // içinde kalıyor: `users` dokümanları silinmediği için, çalıştıkları
+  // dönemlerin raporlarında geçmiş verileriyle görünmeye devam ederler —
+  // ürün kararı buydu. Aşağıda sadece o dönemde HİÇ seansı olmayanlar
+  // eleniyor, yoksa ayrıldıktan sonraki her raporda 0/0 ile yer kaplarlardı.
   const trainerPerformance = await Promise.all(
     trainersSnapshot.docs.map(async (trainerDoc) => {
       const stats = await fetchTrainerWeeklyStats(db, gymId, trainerDoc.id, weekStart, weekEnd);
@@ -208,7 +214,7 @@ export async function fetchGymTrainerPerformance(
       const trainerDuetGroupIds = new Set(
         trainerDuetDocs.map((d) => d.duetGroupId).filter((id): id is string => !!id),
       );
-      return {
+      const performance: TrainerPerformance = {
         trainerId: trainerDoc.id,
         name: (trainerDoc.data().name as string | undefined) ?? "—",
         totalSessions: stats.totalSessions,
@@ -218,8 +224,12 @@ export async function fetchGymTrainerPerformance(
         duetSessions: trainerDuetGroupIds.size,
         groupSessions: 0,
       };
+      return { deactivated: isDeactivated(trainerDoc.data()), performance };
     }),
   );
 
-  return trainerPerformance.sort((a, b) => b.completedSessions - a.completedSessions);
+  return trainerPerformance
+    .filter((row) => !row.deactivated || row.performance.totalSessions > 0)
+    .map((row) => row.performance)
+    .sort((a, b) => b.completedSessions - a.completedSessions);
 }
