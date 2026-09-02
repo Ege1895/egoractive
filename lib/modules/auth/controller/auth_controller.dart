@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/locale/locale_controller.dart';
+import '../../../core/perf/perf_trace.dart';
 import '../../../core/remote_config/remote_config_service.dart';
 import '../domain/auth_login_exception.dart';
 import '../domain/auth_state.dart';
@@ -15,13 +16,13 @@ class AuthController extends _$AuthController {
   @override
   AuthState build() => const AuthState();
 
-  /// Native numeric klavyeden gelen ham metni 10 haneye kırpıp state'e yazar.
+  /// F8-2 — [AppPhoneField]'dan E.164 + bölgesel doğrulama sonucu gelir.
   /// Numara düzenlenince önceki giriş hatası temizlenir — kullanıcı numarayı
   /// düzeltmeye başladığında eski "bulunamadı" mesajı ekranda asılı kalmasın.
-  void setPhoneDigits(String rawInput) {
-    final digits = rawInput.replaceAll(RegExp(r'[^0-9]'), '');
+  void setPhone(String e164, {required bool isValid}) {
     state = state.copyWith(
-      phoneDigits: digits.length > 10 ? digits.substring(0, 10) : digits,
+      phoneE164: e164,
+      isPhoneValid: isValid,
       loginErrorMessage: null,
       loginErrorReason: null,
     );
@@ -52,15 +53,21 @@ class AuthController extends _$AuthController {
       loginErrorReason: null,
     );
     final value = identifierType == 'phone'
-        ? '+90${state.phoneDigits}'
+        ? state.phoneE164
         : state.emailInput.trim();
     try {
+      // F10-1 — "Login → OTP ekranı" ölçümü. Bu çağrı `startLogin`
+      // callable'ına gidiyor; cold start yaşarsa süre buraya yansır
+      // (F10-4'ün hedefi).
+      PerfTrace.begin('AKIS_login_startLogin');
       final result = await ref
           .read(authRepositoryProvider)
           .startLogin(identifierType: identifierType, value: value);
+      PerfTrace.end('AKIS_login_startLogin');
       state = state.copyWith(isRequestingLogin: false);
       return result;
     } on AuthLoginException catch (e) {
+      PerfTrace.end('AKIS_login_startLogin');
       state = state.copyWith(
         isRequestingLogin: false,
         loginErrorMessage: _messageFor(e.reason),

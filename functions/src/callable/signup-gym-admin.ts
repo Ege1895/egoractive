@@ -3,6 +3,7 @@ import { getStorage } from "firebase-admin/storage";
 import { HttpsError, onCall } from "firebase-functions/v2/https";
 
 import { gymsCollection, usersCollection } from "../shared/firestore-paths";
+import { findUserByPhone } from "../shared/phone-lookup";
 
 const MAX_LOGO_BYTES = 300 * 1024;
 
@@ -20,6 +21,21 @@ function optionalNonEmptyString(value: unknown): string | undefined {
 }
 
 const DEFAULT_TIME_ZONE = "Europe/Istanbul";
+
+const DEFAULT_CURRENCY_CODE = "TRY";
+
+/**
+ * F9-2 — para birimi sadece kuruluşta seçilir, sonradan değiştirilemez
+ * (client'ta da düzenleme UI'ı yok). Tam ISO 4217 kod listesini burada
+ * ikinci kez tutmak yerine (client'taki `currency_constants.dart` tek
+ * kaynak), sadece kabaca "3 büyük harf" formatı doğrulanır — geçersiz/eksik
+ * gelirse varsayılana düşülür.
+ */
+function resolveCurrency(value: unknown): string {
+  if (typeof value !== "string") return DEFAULT_CURRENCY_CODE;
+  const trimmed = value.trim().toUpperCase();
+  return /^[A-Z]{3}$/.test(trimmed) ? trimmed : DEFAULT_CURRENCY_CODE;
+}
 
 /**
  * Push bildirimlerinde (ör. seans hatırlatması) saatin salonun bulunduğu
@@ -51,6 +67,17 @@ function resolveTimeZone(value: unknown): string {
  * olarak üretilir — gerçek Firebase Auth hesabı, kullanıcı bu telefon
  * numarasıyla `requestCustomToken` üzerinden ilk girişini yaptığında lazy
  * olarak oluşur.
+ *
+ * Email BİLEREK burada istenmiyor (UX kararı — telefon zaten hesabın kalıcı
+ * giriş kimliği; salon oluşturma anında email de zorunlu tutup ayrıca
+ * doğrulatmak, telefon OTP'sinden ÖNCE ikinci bir doğrulama adımı ekleyip
+ * kurulumu yavaşlatıyordu, üstelik yanlış girilirse salonu hiç
+ * oluşturamama riski taşıyordu). Kullanıcı normal telefon girişini
+ * (`requestCustomToken`) yapınca `email` alanı boş kaldığından
+ * `emailSetupRequired` kapısı devreye girer, `sendEmailSetupOtp`/
+ * `verifyEmailSetupOtp` üzerinden email ilk oturumdan hemen sonra
+ * tamamlanır — `reportEmails.gym` da o an otomatik yazılır (bkz.
+ * `verify-email-setup-otp.ts`).
  */
 export const signupGymAdmin = onCall(async (request) => {
   const data = request.data ?? {};
@@ -61,12 +88,7 @@ export const signupGymAdmin = onCall(async (request) => {
   const themeColorHex = requireNonEmptyString(data.themeColorHex, "Tema rengi");
   const logoBase64 = optionalNonEmptyString(data.logoBase64);
   const timeZone = resolveTimeZone(data.timeZone);
-  // Egoractive Authentication Sistemi §9 — "Login ve rapor e-postası" artık
-  // zorunlu tek alan: hem admin'in email OTP ile giriş yapacağı hem
-  // haftalık/aylık rapor maillerinin gideceği adres (bkz.
-  // weekly-gym-report.ts/monthly-gym-report.ts).
-  const email = requireNonEmptyString(data.email, "Login ve rapor e-postası");
-  const emailLower = email.toLowerCase();
+  const currency = resolveCurrency(data.currency);
 
   let logoBuffer: Buffer | undefined;
   if (logoBase64 !== undefined) {
@@ -77,21 +99,11 @@ export const signupGymAdmin = onCall(async (request) => {
   }
 
   const firestore = getFirestore();
-  const existingPhone = await firestore
-    .collection(usersCollection())
-    .where("phoneNumber", "==", phoneNumber)
-    .limit(1)
-    .get();
-  if (!existingPhone.empty) {
+  // F8-3 — geçiş penceresi: migrate edilmemiş eski çıplak TR kayıtlarıyla da
+  // çakışma kontrolü yapar, bkz. `shared/phone-lookup.ts`.
+  const existingPhoneDoc = await findUserByPhone(firestore, phoneNumber);
+  if (existingPhoneDoc !== null) {
     throw new HttpsError("already-exists", "Bu telefon numarasıyla kayıtlı bir kullanıcı zaten var.");
-  }
-  const existingEmail = await firestore
-    .collection(usersCollection())
-    .where("emailLower", "==", emailLower)
-    .limit(1)
-    .get();
-  if (!existingEmail.empty) {
-    throw new HttpsError("already-exists", "Bu email adresiyle kayıtlı bir kullanıcı zaten var.");
   }
 
   const gymRef = firestore.collection(gymsCollection()).doc();
@@ -118,8 +130,8 @@ export const signupGymAdmin = onCall(async (request) => {
     phone: phoneNumber,
     address,
     timeZone,
+    currency,
     ...(logoUrl !== undefined ? { logoUrl } : {}),
-    reportEmails: { gym: email },
     themeColors: { primary: themeColorHex },
     // subscriptionStatus artık burada otomatik "trial" yazılmıyor — admin,
     // girişten hemen sonra zorunlu SubscriptionOnboardingPanel'de gerçek bir
@@ -138,8 +150,6 @@ export const signupGymAdmin = onCall(async (request) => {
     role: "admin",
     gymId: gymRef.id,
     phoneNumber,
-    email,
-    emailLower,
   });
 
   return { gymId: gymRef.id };

@@ -2,6 +2,7 @@ import { cancelScheduledTask, enqueueScheduledTask } from "./scheduled-task-engi
 
 const REMINDER_QUEUE = "sendSessionReminderTask";
 const COMPLETION_QUEUE = "sendSessionCompletionTask";
+const TRAINER_REMINDER_QUEUE = "sendTrainerSessionReminderTask";
 
 /**
  * Bir seans oluşturulduğunda/ertelendiğinde, başlangıcından `leadMinutes`
@@ -23,6 +24,32 @@ export async function scheduleSessionReminderTask(
 
 export async function cancelSessionReminderTask(sessionId: string, startTimeMs: number): Promise<void> {
   await cancelScheduledTask(REMINDER_QUEUE, sessionId, startTimeMs);
+}
+
+/**
+ * Üyeye giden hatırlatmayla AYNI anda ateşlenecek, ANTRENÖRE giden
+ * hatırlatmayı kurar. Görev id'si `duetGroupId ?? sessionId`'den türer:
+ * düet derste üye başına bir seans dokümanı yazıldığı için bu fonksiyon
+ * üye sayısı kadar çağrılır, ama hepsi AYNI görev id'sini ürettiğinden tek
+ * görev oluşur (motor `task-already-exists`'i yutuyor) — antrenör gruptaki
+ * herkesi tek bildirimde görür.
+ *
+ * İptal fonksiyonu YOK; görev ateşlendiği anda seansların güncel durumunu
+ * kendisi doğruluyor (gerekçe: `send-trainer-session-reminder-task.ts`).
+ */
+export async function scheduleTrainerSessionReminderTask(
+  sessionId: string,
+  duetGroupId: string | undefined,
+  startTimeMs: number,
+  leadMinutes: number,
+): Promise<void> {
+  if (startTimeMs <= Date.now()) return;
+  const sessionKey = duetGroupId ?? sessionId;
+  await enqueueScheduledTask(TRAINER_REMINDER_QUEUE, sessionKey, startTimeMs, startTimeMs - leadMinutes * 60_000, {
+    sessionKey,
+    ...(duetGroupId ? { duetGroupId } : {}),
+    expectedStartTimeMs: startTimeMs,
+  });
 }
 
 /**

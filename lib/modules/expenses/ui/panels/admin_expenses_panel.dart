@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/app_spacing.dart';
+import '../../../../core/constants/currency_constants.dart';
+import '../../../../core/locale/locale_controller.dart';
+import '../../../../core/money/active_gym_currency_provider.dart';
+import '../../../../core/money/app_money_formatter.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
 import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../../../shared/utils/thousands_input_formatter.dart';
 import '../../controller/expenses_controller.dart';
 import '../../domain/expense_state.dart';
 import 'add_expense_panel.dart';
@@ -19,6 +22,10 @@ class AdminExpensesPanel extends ConsumerWidget {
     final colors = context.appColors;
     final typography = context.appTypography;
     final state = ref.watch(expensesControllerProvider);
+    final currency =
+        ref.watch(activeGymCurrencyProvider).valueOrNull ??
+        defaultCurrencyCode;
+    final locale = ref.watch(localeControllerProvider);
     final maxCategory = state.categoryTotals.isEmpty
         ? 1
         : state.categoryTotals.first.amountTl;
@@ -105,22 +112,50 @@ class AdminExpensesPanel extends ConsumerWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          ref
-                              .watch(
-                                rcTextProvider(
-                                  RemoteConfigKeys.expensesMonthlyTotalLabel,
+                        // Ay geçişi — geçmiş ayların giderleri de görülebilsin
+                        // diye (önceden liste içinde bulunulan aya sabitti).
+                        Row(
+                          children: [
+                            _MonthArrow(
+                              icon: Icons.chevron_left,
+                              onTap: () => ref
+                                  .read(expensesSelectedMonthProvider.notifier)
+                                  .previous(),
+                            ),
+                            Expanded(
+                              child: Text(
+                                ref
+                                    .watch(
+                                      rcTextProvider(
+                                        RemoteConfigKeys
+                                            .expensesMonthlyTotalLabel,
+                                      ),
+                                    )
+                                    .replaceAll('{month}', state.monthLabel),
+                                textAlign: TextAlign.center,
+                                style: typography.bodyMedium.copyWith(
+                                  color: colors.onSurfaceMuted,
+                                  fontSize: 13,
                                 ),
-                              )
-                              .replaceAll('{month}', state.monthLabel),
-                          style: typography.bodyMedium.copyWith(
-                            color: colors.onSurfaceMuted,
-                            fontSize: 13,
-                          ),
+                              ),
+                            ),
+                            _MonthArrow(
+                              icon: Icons.chevron_right,
+                              // İçinde bulunulan aydan ileri gidilemez.
+                              onTap: ref.watch(expensesCanGoNextMonthProvider)
+                                  ? () => ref
+                                        .read(
+                                          expensesSelectedMonthProvider
+                                              .notifier,
+                                        )
+                                        .next()
+                                  : null,
+                            ),
+                          ],
                         ),
                         const SizedBox(height: AppSpacing.xs),
                         Text(
-                          '₺${formatThousands(state.totalTl)}',
+                          formatMoney(state.totalTl, currency, locale),
                           style: typography.dataLarge.copyWith(
                             color: colors.onSurface,
                             fontSize: 34,
@@ -173,7 +208,11 @@ class AdminExpensesPanel extends ConsumerWidget {
                           i++
                         ) ...[
                           _CategoryRow(
-                            total: state.categoryTotals[i],
+                            amountText: formatMoney(
+                              state.categoryTotals[i].amountTl,
+                              currency,
+                              locale,
+                            ),
                             label: labelFor(state.categoryTotals[i].category),
                             ratio:
                                 state.categoryTotals[i].amountTl / maxCategory,
@@ -213,6 +252,11 @@ class AdminExpensesPanel extends ConsumerWidget {
                         for (var i = 0; i < state.entries.length; i++)
                           _ExpenseRow(
                             entry: state.entries[i],
+                            amountText: formatMoney(
+                              state.entries[i].amountTl,
+                              currency,
+                              locale,
+                            ),
                             categoryLabel: labelFor(state.entries[i].category),
                             showDivider: i < state.entries.length - 1,
                           ),
@@ -231,12 +275,12 @@ class AdminExpensesPanel extends ConsumerWidget {
 
 class _CategoryRow extends StatelessWidget {
   const _CategoryRow({
-    required this.total,
+    required this.amountText,
     required this.label,
     required this.ratio,
   });
 
-  final ExpenseCategoryTotal total;
+  final String amountText;
   final String label;
   final double ratio;
 
@@ -259,7 +303,7 @@ class _CategoryRow extends StatelessWidget {
               ),
             ),
             Text(
-              '₺${formatThousands(total.amountTl)}',
+              amountText,
               style: typography.headingSmall.copyWith(
                 color: colors.onSurfaceVariant,
                 fontSize: 15,
@@ -285,11 +329,13 @@ class _CategoryRow extends StatelessWidget {
 class _ExpenseRow extends StatelessWidget {
   const _ExpenseRow({
     required this.entry,
+    required this.amountText,
     required this.categoryLabel,
     required this.showDivider,
   });
 
   final ExpenseEntry entry;
+  final String amountText;
   final String categoryLabel;
   final bool showDivider;
 
@@ -327,13 +373,45 @@ class _ExpenseRow extends StatelessWidget {
             ),
           ),
           Text(
-            '₺${formatThousands(entry.amountTl)}',
+            amountText,
             style: typography.headingSmall.copyWith(
               color: colors.onSurfaceVariant,
               fontSize: 15,
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Finans panelindeki ay geçiş oku. [onTap] `null` verilirse pasif görünür
+/// (içinde bulunulan aydayken "sonraki" oku).
+class _MonthArrow extends StatelessWidget {
+  const _MonthArrow({required this.icon, required this.onTap});
+
+  final IconData icon;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+    final enabled = onTap != null;
+    return Material(
+      color: Colors.transparent,
+      shape: const CircleBorder(),
+      child: InkWell(
+        customBorder: const CircleBorder(),
+        onTap: onTap,
+        child: SizedBox(
+          width: 36,
+          height: 36,
+          child: Icon(
+            icon,
+            size: 22,
+            color: enabled ? colors.onSurfaceVariant : colors.outlineStrong,
+          ),
+        ),
       ),
     );
   }

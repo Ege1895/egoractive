@@ -43,7 +43,10 @@ class ReportOccupancy with _$ReportOccupancy {
 /// kullanabilir. [packages]/[groupSessions]/[events] F5-11'de mail
 /// template'i için eklenen alanlar — sadece `report` içine değil, ayrı
 /// tutuluyor çünkü [DashboardReport] canlı özetle de paylaşılıyor ve o akış
-/// bunları henüz hesaplamıyor.
+/// bunları henüz hesaplamıyor. [currency] F9-4'te eklendi: salonun para
+/// birimi kilidi kaldırılırsa diye, raporun yazıldığı ANDAKİ para birimini
+/// (o zamanki `gyms/{gymId}.currency`) tutar — aktif salonun güncel para
+/// birimiyle karıştırılmamalı.
 @freezed
 class ReportSnapshot with _$ReportSnapshot {
   const factory ReportSnapshot({
@@ -55,5 +58,6 @@ class ReportSnapshot with _$ReportSnapshot {
     required List<ReportPackageSale> packages,
     required ReportOccupancy groupSessions,
     required ReportOccupancy events,
+    required String currency,
   }) = _ReportSnapshot;
 }

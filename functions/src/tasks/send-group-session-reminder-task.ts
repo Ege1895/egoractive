@@ -3,9 +3,11 @@ import { getMessaging } from "firebase-admin/messaging";
 import { onTaskDispatched, Request } from "firebase-functions/v2/tasks";
 import * as logger from "firebase-functions/logger";
 
+import { broadcastToGymMembers } from "../shared/community-broadcast";
 import { withFailureAlerting } from "../shared/function-health";
 import { getCachedRemoteConfigTemplate } from "../shared/remote-config-cache";
 import { readLocalizedNotificationText } from "../shared/notification-text";
+import { fetchGymStaffTokens, fetchTokensForUids, firstName, formatNameList, sendPushToTokens } from "../shared/staff-notifications";
 import { resolveGymTimeZone, resolveNotificationLocale } from "../shared/notification-locale";
 import { formatTimeInZone } from "../shared/timezone-math";
 
@@ -18,6 +20,42 @@ const DEFAULT_TEXT: Record<string, { tr: string; en: string }> = {
     tr: "Katılacağını unutma, saat {time}'te başlıyor 💪",
     en: "Don't forget — it starts at {time} 💪",
   },
+  // Katılmamış üyelere giden DAVET metni. Hatırlatmadan bilerek farklı:
+  // burada kişi henüz katılmadığı için ne olduğu, ne zaman olduğu, yer
+  // kalıp kalmadığı ve NE YAPMASI gerektiği tek bakışta anlaşılmalı.
+  lbl_notif_group_session_invite_title: {
+    tr: "🧘 Yarın {className} var — katılmak ister misin?",
+    en: "🧘 {className} is tomorrow — want to join?",
+  },
+  lbl_notif_group_session_invite_body: {
+    tr: "Saat {time}'te başlıyor ve {remaining} kişilik yer kaldı. Katılmak için bu bildirime dokun 👉",
+    en: "It starts at {time} and there are {remaining} spots left. Tap here to join 👉",
+  },
+  // Kontenjan sınırsızsa "kaç kişilik yer kaldı" cümlesi anlamsız olur.
+  lbl_notif_group_session_invite_body_unlimited: {
+    tr: "Saat {time}'te başlıyor, yer var. Katılmak için bu bildirime dokun 👉",
+    en: "It starts at {time} and there's room. Tap here to join 👉",
+  },
+  // DERSİ VERECEK ANTRENÖRE giden metin — üyeninkinden farklı, çünkü
+  // antrenör için soru "katılacak mıyım" değil, "yarın ne zaman, kaç
+  // kişiye ders vereceğim".
+  lbl_notif_group_session_trainer_reminder_title: {
+    tr: "⏰ Yarın {time} · {className} dersini sen vereceksin",
+    en: "⏰ Tomorrow at {time} · you're teaching {className}",
+  },
+  lbl_notif_group_session_trainer_reminder_body: {
+    tr: "Şu an {attendeeCount} kişi katılıyor. Ders yarın saat {time}'te başlıyor.",
+    en: "{attendeeCount} people are signed up so far. The class starts tomorrow at {time}.",
+  },
+  // ADMİNE giden metin: takip amaçlı, kim veriyor + kaç kişi bilgisiyle.
+  lbl_notif_group_session_admin_reminder_title: {
+    tr: "📋 Yarın {className} dersi var",
+    en: "📋 {className} is on tomorrow",
+  },
+  lbl_notif_group_session_admin_reminder_body: {
+    tr: "Saat {time} · Eğitmen: {trainerNames} · {attendeeCount} katılımcı",
+    en: "At {time} · Trainer: {trainerNames} · {attendeeCount} attending",
+  },
 };
 
 interface GroupSessionReminderTaskData {
@@ -28,8 +66,12 @@ interface GroupSessionReminderTaskData {
 /**
  * [onGroupSessionCreated] tarafından, bir grup dersinin başlangıcından 1
  * gün önce (salon saatiyle 21:00) ateşlenmek üzere kurulan görevin
- * işleyicisi — SADECE katılmış (attendeeIds) üyelere gider. Bkz.
- * `send-event-reminder-task.ts`'teki aynı desen.
+ * işleyicisi. İKİ ayrı bildirim gönderir:
+ * 1. KATILANLARA (attendeeIds) "katılacağını unutma" hatırlatması.
+ * 2. KATILMAYANLARA "yarın var, katılmak ister misin?" daveti — SADECE
+ *    kontenjanda yer kaldıysa. Dolu bir derse davet göndermek kullanıcıyı
+ *    boşuna heveslendirir.
+ * Bkz. `send-event-reminder-task.ts`'teki aynı desen.
  */
 export const sendGroupSessionReminderTask = onTaskDispatched(
   { retryConfig: { maxAttempts: 3 }, rateLimits: { maxConcurrentDispatches: 10 } },
@@ -45,35 +87,112 @@ export const sendGroupSessionReminderTask = onTaskDispatched(
       title?: string;
       startTime?: Timestamp;
       attendeeIds?: string[];
+      capacity?: number | null;
+      status?: string;
+      trainerIds?: string[];
+      trainerNames?: string[];
     };
 
     if (data.startTime?.toMillis() !== expectedStartTimeMs) return;
-
-    const attendeeIds = data.attendeeIds ?? [];
-    if (attendeeIds.length === 0) return;
-
-    const attendeeDocs = await Promise.all(attendeeIds.map((uid) => db.collection("users").doc(uid).get()));
-    const fcmTokens = attendeeDocs.flatMap((doc) => (doc.data()?.fcmTokens as string[] | undefined) ?? []);
-    if (fcmTokens.length === 0) {
-      logger.info(`Grup dersi ${groupSessionId} katılımcılarının hiçbirinde kayıtlı FCM token yok, atlandı.`);
+    // İptal edilmiş ders için hatırlatma/davet gitmemeli. Bu kontrol
+    // önceden YOKTU — iptal edilmiş bir ders için katılımcılara hâlâ
+    // "Yarın {className} var!" bildirimi gidiyordu.
+    if (data.status === "cancelled") {
+      logger.info(`Grup dersi ${groupSessionId} iptal edilmiş, bildirim gönderilmedi.`);
       return;
     }
 
+    const attendeeIds = data.attendeeIds ?? [];
     const template = await getCachedRemoteConfigTemplate();
     const gymTimeZone = await resolveGymTimeZone(data.gymId);
     const locale = resolveNotificationLocale(gymTimeZone);
-    const vars = {
-      className: data.title?.trim() || (locale === "tr" ? "grup dersi" : "the class"),
-      time: data.startTime ? formatTimeInZone(data.startTime.toDate(), gymTimeZone) : "--:--",
+    const className = data.title?.trim() || (locale === "tr" ? "grup dersi" : "the class");
+    const time = data.startTime ? formatTimeInZone(data.startTime.toDate(), gymTimeZone) : "--:--";
+
+    // 1) KATILANLAR — "katılacağını unutma" hatırlatması (mevcut davranış).
+    if (attendeeIds.length > 0) {
+      const attendeeDocs = await Promise.all(attendeeIds.map((uid) => db.collection("users").doc(uid).get()));
+      const fcmTokens = attendeeDocs.flatMap((doc) => (doc.data()?.fcmTokens as string[] | undefined) ?? []);
+      if (fcmTokens.length > 0) {
+        const vars = { className, time };
+        await getMessaging().sendEachForMulticast({
+          tokens: fcmTokens,
+          notification: {
+            title: readLocalizedNotificationText(template, "lbl_notif_group_session_reminder_title", locale, vars, DEFAULT_TEXT),
+            body: readLocalizedNotificationText(template, "lbl_notif_group_session_reminder_body", locale, vars, DEFAULT_TEXT),
+          },
+          data: { type: "group_session_reminder", groupSessionId },
+        });
+      } else {
+        logger.info(`Grup dersi ${groupSessionId} katılımcılarının hiçbirinde kayıtlı FCM token yok, hatırlatma atlandı.`);
+      }
+    }
+
+    // 2) DERSİ VERECEK ANTRENÖR(LER) + SALON ADMİN(LER)İ. Kontenjan
+    // kontrolünden ÖNCE: ders dolu olsa bile personelin haberi olmalı.
+    const staffVars = {
+      className,
+      time,
+      attendeeCount: `${attendeeIds.length}`,
+      trainerNames:
+        formatNameList((data.trainerNames ?? []).map(firstName)) ||
+        (locale === "tr" ? "atanmadı" : "not assigned"),
     };
 
-    await getMessaging().sendEachForMulticast({
-      tokens: fcmTokens,
-      notification: {
-        title: readLocalizedNotificationText(template, "lbl_notif_group_session_reminder_title", locale, vars, DEFAULT_TEXT),
-        body: readLocalizedNotificationText(template, "lbl_notif_group_session_reminder_body", locale, vars, DEFAULT_TEXT),
+    const trainerTokens = await fetchTokensForUids(data.trainerIds ?? [], db);
+    await sendPushToTokens(
+      trainerTokens,
+      {
+        title: readLocalizedNotificationText(template, "lbl_notif_group_session_trainer_reminder_title", locale, staffVars, DEFAULT_TEXT),
+        body: readLocalizedNotificationText(template, "lbl_notif_group_session_trainer_reminder_body", locale, staffVars, DEFAULT_TEXT),
       },
-      data: { type: "group_session_reminder", groupSessionId },
-    });
+      { type: "group_session_trainer_reminder", groupSessionId },
+    );
+
+    const adminTokens = await fetchGymStaffTokens(data.gymId, "admin", db);
+    await sendPushToTokens(
+      adminTokens,
+      {
+        title: readLocalizedNotificationText(template, "lbl_notif_group_session_admin_reminder_title", locale, staffVars, DEFAULT_TEXT),
+        body: readLocalizedNotificationText(template, "lbl_notif_group_session_admin_reminder_body", locale, staffVars, DEFAULT_TEXT),
+      },
+      { type: "group_session_admin_reminder", groupSessionId },
+    );
+
+    // 3) KATILMAYAN ÜYELER — sadece YER VARSA davet. `capacity` null ise
+    // kontenjan sınırsız demektir (bkz. `CapacityService`), o durumda da
+    // yer vardır ama "kaç kişilik yer kaldı" cümlesi kullanılamaz.
+    const capacity = typeof data.capacity === "number" ? data.capacity : null;
+    const remaining = capacity === null ? null : capacity - attendeeIds.length;
+    if (remaining !== null && remaining <= 0) {
+      logger.info(`Grup dersi ${groupSessionId} kontenjanı dolu, davet gönderilmedi.`);
+      return;
+    }
+
+    if (!data.gymId) return;
+    await broadcastToGymMembers(
+      data.gymId,
+      {
+        title: readLocalizedNotificationText(
+          template,
+          "lbl_notif_group_session_invite_title",
+          locale,
+          { className, time },
+          DEFAULT_TEXT,
+        ),
+        body: readLocalizedNotificationText(
+          template,
+          remaining === null
+            ? "lbl_notif_group_session_invite_body_unlimited"
+            : "lbl_notif_group_session_invite_body",
+          locale,
+          { className, time, remaining: `${remaining ?? ""}` },
+          DEFAULT_TEXT,
+        ),
+      },
+      { type: "group_session_invite", groupSessionId },
+      // Katılanlar hariç — onlara yukarıda zaten hatırlatma gitti.
+      { excludeUids: attendeeIds },
+    );
   }),
 );

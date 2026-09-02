@@ -167,6 +167,17 @@ service cloud.firestore {
       allow delete: if isSignedIn() && myRole() == 'admin' && resource.data.gymId == myGymId();
     }
 
+    // phoneIndex/{phoneNumber} — F2-2 perf. `checkPhoneAvailable` callable'ının
+    // (cold start'ta 20-30+ saniyeye çıkabiliyordu) yerini alan, sadece
+    // varlık kontrolü için tutulan index. İçeriği sahibinin uid'i dışında
+    // bir şey taşımaz, salon gözetmeksizin herhangi bir oturum açmış kullanıcı
+    // "bu numara alınmış mı" diye okuyabilir — client asla yazamaz, sadece
+    // `on-user-write-sync-phone-index.ts` trigger'ı (Admin SDK) yazar.
+    match /phoneIndex/{phoneNumber} {
+      allow read: if isSignedIn();
+      allow write: if false;
+    }
+
     // memberPackages/{id} — F3-2. Fiyat alanları (totalAmount/paidAmount/
     // dueAmount) içerdiği için sadece admin erişebilir; üye kendi paketini
     // ayrı, fiyatsız bir görünümden (users/{uid} üzerindeki denormalize

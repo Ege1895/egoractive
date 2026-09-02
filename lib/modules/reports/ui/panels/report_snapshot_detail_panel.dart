@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/app_spacing.dart';
+import '../../../../core/locale/locale_controller.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
+import '../../../../core/remote_config/feature_flags.dart';
 import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_back_button.dart';
@@ -38,6 +40,11 @@ class _ReportSnapshotDetailPanelState
     final colors = context.appColors;
     final typography = context.appTypography;
     final report = widget.snapshot.report;
+    // F9-4 — canlı salon profilinin AKSİNE, burada snapshot'ın YAZILDIĞI
+    // andaki para birimi kullanılır (bkz. `ReportSnapshot.currency`) —
+    // para birimi kilidi ileride kaldırılırsa bile geçmiş raporlar o
+    // andaki doğru para biriminde kalır.
+    final currency = widget.snapshot.currency;
 
     return Scaffold(
       body: SafeArea(
@@ -127,7 +134,7 @@ class _ReportSnapshotDetailPanelState
                     ],
                   ),
                   const SizedBox(height: AppSpacing.lg),
-                  ReportFinanceSummaryCard(report: report),
+                  ReportFinanceSummaryCard(report: report, currency: currency),
                   const SizedBox(height: AppSpacing.lg),
                   Text(
                     ref.watch(
@@ -283,11 +290,20 @@ class _ReportSnapshotDetailPanelState
       footer: ref.read(rcTextProvider(RemoteConfigKeys.reportsPdfFooter)),
     );
     final gymName = ref.read(gymProfileControllerProvider).name;
+    final locale = ref.read(localeControllerProvider);
 
     try {
       await ref
           .read(reportPdfExportServiceProvider)
-          .share(widget.snapshot, gymName, labels);
+          .share(
+            widget.snapshot,
+            gymName,
+            labels,
+            locale,
+            showWatermark: ref
+                .read(featureFlagsProvider)
+                .isReportsPdfWatermarkEnabled,
+          );
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

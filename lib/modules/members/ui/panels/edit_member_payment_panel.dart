@@ -3,12 +3,13 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/app_spacing.dart';
+import '../../../../core/locale/locale_controller.dart';
+import '../../../../core/money/app_money_formatter.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
 import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/domain/membership_installment.dart';
-import '../../../../shared/utils/thousands_input_formatter.dart';
 import '../../../../shared/widgets/app_back_button.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_text_field.dart';
@@ -71,7 +72,10 @@ class _EditMemberPaymentPanelState
       _totalAmountTl = 0;
       _installments = const [];
     }
-    _totalController.text = formatThousands(_totalAmountTl);
+    _totalController.text = formatAmountGrouped(
+      _totalAmountTl,
+      ref.read(localeControllerProvider),
+    );
     _countController.text = '${_installments.length}';
   }
 
@@ -105,7 +109,10 @@ class _EditMemberPaymentPanelState
             installment,
       ];
       _totalAmountTl = _installments.fold(0, (total, i) => total + i.amountTl);
-      _totalController.text = formatThousands(_totalAmountTl);
+      _totalController.text = formatAmountGrouped(
+        _totalAmountTl,
+        ref.read(localeControllerProvider),
+      );
     });
   }
 
@@ -212,11 +219,17 @@ class _EditMemberPaymentPanelState
                           ),
                           controller: _totalController,
                           keyboardType: TextInputType.number,
-                          inputFormatters: [ThousandsInputFormatter()],
+                          inputFormatters: [
+                            AppMoneyInputFormatter(
+                              locale: ref.watch(localeControllerProvider),
+                            ),
+                          ],
                           onChanged: (value) {
-                            final digits = value.replaceAll('.', '');
                             _resplit(
-                              totalAmountTl: int.tryParse(digits) ?? 0,
+                              totalAmountTl: parseMoneyInput(
+                                value,
+                                ref.read(localeControllerProvider),
+                              ),
                               count: _installments.isEmpty
                                   ? 1
                                   : _installments.length,

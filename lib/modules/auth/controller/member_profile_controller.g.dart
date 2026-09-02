@@ -152,7 +152,7 @@ class _ProfileDocForUidProviderElement
 }
 
 String _$memberProfileControllerHash() =>
-    r'4043beb30882bce6515f601e6b6cab23953c986e';
+    r'5ae91920851e4fe540979b2a817f6fd4dee7e81c';
 
 /// [ProfilePanel]'in üst kartındaki gerçek kullanıcı adı/telefonu —
 /// önceden `MemberMockProfile`'dan sabit ("Ayşe Yılmaz") değer geliyordu,
@@ -169,7 +169,7 @@ final memberProfileControllerProvider =
       MemberProfileController,
       ({
         String name,
-        String phoneDigits,
+        String phoneE164,
         String email,
         bool sessionReminderEnabled,
       })
@@ -187,7 +187,7 @@ typedef _$MemberProfileController =
     AutoDisposeNotifier<
       ({
         String name,
-        String phoneDigits,
+        String phoneE164,
         String email,
         bool sessionReminderEnabled,
       })

@@ -17,16 +17,18 @@ part 'create_gym_service.g.dart';
 /// `signupGymAdmin` callable'ına (Admin SDK, kurallara tabi değil) yapılır.
 /// O fonksiyon `gyms` dokümanını, logoyu ve `users/{uid}` (`role: admin`)
 /// dokümanını oluşturur — F2-5'teki trigger bunu custom claim'e çevirir,
-/// kullanıcı da girdiği telefon/email ile `startLogin`+OTP üzerinden
-/// (Egoractive Authentication Sistemi) ilk girişini yapınca gerçek Auth
-/// hesabı lazy olarak oluşur.
+/// kullanıcı da girdiği telefonla `startLogin`+OTP üzerinden (Egoractive
+/// Authentication Sistemi) ilk girişini yapınca gerçek Auth hesabı lazy
+/// olarak oluşur. Email BİLEREK burada istenmiyor (UX kararı — bkz.
+/// `signup-gym-admin.ts` dokümantasyonu); ilk girişten hemen sonra
+/// `emailSetupRequired` kapısı devreye girip tamamlatıyor.
 class CreateGymService {
   const CreateGymService();
 
   Future<String> createGym({
     required GymProfile profile,
     required Color themeColor,
-    required String email,
+    required String currency,
     XFile? logoFile,
   }) async {
     // Seans hatırlatma push'larının salonun bulunduğu yerin saatine göre
@@ -44,13 +46,12 @@ class CreateGymService {
         .call<Map<String, dynamic>>({
           'name': profile.name,
           'city': profile.city,
-          // profile.phone sadece 10 haneli rakam (GymProfileController) — F1-10
-          // login akışıyla (AuthService) aynı '+90' + rakam formatına burada
-          // çevriliyor, yoksa requestCustomToken bu numarayı bulamaz.
-          'phoneNumber': '+90${profile.phone}',
+          // F8-4 — profile.phone artık AppPhoneField'dan gelen tam E.164
+          // (GymProfileController), başka bir dönüşüm gerekmiyor.
+          'phoneNumber': profile.phone,
           'address': profile.address,
           'themeColorHex': _toHex(themeColor),
-          'email': email,
+          'currency': currency,
           if (timeZone != null) 'timeZone': timeZone,
           if (logoFile != null)
             'logoBase64': base64Encode(

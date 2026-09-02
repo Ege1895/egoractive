@@ -4,22 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
-
-const _monthNames = {
-  1: 'Ocak',
-  2: 'Şubat',
-  3: 'Mart',
-  4: 'Nisan',
-  5: 'Mayıs',
-  6: 'Haziran',
-  7: 'Temmuz',
-  8: 'Ağustos',
-  9: 'Eylül',
-  10: 'Ekim',
-  11: 'Kasım',
-  12: 'Aralık',
-};
-const _dayNames = ['P', 'S', 'Ç', 'P', 'C', 'C', 'P'];
+import '../../../../shared/utils/date_labels.dart';
 
 /// "Seans Ekle" sheet'indeki "Tekrarla" — admin/antrenör zaten seçtiği
 /// saati, bu takvimde `+`'ya dokunduğu her ek güne de atar. Üyenin kalan
@@ -217,7 +202,7 @@ class _RepeatSessionCalendarSheetState
                       ),
                     ),
                     Text(
-                      '${_monthNames[_month.month]} ${_month.year}',
+                      ref.watch(dateLabelsProvider).monthYear(_month),
                       style: typography.headingSmall.copyWith(
                         color: colors.onSurface,
                         fontSize: 16,
@@ -236,7 +221,8 @@ class _RepeatSessionCalendarSheetState
                 ),
                 Row(
                   children: [
-                    for (final name in _dayNames)
+                    for (final name
+                        in ref.watch(dateLabelsProvider).weekdayInitialList)
                       Expanded(
                         child: Text(
                           name,

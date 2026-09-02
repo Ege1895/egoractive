@@ -17,6 +17,7 @@ export interface ReportSnapshotInput {
   packages: PackageSaleCount[];
   groupSessions: OccupancyStats;
   events: OccupancyStats;
+  currency: string;
 }
 
 function snapshotDocId(period: ReportPeriod, periodStart: Date): string {
@@ -61,6 +62,7 @@ export async function writeReportSnapshot(db: Firestore, gymId: string, input: R
       packages: input.packages,
       groupSessions: input.groupSessions,
       events: input.events,
+      currency: input.currency,
       createdAt: Timestamp.now(),
     });
 }

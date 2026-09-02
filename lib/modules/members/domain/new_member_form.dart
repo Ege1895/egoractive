@@ -9,7 +9,10 @@ class NewMemberForm with _$NewMemberForm {
   const factory NewMemberForm({
     required String firstName,
     required String lastName,
-    required String phoneDigits,
+
+    /// F8-4 — global telefon numarası desteği. E.164 (`+905324187605`).
+    required String phoneE164,
+    @Default(false) bool isPhoneValid,
     required int birthYear,
     required int heightCm,
     MemberGender? gender,

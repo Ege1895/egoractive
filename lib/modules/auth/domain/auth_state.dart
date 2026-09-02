@@ -7,7 +7,14 @@ part 'auth_state.freezed.dart';
 @freezed
 class AuthState with _$AuthState {
   const factory AuthState({
-    @Default('') String phoneDigits,
+    /// F8-2 — global telefon numarası desteği. E.164 formatında
+    /// (`+905324187605`) tam numara — [AppPhoneField] tarafından üretilir,
+    /// artık TR'ye özel 10 hane/`+90` varsayımı yok.
+    @Default('') String phoneE164,
+
+    /// [AppPhoneField]'ın kendi `phone_numbers_parser` tabanlı bölgesel
+    /// doğrulamasından gelir (`PhoneNumber.isValid()`).
+    @Default(false) bool isPhoneValid,
     @Default('') String emailInput,
     @Default(false) bool isRequestingLogin,
     String? loginErrorMessage,
@@ -24,8 +31,7 @@ class AuthState with _$AuthState {
 
   const AuthState._();
 
-  /// Türkiye numarası 10 hane (5XX XXX XX XX) — +90 ayrı gösteriliyor.
-  bool get isPhoneComplete => phoneDigits.length == 10;
+  bool get isPhoneComplete => isPhoneValid;
 
   bool get isEmailComplete =>
       emailInput.contains('@') &&

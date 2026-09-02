@@ -48,6 +48,7 @@ export const monthlyGymReport = onSchedule(
     const locale = resolveNotificationLocale(timeZone);
     const periodLabel = formatMonthInZone(monthStart, timeZone, locale);
     const gymName = (data.name as string | undefined) ?? "Salonunuz";
+    const currency = (data.currency as string | undefined) ?? "TRY";
 
     const [stats, packages, groupSessions, events, duetDocs] = await Promise.all([
       fetchGymWeeklyStats(db, gymDoc.id, monthStart, monthEnd),
@@ -64,6 +65,7 @@ export const monthlyGymReport = onSchedule(
       kind: "monthly",
       periodLabel,
       locale,
+      currency,
       sessions: stats,
       individualSessions,
       duetSessions,
@@ -92,6 +94,7 @@ export const monthlyGymReport = onSchedule(
       packages,
       groupSessions,
       events,
+      currency,
     });
   }
 }));

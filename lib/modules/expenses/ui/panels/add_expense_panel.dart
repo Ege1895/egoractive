@@ -2,18 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/app_spacing.dart';
+import '../../../../core/constants/currency_constants.dart';
+import '../../../../core/locale/locale_controller.dart';
+import '../../../../core/money/active_gym_currency_provider.dart';
+import '../../../../core/money/app_money_formatter.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
 import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/subscription/subscription_write_gate.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../../../shared/utils/thousands_input_formatter.dart';
-import '../../../../shared/utils/tr_date_formatter.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_text_field.dart';
 import '../../../../shared/widgets/native_date_picker.dart';
 import '../../controller/expenses_controller.dart';
 import '../../domain/expense_category.dart';
+import '../../../../shared/utils/date_labels.dart';
 
 /// Admin 15 · Gider Ekle — kategori, tutar, tarih, tekrar. Kategori listesi
 /// Remote Config'ten (`cfg_expense_categories`) okunur — yeni bir kategori
@@ -48,6 +51,8 @@ class _AddExpensePanelState extends BasePanelState<AddExpensePanel> {
     final selectedLabel = selectedMatches.isEmpty
         ? null
         : selectedMatches.first.label;
+    final currency =
+        ref.watch(activeGymCurrencyProvider).valueOrNull ?? defaultCurrencyCode;
 
     return Scaffold(
       body: SafeArea(
@@ -107,14 +112,20 @@ class _AddExpensePanelState extends BasePanelState<AddExpensePanel> {
                       border: Border.all(color: colors.outline),
                     ),
                     child: AppTextField(
-                      label: ref.watch(
-                        rcTextProvider(
-                          RemoteConfigKeys.expensesAmountFieldLabel,
-                        ),
-                      ),
+                      label: ref
+                          .watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.expensesAmountFieldLabel,
+                            ),
+                          )
+                          .replaceAll('{currency}', currencySymbol(currency)),
                       controller: _amountController,
                       keyboardType: TextInputType.number,
-                      inputFormatters: [ThousandsInputFormatter()],
+                      inputFormatters: [
+                        AppMoneyInputFormatter(
+                          locale: ref.watch(localeControllerProvider),
+                        ),
+                      ],
                       hint: ref.watch(
                         rcTextProvider(
                           RemoteConfigKeys.expensesAmountFieldHint,
@@ -268,7 +279,9 @@ class _AddExpensePanelState extends BasePanelState<AddExpensePanel> {
                                         ),
                                       ),
                                       Text(
-                                        formatTrDate(_date),
+                                        ref
+                                            .watch(dateLabelsProvider)
+                                            .dayMonthYear(_date),
                                         style: typography.bodyLarge.copyWith(
                                           color: colors.onSurface,
                                         ),
@@ -414,11 +427,10 @@ class _AddExpensePanelState extends BasePanelState<AddExpensePanel> {
                     onPressed: _isSaving
                         ? null
                         : () async {
-                            final amount =
-                                int.tryParse(
-                                  _amountController.text.replaceAll('.', ''),
-                                ) ??
-                                0;
+                            final amount = parseMoneyInput(
+                              _amountController.text,
+                              ref.read(localeControllerProvider),
+                            );
                             final title = _titleController.text.trim();
                             final category = _category;
                             var hasError = false;

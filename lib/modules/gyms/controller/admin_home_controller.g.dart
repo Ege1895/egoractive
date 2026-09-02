@@ -151,7 +151,7 @@ class _DuePaymentsForGymProviderElement
 }
 
 String _$adminHomeControllerHash() =>
-    r'5caeec843a53fe76678b26d63c405c730f7791c3';
+    r'7b1010b70b8dc5a14876809f0864a22004209c53';
 
 /// Admin 1 · Ana Sayfa — aylık seans/ciro/antrenör performansı zaten
 /// `DashboardReportController` (reports modülü) tarafından gerçek zamanlı

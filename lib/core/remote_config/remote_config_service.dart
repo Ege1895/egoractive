@@ -187,9 +187,15 @@ abstract final class RemoteConfigKeys {
   static const commonPastDatetimeError = 'lbl_common_past_datetime_error';
   static const commonGelicem = 'lbl_common_gelicem';
   static const commonGelmeyecegim = 'lbl_common_gelmeyecegim';
-  static const commonAnaSayfaTab = 'lbl_common_ana_sayfa_tab';
   static const commonProfilTab = 'lbl_common_profil_tab';
   static const commonTelefonLabel = 'lbl_common_telefon_label';
+
+  /// F8-5 sonrası bulundu — `AppPhoneField`'ın ülke seçici sheet'indeki arama
+  /// kutusu, `flutter_country_selector` paketinin kendi varsayılan metnini
+  /// ("Aramak"/"Search") gösteriyordu; bu, kullanıcıya default/placeholder
+  /// gibi görünen, doğal olmayan bir ifadeydi.
+  static const commonPhoneCountrySearchHint =
+      'lbl_common_phone_country_search_hint';
   static const commonTumuFilter = 'lbl_common_tumu_filter';
   static const commonTamamlandi = 'lbl_common_tamamlandi';
   static const commonIptalLabel = 'lbl_common_iptal_label';
@@ -197,8 +203,6 @@ abstract final class RemoteConfigKeys {
   static const commonPaketiYokFilter = 'lbl_common_paketi_yok_filter';
   static const commonSeansSayisiLabel = 'lbl_common_seans_sayisi_label';
   static const commonAddSeansButton = 'lbl_common_add_seans_button';
-  static const commonOlcum6AySectionHeader =
-      'lbl_common_olcum_6_ay_section_header';
   static const commonDersGecmisiSectionHeader =
       'lbl_common_ders_gecmisi_section_header';
   static const commonUyeDetayiTitle = 'lbl_common_uye_detayi_title';
@@ -224,22 +228,13 @@ abstract final class RemoteConfigKeys {
   static const shellAdminTabAyarlar = 'lbl_shell_admin_tab_ayarlar';
   static const shellRolePickerMemberButton =
       'lbl_shell_role_picker_member_button';
-  static const shellRolePickerTrainerButton =
-      'lbl_shell_role_picker_trainer_button';
-  static const shellRolePickerAdminButton =
-      'lbl_shell_role_picker_admin_button';
-  static const shellRolePickerGymSetupButton =
-      'lbl_shell_role_picker_gym_setup_button';
   static const authProfileTitle = 'lbl_auth_profile_title';
   static const authPhoneNumberLabel = 'lbl_auth_phone_number_label';
   static const authLoginButton = 'lbl_auth_login_button';
-  static const authSelectAvatarLabel = 'lbl_auth_select_avatar_label';
   static const authBadgesNavLabel = 'lbl_auth_badges_nav_label';
   static const authGiveFeedbackNavLabel = 'lbl_auth_give_feedback_nav_label';
   static const authSessionRemindersToggleTitle =
       'lbl_auth_session_reminders_toggle_title';
-  static const authSessionRemindersToggleDescription =
-      'lbl_auth_session_reminders_toggle_description';
   static const authDeleteAccountConfirmTitle =
       'lbl_auth_delete_account_confirm_title';
   static const authLoginErrorNotFound = 'lbl_auth_login_error_not_found';
@@ -270,10 +265,6 @@ abstract final class RemoteConfigKeys {
 
   /// Giriş bekleniyor ekranı.
   static const authLoginWaitingHeading = 'lbl_auth_login_waiting_heading';
-  static const authLoginWaitingBody = 'lbl_auth_login_waiting_body';
-  static const authLoginWaitingHint = 'lbl_auth_login_waiting_hint';
-  static const authLoginWaitingCancelButton =
-      'lbl_auth_login_waiting_cancel_button';
 
   /// Onboarding — rol seçimi ekranı.
   static const authOnboardingRoleBrandLabel =
@@ -473,8 +464,6 @@ abstract final class RemoteConfigKeys {
       'lbl_group_sessions_capacity_low_note';
   static const groupSessionsCapacityAvailableNote =
       'lbl_group_sessions_capacity_available_note';
-  static const groupSessionsViewParticipantsLink =
-      'lbl_group_sessions_view_participants_link';
   static const groupSessionsDiscoverTitle = 'lbl_group_sessions_discover_title';
   static const groupSessionsDiscoverTabGroupSessions =
       'lbl_group_sessions_discover_tab_group_sessions';
@@ -570,8 +559,6 @@ abstract final class RemoteConfigKeys {
       'lbl_gyms_admin_home_trainer_performance_section';
   static const gymsAdminHomeUpcomingPaymentsSection =
       'lbl_gyms_admin_home_upcoming_payments_section';
-  static const gymsAdminHomePendingFeedbackLabel =
-      'lbl_gyms_admin_home_pending_feedback_label';
   static const gymsAdminHomeTotalSessionsLabel =
       'lbl_gyms_admin_home_total_sessions_label';
   static const gymsAdminHomeCompletedLabel =
@@ -580,10 +567,6 @@ abstract final class RemoteConfigKeys {
       'lbl_gyms_admin_home_estimated_revenue_label';
   static const gymsAdminHomeExpenseLabel = 'lbl_gyms_admin_home_expense_label';
   static const gymsPermissionsTitle = 'lbl_gyms_permissions_title';
-  static const gymsPermissionsReminderDropdownLabel =
-      'lbl_gyms_permissions_reminder_dropdown_label';
-  static const gymsPermissionsReminderDescription =
-      'lbl_gyms_permissions_reminder_description';
   static const gymsSettingsTitle = 'lbl_gyms_settings_title';
   static const gymsSettingsNavGymInfo = 'lbl_gyms_settings_nav_gym_info';
   static const gymsSettingsNavTrainerManagement =
@@ -606,9 +589,6 @@ abstract final class RemoteConfigKeys {
       'lbl_gyms_gym_info_change_logo_button';
   static const gymsGymInfoThemeColorSection =
       'lbl_gyms_gym_info_theme_color_section';
-  static const gymsGymInfoPreviewLabel = 'lbl_gyms_gym_info_preview_label';
-  static const gymsGymInfoPrimaryButtonLabel =
-      'lbl_gyms_gym_info_primary_button_label';
   static const gymsGymInfoSeeAllThemesLink =
       'lbl_gyms_gym_info_see_all_themes_link';
   static const gymsGymInfoNameFieldLabel = 'lbl_gyms_gym_info_name_field_label';
@@ -616,7 +596,6 @@ abstract final class RemoteConfigKeys {
       'lbl_gyms_gym_info_address_field_label';
   static const gymsGymSetupStepHeader = 'lbl_gyms_gym_setup_step_header';
   static const gymsGymSetupTitle = 'lbl_gyms_gym_setup_title';
-  static const gymsGymSetupLogoLabel = 'lbl_gyms_gym_setup_logo_label';
   static const gymsGymSetupChooseLogoButton =
       'lbl_gyms_gym_setup_choose_logo_button';
   static const gymsGymSetupThemeColorLabel =
@@ -631,20 +610,13 @@ abstract final class RemoteConfigKeys {
       'lbl_gyms_themes_show_logo_silhouette_toggle_label';
   static const gymsThemesShowLogoSilhouetteToggleDescription =
       'lbl_gyms_themes_show_logo_silhouette_toggle_description';
-  static const gymsThemesApplyToAllButton =
-      'lbl_gyms_themes_apply_to_all_button';
   static const gymsAddThemeTitle = 'lbl_gyms_add_theme_title';
   static const gymsAddThemePaletteLabel = 'lbl_gyms_add_theme_palette_label';
   static const gymsAddThemeColorCodeLabel =
       'lbl_gyms_add_theme_color_code_label';
   static const gymsAddThemeColorHelper = 'lbl_gyms_add_theme_color_helper';
-  static const gymsAddThemeUseLogoQuestion =
-      'lbl_gyms_add_theme_use_logo_question';
   static const gymsAddThemePreviewSection =
       'lbl_gyms_add_theme_preview_section';
-  static const gymsAddThemeUseLogoOption = 'lbl_gyms_add_theme_use_logo_option';
-  static const gymsAddThemeFlatBackgroundOption =
-      'lbl_gyms_add_theme_flat_background_option';
   static const gymsAddThemeSubmitButton = 'lbl_gyms_add_theme_submit_button';
   static const gymsAddThemeNameFieldLabel =
       'lbl_gyms_add_theme_name_field_label';
@@ -676,8 +648,6 @@ abstract final class RemoteConfigKeys {
   static const gymsGymInfoPaletteExtractingLabel =
       'lbl_gyms_gym_info_palette_extracting_label';
   static const gymsGymInfoThemeColorNote = 'lbl_gyms_gym_info_theme_color_note';
-  static const gymsGymInfoGymReportEmailLabel =
-      'lbl_gyms_gym_info_gym_report_email_label';
   static const gymsGymInfoGymReportEmailHint =
       'lbl_gyms_gym_info_gym_report_email_hint';
 
@@ -703,11 +673,14 @@ abstract final class RemoteConfigKeys {
   static const gymsGymSetupHeadline = 'lbl_gyms_gym_setup_headline';
   static const gymsGymSetupPhoneFieldLabel =
       'lbl_gyms_gym_setup_phone_field_label';
-  static const gymsGymSetupPhoneHint = 'lbl_gyms_gym_setup_phone_hint';
   static const gymsGymSetupPhoneHelperNote =
       'lbl_gyms_gym_setup_phone_helper_note';
-  static const gymsGymSetupReportEmailDescription =
-      'lbl_gyms_gym_setup_report_email_description';
+  static const gymsGymSetupCurrencyFieldLabel =
+      'lbl_gyms_gym_setup_currency_field_label';
+  static const gymsGymSetupCurrencyHelperNote =
+      'lbl_gyms_gym_setup_currency_helper_note';
+  static const gymsGymInfoCurrencyFieldLabel =
+      'lbl_gyms_gym_info_currency_field_label';
   static const gymsGymSetupLogoOptionalLabel =
       'lbl_gyms_gym_setup_logo_optional_label';
   static const gymsGymSetupLogoDescription =
@@ -759,11 +732,6 @@ abstract final class RemoteConfigKeys {
       'lbl_gyms_trainer_permissions_auto_save_note';
   static const gymsTrainerPermissionsSaveFailedError =
       'lbl_gyms_trainer_permissions_save_failed_error';
-  static const measurementsAddTitle = 'lbl_measurements_add_title';
-  static const measurementsMeasurementDateLabel =
-      'lbl_measurements_measurement_date_label';
-  static const measurementsMeasurementsSection =
-      'lbl_measurements_measurements_section';
   static const measurementsUnitCm = 'lbl_measurements_unit_cm';
   // F7-x — vücut noktası etiketleri ("Bel"/"Göğüs" vb.) önceden
   // `MeasurementMetric.label`'da hardcoded Türkçe idi, app İngilizce iken
@@ -844,7 +812,6 @@ abstract final class RemoteConfigKeys {
   static const membersFilterExpiring = 'lbl_members_filter_expiring';
   static const membersInfoStepIndicator1 = 'lbl_members_info_step_indicator_1';
   static const membersInfoLoginHelper = 'lbl_members_info_login_helper';
-  static const membersGenderFieldLabel = 'lbl_members_gender_field_label';
   static const membersTrainerFieldLabel = 'lbl_members_trainer_field_label';
   static const membersRegistrationDateFieldLabel =
       'lbl_members_registration_date_field_label';
@@ -860,18 +827,8 @@ abstract final class RemoteConfigKeys {
   static const membersPaymentStepIndicator3 =
       'lbl_members_payment_step_indicator_3';
   static const membersPaymentTotalLabel = 'lbl_members_payment_total_label';
-  static const membersPaymentPaidLabel = 'lbl_members_payment_paid_label';
-  static const membersPaymentRemainingLabel =
-      'lbl_members_payment_remaining_label';
-  static const membersPaymentAutoCalculatedHelper =
-      'lbl_members_payment_auto_calculated_helper';
   static const membersPaymentDueDateFieldLabel =
       'lbl_members_payment_due_date_field_label';
-  static const membersPaymentEnterAmountHelper =
-      'lbl_members_payment_enter_amount_helper';
-  static const membersPaymentFullOption = 'lbl_members_payment_full_option';
-  static const membersPaymentHalfOption = 'lbl_members_payment_half_option';
-  static const membersPaymentOtherOption = 'lbl_members_payment_other_option';
   static const membersNewMembershipTitle = 'lbl_members_new_membership_title';
   static const membersNewMembershipStepIndicator2 =
       'lbl_members_new_membership_step_indicator_2';
@@ -917,7 +874,6 @@ abstract final class RemoteConfigKeys {
       'lbl_members_self_info_email_field_label';
   static const membersInfoNewTitle = 'lbl_members_info_new_title';
   static const membersInfoEditTitle = 'lbl_members_info_edit_title';
-  static const membersInfoPhoneHint = 'lbl_members_info_phone_hint';
   static const membersInfoAgeSuffix = 'lbl_members_info_age_suffix';
 
   /// `{type}`/`{days}` yer tutucuları paket seçim kartında seans türü ve
@@ -961,6 +917,11 @@ abstract final class RemoteConfigKeys {
   /// (Seanslar ekranı tarih başlığı) gidermek için eklendi.
   static const commonMonthNamesLong = 'lbl_common_month_names_long';
   static const commonWeekdayNamesLong = 'lbl_common_weekday_names_long';
+
+  /// `{month}` yer tutuculu — "Eylül 2026 özeti" / "September 2026 summary".
+  /// Ay adı `commonMonthNamesLong`'dan gelir; bu şablon sadece ayın etrafındaki
+  /// metni taşır, çünkü İngilizce'de sözcük sırası farklı olabilir.
+  static const commonMonthSummaryTemplate = 'lbl_common_month_summary_template';
   static const membersInfoConfirmAttendanceLabel =
       'lbl_members_info_confirm_attendance_label';
   static const membersInfoConfirmAttendanceHelper =
@@ -982,8 +943,6 @@ abstract final class RemoteConfigKeys {
   static const notificationsTitle = 'lbl_notifications_title';
   static const notificationsTargetQuestionLabel =
       'lbl_notifications_target_question_label';
-  static const notificationsTargetSingleMemberOption =
-      'lbl_notifications_target_single_member_option';
   static const notificationsTargetWholeGymOption =
       'lbl_notifications_target_whole_gym_option';
   static const notificationsPreviewLabel = 'lbl_notifications_preview_label';
@@ -1152,20 +1111,10 @@ abstract final class RemoteConfigKeys {
   static const sessionsCalendarTypeDuet = 'lbl_sessions_calendar_type_duet';
   static const sessionsCalendarDuetMembersLabel =
       'lbl_sessions_calendar_duet_members_label';
-  static const sessionsAttendanceAnswerLabel =
-      'lbl_sessions_attendance_answer_label';
-  static const sessionsAttendanceAnswerTimeLabel =
-      'lbl_sessions_attendance_answer_time_label';
-  static const sessionsAttendanceMemberNoteLabel =
-      'lbl_sessions_attendance_member_note_label';
-  static const sessionsAttendanceBackToCalendarButton =
-      'lbl_sessions_attendance_back_to_calendar_button';
   static const sessionsManagementTitle = 'lbl_sessions_management_title';
   static const sessionsManagementEmptyState =
       'lbl_sessions_management_empty_state';
   static const sessionsFilterScheduled = 'lbl_sessions_filter_scheduled';
-  static const sessionsChangeTrainerAction =
-      'lbl_sessions_change_trainer_action';
   static const sessionsCancelSessionAction =
       'lbl_sessions_cancel_session_action';
   static const sessionsConfirmTitle = 'lbl_sessions_confirm_title';
@@ -1177,10 +1126,6 @@ abstract final class RemoteConfigKeys {
       'lbl_sessions_confirm_change_answer_button';
   static const sessionsMemberHomeThisWeekSection =
       'lbl_sessions_member_home_this_week_section';
-  static const sessionsMemberHomeSeePackageButton =
-      'lbl_sessions_member_home_see_package_button';
-  static const sessionsTrainerNotificationsTitle =
-      'lbl_sessions_trainer_notifications_title';
   static const sessionsCompletionMemberNoShowOption =
       'lbl_sessions_completion_member_no_show_option';
   static const sessionsListTitle = 'lbl_sessions_list_title';
@@ -1250,8 +1195,6 @@ abstract final class RemoteConfigKeys {
   static const sessionsListEmptyState = 'lbl_sessions_list_empty_state';
   static const sessionsListCalendarEmptyDay =
       'lbl_sessions_list_calendar_empty_day';
-  static const sessionsTrainerNotificationsEmptyState =
-      'lbl_sessions_trainer_notifications_empty_state';
   static const sessionsCreateTrainerBusyError =
       'lbl_sessions_create_trainer_busy_error';
 
@@ -1336,8 +1279,6 @@ abstract final class RemoteConfigKeys {
   static const trainersHomeFreeSlotLabel = 'lbl_trainers_home_free_slot_label';
   static const trainersMemberDetailCreateSessionButton =
       'lbl_trainers_member_detail_create_session_button';
-  static const trainersMemberDetailAddMeasurementButton =
-      'lbl_trainers_member_detail_add_measurement_button';
   static const trainersMemberDetailRemainingSessionsLabel =
       'lbl_trainers_member_detail_remaining_sessions_label';
   static const trainersMemberDetailPackageEndLabel =
@@ -1381,6 +1322,26 @@ abstract final class RemoteConfigKeys {
   static const trainersAddTrainerNameRequiredError =
       'lbl_trainers_add_trainer_name_required_error';
   static const trainersAddTrainerError = 'lbl_trainers_add_trainer_error';
+  static const trainersPhoneTakenError = 'lbl_trainers_phone_taken_error';
+  static const trainersDeleteButton = 'lbl_trainers_delete_button';
+  static const trainersDeleteConfirmTitle = 'lbl_trainers_delete_confirm_title';
+  static const trainersDeleteConfirmBody = 'lbl_trainers_delete_confirm_body';
+  static const trainersDeleteConfirmCta = 'lbl_trainers_delete_confirm_cta';
+  static const trainersDeleteError = 'lbl_trainers_delete_error';
+  static const groupSessionsCancelConfirmTitle =
+      'lbl_group_sessions_cancel_confirm_title';
+  static const groupSessionsCancelConfirmBody =
+      'lbl_group_sessions_cancel_confirm_body';
+  static const groupSessionsCancelConfirmCta =
+      'lbl_group_sessions_cancel_confirm_cta';
+  static const groupSessionsCancelError = 'lbl_group_sessions_cancel_error';
+  static const eventsCancelConfirmTitle = 'lbl_events_cancel_confirm_title';
+  static const eventsCancelConfirmBody = 'lbl_events_cancel_confirm_body';
+  static const eventsCancelConfirmCta = 'lbl_events_cancel_confirm_cta';
+  static const eventsCancelError = 'lbl_events_cancel_error';
+  static const feedbackFilterAllLabel = 'lbl_feedback_filter_all_label';
+  static const feedbackEmptyMonthLabel = 'lbl_feedback_empty_month_label';
+  static const feedbackEmptyFilterLabel = 'lbl_feedback_empty_filter_label';
   static const trainersAddTrainerNameHint =
       'lbl_trainers_add_trainer_name_hint';
   static const trainersManagementTrainerCountSuffix =
@@ -1403,11 +1364,6 @@ abstract final class RemoteConfigKeys {
   // `{period}`/`{plan}` yer tutucuları panel tarafında dolduruluyor;
   // `{store}`/`{storeAccount}` ("App Store"/"Apple" ya da "Google Play"/
   // "Google") platforma göre kod içinde sabit — marka adı, iş kuralı değil.
-  static const subscriptionTrialBannerTitle =
-      'lbl_subscription_trial_banner_title';
-  static const subscriptionTrialBannerBody =
-      'lbl_subscription_trial_banner_body';
-  static const subscriptionTrialProgress = 'lbl_subscription_trial_progress';
   static const subscriptionExpiredBannerTitle =
       'lbl_subscription_expired_banner_title';
   static const subscriptionExpiredBannerBody =
@@ -1421,9 +1377,6 @@ abstract final class RemoteConfigKeys {
   static const subscriptionRenewalLabel = 'lbl_subscription_renewal_label';
   static const subscriptionStartedLabel = 'lbl_subscription_started_label';
   static const subscriptionActiveNote = 'lbl_subscription_active_note';
-  static const subscriptionStoreRowTitle = 'lbl_subscription_store_row_title';
-  static const subscriptionStoreRowSubtitle =
-      'lbl_subscription_store_row_subtitle';
   static const subscriptionManageCta = 'lbl_subscription_manage_cta';
   static const subscriptionManageCaption = 'lbl_subscription_manage_caption';
 
@@ -1465,8 +1418,6 @@ abstract final class RemoteConfigKeys {
       'lbl_subscription_yearly_period_word';
   static const subscriptionMonthlyPeriodWord =
       'lbl_subscription_monthly_period_word';
-  static const subscriptionStoreBadgeLabel =
-      'lbl_subscription_store_badge_label';
   static const subscriptionManagementOpenError =
       'lbl_subscription_management_open_error';
   static const subscriptionExemptNote = 'lbl_subscription_exempt_note';
@@ -1478,6 +1429,111 @@ abstract final class RemoteConfigKeys {
   /// `[{label_tr, label_en}]` — süresi dolduğunda kısıtlanan işlemler.
   static const subscriptionRestrictedOperations =
       'cfg_subscription_restricted_operations';
+  static const shellTabHome = 'lbl_shell_tab_home';
+  static const shellTabProfile = 'lbl_shell_tab_profile';
+
+  static const commonMonthNamesShort = 'lbl_common_month_names_short';
+  static const commonWeekdayNamesShort = 'lbl_common_weekday_names_short';
+  static const commonDayMonthYearTemplate =
+      'lbl_common_day_month_year_template';
+  static const commonDayMonthTemplate = 'lbl_common_day_month_template';
+
+  static const commonSoloSessionWithTimeTemplate =
+      'lbl_common_solo_session_with_time_template';
+
+  static const sessionsNoPlannedSessionTitle =
+      'lbl_sessions_no_planned_session_title';
+  static const sessionsNoPlannedSessionMeta =
+      'lbl_sessions_no_planned_session_meta';
+
+  static const commonWeekdayNamesInitial = 'lbl_common_weekday_names_initial';
+  static const commonWeekdayDateTemplate = 'lbl_common_weekday_date_template';
+
+  static const commonNoActiveGymError = 'lbl_common_no_active_gym_error';
+  static const membersListLoadMoreError = 'lbl_members_list_load_more_error';
+  static const membersListSearchError = 'lbl_members_list_search_error';
+  static const gymsCreateLogoPickError = 'lbl_gyms_create_logo_pick_error';
+  static const gymsCreatePhoneTakenError = 'lbl_gyms_create_phone_taken_error';
+  static const gymsCreateGenericError = 'lbl_gyms_create_generic_error';
+  static const gymsCreateNameRequiredError =
+      'lbl_gyms_create_name_required_error';
+  static const gymsCreateCityRequiredError =
+      'lbl_gyms_create_city_required_error';
+  static const commonInvalidMobilePhoneError =
+      'lbl_common_invalid_mobile_phone_error';
+  static const commonInvalidPhoneError = 'lbl_common_invalid_phone_error';
+  static const membersRegistrationTrainerRequiredError =
+      'lbl_members_registration_trainer_required_error';
+  static const membersRegistrationPhoneTakenError =
+      'lbl_members_registration_phone_taken_error';
+  static const membersRegistrationCreateError =
+      'lbl_members_registration_create_error';
+  static const membersRegistrationUpdateError =
+      'lbl_members_registration_update_error';
+
+  static const notificationsHourlyLimitError =
+      'lbl_notifications_hourly_limit_error';
+  static const notificationsSendGenericError =
+      'lbl_notifications_send_generic_error';
+  static const notificationsSelectMemberError =
+      'lbl_notifications_select_member_error';
+  static const subscriptionStartError = 'lbl_subscription_start_error';
+  static const subscriptionPurchaseStartError =
+      'lbl_subscription_purchase_start_error';
+  static const subscriptionAccountAlreadyUsedError =
+      'lbl_subscription_account_already_used_error';
+  static const subscriptionVerificationError =
+      'lbl_subscription_verification_error';
+  static const subscriptionPurchaseCompleteError =
+      'lbl_subscription_purchase_complete_error';
+  static const groupSessionsNotFoundError =
+      'lbl_group_sessions_not_found_error';
+  static const groupSessionsLoadError = 'lbl_group_sessions_load_error';
+  static const groupSessionsTitleRequiredError =
+      'lbl_group_sessions_title_required_error';
+  static const groupSessionsDateRequiredError =
+      'lbl_group_sessions_date_required_error';
+  static const groupSessionsPastDateError =
+      'lbl_group_sessions_past_date_error';
+  static const groupSessionsUpdateError = 'lbl_group_sessions_update_error';
+  static const groupSessionsCreateError = 'lbl_group_sessions_create_error';
+  static const membersPaymentSaveError = 'lbl_members_payment_save_error';
+  static const feedbackSubmitError = 'lbl_feedback_submit_error';
+  static const reportsRecipientInvalidEmailError =
+      'lbl_reports_recipient_invalid_email_error';
+  static const sessionsAttendanceSaveError =
+      'lbl_sessions_attendance_save_error';
+
+  static const subscriptionGateDialogTitle =
+      'lbl_subscription_gate_dialog_title';
+  static const subscriptionGateExpiredBody =
+      'lbl_subscription_gate_expired_body';
+  static const subscriptionGateInactiveBody =
+      'lbl_subscription_gate_inactive_body';
+  static const subscriptionGateGoToSubscription =
+      'lbl_subscription_gate_go_button';
+  static const subscriptionStatusBannerExpired =
+      'lbl_subscription_status_banner_expired';
+  static const commonCancelButton = 'lbl_common_cancel_button';
+
+  static const trainersReportBreakdownTotal =
+      'lbl_trainers_report_breakdown_total';
+  static const trainersReportBreakdownCompleted =
+      'lbl_trainers_report_breakdown_completed';
+  static const trainersReportBreakdownCancelled =
+      'lbl_trainers_report_breakdown_cancelled';
+  static const eventsUnlimitedCapacityLabel =
+      'lbl_events_unlimited_capacity_label';
+  static const notificationsAndroidChannelName =
+      'lbl_notifications_android_channel_name';
+  static const notificationsAndroidChannelDescription =
+      'lbl_notifications_android_channel_description';
+
+  static const trainersHomePendingConfirmationMeta =
+      'lbl_trainers_home_pending_confirmation_meta';
+
+  static const eventsNotFoundError = 'lbl_events_not_found_error';
+  static const eventsLoadError = 'lbl_events_load_error';
 }
 
 /// Firebase Remote Config'e tip güvenli erişim katmanı. `FirebaseRemoteConfig.instance`
@@ -1576,9 +1632,9 @@ class RemoteConfigService {
     'lbl_common_seansi_ertele_tr': 'Seansı ertele',
     'lbl_common_gelicem_tr': 'Gelicem',
     'lbl_common_gelmeyecegim_tr': 'Gelmeyeceğim',
-    'lbl_common_ana_sayfa_tab_tr': 'Ana Sayfa',
     'lbl_common_profil_tab_tr': 'Profil',
     'lbl_common_telefon_label_tr': 'Telefon',
+    'lbl_common_phone_country_search_hint_tr': 'Ülke ara',
     'lbl_common_tumu_filter_tr': 'Tümü',
     'lbl_common_tamamlandi_tr': 'Tamamlandı',
     'lbl_common_iptal_label_tr': 'İptal',
@@ -1586,7 +1642,6 @@ class RemoteConfigService {
     'lbl_common_paketi_yok_filter_tr': 'Paketi yok',
     'lbl_common_seans_sayisi_label_tr': 'Seans sayısı',
     'lbl_common_add_seans_button_tr': '+ Seans',
-    'lbl_common_olcum_6_ay_section_header_tr': 'ÖLÇÜM · 6 AY',
     'lbl_common_ders_gecmisi_section_header_tr': 'DERS GEÇMİŞİ',
     'lbl_common_uye_detayi_title_tr': 'Üye detayı',
     'lbl_common_bu_gunde_seans_yok_tr': 'Bu günde seans yok.',
@@ -1608,19 +1663,12 @@ class RemoteConfigService {
     'lbl_shell_admin_tab_finans_tr': 'Finans',
     'lbl_shell_admin_tab_ayarlar_tr': 'Ayarlar',
     'lbl_shell_role_picker_member_button_tr': 'Üye',
-    'lbl_shell_role_picker_trainer_button_tr': 'Antrenör',
-    'lbl_shell_role_picker_admin_button_tr': 'Admin',
-    'lbl_shell_role_picker_gym_setup_button_tr':
-        'Admin · Salon Kurulumu (ilk kurulum)',
     'lbl_auth_profile_title_tr': 'Profilim',
     'lbl_auth_phone_number_label_tr': 'Telefon numarası',
     'lbl_auth_login_button_tr': 'Giriş yap',
-    'lbl_auth_select_avatar_label_tr': 'Avatarını seç',
     'lbl_auth_badges_nav_label_tr': 'Rozetlerim',
     'lbl_auth_give_feedback_nav_label_tr': 'Geri bildirim ver',
     'lbl_auth_session_reminders_toggle_title_tr': 'Ders hatırlatmaları',
-    'lbl_auth_session_reminders_toggle_description_tr':
-        'Dersinden 2 saat önce bildirim',
     'lbl_auth_delete_account_confirm_title_tr': 'Profilim',
     'lbl_auth_login_error_not_found_tr':
         'Bu numarayla kayıtlı bir hesap bulunamadı. Salon yönetimi seni eklemeli.',
@@ -1648,10 +1696,6 @@ class RemoteConfigService {
         'Anladım, hesabım ve tüm verilerim silinsin.',
     'lbl_auth_delete_account_in_progress_button_tr': 'Siliniyor…',
     'lbl_auth_login_waiting_heading_tr': 'Seni tanıyoruz…',
-    'lbl_auth_login_waiting_body_tr': '+90 {phone} numarası salonda aranıyor.',
-    'lbl_auth_login_waiting_hint_tr':
-        '30 saniyeden uzun sürerse bağlantını kontrol edip tekrar dene.',
-    'lbl_auth_login_waiting_cancel_button_tr': 'İptal',
     'lbl_auth_onboarding_role_brand_label_tr': 'EGORACTIVE',
     'lbl_auth_onboarding_role_title_tr': 'Hoş geldin',
     'lbl_auth_onboarding_role_subtitle_tr': 'Devam etmek için rolünü seç.',
@@ -1770,7 +1814,7 @@ class RemoteConfigService {
     'lbl_expenses_recurring_toggle_label_tr': 'Her ay tekrar et',
     'lbl_expenses_recurring_toggle_description_tr':
         'Kira ve fatura gibi sabit giderler için',
-    'lbl_expenses_amount_field_label_tr': 'Tutar (₺)',
+    'lbl_expenses_amount_field_label_tr': 'Tutar ({currency})',
     'lbl_expenses_description_field_label_tr': 'Açıklama',
     'lbl_expenses_date_field_label_tr': 'Tarih',
     'lbl_expenses_submit_button_tr': 'Gideri kaydet',
@@ -1810,7 +1854,6 @@ class RemoteConfigService {
     'lbl_group_sessions_capacity_full_note_tr': 'Kontenjan doldu',
     'lbl_group_sessions_capacity_low_note_tr': 'Son {remaining} yer',
     'lbl_group_sessions_capacity_available_note_tr': 'Yer var',
-    'lbl_group_sessions_view_participants_link_tr': 'Katılımcıları gör',
     'lbl_group_sessions_discover_title_tr': 'Keşfet',
     'lbl_group_sessions_discover_tab_group_sessions_tr': 'Grup dersleri',
     'lbl_group_sessions_discover_tab_events_tr': 'Etkinlikler',
@@ -1850,16 +1893,11 @@ class RemoteConfigService {
     'lbl_gyms_admin_home_trainer_performance_section_tr':
         'ANTRENÖR PERFORMANSI',
     'lbl_gyms_admin_home_upcoming_payments_section_tr': 'ÖDEME VAKTİ YAKLAŞAN',
-    'lbl_gyms_admin_home_pending_feedback_label_tr': 'Bekleyen geri bildirim',
     'lbl_gyms_admin_home_total_sessions_label_tr': 'Toplam seans',
     'lbl_gyms_admin_home_completed_label_tr': 'Tamamlanan',
     'lbl_gyms_admin_home_estimated_revenue_label_tr': 'Tahmini ciro',
     'lbl_gyms_admin_home_expense_label_tr': 'Gider',
     'lbl_gyms_permissions_title_tr': 'Yetki ayarları',
-    'lbl_gyms_permissions_reminder_dropdown_label_tr':
-        'Seans bitimi eğitmene ne zaman hatırlatılsın?',
-    'lbl_gyms_permissions_reminder_description_tr':
-        'Bildirim seans bitiminden sonra gider',
     'lbl_gyms_settings_title_tr': 'Ayarlar',
     'lbl_gyms_settings_nav_gym_info_tr': 'Salon bilgileri',
     'lbl_gyms_settings_nav_trainer_management_tr': 'Antrenör yönetimi',
@@ -1875,14 +1913,11 @@ class RemoteConfigService {
     'lbl_gyms_gym_info_logo_helper_tr': 'Kare, en az 512×512 px PNG yükleyin.',
     'lbl_gyms_gym_info_change_logo_button_tr': 'Logoyu değiştir',
     'lbl_gyms_gym_info_theme_color_section_tr': 'TEMA RENGİ',
-    'lbl_gyms_gym_info_preview_label_tr': 'Önizleme',
-    'lbl_gyms_gym_info_primary_button_label_tr': 'Birincil buton',
     'lbl_gyms_gym_info_see_all_themes_link_tr': 'Tüm temaları gör ›',
     'lbl_gyms_gym_info_name_field_label_tr': 'Salon adı',
     'lbl_gyms_gym_info_address_field_label_tr': 'Adres',
     'lbl_gyms_gym_setup_step_header_tr': 'KURULUM 1 / 1',
     'lbl_gyms_gym_setup_title_tr': 'Salonunu tanımla',
-    'lbl_gyms_gym_setup_logo_label_tr': 'Salon logosu',
     'lbl_gyms_gym_setup_choose_logo_button_tr': 'Logo seç',
     'lbl_gyms_gym_setup_theme_color_label_tr': 'Tema rengi',
     'lbl_gyms_gym_setup_city_field_label_tr': 'Şehir',
@@ -1893,16 +1928,12 @@ class RemoteConfigService {
         'Logo silüetini arka planda göster',
     'lbl_gyms_themes_show_logo_silhouette_toggle_description_tr':
         'Üye ve antrenör ekranlarında %25 opaklıkla',
-    'lbl_gyms_themes_apply_to_all_button_tr': 'Temayı tüm üyelere uygula',
     'lbl_gyms_add_theme_title_tr': 'Tema ekle',
     'lbl_gyms_add_theme_palette_label_tr': 'Palet',
     'lbl_gyms_add_theme_color_code_label_tr': 'Renk kodu',
     'lbl_gyms_add_theme_color_helper_tr':
         'Paletten seçin ya da kendi HEX kodunuzu yazın.',
-    'lbl_gyms_add_theme_use_logo_question_tr': 'Salon logosu kullanılsın mı?',
     'lbl_gyms_add_theme_preview_section_tr': 'ÖNİZLEME',
-    'lbl_gyms_add_theme_use_logo_option_tr': 'Evet, logoyu kullan',
-    'lbl_gyms_add_theme_flat_background_option_tr': 'Hayır, düz zemin',
     'lbl_gyms_add_theme_submit_button_tr': 'Temayı kaydet ve uygula',
     'lbl_gyms_add_theme_name_field_label_tr': 'Tema adı',
     'lbl_gyms_studio_rules_title_tr': 'Salon kuralları',
@@ -1931,7 +1962,6 @@ class RemoteConfigService {
     'lbl_gyms_gym_info_report_emails_section_tr': 'RAPOR E-POSTASI',
     'lbl_gyms_gym_info_report_emails_description_tr':
         'Haftalık ve aylık salon özeti (ciro/gider dahil) bu adrese e-posta ile gönderilir.',
-    'lbl_gyms_gym_info_gym_report_email_label_tr': 'Rapor e-postası',
     'lbl_gyms_gym_info_gym_report_email_hint_tr': 'admin@salon.com',
     'lbl_gyms_gym_info_saving_label_tr': 'Kaydediliyor…',
     'lbl_gyms_gym_info_logo_upload_failed_error_tr':
@@ -1946,12 +1976,12 @@ class RemoteConfigService {
     'lbl_gyms_gym_setup_headline_tr':
         'Bu adımı tamamlayınca yönetici hesabınız aktifleşir ve uygulamaya girersiniz.',
     'lbl_gyms_gym_setup_phone_field_label_tr': 'Telefon numaran (giriş için)',
-    'lbl_gyms_gym_setup_phone_hint_tr': '5XX XXX XX XX',
     'lbl_gyms_gym_setup_phone_helper_note_tr':
         'Salon kaydı tamamlanınca bu numarayla admin olarak giriş yapacaksın.',
-    'lbl_gyms_gym_setup_report_email_label_tr': 'Rapor e-postası (opsiyonel)',
-    'lbl_gyms_gym_setup_report_email_description_tr':
-        'Haftalık ve aylık salon özeti (ders/ciro/gider) bu adrese gönderilir. Şimdi boş bırakabilirsin, sonra Salon Bilgileri panelinden de ekleyebilirsin.',
+    'lbl_gyms_gym_setup_currency_field_label_tr': 'Para birimi',
+    'lbl_gyms_gym_setup_currency_helper_note_tr':
+        'Salonun tüm paket/ödeme/gider tutarları bu para biriminde tutulur — sonradan değiştirilemez.',
+    'lbl_gyms_gym_info_currency_field_label_tr': 'Para birimi',
     'lbl_gyms_gym_setup_logo_optional_label_tr': 'Salon logosu (opsiyonel)',
     'lbl_gyms_gym_setup_logo_description_tr':
         'Kare PNG, en az 512×512. Eklersen üyelerin ve antrenörlerin her ekranında arka planda %25 opaklıkla silüet olarak görünür — sonradan Salon Bilgileri panelinden de ekleyebilirsin.',
@@ -1999,9 +2029,6 @@ class RemoteConfigService {
         'Her değişiklik anında kaydedilir.',
     'lbl_gyms_trainer_permissions_save_failed_error_tr':
         'Ayar kaydedilemedi, bağlantını kontrol edip tekrar dene.',
-    'lbl_measurements_add_title_tr': 'Yeni ölçüm',
-    'lbl_measurements_measurement_date_label_tr': 'Ölçüm tarihi',
-    'lbl_measurements_measurements_section_tr': 'ÖLÇÜLER',
     'lbl_measurements_unit_cm_tr': 'cm',
     'lbl_measurements_metric_bel_tr': 'Bel',
     'lbl_measurements_metric_gogus_tr': 'Göğüs',
@@ -2051,7 +2078,6 @@ class RemoteConfigService {
     'lbl_members_info_step_indicator_1_tr': '1 / 3',
     'lbl_members_info_login_helper_tr':
         'Üye bu numarayla giriş yapar, şifre yok.',
-    'lbl_members_gender_field_label_tr': 'Cinsiyet',
     'lbl_members_trainer_field_label_tr': 'Antrenör',
     'lbl_members_registration_date_field_label_tr': 'Kayıt tarihi',
     'lbl_members_select_trainer_button_tr': 'Antrenör seç',
@@ -2063,14 +2089,7 @@ class RemoteConfigService {
     'lbl_members_payment_title_tr': 'Ödeme bilgisi',
     'lbl_members_payment_step_indicator_3_tr': '3 / 3',
     'lbl_members_payment_total_label_tr': 'Toplam tutar',
-    'lbl_members_payment_paid_label_tr': 'Ödendi',
-    'lbl_members_payment_remaining_label_tr': 'Kalan ödeme',
-    'lbl_members_payment_auto_calculated_helper_tr': 'Otomatik hesaplanır',
     'lbl_members_payment_due_date_field_label_tr': 'Son ödeme tarihi',
-    'lbl_members_payment_enter_amount_helper_tr': 'Ödenen tutarı gir',
-    'lbl_members_payment_full_option_tr': 'Tam ödendi',
-    'lbl_members_payment_half_option_tr': 'Yarısı',
-    'lbl_members_payment_other_option_tr': 'Diğer',
     'lbl_members_new_membership_title_tr': 'Yeni üyelik',
     'lbl_members_new_membership_step_indicator_2_tr': '2 / 3',
     'lbl_members_package_select_section_tr': 'PAKET SEÇ',
@@ -2107,7 +2126,6 @@ class RemoteConfigService {
         'Kaydedilemedi, bağlantını kontrol edip tekrar dene.',
     'lbl_members_info_new_title_tr': 'Yeni üye',
     'lbl_members_info_edit_title_tr': 'Üye bilgileri',
-    'lbl_members_info_phone_hint_tr': '5XX XXX XX XX',
     'lbl_members_info_age_suffix_tr': '{age} yaş',
     'lbl_members_package_pick_type_validity_caption_tr': '{type} · {days} gün',
     'lbl_members_info_height_picker_title_tr': 'Boy (cm)',
@@ -2131,6 +2149,7 @@ class RemoteConfigService {
         'Ocak,Şubat,Mart,Nisan,Mayıs,Haziran,Temmuz,Ağustos,Eylül,Ekim,Kasım,Aralık',
     'lbl_common_weekday_names_long_tr':
         'Pazartesi,Salı,Çarşamba,Perşembe,Cuma,Cumartesi,Pazar',
+    'lbl_common_month_summary_template_tr': '{month} özeti',
     'lbl_members_info_confirm_attendance_label_tr': 'Ders onayı gönderebilsin',
     'lbl_members_info_confirm_attendance_helper_tr':
         'Üye ana ekranından sıradaki dersi için "Gelicem"/"Gelmeyeceğim" '
@@ -2146,7 +2165,6 @@ class RemoteConfigService {
     'lbl_members_installment_paid_toggle_label_tr': 'Ödendi mi?',
     'lbl_notifications_title_tr': 'Bildirim gönder',
     'lbl_notifications_target_question_label_tr': 'Kime gidecek?',
-    'lbl_notifications_target_single_member_option_tr': 'Tek üye',
     'lbl_notifications_target_whole_gym_option_tr': 'Tüm salon',
     'lbl_notifications_preview_label_tr': 'Önizleme',
     'lbl_notifications_select_member_button_tr': 'Üye seç',
@@ -2172,7 +2190,7 @@ class RemoteConfigService {
     'lbl_packages_delete_package_button_tr': 'Paketi sil',
     'lbl_packages_edit_name_field_label_tr': 'Paket adı',
     'lbl_packages_edit_validity_days_field_label_tr': 'Geçerlilik (gün)',
-    'lbl_packages_edit_price_field_label_tr': 'Fiyat (₺)',
+    'lbl_packages_edit_price_field_label_tr': 'Fiyat ({currency})',
     'lbl_packages_member_package_title_tr': 'Paketim',
     'lbl_packages_remaining_word_tr': 'kalan',
     'lbl_packages_trainer_owner_label_tr': 'Antrenörün',
@@ -2182,7 +2200,7 @@ class RemoteConfigService {
     'lbl_packages_name_field_hint_tr': 'Birebir 12 Seans',
     'lbl_packages_session_count_field_hint_tr': 'Örn. 12',
     'lbl_packages_validity_field_hint_tr': 'Örn. 90',
-    'lbl_packages_per_session_price_caption_tr': 'seans başı ₺{price}',
+    'lbl_packages_per_session_price_caption_tr': 'seans başı {price}',
     'lbl_packages_delete_failed_error_tr': 'Paket silinemedi, tekrar dene.',
     'lbl_packages_name_required_error_tr': 'Paket adı boş bırakılamaz.',
     'lbl_packages_session_count_invalid_error_tr':
@@ -2258,14 +2276,9 @@ class RemoteConfigService {
     'lbl_sessions_calendar_type_individual_tr': 'Birebir',
     'lbl_sessions_calendar_type_duet_tr': 'Düet',
     'lbl_sessions_calendar_duet_members_label_tr': 'Katılan Üyeler',
-    'lbl_sessions_attendance_answer_label_tr': 'Cevabı',
-    'lbl_sessions_attendance_answer_time_label_tr': 'Cevap saati',
-    'lbl_sessions_attendance_member_note_label_tr': 'Üyenin notu',
-    'lbl_sessions_attendance_back_to_calendar_button_tr': 'Takvime dön',
     'lbl_sessions_management_title_tr': 'Seanslar',
     'lbl_sessions_management_empty_state_tr': 'Bu güne uyan seans yok.',
     'lbl_sessions_filter_scheduled_tr': 'Planlandı',
-    'lbl_sessions_change_trainer_action_tr': 'Antrenörü değiştir',
     'lbl_sessions_cancel_session_action_tr': 'Seansı iptal et',
     'lbl_sessions_confirm_title_tr': 'Ders onayı',
     'lbl_sessions_confirm_attending_answer_text_tr': 'Geleceğini bildirdin',
@@ -2273,8 +2286,6 @@ class RemoteConfigService {
         'Gelmeyeceğini bildirdin',
     'lbl_sessions_confirm_change_answer_button_tr': 'Cevabımı değiştir',
     'lbl_sessions_member_home_this_week_section_tr': 'BU HAFTA',
-    'lbl_sessions_member_home_see_package_button_tr': 'Paketimi gör',
-    'lbl_sessions_trainer_notifications_title_tr': 'Bildirimler',
     'lbl_sessions_completion_member_no_show_option_tr': 'Üye gelmedi',
     'lbl_sessions_list_title_tr': 'Derslerim',
     'lbl_sessions_list_view_toggle_tr': 'Liste',
@@ -2334,7 +2345,6 @@ class RemoteConfigService {
     'lbl_sessions_list_empty_state_tr':
         'Henüz dersin yok — antrenörün seninle bir ders planladığında burada görünecek.',
     'lbl_sessions_list_calendar_empty_day_tr': 'Bu günde dersin yok.',
-    'lbl_sessions_trainer_notifications_empty_state_tr': 'Henüz bildirim yok.',
     'lbl_sessions_create_trainer_busy_error_tr':
         '{name} bu saatte dolu, başka bir saat seç.',
     'lbl_sessions_create_reschedule_error_tr':
@@ -2376,7 +2386,6 @@ class RemoteConfigService {
     'lbl_trainers_home_completed_label_tr': 'Tamamlanan',
     'lbl_trainers_home_free_slot_label_tr': 'Boş saat',
     'lbl_trainers_member_detail_create_session_button_tr': 'Seans oluştur',
-    'lbl_trainers_member_detail_add_measurement_button_tr': 'Ölçüm ekle',
     'lbl_trainers_member_detail_remaining_sessions_label_tr': 'Kalan ders',
     'lbl_trainers_member_detail_package_end_label_tr': 'Paket bitişi',
     'lbl_trainers_calendar_title_tr': 'Takvimim',
@@ -2405,6 +2414,28 @@ class RemoteConfigService {
     'lbl_trainers_detail_month_load_error_tr': 'Bu ayın verileri yüklenemedi.',
     'lbl_trainers_add_trainer_name_required_error_tr': 'Ad soyad boş olamaz.',
     'lbl_trainers_add_trainer_error_tr': 'Antrenör eklenemedi, tekrar dene.',
+    'lbl_trainers_phone_taken_error_tr': 'Bu telefon numarası zaten kayıtlı.',
+    'lbl_trainers_delete_button_tr': 'Antrenörü sil',
+    'lbl_trainers_delete_confirm_title_tr': 'Antrenörü silmek istiyor musun?',
+    'lbl_trainers_delete_confirm_body_tr':
+        '{name} artık uygulamaya giriş yapamayacak ve antrenör listesinde görünmeyecek. Geçmiş seansları, grup dersleri ve raporlardaki verileri olduğu gibi kalır.',
+    'lbl_trainers_delete_confirm_cta_tr': 'Evet, sil',
+    'lbl_trainers_delete_error_tr': 'Antrenör silinemedi, tekrar dene.',
+    'lbl_group_sessions_cancel_confirm_title_tr':
+        'Dersi iptal etmek istiyor musun?',
+    'lbl_group_sessions_cancel_confirm_body_tr':
+        'Ders listeden kaldırılmaz, "İptal edildi" olarak işaretlenir. Katılan üyeler dersi iptal edilmiş olarak görür.',
+    'lbl_group_sessions_cancel_confirm_cta_tr': 'Evet, iptal et',
+    'lbl_group_sessions_cancel_error_tr': 'İptal edilemedi, tekrar dene.',
+    'lbl_events_cancel_confirm_title_tr':
+        'Etkinliği iptal etmek istiyor musun?',
+    'lbl_events_cancel_confirm_body_tr':
+        'Etkinlik listeden kaldırılmaz, "İptal edildi" olarak işaretlenir. Katılan üyeler etkinliği iptal edilmiş olarak görür.',
+    'lbl_events_cancel_confirm_cta_tr': 'Evet, iptal et',
+    'lbl_events_cancel_error_tr': 'İptal edilemedi, tekrar dene.',
+    'lbl_feedback_filter_all_label_tr': 'Tümü',
+    'lbl_feedback_empty_month_label_tr': 'Bu ay hiç geri bildirim yok.',
+    'lbl_feedback_empty_filter_label_tr': 'Bu puanda geri bildirim yok.',
     'lbl_trainers_add_trainer_name_hint_tr': 'Emre Kaya',
     'lbl_trainers_management_trainer_count_suffix_tr': '{count} kişi',
     'lbl_trainers_add_trainer_saving_label_tr': 'Ekleniyor…',
@@ -2443,9 +2474,9 @@ class RemoteConfigService {
     'lbl_common_seansi_ertele_en': 'Postpone session',
     'lbl_common_gelicem_en': 'I\'m coming',
     'lbl_common_gelmeyecegim_en': 'I\'m not coming',
-    'lbl_common_ana_sayfa_tab_en': 'Home',
     'lbl_common_profil_tab_en': 'Profile',
     'lbl_common_telefon_label_en': 'Phone',
+    'lbl_common_phone_country_search_hint_en': 'Search country',
     'lbl_common_tumu_filter_en': 'All',
     'lbl_common_tamamlandi_en': 'Completed',
     'lbl_common_iptal_label_en': 'Canceled',
@@ -2453,7 +2484,6 @@ class RemoteConfigService {
     'lbl_common_paketi_yok_filter_en': 'No package',
     'lbl_common_seans_sayisi_label_en': 'Session count',
     'lbl_common_add_seans_button_en': '+ Session',
-    'lbl_common_olcum_6_ay_section_header_en': 'MEASUREMENT · 6 MO',
     'lbl_common_ders_gecmisi_section_header_en': 'SESSION HISTORY',
     'lbl_common_uye_detayi_title_en': 'Member detail',
     'lbl_common_bu_gunde_seans_yok_en': 'No sessions on this day.',
@@ -2475,19 +2505,12 @@ class RemoteConfigService {
     'lbl_shell_admin_tab_finans_en': 'Finance',
     'lbl_shell_admin_tab_ayarlar_en': 'Settings',
     'lbl_shell_role_picker_member_button_en': 'Member',
-    'lbl_shell_role_picker_trainer_button_en': 'Trainer',
-    'lbl_shell_role_picker_admin_button_en': 'Admin',
-    'lbl_shell_role_picker_gym_setup_button_en':
-        'Admin · Gym Setup (first-time setup)',
     'lbl_auth_profile_title_en': 'My Profile',
     'lbl_auth_phone_number_label_en': 'Phone number',
     'lbl_auth_login_button_en': 'Log in',
-    'lbl_auth_select_avatar_label_en': 'Choose your avatar',
     'lbl_auth_badges_nav_label_en': 'My Badges',
     'lbl_auth_give_feedback_nav_label_en': 'Give feedback',
     'lbl_auth_session_reminders_toggle_title_en': 'Session reminders',
-    'lbl_auth_session_reminders_toggle_description_en':
-        'Notification 2 hours before your session',
     'lbl_auth_delete_account_confirm_title_en': 'My Profile',
     'lbl_auth_login_error_not_found_en':
         'No account found with this number. The gym staff needs to add you first.',
@@ -2515,10 +2538,6 @@ class RemoteConfigService {
         'I understand, delete my account and all my data.',
     'lbl_auth_delete_account_in_progress_button_en': 'Deleting…',
     'lbl_auth_login_waiting_heading_en': 'Getting to know you…',
-    'lbl_auth_login_waiting_body_en': 'Looking up +90 {phone} at the studio.',
-    'lbl_auth_login_waiting_hint_en':
-        'If it takes longer than 30 seconds, check your connection and try again.',
-    'lbl_auth_login_waiting_cancel_button_en': 'Cancel',
     'lbl_auth_onboarding_role_brand_label_en': 'EGORACTIVE',
     'lbl_auth_onboarding_role_title_en': 'Welcome',
     'lbl_auth_onboarding_role_subtitle_en': 'Choose your role to continue.',
@@ -2632,7 +2651,7 @@ class RemoteConfigService {
     'lbl_expenses_recurring_toggle_label_en': 'Repeat every month',
     'lbl_expenses_recurring_toggle_description_en':
         'For fixed expenses like rent and bills',
-    'lbl_expenses_amount_field_label_en': 'Amount (₺)',
+    'lbl_expenses_amount_field_label_en': 'Amount ({currency})',
     'lbl_expenses_description_field_label_en': 'Description',
     'lbl_expenses_date_field_label_en': 'Date',
     'lbl_expenses_submit_button_en': 'Save expense',
@@ -2673,7 +2692,6 @@ class RemoteConfigService {
     'lbl_group_sessions_capacity_full_note_en': 'Fully booked',
     'lbl_group_sessions_capacity_low_note_en': '{remaining} spots left',
     'lbl_group_sessions_capacity_available_note_en': 'Spots available',
-    'lbl_group_sessions_view_participants_link_en': 'View participants',
     'lbl_group_sessions_discover_title_en': 'Discover',
     'lbl_group_sessions_discover_tab_group_sessions_en': 'Group Sessions',
     'lbl_group_sessions_discover_tab_events_en': 'Events',
@@ -2713,16 +2731,11 @@ class RemoteConfigService {
     'lbl_gyms_admin_home_completed_word_en': 'completed',
     'lbl_gyms_admin_home_trainer_performance_section_en': 'TRAINER PERFORMANCE',
     'lbl_gyms_admin_home_upcoming_payments_section_en': 'PAYMENT DUE SOON',
-    'lbl_gyms_admin_home_pending_feedback_label_en': 'Pending feedback',
     'lbl_gyms_admin_home_total_sessions_label_en': 'Total sessions',
     'lbl_gyms_admin_home_completed_label_en': 'Completed',
     'lbl_gyms_admin_home_estimated_revenue_label_en': 'Estimated revenue',
     'lbl_gyms_admin_home_expense_label_en': 'Expense',
     'lbl_gyms_permissions_title_en': 'Permission settings',
-    'lbl_gyms_permissions_reminder_dropdown_label_en':
-        'When should the trainer be reminded after a session ends?',
-    'lbl_gyms_permissions_reminder_description_en':
-        'Notification is sent after the session ends',
     'lbl_gyms_settings_title_en': 'Settings',
     'lbl_gyms_settings_nav_gym_info_en': 'Gym information',
     'lbl_gyms_settings_nav_trainer_management_en': 'Trainer management',
@@ -2739,14 +2752,11 @@ class RemoteConfigService {
         'Upload a square PNG, at least 512×512 px.',
     'lbl_gyms_gym_info_change_logo_button_en': 'Change logo',
     'lbl_gyms_gym_info_theme_color_section_en': 'THEME COLOR',
-    'lbl_gyms_gym_info_preview_label_en': 'Preview',
-    'lbl_gyms_gym_info_primary_button_label_en': 'Primary button',
     'lbl_gyms_gym_info_see_all_themes_link_en': 'See all themes ›',
     'lbl_gyms_gym_info_name_field_label_en': 'Gym name',
     'lbl_gyms_gym_info_address_field_label_en': 'Address',
     'lbl_gyms_gym_setup_step_header_en': 'SETUP 1 / 1',
     'lbl_gyms_gym_setup_title_en': 'Define your gym',
-    'lbl_gyms_gym_setup_logo_label_en': 'Gym logo',
     'lbl_gyms_gym_setup_choose_logo_button_en': 'Choose logo',
     'lbl_gyms_gym_setup_theme_color_label_en': 'Theme color',
     'lbl_gyms_gym_setup_city_field_label_en': 'City',
@@ -2757,16 +2767,12 @@ class RemoteConfigService {
         'Show logo silhouette in background',
     'lbl_gyms_themes_show_logo_silhouette_toggle_description_en':
         'At 25% opacity on member and trainer screens',
-    'lbl_gyms_themes_apply_to_all_button_en': 'Apply theme to all members',
     'lbl_gyms_add_theme_title_en': 'Add theme',
     'lbl_gyms_add_theme_palette_label_en': 'Palette',
     'lbl_gyms_add_theme_color_code_label_en': 'Color code',
     'lbl_gyms_add_theme_color_helper_en':
         'Choose from the palette or enter your own HEX code.',
-    'lbl_gyms_add_theme_use_logo_question_en': 'Use gym logo?',
     'lbl_gyms_add_theme_preview_section_en': 'PREVIEW',
-    'lbl_gyms_add_theme_use_logo_option_en': 'Yes, use the logo',
-    'lbl_gyms_add_theme_flat_background_option_en': 'No, flat background',
     'lbl_gyms_add_theme_submit_button_en': 'Save and apply theme',
     'lbl_gyms_add_theme_name_field_label_en': 'Theme name',
     'lbl_gyms_studio_rules_title_en': 'Studio rules',
@@ -2795,7 +2801,6 @@ class RemoteConfigService {
     'lbl_gyms_gym_info_report_emails_section_en': 'REPORT EMAIL',
     'lbl_gyms_gym_info_report_emails_description_en':
         'The weekly and monthly gym summary (including revenue/expenses) is emailed to this address.',
-    'lbl_gyms_gym_info_gym_report_email_label_en': 'Report email',
     'lbl_gyms_gym_info_gym_report_email_hint_en': 'admin@studio.com',
     'lbl_gyms_gym_info_saving_label_en': 'Saving…',
     'lbl_gyms_gym_info_logo_upload_failed_error_en':
@@ -2810,12 +2815,12 @@ class RemoteConfigService {
     'lbl_gyms_gym_setup_headline_en':
         'Once you complete this step, your admin account activates and you enter the app.',
     'lbl_gyms_gym_setup_phone_field_label_en': 'Your phone number (for login)',
-    'lbl_gyms_gym_setup_phone_hint_en': '5XX XXX XX XX',
     'lbl_gyms_gym_setup_phone_helper_note_en':
         'Once gym registration is complete, you will log in as admin with this number.',
-    'lbl_gyms_gym_setup_report_email_label_en': 'Report email (optional)',
-    'lbl_gyms_gym_setup_report_email_description_en':
-        'The weekly and monthly gym summary (sessions/revenue/expenses) is emailed to this address. You can leave it blank now and add it later from Gym Info.',
+    'lbl_gyms_gym_setup_currency_field_label_en': 'Currency',
+    'lbl_gyms_gym_setup_currency_helper_note_en':
+        'All package/payment/expense amounts for this gym are kept in this currency — it cannot be changed later.',
+    'lbl_gyms_gym_info_currency_field_label_en': 'Currency',
     'lbl_gyms_gym_setup_logo_optional_label_en': 'Gym logo (optional)',
     'lbl_gyms_gym_setup_logo_description_en':
         'Square PNG, at least 512×512. If you add one, it appears as a 25%-opacity silhouette in the background on every screen for members and trainers — you can also add it later from the Gym Info panel.',
@@ -2863,9 +2868,6 @@ class RemoteConfigService {
         'Every change is saved instantly.',
     'lbl_gyms_trainer_permissions_save_failed_error_en':
         'Setting could not be saved, check your connection and try again.',
-    'lbl_measurements_add_title_en': 'New measurement',
-    'lbl_measurements_measurement_date_label_en': 'Measurement date',
-    'lbl_measurements_measurements_section_en': 'MEASUREMENTS',
     'lbl_measurements_unit_cm_en': 'cm',
     'lbl_measurements_metric_bel_en': 'Waist',
     'lbl_measurements_metric_gogus_en': 'Chest',
@@ -2916,7 +2918,6 @@ class RemoteConfigService {
     'lbl_members_info_step_indicator_1_en': '1 / 3',
     'lbl_members_info_login_helper_en':
         'The member logs in with this number, no password needed.',
-    'lbl_members_gender_field_label_en': 'Gender',
     'lbl_members_trainer_field_label_en': 'Trainer',
     'lbl_members_registration_date_field_label_en': 'Registration date',
     'lbl_members_select_trainer_button_en': 'Select trainer',
@@ -2928,14 +2929,7 @@ class RemoteConfigService {
     'lbl_members_payment_title_en': 'Payment information',
     'lbl_members_payment_step_indicator_3_en': '3 / 3',
     'lbl_members_payment_total_label_en': 'Total amount',
-    'lbl_members_payment_paid_label_en': 'Paid',
-    'lbl_members_payment_remaining_label_en': 'Remaining payment',
-    'lbl_members_payment_auto_calculated_helper_en': 'Calculated automatically',
     'lbl_members_payment_due_date_field_label_en': 'Due date',
-    'lbl_members_payment_enter_amount_helper_en': 'Enter amount paid',
-    'lbl_members_payment_full_option_en': 'Paid in full',
-    'lbl_members_payment_half_option_en': 'Half',
-    'lbl_members_payment_other_option_en': 'Other',
     'lbl_members_new_membership_title_en': 'New membership',
     'lbl_members_new_membership_step_indicator_2_en': '2 / 3',
     'lbl_members_package_select_section_en': 'SELECT PACKAGE',
@@ -2974,7 +2968,6 @@ class RemoteConfigService {
         'Could not save, check your connection and try again.',
     'lbl_members_info_new_title_en': 'New member',
     'lbl_members_info_edit_title_en': 'Member details',
-    'lbl_members_info_phone_hint_en': '5XX XXX XX XX',
     'lbl_members_info_age_suffix_en': '{age} yo',
     'lbl_members_package_pick_type_validity_caption_en': '{type} · {days} days',
     'lbl_members_info_height_picker_title_en': 'Height (cm)',
@@ -2998,6 +2991,7 @@ class RemoteConfigService {
         'January,February,March,April,May,June,July,August,September,October,November,December',
     'lbl_common_weekday_names_long_en':
         'Monday,Tuesday,Wednesday,Thursday,Friday,Saturday,Sunday',
+    'lbl_common_month_summary_template_en': '{month} summary',
     'lbl_members_info_confirm_attendance_label_en':
         'Can send session confirmations',
     'lbl_members_info_confirm_attendance_helper_en':
@@ -3014,7 +3008,6 @@ class RemoteConfigService {
     'lbl_members_installment_paid_toggle_label_en': 'Paid?',
     'lbl_notifications_title_en': 'Send notification',
     'lbl_notifications_target_question_label_en': 'Who should receive it?',
-    'lbl_notifications_target_single_member_option_en': 'Single member',
     'lbl_notifications_target_whole_gym_option_en': 'Whole gym',
     'lbl_notifications_preview_label_en': 'Preview',
     'lbl_notifications_select_member_button_en': 'Select member',
@@ -3040,7 +3033,7 @@ class RemoteConfigService {
     'lbl_packages_delete_package_button_en': 'Delete package',
     'lbl_packages_edit_name_field_label_en': 'Package name',
     'lbl_packages_edit_validity_days_field_label_en': 'Validity (days)',
-    'lbl_packages_edit_price_field_label_en': 'Price (₺)',
+    'lbl_packages_edit_price_field_label_en': 'Price ({currency})',
     'lbl_packages_member_package_title_en': 'My Package',
     'lbl_packages_remaining_word_en': 'remaining',
     'lbl_packages_trainer_owner_label_en': 'Your trainer',
@@ -3050,7 +3043,7 @@ class RemoteConfigService {
     'lbl_packages_name_field_hint_en': 'One-on-one 12 Sessions',
     'lbl_packages_session_count_field_hint_en': 'E.g. 12',
     'lbl_packages_validity_field_hint_en': 'E.g. 90',
-    'lbl_packages_per_session_price_caption_en': '₺{price} per session',
+    'lbl_packages_per_session_price_caption_en': '{price} per session',
     'lbl_packages_delete_failed_error_en':
         'Could not delete package, try again.',
     'lbl_packages_name_required_error_en': 'Package name cannot be empty.',
@@ -3127,14 +3120,9 @@ class RemoteConfigService {
     'lbl_sessions_calendar_type_individual_en': 'Individual',
     'lbl_sessions_calendar_type_duet_en': 'Duet',
     'lbl_sessions_calendar_duet_members_label_en': 'Participating Members',
-    'lbl_sessions_attendance_answer_label_en': 'Answer',
-    'lbl_sessions_attendance_answer_time_label_en': 'Answer time',
-    'lbl_sessions_attendance_member_note_label_en': 'Member\'s note',
-    'lbl_sessions_attendance_back_to_calendar_button_en': 'Back to calendar',
     'lbl_sessions_management_title_en': 'Sessions',
     'lbl_sessions_management_empty_state_en': 'No sessions match this day.',
     'lbl_sessions_filter_scheduled_en': 'Scheduled',
-    'lbl_sessions_change_trainer_action_en': 'Change trainer',
     'lbl_sessions_cancel_session_action_en': 'Cancel session',
     'lbl_sessions_confirm_title_en': 'Session confirmation',
     'lbl_sessions_confirm_attending_answer_text_en':
@@ -3143,8 +3131,6 @@ class RemoteConfigService {
         'You confirmed you\'re not coming',
     'lbl_sessions_confirm_change_answer_button_en': 'Change my answer',
     'lbl_sessions_member_home_this_week_section_en': 'THIS WEEK',
-    'lbl_sessions_member_home_see_package_button_en': 'View my package',
-    'lbl_sessions_trainer_notifications_title_en': 'Notifications',
     'lbl_sessions_completion_member_no_show_option_en': 'Member didn\'t show',
     'lbl_sessions_list_title_en': 'My Sessions',
     'lbl_sessions_list_view_toggle_en': 'List',
@@ -3203,8 +3189,6 @@ class RemoteConfigService {
     'lbl_sessions_list_empty_state_en':
         "You don't have any classes yet — they'll show up here once your trainer schedules one with you.",
     'lbl_sessions_list_calendar_empty_day_en': 'No classes on this day.',
-    'lbl_sessions_trainer_notifications_empty_state_en':
-        'No notifications yet.',
     'lbl_sessions_create_trainer_busy_error_en':
         '{name} is busy at this time, pick another time.',
     'lbl_sessions_create_reschedule_error_en':
@@ -3247,7 +3231,6 @@ class RemoteConfigService {
     'lbl_trainers_home_completed_label_en': 'Completed',
     'lbl_trainers_home_free_slot_label_en': 'Free slot',
     'lbl_trainers_member_detail_create_session_button_en': 'Create session',
-    'lbl_trainers_member_detail_add_measurement_button_en': 'Add measurement',
     'lbl_trainers_member_detail_remaining_sessions_label_en':
         'Remaining sessions',
     'lbl_trainers_member_detail_package_end_label_en': 'Package end date',
@@ -3280,6 +3263,27 @@ class RemoteConfigService {
         'Full name cannot be empty.',
     'lbl_trainers_add_trainer_error_en':
         'Trainer could not be added, try again.',
+    'lbl_trainers_phone_taken_error_en':
+        'This phone number is already registered.',
+    'lbl_trainers_delete_button_en': 'Delete trainer',
+    'lbl_trainers_delete_confirm_title_en': 'Delete this trainer?',
+    'lbl_trainers_delete_confirm_body_en':
+        '{name} will no longer be able to sign in and will not appear in the trainer list. Past sessions, group classes and report data remain unchanged.',
+    'lbl_trainers_delete_confirm_cta_en': 'Yes, delete',
+    'lbl_trainers_delete_error_en': 'Trainer could not be deleted, try again.',
+    'lbl_group_sessions_cancel_confirm_title_en': 'Cancel this class?',
+    'lbl_group_sessions_cancel_confirm_body_en':
+        'The class stays in the list, marked as "Cancelled". Members who joined will see it as cancelled.',
+    'lbl_group_sessions_cancel_confirm_cta_en': 'Yes, cancel it',
+    'lbl_group_sessions_cancel_error_en': 'Could not cancel, try again.',
+    'lbl_events_cancel_confirm_title_en': 'Cancel this event?',
+    'lbl_events_cancel_confirm_body_en':
+        'The event stays in the list, marked as "Cancelled". Members who joined will see it as cancelled.',
+    'lbl_events_cancel_confirm_cta_en': 'Yes, cancel it',
+    'lbl_events_cancel_error_en': 'Could not cancel, try again.',
+    'lbl_feedback_filter_all_label_en': 'All',
+    'lbl_feedback_empty_month_label_en': 'No feedback this month.',
+    'lbl_feedback_empty_filter_label_en': 'No feedback with this rating.',
     'lbl_trainers_add_trainer_name_hint_en': 'John Smith',
     'lbl_trainers_management_trainer_count_suffix_en': '{count} people',
     'lbl_trainers_add_trainer_saving_label_en': 'Adding…',
@@ -3297,17 +3301,6 @@ class RemoteConfigService {
         _defaultSubscriptionIncludedFeaturesJson,
     RemoteConfigKeys.subscriptionRestrictedOperations:
         _defaultSubscriptionRestrictedOperationsJson,
-    'lbl_subscription_trial_banner_title_tr':
-        'Deneme süreniz {days} gün sonra doluyor',
-    'lbl_subscription_trial_banner_title_en': 'Your trial ends in {days} days',
-    'lbl_subscription_trial_banner_body_tr':
-        '{date} tarihine kadar tüm özellikler açık. Bir plan seçerseniz salonunuz kesintisiz çalışmaya devam eder.',
-    'lbl_subscription_trial_banner_body_en':
-        'All features are open until {date}. If you choose a plan, your studio keeps running without interruption.',
-    'lbl_subscription_trial_progress_tr':
-        '{total} günlük denemenin {current}. günündesiniz',
-    'lbl_subscription_trial_progress_en':
-        "You're on day {current} of your {total}-day trial",
     'lbl_subscription_expired_banner_title_tr':
         'Aboneliğiniz {date} tarihinde sona erdi',
     'lbl_subscription_expired_banner_title_en':
@@ -3338,12 +3331,6 @@ class RemoteConfigService {
         'Salonunuz için abonelik ücreti alınmıyor — tüm özellikler sınırsız kullanımınıza açık.',
     'lbl_subscription_exempt_note_en':
         'Your gym is not billed for a subscription — every feature is available to you without limits.',
-    'lbl_subscription_store_row_title_tr': '{store} üzerinden',
-    'lbl_subscription_store_row_title_en': 'Via {store}',
-    'lbl_subscription_store_row_subtitle_tr':
-        'Ödeme ve faturalar {storeAccount} hesabınızda',
-    'lbl_subscription_store_row_subtitle_en':
-        'Payments and invoices are on your {storeAccount} account',
     'lbl_subscription_manage_cta_tr': 'Aboneliği yönet',
     'lbl_subscription_manage_cta_en': 'Manage subscription',
     'lbl_subscription_manage_caption_tr': '{store} abonelik ayarları açılır',
@@ -3436,11 +3423,228 @@ class RemoteConfigService {
     'lbl_subscription_yearly_period_word_en': 'yearly',
     'lbl_subscription_monthly_period_word_tr': 'her ay',
     'lbl_subscription_monthly_period_word_en': 'monthly',
-    'lbl_subscription_store_badge_label_tr': 'STORE',
-    'lbl_subscription_store_badge_label_en': 'STORE',
     'lbl_subscription_management_open_error_tr': 'Abonelik yönetimi açılamadı.',
     'lbl_subscription_management_open_error_en':
         'Could not open subscription management.',
+    'lbl_shell_tab_home_tr': 'Ana Sayfa',
+    'lbl_shell_tab_home_en': 'Home',
+    'lbl_shell_tab_profile_tr': 'Profil',
+    'lbl_shell_tab_profile_en': 'Profile',
+    'lbl_common_month_names_short_tr':
+        'Oca,Şub,Mar,Nis,May,Haz,Tem,Ağu,Eyl,Eki,Kas,Ara',
+    'lbl_common_month_names_short_en':
+        'Jan,Feb,Mar,Apr,May,Jun,Jul,Aug,Sep,Oct,Nov,Dec',
+    'lbl_common_weekday_names_short_tr': 'Pzt,Sal,Çar,Per,Cum,Cmt,Pzr',
+    'lbl_common_weekday_names_short_en': 'Mon,Tue,Wed,Thu,Fri,Sat,Sun',
+    'lbl_common_day_month_year_template_tr': '{day} {month} {year}',
+    'lbl_common_day_month_year_template_en': '{month} {day}, {year}',
+    'lbl_common_day_month_template_tr': '{day} {month}',
+    'lbl_common_day_month_template_en': '{month} {day}',
+    'lbl_common_solo_session_with_time_template_tr': 'Birebir · {time}',
+    'lbl_common_solo_session_with_time_template_en': 'One-on-one · {time}',
+    'lbl_sessions_no_planned_session_title_tr': 'Planlanmış dersin yok',
+    'lbl_sessions_no_planned_session_title_en': 'No sessions scheduled',
+    'lbl_sessions_no_planned_session_meta_tr': 'Antrenörünle iletişime geç',
+    'lbl_sessions_no_planned_session_meta_en': 'Get in touch with your trainer',
+    'lbl_common_weekday_names_initial_tr': 'P,S,Ç,P,C,C,P',
+    'lbl_common_weekday_names_initial_en': 'M,T,W,T,F,S,S',
+    'lbl_common_weekday_date_template_tr': '{weekday}, {date}',
+    'lbl_common_weekday_date_template_en': '{weekday}, {date}',
+    'lbl_common_no_active_gym_error_tr': 'Aktif bir salon bulunamadı.',
+    'lbl_common_no_active_gym_error_en': 'No active gym found.',
+    'lbl_members_list_load_more_error_tr':
+        'Daha fazla üye yüklenemedi, tekrar dene.',
+    'lbl_members_list_load_more_error_en':
+        'Could not load more members, please try again.',
+    'lbl_members_list_search_error_tr': 'Arama yapılamadı, tekrar dene.',
+    'lbl_members_list_search_error_en': 'Search failed, please try again.',
+    'lbl_gyms_create_logo_pick_error_tr': 'Logo seçilemedi. Tekrar dene.',
+    'lbl_gyms_create_logo_pick_error_en':
+        'Could not select a logo. Please try again.',
+    'lbl_gyms_create_phone_taken_error_tr':
+        'Bu numarayla kayıtlı bir hesap zaten var. Giriş yapmayı dene.',
+    'lbl_gyms_create_phone_taken_error_en':
+        'An account already exists with this number. Try signing in instead.',
+    'lbl_gyms_create_generic_error_tr':
+        'Salon oluşturulamadı. Bağlantını kontrol edip tekrar dene.',
+    'lbl_gyms_create_generic_error_en':
+        'Could not create the gym. Check your connection and try again.',
+    'lbl_gyms_create_name_required_error_tr': 'Salon adı gerekli.',
+    'lbl_gyms_create_name_required_error_en': 'Gym name is required.',
+    'lbl_gyms_create_city_required_error_tr': 'Şehir gerekli.',
+    'lbl_gyms_create_city_required_error_en': 'City is required.',
+    'lbl_common_invalid_mobile_phone_error_tr':
+        'Geçerli bir cep telefonu numarası gir.',
+    'lbl_common_invalid_mobile_phone_error_en':
+        'Enter a valid mobile phone number.',
+    'lbl_common_invalid_phone_error_tr': 'Geçerli bir telefon numarası gir.',
+    'lbl_common_invalid_phone_error_en': 'Enter a valid phone number.',
+    'lbl_members_registration_trainer_required_error_tr': 'Bir antrenör seç.',
+    'lbl_members_registration_trainer_required_error_en': 'Select a trainer.',
+    'lbl_members_registration_phone_taken_error_tr':
+        'Bu telefon numarası zaten kayıtlı.',
+    'lbl_members_registration_phone_taken_error_en':
+        'This phone number is already registered.',
+    'lbl_members_registration_create_error_tr':
+        'Üye eklenemedi. Bağlantını kontrol edip tekrar dene.',
+    'lbl_members_registration_create_error_en':
+        'Could not add the member. Check your connection and try again.',
+    'lbl_members_registration_update_error_tr':
+        'Üye güncellenemedi. Bağlantını kontrol edip tekrar dene.',
+    'lbl_members_registration_update_error_en':
+        'Could not update the member. Check your connection and try again.',
+    'lbl_notifications_hourly_limit_error_tr':
+        'Saatlik bildirim gönderme limitine ulaştın, biraz sonra tekrar dene.',
+    'lbl_notifications_hourly_limit_error_en':
+        'You have reached the hourly notification limit, please try again later.',
+    'lbl_notifications_send_generic_error_tr':
+        'Bildirim gönderilemedi, tekrar dener misin?',
+    'lbl_notifications_send_generic_error_en':
+        'Could not send the notification, would you like to try again?',
+    'lbl_notifications_select_member_error_tr': 'Önce en az bir üye seç.',
+    'lbl_notifications_select_member_error_en':
+        'Select at least one member first.',
+    'lbl_subscription_start_error_tr': 'Başlatılamadı, tekrar dene.',
+    'lbl_subscription_start_error_en': 'Could not start, please try again.',
+    'lbl_subscription_purchase_start_error_tr':
+        'Satın alma başlatılamadı, mağaza bağlantısını kontrol edip tekrar dene.',
+    'lbl_subscription_purchase_start_error_en':
+        'Could not start the purchase. Check your store connection and try again.',
+    'lbl_subscription_account_already_used_error_tr':
+        'Bu Apple/Google hesabıyla zaten başka bir salon abone — her salonun kendi ayrı hesabıyla abone olması gerekiyor.',
+    'lbl_subscription_account_already_used_error_en':
+        'Another gym is already subscribed with this Apple/Google account — each gym needs its own account.',
+    'lbl_subscription_verification_error_tr':
+        'Satın alma doğrulanamadı, tekrar dene ya da destek ile iletişime geç.',
+    'lbl_subscription_verification_error_en':
+        'Could not verify the purchase. Try again or contact support.',
+    'lbl_subscription_purchase_complete_error_tr':
+        'Satın alma tamamlanamadı, mağaza bağlantısını kontrol edip tekrar dene.',
+    'lbl_subscription_purchase_complete_error_en':
+        'Could not complete the purchase. Check your store connection and try again.',
+    'lbl_group_sessions_not_found_error_tr': 'Ders bulunamadı.',
+    'lbl_group_sessions_not_found_error_en': 'Session not found.',
+    'lbl_group_sessions_load_error_tr': 'Ders yüklenemedi, tekrar dene.',
+    'lbl_group_sessions_load_error_en':
+        'Could not load the session, please try again.',
+    'lbl_group_sessions_title_required_error_tr': 'Ders adı boş bırakılamaz.',
+    'lbl_group_sessions_title_required_error_en':
+        'Session name cannot be empty.',
+    'lbl_group_sessions_date_required_error_tr': 'Tarih seçmelisin.',
+    'lbl_group_sessions_date_required_error_en': 'You need to pick a date.',
+    'lbl_group_sessions_past_date_error_tr': 'Geçmiş bir tarih/saat seçilemez.',
+    'lbl_group_sessions_past_date_error_en':
+        'You cannot pick a past date or time.',
+    'lbl_group_sessions_update_error_tr': 'Ders güncellenemedi, tekrar dene.',
+    'lbl_group_sessions_update_error_en':
+        'Could not update the session, please try again.',
+    'lbl_group_sessions_create_error_tr':
+        'Grup dersi oluşturulamadı, tekrar dene.',
+    'lbl_group_sessions_create_error_en':
+        'Could not create the group session, please try again.',
+    'lbl_members_payment_save_error_tr':
+        'Ödeme kaydedilemedi, bağlantını kontrol edip tekrar dene.',
+    'lbl_members_payment_save_error_en':
+        'Could not save the payment. Check your connection and try again.',
+    'lbl_feedback_submit_error_tr': 'Gönderilemedi, tekrar dener misin?',
+    'lbl_feedback_submit_error_en':
+        'Could not send, would you like to try again?',
+    'lbl_reports_recipient_invalid_email_error_tr':
+        'Rapor e-postası geçerli değil.',
+    'lbl_reports_recipient_invalid_email_error_en':
+        'The report email address is not valid.',
+    'lbl_sessions_attendance_save_error_tr':
+        'Cevabın kaydedilemedi, bağlantını kontrol edip tekrar dene.',
+    'lbl_sessions_attendance_save_error_en':
+        'Your answer could not be saved. Check your connection and try again.',
+    'lbl_subscription_gate_dialog_title_tr': 'Aboneliğini yenile',
+    'lbl_subscription_gate_dialog_title_en': 'Renew your subscription',
+    'lbl_subscription_gate_expired_body_tr':
+        'Deneme sürenin süresi doldu. Bu işlemi yapabilmek için aboneliğini yenilemen gerekiyor.',
+    'lbl_subscription_gate_expired_body_en':
+        'Your trial has ended. You need to renew your subscription to do this.',
+    'lbl_subscription_gate_inactive_body_tr':
+        'Bu işlemi yapabilmek için aktif bir aboneliğin olması gerekiyor.',
+    'lbl_subscription_gate_inactive_body_en':
+        'You need an active subscription to do this.',
+    'lbl_subscription_gate_go_button_tr': 'Aboneliğe git',
+    'lbl_subscription_gate_go_button_en': 'Go to subscription',
+    'lbl_subscription_status_banner_expired_tr':
+        'Aboneliğinin süresi doldu — yeni işlem yapabilmek için yenile.',
+    'lbl_subscription_status_banner_expired_en':
+        'Your subscription has expired — renew it to keep working.',
+    'lbl_common_cancel_button_tr': 'Vazgeç',
+    'lbl_common_cancel_button_en': 'Cancel',
+    'lbl_trainers_report_breakdown_total_tr': 'Toplam seanslar',
+    'lbl_trainers_report_breakdown_total_en': 'Total sessions',
+    'lbl_trainers_report_breakdown_completed_tr': 'Tamamlanan seanslar',
+    'lbl_trainers_report_breakdown_completed_en': 'Completed sessions',
+    'lbl_trainers_report_breakdown_cancelled_tr': 'İptal edilen seanslar',
+    'lbl_trainers_report_breakdown_cancelled_en': 'Cancelled sessions',
+    'lbl_events_unlimited_capacity_label_tr': 'Sınırsız',
+    'lbl_events_unlimited_capacity_label_en': 'Unlimited',
+    'lbl_notifications_android_channel_name_tr': 'Ders Hatırlatmaları',
+    'lbl_notifications_android_channel_name_en': 'Session Reminders',
+    'lbl_notifications_android_channel_description_tr':
+        'Yaklaşan dersler için hatırlatma bildirimleri',
+    'lbl_notifications_android_channel_description_en':
+        'Reminder notifications for upcoming sessions',
+    'lbl_trainers_home_pending_confirmation_meta_tr':
+        'Birebir · tamamlandı mı?',
+    'lbl_trainers_home_pending_confirmation_meta_en': 'One-on-one · completed?',
+    'lbl_common_past_datetime_error_en': 'You can\'t create this in the past.',
+    'lbl_common_past_datetime_error_tr':
+        'Geçmiş bir tarih/saate oluşturamazsın.',
+    'lbl_events_detail_title_en': 'Event',
+    'lbl_events_detail_title_tr': 'Etkinlik',
+    'lbl_events_edit_submit_button_en': 'Save',
+    'lbl_events_edit_submit_button_tr': 'Kaydet',
+    'lbl_events_edit_title_en': 'Edit Event',
+    'lbl_events_edit_title_tr': 'Etkinliği Düzenle',
+    'lbl_events_join_button_en': 'Join',
+    'lbl_events_join_button_tr': 'Katılıyorum',
+    'lbl_events_joined_leave_button_en': 'I\'m no longer attending',
+    'lbl_events_joined_leave_button_tr': 'Katılmaktan Vazgeçtim',
+    'lbl_group_sessions_cancel_button_en': 'Cancel',
+    'lbl_group_sessions_cancel_button_tr': 'İptal Et',
+    'lbl_group_sessions_cancelled_badge_en': 'Cancelled',
+    'lbl_group_sessions_cancelled_badge_tr': 'İptal Edildi',
+    'lbl_group_sessions_description_char_count_template_en': '{count}/{max}',
+    'lbl_group_sessions_description_char_count_template_tr': '{count}/{max}',
+    'lbl_group_sessions_description_field_label_en': 'Description (optional)',
+    'lbl_group_sessions_description_field_label_tr': 'Açıklama (opsiyonel)',
+    'lbl_group_sessions_detail_title_en': 'Group Session',
+    'lbl_group_sessions_detail_title_tr': 'Grup Dersi',
+    'lbl_group_sessions_edit_submit_button_en': 'Save',
+    'lbl_group_sessions_edit_submit_button_tr': 'Kaydet',
+    'lbl_group_sessions_edit_title_en': 'Edit Group Session',
+    'lbl_group_sessions_edit_title_tr': 'Grup Dersini Düzenle',
+    'lbl_group_sessions_trainer_count_selected_en': '{count} trainers selected',
+    'lbl_group_sessions_trainer_count_selected_tr': '{count} antrenör seçildi',
+    'lbl_group_sessions_trainer_field_label_en': 'Trainer',
+    'lbl_group_sessions_trainer_field_label_tr': 'Antrenör',
+    'lbl_group_sessions_trainer_field_placeholder_en':
+        'Select trainer (optional)',
+    'lbl_group_sessions_trainer_field_placeholder_tr':
+        'Antrenör seç (opsiyonel)',
+    'lbl_group_sessions_trainer_picker_title_en': 'Select trainers',
+    'lbl_group_sessions_trainer_picker_title_tr': 'Antrenör seç',
+    'lbl_sessions_create_generic_error_en':
+        'Couldn\'t create the session, try again.',
+    'lbl_sessions_create_generic_error_tr':
+        'Seans oluşturulamadı, tekrar dene.',
+    'lbl_sessions_skip_reason_insufficient_sessions_en': 'no sessions left',
+    'lbl_sessions_skip_reason_insufficient_sessions_tr': 'seans hakkı bitti',
+    'lbl_sessions_skip_reason_past_datetime_en': 'past date',
+    'lbl_sessions_skip_reason_past_datetime_tr': 'geçmiş tarih',
+    'lbl_sessions_skip_reason_trainer_busy_en': 'trainer busy',
+    'lbl_sessions_skip_reason_trainer_busy_tr': 'antrenör dolu',
+    'lbl_sessions_skip_reason_unknown_error_en': 'error',
+    'lbl_sessions_skip_reason_unknown_error_tr': 'hata oluştu',
+    'lbl_events_not_found_error_tr': 'Etkinlik bulunamadı.',
+    'lbl_events_not_found_error_en': 'Event not found.',
+    'lbl_events_load_error_tr': 'Etkinlik yüklenemedi, tekrar dene.',
+    'lbl_events_load_error_en': 'Could not load the event, please try again.',
   };
 
   /// Ders/seans onay bildiriminin kaç dakika önce gönderileceği.
@@ -3539,39 +3743,70 @@ class RemoteConfigService {
   String getText(String baseKey, String locale) =>
       getString('${baseKey}_$locale');
 
-  /// Uygulama açılışında bir kez çağrılır: varsayılanları ayarlar, sonra
-  /// fetch+activate dener. İnternet yoksa/başarısız olursa varsayılanlarla
-  /// devam eder — uygulama hiçbir zaman bu yüzden çökmez.
+  /// F10-2 — `runApp()` blokajını kaldırma. Eskiden tek bir `init()` vardı
+  /// ve `main()` içinde `await` ediliyordu; içindeki `fetchAndActivate()`
+  /// AĞA çıktığı için (255 KB'lık şablon, 10 sn timeout) uygulamanın ilk
+  /// karesi ağ hızına bağımlı hale geliyordu — zayıf/tıkalı mobil bağlantıda
+  /// kullanıcı 10 saniyeye kadar boş ekran görüyordu. Artık ikiye bölündü:
+  /// [applyDefaults] ağa hiç çıkmaz ve `runApp()` öncesinde beklenir;
+  /// [fetchInBackground] ise `runApp()` SONRASINDA, kimseyi bekletmeden
+  /// çalışır.
   ///
-  /// Ayrıca `onConfigUpdated` (Remote Config Realtime) dinlenir — Console'da
-  /// bir parametre değiştirildiğinde SDK bunu anlık bir stream event'i
-  /// olarak alır (normal `minimumFetchInterval` kısıtlamasına tabi değil);
-  /// `activate()` çağrılınca yeni değerler hemen `getBool`/`getString` vb.
-  /// okumalarına yansır — kullanıcının uygulamayı kapatıp açmasına gerek
-  /// kalmaz. Bu, özellikle `cfg_allow_past_datetime_creation` gibi test
-  /// bayraklarının anında etkili olması için önemli.
-  Future<void> init() async {
+  /// Bu güvenli çünkü [_defaults] (1496 anahtar) kodun içinde gömülü —
+  /// ilk kare her zaman doğru metinlerle çizilir, fetch sadece Console'da
+  /// yapılmış değişiklikleri getirir.
+  Future<void> applyDefaults() async {
     final rc = FirebaseRemoteConfig.instance;
     await rc.setConfigSettings(
       RemoteConfigSettings(
         fetchTimeout: const Duration(seconds: 10),
-        minimumFetchInterval: const Duration(hours: 24),
+        // Bu aralıktan daha taze bir cache varsa [fetchInBackground] ağa hiç
+        // çıkmaz. 24 saatten 2 saate çekildi: Console'da yapılan bir
+        // değişiklik artık en geç birkaç saat içinde kullanıcılara ulaşıyor.
+        // Zamanlayıcı DEĞİL — periyodik bir fetch kurmuyor; sadece açılışta
+        // yapılan fetch'in ne zaman ağa çıkacağını belirliyor. Yani bir
+        // kullanıcı günde en fazla 12 kez (12 ayrı 2 saatlik pencerede
+        // uygulamayı açarsa) fetch eder, pratikte 1-3.
+        minimumFetchInterval: const Duration(hours: 2),
       ),
     );
     await rc.setDefaults(_defaults);
+  }
+
+  /// `runApp()`'ten SONRA, `unawaited` olarak çağrılır — hiçbir şeyi
+  /// bekletmez. İnternet yoksa/başarısız olursa [applyDefaults]'taki
+  /// değerler geçerliliğini korur, uygulama hiçbir zaman bu yüzden çökmez.
+  ///
+  /// Remote Config Realtime (`onConfigUpdated`) BİLEREK kullanılmıyor:
+  /// her yayın (publish), o anda çevrimiçi olan HER istemciye
+  /// `minimumFetchInterval`'ı tanımayan otomatik bir fetch tetikliyordu —
+  /// yani "yayın sayısı × çevrimiçi kullanıcı" kadar fetch. RC 1 Eylül
+  /// 2026'dan itibaren kullandıkça-öde modeline geçtiği (günde 100.000
+  /// fetch ücretsiz) için bu çarpan kaldırıldı. Karşılığında kaybedilen
+  /// şey sınırlı: aşağıdaki bilinen davranış yüzünden realtime zaten
+  /// ekrandaki metinleri tazelemiyordu, sadece `cfg_*` bayraklarını anında
+  /// güncelliyordu. Artık bayrak değişiklikleri de en geç bir sonraki
+  /// açılışta (ve 2 saatlik fetch penceresinde) etkili oluyor.
+  ///
+  /// ⚠️ BİLİNEN DAVRANIŞ: `activate()` sonrası ekranda ZATEN çizili olan
+  /// metinler o oturumda tazelenmez — `rcTextProvider` yalnızca
+  /// `remoteConfigServiceProvider` (const, hiç değişmez) ve
+  /// `localeControllerProvider`'ı izliyor, bu ikisi de değişmediği için
+  /// yeniden çizim tetiklenmez. Yeni değerler BİR SONRAKİ AÇILIŞTA görünür
+  /// (Firebase RC aktive edilen değerleri cihazda kalıcı tutar). Karar
+  /// anında okunan `cfg_*` bayrakları ise (ör. `ref.read(...)` ile) anında
+  /// yeni değeri alır, yani iş mantığı etkilenmez. Bu davranış F10-2'de
+  /// bilinçli olarak kabul edildi (bkz. FAZ 10 notları) — 889 widget'ı aynı
+  /// anda yeniden çizmenin frame hitch riski, kazanca değmedi. **Sonucu:**
+  /// `remoteconfig.template.json` ile buradaki [_defaults] haritasının
+  /// senkron tutulması kritik.
+  Future<void> fetchInBackground() async {
+    final rc = FirebaseRemoteConfig.instance;
     try {
       await rc.fetchAndActivate();
     } on Exception {
       // Fetch başarısız oldu — setDefaults'taki değerler geçerliliğini korur.
     }
-    rc.onConfigUpdated.listen((_) async {
-      try {
-        await rc.activate();
-      } on Exception {
-        // Aktivasyon başarısız olursa mevcut değerlerle devam edilir —
-        // bir sonraki güncelleme sinyalinde tekrar denenir.
-      }
-    });
   }
 
   int getInt(String key) => FirebaseRemoteConfig.instance.getInt(key);

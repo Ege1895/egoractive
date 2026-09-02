@@ -19,9 +19,18 @@ final _privateConstructorUsedError = UnsupportedError(
 mixin _$GymProfile {
   String get name => throw _privateConstructorUsedError;
   String get city => throw _privateConstructorUsedError;
+
+  /// F8-4 — global telefon numarası desteği. E.164 (`+905324187605`).
   String get phone => throw _privateConstructorUsedError;
+  bool get isPhoneValid => throw _privateConstructorUsedError;
   String get address => throw _privateConstructorUsedError;
   String get logoUrl => throw _privateConstructorUsedError;
+
+  /// F9-2 — SADECE salon kuruluşunda yazılır, sonradan değiştirilemez.
+  /// `GymProfileService.saveProfile()` bu alanı hiçbir zaman Firestore'a
+  /// geri yazmaz (bilerek) — [GymInfoPanel] burada sadece okuma amaçlı
+  /// gösterir, bir düzenleme yolu yok.
+  String get currency => throw _privateConstructorUsedError;
 
   /// Create a copy of GymProfile
   /// with the given fields replaced by the non-null parameter values.
@@ -41,8 +50,10 @@ abstract class $GymProfileCopyWith<$Res> {
     String name,
     String city,
     String phone,
+    bool isPhoneValid,
     String address,
     String logoUrl,
+    String currency,
   });
 }
 
@@ -64,8 +75,10 @@ class _$GymProfileCopyWithImpl<$Res, $Val extends GymProfile>
     Object? name = null,
     Object? city = null,
     Object? phone = null,
+    Object? isPhoneValid = null,
     Object? address = null,
     Object? logoUrl = null,
+    Object? currency = null,
   }) {
     return _then(
       _value.copyWith(
@@ -81,6 +94,10 @@ class _$GymProfileCopyWithImpl<$Res, $Val extends GymProfile>
                 ? _value.phone
                 : phone // ignore: cast_nullable_to_non_nullable
                       as String,
+            isPhoneValid: null == isPhoneValid
+                ? _value.isPhoneValid
+                : isPhoneValid // ignore: cast_nullable_to_non_nullable
+                      as bool,
             address: null == address
                 ? _value.address
                 : address // ignore: cast_nullable_to_non_nullable
@@ -88,6 +105,10 @@ class _$GymProfileCopyWithImpl<$Res, $Val extends GymProfile>
             logoUrl: null == logoUrl
                 ? _value.logoUrl
                 : logoUrl // ignore: cast_nullable_to_non_nullable
+                      as String,
+            currency: null == currency
+                ? _value.currency
+                : currency // ignore: cast_nullable_to_non_nullable
                       as String,
           )
           as $Val,
@@ -108,8 +129,10 @@ abstract class _$$GymProfileImplCopyWith<$Res>
     String name,
     String city,
     String phone,
+    bool isPhoneValid,
     String address,
     String logoUrl,
+    String currency,
   });
 }
 
@@ -130,8 +153,10 @@ class __$$GymProfileImplCopyWithImpl<$Res>
     Object? name = null,
     Object? city = null,
     Object? phone = null,
+    Object? isPhoneValid = null,
     Object? address = null,
     Object? logoUrl = null,
+    Object? currency = null,
   }) {
     return _then(
       _$GymProfileImpl(
@@ -147,6 +172,10 @@ class __$$GymProfileImplCopyWithImpl<$Res>
             ? _value.phone
             : phone // ignore: cast_nullable_to_non_nullable
                   as String,
+        isPhoneValid: null == isPhoneValid
+            ? _value.isPhoneValid
+            : isPhoneValid // ignore: cast_nullable_to_non_nullable
+                  as bool,
         address: null == address
             ? _value.address
             : address // ignore: cast_nullable_to_non_nullable
@@ -154,6 +183,10 @@ class __$$GymProfileImplCopyWithImpl<$Res>
         logoUrl: null == logoUrl
             ? _value.logoUrl
             : logoUrl // ignore: cast_nullable_to_non_nullable
+                  as String,
+        currency: null == currency
+            ? _value.currency
+            : currency // ignore: cast_nullable_to_non_nullable
                   as String,
       ),
     );
@@ -167,25 +200,40 @@ class _$GymProfileImpl implements _GymProfile {
     required this.name,
     required this.city,
     required this.phone,
+    this.isPhoneValid = false,
     required this.address,
     this.logoUrl = '',
+    this.currency = defaultCurrencyCode,
   });
 
   @override
   final String name;
   @override
   final String city;
+
+  /// F8-4 — global telefon numarası desteği. E.164 (`+905324187605`).
   @override
   final String phone;
+  @override
+  @JsonKey()
+  final bool isPhoneValid;
   @override
   final String address;
   @override
   @JsonKey()
   final String logoUrl;
 
+  /// F9-2 — SADECE salon kuruluşunda yazılır, sonradan değiştirilemez.
+  /// `GymProfileService.saveProfile()` bu alanı hiçbir zaman Firestore'a
+  /// geri yazmaz (bilerek) — [GymInfoPanel] burada sadece okuma amaçlı
+  /// gösterir, bir düzenleme yolu yok.
+  @override
+  @JsonKey()
+  final String currency;
+
   @override
   String toString() {
-    return 'GymProfile(name: $name, city: $city, phone: $phone, address: $address, logoUrl: $logoUrl)';
+    return 'GymProfile(name: $name, city: $city, phone: $phone, isPhoneValid: $isPhoneValid, address: $address, logoUrl: $logoUrl, currency: $currency)';
   }
 
   @override
@@ -196,13 +244,25 @@ class _$GymProfileImpl implements _GymProfile {
             (identical(other.name, name) || other.name == name) &&
             (identical(other.city, city) || other.city == city) &&
             (identical(other.phone, phone) || other.phone == phone) &&
+            (identical(other.isPhoneValid, isPhoneValid) ||
+                other.isPhoneValid == isPhoneValid) &&
             (identical(other.address, address) || other.address == address) &&
-            (identical(other.logoUrl, logoUrl) || other.logoUrl == logoUrl));
+            (identical(other.logoUrl, logoUrl) || other.logoUrl == logoUrl) &&
+            (identical(other.currency, currency) ||
+                other.currency == currency));
   }
 
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, name, city, phone, address, logoUrl);
+  int get hashCode => Object.hash(
+    runtimeType,
+    name,
+    city,
+    phone,
+    isPhoneValid,
+    address,
+    logoUrl,
+    currency,
+  );
 
   /// Create a copy of GymProfile
   /// with the given fields replaced by the non-null parameter values.
@@ -218,20 +278,33 @@ abstract class _GymProfile implements GymProfile {
     required final String name,
     required final String city,
     required final String phone,
+    final bool isPhoneValid,
     required final String address,
     final String logoUrl,
+    final String currency,
   }) = _$GymProfileImpl;
 
   @override
   String get name;
   @override
   String get city;
+
+  /// F8-4 — global telefon numarası desteği. E.164 (`+905324187605`).
   @override
   String get phone;
+  @override
+  bool get isPhoneValid;
   @override
   String get address;
   @override
   String get logoUrl;
+
+  /// F9-2 — SADECE salon kuruluşunda yazılır, sonradan değiştirilemez.
+  /// `GymProfileService.saveProfile()` bu alanı hiçbir zaman Firestore'a
+  /// geri yazmaz (bilerek) — [GymInfoPanel] burada sadece okuma amaçlı
+  /// gösterir, bir düzenleme yolu yok.
+  @override
+  String get currency;
 
   /// Create a copy of GymProfile
   /// with the given fields replaced by the non-null parameter values.

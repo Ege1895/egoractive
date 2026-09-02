@@ -59,7 +59,9 @@ class CreateGroupSessionController extends _$CreateGroupSessionController {
       if (data == null) {
         state = state.copyWith(
           isLoadingForEdit: false,
-          errorMessage: 'Ders bulunamadı.',
+          errorMessage: ref.read(
+            rcTextProvider(RemoteConfigKeys.groupSessionsNotFoundError),
+          ),
         );
         return;
       }
@@ -84,7 +86,9 @@ class CreateGroupSessionController extends _$CreateGroupSessionController {
     } catch (_) {
       state = state.copyWith(
         isLoadingForEdit: false,
-        errorMessage: 'Ders yüklenemedi, tekrar dene.',
+        errorMessage: ref.read(
+          rcTextProvider(RemoteConfigKeys.groupSessionsLoadError),
+        ),
       );
     }
   }
@@ -142,9 +146,17 @@ class CreateGroupSessionController extends _$CreateGroupSessionController {
   /// seçilmemişse alanların altına spesifik hata yazıp `false` döner.
   Future<bool> submit() async {
     final title = state.title.trim();
-    final titleError = title.isEmpty ? 'Ders adı boş bırakılamaz.' : null;
+    final titleError = title.isEmpty
+        ? ref.read(
+            rcTextProvider(RemoteConfigKeys.groupSessionsTitleRequiredError),
+          )
+        : null;
     final selectedDate = state.selectedDate;
-    final dateError = selectedDate == null ? 'Tarih seçmelisin.' : null;
+    final dateError = selectedDate == null
+        ? ref.read(
+            rcTextProvider(RemoteConfigKeys.groupSessionsDateRequiredError),
+          )
+        : null;
     if (titleError != null || dateError != null) {
       state = state.copyWith(titleError: titleError, dateError: dateError);
       return false;
@@ -166,7 +178,11 @@ class CreateGroupSessionController extends _$CreateGroupSessionController {
         .map((date) => DateTime(date.year, date.month, date.day, hour, minute))
         .toList();
     if (!allowPast && startTimes.any((t) => t.isBefore(DateTime.now()))) {
-      state = state.copyWith(dateError: 'Geçmiş bir tarih/saat seçilemez.');
+      state = state.copyWith(
+        dateError: ref.read(
+          rcTextProvider(RemoteConfigKeys.groupSessionsPastDateError),
+        ),
+      );
       return false;
     }
 
@@ -176,7 +192,9 @@ class CreateGroupSessionController extends _$CreateGroupSessionController {
       if (gymId == null) {
         state = state.copyWith(
           isSubmitting: false,
-          errorMessage: 'Aktif bir salon bulunamadı.',
+          errorMessage: ref.read(
+            rcTextProvider(RemoteConfigKeys.commonNoActiveGymError),
+          ),
         );
         return false;
       }
@@ -226,8 +244,12 @@ class CreateGroupSessionController extends _$CreateGroupSessionController {
       state = state.copyWith(
         isSubmitting: false,
         errorMessage: state.editingId != null
-            ? 'Ders güncellenemedi, tekrar dene.'
-            : 'Grup dersi oluşturulamadı, tekrar dene.',
+            ? ref.read(
+                rcTextProvider(RemoteConfigKeys.groupSessionsUpdateError),
+              )
+            : ref.read(
+                rcTextProvider(RemoteConfigKeys.groupSessionsCreateError),
+              ),
       );
       return false;
     }
@@ -249,7 +271,9 @@ class CreateGroupSessionController extends _$CreateGroupSessionController {
     } catch (_) {
       state = state.copyWith(
         isCancelling: false,
-        errorMessage: 'İptal edilemedi, tekrar dene.',
+        errorMessage: ref.read(
+          rcTextProvider(RemoteConfigKeys.groupSessionsCancelError),
+        ),
       );
       return false;
     }

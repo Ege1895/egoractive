@@ -14,36 +14,12 @@ import '../../../trainers/controller/admin_trainers_controller.dart';
 import '../../../trainers/domain/admin_trainer_summary.dart';
 import '../../service/sessions_write_service.dart';
 import 'repeat_session_calendar_sheet.dart';
-
-const _weekdayShort = {
-  1: 'Pzt',
-  2: 'Sal',
-  3: 'Çar',
-  4: 'Per',
-  5: 'Cum',
-  6: 'Cmt',
-  7: 'Paz',
-};
-
-const _monthShort = {
-  1: 'Oca',
-  2: 'Şub',
-  3: 'Mar',
-  4: 'Nis',
-  5: 'May',
-  6: 'Haz',
-  7: 'Tem',
-  8: 'Ağu',
-  9: 'Eyl',
-  10: 'Eki',
-  11: 'Kas',
-  12: 'Ara',
-};
+import '../../../../shared/utils/date_labels.dart';
 
 /// Atlanan günleri bildirimde "3.9" gibi belirsiz bir formatla değil, hangi
 /// gün olduğu tek bakışta anlaşılsın diye "3 Eyl Per" şeklinde gösterir.
-String _formatSkippedDay(DateTime date) =>
-    '${date.day} ${_monthShort[date.month]} ${_weekdayShort[date.weekday]}';
+String _formatSkippedDay(DateTime date, DateLabels labels) =>
+    '${labels.dayMonthShort(date)} ${labels.weekdayShort(date.weekday)}';
 
 String _formatTimeOfDay(TimeOfDay time) =>
     '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
@@ -232,7 +208,7 @@ class _CreateSessionSheetState extends ConsumerState<_CreateSessionSheet> {
   /// sebebini yazar, hepsini tek bir "antrenör dolu" etiketine indirgemez.
   String _skippedDayEntry(DateTime date, String reasonKey) {
     final reason = ref.read(rcTextProvider(reasonKey));
-    return '${_formatSkippedDay(date)} ($reason)';
+    return '${_formatSkippedDay(date, ref.read(dateLabelsProvider))} ($reason)';
   }
 
   void _setDuet(bool value) {

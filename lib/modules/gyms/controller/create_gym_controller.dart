@@ -7,31 +7,37 @@ import 'package:image_picker/image_picker.dart';
 import 'package:palette_generator/palette_generator.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../core/constants/currency_constants.dart';
 import '../../../core/theme/theme_controller.dart';
 import '../../../shared/utils/gym_logo_image.dart';
 import '../domain/gym_profile.dart';
 import '../service/create_gym_service.dart';
 import 'gym_profile_controller.dart';
 import 'gym_theme_controller.dart';
+import '../../../core/remote_config/remote_config_service.dart';
 
 part 'create_gym_controller.g.dart';
 
 class CreateGymState {
   const CreateGymState({
     this.logoFile,
+    this.currency = defaultCurrencyCode,
     this.isSubmitting = false,
     this.errorMessage,
     this.nameError,
     this.cityError,
     this.addressError,
     this.phoneError,
-    this.emailError,
     this.isExtractingPalette = false,
     this.logoPalette = const [],
     this.selectedPaletteColor,
   });
 
   final XFile? logoFile;
+
+  /// F9-2 — sadece salon kuruluşunda seçilir, sonradan değiştirilemez
+  /// (dönüşüm/kur mantığı yok, bilinçli kısıtlama — bkz. FAZ 9 notu).
+  final String currency;
   final bool isSubmitting;
 
   /// Alana bağlanamayan hatalar (network, sunucu) için — field-seviyeli
@@ -41,7 +47,6 @@ class CreateGymState {
   final String? cityError;
   final String? addressError;
   final String? phoneError;
-  final String? emailError;
 
   /// Logo seçildikten sonra `palette_generator` ile renk çıkarımı sürüyor mu.
   final bool isExtractingPalette;
@@ -56,6 +61,7 @@ class CreateGymState {
 
   CreateGymState copyWith({
     XFile? logoFile,
+    String? currency,
     bool? isSubmitting,
     String? errorMessage,
     bool clearError = false,
@@ -63,7 +69,6 @@ class CreateGymState {
     String? cityError,
     String? addressError,
     String? phoneError,
-    String? emailError,
     bool clearFieldErrors = false,
     bool? isExtractingPalette,
     List<Color>? logoPalette,
@@ -72,6 +77,7 @@ class CreateGymState {
   }) {
     return CreateGymState(
       logoFile: logoFile ?? this.logoFile,
+      currency: currency ?? this.currency,
       isSubmitting: isSubmitting ?? this.isSubmitting,
       errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
       nameError: clearFieldErrors ? null : (nameError ?? this.nameError),
@@ -80,7 +86,6 @@ class CreateGymState {
           ? null
           : (addressError ?? this.addressError),
       phoneError: clearFieldErrors ? null : (phoneError ?? this.phoneError),
-      emailError: clearFieldErrors ? null : (emailError ?? this.emailError),
       isExtractingPalette: isExtractingPalette ?? this.isExtractingPalette,
       logoPalette: logoPalette ?? this.logoPalette,
       selectedPaletteColor: clearSelectedPaletteColor
@@ -109,6 +114,10 @@ class CreateGymController extends _$CreateGymController {
     ref.read(themeControllerProvider.notifier).resetToDefault();
   }
 
+  /// F9-2 — sadece bu ekranda (salon kuruluşu) çağrılır; [GymInfoPanel]'de
+  /// bu alana dokunacak hiçbir UI yok, bilerek.
+  void selectCurrency(String code) => state = state.copyWith(currency: code);
+
   Future<void> pickLogo() async {
     try {
       final file = await ImagePicker().pickImage(
@@ -124,7 +133,11 @@ class CreateGymController extends _$CreateGymController {
       );
       await _extractPalette(file);
     } catch (_) {
-      state = state.copyWith(errorMessage: 'Logo seçilemedi. Tekrar dene.');
+      state = state.copyWith(
+        errorMessage: ref.read(
+          rcTextProvider(RemoteConfigKeys.gymsCreateLogoPickError),
+        ),
+      );
     }
   }
 
@@ -162,14 +175,14 @@ class CreateGymController extends _$CreateGymController {
   /// önceki sürüm tüm hataları ("zaten kayıtlı" dahil) tek bir genel
   /// banner'da gösteriyordu, kullanıcı hangi alanın sorunlu olduğunu
   /// görmeden alanlara tek tek bakmak zorunda kalıyordu. Başarılıysa
-  /// oluşturulan `gymId`'yi döner. [email] — Egoractive Authentication
-  /// Sistemi §9: "Login ve rapor e-postası", zorunlu; hem admin OTP
-  /// girişinde hem salon raporlarında kullanılır. Logo opsiyoneldir.
-  Future<String?> submit({required String email}) async {
+  /// oluşturulan `gymId`'yi döner. Email BİLEREK istenmiyor (UX kararı —
+  /// bkz. `signup-gym-admin.ts`); admin ilk telefon girişinden hemen sonra
+  /// `emailSetupRequired` kapısından tamamlıyor. Logo opsiyoneldir.
+  Future<String?> submit() async {
     if (state.isSubmitting) return null;
 
     final profile = ref.read(gymProfileControllerProvider);
-    if (!_validate(profile, email)) return null;
+    if (!_validate(profile)) return null;
 
     state = state.copyWith(
       isSubmitting: true,
@@ -185,32 +198,30 @@ class CreateGymController extends _$CreateGymController {
           .createGym(
             profile: profile,
             themeColor: themeColor,
-            email: email.trim(),
             logoFile: state.logoFile,
+            currency: state.currency,
           );
       state = state.copyWith(isSubmitting: false);
       return gymId;
     } on FirebaseFunctionsException catch (e) {
-      final isEmailConflict =
-          e.code == 'already-exists' && (e.message ?? '').contains('email');
       state = state.copyWith(
         isSubmitting: false,
-        phoneError: e.code == 'already-exists' && !isEmailConflict
-            ? 'Bu numarayla kayıtlı bir hesap zaten var. Giriş yapmayı dene.'
-            : null,
-        emailError: isEmailConflict
-            ? 'Bu email adresiyle kayıtlı bir hesap zaten var. Giriş yapmayı dene.'
+        phoneError: e.code == 'already-exists'
+            ? ref.read(
+                rcTextProvider(RemoteConfigKeys.gymsCreatePhoneTakenError),
+              )
             : null,
         errorMessage: e.code == 'already-exists'
             ? null
-            : 'Salon oluşturulamadı. Bağlantını kontrol edip tekrar dene.',
+            : ref.read(rcTextProvider(RemoteConfigKeys.gymsCreateGenericError)),
       );
       return null;
     } catch (_) {
       state = state.copyWith(
         isSubmitting: false,
-        errorMessage:
-            'Salon oluşturulamadı. Bağlantını kontrol edip tekrar dene.',
+        errorMessage: ref.read(
+          rcTextProvider(RemoteConfigKeys.gymsCreateGenericError),
+        ),
       );
       return null;
     }
@@ -218,37 +229,39 @@ class CreateGymController extends _$CreateGymController {
 
   /// Her boş/geçersiz alan için ayrı bir hata mesajı yazar, geçerliyse
   /// `true` döner.
-  bool _validate(GymProfile profile, String email) {
-    final nameError = profile.name.trim().isEmpty ? 'Salon adı gerekli.' : null;
-    final cityError = profile.city.trim().isEmpty ? 'Şehir gerekli.' : null;
+  bool _validate(GymProfile profile) {
+    final nameError = profile.name.trim().isEmpty
+        ? ref.read(rcTextProvider(RemoteConfigKeys.gymsCreateNameRequiredError))
+        : null;
+    final cityError = profile.city.trim().isEmpty
+        ? ref.read(rcTextProvider(RemoteConfigKeys.gymsCreateCityRequiredError))
+        : null;
     final addressError = profile.address.trim().isEmpty
         ? 'Adres gerekli.'
         : null;
-    // profile.phone GymProfileController.updatePhone'da zaten sadece rakam
-    // tutuluyor — bu numarayla admin girişi yapılacağı için 10 haneli
-    // geçerli bir TR cep telefonu olmalı (AuthState.isPhoneComplete ile
-    // aynı kural).
-    final phoneError = profile.phone.length != 10
-        ? 'Geçerli bir cep telefonu numarası gir.'
-        : null;
-    // Egoractive Authentication Sistemi §9 — "Login ve rapor e-postası"
-    // zorunlu, admin bununla OTP alıp giriş yapacak.
-    final emailError = !email.contains('@') || email.trim().length < 4
-        ? 'Geçerli bir email adresi gir.'
-        : null;
+    // F8-4 — bu numarayla admin girişi yapılacağı için geçerli olmalı
+    // (AppPhoneField'ın phone_numbers_parser tabanlı doğrulaması).
+    final phoneError = profile.isPhoneValid
+        ? null
+        : ref.read(
+            rcTextProvider(RemoteConfigKeys.commonInvalidMobilePhoneError),
+          );
 
     if (nameError == null &&
         cityError == null &&
         addressError == null &&
-        phoneError == null &&
-        emailError == null) {
+        phoneError == null) {
       return true;
     }
     // copyWith'in `x ?? this.x` deseni "null geç" ile "hiç geçme"yi ayırt
     // edemediği için (biri geçersizken diğeri artık geçerli olan alanın
-    // eski hatası temizlenemez), burada state doğrudan kuruluyor.
+    // eski hatası temizlenemez), burada state doğrudan kuruluyor. `currency`
+    // önceki sürümde burada kaçırılıp sessizce varsayılana (TRY) dönüyordu
+    // (F9-2 sonrası fark edildi) — kullanıcı TRY dışı bir para birimi seçip
+    // sonra bir alanı boş bırakırsa seçimi kaybolmasın diye korunuyor.
     state = CreateGymState(
       logoFile: state.logoFile,
+      currency: state.currency,
       isExtractingPalette: state.isExtractingPalette,
       logoPalette: state.logoPalette,
       selectedPaletteColor: state.selectedPaletteColor,
@@ -256,7 +269,6 @@ class CreateGymController extends _$CreateGymController {
       cityError: cityError,
       addressError: addressError,
       phoneError: phoneError,
-      emailError: emailError,
     );
     return false;
   }

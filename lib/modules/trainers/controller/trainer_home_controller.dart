@@ -7,6 +7,7 @@ import '../domain/pending_confirmation.dart';
 import '../domain/schedule_slot.dart';
 import '../domain/trainer_home_state.dart';
 import '../repository/trainer_home_repository.dart';
+import '../../../core/remote_config/remote_config_service.dart';
 
 part 'trainer_home_controller.g.dart';
 
@@ -68,6 +69,9 @@ Stream<List<PendingConfirmation>> _pendingConfirmationsForTrainer(
   _PendingConfirmationsForTrainerRef ref,
   String trainerId,
 ) {
+  final meta = ref.watch(
+    rcTextProvider(RemoteConfigKeys.trainersHomePendingConfirmationMeta),
+  );
   return FirebaseFirestore.instance
       .collection('sessions')
       .where('trainerId', isEqualTo: trainerId)
@@ -98,7 +102,7 @@ Stream<List<PendingConfirmation>> _pendingConfirmationsForTrainer(
               memberId: memberId,
               memberInitials: _initialsFor(memberName),
               memberName: memberName,
-              meta: 'Birebir · tamamlandı mı?',
+              meta: meta,
               time:
                   '${startTime.hour.toString().padLeft(2, '0')}:${startTime.minute.toString().padLeft(2, '0')}',
               remainingBefore: remaining,

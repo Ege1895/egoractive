@@ -5,12 +5,13 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/app_spacing.dart';
+import '../../../../core/locale/locale_controller.dart';
+import '../../../../core/money/app_money_formatter.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
 import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/subscription/subscription_write_gate.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../../../shared/utils/thousands_input_formatter.dart';
 import '../../../../shared/widgets/app_back_button.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_text_field.dart';
@@ -57,7 +58,10 @@ class _NewMembershipPaymentPanelState
 
     if (!_hydrated && membership.totalAmountTl > 0) {
       _hydrated = true;
-      _totalController.text = formatThousands(membership.totalAmountTl);
+      _totalController.text = formatAmountGrouped(
+        membership.totalAmountTl,
+        ref.read(localeControllerProvider),
+      );
       _countController.text = '${membership.installments.length}';
     }
 
@@ -223,11 +227,17 @@ class _NewMembershipPaymentPanelState
                           ),
                           controller: _totalController,
                           keyboardType: TextInputType.number,
-                          inputFormatters: [ThousandsInputFormatter()],
+                          inputFormatters: [
+                            AppMoneyInputFormatter(
+                              locale: ref.watch(localeControllerProvider),
+                            ),
+                          ],
                           onChanged: (value) {
-                            final digits = value.replaceAll('.', '');
                             membershipController.setTotalAmount(
-                              int.tryParse(digits) ?? 0,
+                              parseMoneyInput(
+                                value,
+                                ref.read(localeControllerProvider),
+                              ),
                             );
                           },
                         ),
@@ -320,10 +330,11 @@ class _NewMembershipPaymentPanelState
                                       dueDate: dueDate,
                                       paid: paid,
                                     );
-                                    _totalController.text = formatThousands(
+                                    _totalController.text = formatAmountGrouped(
                                       ref
                                           .read(newMembershipControllerProvider)
                                           .totalAmountTl,
+                                      ref.read(localeControllerProvider),
                                     );
                                   },
                             ),

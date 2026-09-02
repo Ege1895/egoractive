@@ -17,7 +17,14 @@ final _privateConstructorUsedError = UnsupportedError(
 
 /// @nodoc
 mixin _$AuthState {
-  String get phoneDigits => throw _privateConstructorUsedError;
+  /// F8-2 — global telefon numarası desteği. E.164 formatında
+  /// (`+905324187605`) tam numara — [AppPhoneField] tarafından üretilir,
+  /// artık TR'ye özel 10 hane/`+90` varsayımı yok.
+  String get phoneE164 => throw _privateConstructorUsedError;
+
+  /// [AppPhoneField]'ın kendi `phone_numbers_parser` tabanlı bölgesel
+  /// doğrulamasından gelir (`PhoneNumber.isValid()`).
+  bool get isPhoneValid => throw _privateConstructorUsedError;
   String get emailInput => throw _privateConstructorUsedError;
   bool get isRequestingLogin => throw _privateConstructorUsedError;
   String? get loginErrorMessage => throw _privateConstructorUsedError;
@@ -45,7 +52,8 @@ abstract class $AuthStateCopyWith<$Res> {
       _$AuthStateCopyWithImpl<$Res, AuthState>;
   @useResult
   $Res call({
-    String phoneDigits,
+    String phoneE164,
+    bool isPhoneValid,
     String emailInput,
     bool isRequestingLogin,
     String? loginErrorMessage,
@@ -71,7 +79,8 @@ class _$AuthStateCopyWithImpl<$Res, $Val extends AuthState>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? phoneDigits = null,
+    Object? phoneE164 = null,
+    Object? isPhoneValid = null,
     Object? emailInput = null,
     Object? isRequestingLogin = null,
     Object? loginErrorMessage = freezed,
@@ -82,10 +91,14 @@ class _$AuthStateCopyWithImpl<$Res, $Val extends AuthState>
   }) {
     return _then(
       _value.copyWith(
-            phoneDigits: null == phoneDigits
-                ? _value.phoneDigits
-                : phoneDigits // ignore: cast_nullable_to_non_nullable
+            phoneE164: null == phoneE164
+                ? _value.phoneE164
+                : phoneE164 // ignore: cast_nullable_to_non_nullable
                       as String,
+            isPhoneValid: null == isPhoneValid
+                ? _value.isPhoneValid
+                : isPhoneValid // ignore: cast_nullable_to_non_nullable
+                      as bool,
             emailInput: null == emailInput
                 ? _value.emailInput
                 : emailInput // ignore: cast_nullable_to_non_nullable
@@ -130,7 +143,8 @@ abstract class _$$AuthStateImplCopyWith<$Res>
   @override
   @useResult
   $Res call({
-    String phoneDigits,
+    String phoneE164,
+    bool isPhoneValid,
     String emailInput,
     bool isRequestingLogin,
     String? loginErrorMessage,
@@ -155,7 +169,8 @@ class __$$AuthStateImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? phoneDigits = null,
+    Object? phoneE164 = null,
+    Object? isPhoneValid = null,
     Object? emailInput = null,
     Object? isRequestingLogin = null,
     Object? loginErrorMessage = freezed,
@@ -166,10 +181,14 @@ class __$$AuthStateImplCopyWithImpl<$Res>
   }) {
     return _then(
       _$AuthStateImpl(
-        phoneDigits: null == phoneDigits
-            ? _value.phoneDigits
-            : phoneDigits // ignore: cast_nullable_to_non_nullable
+        phoneE164: null == phoneE164
+            ? _value.phoneE164
+            : phoneE164 // ignore: cast_nullable_to_non_nullable
                   as String,
+        isPhoneValid: null == isPhoneValid
+            ? _value.isPhoneValid
+            : isPhoneValid // ignore: cast_nullable_to_non_nullable
+                  as bool,
         emailInput: null == emailInput
             ? _value.emailInput
             : emailInput // ignore: cast_nullable_to_non_nullable
@@ -207,7 +226,8 @@ class __$$AuthStateImplCopyWithImpl<$Res>
 
 class _$AuthStateImpl extends _AuthState {
   const _$AuthStateImpl({
-    this.phoneDigits = '',
+    this.phoneE164 = '',
+    this.isPhoneValid = false,
     this.emailInput = '',
     this.isRequestingLogin = false,
     this.loginErrorMessage,
@@ -217,9 +237,18 @@ class _$AuthStateImpl extends _AuthState {
     this.deleteAccountErrorMessage,
   }) : super._();
 
+  /// F8-2 — global telefon numarası desteği. E.164 formatında
+  /// (`+905324187605`) tam numara — [AppPhoneField] tarafından üretilir,
+  /// artık TR'ye özel 10 hane/`+90` varsayımı yok.
   @override
   @JsonKey()
-  final String phoneDigits;
+  final String phoneE164;
+
+  /// [AppPhoneField]'ın kendi `phone_numbers_parser` tabanlı bölgesel
+  /// doğrulamasından gelir (`PhoneNumber.isValid()`).
+  @override
+  @JsonKey()
+  final bool isPhoneValid;
   @override
   @JsonKey()
   final String emailInput;
@@ -246,7 +275,7 @@ class _$AuthStateImpl extends _AuthState {
 
   @override
   String toString() {
-    return 'AuthState(phoneDigits: $phoneDigits, emailInput: $emailInput, isRequestingLogin: $isRequestingLogin, loginErrorMessage: $loginErrorMessage, loginErrorReason: $loginErrorReason, deleteAccountAcknowledged: $deleteAccountAcknowledged, isDeletingAccount: $isDeletingAccount, deleteAccountErrorMessage: $deleteAccountErrorMessage)';
+    return 'AuthState(phoneE164: $phoneE164, isPhoneValid: $isPhoneValid, emailInput: $emailInput, isRequestingLogin: $isRequestingLogin, loginErrorMessage: $loginErrorMessage, loginErrorReason: $loginErrorReason, deleteAccountAcknowledged: $deleteAccountAcknowledged, isDeletingAccount: $isDeletingAccount, deleteAccountErrorMessage: $deleteAccountErrorMessage)';
   }
 
   @override
@@ -254,8 +283,10 @@ class _$AuthStateImpl extends _AuthState {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$AuthStateImpl &&
-            (identical(other.phoneDigits, phoneDigits) ||
-                other.phoneDigits == phoneDigits) &&
+            (identical(other.phoneE164, phoneE164) ||
+                other.phoneE164 == phoneE164) &&
+            (identical(other.isPhoneValid, isPhoneValid) ||
+                other.isPhoneValid == isPhoneValid) &&
             (identical(other.emailInput, emailInput) ||
                 other.emailInput == emailInput) &&
             (identical(other.isRequestingLogin, isRequestingLogin) ||
@@ -281,7 +312,8 @@ class _$AuthStateImpl extends _AuthState {
   @override
   int get hashCode => Object.hash(
     runtimeType,
-    phoneDigits,
+    phoneE164,
+    isPhoneValid,
     emailInput,
     isRequestingLogin,
     loginErrorMessage,
@@ -302,7 +334,8 @@ class _$AuthStateImpl extends _AuthState {
 
 abstract class _AuthState extends AuthState {
   const factory _AuthState({
-    final String phoneDigits,
+    final String phoneE164,
+    final bool isPhoneValid,
     final String emailInput,
     final bool isRequestingLogin,
     final String? loginErrorMessage,
@@ -313,8 +346,16 @@ abstract class _AuthState extends AuthState {
   }) = _$AuthStateImpl;
   const _AuthState._() : super._();
 
+  /// F8-2 — global telefon numarası desteği. E.164 formatında
+  /// (`+905324187605`) tam numara — [AppPhoneField] tarafından üretilir,
+  /// artık TR'ye özel 10 hane/`+90` varsayımı yok.
   @override
-  String get phoneDigits;
+  String get phoneE164;
+
+  /// [AppPhoneField]'ın kendi `phone_numbers_parser` tabanlı bölgesel
+  /// doğrulamasından gelir (`PhoneNumber.isValid()`).
+  @override
+  bool get isPhoneValid;
   @override
   String get emailInput;
   @override

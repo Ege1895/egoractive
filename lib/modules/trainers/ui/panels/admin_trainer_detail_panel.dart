@@ -6,14 +6,16 @@ import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
 import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../../../shared/utils/phone_number_formatter.dart';
 import '../../../../shared/widgets/app_back_button.dart';
+import '../../../../shared/widgets/app_button.dart';
+import '../../../../shared/widgets/app_confirm_dialog.dart';
 import '../../controller/admin_trainer_detail_controller.dart';
 import '../../controller/admin_trainers_controller.dart';
 import '../../controller/trainer_activity_breakdown_controller.dart';
 import '../../domain/admin_trainer_detail_stats.dart';
 import '../../domain/admin_trainer_summary.dart';
 import '../../domain/trainer_activity_breakdown.dart';
+import '../../service/trainer_registration_service.dart';
 import 'admin_trainer_management_panel.dart' show showTrainerFormSheet;
 
 /// Admin 4 · Antrenör Detayı — [AdminTrainerManagementPanel]'deki listeden
@@ -163,9 +165,7 @@ class _AdminTrainerDetailPanelState
                               ),
                               const SizedBox(height: AppSpacing.xs),
                               Text(
-                                trainer.phone.isEmpty
-                                    ? '—'
-                                    : formatTrPhoneDisplay(trainer.phone),
+                                trainer.phone.isEmpty ? '—' : trainer.phone,
                                 style: typography.bodyMedium.copyWith(
                                   color: colors.onSurfaceMuted,
                                 ),
@@ -293,6 +293,14 @@ class _AdminTrainerDetailPanelState
                     activity: activity,
                     counts: (b) => b.weekly,
                   ),
+                  const SizedBox(height: AppSpacing.xl),
+                  AppButton(
+                    label: ref.watch(
+                      rcTextProvider(RemoteConfigKeys.trainersDeleteButton),
+                    ),
+                    variant: AppButtonVariant.secondary,
+                    onPressed: () => _showDeleteDialog(trainer.id, trainer.name),
+                  ),
                 ],
               ),
             ),
@@ -301,13 +309,43 @@ class _AdminTrainerDetailPanelState
       ),
     );
   }
+
+  /// Silme geri alınamaz olduğu için önce onay alınır. Onay metni, verinin
+  /// KALDIĞINI açıkça söylüyor — admin "geçmişi de siliyorum" sanmasın.
+  ///
+  /// Geri alınamaz aksiyon — ortak onay diyaloğu (`showAppConfirmDialog`)
+  /// üzerinden (aynı diyalog grup dersi/etkinlik iptalinde de kullanılıyor).
+  /// Diyalog yazma tamamlanana kadar açık kalır, hata içeride gösterilir;
+  /// onay metni verinin KALDIĞINI açıkça söylüyor.
+  Future<void> _showDeleteDialog(String trainerId, String trainerName) async {
+    final deleted = await showAppConfirmDialog(
+      context: context,
+      title: ref.read(
+        rcTextProvider(RemoteConfigKeys.trainersDeleteConfirmTitle),
+      ),
+      message: ref
+          .read(rcTextProvider(RemoteConfigKeys.trainersDeleteConfirmBody))
+          .replaceAll('{name}', trainerName),
+      confirmLabel: ref.read(
+        rcTextProvider(RemoteConfigKeys.trainersDeleteConfirmCta),
+      ),
+      cancelLabel: ref.read(rcTextProvider(RemoteConfigKeys.commonVazgec)),
+      busyLabel: ref.read(rcTextProvider(RemoteConfigKeys.membersSavingLabel)),
+      errorMessage: ref.read(
+        rcTextProvider(RemoteConfigKeys.trainersDeleteError),
+      ),
+      onConfirm: () => ref
+          .read(trainerRegistrationServiceProvider)
+          .deactivateTrainer(trainerId),
+    );
+    // Antrenör artık `AdminTrainersController` listesinde yok — bu panel
+    // geçersiz bir kayda bakıyor, listeye dönülür.
+    if (deleted && mounted) {
+      ref.read(panelStackControllerProvider.notifier).pop();
+    }
+  }
 }
 
-/// "BU AY"/"BU HAFTA" kartı — [counts] ile aynı [activity] snapshot'ından
-/// aylık ya da haftalık kırılımı seçip Tamamlanan/Planlanan alt
-/// başlıklarıyla (birebir seans + düet ders) render eder. Grup dersleri şu
-/// an bir antrenöre atanmadığından (bkz. `TrainerActivityCounts` yorumu)
-/// burada gösterilmiyor.
 class _ActivityBreakdownCard extends ConsumerWidget {
   const _ActivityBreakdownCard({required this.activity, required this.counts});
 

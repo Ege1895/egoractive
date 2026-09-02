@@ -7,23 +7,10 @@ import '../domain/trainer_member_detail_mapper.dart';
 import '../domain/trainer_metric.dart';
 import '../domain/trainer_metric_measurement_source.dart';
 import '../repository/trainer_member_detail_repository.dart';
+import '../../../shared/utils/date_labels.dart';
+import '../../../core/remote_config/remote_config_service.dart';
 
 part 'trainer_member_detail_controller.g.dart';
-
-const _monthAbbrev = {
-  1: 'Oca',
-  2: 'Şub',
-  3: 'Mar',
-  4: 'Nis',
-  5: 'May',
-  6: 'Haz',
-  7: 'Tem',
-  8: 'Ağu',
-  9: 'Eyl',
-  10: 'Eki',
-  11: 'Kas',
-  12: 'Ara',
-};
 
 @riverpod
 Stream<TrainerMemberDetail> _trainerDetailStreamForId(
@@ -42,6 +29,14 @@ Stream<List<SessionHistoryEntry>> _sessionHistoryForMember(
   String trainerId,
   String memberId,
 ) {
+  final labels = ref.watch(dateLabelsProvider);
+  final texts = _HistoryLabels(
+    soloWithTimeTemplate: ref.watch(
+      rcTextProvider(RemoteConfigKeys.commonSoloSessionWithTimeTemplate),
+    ),
+    completed: ref.watch(rcTextProvider(RemoteConfigKeys.commonTamamlandi)),
+    cancelled: ref.watch(rcTextProvider(RemoteConfigKeys.commonIptalLabel)),
+  );
   return FirebaseFirestore.instance
       .collection('sessions')
       .where('trainerId', isEqualTo: trainerId)
@@ -56,13 +51,15 @@ Stream<List<SessionHistoryEntry>> _sessionHistoryForMember(
               return status == 'completed' || status == 'cancelled';
             })
             .take(10)
-            .map(_toHistoryEntry)
+            .map((doc) => _toHistoryEntry(doc, labels, texts))
             .toList();
       });
 }
 
 SessionHistoryEntry _toHistoryEntry(
   QueryDocumentSnapshot<Map<String, dynamic>> doc,
+  DateLabels labels,
+  _HistoryLabels texts,
 ) {
   final data = doc.data();
   final startTime = (data['startTime'] as Timestamp).toDate();
@@ -70,9 +67,9 @@ SessionHistoryEntry _toHistoryEntry(
       '${startTime.hour.toString().padLeft(2, '0')}:${startTime.minute.toString().padLeft(2, '0')}';
   final isCompleted = data['status'] == 'completed';
   return SessionHistoryEntry(
-    date: '${startTime.day} ${_monthAbbrev[startTime.month] ?? ''}',
-    type: 'Birebir · $time',
-    stateLabel: isCompleted ? 'Tamamlandı' : 'İptal',
+    date: labels.dayMonthShort(startTime),
+    type: texts.soloWithTimeTemplate.replaceAll('{time}', time),
+    stateLabel: isCompleted ? texts.completed : texts.cancelled,
     isPositive: isCompleted,
   );
 }
@@ -87,7 +84,7 @@ Stream<Map<TrainerMetric, TrainerMetricSeries>> _metricSeriesForMember(
   _MetricSeriesForMemberRef ref,
   String memberId,
 ) {
-  return watchTrainerMetricSeries(memberId);
+  return watchTrainerMetricSeries(memberId, ref.watch(dateLabelsProvider));
 }
 
 @riverpod
@@ -116,4 +113,18 @@ class TrainerMemberDetailController extends _$TrainerMemberDetailController {
 
   void selectMetric(TrainerMetric metric) =>
       state = state.copyWith(selectedMetric: metric);
+}
+
+/// Seans geçmişi satırındaki sabit metinler — RC'den okunup buraya
+/// taşınıyor (servis/mapper katmanı RC'ye erişmiyor).
+class _HistoryLabels {
+  const _HistoryLabels({
+    required this.soloWithTimeTemplate,
+    required this.completed,
+    required this.cancelled,
+  });
+
+  final String soloWithTimeTemplate;
+  final String completed;
+  final String cancelled;
 }

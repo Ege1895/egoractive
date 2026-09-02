@@ -5,11 +5,6 @@ import '../domain/dashboard_report.dart';
 
 part 'dashboard_report_service.g.dart';
 
-const _monthNamesLong = {
-  1: 'Ocak', 2: 'Şubat', 3: 'Mart', 4: 'Nisan', 5: 'Mayıs', 6: 'Haziran',
-  7: 'Temmuz', 8: 'Ağustos', 9: 'Eylül', 10: 'Ekim', 11: 'Kasım', 12: 'Aralık',
-};
-
 /// F5-1/F7-2 — büyük veri setlerinde (10.000+ seans) dashboard'ı hızlı
 /// tutmak için hiçbir yerde tüm dokümanlar client'a çekilmiyor: [loadSummary]
 /// Firestore `count()`/`sum()` aggregation query'leriyle sunucu tarafında
@@ -50,7 +45,7 @@ class DashboardReportService {
     ]);
 
     return DashboardSummary(
-      monthLabel: '${_monthNamesLong[now.month]} ${now.year} özeti',
+      month: DateTime(now.year, now.month),
       totalSessions: results[0].count ?? 0,
       completedSessions: results[1].count ?? 0,
       cancelledSessions: results[2].count ?? 0,
@@ -74,7 +69,8 @@ class DashboardReportService {
         .doc(yearMonth)
         .get();
 
-    final stats = snapshot.data()?['stats'] as Map<String, dynamic>? ?? const {};
+    final stats =
+        snapshot.data()?['stats'] as Map<String, dynamic>? ?? const {};
     final trainerPerformance = stats.entries.map((entry) {
       final trainerId = entry.key;
       final data = entry.value as Map<String, dynamic>? ?? const {};
@@ -86,7 +82,9 @@ class DashboardReportService {
       );
     }).toList();
 
-    trainerPerformance.sort((a, b) => b.completedSessions.compareTo(a.completedSessions));
+    trainerPerformance.sort(
+      (a, b) => b.completedSessions.compareTo(a.completedSessions),
+    );
     return trainerPerformance;
   }
 
@@ -97,7 +95,10 @@ class DashboardReportService {
   String _yearMonthUtc(DateTime utc) =>
       '${utc.year}-${utc.month.toString().padLeft(2, '0')}';
 
-  Query<Map<String, dynamic>> _monthSessionsQuery(String gymId, Timestamp monthStart) {
+  Query<Map<String, dynamic>> _monthSessionsQuery(
+    String gymId,
+    Timestamp monthStart,
+  ) {
     return FirebaseFirestore.instance
         .collection('sessions')
         .where('gymId', isEqualTo: gymId)
@@ -106,4 +107,5 @@ class DashboardReportService {
 }
 
 @riverpod
-DashboardReportService dashboardReportService(DashboardReportServiceRef ref) => const DashboardReportService();
+DashboardReportService dashboardReportService(DashboardReportServiceRef ref) =>
+    const DashboardReportService();

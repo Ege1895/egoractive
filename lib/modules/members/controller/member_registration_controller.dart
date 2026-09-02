@@ -3,6 +3,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/theme/theme_controller.dart';
 import '../service/member_registration_service.dart';
 import 'new_member_controller.dart';
+import '../../../core/remote_config/remote_config_service.dart';
 
 part 'member_registration_controller.g.dart';
 
@@ -70,14 +71,17 @@ class MemberRegistrationController extends _$MemberRegistrationController {
 
     final form = ref.read(newMemberControllerProvider);
     final name = '${form.firstName.trim()} ${form.lastName.trim()}'.trim();
-    final phoneDigits = form.phoneDigits.trim();
 
     final nameError = name.isEmpty ? 'Ad ve soyad gerekli.' : null;
-    final phoneError = phoneDigits.length != 10
-        ? 'Geçerli bir telefon numarası gir.'
-        : null;
+    final phoneError = form.isPhoneValid
+        ? null
+        : ref.read(rcTextProvider(RemoteConfigKeys.commonInvalidPhoneError));
     final trainerError = form.trainerId == null || form.trainerName == null
-        ? 'Bir antrenör seç.'
+        ? ref.read(
+            rcTextProvider(
+              RemoteConfigKeys.membersRegistrationTrainerRequiredError,
+            ),
+          )
         : null;
     if (nameError != null || phoneError != null || trainerError != null) {
       state = MemberRegistrationState(
@@ -90,17 +94,23 @@ class MemberRegistrationController extends _$MemberRegistrationController {
 
     final gymId = await ref.read(activeGymIdProvider.future);
     if (gymId == null) {
-      state = state.copyWith(errorMessage: 'Aktif bir salon bulunamadı.');
+      state = state.copyWith(
+        errorMessage: ref.read(
+          rcTextProvider(RemoteConfigKeys.commonNoActiveGymError),
+        ),
+      );
       return false;
     }
 
     state = state.copyWith(isSubmitting: true, clearError: true);
-    final phoneNumber = '+90$phoneDigits';
+    final phoneNumber = form.phoneE164;
     final service = ref.read(memberRegistrationServiceProvider);
     try {
       if (await service.phoneNumberIsTaken(phoneNumber)) {
         state = MemberRegistrationState(
-          phoneError: 'Bu telefon numarası zaten kayıtlı.',
+          phoneError: ref.read(
+            rcTextProvider(RemoteConfigKeys.membersRegistrationPhoneTakenError),
+          ),
         );
         return false;
       }
@@ -123,7 +133,9 @@ class MemberRegistrationController extends _$MemberRegistrationController {
     } catch (_) {
       state = state.copyWith(
         isSubmitting: false,
-        errorMessage: 'Üye eklenemedi. Bağlantını kontrol edip tekrar dene.',
+        errorMessage: ref.read(
+          rcTextProvider(RemoteConfigKeys.membersRegistrationCreateError),
+        ),
       );
       return false;
     }
@@ -136,12 +148,11 @@ class MemberRegistrationController extends _$MemberRegistrationController {
 
     final form = ref.read(newMemberControllerProvider);
     final name = '${form.firstName.trim()} ${form.lastName.trim()}'.trim();
-    final phoneDigits = form.phoneDigits.trim();
 
     final nameError = name.isEmpty ? 'Ad ve soyad gerekli.' : null;
-    final phoneError = phoneDigits.length != 10
-        ? 'Geçerli bir telefon numarası gir.'
-        : null;
+    final phoneError = form.isPhoneValid
+        ? null
+        : ref.read(rcTextProvider(RemoteConfigKeys.commonInvalidPhoneError));
     if (nameError != null || phoneError != null) {
       state = MemberRegistrationState(
         nameError: nameError,
@@ -157,7 +168,7 @@ class MemberRegistrationController extends _$MemberRegistrationController {
           .updateMember(
             memberId: memberId,
             name: name,
-            phoneNumber: '+90$phoneDigits',
+            phoneNumber: form.phoneE164,
             trainerId: form.trainerId,
             trainerName: form.trainerName,
             gender: form.gender,
@@ -168,8 +179,9 @@ class MemberRegistrationController extends _$MemberRegistrationController {
     } catch (_) {
       state = state.copyWith(
         isSubmitting: false,
-        errorMessage:
-            'Üye güncellenemedi. Bağlantını kontrol edip tekrar dene.',
+        errorMessage: ref.read(
+          rcTextProvider(RemoteConfigKeys.membersRegistrationUpdateError),
+        ),
       );
       return false;
     }

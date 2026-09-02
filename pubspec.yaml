@@ -16,7 +16,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.0.0+10
+version: 1.0.0+16
 
 environment:
   sdk: ^3.12.2
@@ -69,6 +69,17 @@ dependencies:
   pdf: ^3.11.3
   printing: ^5.13.4
   app_links: ^6.3.3
+  # F8-1 — global telefon numarası desteği: saf Dart (native platform
+  # bağımlılığı yok), libphonenumber metadata portu üzerinden gerçek
+  # bölgesel doğrulama + hazır ülke seçici widget. 10.0.18'e sabitlendi —
+  # 11.x Flutter >=3.47.0 istiyor, bu projedeki Flutter 3.44.5 ile
+  # uyumsuz.
+  phone_form_field: ^10.0.18
+  # F9-1 — global para birimi desteği: CLDR tabanlı para birimi/locale
+  # formatlama (sembol, ondalık basamak, binlik ayracı) — zaten transitive
+  # bağımlılıktı (flutter_localizations üzerinden), doğrudan bağımlılık
+  # olarak eklendi çünkü artık uygulama kodunda doğrudan import ediliyor.
+  intl: ^0.20.2
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -378,17 +378,22 @@ Sıralama, store review sürecini en hızlı şekilde başlatacak şekilde tasar
 **Prompt:** "`phone_form_field` paketini ekle. `shared/widgets/app_phone_field.dart` — `PhoneFormField`'ı sarmalayan, projenin `AppTextField` görsel dilinde (renk/köşe/tipografi `AppColorScheme`/`AppTypography`'den) bir bileşen. Varsayılan ülke `TR`, `onChanged` E.164 (`PhoneNumber.international`) döndürsün. Henüz hiçbir ekrana bağlanmasın — sadece bileşen + component showcase'e örnek."
 **Kabul kriterleri:** `component_showcase_panel.dart`'ta bileşen görülebiliyor, ülke seçici açılıp aranabiliyor, yazarken TR için "532 418 76 05" gibi canlı formatlanıyor.
 
-### F8-2 — Auth/login akışını E.164 + ülke seçiciye taşı
-**Prompt:** "`phone_login_panel.dart` artık `AppPhoneField` kullanıyor. `AuthController.setPhoneDigits`/`requestLogin`, `auth_repository.dart`, `auth_service.dart` tam E.164 numarayla çalışacak şekilde güncellensin. `functions/src/callable/request-custom-token.ts` artık `+90` varsaymadan, gelen E.164 numarayı olduğu gibi kullanmalı. RC'deki literal '+90 {phone}' metinleri (`lbl_auth_login_waiting_body_*` vb.) `{phone}` zaten tam numarayı içerecek şekilde güncellensin."
-**Kabul kriterleri:** TR dışında bir ülke kodu seçilip gerçek bir numarayla uçtan uca OTP girişi test edilmiş (gerçek SMS gidiyor); mevcut TR kullanıcıların girişi bozulmamış.
+### F8-2 — Telefonla giriş (hesap arama) akışını E.164 + ülke seçiciye taşı
+> **Düzeltme notu:** Bu görev ilk yazıldığında "telefon girişi = SMS OTP" varsayılmıştı — YANLIŞ. Gerçek mimari (`phone_login_panel.dart`'ın kendi doc comment'i, Egoractive Authentication Sistemi §2/§8): **tek authentication yöntemi email OTP'dir, SMS hiçbir yerde kullanılmıyor.** Telefon numarası sadece `startLogin(identifierType: 'phone', value: ...)` Cloud Function'ıyla hesabı BULMAK için bir kimlik alanı — telefonla girişte bile doğrulama kodu her zaman `result.email!`'e gidiyor (`OtpVerificationPanel`). Asıl risk SMS deliverability değil, backend'in E.164 telefon eşleştirmesi.
+**Prompt:** "`phone_login_panel.dart` artık `AppPhoneField` kullanıyor (bugünkü hardcoded '+90' + `TrPhoneNumberInputFormatter` satırları kaldırılıyor). `AuthController.setPhoneDigits`/`startLogin`, `auth_repository.dart`, `auth_service.dart` tam E.164 numarayla çalışacak şekilde güncellensin. `functions/src/callable/start-login.ts` — `identifierType: 'phone'` geldiğinde artık `+90` varsaymadan, gelen E.164 numarayı olduğu gibi Firestore'daki kayıtlı telefonla eşleştirmeli (bu dosyanın bugün nasıl eşleştirdiği önce incelenmeli — muhtemelen bir normalizasyon/canonicalization adımı var, o adım TR'ye özel olabilir). RC'deki literal '+90' içeren metinler varsa `{phone}` zaten tam E.164 içerecek şekilde güncellensin."
+**Kabul kriterleri:** TR dışında bir ülke kodu seçilip (gerçek bir test hesabıyla) telefonla giriş başlatıldığında hesap doğru bulunuyor ve e-postaya OTP gidiyor (SMS YOK — bu bir email teslim testi); mevcut TR kullanıcıların girişi bozulmamış; `email_login_panel.dart`/`EmailSetupPanel` akışına dokunulmuyor (kapsam dışı).
 
-### F8-3 — Mevcut Firestore telefon kayıtlarını E.164'e migrate et
-**Prompt:** "Tek seferlik bir Cloud Function/script (`functions/src/scripts/` veya benzeri) — `users`/`members`/`trainers` vb. koleksiyonlarındaki mevcut çıplak (prefiksiz, TR varsayılan) `phoneNumber` alanlarına `+90` prepend edip E.164'e çevirsin. Migration bitene kadar okuma tarafında prefiksiz kayıtlar için TR fallback bırakılsın (geçiş penceresi güvenliği)."
-**Kabul kriterleri:** Migration script'i staging/emulator'da çalıştırılıp tüm kayıtların `+90` ile başladığı doğrulanmış; production'da manuel onaylı tek seferlik çalıştırma planı var.
+### F8-3 — Mevcut Firestore telefon kayıtlarını E.164'e migrate et ✅ (koda alındı)
+> **Kapsam düzeltmesi:** F8-2 sırasında incelenince tek canonical login-kimliği alanının `users/{uid}.phoneNumber` olduğu netleşti (`members`/`trainers` alt koleksiyonlarındaki `phone` alanları sadece görüntüleme amaçlı ayrı kopyalar — F8-4 kapsamında) — migration'ın kapsamı sadece `users` koleksiyonuna daraltıldı.
+**Prompt:** "`functions/src/scripts/migrate-phone-e164.ts` — `users` koleksiyonundaki mevcut çıplak (prefiksiz, TR varsayılan) `phoneNumber` alanlarına `+90` prepend edip E.164'e çevirsin (idempotent — zaten `+` ile başlayanlara dokunmaz). Migration bitene kadar okuma tarafında prefiksiz kayıtlar için TR fallback bırakılsın (geçiş penceresi güvenliği)."
+**Yapılanlar:** `functions/src/shared/phone-lookup.ts` — `findUserByPhone()`/`phoneLookupCandidates()` ortak fallback helper'ı (E.164 bulunamazsa eski çıplak TR halini dener); `start-login.ts`, `check-phone-available.ts`, `signup-gym-admin.ts`'in telefon eşleştirme/çakışma kontrolü hepsi bu helper'a taşındı. `migrate-phone-e164.ts` — `--dry-run` destekli, batch'li (400/batch), idempotent migration script'i; `npm run migrate:phone-e164` ile çalıştırılıyor.
+**Kabul kriterleri:** ✅ Migration script'i Firestore emulator'da 5 senaryoyu (çıplak TR, zaten E.164 TR, zaten E.164 yabancı, telefonsuz, ikinci çıplak TR) kapsayan seed veriyle test edildi — `--dry-run` doğru sayıları raporladı, gerçek çalıştırma sonrası tüm kayıtlar `+90`/E.164 ile doğrulandı, ikinci çalıştırmada 0 migrasyon (idempotent) doğrulandı. `phoneLookupCandidates()` için 4 birim testi (`phone-lookup.test.ts`) geçiyor. **Production'da manuel onaylı tek seferlik çalıştırma henüz yapılmadı** — bu insan kararı gerektiren bir adım.
 
-### F8-4 — İletişim telefon formlarını `AppPhoneField`'a geçir
+### F8-4 — İletişim telefon formlarını `AppPhoneField`'a geçir ✅
+> **Kapsam genişlemesi:** Uygulanırken doküman'da listelenmeyen 5 ekran/dosya daha aynı `TrPhoneNumberInputFormatter`/`formatTrPhoneDigits` desenini kullandığı ortaya çıktı — hepsi kapsama alındı: `trainer_info_panel.dart`/`trainer_profile_controller.dart` (antrenörün kendi profili — `member_self_info_panel.dart`'ın birebir eşi), `profile_panel.dart`/`admin_member_detail_panel.dart`/`admin_trainer_detail_panel.dart`/`trainer_member_detail_panel.dart` (salt-okunur gösterim yerleri).
 **Prompt:** "Üye (`member_info_panel.dart`), antrenör (`admin_trainer_management_panel.dart`), salon (`gym_setup_panel.dart`, `gym_info_panel.dart`) gibi ekranlardaki telefon alanları `AppPhoneField`'a geçirilsin. Eski `TrPhoneNumberInputFormatter` artık hiçbir yerden çağrılmıyorsa kaldırılsın."
-**Kabul kriterleri:** Listelenen ekranların hepsinde ülke seçici çalışıyor, kaydedilen değer E.164; `flutter analyze` temiz.
+**Yapılanlar:** Toplam 9 UI dosyası (4 doküman'da listelenen + 5 keşfedilen) + 4 controller (`new_member_controller`, `member_profile_controller`, `trainer_profile_controller`, `gym_profile_controller`) `phoneDigits`/TR-varsayımlı alanlardan `phoneE164`/`isPhoneValid`'e geçirildi. `shared/utils/phone_number_formatter.dart` (TrPhoneNumberInputFormatter + formatTrPhoneDigits + formatTrPhoneDisplay) tamamen silindi — hiçbir yerden çağrılmıyordu.
+**Kabul kriterleri:** ✅ Listelenen + keşfedilen tüm ekranlarda ülke seçici çalışıyor, kaydedilen değer E.164; `flutter analyze` temiz, `flutter test` 127/128 (kalan 1 hata pre-existing, bu işten bağımsız doğrulandı).
 
 ### F8-5 — Son seçilen ülkeyi hatırlama + ülke ismi TR lokalizasyonu (nice-to-have)
 **Prompt:** "`AppPhoneField`, cihazda son seçilen ülkeyi (basit local storage) hatırlasın — her seferinde TR'den başlamak zorunda kalınmasın. `phone_form_field`'ın ülke isimleri sadece İngilizce geldiğinden, uygulama dili TR iken ülke seçici listesinde Türkçe isim gösterecek bir çeviri katmanı eklensin (RC'ye taşımaya gerek yok — ISO kod → TR isim eşlemesi build-time sabit)."
@@ -425,3 +430,161 @@ Sıralama, store review sürecini en hızlı şekilde başlatacak şekilde tasar
 ### F9-5 — Mevcut salonlara varsayılan `currency: "TRY"` migration
 **Prompt:** "Tek seferlik bir Cloud Function/script (`functions/src/scripts/`, F8-3'teki telefon migration'ıyla aynı desende) — `gyms` koleksiyonunda `currency` alanı olmayan tüm dokümanlara `currency: 'TRY'` yazsın. Client tarafında da `currency` alanı boş/eksik gelirse `'TRY'` fallback'i (migration tamamlanana kadar güvenlik ağı) tutulsun."
 **Kabul kriterleri:** Migration script'i staging/emulator'da çalıştırılıp tüm mevcut salonların `currency: "TRY"` aldığı doğrulanmış; production'da manuel onaylı tek seferlik çalıştırma planı var.
+
+---
+
+## FAZ 10 — Performans: Açılış ve İşlem Sürelerini Düşürme
+
+**Problem tespiti (2026-09-02, gerçek production ölçümleriyle doğrulandı):**
+Gerçek cihazda mobil veriyle login ~1,5-2 dk, salon listesi ~1 dk, salon oluşturma ~1 dk sürüyordu. Kök sebepler:
+1. **Bölge:** Firestore + Functions + Storage üçü de `us-central1` (Iowa). Türkiye'den her round-trip'te ~200-220 ms (Avrupa'ya göre 2 kat). *(Bu fazın kapsamı DIŞINDA — ayrı bir migration projesi, bkz. aşağıdaki not.)*
+2. **Cold start:** Hiçbir fonksiyonda `minInstances` yok, hepsi scale-to-zero. **Her Cloud Function ayrı bir Cloud Run servisi** olduğu için birini ısıtmak diğerini ısıtmıyor — kullanıcının dokunduğu her yeni fonksiyon ayrı cold start yaşıyor. Ölçülen: `startLogin` 18 sn, `listPartnerGyms` 16 sn, `signupGymAdmin` 5 sn.
+3. **`runApp()` blokajı:** UI, 7 ardışık `await` (biri 255 KB'lık Remote Config fetch, biri FCM token kaydı) bitene kadar hiç çizilmiyor.
+4. **Ardışık round-trip'ler:** `appAccess` zinciri 4 adımı sırayla bekliyor.
+
+**Maliyet notu:** Bu fazdaki TÜM görevler **ücretsizdir** (aylık gider yaratmaz). Ölçüm: 1 salon/10 antrenör/130 üye ve 10 salon/100 antrenör/1300 üye senaryolarında Firestore/Functions kullanımı ücretsiz kotanın sırasıyla ~%12 ve ~%120'si (aşım ~$0,20/ay). Aylık gider yaratacak tek seçenek `minInstances` (~$8/fonksiyon/ay) — **bilinçli olarak bu fazın dışında bırakıldı**, önce ücretsiz optimizasyonlar yapılıp ölçülecek.
+
+**Hedeflenen hızlar (F10-1 ölçümü bu tabloyu doldurup doğrulayacak):**
+
+| Akış | Şu an (mobil, bildirilen) | Hedef | Hangi görev |
+|---|---|---|---|
+| Uygulama açılış → ilk kare | 5-12 sn | **< 1,5 sn** (uçak modunda: anında) | F10-2 → ✅ **ULAŞILDI: 457 ms** (temiz kurulumda 61.645 ms → 457 ms, bkz. ölçüm tablosu) |
+| Login → OTP ekranı | 20-120 sn | **3-10 sn** (soğuk) / **1-2 sn** (sıcak) | F10-4 + F10-2 |
+| Anlaşmalı Salonlar listesi | ~60 sn | **3-10 sn** (soğuk) / **1-2 sn** (sıcak) | F10-4 |
+| Login → ana ekran | 1-2 sn | **0,5-1 sn** | F10-3 |
+| Seans oluşturma | ~60 sn | **1-3 sn** | F10-2 (dolaylı) — ⚠️ bkz. not |
+
+**"Soğuk" / "sıcak" ayrımı:** F10-4 cold start'ı bitirmiyor, KISALTIYOR (ölçülen 18 sn → beklenen ~7-9 sn). Bir fonksiyon ~15 dk çağrılmazsa tekrar soğur. Gerçek kullanımda birden fazla kullanıcı oldukça fonksiyonlar daha sık sıcak kalır. Kalan soğuk başlangıcı sıfırlamanın tek yolu `minInstances` (~$8/fonksiyon/ay) — bilinçli olarak kapsam dışı.
+
+**⚠️ Seans oluşturma hakkında dürüst not:** Bu akış hiç Cloud Function kullanmıyor (doğrudan Firestore) ve ~4 ardışık round-trip içeriyor; teorik olarak 1-2 sn sürmeli, ~60 sn statik analizle AÇIKLANAMADI. Çalışan hipotez: uygulama açılışta bloklayan işleri (255 KB RC fetch + FCM kaydı) sürdürürken tıkalı bir mobil ağda tüm istekler bant genişliği için yarışıyordu — bu doğruysa F10-2 bunu da düzeltir. **F10-1 baseline'ı bu hipotezi test etmeli:** ölçümü hem "uygulama yeni açıldı" hem "uygulama 1 dakikadır açık" durumunda ayrı ayrı al.
+
+**Bu görevlerle ULAŞILAMAYACAKLAR (para gerektiriyor, bilinçli kapsam dışı):**
+- Kalan ~7-9 sn'lik cold start → `minInstances` gerekir
+- Her round-trip'teki ~120 ms bölge cezası → bölge taşıma gerekir
+
+**📊 ÖLÇÜM SONUÇLARI (2026-09-02, Android emülatör / fiber WiFi, A/B testi)**
+
+A/B yöntemi: `677bfce` (F10-1 — ölçüm altyapısı var, `main()` hâlâ bloklayan) ile `a879590` (F10-2 + F10-3 uygulanmış) aynı emülatörde, aynı ağda, aynı build komutuyla (`flutter build apk --profile`) karşılaştırıldı.
+
+**Senaryo A — TEMİZ KURULUM** (`adb shell pm clear`: RC cache boş, bildirim izni henüz verilmemiş). Gerçek kullanıcının uygulamayı ilk kez açtığı durum:
+
+| Adım | ÖNCE (bloklayan) | SONRA (F10-2) |
+|---|---|---|
+| `firebase_init` | 365 ms | 396 ms |
+| Remote Config | **2.114 ms** ⛔ blokluyor | 44 ms (sadece varsayılanlar) |
+| `prefs_init` | 1 ms | 1 ms |
+| Push izni | **59.138 ms** ⛔ blokluyor | — arka planda |
+| **İLK KARE** | **61.645 ms** | **457 ms** |
+| RC fetch (arka plan) | — | 2.158 ms (ilk kareyi bloklamıyor) |
+
+**🔴 KÖK SEBEP BULUNDU — kullanıcının bildirdiği "1 dakikaya yakın açılış" tam olarak buydu.** Eski kodda `runApp()` ÖNCESİNDE `await PushNotificationService().init()` vardı; bu da `requestPermission()` çağırıp **sistem izin diyaloğunu** açıyor. Emülatörde doğrulandı: loglar `prefs_init`'te duruyor, `İLK KARE` hiç gelmiyor ve `dumpsys window` çıktısı `mCurrentFocus=GrantPermissionsActivity` gösteriyor — yani **uygulama, kullanıcı izin diyaloğuna cevap verene kadar BOMBOŞ ekranda bekliyor.** Diyalog 59 sn açık bırakıldığında ilk kare 61,6 saniyede geldi. Yeni kodda aynı test: **izin diyaloğu HÂLÂ ekranda dururken uygulama 457 ms'de açılmıştı** — diyalog artık çalışan bir arayüzün üstünde çıkıyor.
+
+**Senaryo B — ISINMIŞ AÇILIŞ** (RC cache dolu, izin verilmiş): ÖNCE 644-661 ms, SONRA ~490 ms. Fark emülatör gürültüsünün içinde kaldı — beklenen davranış: `minimumFetchInterval: 24 saat` yüzünden ısınmış durumda RC fetch throttle'a takılıp anında dönüyor, yani bloklayacak bir şey zaten yok.
+
+**F10-2'nin kazancı şu üç durumda ortaya çıkıyor:** (1) ilk kurulum → **61 sn → 0,5 sn**, (2) 24 saat sonraki ilk açılış (RC throttle sıfırlanır) → ~2 sn, (3) zayıf/tıkalı mobil ağ → RC fetch uzadıkça kazanç büyür.
+
+**Cold start (ayrıca ölçüldü, `listPartnerGyms` doğrudan çağrılarak):** soğuk 2,67 sn · sıcak 0,47 sn → ceza **~2,2 sn**. F10-4 yapılmadığı için değişmedi (zaten ~%2 kazandıracaktı, bkz. F10-4 notu). Bunu sıfırlamanın tek yolu `minInstances`.
+
+**⚠️ Bu ölçümler fiber WiFi üzerinde alındı.** Kullanıcının bildirdiği asıl senaryo (mobil veri) daha kötüdür: RC fetch ve tüm round-trip'ler uzar, dolayısıyla F10-2'nin kazancı gerçek cihazda daha da büyük olmalıdır. Gerçek cihazda mobil veriyle doğrulama hâlâ faydalı olur.
+
+### F10-1 — Baseline performans ölçümü (İLK yapılacak, atlanmamalı)
+**Prompt:** "Herhangi bir optimizasyon yapmadan ÖNCE, gerçek bir cihazda **mobil veriyle** (WiFi değil) şu 4 akışın süresini ölç ve kaydet: (a) uygulama açılışı → ilk kare, (b) login butonuna basış → OTP ekranı, (c) Anlaşmalı Salonlar → liste görünmesi, (d) seans oluştur → tamamlanma. Ölçüm için `Stopwatch` + `debugPrint` yeterli; istersen Firebase Performance Monitoring (ücretsiz) da eklenebilir. Sonuçları bu dosyaya bir tabloya yaz. Her F10-x görevinden sonra aynı ölçüm tekrarlanacak."
+**Kabul kriterleri:**
+- [ ] 4 akış için de "önce" değerleri kayıt altında (mobil veriyle, en az 3 tekrarın ortalaması)
+- [ ] Ölçüm yöntemi tekrarlanabilir şekilde dokümante edilmiş
+
+### F10-2 — `runApp()` blokajını kaldır (EN BÜYÜK KAZANÇ)
+**Prompt:** "`main.dart`'ta `runApp()` öncesindeki ardışık `await` zinciri UI'ı blokluyor. Şu yapıya geçir: (1) `Firebase.initializeApp` await kalsın (zorunlu). (2) `LocalePrefs.init()`, `OnboardingPrefs.init()`, `AppPhoneFieldPrefs.init()` — üçü de SharedPreferences (yerel disk, hızlı), `Future.wait` ile PARALEL await edilsin. (3) `RemoteConfigService.init()` İKİYE bölünsün: `applyDefaults()` (sadece `setConfigSettings` + `setDefaults` — ağ YOK, ~ms) ve `fetchInBackground()` (`fetchAndActivate` + `onConfigUpdated` listener). Sadece `applyDefaults()` await edilsin. (4) `runApp()` çağrılsın. (5) `runApp()`'ten SONRA `unawaited(...)` ile: `fetchInBackground()`, `PushNotificationService().init()`, `AppDeepLinkService().init()`."
+**Neden güvenli:** `_defaults` (1496 anahtar, kodda gömülü) `applyDefaults()` ile anında yükleniyor — ilk kare doğru metinlerle açılır. `AppDeepLinkService._handle()` zaten `await appAccessProvider.future` yapıyor, UI'ı kendi bekliyor.
+**⚠️ BİLİNÇLİ KABUL EDİLEN DAVRANIŞ DEĞİŞİKLİĞİ:** `rcTextProvider` (889 kullanım) yalnızca `remoteConfigServiceProvider` (const, hiç değişmez) + `localeControllerProvider` izliyor. Bu yüzden arka plan fetch bitince ekrandaki metinler O OTURUMDA tazelenmez; yeni RC değerleri **bir sonraki açılışta** görünür (Firebase RC aktive edilen değerleri yerelde kalıcı tutuyor). Bu, mevcut `onConfigUpdated` davranışıyla zaten aynı (o da UI'ı tazelemiyordu) — yani regresyon değil. **GÜNCELLEME (2026-09-03):** `onConfigUpdated` (RC Realtime) tamamen kaldırıldı ve `minimumFetchInterval` 24 saatten 2 saate çekildi — RC 1 Eylül 2026'da kullandıkça-öde modeline geçti (günde 100.000 fetch ücretsiz) ve realtime, her yayında çevrimiçi her istemciye bir fetch tetikliyordu. Metinler zaten bir sonraki açılışta göründüğü için kaybedilen tek şey `cfg_*` bayraklarının anlık güncellenmesiydi. **Sonucu:** `remoteconfig.template.json` ile Dart `_defaults` haritasının senkron tutulması artık daha kritik; RC'de bir metin değiştirildiğinde koddaki default'u da güncelle.
+**Kabul kriterleri:**
+- [ ] **Uçak modunda** uygulama açılışı ANINDA giriş ekranı gösteriyor (şu an 10 sn RC timeout'u bekliyor)
+- [ ] Normal ağda ilk kare < 1,5 sn
+- [ ] TR/EN dil seçimi ilk karede doğru
+- [ ] Bildirime tıklayarak açılış doğru ekrana gidiyor (deep link regresyonu yok)
+- [ ] Push bildirim izni/token kaydı hâlâ çalışıyor (sadece gecikmeli)
+- [ ] F10-1 ölçümü tekrarlandı, (a) akışında belirgin düşüş var
+
+### F10-3 — `appAccess` zincirini paralelleştir
+**Prompt:** "`lib/core/router/app_access.dart`'taki `appAccess` provider'ı 4 adımı ARDIŞIK bekliyor: `currentRole` → `currentUserEmail` → `activeGymId` → `subscriptionStateForGym`. Kritik gözlem: `currentRole` ve `activeGymId` AYNI `authIdTokenResultProvider`'dan geliyor (zaten memoize edilmiş), yani token çözülür çözülmez ikisi de bedava hazır. Yeni akış: (1) `authIdTokenResultProvider` bir kez await edilsin, `role` ve `gymId` aynı anda claim'lerden okunsun. (2) `role == null` → `signedOut` (değişmedi). (3) `gymId == null` → `ready` (değişmedi). (4) `gymId != null` ise `currentUserEmail` okuması ile `subscriptionStateForGym` listener'ı PARALEL başlatılsın. (5) Email `null` çıkarsa `emailSetupRequired` yayınlansın ve açılmış abonelik listener'ı `ref.onDispose` ile mutlaka kapatılsın."
+**Kabul kriterleri:**
+- [ ] Admin / antrenör / üye — üç rolle de giriş doğru shell'i açıyor
+- [ ] Email'i olmayan hesapla giriş → `EmailSetupPanel` açılıyor
+- [ ] Aboneliği bitmiş salon → admin `SubscriptionOnboardingPanel`, antrenör/üye `blocked`
+- [ ] Salonu olmayan admin → `ready`
+- [ ] Uygulama AÇIKKEN abonelik durumu değişince ekran anında tepki veriyor (canlı listener korunmuş)
+- [ ] `otp_verification_panel.dart`'taki `ref.invalidate(appAccessProvider)` akışı bozulmamış
+- [ ] Gereksiz açılan listener sızmıyor (dispose doğrulandı)
+
+### F10-4 — Cloud Functions'ı iki codebase'e böl — ❌ ÖLÇÜLDÜ, YAPILMADI (2026-09-02)
+
+**KARAR: Uygulanmadı.** Task yazılırken "cold start'ta %40-60 kazanç" tahmin edilmişti; uygulamadan ÖNCE ölçüldü ve **bu tahmin yanlış çıktı.** Gerçek ölçümler:
+
+| Ölçüm | Sonuç |
+|---|---|
+| Derlenmiş `lib/index.js`'in TAMAMININ yüklenmesi | **107 ms** |
+| `@apple/app-store-server-library` yüklemesi | 34 ms |
+| `google-auth-library` yüklemesi | 13 ms |
+| **Codebase bölerek kazanılacak toplam** | **~47 ms** |
+| Production'da tipik cold start (gerçek loglar) | **1,4 – 3,5 sn** |
+| **Kazanç oranı** | **~%2** |
+
+Production cold start ölçümleri (`Starting new instance` → `STARTUP TCP probe`): `startLogin` 2,6 / 2,4 / 17,6 / 1,8 sn · `verifyLoginOtp` 3,5 / 1,9 / 12,4 / 1,4 sn · `listPartnerGyms` 15,9 / 1,5 sn · `signupGymAdmin` 1,4 / 2,0 / 3,2 / 5,0 sn. **12-17 sn'lik sıçramaların hepsi 1 Eylül 17:48-18:10 aralığında** (kullanıcının demo yaptığı saatler); aynı fonksiyon dakikalar sonra 1,8 sn'ye düşmüş — yani bunlar image'ın host cache'inden düşmesi kaynaklı, kod kaynaklı değil.
+
+**Cold start'ın gerçek kaynağı kod yükleme DEĞİL** (107 ms), container sağlama (image çekme + sandbox kurulumu) — Google'ın altyapısı. Deploy paketi zaten sadece 382 KB (node_modules yüklenmiyor, Cloud Build kendi kuruyor), `@apple`'ı çıkarmak image'da ~6 MB / ~150 MB kazandırır, o da marjinal.
+
+**%2 kazanç karşılığında alınacak riskler** (yeni codebase, paylaşılan kod paketi, deploy topolojisi değişikliği, yanlış `--only` bayrağıyla fonksiyon silme riski) bu takası kötü kılıyor. **Cold start'ı gerçekten bitiren tek yol `minInstances`'tır** (~$8/fonksiyon/ay) — F10-1 ölçümleri alındıktan sonra, hâlâ gerekiyorsa yalnızca `startLogin` + `listPartnerGyms` için değerlendirilmeli (~$16/ay).
+
+<details>
+<summary>Orijinal task tanımı (uygulanmadı, referans için korunuyor)</summary>
+
+**Prompt:** "Tüm fonksiyonlar tek `functions/` paketinden deploy ediliyor; `@apple/app-store-server-library` ve `google-auth-library` gibi ağır bağımlılıklar, basit bir `startLogin` çağrısında bile cold start'ta modül grafiğine giriyor. Auth grubunun bağımlılık kapanışı DOĞRULANDI: sadece `firebase-admin` + `node:crypto`, ağır lib YOK. Yeni bir `functions-auth/` codebase'i oluştur (kendi `package.json`'ı, dependencies SADECE `firebase-admin` + `firebase-functions`) ve şu fonksiyonları taşı: `startLogin`, `verifyLoginOtp`, `sendEmailSetupOtp`, `verifyEmailSetupOtp`, `sendEmailChangeOtp`, `verifyEmailChangeOtp`, `listPartnerGyms`, `signupGymAdmin`, `deleteAccount`. Gereken shared dosyalar: `firestore-paths`, `phone-lookup`, `otp`, `otp-email-template`, `mail`, `login-token`. `firebase.json`'a iki codebase tanımı eklensin (`{source: functions, codebase: default}`, `{source: functions-auth, codebase: auth}`). `functions/src/index.ts`'ten taşınan export'lar kaldırılsın."
+**⚠️ EN BÜYÜK RİSK — paylaşılan dosyalar:** `shared/` dosyaları iki codebase'de de gerekiyor. Seçenekler: (a) kopyala — **YAPMA**, iki kopya sessizce ayrışırsa `firestore-paths.ts` farklılığı veri hatasına yol açar; (b) symlink — tek kaynak ama TS/paketleme sorun çıkarabilir; (c) local npm paketi (`file:../shared`) — **ÖNERİLEN**, en temiz.
+**Diğer notlar:** Fonksiyon isimleri ve bölge DEĞİŞMİYOR → client tarafında hiçbir değişiklik gerekmiyor, URL'ler aynı. `firebase deploy --only functions` artık iki codebase'i birden deploy eder — ilk deploy'da `--only functions:auth` ile başla, mevcut fonksiyonların silinmediğini doğrula.
+**Kabul kriterleri:**
+- [ ] Her iki codebase de `npm run build` + `npm run lint` temiz
+- [ ] `npm test` (76+ test) geçiyor
+- [ ] Deploy sonrası `firebase functions:list` — hiçbir fonksiyon kaybolmamış
+- [ ] Login akışı uçtan uca çalışıyor (telefon → OTP → giriş)
+- [ ] Salon oluşturma çalışıyor (logo yükleme dahil)
+- [ ] Email değiştirme akışı çalışıyor
+- [ ] **Cold start ölçümü:** deploy sonrası ~15 dk bekle, `startLogin` çağır, logdan boot süresini oku — 18 sn'den belirgin düşüş beklentisi (~7-9 sn)
+</details>
+
+### F10-5 — Ölü kod ve küçük israfların temizliği — ✅ 5a YAPILDI, 5b/5c/5d ÖLÇÜLDÜ VE ATLANDI (2026-09-02)
+
+**✅ 5a — `requestCustomToken` silindi.** Kodda yoktu (F1-10'da kaldırılmış, sadece yorum referansları kalmış) ama production'da canlı duruyordu. `firebase functions:delete` ile silindi; sonrasında `functions:list` ile diğer 36 fonksiyonun sağlam olduğu doğrulandı.
+
+**❌ 5b — `listPartnerGyms` özet dokümanı: ATLANDI, bugün HİÇ hız kazancı yok.** Gerekçe: Firestore, `gyms` koleksiyonunun tamamını **TEK bir sorgu round-trip'inde** döndürüyor (şu an 6 doküman / ~11,8 KB). Tek bir özet dokümanına indirmek de **yine tek round-trip** olurdu — yani kullanıcının gördüğü sürede ölçülebilir bir fark YOK. Kazanç sadece yüksek salon sayısında ortaya çıkar ve o da *gecikme* değil *okuma maliyeti* tarafında (ki ücretsiz kotanın çok altındayız). Karşılığında yeni bir koleksiyon + trigger + backfill + "index dokümanı bayatlarsa yanlış salon listesi gösterme" riski geliyor. Salon sayısı 50+'ye çıkarsa yeniden değerlendirilmeli.
+
+**❌ 5c — `weeklySubscriberSummary` saatlik tetikleme: ATLANDI.** Ayda 720 çalışma, her biri 1 ucuz Firestore point-read (RC cache dokümanı). Ücretsiz kotanın çok altında, kullanıcıya görünen hiçbir etkisi yok. Schedule'ı seyrekleştirmek RC ile saat ayarlama esnekliğini (LiveOps) azaltırdı — takas değmez.
+
+**❌ 5d — `recordSuccess` ekstra okuması: ATLANDI, kritik yolda DEĞİL.** Doğrulandı: `withFailureAlerting` yalnızca scheduled/task/trigger fonksiyonlarını sarıyor. Kullanıcının BEKLEDİĞİ callable'ların (`startLogin`, `verifyLoginOtp`, `listPartnerGyms`, `signupGymAdmin`) hiçbiri sarılı değil — yani bu ekstra okuma hiçbir zaman kullanıcının beklediği sürenin parçası olmuyor. Trigger'lar zaten yazma işleminden SONRA, asenkron çalışıyor.
+
+<details>
+<summary>Orijinal task tanımı (referans için korunuyor)</summary>
+
+**Prompt:** "(a) `requestCustomToken` fonksiyonu kodda YOK ama production'da hâlâ canlı (F1-10'da silinmiş olmalıydı) — `firebase functions:delete requestCustomToken --project egoractive-e92bd --force` ile sil. (b) `listPartnerGyms` her çağrıda tüm `gyms` koleksiyonunu okuyor; bir trigger'la güncel tutulan tek bir `publicGyms/index` özet dokümanına indir (çağrı başına sabit 1 okuma). (c) `weeklySubscriberSummary` saatte bir tetikleniyor (ayda 720 kez) ama işini ayda ~4 kez yapıyor — schedule'ı günde 2-3 kereye indirmeyi değerlendir (RC esnekliği biraz azalır, düşük öncelik). (d) `withFailureAlerting`'deki `recordSuccess` her başarılı trigger çalışmasında fazladan bir `functionHealth` okuması yapıyor — yüksek frekanslı trigger'larda atlanabilir (düşük öncelik)."
+**Kabul kriterleri:**
+- [ ] `firebase functions:list` çıktısında `requestCustomToken` yok
+- [ ] (b) yapıldıysa: Anlaşmalı Salonlar listesi doğru salonları gösteriyor, yeni salon eklenince index tazeleniyor
+- [ ] Tüm mevcut testler geçiyor
+</details>
+
+---
+
+### FAZ 10 kapsamı DIŞINDA bırakılanlar (ayrıca karar verilecek)
+
+**Bölge taşıma (`us-central1` → `europe-west3`) — KARAR: şimdilik YAPILMIYOR (2026-09-02).** Gerekçe: kazanç gerçek ama sınırlı (round-trip başına ~120 ms → tipik akışlarda 0,3-1,5 sn), buna karşılık migration riski yüksek ve çözülmemiş bir maliyet belirsizliği var (aşağıya bkz.). Önce F10-1…F10-5 yapılıp ölçülecek; kalan yavaşlık kabul edilemezse yeniden değerlendirilecek. Aşağıdaki teknik notlar, o gün gelirse hazır olsun diye korunuyor.
+**⚠️ Yeniden değerlendirilirse ÖNCE şu netleşmeli:** Firestore ücretsiz kotasının yalnızca `(default)` veritabanına mı uygulandığı (https://firebase.google.com/docs/firestore/pricing). Eğer öyleyse "aynı projede ikinci veritabanı" yolu ücretsiz kotayı kaybettirir ve yeni bir Firebase projesi (yeni API key'ler, FCM/IAP/Analytics yeniden kurulum) gerekir — bu da işi kat kat büyütür.
+
+Teknik notlar: en büyük tekil kazanç (her round-trip 2 kat hızlanır) ama ayrı ve dikkatli bir migration projesi. **Firestore'un bölgesi oluşturulduktan sonra değiştirilemez** — çözüm: aynı proje içinde ikinci bir veritabanı (`gcloud firestore databases create --database=eu --location=europe-west3`), export/import ile veri taşıma, client'ta `FirebaseFirestore.instanceFor(databaseId:)` (SDK destekliyor, doğrulandı). Dikkat: rules/index'ler veritabanı başına ayrı; Trigger Email extension'ı `DATABASE=(default)` ile kurulu, güncellenmeli; Firestore trigger'ları veritabanıyla aynı bölgede olmalı; Storage bucket'ı taşınırsa Firestore'daki mutlak `logoUrl`'ler yeniden yazılmalı. **Not:** Ücretsiz kota bölgeden bağımsız aynıdır — bu taşıma bugünkü kullanımda ek maliyet YARATMAZ (doğrulanmalı: https://firebase.google.com/docs/firestore/pricing). Store'a çıkmadan yapmak en ucuz an.
+
+**`minInstances: 1` (cold start'ı tamamen bitirir):** ~$8/fonksiyon/ay. F10-2/F10-3/F10-4 tamamlanıp ölçüm yapıldıktan SONRA, hâlâ gerekiyorsa sadece `startLogin` + `listPartnerGyms` için değerlendirilmeli (~$16/ay). Maliyet doğrulaması: https://cloud.google.com/run/pricing
+
+**Remote Config payload küçültme (`_tr`/`_en` birleştirme) — YAPILAMAZ, teknik engel var:** 1573 parametre / 255 KB. Akla gelen çözüm `lbl_x_tr` + `lbl_x_en` yerine RC *conditions* ile tek `lbl_x` tutmak (~%50 azalma). **Ama bu, uygulama içi dil değiştiriciyi bozar** — `language_select_panel.dart` kullanıcının cihaz dilinden BAĞIMSIZ olarak dili değiştirmesine izin veriyor (`LocalePrefs.override`). RC conditions dil seçimini SUNUCUYA devreder: değer fetch anında seçilir ve tek bir dil gönderilir. Kullanıcı uygulama içinde TR→EN geçtiğinde RC'de hâlâ eski dilin değerleri durur ve `minimumFetchInterval: 24 saat` yüzünden 24 saat boyunca yenilenemez. Zorla fetch de çözüm değil: her dil değişimi ağa çıkmayı gerektirir, çevrimdışı hiç çalışmaz. **Mevcut `_tr`/`_en` son eki tam olarak bunun için var — anlık, çevrimdışı çalışan dil değiştirme; her iki dil de cihazda hazır bekliyor. Bilinçli bir tasarım, "gereksiz tekrar" değil.**
+Ayrıca kazanç zaten küçük: RC yanıtı gzip'li geldiği ve JSON çok tekrarlı olduğu için ağdan geçen gerçek veri ~50-70 KB; yarıya inmesi ~25-35 KB (mobilde ~0,05-0,3 sn) kazandırır — F10-2'den sonra bu fetch arka planda olduğu için kullanıcıya görünen kazanç sıfırdır. Ölçülebilir tek gerçek kazanç `applyDefaults()`'ta ~10-25 ms olurdu; 889 kullanım noktası + 1496 default'u değiştirme riskine değmez.
+
+**`rcTextProvider` tazeleme sinyali:** F10-2'nin notunda açıklanan davranış (RC değişiklikleri bir sonraki açılışta görünür) kabul edilebilir bulunmazsa, `rcVersionProvider` deseniyle çözülebilir. Dikkat: 889 widget'ın aynı anda yeniden çizilmesi frame hitch'e yol açabilir.
+
+**App Check:** Şu an kurulu değil (`"app":"MISSING"`). Güvenlik konusu, performans değil — ayrı ele alınmalı.

@@ -15,40 +15,57 @@ Stream<GymProfile> _profileForGym(_ProfileForGymRef ref, String gymId) {
 
 @riverpod
 class GymProfileController extends _$GymProfileController {
+  /// [GymSetupPanel]'in (henüz `gymId` yokken) yazdığı form buffer'ının asıl
+  /// kaynağı — `state` DEĞİL, bu alan. Sebep: `build()`, izlediği
+  /// `activeGymIdProvider`/`_profileForGymProvider` her yeniden çözüldüğünde
+  /// (ör. token/auth stream'i `loading`'den `data(null)`'a geçince) YENİDEN
+  /// çalışır ve dönen değer `state`'in yerini alır — `gymId == null` iken
+  /// bu her seferinde sabit `_emptyProfile` dönseydi, kullanıcının o ana
+  /// kadar `updateName`/`updateCity`/... ile yazdığı HER ŞEY, arka planda
+  /// tamamen ilgisiz bir provider yeniden çözüldüğü anda sessizce silinirdi
+  /// (gerçek rapor edilen hata: alanlar dolu göründüğü halde submit "gerekli"
+  /// hatası veriyordu). `_buffer` bu Notifier örneği YAŞADIĞI sürece
+  /// `build()`'ın kaç kez tekrar çalıştığından bağımsız kalıcıdır.
+  GymProfile _buffer = _emptyProfile;
+
   @override
   GymProfile build() {
     final gymId = ref.watch(activeGymIdProvider).valueOrNull;
     // Aktif salon yoksa (F2-9 salon oluşturma akışı, henüz gymId atanmadan
-    // önce) boş bir profil döner — GymSetupPanel bu state'i kendi form
-    // buffer'ı olarak kullanır. Aktif salon varsa (GymInfoPanel, üye
+    // önce) buffer'ı olduğu gibi döner. Aktif salon varsa (GymInfoPanel, üye
     // sayısı vb.) `gyms/{gymId}` dokümanı gerçek zamanlı izlenir.
-    if (gymId == null) return _emptyProfile;
-    return ref.watch(_profileForGymProvider(gymId)).valueOrNull ??
-        _emptyProfile;
+    if (gymId == null) return _buffer;
+    _buffer =
+        ref.watch(_profileForGymProvider(gymId)).valueOrNull ?? _emptyProfile;
+    return _buffer;
   }
 
   /// [GymSetupPanel] (yeni salon oluşturma) her açıldığında çağırır — bu
   /// provider [GymInfoPanel] (mevcut salonu düzenleme) ile paylaşıldığı ve
   /// panel stack eski panelleri `maintainState` ile canlı tuttuğu için,
   /// `build()`'ın autoDispose ile kendiliğinden sıfırlanacağı garanti değil.
-  void reset() => state = _emptyProfile;
-
-  void updateName(String name) => state = state.copyWith(name: name);
-
-  void updateCity(String city) => state = state.copyWith(city: city);
-
-  /// Salonu oluşturan kişi bu numarayla giriş yapacağı için (F2-9), sadece
-  /// rakamlar (en fazla 10 hane) tutulur — [AuthController.setPhoneDigits]
-  /// ile aynı temsil, `+90` öneki gönderim anında eklenir.
-  void updatePhone(String rawInput) {
-    final digits = rawInput.replaceAll(RegExp(r'[^0-9]'), '');
-    state = state.copyWith(
-      phone: digits.length > 10 ? digits.substring(0, 10) : digits,
-    );
+  void reset() {
+    _buffer = _emptyProfile;
+    state = _buffer;
   }
 
+  void updateName(String name) => _set(_buffer.copyWith(name: name));
+
+  void updateCity(String city) => _set(_buffer.copyWith(city: city));
+
+  /// F8-4 — [GymSetupPanel]'de salonu oluşturan kişi bu numarayla giriş
+  /// yapacağı için (F2-9), [GymInfoPanel]'de ise sadece salonun iletişim
+  /// numarası olarak kullanılır — ikisinde de artık tam E.164.
+  void updatePhone(String e164, {required bool isValid}) =>
+      _set(_buffer.copyWith(phone: e164, isPhoneValid: isValid));
+
   void updateAddress(String address) =>
-      state = state.copyWith(address: address);
+      _set(_buffer.copyWith(address: address));
+
+  void _set(GymProfile profile) {
+    _buffer = profile;
+    state = profile;
+  }
 
   /// [GymInfoPanel]'in "Kaydet" butonu tarafından çağrılır — mevcut state'i
   /// `gyms/{gymId}` dokümanına yazar. Aktif salon yoksa (beklenmeyen durum,

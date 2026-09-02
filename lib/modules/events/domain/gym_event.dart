@@ -18,5 +18,8 @@ class GymEvent with _$GymEvent {
 
   const GymEvent._();
 
-  String get capacityLabel => capacity == null ? 'Sınırsız' : '$capacity';
+  /// [unlimitedLabel] RC'den (aktif dile göre) UI katmanında geçilir —
+  /// domain katmanı Remote Config'e erişmiyor.
+  String capacityLabel(String unlimitedLabel) =>
+      capacity == null ? unlimitedLabel : '$capacity';
 }

@@ -9,6 +9,7 @@ import {
   reconcileSessionTask,
   scheduleSessionCompletionTask,
   scheduleSessionReminderTask,
+  scheduleTrainerSessionReminderTask,
 } from "../shared/session-scheduled-tasks";
 import { withFailureAlerting } from "../shared/function-health";
 import { getCachedRemoteConfigTemplate } from "../shared/remote-config-cache";
@@ -68,7 +69,19 @@ export const onSessionWriteScheduleNotifications = onDocumentWritten(
     await reconcileSessionTask(
       { wasPlanned, beforeTimeMs: beforeStartMs, isPlanned, afterTimeMs: afterStartMs },
       (timeMs) => cancelSessionReminderTask(sessionId, timeMs),
-      async (timeMs) => scheduleSessionReminderTask(sessionId, timeMs, readReminderMinutesBefore(await getTemplate())),
+      async (timeMs) => {
+        const leadMinutes = readReminderMinutesBefore(await getTemplate());
+        await scheduleSessionReminderTask(sessionId, timeMs, leadMinutes);
+        // Antrenör hatırlatması üyeninkiyle aynı anda gider — ayrı bir RC
+        // eşiği tanımlanmadı; iki taraf için farklı süre istenirse yeni bir
+        // anahtar gerekir.
+        await scheduleTrainerSessionReminderTask(
+          sessionId,
+          afterData?.duetGroupId as string | undefined,
+          timeMs,
+          leadMinutes,
+        );
+      },
     );
 
     await reconcileSessionTask(

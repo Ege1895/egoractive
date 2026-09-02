@@ -6,6 +6,7 @@ import '../../../core/theme/theme_controller.dart';
 import '../../../shared/domain/membership_installment.dart';
 import '../../packages/domain/studio_package.dart';
 import '../domain/new_membership_state.dart';
+import '../../../core/remote_config/remote_config_service.dart';
 
 part 'new_membership_controller.g.dart';
 
@@ -119,7 +120,9 @@ class NewMembershipController extends _$NewMembershipController {
       if (gymId == null) {
         state = state.copyWith(
           isSaving: false,
-          errorMessage: 'Aktif bir salon bulunamadı.',
+          errorMessage: ref.read(
+            rcTextProvider(RemoteConfigKeys.commonNoActiveGymError),
+          ),
         );
         return false;
       }
@@ -167,8 +170,9 @@ class NewMembershipController extends _$NewMembershipController {
     } catch (_) {
       state = state.copyWith(
         isSaving: false,
-        errorMessage:
-            'Ödeme kaydedilemedi, bağlantını kontrol edip tekrar dene.',
+        errorMessage: ref.read(
+          rcTextProvider(RemoteConfigKeys.membersPaymentSaveError),
+        ),
       );
       return false;
     }

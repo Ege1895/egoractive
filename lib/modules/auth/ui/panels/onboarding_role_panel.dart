@@ -7,6 +7,7 @@ import '../../../../core/panels/panel_stack_controller.dart';
 import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_button.dart';
+import '../../../gyms/controller/partner_gyms_controller.dart';
 import '../../../gyms/ui/panels/partner_gyms_panel.dart';
 import 'onboarding_trainer_path_panel.dart';
 import 'phone_login_panel.dart';
@@ -33,6 +34,16 @@ class _OnboardingRolePanelState extends BasePanelState<OnboardingRolePanel> {
   Widget build(BuildContext context) {
     final colors = context.appColors;
     final typography = context.appTypography;
+    // "Anlaşmalı Salonlar" listesi çok az kayıt taşıyor (şu an 9 salon) —
+    // gecikmenin asıl sebebi veri hacmi/UI oluşturma değil, kullanıcı
+    // butona basınca sıfırdan başlayan `listPartnerGyms` callable'ının
+    // cold start + round-trip süresi. Bu ekran açılır açılmaz isteği
+    // sessizce tetikleyip (`ref.watch` bu panel canlıyken — panel stack
+    // `maintainState` ile [PartnerGymsPanel]'in altında canlı kalıyor —
+    // sonucu cache'de tutar), kullanıcı butona bastığında `PartnerGymsPanel`
+    // aynı provider'ı okuyup ya zaten gelmiş veriyi ya da devam eden
+    // isteği kullanır; sıfırdan beklemez.
+    ref.watch(partnerGymsProvider);
 
     return Scaffold(
       body: SafeArea(

@@ -20,6 +20,13 @@ class FeatureFlags {
   /// değişikliği/store güncellemesi gerekmeden anlık devre dışı bırakılabilir.
   bool get isGroupSessionsEnabled => _flag('group_sessions_enabled', true);
 
+  /// Rapor PDF export'unun her sayfasının sağ alt köşesindeki uygulama
+  /// ikonu filigranı. Kapatıldığında PDF'e görsel hiç gömülmez (dosya
+  /// boyutu da eski haline döner) — beyaz etiketli bir salon için store
+  /// güncellemesi olmadan kapatılabilsin diye flag'lendi.
+  bool get isReportsPdfWatermarkEnabled =>
+      _flag('reports_pdf_watermark_enabled', true);
+
   /// RC henüz hazır olmadığı (ör. Firebase başlatılmamış test ortamı)
   /// durumlarda widget'ı çökertmemek için burada savunmacı: hata olursa
   /// varsayılana düşer. Bu sayede çağıran taraflar `featureFlagsProvider`'ı

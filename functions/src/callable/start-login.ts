@@ -2,6 +2,8 @@ import { getFirestore } from "firebase-admin/firestore";
 import { HttpsError, onCall } from "firebase-functions/v2/https";
 
 import { gymDoc, usersCollection } from "../shared/firestore-paths";
+import { findUserByPhone } from "../shared/phone-lookup";
+import { isDeactivated } from "../shared/user-active";
 import { sendOtpToEmail } from "../shared/otp";
 
 const RATE_LIMIT_WINDOW_MS = 60_000;
@@ -44,26 +46,36 @@ export const startLogin = onCall(async (request) => {
     throw new HttpsError("resource-exhausted", "Çok fazla deneme yapıldı.");
   }
 
-  const field = identifierType === "phone" ? "phoneNumber" : "emailLower";
-  const snapshot = await getFirestore()
-    .collection(usersCollection())
-    .where(field, "==", value)
-    .limit(1)
-    .get();
+  const db = getFirestore();
+  const matchedDoc =
+    identifierType === "phone"
+      ? await findUserByPhone(db, value)
+      : (
+          await db.collection(usersCollection()).where("emailLower", "==", value).limit(1).get()
+        ).docs[0] ?? null;
 
-  if (snapshot.empty) {
+  if (!matchedDoc) {
     throw new HttpsError("not-found", "Bu bilgiyle kayıtlı bir kullanıcı bulunamadı.");
   }
 
-  const uid = snapshot.docs[0].id;
-  const userData = snapshot.docs[0].data();
+  const uid = matchedDoc.id;
+  const userData = matchedDoc.data();
+
+  // Admin bu hesabı pasife aldıysa giriş yok (bkz. `deactivateTrainer`).
+  // BİLEREK "not-found" ile aynı mesaj: hesabın var olduğunu ve pasife
+  // alındığını dışarıya sızdırmamak için — kullanıcı deneyimi açısından da
+  // "bu bilgiyle kayıtlı kullanıcı yok" doğru bir ifade.
+  if (isDeactivated(userData)) {
+    throw new HttpsError("not-found", "Bu bilgiyle kayıtlı bir kullanıcı bulunamadı.");
+  }
+
   const role = typeof userData.role === "string" ? userData.role : undefined;
   const gymId = typeof userData.gymId === "string" ? userData.gymId : null;
 
   // Salon Abonelik ve Erişim Akışı — antrenör/üye salonu aboneliği aktif
   // değilken hiç giriş yapamamalı; admin'e bu kısıtlama uygulanmaz.
   if (role && role !== "admin" && gymId) {
-    const gymSnap = await getFirestore().doc(gymDoc(gymId)).get();
+    const gymSnap = await db.doc(gymDoc(gymId)).get();
     const gymData = gymSnap.data();
     const status = gymData?.subscriptionStatus;
     const exempt = gymData?.subscriptionExempt === true;

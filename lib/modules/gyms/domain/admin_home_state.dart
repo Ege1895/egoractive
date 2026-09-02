@@ -14,7 +14,7 @@ class TrainerPerformance with _$TrainerPerformance {
 @freezed
 class AdminHomeState with _$AdminHomeState {
   const factory AdminHomeState({
-    required String monthLabel,
+    required DateTime? month,
     required int totalSessions,
     required int completedSessions,
     required int cancelledSessions,
@@ -29,7 +29,7 @@ class AdminHomeState with _$AdminHomeState {
   const AdminHomeState._();
 
   static const empty = AdminHomeState(
-    monthLabel: '',
+    month: null,
     totalSessions: 0,
     completedSessions: 0,
     cancelledSessions: 0,

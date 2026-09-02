@@ -6,7 +6,7 @@ part of 'admin_trainers_controller.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$trainerDocsForGymHash() => r'6a640e2091e70ac490674b2d935e08b7e4f3ecd5';
+String _$trainerDocsForGymHash() => r'4093dc80a28d8b90d956507a8578408cde9606b4';
 
 /// Copied from Dart SDK
 class _SystemHash {

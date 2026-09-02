@@ -26,6 +26,23 @@ class _AdminFeedbackListPanelState
     final colors = context.appColors;
     final typography = context.appTypography;
     final summary = ref.watch(adminFeedbackControllerProvider);
+    final entries = ref.watch(adminFeedbackFilteredEntriesProvider);
+    final starFilter = ref.watch(adminFeedbackStarFilterProvider);
+    final month = ref.watch(adminFeedbackSelectedMonthProvider);
+    // Sınır kontrolü şart: Remote Config hazır değilse (ör. Firebase
+    // başlatılmamış test ortamı) `rcTextProvider` boş string döner ve
+    // `''.split(',')` TEK elemanlı bir liste verir — doğrudan
+    // `[month - 1]` indekslemek RangeError ile paneli çökertiyordu.
+    // `create_event_panel.dart`'taki `_formatDate` ile aynı desen.
+    final monthNames = ref
+        .watch(rcTextProvider(RemoteConfigKeys.commonMonthNamesLong))
+        .split(',');
+    final monthName = month.month >= 1 && month.month <= monthNames.length
+        ? monthNames[month.month - 1].trim()
+        : '';
+    final monthLabel = monthName.isEmpty
+        ? '${month.month}.${month.year}'
+        : '$monthName ${month.year}';
 
     return Scaffold(
       body: SafeArea(
@@ -56,6 +73,29 @@ class _AdminFeedbackListPanelState
                         fontSize: 24,
                       ),
                     ),
+                  ),
+                  // Ay geçişi — liste tek bir ayla sınırlı olduğu için
+                  // geçmiş ayların geri bildirimleri buradan görülüyor.
+                  _MonthArrow(
+                    icon: Icons.chevron_left,
+                    onTap: () => ref
+                        .read(adminFeedbackSelectedMonthProvider.notifier)
+                        .previous(),
+                  ),
+                  Text(
+                    monthLabel,
+                    style: typography.bodyMedium.copyWith(
+                      color: colors.onSurfaceVariant,
+                      fontSize: 13,
+                    ),
+                  ),
+                  _MonthArrow(
+                    icon: Icons.chevron_right,
+                    onTap: ref.watch(adminFeedbackCanGoNextMonthProvider)
+                        ? () => ref
+                              .read(adminFeedbackSelectedMonthProvider.notifier)
+                              .next()
+                        : null,
                   ),
                 ],
               ),
@@ -131,8 +171,60 @@ class _AdminFeedbackListPanelState
                     ),
                   ),
                   const SizedBox(height: AppSpacing.lg),
-                  for (final entry in summary.entries)
-                    _FeedbackCard(entry: entry),
+                  // Yıldıza göre filtre — sorgu zaten tek bir ayla sınırlı
+                  // olduğu için client tarafında uygulanıyor (ek index yok,
+                  // geçiş anında). Aynı yıldıza tekrar dokunmak filtreyi
+                  // kaldırır.
+                  SizedBox(
+                    height: 36,
+                    child: ListView(
+                      scrollDirection: Axis.horizontal,
+                      children: [
+                        _StarFilterChip(
+                          label: ref.watch(
+                            rcTextProvider(
+                              RemoteConfigKeys.feedbackFilterAllLabel,
+                            ),
+                          ),
+                          selected: starFilter == null,
+                          onTap: () => ref
+                              .read(adminFeedbackStarFilterProvider.notifier)
+                              .clear(),
+                        ),
+                        for (var star = 5; star >= 1; star--)
+                          _StarFilterChip(
+                            label: '$star ★',
+                            selected: starFilter == star,
+                            count: summary.starCounts[star] ?? 0,
+                            onTap: () => ref
+                                .read(adminFeedbackStarFilterProvider.notifier)
+                                .toggle(star),
+                          ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  if (entries.isEmpty)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: AppSpacing.xl,
+                      ),
+                      child: Text(
+                        ref.watch(
+                          rcTextProvider(
+                            starFilter == null
+                                ? RemoteConfigKeys.feedbackEmptyMonthLabel
+                                : RemoteConfigKeys.feedbackEmptyFilterLabel,
+                          ),
+                        ),
+                        textAlign: TextAlign.center,
+                        style: typography.bodyMedium.copyWith(
+                          color: colors.onSurfaceMuted,
+                        ),
+                      ),
+                    )
+                  else
+                    for (final entry in entries) _FeedbackCard(entry: entry),
                 ],
               ),
             ),
@@ -295,6 +387,88 @@ class _FeedbackCard extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Ay geçiş oku — [onTap] `null` ise pasif görünür (içinde bulunulan
+/// aydayken "sonraki" oku).
+class _MonthArrow extends StatelessWidget {
+  const _MonthArrow({required this.icon, required this.onTap});
+
+  final IconData icon;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+    return Material(
+      color: Colors.transparent,
+      shape: const CircleBorder(),
+      child: InkWell(
+        customBorder: const CircleBorder(),
+        onTap: onTap,
+        child: SizedBox(
+          width: 32,
+          height: 32,
+          child: Icon(
+            icon,
+            size: 20,
+            color: onTap == null ? colors.outlineStrong : colors.onSurfaceVariant,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Yıldız filtresi çipi. [count] verilirse etiketin yanında o puandaki
+/// geri bildirim sayısı gösterilir — admin hangi puanda kaç kayıt olduğunu
+/// filtreye dokunmadan görebilsin diye.
+class _StarFilterChip extends StatelessWidget {
+  const _StarFilterChip({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+    this.count,
+  });
+
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+  final int? count;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+    final typography = context.appTypography;
+    return Padding(
+      padding: const EdgeInsets.only(right: AppSpacing.sm),
+      child: Material(
+        color: selected ? colors.primary : colors.surface,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 13),
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
+              border: Border.all(
+                color: selected ? colors.primary : colors.outlineStrong,
+              ),
+            ),
+            child: Text(
+              count == null ? label : '$label ($count)',
+              style: typography.headingSmall.copyWith(
+                fontSize: 13,
+                color: selected ? colors.onPrimary : colors.onSurfaceVariant,
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }

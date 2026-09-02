@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../core/constants/currency_constants.dart';
 import '../domain/dashboard_report.dart';
 import '../domain/report_snapshot.dart';
 
@@ -79,6 +80,7 @@ class ReportSnapshotService {
       packages: packages,
       groupSessions: _occupancyFrom(data['groupSessions']),
       events: _occupancyFrom(data['events']),
+      currency: data['currency'] as String? ?? defaultCurrencyCode,
     );
   }
 

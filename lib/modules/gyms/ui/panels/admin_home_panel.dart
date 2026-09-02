@@ -3,9 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/app_spacing.dart';
+import '../../../../core/locale/locale_controller.dart';
+import '../../../../core/money/app_money_formatter.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
 import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../shared/utils/date_labels.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/progress_ring.dart';
 import '../../../trainers/ui/panels/admin_trainer_management_panel.dart';
@@ -23,7 +26,9 @@ class AdminHomePanel extends ConsumerWidget {
     final colors = context.appColors;
     final typography = context.appTypography;
     final state = ref.watch(adminHomeControllerProvider);
+    final monthSummaryLabel = _monthSummaryLabel(ref, state.month);
     final profile = ref.watch(gymProfileControllerProvider);
+    final locale = ref.watch(localeControllerProvider);
     final panelStack = ref.read(panelStackControllerProvider.notifier);
 
     return Scaffold(
@@ -79,9 +84,9 @@ class AdminHomePanel extends ConsumerWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            if (state.monthLabel.isNotEmpty)
+                            if (monthSummaryLabel.isNotEmpty)
                               Text(
-                                state.monthLabel,
+                                monthSummaryLabel,
                                 overflow: TextOverflow.ellipsis,
                                 style: typography.caption.copyWith(
                                   color: colors.onSurfaceMuted,
@@ -188,7 +193,11 @@ class AdminHomePanel extends ConsumerWidget {
                         RemoteConfigKeys.gymsAdminHomeEstimatedRevenueLabel,
                       ),
                     ),
-                    value: '₺${state.estimatedRevenueTl}',
+                    value: formatMoney(
+                      state.estimatedRevenueTl,
+                      profile.currency,
+                      locale,
+                    ),
                     note: ref.watch(
                       rcTextProvider(
                         RemoteConfigKeys.gymsAdminHomeThisMonthNote,
@@ -205,7 +214,11 @@ class AdminHomePanel extends ConsumerWidget {
                         RemoteConfigKeys.gymsAdminHomeExpenseLabel,
                       ),
                     ),
-                    value: '₺${state.expensesTl}',
+                    value: formatMoney(
+                      state.expensesTl,
+                      profile.currency,
+                      locale,
+                    ),
                     note: ref.watch(
                       rcTextProvider(
                         RemoteConfigKeys.gymsAdminHomeThisMonthNote,
@@ -335,7 +348,11 @@ class AdminHomePanel extends ConsumerWidget {
                           ),
                         ),
                         Text(
-                          '₺${state.duePaymentTotalTl}',
+                          formatMoney(
+                            state.duePaymentTotalTl,
+                            profile.currency,
+                            locale,
+                          ),
                           style: typography.headingSmall.copyWith(
                             color: colors.primary,
                             fontSize: 16,
@@ -546,4 +563,15 @@ class _TrainerPerformanceRow extends StatelessWidget {
       ],
     );
   }
+}
+
+/// Canlı dashboard'ın "{ay} özeti" başlığı — ay adı ve şablon Remote
+/// Config'ten, aktif dile göre. Snapshot yolunda ay bilgisi sunucudan hazır
+/// metin olarak geldiği için burada boş dönülür.
+String _monthSummaryLabel(WidgetRef ref, DateTime? month) {
+  if (month == null) return '';
+  final monthName = ref.watch(dateLabelsProvider).monthYear(month);
+  return ref
+      .watch(rcTextProvider(RemoteConfigKeys.commonMonthSummaryTemplate))
+      .replaceAll('{month}', monthName);
 }

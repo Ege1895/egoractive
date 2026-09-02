@@ -12,6 +12,9 @@ import '../../feedback/ui/panels/feedback_panel.dart';
 import '../../sessions/ui/panels/attendance_confirm_panel.dart';
 import '../../trainers/ui/panels/trainer_calendar_panel.dart';
 import '../../../firebase_options.dart';
+import '../../events/ui/panels/event_detail_panel.dart';
+import '../../group_sessions/ui/panels/group_session_detail_panel.dart';
+import '../../../core/remote_config/remote_config_service.dart';
 
 /// Uygulama tamamen kapalıyken gelen bildirimler ayrı bir isolate'te işlenir
 /// — bu yüzden top-level olmak zorunda ve kendi Firebase.initializeApp'ini
@@ -32,21 +35,40 @@ class PushNotificationService {
   final FlutterLocalNotificationsPlugin _localNotifications =
       FlutterLocalNotificationsPlugin();
 
-  static const _androidChannel = AndroidNotificationChannel(
+  /// Kanal adı/açıklaması telefonun sistem ayarlarında görünür, o yüzden
+  /// aktif dile göre RC'den okunuyor. Kanal bir kez oluşturulduktan sonra
+  /// Android adı güncellemiyor — dil değişirse kullanıcı uygulamayı yeniden
+  /// kurana kadar eski ad kalabilir; kabul edilen bir sınır.
+  /// [init] çalıştıktan sonra dolu — bildirim gösterirken kanal
+  /// id/adı buradan okunuyor.
+  late AndroidNotificationChannel _channel;
+
+  static AndroidNotificationChannel _androidChannel(
+    String name,
+    String description,
+  ) => AndroidNotificationChannel(
     'session_reminders',
-    'Ders Hatırlatmaları',
-    description: 'Yaklaşan dersler için hatırlatma bildirimleri',
+    name,
+    description: description,
     importance: Importance.high,
   );
 
   Future<void> init(ProviderContainer container) async {
     await FirebaseMessaging.instance.requestPermission();
 
+    _channel = _androidChannel(
+      container.read(
+        rcTextProvider(RemoteConfigKeys.notificationsAndroidChannelName),
+      ),
+      container.read(
+        rcTextProvider(RemoteConfigKeys.notificationsAndroidChannelDescription),
+      ),
+    );
     await _localNotifications
         .resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin
         >()
-        ?.createNotificationChannel(_androidChannel);
+        ?.createNotificationChannel(_channel);
 
     await _localNotifications.initialize(
       settings: const InitializationSettings(
@@ -118,10 +140,7 @@ class PushNotificationService {
       title: notification.title,
       body: notification.body,
       notificationDetails: NotificationDetails(
-        android: AndroidNotificationDetails(
-          _androidChannel.id,
-          _androidChannel.name,
-        ),
+        android: AndroidNotificationDetails(_channel.id, _channel.name),
         iOS: const DarwinNotificationDetails(),
       ),
       // `payload` tek bir string — antrenörün "Dersi onayla" push'una
@@ -150,7 +169,10 @@ class PushNotificationService {
     _navigateForData(container, data);
   }
 
-  void _navigateForData(ProviderContainer container, Map<String, dynamic> data) {
+  void _navigateForData(
+    ProviderContainer container,
+    Map<String, dynamic> data,
+  ) {
     final panelStack = container.read(panelStackControllerProvider.notifier);
     switch (data['type'] as String?) {
       case 'session_reminder':
@@ -165,6 +187,22 @@ class PushNotificationService {
         );
       case 'feedback_reminder':
         panelStack.push(const FeedbackPanel());
+      // "Yarın grup dersi/etkinlik var, katılmak ister misin?" daveti —
+      // bildirim metni "katılmak için dokun" diyor, dolayısıyla dokunuş
+      // doğrudan O DERSİN/ETKİNLİĞİN detayına götürüyor; katılım butonu
+      // zaten orada. Listeye düşürmek kullanıcıya aramayı bırakırdı.
+      case 'group_session_invite':
+        final groupSessionId = data['groupSessionId'] as String?;
+        if (groupSessionId != null) {
+          panelStack.push(
+            GroupSessionDetailPanel(groupSessionId: groupSessionId),
+          );
+        }
+      case 'event_invite':
+        final eventId = data['eventId'] as String?;
+        if (eventId != null) {
+          panelStack.push(EventDetailPanel(eventId: eventId));
+        }
       default:
         // manual_notification (salon duyurusu) ya da bilinmeyen bir tür —
         // ilgisiz bir onay ekranına zorlamak yerine uygulamayı sadece ön

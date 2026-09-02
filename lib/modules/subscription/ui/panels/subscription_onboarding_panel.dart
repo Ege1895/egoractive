@@ -54,6 +54,19 @@ class _SubscriptionOnboardingPanelState
   bool _isYearly(String productId) =>
       productId == gymYearlySubscriptionProductId;
 
+  /// Satın alma CTA'sındaki `{plan}` yer tutucusu için — mağazadan gelen ham
+  /// ürün başlığı ("Egoractive Business - Yıllık Plan" gibi, App Store
+  /// Connect'teki abonelik grup/plan adı) yerine sadece "Yıllık"/"Aylık"
+  /// kısa kelimesi kullanılır (bkz. `SubscriptionPanel._planWord` — aynı
+  /// düzeltme burada eksikti).
+  String _planWord(String productId) => ref.watch(
+    rcTextProvider(
+      _isYearly(productId)
+          ? RemoteConfigKeys.subscriptionYearlyPlanFallback
+          : RemoteConfigKeys.subscriptionMonthlyPlanFallback,
+    ),
+  );
+
   void _ensureSelection(List<SubscriptionProduct> products) {
     if (_selectedProductId != null &&
         products.any((p) => p.id == _selectedProductId)) {
@@ -255,11 +268,11 @@ class _SubscriptionOnboardingPanelState
                     RemoteConfigKeys.subscriptionOnboardingCtaPaidOnly,
                     locale,
                   ),
-                  {'plan': selected.title},
+                  {'plan': _planWord(selected.id)},
                 )
               : _fill(
                   rc.getText(RemoteConfigKeys.subscriptionOnboardingCta, locale),
-                  {'plan': selected.title, 'days': days},
+                  {'plan': _planWord(selected.id), 'days': days},
                 ),
           caption: subscription.trialUsed
               ? _fill(

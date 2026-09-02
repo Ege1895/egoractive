@@ -154,7 +154,7 @@ class _TrainerProfileDocForUidProviderElement
 }
 
 String _$trainerProfileControllerHash() =>
-    r'77dbbea6e85e4baea318e8ed4305906cbf0e8b09';
+    r'38ee84ed62bf09ea0e1acf3f4d9fcb0f697ffffb';
 
 /// [TrainerProfilePanel]'in üst kartındaki gerçek antrenör adı/uzmanlığı —
 /// önceden `TrainerMockData`'dan sabit ("Berk Aydın") değer geliyordu,
@@ -169,7 +169,7 @@ final trainerProfileControllerProvider =
         String name,
         String initials,
         String specialty,
-        String phoneDigits,
+        String phoneE164,
         String email,
       })
     >.internal(
@@ -188,7 +188,7 @@ typedef _$TrainerProfileController =
         String name,
         String initials,
         String specialty,
-        String phoneDigits,
+        String phoneE164,
         String email,
       })
     >;

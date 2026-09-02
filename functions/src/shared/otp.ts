@@ -3,6 +3,7 @@ import { randomBytes, randomInt, createHash } from "node:crypto";
 import { getFirestore, Timestamp } from "firebase-admin/firestore";
 
 import { otpRequestDoc } from "./firestore-paths";
+import { resolveUserLocale } from "./notification-locale";
 import { otpEmailHtml, otpEmailSubject } from "./otp-email-template";
 import { queueEmail } from "./mail";
 
@@ -58,10 +59,11 @@ export async function sendOtpToEmail(params: {
     lastSentAt: Timestamp.now(),
   });
 
+  const locale = await resolveUserLocale(params.uid);
   await queueEmail({
     to: params.email,
-    subject: otpEmailSubject(params.purpose, code),
-    html: otpEmailHtml(params.purpose, code, OTP_TTL_MS / 60_000),
+    subject: otpEmailSubject(params.purpose, code, locale),
+    html: otpEmailHtml(params.purpose, code, OTP_TTL_MS / 60_000, locale),
   });
 
   return { ok: true };

@@ -2,11 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/app_spacing.dart';
+import '../../../../core/constants/currency_constants.dart';
+import '../../../../core/money/active_gym_currency_provider.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
 import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/theme/theme_controller.dart';
+import '../../../../shared/utils/date_labels.dart';
 import '../../../../shared/widgets/app_back_button.dart';
 import '../../controller/dashboard_report_controller.dart';
 import '../../controller/report_snapshot_controller.dart';
@@ -121,7 +124,7 @@ class _AdminDashboardPanelState extends BasePanelState<AdminDashboardPanel> {
                       ),
                       children: [
                         Text(
-                          report.monthLabel,
+                          _monthSummaryLabel(ref, report.month),
                           style: typography.bodyMedium.copyWith(
                             color: colors.onSurfaceMuted,
                             fontSize: 13,
@@ -169,7 +172,14 @@ class _AdminDashboardPanelState extends BasePanelState<AdminDashboardPanel> {
                           ],
                         ),
                         const SizedBox(height: AppSpacing.lg),
-                        ReportFinanceSummaryCard(report: report),
+                        ReportFinanceSummaryCard(
+                          report: report,
+                          currency:
+                              ref
+                                  .watch(activeGymCurrencyProvider)
+                                  .valueOrNull ??
+                              defaultCurrencyCode,
+                        ),
                         const SizedBox(height: AppSpacing.lg),
                         Text(
                           ref.watch(
@@ -475,4 +485,15 @@ class _PastReportListTile extends ConsumerWidget {
       ),
     );
   }
+}
+
+/// Canlı dashboard'ın "{ay} özeti" başlığı — ay adı ve şablon Remote
+/// Config'ten, aktif dile göre. Snapshot yolunda ay bilgisi sunucudan hazır
+/// metin olarak geldiği için burada boş dönülür.
+String _monthSummaryLabel(WidgetRef ref, DateTime? month) {
+  if (month == null) return '';
+  final monthName = ref.watch(dateLabelsProvider).monthYear(month);
+  return ref
+      .watch(rcTextProvider(RemoteConfigKeys.commonMonthSummaryTemplate))
+      .replaceAll('{month}', monthName);
 }

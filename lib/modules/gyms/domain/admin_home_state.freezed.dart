@@ -197,7 +197,7 @@ abstract class _TrainerPerformance implements TrainerPerformance {
 
 /// @nodoc
 mixin _$AdminHomeState {
-  String get monthLabel => throw _privateConstructorUsedError;
+  DateTime? get month => throw _privateConstructorUsedError;
   int get totalSessions => throw _privateConstructorUsedError;
   int get completedSessions => throw _privateConstructorUsedError;
   int get cancelledSessions => throw _privateConstructorUsedError;
@@ -224,7 +224,7 @@ abstract class $AdminHomeStateCopyWith<$Res> {
   ) = _$AdminHomeStateCopyWithImpl<$Res, AdminHomeState>;
   @useResult
   $Res call({
-    String monthLabel,
+    DateTime? month,
     int totalSessions,
     int completedSessions,
     int cancelledSessions,
@@ -252,7 +252,7 @@ class _$AdminHomeStateCopyWithImpl<$Res, $Val extends AdminHomeState>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? monthLabel = null,
+    Object? month = freezed,
     Object? totalSessions = null,
     Object? completedSessions = null,
     Object? cancelledSessions = null,
@@ -265,10 +265,10 @@ class _$AdminHomeStateCopyWithImpl<$Res, $Val extends AdminHomeState>
   }) {
     return _then(
       _value.copyWith(
-            monthLabel: null == monthLabel
-                ? _value.monthLabel
-                : monthLabel // ignore: cast_nullable_to_non_nullable
-                      as String,
+            month: freezed == month
+                ? _value.month
+                : month // ignore: cast_nullable_to_non_nullable
+                      as DateTime?,
             totalSessions: null == totalSessions
                 ? _value.totalSessions
                 : totalSessions // ignore: cast_nullable_to_non_nullable
@@ -321,7 +321,7 @@ abstract class _$$AdminHomeStateImplCopyWith<$Res>
   @override
   @useResult
   $Res call({
-    String monthLabel,
+    DateTime? month,
     int totalSessions,
     int completedSessions,
     int cancelledSessions,
@@ -348,7 +348,7 @@ class __$$AdminHomeStateImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? monthLabel = null,
+    Object? month = freezed,
     Object? totalSessions = null,
     Object? completedSessions = null,
     Object? cancelledSessions = null,
@@ -361,10 +361,10 @@ class __$$AdminHomeStateImplCopyWithImpl<$Res>
   }) {
     return _then(
       _$AdminHomeStateImpl(
-        monthLabel: null == monthLabel
-            ? _value.monthLabel
-            : monthLabel // ignore: cast_nullable_to_non_nullable
-                  as String,
+        month: freezed == month
+            ? _value.month
+            : month // ignore: cast_nullable_to_non_nullable
+                  as DateTime?,
         totalSessions: null == totalSessions
             ? _value.totalSessions
             : totalSessions // ignore: cast_nullable_to_non_nullable
@@ -410,7 +410,7 @@ class __$$AdminHomeStateImplCopyWithImpl<$Res>
 
 class _$AdminHomeStateImpl extends _AdminHomeState {
   const _$AdminHomeStateImpl({
-    required this.monthLabel,
+    required this.month,
     required this.totalSessions,
     required this.completedSessions,
     required this.cancelledSessions,
@@ -424,7 +424,7 @@ class _$AdminHomeStateImpl extends _AdminHomeState {
        super._();
 
   @override
-  final String monthLabel;
+  final DateTime? month;
   @override
   final int totalSessions;
   @override
@@ -453,7 +453,7 @@ class _$AdminHomeStateImpl extends _AdminHomeState {
 
   @override
   String toString() {
-    return 'AdminHomeState(monthLabel: $monthLabel, totalSessions: $totalSessions, completedSessions: $completedSessions, cancelledSessions: $cancelledSessions, estimatedRevenueTl: $estimatedRevenueTl, expensesTl: $expensesTl, trainerPerformance: $trainerPerformance, duePaymentMemberCount: $duePaymentMemberCount, duePaymentTotalTl: $duePaymentTotalTl, feedbackCount: $feedbackCount)';
+    return 'AdminHomeState(month: $month, totalSessions: $totalSessions, completedSessions: $completedSessions, cancelledSessions: $cancelledSessions, estimatedRevenueTl: $estimatedRevenueTl, expensesTl: $expensesTl, trainerPerformance: $trainerPerformance, duePaymentMemberCount: $duePaymentMemberCount, duePaymentTotalTl: $duePaymentTotalTl, feedbackCount: $feedbackCount)';
   }
 
   @override
@@ -461,8 +461,7 @@ class _$AdminHomeStateImpl extends _AdminHomeState {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$AdminHomeStateImpl &&
-            (identical(other.monthLabel, monthLabel) ||
-                other.monthLabel == monthLabel) &&
+            (identical(other.month, month) || other.month == month) &&
             (identical(other.totalSessions, totalSessions) ||
                 other.totalSessions == totalSessions) &&
             (identical(other.completedSessions, completedSessions) ||
@@ -488,7 +487,7 @@ class _$AdminHomeStateImpl extends _AdminHomeState {
   @override
   int get hashCode => Object.hash(
     runtimeType,
-    monthLabel,
+    month,
     totalSessions,
     completedSessions,
     cancelledSessions,
@@ -514,7 +513,7 @@ class _$AdminHomeStateImpl extends _AdminHomeState {
 
 abstract class _AdminHomeState extends AdminHomeState {
   const factory _AdminHomeState({
-    required final String monthLabel,
+    required final DateTime? month,
     required final int totalSessions,
     required final int completedSessions,
     required final int cancelledSessions,
@@ -528,7 +527,7 @@ abstract class _AdminHomeState extends AdminHomeState {
   const _AdminHomeState._() : super._();
 
   @override
-  String get monthLabel;
+  DateTime? get month;
   @override
   int get totalSessions;
   @override

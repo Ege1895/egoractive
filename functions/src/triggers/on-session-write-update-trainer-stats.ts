@@ -102,6 +102,33 @@ export function computeBucketDeltas(
 }
 
 /**
+ * Bir kova + delta için Firestore'a yazılacak payload'ı üretir — saf,
+ * test edilebilir.
+ *
+ * 🔴 İÇ İÇE MAP kullanılıyor, NOKTALI ANAHTAR DEĞİL. Bu, sessiz bir veri
+ * bozulmasına yol açan gerçek bir hataydı (2026-09-02): önceden
+ * `{ [`stats.${trainerId}.total`]: increment(1) }` şeklinde yazılıyordu ve
+ * `set()` çağrılıyordu. **`set()` noktalı anahtarları alan YOLU olarak
+ * DEĞİL, LİTERAL alan adı olarak yazar** — nokta notasyonunu yalnızca
+ * `update()` yorumlar. Sonuç: doküman `stats` haritası yerine
+ * `"stats.45lhq….total"` adında düz bir alan taşıyordu; client
+ * `data['stats']`'ı okuduğu için ana ekranda "Henüz antrenör yok" görünüyordu.
+ * (`update()`'e geçmek de çözüm değil — doküman ilk kez oluşurken
+ * `update()` "not found" ile patlar, `set(..., {merge:true})` ise oluşturur.)
+ */
+export function buildStatsPayload(
+  bucket: TrainerStatsBucket,
+  delta: BucketDelta,
+): Record<string, unknown> | null {
+  const trainer: Record<string, FirebaseFirestore.FieldValue | string> = {};
+  if (delta.total !== 0) trainer.total = FieldValue.increment(delta.total);
+  if (delta.completed !== 0) trainer.completed = FieldValue.increment(delta.completed);
+  if (delta.writeName && bucket.trainerName) trainer.name = bucket.trainerName;
+  if (Object.keys(trainer).length === 0) return null;
+  return { stats: { [bucket.trainerId]: trainer } };
+}
+
+/**
  * F5-1/F7-2 — dashboard'daki antrenör performans dökümü önceden antrenör
  * başına 2 `count()` aggregate sorgusu yapıyordu (N antrenörde 2N
  * round-trip; 20 antrenörlü bir salonda yük testinde ~5sn ölçüldü, bkz.
@@ -133,20 +160,11 @@ export const onSessionWriteUpdateTrainerStats = onDocumentWritten(
     const firestore = getFirestore();
     await Promise.all(
       writes.map(({ bucket, delta }) => {
-        const update: Record<string, FirebaseFirestore.FieldValue | string> = {};
-        if (delta.total !== 0) {
-          update[`stats.${bucket.trainerId}.total`] = FieldValue.increment(delta.total);
-        }
-        if (delta.completed !== 0) {
-          update[`stats.${bucket.trainerId}.completed`] = FieldValue.increment(delta.completed);
-        }
-        if (delta.writeName && bucket.trainerName) {
-          update[`stats.${bucket.trainerId}.name`] = bucket.trainerName;
-        }
-        if (Object.keys(update).length === 0) return Promise.resolve();
+        const payload = buildStatsPayload(bucket, delta);
+        if (payload === null) return Promise.resolve();
         return firestore
           .doc(monthlyTrainerStatsDoc(bucket.gymId, bucket.yearMonth))
-          .set(update, { merge: true });
+          .set(payload, { merge: true });
       }),
     );
   }),

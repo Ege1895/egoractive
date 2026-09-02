@@ -2,9 +2,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/router/app_router.dart';
-import '../../../shared/utils/tr_date_formatter.dart';
 import '../domain/trainer_report_state.dart';
 import '../repository/trainer_report_repository.dart';
+import '../../../shared/utils/date_labels.dart';
+import '../../../core/remote_config/remote_config_service.dart';
 
 part 'trainer_report_controller.g.dart';
 
@@ -42,6 +43,7 @@ Future<TrainerReportState> reportForTrainer(
   ReportForTrainerRef ref,
   String trainerId,
 ) async {
+  final labels = ref.watch(dateLabelsProvider);
   final period = ref.watch(_trainerReportPeriodProvider);
   final customStart = ref.watch(_trainerReportCustomStartProvider);
   final customEnd = ref.watch(_trainerReportCustomEndProvider);
@@ -133,29 +135,35 @@ Future<TrainerReportState> reportForTrainer(
   }
 
   return TrainerReportState(
-    startDate: formatTrDate(start),
-    endDate: formatTrDate(end),
+    startDate: labels.dayMonthYear(start),
+    endDate: labels.dayMonthYear(end),
     period: period,
     periodStart: start,
     periodEnd: end,
     gymJoinedAt: gymJoinedAt,
     breakdown: [
       TrainerReportBreakdown(
-        title: 'Toplam seanslar',
+        title: ref.read(
+          rcTextProvider(RemoteConfigKeys.trainersReportBreakdownTotal),
+        ),
         total: soloTotal + duetTotalGroups.length,
         solo: soloTotal,
         group: 0,
         duet: duetTotalGroups.length,
       ),
       TrainerReportBreakdown(
-        title: 'Tamamlanan seanslar',
+        title: ref.read(
+          rcTextProvider(RemoteConfigKeys.trainersReportBreakdownCompleted),
+        ),
         total: soloCompleted + duetCompletedGroups.length,
         solo: soloCompleted,
         group: 0,
         duet: duetCompletedGroups.length,
       ),
       TrainerReportBreakdown(
-        title: 'İptal edilen seanslar',
+        title: ref.read(
+          rcTextProvider(RemoteConfigKeys.trainersReportBreakdownCancelled),
+        ),
         total: soloCancelled + duetCancelledGroups.length,
         solo: soloCancelled,
         group: 0,
@@ -198,32 +206,39 @@ class TrainerReportController extends _$TrainerReportController {
   }
 
   TrainerReportState _loadingState() {
+    final labels = ref.read(dateLabelsProvider);
     final now = DateTime.now();
     final start = DateTime(now.year, now.month - 1, now.day);
     return TrainerReportState(
-      startDate: formatTrDate(start),
-      endDate: formatTrDate(now),
+      startDate: labels.dayMonthYear(start),
+      endDate: labels.dayMonthYear(now),
       period: TrainerReportPeriod.monthly,
       periodStart: start,
       periodEnd: now,
       gymJoinedAt: _defaultGymJoinedAt,
-      breakdown: const [
+      breakdown: [
         TrainerReportBreakdown(
-          title: 'Toplam seanslar',
+          title: ref.read(
+            rcTextProvider(RemoteConfigKeys.trainersReportBreakdownTotal),
+          ),
           total: 0,
           solo: 0,
           group: 0,
           duet: 0,
         ),
         TrainerReportBreakdown(
-          title: 'Tamamlanan seanslar',
+          title: ref.read(
+            rcTextProvider(RemoteConfigKeys.trainersReportBreakdownCompleted),
+          ),
           total: 0,
           solo: 0,
           group: 0,
           duet: 0,
         ),
         TrainerReportBreakdown(
-          title: 'İptal edilen seanslar',
+          title: ref.read(
+            rcTextProvider(RemoteConfigKeys.trainersReportBreakdownCancelled),
+          ),
           total: 0,
           solo: 0,
           group: 0,

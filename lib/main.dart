@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:phone_form_field/phone_form_field.dart';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -17,6 +18,7 @@ import 'core/locale/locale_prefs.dart';
 import 'core/onboarding/onboarding_prefs.dart';
 import 'core/panels/panel_stack_controller.dart';
 import 'core/panels/panel_stack_view.dart';
+import 'core/perf/perf_trace.dart';
 import 'core/remote_config/remote_config_service.dart';
 import 'core/router/app_access.dart';
 import 'core/router/app_router.dart';
@@ -30,6 +32,7 @@ import 'modules/auth/ui/panels/phone_login_panel.dart';
 import 'modules/auth/ui/panels/splash_panel.dart';
 import 'modules/notifications/service/push_notification_service.dart';
 import 'modules/subscription/ui/panels/subscription_onboarding_panel.dart';
+import 'shared/widgets/app_phone_field_prefs.dart';
 
 /// Widget ağacı dışından (bildirim servisi gibi) `PanelStackController`'a
 /// erişebilmek için paylaşılan container — `UncontrolledProviderScope` bunu
@@ -37,21 +40,70 @@ import 'modules/subscription/ui/panels/subscription_onboarding_panel.dart';
 final _providerContainer = ProviderContainer();
 
 void main() async {
+  // F10-1/F10-2 — açılış zincirinin her adımı ayrı ölçülüyor. `runApp()`
+  // öncesinde SADECE ağa çıkmayan, ilk kare için gerçekten gerekli olan
+  // adımlar var; ağa çıkan her şey `_initInBackground()`'a taşındı.
+  PerfTrace.startApp();
   WidgetsFlutterBinding.ensureInitialized();
+  PerfTrace.begin('firebase_init');
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  await const RemoteConfigService().init();
-  await LocalePrefs.init();
-  await OnboardingPrefs.init();
+  PerfTrace.end('firebase_init');
+  // F10-2 — bu üçü de SharedPreferences (yerel disk, ağ yok) ve ilk kare
+  // çizilmeden hazır olmaları gerekiyor (dil seçimi, onboarding durumu,
+  // son seçilen ülke kodu). Ardışık yerine paralel bekleniyor.
+  PerfTrace.begin('prefs_init');
+  await Future.wait([
+    LocalePrefs.init(),
+    OnboardingPrefs.init(),
+    AppPhoneFieldPrefs.init(),
+  ]);
+  PerfTrace.end('prefs_init');
+  // F10-2 — SADECE varsayılanlar (ağa çıkmaz, ~ms). Asıl fetch runApp'ten
+  // sonra, arka planda; bkz. `RemoteConfigService.fetchInBackground`.
+  PerfTrace.begin('remote_config_defaults');
+  await const RemoteConfigService().applyDefaults();
+  PerfTrace.end('remote_config_defaults');
   unawaited(MobileAds.instance.initialize());
   if (debugTestDeviceIds.isNotEmpty) {
     MobileAds.instance.updateRequestConfiguration(
       RequestConfiguration(testDeviceIds: debugTestDeviceIds),
     );
   }
+  // Sadece bir handler kaydı (ağ yok) — arka plan bildirimlerinin
+  // yakalanabilmesi için isolate ayağa kalkmadan önce kurulmuş olmalı,
+  // bu yüzden `runApp()` öncesinde kalıyor.
   FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
-  // Push bildirim kurulumu opsiyonel bir iyileştirme — burada oluşacak
-  // herhangi bir hata (izin reddi, APNS gecikmesi vb.) runApp() çağrısını
-  // asla engellememeli, yoksa uygulama açılışta beyaz ekranda takılı kalır.
+  runApp(
+    UncontrolledProviderScope(
+      container: _providerContainer,
+      child: const EgoractiveApp(),
+    ),
+  );
+  // Bu geri çağırma ilk kare GERÇEKTEN çizildikten sonra tetiklenir —
+  // "uygulama açılış → ilk kare" hedefinin (F10-2: < 1,5 sn) ölçümü.
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    PerfTrace.sinceAppStart('İLK KARE');
+  });
+  // F10-2 — buradan aşağısı ilk kareyi BEKLETMEZ. Üçü de ağa çıkıyor
+  // (RC fetch 255 KB, FCM token kaydı + Firestore yazması, deep link
+  // kanalı) ve hiçbiri ilk karenin çizilmesi için gerekli değil.
+  unawaited(_initInBackground());
+}
+
+/// `runApp()` sonrasında, kullanıcı zaten giriş ekranını görürken çalışan
+/// kurulum adımları. Her biri kendi `try/catch`'iyle sarılı — burada
+/// oluşacak bir hata `unawaited` olduğu için yakalanmazsa uygulamayı
+/// çökertebilirdi.
+Future<void> _initInBackground() async {
+  PerfTrace.begin('bg_remote_config_fetch');
+  try {
+    await const RemoteConfigService().fetchInBackground();
+  } on Exception catch (error) {
+    debugPrint('Remote Config arka plan fetch başarısız: $error');
+  }
+  PerfTrace.end('bg_remote_config_fetch');
+
+  PerfTrace.begin('bg_push_init');
   try {
     await PushNotificationService().init(_providerContainer);
   } on Exception catch (error) {
@@ -59,6 +111,9 @@ void main() async {
       'Push bildirim kurulumu başarısız oldu, uygulama yine de açılıyor: $error',
     );
   }
+  PerfTrace.end('bg_push_init');
+
+  PerfTrace.begin('bg_deeplink_init');
   try {
     await AppDeepLinkService().init(_providerContainer);
   } on Exception catch (error) {
@@ -66,12 +121,7 @@ void main() async {
       'Deep link kurulumu başarısız oldu, uygulama yine de açılıyor: $error',
     );
   }
-  runApp(
-    UncontrolledProviderScope(
-      container: _providerContainer,
-      child: const EgoractiveApp(),
-    ),
-  );
+  PerfTrace.end('bg_deeplink_init');
 }
 
 class EgoractiveApp extends ConsumerWidget {
@@ -96,6 +146,7 @@ class EgoractiveApp extends ConsumerWidget {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
         FlutterQuillLocalizations.delegate,
+        ...PhoneFieldLocalization.delegates,
       ],
       home: const _AppRoot(),
     );

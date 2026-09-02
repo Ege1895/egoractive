@@ -3,12 +3,9 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../domain/send_notification_exception.dart';
 import '../domain/send_notification_form.dart';
 import '../service/send_notification_service.dart';
+import '../../../core/remote_config/remote_config_service.dart';
 
 part 'send_notification_controller.g.dart';
-
-const _rateLimitedMessage =
-    'Saatlik bildirim gönderme limitine ulaştın, biraz sonra tekrar dene.';
-const _genericErrorMessage = 'Bildirim gönderilemedi, tekrar dener misin?';
 
 /// F6-4 — `sendManualNotification` Cloud Function'ını çağırır.
 @riverpod
@@ -43,7 +40,11 @@ class SendNotificationController extends _$SendNotificationController {
     }
     if (state.targetType == NotificationTargetType.selectedMembers &&
         state.targetMembers.isEmpty) {
-      state = state.copyWith(errorMessage: 'Önce en az bir üye seç.');
+      state = state.copyWith(
+        errorMessage: ref.read(
+          rcTextProvider(RemoteConfigKeys.notificationsSelectMemberError),
+        ),
+      );
       return;
     }
 
@@ -62,8 +63,12 @@ class SendNotificationController extends _$SendNotificationController {
       state = state.copyWith(
         isSending: false,
         errorMessage: e.reason == SendNotificationErrorReason.rateLimited
-            ? _rateLimitedMessage
-            : _genericErrorMessage,
+            ? ref.read(
+                rcTextProvider(RemoteConfigKeys.notificationsHourlyLimitError),
+              )
+            : ref.read(
+                rcTextProvider(RemoteConfigKeys.notificationsSendGenericError),
+              ),
       );
     }
   }

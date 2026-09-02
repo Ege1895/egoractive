@@ -363,6 +363,7 @@ mixin _$ReportSnapshot {
   List<ReportPackageSale> get packages => throw _privateConstructorUsedError;
   ReportOccupancy get groupSessions => throw _privateConstructorUsedError;
   ReportOccupancy get events => throw _privateConstructorUsedError;
+  String get currency => throw _privateConstructorUsedError;
 
   /// Create a copy of ReportSnapshot
   /// with the given fields replaced by the non-null parameter values.
@@ -387,6 +388,7 @@ abstract class $ReportSnapshotCopyWith<$Res> {
     List<ReportPackageSale> packages,
     ReportOccupancy groupSessions,
     ReportOccupancy events,
+    String currency,
   });
 
   $DashboardReportCopyWith<$Res> get report;
@@ -417,6 +419,7 @@ class _$ReportSnapshotCopyWithImpl<$Res, $Val extends ReportSnapshot>
     Object? packages = null,
     Object? groupSessions = null,
     Object? events = null,
+    Object? currency = null,
   }) {
     return _then(
       _value.copyWith(
@@ -452,6 +455,10 @@ class _$ReportSnapshotCopyWithImpl<$Res, $Val extends ReportSnapshot>
                 ? _value.events
                 : events // ignore: cast_nullable_to_non_nullable
                       as ReportOccupancy,
+            currency: null == currency
+                ? _value.currency
+                : currency // ignore: cast_nullable_to_non_nullable
+                      as String,
           )
           as $Val,
     );
@@ -506,6 +513,7 @@ abstract class _$$ReportSnapshotImplCopyWith<$Res>
     List<ReportPackageSale> packages,
     ReportOccupancy groupSessions,
     ReportOccupancy events,
+    String currency,
   });
 
   @override
@@ -538,6 +546,7 @@ class __$$ReportSnapshotImplCopyWithImpl<$Res>
     Object? packages = null,
     Object? groupSessions = null,
     Object? events = null,
+    Object? currency = null,
   }) {
     return _then(
       _$ReportSnapshotImpl(
@@ -573,6 +582,10 @@ class __$$ReportSnapshotImplCopyWithImpl<$Res>
             ? _value.events
             : events // ignore: cast_nullable_to_non_nullable
                   as ReportOccupancy,
+        currency: null == currency
+            ? _value.currency
+            : currency // ignore: cast_nullable_to_non_nullable
+                  as String,
       ),
     );
   }
@@ -590,6 +603,7 @@ class _$ReportSnapshotImpl implements _ReportSnapshot {
     required final List<ReportPackageSale> packages,
     required this.groupSessions,
     required this.events,
+    required this.currency,
   }) : _packages = packages;
 
   @override
@@ -614,10 +628,12 @@ class _$ReportSnapshotImpl implements _ReportSnapshot {
   final ReportOccupancy groupSessions;
   @override
   final ReportOccupancy events;
+  @override
+  final String currency;
 
   @override
   String toString() {
-    return 'ReportSnapshot(id: $id, period: $period, periodStart: $periodStart, periodEnd: $periodEnd, report: $report, packages: $packages, groupSessions: $groupSessions, events: $events)';
+    return 'ReportSnapshot(id: $id, period: $period, periodStart: $periodStart, periodEnd: $periodEnd, report: $report, packages: $packages, groupSessions: $groupSessions, events: $events, currency: $currency)';
   }
 
   @override
@@ -635,7 +651,9 @@ class _$ReportSnapshotImpl implements _ReportSnapshot {
             const DeepCollectionEquality().equals(other._packages, _packages) &&
             (identical(other.groupSessions, groupSessions) ||
                 other.groupSessions == groupSessions) &&
-            (identical(other.events, events) || other.events == events));
+            (identical(other.events, events) || other.events == events) &&
+            (identical(other.currency, currency) ||
+                other.currency == currency));
   }
 
   @override
@@ -649,6 +667,7 @@ class _$ReportSnapshotImpl implements _ReportSnapshot {
     const DeepCollectionEquality().hash(_packages),
     groupSessions,
     events,
+    currency,
   );
 
   /// Create a copy of ReportSnapshot
@@ -673,6 +692,7 @@ abstract class _ReportSnapshot implements ReportSnapshot {
     required final List<ReportPackageSale> packages,
     required final ReportOccupancy groupSessions,
     required final ReportOccupancy events,
+    required final String currency,
   }) = _$ReportSnapshotImpl;
 
   @override
@@ -691,6 +711,8 @@ abstract class _ReportSnapshot implements ReportSnapshot {
   ReportOccupancy get groupSessions;
   @override
   ReportOccupancy get events;
+  @override
+  String get currency;
 
   /// Create a copy of ReportSnapshot
   /// with the given fields replaced by the non-null parameter values.

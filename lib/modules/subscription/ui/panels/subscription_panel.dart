@@ -14,49 +14,7 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_back_button.dart';
 import '../../controller/subscription_controller.dart';
 import '../../domain/subscription_state.dart';
-
-const _monthNamesShortTr = {
-  1: 'Oca',
-  2: 'Şub',
-  3: 'Mar',
-  4: 'Nis',
-  5: 'May',
-  6: 'Haz',
-  7: 'Tem',
-  8: 'Ağu',
-  9: 'Eyl',
-  10: 'Eki',
-  11: 'Kas',
-  12: 'Ara',
-};
-const _monthNamesLongTr = {
-  1: 'Ocak',
-  2: 'Şubat',
-  3: 'Mart',
-  4: 'Nisan',
-  5: 'Mayıs',
-  6: 'Haziran',
-  7: 'Temmuz',
-  8: 'Ağustos',
-  9: 'Eylül',
-  10: 'Ekim',
-  11: 'Kasım',
-  12: 'Aralık',
-};
-const _monthNamesShortEn = {
-  1: 'Jan',
-  2: 'Feb',
-  3: 'Mar',
-  4: 'Apr',
-  5: 'May',
-  6: 'Jun',
-  7: 'Jul',
-  8: 'Aug',
-  9: 'Sep',
-  10: 'Oct',
-  11: 'Nov',
-  12: 'Dec',
-};
+import '../../../../shared/utils/date_labels.dart';
 
 /// Mağazadan gerçek ücretsiz deneme süresi okunabildiyse (bkz.
 /// `SubscriptionProduct.trialDays`) onu gösterir — hardcode "aylık"/"2 ay
@@ -156,19 +114,13 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
     return result;
   }
 
-  String _dateLong(DateTime date, String locale) {
-    final months = locale == 'tr' ? _monthNamesLongTr : _monthNamesShortEn;
-    final month = months[date.month] ?? '';
-    return locale == 'tr' ? "${date.day} $month" : '$month ${date.day}';
-  }
+  // Ay adı ve gün/ay sırası artık `DateLabels` üzerinden RC'den geliyor —
+  // burada `locale == 'tr'` diye dallanan iki ayrı map tutulmuyor.
+  String _dateLong(DateTime date, DateLabels labels) =>
+      labels.dayMonthLong(date);
 
-  String _dateShort(DateTime date, String locale) {
-    final months = locale == 'tr' ? _monthNamesShortTr : _monthNamesShortEn;
-    final month = months[date.month] ?? '';
-    return locale == 'tr'
-        ? '${date.day} $month ${date.year}'
-        : '$month ${date.day}, ${date.year}';
-  }
+  String _dateShort(DateTime date, DateLabels labels) =>
+      labels.dayMonthYear(date);
 
   @override
   Widget build(BuildContext context) {
@@ -211,27 +163,23 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
               ),
             ),
             Expanded(
-              child: subscription.subscriptionExempt
-                  ? _exemptView(context, rc)
-                  : FutureBuilder<List<SubscriptionProduct>>(
-                      future: _productsFuture,
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return const Center(
-                            child: CircularProgressIndicator(),
-                          );
-                        }
-                        final products = snapshot.data ?? const [];
-                        _ensureSelection(products);
-                        return _buildForState(
-                          context,
-                          products,
-                          subscription,
-                          rc,
-                        );
-                      },
-                    ),
+              // Exempt salon da artık mağaza ürünlerini bekliyor: planı
+              // gerçek fiyat/deneme bilgisiyle göstermek için (önceden
+              // sadece "Yıllık" kelimesi yazıyordu).
+              child: FutureBuilder<List<SubscriptionProduct>>(
+                future: _productsFuture,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  final products = snapshot.data ?? const [];
+                  if (subscription.subscriptionExempt) {
+                    return _exemptView(context, rc, products);
+                  }
+                  _ensureSelection(products);
+                  return _buildForState(context, products, subscription, rc);
+                },
+              ),
             ),
           ],
         ),
@@ -264,13 +212,30 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
 
   /// `gyms/{gymId}.subscriptionExempt == true` — sadece Firebase
   /// Console/Admin SDK'dan elle set edilir (bkz. [SubscriptionState]).
-  /// Bu salonlar hiçbir zaman gerçek mağaza aboneliği almaz; ekran doğrudan
-  /// "mevcut plan: yıllık" görünümünü, satın alma/yönetim CTA'ları olmadan
-  /// gösterir.
-  Widget _exemptView(BuildContext context, RemoteConfigService rc) {
+  /// Ekran BİLEREK [_activeView]'in kart yapısını (rozet + başlık + tarih
+  /// kutuları) birebir kullanır ki bu gösterim, gerçekten abone bir salonun
+  /// ekranından görsel olarak ayırt edilemesin (ör. reklam amaçlı geçici
+  /// ücretsiz erişim verilen bir salonun panelinde) — AMA `gyms/{gymId}`'ye
+  /// asla gerçek bir abonelik yazılmıyor: tarih kutuları hep "—" gösterir,
+  /// fiyat satırı hiç yok, "Aboneliği yönet" (App Store'a giden) butonu da
+  /// yok, çünkü yönetilecek gerçek bir abonelik yok. Bu SADECE görsel bir
+  /// gösterim — `subscriptionExempt` `false`'a çekildiğinde `gyms/{gymId}`'de
+  /// hiçbir gerçek `subscriptionStatus`/`subscriptionProductId` olmadığı
+  /// için salon otomatik olarak (appAccess üzerinden) zorunlu abonelik
+  /// seçim ekranına düşer — tam istenen davranış.
+  Widget _exemptView(
+    BuildContext context,
+    RemoteConfigService rc,
+    List<SubscriptionProduct> products,
+  ) {
     final colors = context.appColors;
     final typography = context.appTypography;
     final locale = ref.watch(localeControllerProvider);
+    // Mağazadan gelen GERÇEK yıllık ürün — fiyat, açıklama ve deneme
+    // etiketiyle birlikte gösterilir. Mağaza henüz yanıt vermediyse ya da
+    // ürün bulunamadıysa (ör. store kurulumu tamamlanmamış) eski davranışa,
+    // yani sadece "Yıllık" kelimesine düşülür.
+    final yearlyProduct = products.where((p) => _isYearly(p.id)).firstOrNull;
     final planName = ref.watch(
       rcTextProvider(RemoteConfigKeys.subscriptionYearlyPlanFallback),
     );
@@ -291,55 +256,100 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
             borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
             border: Border.all(color: colors.primary.withValues(alpha: 0.32)),
           ),
-          child: Row(
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      rc.getText(
-                        RemoteConfigKeys.subscriptionActivePlanLabel,
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          rc.getText(
+                            RemoteConfigKeys.subscriptionActivePlanLabel,
+                            locale,
+                          ),
+                          style: typography.bodyMedium.copyWith(
+                            color: colors.secondary,
+                            fontSize: 13,
+                          ),
+                        ),
+                        const SizedBox(height: AppSpacing.xs),
+                        Text(
+                          yearlyProduct?.title ?? planName,
+                          style: typography.headingLarge.copyWith(
+                            color: colors.onSurface,
+                            fontSize: yearlyProduct == null ? 26 : 20,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  _Pill(
+                    label: rc.getText(
+                      RemoteConfigKeys.subscriptionActiveBadge,
+                      locale,
+                    ),
+                    bg: colors.success.withValues(alpha: 0.16),
+                    fg: colors.success,
+                  ),
+                ],
+              ),
+              const SizedBox(height: AppSpacing.md),
+              Row(
+                children: [
+                  Expanded(
+                    child: _DateChip(
+                      label: rc.getText(
+                        RemoteConfigKeys.subscriptionRenewalLabel,
                         locale,
                       ),
-                      style: typography.bodyMedium.copyWith(
-                        color: colors.secondary,
-                        fontSize: 13,
-                      ),
+                      value: '—',
                     ),
-                    const SizedBox(height: AppSpacing.xs),
-                    Text(
-                      planName,
-                      style: typography.headingLarge.copyWith(
-                        color: colors.onSurface,
-                        fontSize: 26,
+                  ),
+                  const SizedBox(width: AppSpacing.sm),
+                  Expanded(
+                    child: _DateChip(
+                      label: rc.getText(
+                        RemoteConfigKeys.subscriptionStartedLabel,
+                        locale,
                       ),
+                      value: '—',
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-              _Pill(
-                label: rc.getText(
-                  RemoteConfigKeys.subscriptionActiveBadge,
-                  locale,
+              const SizedBox(height: AppSpacing.md),
+              Text(
+                rc.getText(RemoteConfigKeys.subscriptionExemptNote, locale),
+                style: typography.bodyMedium.copyWith(
+                  color: colors.onSurfaceVariant,
+                  fontSize: 13,
                 ),
-                bg: colors.success.withValues(alpha: 0.16),
-                fg: colors.success,
               ),
             ],
           ),
         ),
+        // Mağazadan çekilen gerçek plan kartı — fiyat, "2 ay bedava" gibi
+        // deneme etiketi ve açıklama dahil. `showSelector: false`: bu bir
+        // seçenek değil, salonun sahip olduğu planın gösterimi (seçilecek
+        // bir şey yok, dokunulamaz).
+        if (yearlyProduct != null) ...[
+          const SizedBox(height: AppSpacing.lg),
+          _PlanCard(
+            product: yearlyProduct,
+            selected: true,
+            enabled: true,
+            showSelector: false,
+            onTap: null,
+            badge: rc.getText(RemoteConfigKeys.subscriptionYearlyBadge, locale),
+            subLabel: _planSubLabel(yearlyProduct, true, rc, locale),
+          ),
+        ],
         const SizedBox(height: AppSpacing.lg),
         _IncludedFeaturesCard(rc: rc, locale: locale),
-        const SizedBox(height: AppSpacing.lg),
-        Text(
-          rc.getText(RemoteConfigKeys.subscriptionExemptNote, locale),
-          style: typography.bodyMedium.copyWith(
-            color: colors.onSurfaceMuted,
-            fontSize: 13,
-          ),
-        ),
       ],
     );
   }
@@ -434,6 +444,7 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
     final colors = context.appColors;
     final typography = context.appTypography;
     final locale = ref.watch(localeControllerProvider);
+    final dateLabels = ref.watch(dateLabelsProvider);
     final productId = subscription.productId;
     final isYearly = productId != null && _isYearly(productId);
     final matchingProduct = products
@@ -538,7 +549,7 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
                       ),
                       value: subscription.expiresAt == null
                           ? '—'
-                          : _dateShort(subscription.expiresAt!, locale),
+                          : _dateShort(subscription.expiresAt!, dateLabels),
                     ),
                   ),
                   const SizedBox(width: AppSpacing.sm),
@@ -550,7 +561,7 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
                       ),
                       value: subscription.startedAt == null
                           ? '—'
-                          : _dateShort(subscription.startedAt!, locale),
+                          : _dateShort(subscription.startedAt!, dateLabels),
                     ),
                   ),
                 ],
@@ -632,6 +643,7 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
     final colors = context.appColors;
     final typography = context.appTypography;
     final locale = ref.watch(localeControllerProvider);
+    final dateLabels = ref.watch(dateLabelsProvider);
     final restricted = rc.subscriptionRestrictedOperations
         .map((raw) => (raw['label_$locale'] as String?) ?? '')
         .where((s) => s.isNotEmpty)
@@ -662,7 +674,7 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
                     RemoteConfigKeys.subscriptionExpiredBannerTitle,
                     locale,
                   ),
-                  {'date': _dateLong(subscription.expiresAt!, locale)},
+                  {'date': _dateLong(subscription.expiresAt!, dateLabels)},
                 ),
           titleColor: colors.error,
           body: rc.getText(
@@ -1102,6 +1114,7 @@ class _PlanCard extends StatelessWidget {
     required this.subLabel,
     required this.onTap,
     this.pendingLabel,
+    this.showSelector = true,
   });
 
   final SubscriptionProduct product;
@@ -1111,6 +1124,12 @@ class _PlanCard extends StatelessWidget {
   final String subLabel;
   final VoidCallback? onTap;
   final String? pendingLabel;
+
+  /// `false` ise seçim dairesi (radio) hiç çizilmez — kart bir SEÇENEK değil,
+  /// "sahip olunan plan"ın gösterimi olduğunda kullanılır (bkz.
+  /// `_exemptView`: ödeme yapmayacak salona planı olduğu gibi gösteriliyor,
+  /// ama seçilecek bir şey yok).
+  final bool showSelector;
 
   @override
   Widget build(BuildContext context) {
@@ -1143,34 +1162,36 @@ class _PlanCard extends StatelessWidget {
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.only(top: 3),
-                      child: Container(
-                        width: 22,
-                        height: 22,
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: selected
-                                ? colors.primary
-                                : colors.outlineStrong,
-                            width: 2,
+                    if (showSelector) ...[
+                      Padding(
+                        padding: const EdgeInsets.only(top: 3),
+                        child: Container(
+                          width: 22,
+                          height: 22,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: selected
+                                  ? colors.primary
+                                  : colors.outlineStrong,
+                              width: 2,
+                            ),
                           ),
+                          child: selected
+                              ? Container(
+                                  width: 10,
+                                  height: 10,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: colors.primary,
+                                  ),
+                                )
+                              : null,
                         ),
-                        child: selected
-                            ? Container(
-                                width: 10,
-                                height: 10,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: colors.primary,
-                                ),
-                              )
-                            : null,
                       ),
-                    ),
-                    const SizedBox(width: AppSpacing.md),
+                      const SizedBox(width: AppSpacing.md),
+                    ],
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,

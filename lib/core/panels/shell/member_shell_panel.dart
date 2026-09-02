@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../ads/ad_banner_widget.dart';
 import '../../ads/ad_interstitial_gate.dart';
 import '../../ads/home_return_signal.dart';
+import '../../remote_config/remote_config_service.dart';
 import '../base_panel.dart';
 import 'app_tab_shell.dart';
 import '../../../modules/auth/ui/panels/profile_panel.dart';
@@ -54,27 +55,31 @@ class _MemberShellPanelState extends BasePanelState<MemberShellPanel> {
     return [
       AppTabItem(
         icon: Icons.home_rounded,
-        label: 'Ana Sayfa',
+        label: ref.watch(rcTextProvider(RemoteConfigKeys.shellTabHome)),
         builder: (_) => const MemberHomePanel(),
       ),
       AppTabItem(
         icon: Icons.event_note_rounded,
-        label: 'Derslerim',
+        label: ref.watch(
+          rcTextProvider(RemoteConfigKeys.shellMemberTabDerslerim),
+        ),
         builder: (_) => const SessionsListPanel(),
       ),
       AppTabItem(
         icon: Icons.straighten_rounded,
-        label: 'Ölçümlerim',
+        label: ref.watch(
+          rcTextProvider(RemoteConfigKeys.shellMemberTabOlcumlerim),
+        ),
         builder: (_) => const MeasurementsPanel(),
       ),
       AppTabItem(
         icon: Icons.explore_rounded,
-        label: 'Keşfet',
+        label: ref.watch(rcTextProvider(RemoteConfigKeys.shellMemberTabKesfet)),
         builder: (_) => const DiscoverPanel(),
       ),
       AppTabItem(
         icon: Icons.person_rounded,
-        label: 'Profil',
+        label: ref.watch(rcTextProvider(RemoteConfigKeys.shellTabProfile)),
         builder: (_) => const ProfilePanel(),
       ),
     ];

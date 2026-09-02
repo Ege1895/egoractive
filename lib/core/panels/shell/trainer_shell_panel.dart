@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../remote_config/remote_config_service.dart';
 import '../base_panel.dart';
 import 'app_tab_shell.dart';
 import '../../../modules/group_sessions/ui/panels/discover_panel.dart';
@@ -30,27 +31,33 @@ class _TrainerShellPanelState extends BasePanelState<TrainerShellPanel> {
       items: [
         AppTabItem(
           icon: Icons.home_rounded,
-          label: 'Ana Sayfa',
+          label: ref.watch(rcTextProvider(RemoteConfigKeys.shellTabHome)),
           builder: (_) => const TrainerHomePanel(),
         ),
         AppTabItem(
           icon: Icons.calendar_month_rounded,
-          label: 'Takvimim',
+          label: ref.watch(
+            rcTextProvider(RemoteConfigKeys.shellTrainerTabTakvimim),
+          ),
           builder: (_) => const TrainerCalendarPanel(),
         ),
         AppTabItem(
           icon: Icons.groups_rounded,
-          label: 'Üyelerim',
+          label: ref.watch(
+            rcTextProvider(RemoteConfigKeys.shellTrainerTabUyelerim),
+          ),
           builder: (_) => const TrainerMembersListPanel(),
         ),
         AppTabItem(
           icon: Icons.explore_rounded,
-          label: 'Keşfet',
+          label: ref.watch(
+            rcTextProvider(RemoteConfigKeys.shellMemberTabKesfet),
+          ),
           builder: (_) => const DiscoverPanel(),
         ),
         AppTabItem(
           icon: Icons.person_rounded,
-          label: 'Profil',
+          label: ref.watch(rcTextProvider(RemoteConfigKeys.shellTabProfile)),
           builder: (_) => const TrainerProfilePanel(),
         ),
       ],

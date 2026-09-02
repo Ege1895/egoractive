@@ -3,6 +3,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/analytics/analytics_service.dart';
 import '../domain/feedback_state.dart';
 import '../repository/feedback_repository.dart';
+import '../../../core/remote_config/remote_config_service.dart';
 
 part 'feedback_controller.g.dart';
 
@@ -36,7 +37,9 @@ class FeedbackController extends _$FeedbackController {
     } catch (_) {
       state = state.copyWith(
         isSubmitting: false,
-        errorMessage: 'Gönderilemedi, tekrar dener misin?',
+        errorMessage: ref.read(
+          rcTextProvider(RemoteConfigKeys.feedbackSubmitError),
+        ),
       );
     }
   }

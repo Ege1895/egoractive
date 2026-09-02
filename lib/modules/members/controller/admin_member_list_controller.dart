@@ -58,13 +58,17 @@ class AdminMemberListController extends _$AdminMemberListController {
       } else {
         state = state.copyWith(
           isLoadingMore: false,
-          errorMessage: 'Daha fazla üye yüklenemedi, tekrar dene.',
+          errorMessage: ref.read(
+            rcTextProvider(RemoteConfigKeys.membersListLoadMoreError),
+          ),
         );
       }
     } catch (_) {
       state = state.copyWith(
         isLoadingMore: false,
-        errorMessage: 'Daha fazla üye yüklenemedi, tekrar dene.',
+        errorMessage: ref.read(
+          rcTextProvider(RemoteConfigKeys.membersListLoadMoreError),
+        ),
       );
     }
   }
@@ -94,13 +98,17 @@ class AdminMemberListController extends _$AdminMemberListController {
       } else {
         state = state.copyWith(
           isSearching: false,
-          errorMessage: 'Arama yapılamadı, tekrar dene.',
+          errorMessage: ref.read(
+            rcTextProvider(RemoteConfigKeys.membersListSearchError),
+          ),
         );
       }
     } catch (_) {
       state = state.copyWith(
         isSearching: false,
-        errorMessage: 'Arama yapılamadı, tekrar dene.',
+        errorMessage: ref.read(
+          rcTextProvider(RemoteConfigKeys.membersListSearchError),
+        ),
       );
     }
   }
@@ -144,13 +152,17 @@ class AdminMemberListController extends _$AdminMemberListController {
       } else {
         state = state.copyWith(
           isLoading: false,
-          errorMessage: 'Üye listesi yüklenemedi, tekrar dene.',
+          errorMessage: ref.read(
+            rcTextProvider(RemoteConfigKeys.membersListLoadError),
+          ),
         );
       }
     } catch (_) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage: 'Üye listesi yüklenemedi, tekrar dene.',
+        errorMessage: ref.read(
+          rcTextProvider(RemoteConfigKeys.membersListLoadError),
+        ),
       );
     }
   }

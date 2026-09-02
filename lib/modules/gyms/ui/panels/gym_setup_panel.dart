@@ -2,15 +2,18 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:phone_form_field/phone_form_field.dart';
 
 import '../../../../core/constants/app_spacing.dart';
+import '../../../../core/locale/locale_controller.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
 import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../../../shared/utils/phone_number_formatter.dart';
 import '../../../../shared/widgets/app_back_button.dart';
 import '../../../../shared/widgets/app_button.dart';
+import '../../../../shared/widgets/app_currency_field.dart';
+import '../../../../shared/widgets/app_phone_field.dart';
 import '../../../../shared/widgets/app_text_field.dart';
 import '../../../auth/ui/panels/phone_login_panel.dart';
 import '../../controller/create_gym_controller.dart';
@@ -29,9 +32,8 @@ class GymSetupPanel extends BasePanel {
 class _GymSetupPanelState extends BasePanelState<GymSetupPanel> {
   late final TextEditingController _nameController;
   late final TextEditingController _cityController;
-  late final TextEditingController _phoneController;
+  late final PhoneController _phoneController;
   late final TextEditingController _addressController;
-  late final TextEditingController _emailController;
   final _phoneFieldKey = GlobalKey();
 
   @override
@@ -45,13 +47,8 @@ class _GymSetupPanelState extends BasePanelState<GymSetupPanel> {
     // state ataması olduğu için build fazının bitmesini (post-frame) bekler.
     _nameController = TextEditingController();
     _cityController = TextEditingController();
-    _phoneController = TextEditingController();
+    _phoneController = PhoneController(initialValue: initialPhoneNumber());
     _addressController = TextEditingController();
-    // Egoractive Authentication Sistemi §9 — "Login ve rapor e-postası",
-    // GymProfile'a dahil değil (o model sadece zorunlu iletişim alanlarını
-    // tutuyor); bu yüzden diğerlerinin aksine bir provider'a senkronize
-    // edilmiyor, submit anında doğrudan okunuyor.
-    _emailController = TextEditingController();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       ref.read(gymProfileControllerProvider.notifier).reset();
@@ -63,21 +60,23 @@ class _GymSetupPanelState extends BasePanelState<GymSetupPanel> {
   Widget build(BuildContext context) {
     final colors = context.appColors;
     final typography = context.appTypography;
+    // `GymProfileController` autoDispose'dur ve bu ekranda SADECE `.notifier`
+    // üzerinden `ref.read` ile yazılıyordu — hiçbir yerde `ref.watch`
+    // edilmediği için provider'ı canlı tutan bir dinleyici yoktu. Sonuç:
+    // Firestore'a bağlı `GymInfoPanel` gibi bu provider'ı `ref.watch` eden
+    // başka bir panel panel stack'te canlı DEĞİLSE (tam da bu ekranın kendi
+    // akışı — hesap açılışında ilk salon kurulumu), her `ref.read` arasında
+    // provider disposed olup yeniden `build()`'a düşüyor, yazılan
+    // ad/şehir/adres/telefon sessizce kayboluyordu — kullanıcı alanları dolu
+    // görse bile submit "gerekli" hatalarını gösterip duruyordu (gerçek
+    // rapor edilen hata). `ref.watch` burada provider'ı bu panelin ömrü
+    // boyunca canlı tutuyor (bkz. `gym_info_panel.dart`'taki aynı desen).
+    ref.watch(gymProfileControllerProvider);
     final profileController = ref.read(gymProfileControllerProvider.notifier);
     final themeState = ref.watch(gymThemeControllerProvider);
     final themeController = ref.read(gymThemeControllerProvider.notifier);
     final createGymState = ref.watch(createGymControllerProvider);
     final createGymController = ref.read(createGymControllerProvider.notifier);
-    final profile = ref.watch(gymProfileControllerProvider);
-
-    final formattedPhone = formatTrPhoneDigits(profile.phone);
-    if (_phoneController.text != formattedPhone) {
-      _phoneController.value = TextEditingValue(
-        text: formattedPhone,
-        selection: TextSelection.collapsed(offset: formattedPhone.length),
-      );
-    }
-
     // "Bu numarayla kayıtlı bir hesap zaten var" gibi telefon hatası
     // ListView'de scroll'un altında kalabiliyordu — kullanıcı hatayı hiç
     // görmeden "Oluşturuluyor…" sonrası hiçbir şey olmamış gibi düşünüyordu.
@@ -201,24 +200,17 @@ class _GymSetupPanelState extends BasePanelState<GymSetupPanel> {
                             onChanged: profileController.updateCity,
                           ),
                           const SizedBox(height: AppSpacing.md),
-                          AppTextField(
+                          AppPhoneField(
                             key: _phoneFieldKey,
                             label: ref.watch(
                               rcTextProvider(
                                 RemoteConfigKeys.gymsGymSetupPhoneFieldLabel,
                               ),
                             ),
-                            hint: ref.watch(
-                              rcTextProvider(
-                                RemoteConfigKeys.gymsGymSetupPhoneHint,
-                              ),
-                            ),
-                            prefixText: '+90 ',
-                            keyboardType: TextInputType.number,
                             controller: _phoneController,
-                            inputFormatters: [TrPhoneNumberInputFormatter()],
                             errorText: createGymState.phoneError,
-                            onChanged: profileController.updatePhone,
+                            onChanged: (e164, isValid) => profileController
+                                .updatePhone(e164, isValid: isValid),
                           ),
                           const SizedBox(height: AppSpacing.xs),
                           Text(
@@ -236,42 +228,35 @@ class _GymSetupPanelState extends BasePanelState<GymSetupPanel> {
                           AppTextField(
                             label: ref.watch(
                               rcTextProvider(
-                                RemoteConfigKeys
-                                    .gymsGymInfoLoginReportEmailLabel,
-                              ),
-                            ),
-                            hint: ref.watch(
-                              rcTextProvider(
-                                RemoteConfigKeys.gymsGymInfoGymReportEmailHint,
-                              ),
-                            ),
-                            keyboardType: TextInputType.emailAddress,
-                            controller: _emailController,
-                            errorText: createGymState.emailError,
-                          ),
-                          const SizedBox(height: AppSpacing.xs),
-                          Text(
-                            ref.watch(
-                              rcTextProvider(
-                                RemoteConfigKeys
-                                    .gymsGymSetupReportEmailDescription,
-                              ),
-                            ),
-                            style: typography.caption.copyWith(
-                              color: colors.onSurfaceMuted,
-                              fontSize: 12,
-                            ),
-                          ),
-                          const SizedBox(height: AppSpacing.md),
-                          AppTextField(
-                            label: ref.watch(
-                              rcTextProvider(
                                 RemoteConfigKeys.gymsGymInfoAddressFieldLabel,
                               ),
                             ),
                             controller: _addressController,
                             errorText: createGymState.addressError,
                             onChanged: profileController.updateAddress,
+                          ),
+                          const SizedBox(height: AppSpacing.md),
+                          AppCurrencyField(
+                            currencyCode: createGymState.currency,
+                            locale: ref.watch(localeControllerProvider),
+                            label: ref.watch(
+                              rcTextProvider(
+                                RemoteConfigKeys.gymsGymSetupCurrencyFieldLabel,
+                              ),
+                            ),
+                            onChanged: createGymController.selectCurrency,
+                          ),
+                          const SizedBox(height: AppSpacing.xs),
+                          Text(
+                            ref.watch(
+                              rcTextProvider(
+                                RemoteConfigKeys.gymsGymSetupCurrencyHelperNote,
+                              ),
+                            ),
+                            style: typography.caption.copyWith(
+                              color: colors.onSurfaceMuted,
+                              fontSize: 12,
+                            ),
                           ),
                         ],
                       ),
@@ -532,15 +517,15 @@ class _GymSetupPanelState extends BasePanelState<GymSetupPanel> {
                       onPressed: createGymState.isSubmitting
                           ? null
                           : () async {
-                              final gymId = await createGymController.submit(
-                                email: _emailController.text,
-                              );
+                              final gymId = await createGymController.submit();
                               if (gymId != null && mounted) {
                                 ref
                                     .read(panelStackControllerProvider.notifier)
                                     .push(
                                       PhoneLoginPanel(
-                                        prefillPhoneDigits: ref
+                                        // F8-4 — bu ekran artık AppPhoneField
+                                        // kullanıyor, `phone` zaten tam E.164.
+                                        prefillPhoneE164: ref
                                             .read(gymProfileControllerProvider)
                                             .phone,
                                         successBanner: ref.read(
@@ -570,7 +555,6 @@ class _GymSetupPanelState extends BasePanelState<GymSetupPanel> {
     _cityController.dispose();
     _phoneController.dispose();
     _addressController.dispose();
-    _emailController.dispose();
     super.dispose();
   }
 }

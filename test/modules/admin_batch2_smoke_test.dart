@@ -218,7 +218,13 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('AdminMemberDetailPanel metric picker renders without overflow', (
+  // NOT: "metric picker renders without overflow" testi kaldırıldı —
+  // `AdminMemberDetailPanel`'deki "ÖLÇÜM · 6 AY" metrik seçicisi ve trend
+  // grafiği kullanıcı isteğiyle BİLEREK silindi (bkz. d6665bc): aynı veri
+  // zaten ayrı Ölçüm ekranından (`MeasurementsPanel`) görüntülenebiliyordu,
+  // üye detayında tekrar edilmesine gerek yoktu. Metrik seçici davranışı
+  // artık orada yaşıyor.
+  testWidgets('AdminMemberDetailPanel ölçüm ekranı butonunu gösterir', (
     tester,
   ) async {
     await tester.pumpWidget(
@@ -227,16 +233,6 @@ void main() {
         overrides: _adminMemberDetailOverrides,
       ),
     );
-    await tester.pump();
-    // F5-17 — "Paketi Yenile" butonu (+ borç varken görünen uyarı notu)
-    // eklendiği için metrik satırı artık varsayılan test viewport'unun
-    // altında kalabiliyor — dokunmadan önce görünür hale getirilmeli.
-    await tester.scrollUntilVisible(
-      find.text('Kilo'),
-      200,
-      scrollable: find.byType(Scrollable),
-    );
-    await tester.tap(find.text('Kilo'));
     await tester.pump();
     expect(tester.takeException(), isNull);
   });

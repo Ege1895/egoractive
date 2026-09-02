@@ -1,7 +1,9 @@
 import { getAuth } from "firebase-admin/auth";
 import { getFirestore } from "firebase-admin/firestore";
+import { HttpsError } from "firebase-functions/v2/https";
 
 import { userDoc } from "./firestore-paths";
+import { isDeactivated } from "./user-active";
 
 /**
  * F1-10 — `role`/`gymId` custom claim'lerini custom token'a gömüp döner.
@@ -13,6 +15,13 @@ import { userDoc } from "./firestore-paths";
 export async function mintLoginToken(uid: string): Promise<string> {
   const userSnap = await getFirestore().doc(userDoc(uid)).get();
   const userData = userSnap.data();
+  // Admin bu hesabı pasife aldıysa (bkz. `deactivateTrainer`) token
+  // üretilmez. `startLogin` zaten daha erken reddediyor; bu ikinci kontrol,
+  // pasife alınmadan ÖNCE OTP almış birinin sonradan doğrulayıp giriş
+  // yapabildiği dar pencereyi kapatıyor.
+  if (isDeactivated(userData)) {
+    throw new HttpsError("not-found", "Bu bilgiyle kayıtlı bir kullanıcı bulunamadı.");
+  }
   const role = typeof userData?.role === "string" ? userData.role : undefined;
   const gymId = typeof userData?.gymId === "string" ? userData.gymId : null;
   const claims = role ? { role, gymId } : undefined;

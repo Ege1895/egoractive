@@ -6,7 +6,7 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../../shared/utils/thousands_input_formatter.dart';
+import '../../../core/money/app_money_formatter.dart';
 import '../domain/dashboard_report.dart';
 import '../domain/report_snapshot.dart';
 
@@ -25,6 +25,15 @@ const _badWash = PdfColor.fromInt(0xFFFDEBE9);
 const _amber = PdfColor.fromInt(0xFFC97A1B);
 const _other = PdfColor.fromInt(0xFFC7CFDA);
 const _fill = PdfColor.fromInt(0xFFDCE6F2);
+
+/// Filigran — `assets/icon/app_icon.png`'den türetilmiş, saydam zeminli ve
+/// 72px'e küçültülmüş sürüm (`tool/generate_pdf_watermark.dart`). Kaynak
+/// ikon 1254x1254/1 MB: `pdf` paketi PNG'i ham piksele açıp gömdüğü için
+/// (bkz. `PdfImage.file`) büyük görsel hem uygulama boyutunu hem PDF
+/// boyutunu hem de export süresini gereksiz şişirirdi.
+const _watermarkAsset = 'assets/images/pdf_watermark.png';
+const _watermarkHeight = 20.0;
+const _watermarkOpacity = 0.55;
 
 /// F5-21'deki metin etiketleri — RC'den okunması gereken statik metinler
 /// (bkz. proje hardcode kuralı) UI katmanında toplanıp buraya taşınır; bu
@@ -131,28 +140,45 @@ class ReportPdfExportService {
     ReportSnapshot snapshot,
     String gymName,
     ReportPdfLabels labels,
-  ) async {
+    String locale, {
+    required bool showWatermark,
+  }) async {
     final fontData = await rootBundle.load(
       'assets/fonts/IBMPlexSans-Variable.ttf',
     );
     final font = pw.Font.ttf(fontData);
+    // Görsel doküman başına bir kez encode edilir: aynı `MemoryImage` örneği
+    // tüm sayfalarda paylaşıldığından `pdf` paketi onu tek bir XObject olarak
+    // gömer (bkz. `ImageProvider._cache`) — sayfa başına ek boyut/süre yok.
+    final watermark = showWatermark ? await _loadWatermark() : null;
     final report = snapshot.report;
     final net = report.netTl;
+    final currency = snapshot.currency;
 
     final doc = pw.Document();
     doc.addPage(
       pw.MultiPage(
-        theme: pw.ThemeData.withFont(base: font, bold: font),
-        margin: const pw.EdgeInsets.all(28),
+        // `theme`/`margin` ile `pageTheme` aynı anda verilemiyor (paket
+        // assert'i); filigran `buildBackground` üzerinden geldiği için ikisi
+        // tek bir `PageTheme`'de birleşti. `a4`, önceki örtük varsayılanın
+        // (`PdfPageFormat.standard`) aynısı — çıktı boyutu değişmiyor.
+        pageTheme: pw.PageTheme(
+          pageFormat: PdfPageFormat.a4,
+          theme: pw.ThemeData.withFont(base: font, bold: font),
+          margin: const pw.EdgeInsets.all(28),
+          buildBackground: watermark == null
+              ? null
+              : (context) => _watermark(watermark),
+        ),
         build: (context) => [
           _header(gymName, report.monthLabel),
           pw.SizedBox(height: 16),
-          _heroBanner(net, labels),
+          _heroBanner(net, labels, currency, locale),
           _sessionsSection(report, labels),
           _groupEventsSection(snapshot, labels),
           _trainersSection(report.trainerPerformance, labels),
           _packagesSection(snapshot.packages, labels),
-          _financeSection(report, labels),
+          _financeSection(report, labels, currency, locale),
           pw.SizedBox(height: 8),
           pw.Center(
             child: pw.Text(
@@ -173,12 +199,41 @@ class ReportPdfExportService {
     ReportSnapshot snapshot,
     String gymName,
     ReportPdfLabels labels,
-  ) async {
-    final bytes = await buildPdf(snapshot, gymName, labels);
+    String locale, {
+    required bool showWatermark,
+  }) async {
+    final bytes = await buildPdf(
+      snapshot,
+      gymName,
+      labels,
+      locale,
+      showWatermark: showWatermark,
+    );
     final dateSuffix = snapshot.periodStart.toIso8601String().substring(0, 10);
     await Printing.sharePdf(
       bytes: bytes,
       filename: 'rapor_${snapshot.period.name}_$dateSuffix.pdf',
+    );
+  }
+
+  Future<pw.MemoryImage> _loadWatermark() async {
+    final data = await rootBundle.load(_watermarkAsset);
+    return pw.MemoryImage(
+      data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes),
+    );
+  }
+
+  /// Her sayfanın sağ alt köşesinde, içerik alanının (margin'lerin içi)
+  /// dibinde duran filigran. `buildBackground` layout'ta yer kaplamadığı için
+  /// mevcut yerleşim ve sayfa sayısı değişmez; arkada çizildiğinden dolu bir
+  /// sayfada içeriğin altında kalır.
+  pw.Widget _watermark(pw.ImageProvider image) {
+    return pw.Align(
+      alignment: pw.Alignment.bottomRight,
+      child: pw.Opacity(
+        opacity: _watermarkOpacity,
+        child: pw.Image(image, height: _watermarkHeight),
+      ),
     );
   }
 
@@ -220,11 +275,16 @@ class ReportPdfExportService {
     );
   }
 
-  pw.Widget _heroBanner(int net, ReportPdfLabels labels) {
+  pw.Widget _heroBanner(
+    int net,
+    ReportPdfLabels labels,
+    String currency,
+    String locale,
+  ) {
     final positive = net >= 0;
     final headline =
         (positive ? labels.heroPositiveTemplate : labels.heroNegativeTemplate)
-            .replaceAll('{net}', _tl(net.abs()));
+            .replaceAll('{net}', formatMoney(net.abs(), currency, locale));
     final sub = positive ? labels.heroSubPositive : labels.heroSubNegative;
     return pw.Container(
       width: double.infinity,
@@ -362,8 +422,11 @@ class ReportPdfExportService {
   ) {
     final completedPct = _pct(breakdown.completed, breakdown.total);
     final cancelledPct = _pct(breakdown.cancelled, breakdown.total);
-    final otherCount = (breakdown.total - breakdown.completed - breakdown.cancelled)
-        .clamp(0, 1 << 30);
+    final otherCount =
+        (breakdown.total - breakdown.completed - breakdown.cancelled).clamp(
+          0,
+          1 << 30,
+        );
     final otherPct = (100 - completedPct - cancelledPct).clamp(0, 100);
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
@@ -687,7 +750,12 @@ class ReportPdfExportService {
     );
   }
 
-  pw.Widget _financeSection(DashboardReport report, ReportPdfLabels labels) {
+  pw.Widget _financeSection(
+    DashboardReport report,
+    ReportPdfLabels labels,
+    String currency,
+    String locale,
+  ) {
     final revenue = report.estimatedRevenueTl;
     final expenses = report.totalExpensesTl;
     final net = report.netTl;
@@ -706,7 +774,7 @@ class ReportPdfExportService {
                 style: const pw.TextStyle(fontSize: 10, color: _muted),
               ),
               pw.Text(
-                _tl(revenue),
+                formatMoney(revenue, currency, locale),
                 style: pw.TextStyle(
                   fontSize: 12,
                   fontWeight: pw.FontWeight.bold,
@@ -732,7 +800,7 @@ class ReportPdfExportService {
                 style: const pw.TextStyle(fontSize: 10, color: _muted),
               ),
               pw.Text(
-                _tl(expenses),
+                formatMoney(expenses, currency, locale),
                 style: pw.TextStyle(
                   fontSize: 12,
                   fontWeight: pw.FontWeight.bold,
@@ -775,7 +843,7 @@ class ReportPdfExportService {
                   ),
                 ),
                 pw.Text(
-                  '${positive ? '+' : '-'}${_tl(net.abs())}',
+                  '${positive ? '+' : '-'}${formatMoney(net.abs(), currency, locale)}',
                   style: pw.TextStyle(
                     fontSize: 15,
                     fontWeight: pw.FontWeight.bold,
@@ -789,8 +857,6 @@ class ReportPdfExportService {
       ),
     );
   }
-
-  String _tl(int amount) => '₺${formatThousands(amount)}';
 
   int _pct(int part, int total) =>
       total == 0 ? 0 : ((part / total) * 100).round();

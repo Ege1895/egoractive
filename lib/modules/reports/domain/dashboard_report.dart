@@ -43,7 +43,11 @@ class SessionTypeBreakdown with _$SessionTypeBreakdown {
 
   const SessionTypeBreakdown._();
 
-  static const empty = SessionTypeBreakdown(total: 0, completed: 0, cancelled: 0);
+  static const empty = SessionTypeBreakdown(
+    total: 0,
+    completed: 0,
+    cancelled: 0,
+  );
 
   double get completionRatio => total == 0 ? 0 : completed / total;
   double get cancellationRatio => total == 0 ? 0 : cancelled / total;
@@ -57,7 +61,10 @@ class SessionTypeBreakdown with _$SessionTypeBreakdown {
 @freezed
 class DashboardSummary with _$DashboardSummary {
   const factory DashboardSummary({
-    required String monthLabel,
+    /// Özetin KAPSADIĞI ay (ayın 1'i). Hazır metin yerine ham tarih taşınıyor:
+    /// ay adı Remote Config'ten, aktif dile göre UI katmanında biçimlendiriliyor
+    /// (bkz. `shared/utils/month_label.dart`).
+    required DateTime? month,
     required int totalSessions,
     required int completedSessions,
     required int cancelledSessions,
@@ -68,7 +75,7 @@ class DashboardSummary with _$DashboardSummary {
   const DashboardSummary._();
 
   static const empty = DashboardSummary(
-    monthLabel: '',
+    month: null,
     totalSessions: 0,
     completedSessions: 0,
     cancelledSessions: 0,
@@ -86,7 +93,14 @@ class DashboardSummary with _$DashboardSummary {
 @freezed
 class DashboardReport with _$DashboardReport {
   const factory DashboardReport({
+    /// SUNUCUDA biçimlenmiş dönem etiketi — sadece geçmiş rapor
+    /// snapshot'larında (F5-9, `periodLabel`) dolu gelir. Canlı dashboard bu
+    /// alanı boş bırakıp [month]'u doldurur; etiketi UI kendi diline göre
+    /// üretir.
     required String monthLabel,
+
+    /// Canlı dashboard'ın kapsadığı ay; snapshot yolunda null.
+    @Default(null) DateTime? month,
     required int totalSessions,
     required int completedSessions,
     required int cancelledSessions,
@@ -97,7 +111,8 @@ class DashboardReport with _$DashboardReport {
     // kırılımı (bkz. `SessionTypeBreakdown`). Canlı dashboard özetinde
     // (`DashboardReportService`) henüz hesaplanmadığından varsayılan boş —
     // bu alanlar sadece geçmiş rapor snapshot'larında (F5-9) dolu gelir.
-    @Default(SessionTypeBreakdown.empty) SessionTypeBreakdown individualSessions,
+    @Default(SessionTypeBreakdown.empty)
+    SessionTypeBreakdown individualSessions,
     @Default(SessionTypeBreakdown.empty) SessionTypeBreakdown duetSessions,
   }) = _DashboardReport;
 
@@ -118,7 +133,8 @@ class DashboardReport with _$DashboardReport {
     List<TrainerPerformance> trainerPerformance,
   ) {
     return DashboardReport(
-      monthLabel: summary.monthLabel,
+      monthLabel: '',
+      month: summary.month,
       totalSessions: summary.totalSessions,
       completedSessions: summary.completedSessions,
       cancelledSessions: summary.cancelledSessions,

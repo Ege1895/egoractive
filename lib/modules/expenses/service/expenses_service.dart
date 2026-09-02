@@ -2,37 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../domain/expense_state.dart';
+import '../../../shared/utils/date_labels.dart';
 
 part 'expenses_service.g.dart';
-
-const _monthNamesLong = {
-  1: 'Ocak',
-  2: 'Şubat',
-  3: 'Mart',
-  4: 'Nisan',
-  5: 'Mayıs',
-  6: 'Haziran',
-  7: 'Temmuz',
-  8: 'Ağustos',
-  9: 'Eylül',
-  10: 'Ekim',
-  11: 'Kasım',
-  12: 'Aralık',
-};
-const _monthAbbrev = {
-  1: 'Oca',
-  2: 'Şub',
-  3: 'Mar',
-  4: 'Nis',
-  5: 'May',
-  6: 'Haz',
-  7: 'Tem',
-  8: 'Ağu',
-  9: 'Eyl',
-  10: 'Eki',
-  11: 'Kas',
-  12: 'Ara',
-};
 
 /// F5-3 — `expenses` koleksiyonu (gymId, category, title, date, amountTl,
 /// recurring). Antrenör primleri seans onaylarından otomatik hesaplanır,
@@ -40,10 +12,18 @@ const _monthAbbrev = {
 class ExpensesService {
   const ExpensesService();
 
-  Stream<ExpensesState> watchMonth(String gymId) {
-    final now = DateTime.now();
-    final monthStart = DateTime(now.year, now.month, 1);
-    final monthEnd = DateTime(now.year, now.month + 1, 1);
+  /// [month] gösterilecek ayın herhangi bir günü olabilir; ayın ilk gününe
+  /// normalize edilir. Önceden `DateTime.now()` sabit kullanılıyordu, yani
+  /// SADECE içinde bulunulan ay görülebiliyordu — ay değiştiğinde bir önceki
+  /// ayın girilmiş giderleri erişilemez hale geliyordu (kullanıcı raporu,
+  /// 2026-09-02). Artık panel ay seçebiliyor (bkz. `ExpensesSelectedMonth`).
+  Stream<ExpensesState> watchMonth(
+    String gymId,
+    DateTime month,
+    DateLabels labels,
+  ) {
+    final monthStart = DateTime(month.year, month.month, 1);
+    final monthEnd = DateTime(month.year, month.month + 1, 1);
 
     return FirebaseFirestore.instance
         .collection('expenses')
@@ -58,7 +38,7 @@ class ExpensesService {
                 a.data()['date'] as Timestamp,
               ),
             );
-          final entries = docs.map(_toEntry).toList();
+          final entries = docs.map((doc) => _toEntry(doc, labels)).toList();
           final revenueRatioLabel = await _revenueRatioLabel(
             gymId,
             monthStart,
@@ -66,7 +46,7 @@ class ExpensesService {
             entries,
           );
           return ExpensesState(
-            monthLabel: '${_monthNamesLong[now.month]} ${now.year}',
+            monthLabel: labels.monthYear(monthStart),
             revenueRatioLabel: revenueRatioLabel,
             entries: entries,
           );
@@ -92,14 +72,17 @@ class ExpensesService {
     });
   }
 
-  ExpenseEntry _toEntry(QueryDocumentSnapshot<Map<String, dynamic>> doc) {
+  ExpenseEntry _toEntry(
+    QueryDocumentSnapshot<Map<String, dynamic>> doc,
+    DateLabels labels,
+  ) {
     final data = doc.data();
     final date = (data['date'] as Timestamp).toDate();
     return ExpenseEntry(
       id: doc.id,
       category: (data['category'] as String?) ?? '',
       title: (data['title'] as String?) ?? '',
-      date: '${date.day} ${_monthAbbrev[date.month]} ${date.year}',
+      date: labels.dayMonthYear(date),
       amountTl: (data['amountTl'] as num?)?.toInt() ?? 0,
       recurring: (data['recurring'] as bool?) ?? false,
     );

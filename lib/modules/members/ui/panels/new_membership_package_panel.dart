@@ -3,6 +3,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/app_spacing.dart';
+import '../../../../core/constants/currency_constants.dart';
+import '../../../../core/locale/locale_controller.dart';
+import '../../../../core/money/active_gym_currency_provider.dart';
+import '../../../../core/money/app_money_formatter.dart';
 import '../../../../core/panels/base_panel.dart';
 import '../../../../core/panels/panel_stack_controller.dart';
 import '../../../../core/remote_config/remote_config_service.dart';
@@ -15,24 +19,10 @@ import '../../controller/member_registration_controller.dart';
 import '../../controller/new_member_controller.dart';
 import '../../controller/new_membership_controller.dart';
 import 'new_membership_payment_panel.dart';
+import '../../../../shared/utils/date_labels.dart';
 
-const _monthAbbrev = {
-  1: 'Oca',
-  2: 'Şub',
-  3: 'Mar',
-  4: 'Nis',
-  5: 'May',
-  6: 'Haz',
-  7: 'Tem',
-  8: 'Ağu',
-  9: 'Eyl',
-  10: 'Eki',
-  11: 'Kas',
-  12: 'Ara',
-};
-
-String _formatDate(DateTime date) =>
-    '${date.day} ${_monthAbbrev[date.month]} ${date.year}';
+String _formatDate(DateTime date, WidgetRef ref) =>
+    ref.watch(dateLabelsProvider).dayMonthYear(date);
 
 /// Admin 6 · Yeni üyelik — Paket — paket seçince alanlar otomatik dolar.
 class NewMembershipPackagePanel extends BasePanel {
@@ -62,6 +52,9 @@ class _NewMembershipPackagePanelState
   Widget build(BuildContext context) {
     final colors = context.appColors;
     final typography = context.appTypography;
+    final currency =
+        ref.watch(activeGymCurrencyProvider).valueOrNull ?? defaultCurrencyCode;
+    final locale = ref.watch(localeControllerProvider);
     final memberForm = ref.watch(newMemberControllerProvider);
     final packages = ref
         .watch(studioPackagesControllerProvider)
@@ -267,6 +260,7 @@ class _NewMembershipPackagePanelState
                   for (final package in packages)
                     _PackagePick(
                       package: package,
+                      priceText: formatMoney(package.priceTl, currency, locale),
                       selected: membership.selectedPackage?.id == package.id,
                       onTap: () => membershipController.selectPackage(package),
                     ),
@@ -289,7 +283,7 @@ class _NewMembershipPackagePanelState
                               RemoteConfigKeys.membersStartDateFieldLabel,
                             ),
                           ),
-                          value: _formatDate(membership.startDate),
+                          value: _formatDate(membership.startDate, ref),
                           showDivider: true,
                           onTap: () => showNativeDatePicker(
                             context: context,
@@ -305,7 +299,7 @@ class _NewMembershipPackagePanelState
                               RemoteConfigKeys.membersEndDateFieldLabel,
                             ),
                           ),
-                          value: _formatDate(membership.endDate),
+                          value: _formatDate(membership.endDate, ref),
                           showDivider: true,
                           onTap: () => showNativeDatePicker(
                             context: context,
@@ -460,11 +454,13 @@ String _initialsOf(String name) {
 class _PackagePick extends StatelessWidget {
   const _PackagePick({
     required this.package,
+    required this.priceText,
     required this.selected,
     required this.onTap,
   });
 
   final StudioPackage package;
+  final String priceText;
   final bool selected;
   final VoidCallback onTap;
 
@@ -558,7 +554,7 @@ class _PackagePick extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  '₺${package.priceTl}',
+                  priceText,
                   style: typography.headingSmall.copyWith(
                     color: colors.onSurfaceVariant,
                     fontSize: 15,

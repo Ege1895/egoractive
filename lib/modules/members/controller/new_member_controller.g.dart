@@ -7,7 +7,7 @@ part of 'new_member_controller.dart';
 // **************************************************************************
 
 String _$newMemberControllerHash() =>
-    r'dfa321526de43e6b0de6d580b1a644cad6e80c81';
+    r'9543d53e104a233d13b4fa36dd5604fd21003c75';
 
 /// Yeni üye kayıt akışının (P4-5 → P4-6 → P4-7) formu — geri tuşuyla önceki
 /// adıma dönüldüğünde veri kaybolmasın diye tek bir kalıcı state'te tutulur.

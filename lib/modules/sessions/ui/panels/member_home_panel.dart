@@ -7,7 +7,6 @@ import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/domain/membership_installment.dart';
 import '../../../../shared/widgets/progress_ring.dart';
-import '../../../../shared/utils/tr_date_formatter.dart';
 import '../../../auth/controller/member_profile_controller.dart';
 import '../../../gyms/controller/gym_profile_controller.dart';
 import '../../../members/ui/panels/member_self_info_panel.dart';
@@ -15,6 +14,7 @@ import '../../../packages/controller/package_controller.dart';
 import '../../controller/sessions_controller.dart';
 import '../../domain/session.dart';
 import 'attendance_confirm_panel.dart';
+import '../../../../shared/utils/date_labels.dart';
 
 /// Üye · Ana Sayfa (Ana Sayfa sekmesi kökü).
 class MemberHomePanel extends ConsumerWidget {
@@ -572,7 +572,12 @@ class _MemberInstallmentRow extends ConsumerWidget {
                           .sessionsMemberHomeInstallmentDueDateLabel,
                     ),
                   )
-                  .replaceAll('{date}', formatTrDate(installment.dueDate)),
+                  .replaceAll(
+                    '{date}',
+                    ref
+                        .watch(dateLabelsProvider)
+                        .dayMonthYear(installment.dueDate),
+                  ),
               style: typography.caption.copyWith(color: colors.onSurfaceMuted),
             ),
             const SizedBox(width: AppSpacing.sm),

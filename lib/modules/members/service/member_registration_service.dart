@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:cloud_functions/cloud_functions.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/analytics/analytics_service.dart';
+import '../../../shared/utils/phone_lookup.dart';
 import '../domain/new_member_form.dart';
 
 part 'member_registration_service.g.dart';
@@ -13,24 +13,23 @@ class MemberRegistrationService {
 
   final AnalyticsService _analytics;
 
-  /// `phoneNumber` tüm `users` koleksiyonunda (salon gözetmeksizin) global
-  /// benzersiz olmalı — girişte `requestCustomToken` numarayla eşleşen ilk
-  /// dokümanı kullanıyor. Bu yüzden doğrudan client-side bir Firestore
-  /// sorgusuyla kontrol edilemez: `firestore.rules`'taki `users` okuma
-  /// kuralı `resource.data.gymId == myGymId()` gerektirir ve gymId filtresi
-  /// olmayan bir `list` sorgusu Firestore tarafından asla provably-safe
-  /// sayılmaz — her zaman permission-denied ile reddedilir. Bunun yerine
-  /// Admin SDK ile kuralları atlayan `checkPhoneAvailable` callable'ı
-  /// çağrılır (başka salonun üye verisini client'a sızdırmadan sadece bir
-  /// boolean döner).
+  /// F2-2 perf — eskiden Admin SDK ile kuralları atlayan `checkPhoneAvailable`
+  /// callable'ına gidiyordu; bu callable soğuk başlarsa (Cloud Run
+  /// scale-to-zero) "Kaydet"e basınca tek başına 20-30+ saniye ekleyebiliyordu
+  /// (kullanıcı raporu: ~1 dakikaya varan donma). `phoneIndex/{phoneNumber}`
+  /// (bkz. `on-user-write-sync-phone-index.ts` trigger'ı) sadece varlık
+  /// kontrolü için var ve herkese okumaya açık — Cloud Function'a hiç
+  /// gitmeden, doğrudan ucuz bir point-read'le (cold start riski yok)
+  /// kontrol edilir.
   Future<bool> phoneNumberIsTaken(String phoneNumber) async {
-    final callable = FirebaseFunctions.instance.httpsCallable(
-      'checkPhoneAvailable',
-    );
-    final result = await callable.call<Map<String, dynamic>>({
-      'phoneNumber': phoneNumber,
-    });
-    return result.data['available'] != true;
+    for (final candidate in phoneLookupCandidates(phoneNumber)) {
+      final doc = await FirebaseFirestore.instance
+          .collection('phoneIndex')
+          .doc(candidate)
+          .get();
+      if (doc.exists) return true;
+    }
+    return false;
   }
 
   /// Oluşturulan `users/{uid}` dokümanının id'sini döner — F3-2'deki paket

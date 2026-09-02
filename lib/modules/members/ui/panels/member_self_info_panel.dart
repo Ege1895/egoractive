@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:phone_form_field/phone_form_field.dart';
 
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/panels/base_panel.dart';
@@ -7,9 +8,9 @@ import '../../../../core/panels/panel_stack_controller.dart';
 import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../../../shared/utils/phone_number_formatter.dart';
 import '../../../../shared/widgets/app_back_button.dart';
 import '../../../../shared/widgets/app_button.dart';
+import '../../../../shared/widgets/app_phone_field.dart';
 import '../../../../shared/widgets/app_text_field.dart';
 import '../../../auth/controller/member_profile_controller.dart';
 import '../../../auth/domain/otp_purpose.dart';
@@ -30,7 +31,7 @@ class MemberSelfInfoPanel extends BasePanel {
 class _MemberSelfInfoPanelState extends BasePanelState<MemberSelfInfoPanel> {
   late final TextEditingController _firstNameController;
   late final TextEditingController _lastNameController;
-  late final TextEditingController _phoneController;
+  late final PhoneController _phoneController;
   late final TextEditingController _emailController;
 
   bool _isSaving = false;
@@ -51,8 +52,8 @@ class _MemberSelfInfoPanelState extends BasePanelState<MemberSelfInfoPanel> {
     _lastNameController = TextEditingController(
       text: parts.length > 1 ? parts.skip(1).join(' ') : '',
     );
-    _phoneController = TextEditingController(
-      text: formatTrPhoneDigits(profile.phoneDigits),
+    _phoneController = PhoneController(
+      initialValue: initialPhoneNumber(profile.phoneE164),
     );
     _emailController = TextEditingController(text: profile.email);
     _originalEmail = profile.email;
@@ -152,16 +153,13 @@ class _MemberSelfInfoPanelState extends BasePanelState<MemberSelfInfoPanel> {
                           ],
                         ),
                         const SizedBox(height: AppSpacing.md),
-                        AppTextField(
+                        AppPhoneField(
                           label: ref.watch(
                             rcTextProvider(RemoteConfigKeys.commonTelefonLabel),
                           ),
-                          prefixText: '+90 ',
-                          keyboardType: TextInputType.number,
                           controller: _phoneController,
-                          inputFormatters: [TrPhoneNumberInputFormatter()],
                           errorText: _phoneError,
-                          onChanged: (_) {
+                          onChanged: (_, _) {
                             if (_phoneError != null) {
                               setState(() => _phoneError = null);
                             }
@@ -233,7 +231,8 @@ class _MemberSelfInfoPanelState extends BasePanelState<MemberSelfInfoPanel> {
     final firstName = _firstNameController.text.trim();
     final lastName = _lastNameController.text.trim();
     final name = [firstName, lastName].where((p) => p.isNotEmpty).join(' ');
-    final phoneDigits = _phoneController.text.replaceAll(RegExp(r'[^0-9]'), '');
+    final phoneE164 = _phoneController.value.international;
+    final isPhoneValid = _phoneController.value.isValid();
     final email = _emailController.text.trim();
 
     setState(() {
@@ -242,11 +241,11 @@ class _MemberSelfInfoPanelState extends BasePanelState<MemberSelfInfoPanel> {
               rcTextProvider(RemoteConfigKeys.membersSelfInfoNameRequiredError),
             )
           : null;
-      _phoneError = phoneDigits.length != 10
-          ? ref.read(
+      _phoneError = isPhoneValid
+          ? null
+          : ref.read(
               rcTextProvider(RemoteConfigKeys.membersSelfInfoPhoneInvalidError),
-            )
-          : null;
+            );
       _emailError = (!email.contains('@') || email.length < 4)
           ? ref.read(
               rcTextProvider(RemoteConfigKeys.authEmailSetupInvalidEmailError),
@@ -258,7 +257,7 @@ class _MemberSelfInfoPanelState extends BasePanelState<MemberSelfInfoPanel> {
       return;
 
     if (email == _originalEmail) {
-      await _continueSave(name: name, phoneDigits: phoneDigits);
+      await _continueSave(name: name, phoneE164: phoneE164);
       return;
     }
 
@@ -287,7 +286,7 @@ class _MemberSelfInfoPanelState extends BasePanelState<MemberSelfInfoPanel> {
             email: email,
             onVerified: () async {
               _originalEmail = email;
-              await _continueSave(name: name, phoneDigits: phoneDigits);
+              await _continueSave(name: name, phoneE164: phoneE164);
             },
           ),
         );
@@ -295,20 +294,17 @@ class _MemberSelfInfoPanelState extends BasePanelState<MemberSelfInfoPanel> {
 
   Future<void> _continueSave({
     required String name,
-    required String phoneDigits,
+    required String phoneE164,
   }) async {
     final uid = ref.read(authStateProvider).valueOrNull?.uid;
     if (uid == null) return;
-    final phoneNumber = '+90$phoneDigits';
     final service = ref.read(memberRegistrationServiceProvider);
 
     setState(() => _isSaving = true);
     try {
-      final currentDigits = ref
-          .read(memberProfileControllerProvider)
-          .phoneDigits;
-      if (phoneDigits != currentDigits &&
-          await service.phoneNumberIsTaken(phoneNumber)) {
+      final currentPhone = ref.read(memberProfileControllerProvider).phoneE164;
+      if (phoneE164 != currentPhone &&
+          await service.phoneNumberIsTaken(phoneE164)) {
         if (!mounted) return;
         setState(() {
           _isSaving = false;
@@ -321,7 +317,7 @@ class _MemberSelfInfoPanelState extends BasePanelState<MemberSelfInfoPanel> {
       await service.updateOwnInfo(
         memberId: uid,
         name: name,
-        phoneNumber: phoneNumber,
+        phoneNumber: phoneE164,
       );
       if (!mounted) return;
       ref.read(panelStackControllerProvider.notifier).pop();

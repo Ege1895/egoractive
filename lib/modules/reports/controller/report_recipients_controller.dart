@@ -3,6 +3,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/theme/theme_controller.dart';
 import '../domain/report_recipients.dart';
 import '../repository/report_recipients_repository.dart';
+import '../../../core/remote_config/remote_config_service.dart';
 
 part 'report_recipients_controller.g.dart';
 
@@ -33,13 +34,21 @@ class ReportRecipientsController extends _$ReportRecipientsController {
   Future<void> save(ReportRecipients recipients) async {
     if (recipients.gymReportEmail.isNotEmpty &&
         !_emailPattern.hasMatch(recipients.gymReportEmail)) {
-      state = state.copyWith(errorMessage: 'Rapor e-postası geçerli değil.');
+      state = state.copyWith(
+        errorMessage: ref.read(
+          rcTextProvider(RemoteConfigKeys.reportsRecipientInvalidEmailError),
+        ),
+      );
       return;
     }
 
     final gymId = ref.read(activeGymIdProvider).valueOrNull;
     if (gymId == null) {
-      state = state.copyWith(errorMessage: 'Aktif bir salon bulunamadı.');
+      state = state.copyWith(
+        errorMessage: ref.read(
+          rcTextProvider(RemoteConfigKeys.commonNoActiveGymError),
+        ),
+      );
       return;
     }
 
