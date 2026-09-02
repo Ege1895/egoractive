@@ -9690,6 +9690,78 @@
         "value": "No feedback with this rating."
       },
       "valueType": "STRING"
+    },
+    "lbl_notif_group_session_invite_title_tr": {
+      "defaultValue": {
+        "value": "🧘 Yarın {className} var — katılmak ister misin?"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notif_group_session_invite_title_en": {
+      "defaultValue": {
+        "value": "🧘 {className} is tomorrow — want to join?"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notif_group_session_invite_body_tr": {
+      "defaultValue": {
+        "value": "Saat {time}'te başlıyor ve {remaining} kişilik yer kaldı. Katılmak için bu bildirime dokun 👉"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notif_group_session_invite_body_en": {
+      "defaultValue": {
+        "value": "It starts at {time} and there are {remaining} spots left. Tap here to join 👉"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notif_group_session_invite_body_unlimited_tr": {
+      "defaultValue": {
+        "value": "Saat {time}'te başlıyor, yer var. Katılmak için bu bildirime dokun 👉"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notif_group_session_invite_body_unlimited_en": {
+      "defaultValue": {
+        "value": "It starts at {time} and there's room. Tap here to join 👉"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notif_event_invite_title_tr": {
+      "defaultValue": {
+        "value": "🎉 Yarın {eventName} var — katılmak ister misin?"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notif_event_invite_title_en": {
+      "defaultValue": {
+        "value": "🎉 {eventName} is tomorrow — want to join?"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notif_event_invite_body_tr": {
+      "defaultValue": {
+        "value": "Saat {time}'te başlıyor ve {remaining} kişilik yer kaldı. Katılmak için bu bildirime dokun 👉"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notif_event_invite_body_en": {
+      "defaultValue": {
+        "value": "It starts at {time} and there are {remaining} spots left. Tap here to join 👉"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notif_event_invite_body_unlimited_tr": {
+      "defaultValue": {
+        "value": "Saat {time}'te başlıyor, yer var. Katılmak için bu bildirime dokun 👉"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_notif_event_invite_body_unlimited_en": {
+      "defaultValue": {
+        "value": "It starts at {time} and there's room. Tap here to join 👉"
+      },
+      "valueType": "STRING"
     }
   }
 }

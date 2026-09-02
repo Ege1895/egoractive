@@ -12,6 +12,8 @@ import '../../feedback/ui/panels/feedback_panel.dart';
 import '../../sessions/ui/panels/attendance_confirm_panel.dart';
 import '../../trainers/ui/panels/trainer_calendar_panel.dart';
 import '../../../firebase_options.dart';
+import '../../events/ui/panels/event_detail_panel.dart';
+import '../../group_sessions/ui/panels/group_session_detail_panel.dart';
 
 /// Uygulama tamamen kapalıyken gelen bildirimler ayrı bir isolate'te işlenir
 /// — bu yüzden top-level olmak zorunda ve kendi Firebase.initializeApp'ini
@@ -165,6 +167,22 @@ class PushNotificationService {
         );
       case 'feedback_reminder':
         panelStack.push(const FeedbackPanel());
+      // "Yarın grup dersi/etkinlik var, katılmak ister misin?" daveti —
+      // bildirim metni "katılmak için dokun" diyor, dolayısıyla dokunuş
+      // doğrudan O DERSİN/ETKİNLİĞİN detayına götürüyor; katılım butonu
+      // zaten orada. Listeye düşürmek kullanıcıya aramayı bırakırdı.
+      case 'group_session_invite':
+        final groupSessionId = data['groupSessionId'] as String?;
+        if (groupSessionId != null) {
+          panelStack.push(
+            GroupSessionDetailPanel(groupSessionId: groupSessionId),
+          );
+        }
+      case 'event_invite':
+        final eventId = data['eventId'] as String?;
+        if (eventId != null) {
+          panelStack.push(EventDetailPanel(eventId: eventId));
+        }
       default:
         // manual_notification (salon duyurusu) ya da bilinmeyen bir tür —
         // ilgisiz bir onay ekranına zorlamak yerine uygulamayı sadece ön
