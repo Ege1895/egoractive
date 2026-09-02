@@ -111,12 +111,19 @@ export function eventDoc(gymId: string, eventId: string) {
   return `${eventsCollection(gymId)}/${eventId}`;
 }
 
-export function expensesCollection(gymId: string) {
-  return `${gymDoc(gymId)}/expenses`;
+/**
+ * Giderler alt koleksiyon DEĞİL, kök seviyede tek bir koleksiyon: her
+ * doküman `gymId` alanı taşıyor (bkz. client `expenses_service.dart` ve
+ * `weekly-report-stats.ts`). Buradaki eski `gyms/{gymId}/expenses` tanımı
+ * hiç kullanılmayan, F1-9'daki şema tahminiydi — gerçek şemayla
+ * uyuşmadığı için düzeltildi.
+ */
+export function expensesCollection() {
+  return "expenses";
 }
 
-export function expenseDoc(gymId: string, expenseId: string) {
-  return `${expensesCollection(gymId)}/${expenseId}`;
+export function expenseDoc(expenseId: string) {
+  return `${expensesCollection()}/${expenseId}`;
 }
 
 export function feedbackCollection(gymId: string) {
