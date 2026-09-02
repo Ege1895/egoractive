@@ -3,12 +3,15 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/theme/theme_controller.dart';
 import '../domain/gym_rules.dart';
 import '../repository/gym_rules_repository.dart';
+import '../../../shared/utils/date_labels.dart';
 
 part 'gym_rules_controller.g.dart';
 
 @riverpod
 Stream<GymRules> _rulesForGym(_RulesForGymRef ref, String gymId) {
-  return ref.watch(gymRulesRepositoryProvider).watchRules(gymId);
+  return ref
+      .watch(gymRulesRepositoryProvider)
+      .watchRules(gymId, ref.watch(dateLabelsProvider));
 }
 
 /// F4-5 — `gyms/{gymId}.rulesContent` (Quill Delta JSON), her rol için

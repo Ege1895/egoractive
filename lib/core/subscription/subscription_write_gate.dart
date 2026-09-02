@@ -8,6 +8,7 @@ import '../constants/app_spacing.dart';
 import '../panels/panel_stack_controller.dart';
 import '../router/app_router.dart';
 import '../theme/app_theme.dart';
+import '../remote_config/remote_config_service.dart';
 
 /// F6-3 — yeni içerik oluşturan (üye, paket satışı, seans, grup dersi,
 /// etkinlik, gider, paket kataloğu) her ekran, yazma işlemine başlamadan
@@ -21,7 +22,10 @@ import '../theme/app_theme.dart';
 /// hesapları bu uyarıyı hiç görmemeli (onlar zaten kendi admin'lerinin
 /// aboneliğine bağlı çalışıyor, aboneliği yenilemek onların elinde değil).
 /// Bu yüzden rol admin değilse kontrol hiç yapılmadan geçiliyor.
-Future<bool> ensureSubscriptionAllowsWrite(BuildContext context, WidgetRef ref) async {
+Future<bool> ensureSubscriptionAllowsWrite(
+  BuildContext context,
+  WidgetRef ref,
+) async {
   final role = ref.read(currentRoleProvider).valueOrNull;
   if (role != AppRole.admin) return true;
 
@@ -42,18 +46,40 @@ Future<bool> ensureSubscriptionAllowsWrite(BuildContext context, WidgetRef ref) 
 
       return AlertDialog(
         backgroundColor: colors.surface,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppSpacing.radiusCard)),
-        title: Text('Aboneliğini yenile', style: typography.headingSmall.copyWith(color: colors.onSurface, fontSize: 17)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
+        ),
+        title: Text(
+          ref.read(
+            rcTextProvider(RemoteConfigKeys.subscriptionGateDialogTitle),
+          ),
+          style: typography.headingSmall.copyWith(
+            color: colors.onSurface,
+            fontSize: 17,
+          ),
+        ),
         content: Text(
           status == SubscriptionStatus.expired
-              ? 'Deneme sürenin süresi doldu. Bu işlemi yapabilmek için aboneliğini yenilemen gerekiyor.'
-              : 'Bu işlemi yapabilmek için aktif bir aboneliğin olması gerekiyor.',
-          style: typography.bodyMedium.copyWith(color: colors.onSurfaceMuted, fontSize: 14),
+              ? ref.read(
+                  rcTextProvider(RemoteConfigKeys.subscriptionGateExpiredBody),
+                )
+              : ref.read(
+                  rcTextProvider(RemoteConfigKeys.subscriptionGateInactiveBody),
+                ),
+          style: typography.bodyMedium.copyWith(
+            color: colors.onSurfaceMuted,
+            fontSize: 14,
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(),
-            child: Text('Vazgeç', style: typography.bodyMedium.copyWith(color: colors.onSurfaceMuted)),
+            child: Text(
+              ref.read(rcTextProvider(RemoteConfigKeys.commonCancelButton)),
+              style: typography.bodyMedium.copyWith(
+                color: colors.onSurfaceMuted,
+              ),
+            ),
           ),
           TextButton(
             onPressed: () {
@@ -68,9 +94,18 @@ Future<bool> ensureSubscriptionAllowsWrite(BuildContext context, WidgetRef ref) 
               if (context.mounted && Navigator.of(context).canPop()) {
                 Navigator.of(context).pop();
               }
-              ref.read(panelStackControllerProvider.notifier).push(const SubscriptionPanel());
+              ref
+                  .read(panelStackControllerProvider.notifier)
+                  .push(const SubscriptionPanel());
             },
-            child: Text('Aboneliğe git', style: typography.bodyMedium.copyWith(color: colors.primary)),
+            child: Text(
+              ref.read(
+                rcTextProvider(
+                  RemoteConfigKeys.subscriptionGateGoToSubscription,
+                ),
+              ),
+              style: typography.bodyMedium.copyWith(color: colors.primary),
+            ),
           ),
         ],
       );

@@ -11,16 +11,7 @@ import '../../../../shared/widgets/app_back_button.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../group_sessions/controller/discover_controller.dart';
 import '../../../group_sessions/domain/discover_item.dart';
-
-const _weekdayNames = {
-  1: 'Pazartesi',
-  2: 'Salı',
-  3: 'Çarşamba',
-  4: 'Perşembe',
-  5: 'Cuma',
-  6: 'Cumartesi',
-  7: 'Pazar',
-};
+import '../../../../shared/utils/date_labels.dart';
 
 /// Üye 5 · Etkinlik Detayı — [DiscoverPanel]'deki listeden bir etkinlik
 /// kartına dokunulunca açılır. `group_session_detail_panel.dart` ile aynı
@@ -139,8 +130,12 @@ class _EventDetailPanelState extends BasePanelState<EventDetailPanel> {
                                     RemoteConfigKeys.eventsDateFieldLabel,
                                   ),
                                 ),
-                                value:
-                                    '${_weekdayNames[item.startTime!.weekday]}, ${item.day} ${item.month}',
+                                value: ref
+                                    .watch(dateLabelsProvider)
+                                    .weekdayWithDate(
+                                      item.startTime!.weekday,
+                                      '${item.day} ${item.month}',
+                                    ),
                               ),
                               _IconDetailRow(
                                 icon: Icons.access_time_rounded,

@@ -67,7 +67,9 @@ class _CreateEventPanelState extends BasePanelState<CreateEventPanel> {
       if (data == null) {
         setState(() {
           _isLoadingForEdit = false;
-          _errorMessage = 'Etkinlik bulunamadı.';
+          _errorMessage = ref.read(
+            rcTextProvider(RemoteConfigKeys.eventsNotFoundError),
+          );
         });
         return;
       }
@@ -87,7 +89,9 @@ class _CreateEventPanelState extends BasePanelState<CreateEventPanel> {
       if (!mounted) return;
       setState(() {
         _isLoadingForEdit = false;
-        _errorMessage = 'Etkinlik yüklenemedi, tekrar dene.';
+        _errorMessage = ref.read(
+          rcTextProvider(RemoteConfigKeys.eventsLoadError),
+        );
       });
     }
   }
@@ -538,7 +542,8 @@ class _CreateEventPanelState extends BasePanelState<CreateEventPanel> {
                                 ),
                                 busyLabel: ref.read(
                                   rcTextProvider(
-                                    RemoteConfigKeys.gymsGymSetupSubmittingLabel,
+                                    RemoteConfigKeys
+                                        .gymsGymSetupSubmittingLabel,
                                   ),
                                 ),
                                 errorMessage: ref.read(

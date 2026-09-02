@@ -11,7 +11,7 @@ import '../../../../core/theme/app_color_scheme.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../shared/domain/membership_installment.dart';
-import '../../../../shared/utils/tr_date_formatter.dart';
+import '../../../../shared/utils/date_labels.dart';
 
 /// Tek bir taksit satırı (admin görünümü, tutar dahil) — admin taksit
 /// oluştururken (`NewMembershipPaymentPanel`) ve mevcut bir üyenin
@@ -48,8 +48,7 @@ class InstallmentRow extends ConsumerWidget {
     AppTypography typography,
   ) {
     final currency =
-        ref.watch(activeGymCurrencyProvider).valueOrNull ??
-        defaultCurrencyCode;
+        ref.watch(activeGymCurrencyProvider).valueOrNull ?? defaultCurrencyCode;
     final locale = ref.watch(localeControllerProvider);
     return Container(
       constraints: const BoxConstraints(minHeight: 56),
@@ -79,7 +78,7 @@ class InstallmentRow extends ConsumerWidget {
                   ),
                 ),
                 Text(
-                  '${formatMoney(installment.amountTl, currency, locale)} · ${formatTrDate(installment.dueDate)}',
+                  '${formatMoney(installment.amountTl, currency, locale)} · ${ref.watch(dateLabelsProvider).dayMonthYear(installment.dueDate)}',
                   style: typography.caption.copyWith(
                     color: colors.onSurfaceMuted,
                   ),

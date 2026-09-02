@@ -10,7 +10,6 @@ import '../../../../core/panels/panel_stack_controller.dart';
 import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/subscription/subscription_write_gate.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../../../shared/utils/tr_date_formatter.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_phone_field.dart';
 import '../../../../shared/widgets/app_text_field.dart';
@@ -22,6 +21,7 @@ import '../../controller/new_member_controller.dart';
 import '../../domain/admin_member_summary.dart';
 import '../../domain/new_member_form.dart';
 import 'new_membership_package_panel.dart';
+import '../../../../shared/utils/date_labels.dart';
 
 /// Admin 5 · Üye bilgileri — [existing] verilirse mevcut üyeyi görüntüle/
 /// düzenle, verilmezse Yeni Üye kayıt sihirbazının 1. adımı (1/3).
@@ -541,7 +541,9 @@ class _MemberInfoPanelState extends BasePanelState<MemberInfoPanel> {
                                   // Mevcut üye düzenlenirken gerçek kayıt tarihi
                                   // henüz Firestore'dan okunmuyor (ayrı kapsam).
                                   widget.isNew
-                                      ? formatTrDate(form.registeredAt)
+                                      ? ref
+                                            .watch(dateLabelsProvider)
+                                            .dayMonthYear(form.registeredAt)
                                       : '—',
                                   style: typography.headingSmall.copyWith(
                                     color: colors.onSurface,

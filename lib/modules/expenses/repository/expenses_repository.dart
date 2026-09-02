@@ -2,11 +2,16 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../domain/expense_state.dart';
 import '../service/expenses_service.dart';
+import '../../../shared/utils/date_labels.dart';
 
 part 'expenses_repository.g.dart';
 
 abstract interface class ExpensesRepository {
-  Stream<ExpensesState> watchMonth(String gymId, DateTime month);
+  Stream<ExpensesState> watchMonth(
+    String gymId,
+    DateTime month,
+    DateLabels labels,
+  );
   Future<void> addExpense({
     required String gymId,
     required String category,
@@ -23,8 +28,11 @@ class ExpensesRepositoryImpl implements ExpensesRepository {
   final ExpensesService _service;
 
   @override
-  Stream<ExpensesState> watchMonth(String gymId, DateTime month) =>
-      _service.watchMonth(gymId, month);
+  Stream<ExpensesState> watchMonth(
+    String gymId,
+    DateTime month,
+    DateLabels labels,
+  ) => _service.watchMonth(gymId, month, labels);
 
   @override
   Future<void> addExpense({

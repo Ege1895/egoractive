@@ -4,24 +4,16 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/theme/theme_controller.dart';
 import '../domain/admin_group_session.dart';
 import '../repository/admin_group_sessions_repository.dart';
+import '../../../shared/utils/date_labels.dart';
 
 part 'admin_group_sessions_controller.g.dart';
-
-const _weekdayNames = {
-  1: 'Pazartesi',
-  2: 'Salı',
-  3: 'Çarşamba',
-  4: 'Perşembe',
-  5: 'Cuma',
-  6: 'Cumartesi',
-  7: 'Pazar',
-};
 
 @riverpod
 Stream<List<AdminGroupSession>> _groupSessionsForGym(
   _GroupSessionsForGymRef ref,
   String gymId,
 ) {
+  final labels = ref.watch(dateLabelsProvider);
   final now = Timestamp.now();
   return FirebaseFirestore.instance
       .collection('groupSessions')
@@ -29,11 +21,16 @@ Stream<List<AdminGroupSession>> _groupSessionsForGym(
       .where('startTime', isGreaterThanOrEqualTo: now)
       .orderBy('startTime')
       .snapshots()
-      .map((snapshot) => snapshot.docs.map(_toAdminGroupSession).toList());
+      .map(
+        (snapshot) => snapshot.docs
+            .map((doc) => _toAdminGroupSession(doc, labels))
+            .toList(),
+      );
 }
 
 AdminGroupSession _toAdminGroupSession(
   QueryDocumentSnapshot<Map<String, dynamic>> doc,
+  DateLabels labels,
 ) {
   final data = doc.data();
   final startTime = (data['startTime'] as Timestamp).toDate();
@@ -46,7 +43,7 @@ AdminGroupSession _toAdminGroupSession(
     id: doc.id,
     name: (data['title'] as String?) ?? '',
     meta:
-        '${(data['trainerName'] as String?) ?? ''} · ${_weekdayNames[startTime.weekday]} $time',
+        '${(data['trainerName'] as String?) ?? ''} · ${labels.weekdayLong(startTime.weekday)} $time',
     taken: attendeeIds.length,
     capacity: (data['capacity'] as num?)?.toInt() ?? 0,
     isCancelled: (data['status'] as String?) == 'cancelled',

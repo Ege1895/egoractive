@@ -534,7 +534,10 @@ abstract class _SessionTypeBreakdown extends SessionTypeBreakdown {
 
 /// @nodoc
 mixin _$DashboardSummary {
-  String get monthLabel => throw _privateConstructorUsedError;
+  /// Özetin KAPSADIĞI ay (ayın 1'i). Hazır metin yerine ham tarih taşınıyor:
+  /// ay adı Remote Config'ten, aktif dile göre UI katmanında biçimlendiriliyor
+  /// (bkz. `shared/utils/month_label.dart`).
+  DateTime? get month => throw _privateConstructorUsedError;
   int get totalSessions => throw _privateConstructorUsedError;
   int get completedSessions => throw _privateConstructorUsedError;
   int get cancelledSessions => throw _privateConstructorUsedError;
@@ -556,7 +559,7 @@ abstract class $DashboardSummaryCopyWith<$Res> {
   ) = _$DashboardSummaryCopyWithImpl<$Res, DashboardSummary>;
   @useResult
   $Res call({
-    String monthLabel,
+    DateTime? month,
     int totalSessions,
     int completedSessions,
     int cancelledSessions,
@@ -580,7 +583,7 @@ class _$DashboardSummaryCopyWithImpl<$Res, $Val extends DashboardSummary>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? monthLabel = null,
+    Object? month = freezed,
     Object? totalSessions = null,
     Object? completedSessions = null,
     Object? cancelledSessions = null,
@@ -589,10 +592,10 @@ class _$DashboardSummaryCopyWithImpl<$Res, $Val extends DashboardSummary>
   }) {
     return _then(
       _value.copyWith(
-            monthLabel: null == monthLabel
-                ? _value.monthLabel
-                : monthLabel // ignore: cast_nullable_to_non_nullable
-                      as String,
+            month: freezed == month
+                ? _value.month
+                : month // ignore: cast_nullable_to_non_nullable
+                      as DateTime?,
             totalSessions: null == totalSessions
                 ? _value.totalSessions
                 : totalSessions // ignore: cast_nullable_to_non_nullable
@@ -629,7 +632,7 @@ abstract class _$$DashboardSummaryImplCopyWith<$Res>
   @override
   @useResult
   $Res call({
-    String monthLabel,
+    DateTime? month,
     int totalSessions,
     int completedSessions,
     int cancelledSessions,
@@ -652,7 +655,7 @@ class __$$DashboardSummaryImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? monthLabel = null,
+    Object? month = freezed,
     Object? totalSessions = null,
     Object? completedSessions = null,
     Object? cancelledSessions = null,
@@ -661,10 +664,10 @@ class __$$DashboardSummaryImplCopyWithImpl<$Res>
   }) {
     return _then(
       _$DashboardSummaryImpl(
-        monthLabel: null == monthLabel
-            ? _value.monthLabel
-            : monthLabel // ignore: cast_nullable_to_non_nullable
-                  as String,
+        month: freezed == month
+            ? _value.month
+            : month // ignore: cast_nullable_to_non_nullable
+                  as DateTime?,
         totalSessions: null == totalSessions
             ? _value.totalSessions
             : totalSessions // ignore: cast_nullable_to_non_nullable
@@ -694,7 +697,7 @@ class __$$DashboardSummaryImplCopyWithImpl<$Res>
 
 class _$DashboardSummaryImpl extends _DashboardSummary {
   const _$DashboardSummaryImpl({
-    required this.monthLabel,
+    required this.month,
     required this.totalSessions,
     required this.completedSessions,
     required this.cancelledSessions,
@@ -702,8 +705,11 @@ class _$DashboardSummaryImpl extends _DashboardSummary {
     required this.totalExpensesTl,
   }) : super._();
 
+  /// Özetin KAPSADIĞI ay (ayın 1'i). Hazır metin yerine ham tarih taşınıyor:
+  /// ay adı Remote Config'ten, aktif dile göre UI katmanında biçimlendiriliyor
+  /// (bkz. `shared/utils/month_label.dart`).
   @override
-  final String monthLabel;
+  final DateTime? month;
   @override
   final int totalSessions;
   @override
@@ -717,7 +723,7 @@ class _$DashboardSummaryImpl extends _DashboardSummary {
 
   @override
   String toString() {
-    return 'DashboardSummary(monthLabel: $monthLabel, totalSessions: $totalSessions, completedSessions: $completedSessions, cancelledSessions: $cancelledSessions, estimatedRevenueTl: $estimatedRevenueTl, totalExpensesTl: $totalExpensesTl)';
+    return 'DashboardSummary(month: $month, totalSessions: $totalSessions, completedSessions: $completedSessions, cancelledSessions: $cancelledSessions, estimatedRevenueTl: $estimatedRevenueTl, totalExpensesTl: $totalExpensesTl)';
   }
 
   @override
@@ -725,8 +731,7 @@ class _$DashboardSummaryImpl extends _DashboardSummary {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$DashboardSummaryImpl &&
-            (identical(other.monthLabel, monthLabel) ||
-                other.monthLabel == monthLabel) &&
+            (identical(other.month, month) || other.month == month) &&
             (identical(other.totalSessions, totalSessions) ||
                 other.totalSessions == totalSessions) &&
             (identical(other.completedSessions, completedSessions) ||
@@ -742,7 +747,7 @@ class _$DashboardSummaryImpl extends _DashboardSummary {
   @override
   int get hashCode => Object.hash(
     runtimeType,
-    monthLabel,
+    month,
     totalSessions,
     completedSessions,
     cancelledSessions,
@@ -764,7 +769,7 @@ class _$DashboardSummaryImpl extends _DashboardSummary {
 
 abstract class _DashboardSummary extends DashboardSummary {
   const factory _DashboardSummary({
-    required final String monthLabel,
+    required final DateTime? month,
     required final int totalSessions,
     required final int completedSessions,
     required final int cancelledSessions,
@@ -773,8 +778,11 @@ abstract class _DashboardSummary extends DashboardSummary {
   }) = _$DashboardSummaryImpl;
   const _DashboardSummary._() : super._();
 
+  /// Özetin KAPSADIĞI ay (ayın 1'i). Hazır metin yerine ham tarih taşınıyor:
+  /// ay adı Remote Config'ten, aktif dile göre UI katmanında biçimlendiriliyor
+  /// (bkz. `shared/utils/month_label.dart`).
   @override
-  String get monthLabel;
+  DateTime? get month;
   @override
   int get totalSessions;
   @override
@@ -796,7 +804,14 @@ abstract class _DashboardSummary extends DashboardSummary {
 
 /// @nodoc
 mixin _$DashboardReport {
+  /// SUNUCUDA biçimlenmiş dönem etiketi — sadece geçmiş rapor
+  /// snapshot'larında (F5-9, `periodLabel`) dolu gelir. Canlı dashboard bu
+  /// alanı boş bırakıp [month]'u doldurur; etiketi UI kendi diline göre
+  /// üretir.
   String get monthLabel => throw _privateConstructorUsedError;
+
+  /// Canlı dashboard'ın kapsadığı ay; snapshot yolunda null.
+  DateTime? get month => throw _privateConstructorUsedError;
   int get totalSessions => throw _privateConstructorUsedError;
   int get completedSessions => throw _privateConstructorUsedError;
   int get cancelledSessions => throw _privateConstructorUsedError;
@@ -828,6 +843,7 @@ abstract class $DashboardReportCopyWith<$Res> {
   @useResult
   $Res call({
     String monthLabel,
+    DateTime? month,
     int totalSessions,
     int completedSessions,
     int cancelledSessions,
@@ -858,6 +874,7 @@ class _$DashboardReportCopyWithImpl<$Res, $Val extends DashboardReport>
   @override
   $Res call({
     Object? monthLabel = null,
+    Object? month = freezed,
     Object? totalSessions = null,
     Object? completedSessions = null,
     Object? cancelledSessions = null,
@@ -873,6 +890,10 @@ class _$DashboardReportCopyWithImpl<$Res, $Val extends DashboardReport>
                 ? _value.monthLabel
                 : monthLabel // ignore: cast_nullable_to_non_nullable
                       as String,
+            month: freezed == month
+                ? _value.month
+                : month // ignore: cast_nullable_to_non_nullable
+                      as DateTime?,
             totalSessions: null == totalSessions
                 ? _value.totalSessions
                 : totalSessions // ignore: cast_nullable_to_non_nullable
@@ -944,6 +965,7 @@ abstract class _$$DashboardReportImplCopyWith<$Res>
   @useResult
   $Res call({
     String monthLabel,
+    DateTime? month,
     int totalSessions,
     int completedSessions,
     int cancelledSessions,
@@ -975,6 +997,7 @@ class __$$DashboardReportImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? monthLabel = null,
+    Object? month = freezed,
     Object? totalSessions = null,
     Object? completedSessions = null,
     Object? cancelledSessions = null,
@@ -990,6 +1013,10 @@ class __$$DashboardReportImplCopyWithImpl<$Res>
             ? _value.monthLabel
             : monthLabel // ignore: cast_nullable_to_non_nullable
                   as String,
+        month: freezed == month
+            ? _value.month
+            : month // ignore: cast_nullable_to_non_nullable
+                  as DateTime?,
         totalSessions: null == totalSessions
             ? _value.totalSessions
             : totalSessions // ignore: cast_nullable_to_non_nullable
@@ -1032,6 +1059,7 @@ class __$$DashboardReportImplCopyWithImpl<$Res>
 class _$DashboardReportImpl extends _DashboardReport {
   const _$DashboardReportImpl({
     required this.monthLabel,
+    this.month = null,
     required this.totalSessions,
     required this.completedSessions,
     required this.cancelledSessions,
@@ -1043,8 +1071,17 @@ class _$DashboardReportImpl extends _DashboardReport {
   }) : _trainerPerformance = trainerPerformance,
        super._();
 
+  /// SUNUCUDA biçimlenmiş dönem etiketi — sadece geçmiş rapor
+  /// snapshot'larında (F5-9, `periodLabel`) dolu gelir. Canlı dashboard bu
+  /// alanı boş bırakıp [month]'u doldurur; etiketi UI kendi diline göre
+  /// üretir.
   @override
   final String monthLabel;
+
+  /// Canlı dashboard'ın kapsadığı ay; snapshot yolunda null.
+  @override
+  @JsonKey()
+  final DateTime? month;
   @override
   final int totalSessions;
   @override
@@ -1077,7 +1114,7 @@ class _$DashboardReportImpl extends _DashboardReport {
 
   @override
   String toString() {
-    return 'DashboardReport(monthLabel: $monthLabel, totalSessions: $totalSessions, completedSessions: $completedSessions, cancelledSessions: $cancelledSessions, trainerPerformance: $trainerPerformance, estimatedRevenueTl: $estimatedRevenueTl, totalExpensesTl: $totalExpensesTl, individualSessions: $individualSessions, duetSessions: $duetSessions)';
+    return 'DashboardReport(monthLabel: $monthLabel, month: $month, totalSessions: $totalSessions, completedSessions: $completedSessions, cancelledSessions: $cancelledSessions, trainerPerformance: $trainerPerformance, estimatedRevenueTl: $estimatedRevenueTl, totalExpensesTl: $totalExpensesTl, individualSessions: $individualSessions, duetSessions: $duetSessions)';
   }
 
   @override
@@ -1087,6 +1124,7 @@ class _$DashboardReportImpl extends _DashboardReport {
             other is _$DashboardReportImpl &&
             (identical(other.monthLabel, monthLabel) ||
                 other.monthLabel == monthLabel) &&
+            (identical(other.month, month) || other.month == month) &&
             (identical(other.totalSessions, totalSessions) ||
                 other.totalSessions == totalSessions) &&
             (identical(other.completedSessions, completedSessions) ||
@@ -1111,6 +1149,7 @@ class _$DashboardReportImpl extends _DashboardReport {
   int get hashCode => Object.hash(
     runtimeType,
     monthLabel,
+    month,
     totalSessions,
     completedSessions,
     cancelledSessions,
@@ -1136,6 +1175,7 @@ class _$DashboardReportImpl extends _DashboardReport {
 abstract class _DashboardReport extends DashboardReport {
   const factory _DashboardReport({
     required final String monthLabel,
+    final DateTime? month,
     required final int totalSessions,
     required final int completedSessions,
     required final int cancelledSessions,
@@ -1147,8 +1187,16 @@ abstract class _DashboardReport extends DashboardReport {
   }) = _$DashboardReportImpl;
   const _DashboardReport._() : super._();
 
+  /// SUNUCUDA biçimlenmiş dönem etiketi — sadece geçmiş rapor
+  /// snapshot'larında (F5-9, `periodLabel`) dolu gelir. Canlı dashboard bu
+  /// alanı boş bırakıp [month]'u doldurur; etiketi UI kendi diline göre
+  /// üretir.
   @override
   String get monthLabel;
+
+  /// Canlı dashboard'ın kapsadığı ay; snapshot yolunda null.
+  @override
+  DateTime? get month;
   @override
   int get totalSessions;
   @override

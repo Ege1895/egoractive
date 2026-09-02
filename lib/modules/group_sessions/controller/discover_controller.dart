@@ -8,32 +8,9 @@ import '../../events/service/events_write_service.dart';
 import '../domain/discover_item.dart';
 import '../repository/discover_repository.dart';
 import '../service/group_sessions_write_service.dart';
+import '../../../shared/utils/date_labels.dart';
 
 part 'discover_controller.g.dart';
-
-const _monthAbbrev = {
-  1: 'Oca',
-  2: 'Şub',
-  3: 'Mar',
-  4: 'Nis',
-  5: 'May',
-  6: 'Haz',
-  7: 'Tem',
-  8: 'Ağu',
-  9: 'Eyl',
-  10: 'Eki',
-  11: 'Kas',
-  12: 'Ara',
-};
-const _weekdayNames = {
-  1: 'Pazartesi',
-  2: 'Salı',
-  3: 'Çarşamba',
-  4: 'Perşembe',
-  5: 'Cuma',
-  6: 'Cumartesi',
-  7: 'Pazar',
-};
 
 @riverpod
 Stream<List<DiscoverItem>> _groupSessionsForGym(
@@ -44,6 +21,7 @@ Stream<List<DiscoverItem>> _groupSessionsForGym(
   final leaveLockHours = ref
       .watch(remoteConfigServiceProvider)
       .groupSessionLeaveLockHoursBefore;
+  final labels = ref.watch(dateLabelsProvider);
   final now = Timestamp.now();
   return FirebaseFirestore.instance
       .collection('groupSessions')
@@ -60,7 +38,9 @@ Stream<List<DiscoverItem>> _groupSessionsForGym(
             // görünmez — admin ekranında ise rozetle listelenmeye devam
             // eder (bkz. admin_group_sessions_controller.dart).
             .where((doc) => (doc.data()['status'] as String?) != 'cancelled')
-            .map((doc) => _toGroupSessionItem(doc, myUid, leaveLockHours))
+            .map(
+              (doc) => _toGroupSessionItem(doc, myUid, leaveLockHours, labels),
+            )
             .toList(),
       );
 }
@@ -69,6 +49,7 @@ DiscoverItem _toGroupSessionItem(
   QueryDocumentSnapshot<Map<String, dynamic>> doc,
   String myUid,
   int leaveLockHours,
+  DateLabels labels,
 ) {
   final data = doc.data();
   final startTime = (data['startTime'] as Timestamp).toDate();
@@ -82,10 +63,10 @@ DiscoverItem _toGroupSessionItem(
     id: doc.id,
     category: DiscoverCategory.groupSessions,
     day: startTime.day.toString().padLeft(2, '0'),
-    month: _monthAbbrev[startTime.month] ?? '',
+    month: labels.monthShort(startTime.month),
     title: (data['title'] as String?) ?? '',
     meta:
-        '${(data['trainerName'] as String?) ?? ''} · ${_weekdayNames[startTime.weekday]} $time · $durationMinutes dk',
+        '${(data['trainerName'] as String?) ?? ''} · ${labels.weekdayLong(startTime.weekday)} $time · $durationMinutes dk',
     taken: attendeeIds.length,
     capacity: (data['capacity'] as num?)?.toInt(),
     joined: attendeeIds.contains(myUid),
@@ -109,6 +90,7 @@ Stream<List<DiscoverItem>> _eventsForGym(
   final leaveLockHours = ref
       .watch(remoteConfigServiceProvider)
       .eventLeaveLockHoursBefore;
+  final labels = ref.watch(dateLabelsProvider);
   final now = Timestamp.now();
   return FirebaseFirestore.instance
       .collection('events')
@@ -119,7 +101,7 @@ Stream<List<DiscoverItem>> _eventsForGym(
       .map(
         (snapshot) => snapshot.docs
             .where((doc) => (doc.data()['status'] as String?) != 'cancelled')
-            .map((doc) => _toEventItem(doc, myUid, leaveLockHours))
+            .map((doc) => _toEventItem(doc, myUid, leaveLockHours, labels))
             .toList(),
       );
 }
@@ -134,6 +116,7 @@ DiscoverItem _toEventItem(
   QueryDocumentSnapshot<Map<String, dynamic>> doc,
   String myUid,
   int leaveLockHours,
+  DateLabels labels,
 ) {
   final data = doc.data();
   final dateTime = (data['dateTime'] as Timestamp).toDate();
@@ -146,10 +129,10 @@ DiscoverItem _toEventItem(
     id: doc.id,
     category: DiscoverCategory.events,
     day: dateTime.day.toString().padLeft(2, '0'),
-    month: _monthAbbrev[dateTime.month] ?? '',
+    month: labels.monthShort(dateTime.month),
     title: (data['name'] as String?) ?? '',
     meta:
-        '${(data['location'] as String?) ?? ''} · ${_weekdayNames[dateTime.weekday]} $time',
+        '${(data['location'] as String?) ?? ''} · ${labels.weekdayLong(dateTime.weekday)} $time',
     taken: attendeeIds.length,
     capacity: (data['capacity'] as num?)?.toInt(),
     joined: attendeeIds.contains(myUid),

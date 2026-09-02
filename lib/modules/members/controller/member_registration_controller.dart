@@ -3,6 +3,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/theme/theme_controller.dart';
 import '../service/member_registration_service.dart';
 import 'new_member_controller.dart';
+import '../../../core/remote_config/remote_config_service.dart';
 
 part 'member_registration_controller.g.dart';
 
@@ -74,9 +75,13 @@ class MemberRegistrationController extends _$MemberRegistrationController {
     final nameError = name.isEmpty ? 'Ad ve soyad gerekli.' : null;
     final phoneError = form.isPhoneValid
         ? null
-        : 'Geçerli bir telefon numarası gir.';
+        : ref.read(rcTextProvider(RemoteConfigKeys.commonInvalidPhoneError));
     final trainerError = form.trainerId == null || form.trainerName == null
-        ? 'Bir antrenör seç.'
+        ? ref.read(
+            rcTextProvider(
+              RemoteConfigKeys.membersRegistrationTrainerRequiredError,
+            ),
+          )
         : null;
     if (nameError != null || phoneError != null || trainerError != null) {
       state = MemberRegistrationState(
@@ -89,7 +94,11 @@ class MemberRegistrationController extends _$MemberRegistrationController {
 
     final gymId = await ref.read(activeGymIdProvider.future);
     if (gymId == null) {
-      state = state.copyWith(errorMessage: 'Aktif bir salon bulunamadı.');
+      state = state.copyWith(
+        errorMessage: ref.read(
+          rcTextProvider(RemoteConfigKeys.commonNoActiveGymError),
+        ),
+      );
       return false;
     }
 
@@ -99,7 +108,9 @@ class MemberRegistrationController extends _$MemberRegistrationController {
     try {
       if (await service.phoneNumberIsTaken(phoneNumber)) {
         state = MemberRegistrationState(
-          phoneError: 'Bu telefon numarası zaten kayıtlı.',
+          phoneError: ref.read(
+            rcTextProvider(RemoteConfigKeys.membersRegistrationPhoneTakenError),
+          ),
         );
         return false;
       }
@@ -122,7 +133,9 @@ class MemberRegistrationController extends _$MemberRegistrationController {
     } catch (_) {
       state = state.copyWith(
         isSubmitting: false,
-        errorMessage: 'Üye eklenemedi. Bağlantını kontrol edip tekrar dene.',
+        errorMessage: ref.read(
+          rcTextProvider(RemoteConfigKeys.membersRegistrationCreateError),
+        ),
       );
       return false;
     }
@@ -139,7 +152,7 @@ class MemberRegistrationController extends _$MemberRegistrationController {
     final nameError = name.isEmpty ? 'Ad ve soyad gerekli.' : null;
     final phoneError = form.isPhoneValid
         ? null
-        : 'Geçerli bir telefon numarası gir.';
+        : ref.read(rcTextProvider(RemoteConfigKeys.commonInvalidPhoneError));
     if (nameError != null || phoneError != null) {
       state = MemberRegistrationState(
         nameError: nameError,
@@ -166,8 +179,9 @@ class MemberRegistrationController extends _$MemberRegistrationController {
     } catch (_) {
       state = state.copyWith(
         isSubmitting: false,
-        errorMessage:
-            'Üye güncellenemedi. Bağlantını kontrol edip tekrar dene.',
+        errorMessage: ref.read(
+          rcTextProvider(RemoteConfigKeys.membersRegistrationUpdateError),
+        ),
       );
       return false;
     }

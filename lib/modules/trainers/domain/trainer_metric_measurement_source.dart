@@ -1,22 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'trainer_member_detail.dart';
+import '../../../shared/utils/date_labels.dart';
 import 'trainer_metric.dart';
-
-const _monthAbbrev = {
-  1: 'Oca',
-  2: 'Şub',
-  3: 'Mar',
-  4: 'Nis',
-  5: 'May',
-  6: 'Haz',
-  7: 'Tem',
-  8: 'Ağu',
-  9: 'Eyl',
-  10: 'Eki',
-  11: 'Kas',
-  12: 'Ara',
-};
 
 /// `TrainerMetric` <-> ölçüm modülünün `measurements/{uid}/entries`
 /// dokümanlarındaki alan adı eşlemesi. `MeasurementMetric.kilo.name`/
@@ -35,6 +21,7 @@ const _fieldByMetric = {
 /// ekranı o zaman bu ikisini hiç toplamıyordu).
 Stream<Map<TrainerMetric, TrainerMetricSeries>> watchTrainerMetricSeries(
   String memberId,
+  DateLabels labels,
 ) {
   return FirebaseFirestore.instance
       .collection('measurements')
@@ -53,7 +40,7 @@ Stream<Map<TrainerMetric, TrainerMetricSeries>> watchTrainerMetricSeries(
             final raw = data[field];
             if (raw is num) {
               final date = (data['date'] as Timestamp).toDate();
-              months.add(_monthAbbrev[date.month] ?? '');
+              months.add(labels.monthShort(date.month));
               values.add(raw.toDouble());
             }
           }

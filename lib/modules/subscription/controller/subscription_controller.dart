@@ -8,6 +8,7 @@ import '../../../core/locale/locale_controller.dart';
 import '../../../core/theme/theme_controller.dart';
 import '../domain/subscription_state.dart';
 import '../repository/subscription_repository.dart';
+import '../../../core/remote_config/remote_config_service.dart';
 
 part 'subscription_controller.g.dart';
 
@@ -100,7 +101,9 @@ class SubscriptionController extends _$SubscriptionController {
       state = state.copyWith(
         isPurchasing: false,
         pendingProductId: null,
-        purchaseErrorMessage: 'Başlatılamadı, tekrar dene.',
+        purchaseErrorMessage: ref.read(
+          rcTextProvider(RemoteConfigKeys.subscriptionStartError),
+        ),
       );
     }
   }
@@ -148,8 +151,9 @@ class SubscriptionController extends _$SubscriptionController {
       state = state.copyWith(
         isPurchasing: false,
         pendingProductId: null,
-        purchaseErrorMessage:
-            'Satın alma başlatılamadı, mağaza bağlantısını kontrol edip tekrar dene.',
+        purchaseErrorMessage: ref.read(
+          rcTextProvider(RemoteConfigKeys.subscriptionPurchaseStartError),
+        ),
       );
     }
   }
@@ -182,8 +186,16 @@ class SubscriptionController extends _$SubscriptionController {
             // ayrı, net bir mesaj gerekiyor.
             verifyErrorMessage =
                 e is FirebaseFunctionsException && e.code == 'already-exists'
-                ? 'Bu Apple/Google hesabıyla zaten başka bir salon abone — her salonun kendi ayrı hesabıyla abone olması gerekiyor.'
-                : 'Satın alma doğrulanamadı, tekrar dene ya da destek ile iletişime geç.';
+                ? ref.read(
+                    rcTextProvider(
+                      RemoteConfigKeys.subscriptionAccountAlreadyUsedError,
+                    ),
+                  )
+                : ref.read(
+                    rcTextProvider(
+                      RemoteConfigKeys.subscriptionVerificationError,
+                    ),
+                  );
           }
         }
         await repo.completePurchase(purchase);
@@ -203,7 +215,11 @@ class SubscriptionController extends _$SubscriptionController {
           isPurchasing: false,
           pendingProductId: null,
           purchaseErrorMessage: purchase.status == PurchaseStatus.error
-              ? 'Satın alma tamamlanamadı, mağaza bağlantısını kontrol edip tekrar dene.'
+              ? ref.read(
+                  rcTextProvider(
+                    RemoteConfigKeys.subscriptionPurchaseCompleteError,
+                  ),
+                )
               : null,
         );
       }

@@ -19,24 +19,10 @@ import '../../controller/member_registration_controller.dart';
 import '../../controller/new_member_controller.dart';
 import '../../controller/new_membership_controller.dart';
 import 'new_membership_payment_panel.dart';
+import '../../../../shared/utils/date_labels.dart';
 
-const _monthAbbrev = {
-  1: 'Oca',
-  2: 'Şub',
-  3: 'Mar',
-  4: 'Nis',
-  5: 'May',
-  6: 'Haz',
-  7: 'Tem',
-  8: 'Ağu',
-  9: 'Eyl',
-  10: 'Eki',
-  11: 'Kas',
-  12: 'Ara',
-};
-
-String _formatDate(DateTime date) =>
-    '${date.day} ${_monthAbbrev[date.month]} ${date.year}';
+String _formatDate(DateTime date, WidgetRef ref) =>
+    ref.watch(dateLabelsProvider).dayMonthYear(date);
 
 /// Admin 6 · Yeni üyelik — Paket — paket seçince alanlar otomatik dolar.
 class NewMembershipPackagePanel extends BasePanel {
@@ -67,8 +53,7 @@ class _NewMembershipPackagePanelState
     final colors = context.appColors;
     final typography = context.appTypography;
     final currency =
-        ref.watch(activeGymCurrencyProvider).valueOrNull ??
-        defaultCurrencyCode;
+        ref.watch(activeGymCurrencyProvider).valueOrNull ?? defaultCurrencyCode;
     final locale = ref.watch(localeControllerProvider);
     final memberForm = ref.watch(newMemberControllerProvider);
     final packages = ref
@@ -275,11 +260,7 @@ class _NewMembershipPackagePanelState
                   for (final package in packages)
                     _PackagePick(
                       package: package,
-                      priceText: formatMoney(
-                        package.priceTl,
-                        currency,
-                        locale,
-                      ),
+                      priceText: formatMoney(package.priceTl, currency, locale),
                       selected: membership.selectedPackage?.id == package.id,
                       onTap: () => membershipController.selectPackage(package),
                     ),
@@ -302,7 +283,7 @@ class _NewMembershipPackagePanelState
                               RemoteConfigKeys.membersStartDateFieldLabel,
                             ),
                           ),
-                          value: _formatDate(membership.startDate),
+                          value: _formatDate(membership.startDate, ref),
                           showDivider: true,
                           onTap: () => showNativeDatePicker(
                             context: context,
@@ -318,7 +299,7 @@ class _NewMembershipPackagePanelState
                               RemoteConfigKeys.membersEndDateFieldLabel,
                             ),
                           ),
-                          value: _formatDate(membership.endDate),
+                          value: _formatDate(membership.endDate, ref),
                           showDivider: true,
                           onTap: () => showNativeDatePicker(
                             context: context,

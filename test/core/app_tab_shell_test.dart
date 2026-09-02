@@ -24,6 +24,19 @@ class _FakeRemoteConfigService extends RemoteConfigService {
     'lbl_sessions_list_title': 'Derslerim',
     'lbl_trainers_calendar_title': 'Takvimim',
     'lbl_expenses_list_title': 'Giderler',
+    // Alt navigasyon etiketleri de artık RC'den geliyor (sabit Türkçe
+    // metinlerdi, uygulama İngilizce'yken bile Türkçe kalıyorlardı).
+    'lbl_shell_tab_home': 'Ana Sayfa',
+    'lbl_shell_tab_profile': 'Profil',
+    'lbl_shell_member_tab_derslerim': 'Derslerim',
+    'lbl_shell_member_tab_olcumlerim': 'Ölçümlerim',
+    'lbl_shell_member_tab_kesfet': 'Keşfet',
+    'lbl_shell_trainer_tab_takvimim': 'Takvimim',
+    'lbl_shell_trainer_tab_uyelerim': 'Üyelerim',
+    'lbl_shell_admin_tab_uyeler': 'Üyeler',
+    'lbl_shell_admin_tab_seanslar': 'Seanslar',
+    'lbl_shell_admin_tab_finans': 'Finans',
+    'lbl_shell_admin_tab_ayarlar': 'Ayarlar',
   };
 
   @override

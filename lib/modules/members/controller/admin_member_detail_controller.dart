@@ -10,23 +10,10 @@ import '../domain/admin_member_detail.dart';
 import '../domain/admin_member_detail_mapper.dart';
 import '../repository/admin_member_detail_repository.dart';
 import '../service/membership_installment_write_service.dart';
+import '../../../shared/utils/date_labels.dart';
+import '../../../core/remote_config/remote_config_service.dart';
 
 part 'admin_member_detail_controller.g.dart';
-
-const _monthAbbrev = {
-  1: 'Oca',
-  2: 'Şub',
-  3: 'Mar',
-  4: 'Nis',
-  5: 'May',
-  6: 'Haz',
-  7: 'Tem',
-  8: 'Ağu',
-  9: 'Eyl',
-  10: 'Eki',
-  11: 'Kas',
-  12: 'Ara',
-};
 
 @riverpod
 Stream<AdminMemberDetail> _detailStreamForId(
@@ -74,6 +61,14 @@ Stream<List<SessionHistoryEntry>> _sessionHistoryForAdminMember(
 ) {
   final gymId = ref.watch(activeGymIdProvider).valueOrNull;
   if (gymId == null) return Stream.value(const []);
+  final labels = ref.watch(dateLabelsProvider);
+  final texts = _HistoryLabels(
+    soloWithTimeTemplate: ref.watch(
+      rcTextProvider(RemoteConfigKeys.commonSoloSessionWithTimeTemplate),
+    ),
+    completed: ref.watch(rcTextProvider(RemoteConfigKeys.commonTamamlandi)),
+    cancelled: ref.watch(rcTextProvider(RemoteConfigKeys.commonIptalLabel)),
+  );
   return FirebaseFirestore.instance
       .collection('sessions')
       .where('gymId', isEqualTo: gymId)
@@ -88,13 +83,15 @@ Stream<List<SessionHistoryEntry>> _sessionHistoryForAdminMember(
               return status == 'completed' || status == 'cancelled';
             })
             .take(10)
-            .map(_toHistoryEntry)
+            .map((doc) => _toHistoryEntry(doc, labels, texts))
             .toList();
       });
 }
 
 SessionHistoryEntry _toHistoryEntry(
   QueryDocumentSnapshot<Map<String, dynamic>> doc,
+  DateLabels labels,
+  _HistoryLabels texts,
 ) {
   final data = doc.data();
   final startTime = (data['startTime'] as Timestamp).toDate();
@@ -102,9 +99,9 @@ SessionHistoryEntry _toHistoryEntry(
       '${startTime.hour.toString().padLeft(2, '0')}:${startTime.minute.toString().padLeft(2, '0')}';
   final isCompleted = data['status'] == 'completed';
   return SessionHistoryEntry(
-    date: '${startTime.day} ${_monthAbbrev[startTime.month] ?? ''}',
-    type: 'Birebir · $time',
-    stateLabel: isCompleted ? 'Tamamlandı' : 'İptal',
+    date: labels.dayMonthShort(startTime),
+    type: texts.soloWithTimeTemplate.replaceAll('{time}', time),
+    stateLabel: isCompleted ? texts.completed : texts.cancelled,
     isPositive: isCompleted,
   );
 }
@@ -119,7 +116,7 @@ Stream<Map<TrainerMetric, TrainerMetricSeries>> _metricSeriesForAdminMember(
   _MetricSeriesForAdminMemberRef ref,
   String memberId,
 ) {
-  return watchTrainerMetricSeries(memberId);
+  return watchTrainerMetricSeries(memberId, ref.watch(dateLabelsProvider));
 }
 
 @riverpod
@@ -154,7 +151,7 @@ class AdminMemberDetailController extends _$AdminMemberDetailController {
       paymentPaidTl: (packageData?['paidAmount'] as num?)?.toInt() ?? 0,
       lastPaymentDate: purchasedAt == null
           ? '—'
-          : '${purchasedAt.day} ${_monthAbbrev[purchasedAt.month] ?? ''}',
+          : ref.watch(dateLabelsProvider).dayMonthShort(purchasedAt),
       history: history,
       seriesByMetric: metricSeries ?? base.seriesByMetric,
       packageDocId: package?.id,
@@ -232,4 +229,18 @@ class AdminMemberDetailController extends _$AdminMemberDetailController {
           .fold(0, (total, i) => total + i.amountTl),
     );
   }
+}
+
+/// Seans geçmişi satırındaki sabit metinler — RC'den okunup buraya
+/// taşınıyor (servis/mapper katmanı RC'ye erişmiyor).
+class _HistoryLabels {
+  const _HistoryLabels({
+    required this.soloWithTimeTemplate,
+    required this.completed,
+    required this.cancelled,
+  });
+
+  final String soloWithTimeTemplate;
+  final String completed;
+  final String cancelled;
 }

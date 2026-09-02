@@ -6,6 +6,7 @@ import '../../../core/theme/theme_controller.dart';
 import '../domain/expense_category.dart';
 import '../domain/expense_state.dart';
 import '../repository/expenses_repository.dart';
+import '../../../shared/utils/date_labels.dart';
 
 part 'expenses_controller.g.dart';
 
@@ -60,7 +61,9 @@ Stream<ExpensesState> _expensesForGym(
   String gymId,
   DateTime month,
 ) {
-  return ref.watch(expensesRepositoryProvider).watchMonth(gymId, month);
+  return ref
+      .watch(expensesRepositoryProvider)
+      .watchMonth(gymId, month, ref.watch(dateLabelsProvider));
 }
 
 /// F5-3 — `cfg_expense_categories` okuması burada async-wrapped: Remote

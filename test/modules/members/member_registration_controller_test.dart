@@ -57,9 +57,10 @@ void main() {
         final success = await notifier.submit();
 
         expect(success, isFalse);
+        // Metin RC'den geliyor (testte boş); alanın hata taşıması yeterli.
         expect(
           container.read(memberRegistrationControllerProvider).phoneError,
-          contains('Geçerli bir telefon'),
+          isNotNull,
         );
         expect(
           container.read(memberRegistrationControllerProvider).nameError,

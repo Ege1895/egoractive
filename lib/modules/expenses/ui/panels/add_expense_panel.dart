@@ -11,12 +11,12 @@ import '../../../../core/panels/panel_stack_controller.dart';
 import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/subscription/subscription_write_gate.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../../../shared/utils/tr_date_formatter.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_text_field.dart';
 import '../../../../shared/widgets/native_date_picker.dart';
 import '../../controller/expenses_controller.dart';
 import '../../domain/expense_category.dart';
+import '../../../../shared/utils/date_labels.dart';
 
 /// Admin 15 · Gider Ekle — kategori, tutar, tarih, tekrar. Kategori listesi
 /// Remote Config'ten (`cfg_expense_categories`) okunur — yeni bir kategori
@@ -52,8 +52,7 @@ class _AddExpensePanelState extends BasePanelState<AddExpensePanel> {
         ? null
         : selectedMatches.first.label;
     final currency =
-        ref.watch(activeGymCurrencyProvider).valueOrNull ??
-        defaultCurrencyCode;
+        ref.watch(activeGymCurrencyProvider).valueOrNull ?? defaultCurrencyCode;
 
     return Scaffold(
       body: SafeArea(
@@ -280,7 +279,9 @@ class _AddExpensePanelState extends BasePanelState<AddExpensePanel> {
                                         ),
                                       ),
                                       Text(
-                                        formatTrDate(_date),
+                                        ref
+                                            .watch(dateLabelsProvider)
+                                            .dayMonthYear(_date),
                                         style: typography.bodyLarge.copyWith(
                                           color: colors.onSurface,
                                         ),

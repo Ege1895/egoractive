@@ -14,22 +14,7 @@ import '../../controller/admin_calendar_controller.dart';
 import '../../domain/admin_calendar_state.dart';
 import '../../service/sessions_write_service.dart';
 import '../widgets/create_session_sheet.dart';
-
-const _monthNames = {
-  1: 'Ocak',
-  2: 'Şubat',
-  3: 'Mart',
-  4: 'Nisan',
-  5: 'Mayıs',
-  6: 'Haziran',
-  7: 'Temmuz',
-  8: 'Ağustos',
-  9: 'Eylül',
-  10: 'Ekim',
-  11: 'Kasım',
-  12: 'Aralık',
-};
-const _dayNames = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'];
+import '../../../../shared/utils/date_labels.dart';
 
 /// Admin · Aylık Takvim (Seanslar sekmesi kökü) — güne tıkla → saat
 /// çizelgesi, seansa tıkla → detay bottom-sheet.
@@ -41,8 +26,7 @@ class AdminCalendarPanel extends ConsumerWidget {
     final colors = context.appColors;
     final typography = context.appTypography;
     final expenseCurrency =
-        ref.watch(activeGymCurrencyProvider).valueOrNull ??
-        defaultCurrencyCode;
+        ref.watch(activeGymCurrencyProvider).valueOrNull ?? defaultCurrencyCode;
     final expenseLocale = ref.watch(localeControllerProvider);
     final state = ref.watch(adminCalendarControllerProvider);
     final controller = ref.read(adminCalendarControllerProvider.notifier);
@@ -140,7 +124,7 @@ class AdminCalendarPanel extends ConsumerWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              '${_monthNames[month.month]} ${month.year}',
+                              ref.watch(dateLabelsProvider).monthYear(month),
                               style: typography.headingSmall.copyWith(
                                 color: colors.onSurface,
                                 fontSize: 17,
@@ -168,7 +152,10 @@ class AdminCalendarPanel extends ConsumerWidget {
                         const SizedBox(height: AppSpacing.sm),
                         Row(
                           children: [
-                            for (final name in _dayNames)
+                            for (final name
+                                in ref
+                                    .watch(dateLabelsProvider)
+                                    .weekdayShortList)
                               Expanded(
                                 child: Text(
                                   name,
@@ -303,7 +290,9 @@ class AdminCalendarPanel extends ConsumerWidget {
                   ),
                   const SizedBox(height: AppSpacing.lg),
                   Text(
-                    '${state.selectedDate.day} ${_monthNames[state.selectedDate.month]}',
+                    ref
+                        .watch(dateLabelsProvider)
+                        .dayMonthLong(state.selectedDate),
                     style: typography.caption.copyWith(
                       color: colors.onSurfaceMuted,
                       letterSpacing: 1.2,
@@ -496,7 +485,9 @@ class AdminCalendarPanel extends ConsumerWidget {
                             ),
                           ),
                           Text(
-                            _monthNames[date.month]!.substring(0, 3),
+                            ref
+                                .watch(dateLabelsProvider)
+                                .monthShort(date.month),
                             style: typography.caption.copyWith(
                               color: colors.onSurfaceMuted,
                               fontSize: 11,
@@ -605,11 +596,7 @@ class AdminCalendarPanel extends ConsumerWidget {
                     ),
                     child: Column(
                       children: [
-                        for (
-                          var i = 0;
-                          i < slot.duetMemberNames.length;
-                          i++
-                        )
+                        for (var i = 0; i < slot.duetMemberNames.length; i++)
                           _PopupRow(
                             label: slot.duetMemberNames[i],
                             value: '',

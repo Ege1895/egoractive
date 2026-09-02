@@ -13,6 +13,7 @@ import '../../controller/measurements_controller.dart';
 import '../../domain/measurement_metric.dart';
 import '../../domain/measurements_state.dart';
 import '../widgets/measurement_avatar.dart';
+import '../../../../shared/utils/date_labels.dart';
 
 /// Üye · Ölçümlerim (Ölçümlerim sekmesi kökü, kendi verisi için sekme
 /// içine gömülü kullanılır) — avatar / grafik geçişi.
@@ -180,23 +181,8 @@ class _ViewToggleChip extends StatelessWidget {
   }
 }
 
-const _monthNames = {
-  1: 'Ocak',
-  2: 'Şubat',
-  3: 'Mart',
-  4: 'Nisan',
-  5: 'Mayıs',
-  6: 'Haziran',
-  7: 'Temmuz',
-  8: 'Ağustos',
-  9: 'Eylül',
-  10: 'Ekim',
-  11: 'Kasım',
-  12: 'Aralık',
-};
-
-String _formatDate(DateTime date) =>
-    '${date.day} ${_monthNames[date.month]} ${date.year}';
+String _formatDate(DateTime date, WidgetRef ref) =>
+    ref.watch(dateLabelsProvider).dayMonthYearLong(date);
 
 /// Grafik ekranı (çubuk grafik + altındaki liste) sadece son bu kadar
 /// ölçümü gösterir — karşılaştırma yapılabilsin diye, tüm geçmiş değil.
@@ -263,7 +249,7 @@ void _showDatePicker(
               ),
               for (final date in dates)
                 _DateOption(
-                  label: _formatDate(date),
+                  label: _formatDate(date, ref),
                   selected:
                       selected != null &&
                       selected.year == date.year &&
@@ -440,7 +426,7 @@ class _AvatarViewState extends ConsumerState<_AvatarView> {
                                     )
                                     .replaceAll(
                                       '{date}',
-                                      _formatDate(state.selectedDate!),
+                                      _formatDate(state.selectedDate!, ref),
                                     ),
                           style: typography.bodyMedium.copyWith(
                             color: colors.onSurfaceVariant,

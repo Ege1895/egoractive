@@ -2,9 +2,9 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/router/app_router.dart';
 import '../../../shared/domain/membership_installment.dart';
-import '../../../shared/utils/tr_date_formatter.dart';
 import '../domain/member_package.dart';
 import '../repository/package_repository.dart';
+import '../../../shared/utils/date_labels.dart';
 
 part 'package_controller.g.dart';
 
@@ -81,7 +81,7 @@ class PackageController extends _$PackageController {
   String _dateFrom(String? iso) {
     if (iso == null) return '—';
     final date = DateTime.tryParse(iso);
-    return date == null ? '—' : formatTrDate(date);
+    return date == null ? '—' : ref.read(dateLabelsProvider).dayMonthYear(date);
   }
 
   String _initialsFor(String name) {

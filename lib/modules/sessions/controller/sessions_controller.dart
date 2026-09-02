@@ -1,46 +1,23 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../core/remote_config/remote_config_service.dart';
 import '../../../core/router/app_router.dart';
+import '../../../shared/utils/date_labels.dart';
 import '../domain/session.dart';
 import '../domain/sessions_state.dart';
 import '../repository/sessions_repository.dart';
 
 part 'sessions_controller.g.dart';
 
-const _monthAbbrev = {
-  1: 'Oca',
-  2: 'Şub',
-  3: 'Mar',
-  4: 'Nis',
-  5: 'May',
-  6: 'Haz',
-  7: 'Tem',
-  8: 'Ağu',
-  9: 'Eyl',
-  10: 'Eki',
-  11: 'Kas',
-  12: 'Ara',
-};
-
-const _emptyNextSession = Session(
+Session _emptyNextSession(String title, String meta) => Session(
   id: 'none',
   day: '—',
   month: '',
-  title: 'Planlanmış dersin yok',
-  meta: 'Antrenörünle iletişime geç',
+  title: title,
+  meta: meta,
   status: SessionStatus.planned,
 );
-
-const _weekdayLabels = {
-  1: 'Pzt',
-  2: 'Sal',
-  3: 'Çar',
-  4: 'Per',
-  5: 'Cum',
-  6: 'Cmt',
-  7: 'Pzr',
-};
 
 /// Bu haftanın (Pazartesi-Pazar) her günü için üyenin o gün iptal edilmemiş
 /// bir seansı var mı — "BU HAFTA" bar grafiğinin gerçek verisi. Önceden bu
@@ -51,6 +28,7 @@ Stream<List<WeekActivityDay>> _weekActivityForMember(
   _WeekActivityForMemberRef ref,
   String memberId,
 ) {
+  final labels = ref.watch(dateLabelsProvider);
   final now = DateTime.now();
   final today = DateTime(now.year, now.month, now.day);
   final monday = today.subtract(Duration(days: today.weekday - 1));
@@ -72,7 +50,7 @@ Stream<List<WeekActivityDay>> _weekActivityForMember(
         return [
           for (var weekday = 1; weekday <= 7; weekday++)
             WeekActivityDay(
-              label: _weekdayLabels[weekday]!,
+              label: labels.weekdayShort(weekday),
               intensity: activeWeekdays.contains(weekday) ? 0.85 : 0.12,
               isRestDay: !activeWeekdays.contains(weekday),
             ),
@@ -80,10 +58,10 @@ Stream<List<WeekActivityDay>> _weekActivityForMember(
       });
 }
 
-final _emptyWeek = [
+List<WeekActivityDay> _emptyWeek(DateLabels labels) => [
   for (var weekday = 1; weekday <= 7; weekday++)
     WeekActivityDay(
-      label: _weekdayLabels[weekday]!,
+      label: labels.weekdayShort(weekday),
       intensity: 0.12,
       isRestDay: true,
     ),
@@ -106,6 +84,10 @@ Stream<(List<Session>, List<Session>)> _sessionsForMember(
   _SessionsForMemberRef ref,
   String memberId,
 ) {
+  final labels = ref.watch(dateLabelsProvider);
+  final soloTemplate = ref.watch(
+    rcTextProvider(RemoteConfigKeys.commonSoloSessionWithTimeTemplate),
+  );
   return FirebaseFirestore.instance
       .collection('sessions')
       .where('memberId', isEqualTo: memberId)
@@ -118,7 +100,13 @@ Stream<(List<Session>, List<Session>)> _sessionsForMember(
         for (final doc in snapshot.docs) {
           final data = doc.data();
           final startTime = (data['startTime'] as Timestamp).toDate();
-          final session = _toSession(doc.id, data, startTime);
+          final session = _toSession(
+            doc.id,
+            data,
+            startTime,
+            labels,
+            soloTemplate,
+          );
           if (session.status == SessionStatus.planned &&
               startTime.isAfter(now)) {
             upcoming.add(session);
@@ -130,7 +118,13 @@ Stream<(List<Session>, List<Session>)> _sessionsForMember(
       });
 }
 
-Session _toSession(String id, Map<String, dynamic> data, DateTime startTime) {
+Session _toSession(
+  String id,
+  Map<String, dynamic> data,
+  DateTime startTime,
+  DateLabels labels,
+  String soloTemplate,
+) {
   final statusStr = data['status'] as String? ?? 'planned';
   final attended = data['attended'] as bool?;
   final status = switch (statusStr) {
@@ -150,8 +144,8 @@ Session _toSession(String id, Map<String, dynamic> data, DateTime startTime) {
   return Session(
     id: id,
     day: startTime.day.toString().padLeft(2, '0'),
-    month: _monthAbbrev[startTime.month] ?? '',
-    title: 'Birebir · $time',
+    month: labels.monthShort(startTime.month),
+    title: soloTemplate.replaceAll('{time}', time),
     meta: (data['trainerName'] as String?) ?? '',
     status: status,
     confirmation: confirmation,
@@ -175,13 +169,22 @@ class SessionsController extends _$SessionsController {
     final (upcoming, past) =
         ref.watch(_sessionsForMemberProvider(uid)).valueOrNull ??
         (const <Session>[], const <Session>[]);
-    final nextSession = upcoming.isEmpty ? _emptyNextSession : upcoming.first;
+    final nextSession = upcoming.isEmpty
+        ? _emptyNextSession(
+            ref.watch(
+              rcTextProvider(RemoteConfigKeys.sessionsNoPlannedSessionTitle),
+            ),
+            ref.watch(
+              rcTextProvider(RemoteConfigKeys.sessionsNoPlannedSessionMeta),
+            ),
+          )
+        : upcoming.first;
     final canConfirmAttendance =
         ref.watch(_canConfirmAttendanceForMemberProvider(uid)).valueOrNull ??
         false;
     final week =
         ref.watch(_weekActivityForMemberProvider(uid)).valueOrNull ??
-        _emptyWeek;
+        _emptyWeek(ref.watch(dateLabelsProvider));
     return mock.copyWith(
       nextSession: nextSession,
       upcoming: upcoming,
@@ -225,8 +228,9 @@ class SessionsController extends _$SessionsController {
     } catch (_) {
       state = state.copyWith(
         attendanceAnswer: previousAnswer,
-        attendanceErrorMessage:
-            'Cevabın kaydedilemedi, bağlantını kontrol edip tekrar dene.',
+        attendanceErrorMessage: ref.read(
+          rcTextProvider(RemoteConfigKeys.sessionsAttendanceSaveError),
+        ),
       );
     }
   }
@@ -250,8 +254,9 @@ class SessionsController extends _$SessionsController {
     } catch (_) {
       state = state.copyWith(
         attendanceAnswer: previousAnswer,
-        attendanceErrorMessage:
-            'Cevabın kaydedilemedi, bağlantını kontrol edip tekrar dene.',
+        attendanceErrorMessage: ref.read(
+          rcTextProvider(RemoteConfigKeys.sessionsAttendanceSaveError),
+        ),
       );
     }
   }

@@ -45,9 +45,12 @@ void main() {
         expect(gymId, isNull);
         // Genel bir banner yerine hangi alanın eksik olduğu ayrı ayrı
         // gösteriliyor (bkz. task #89).
+        // Metnin kendisi artık Remote Config'ten geliyor (test ortamında RC
+        // yok, boş string döner) — burada önemli olan HANGİ alanın hata
+        // taşıdığı, metnin kendisi değil.
         expect(
           container.read(createGymControllerProvider).nameError,
-          contains('Salon adı'),
+          isNotNull,
         );
         expect(
           container.read(createGymControllerProvider).errorMessage,

@@ -7,10 +7,10 @@ import '../../../../core/money/app_money_formatter.dart';
 import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/domain/membership_installment.dart';
-import '../../../../shared/utils/tr_date_formatter.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_text_field.dart';
 import '../../../../shared/widgets/native_date_picker.dart';
+import '../../../../shared/utils/date_labels.dart';
 
 /// Bir taksitin tutarını/son ödeme tarihini/ödendi durumunu düzenleme
 /// popup'ı — hem paket oluşturma (yerel state) hem de mevcut bir üyenin
@@ -152,7 +152,7 @@ class _InstallmentEditSheetState extends ConsumerState<_InstallmentEditSheet> {
                     ),
                   ),
                   Text(
-                    formatTrDate(_dueDate),
+                    ref.watch(dateLabelsProvider).dayMonthYear(_dueDate),
                     style: typography.headingSmall.copyWith(
                       color: colors.onSurface,
                       fontSize: 15,

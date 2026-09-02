@@ -35,7 +35,7 @@ class AdminHomeController extends _$AdminHomeController {
               DuePaymentsSummary.empty;
 
     return AdminHomeState(
-      monthLabel: report.monthLabel,
+      month: report.month,
       totalSessions: report.totalSessions,
       completedSessions: report.completedSessions,
       cancelledSessions: report.cancelledSessions,

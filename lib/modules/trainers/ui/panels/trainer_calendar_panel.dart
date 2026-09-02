@@ -12,22 +12,7 @@ import '../../../sessions/service/session_completion_service.dart';
 import '../../../sessions/ui/widgets/create_session_sheet.dart';
 import '../../controller/trainer_calendar_controller.dart';
 import '../../domain/schedule_slot.dart';
-
-const _monthNames = {
-  1: 'Ocak',
-  2: 'Şubat',
-  3: 'Mart',
-  4: 'Nisan',
-  5: 'Mayıs',
-  6: 'Haziran',
-  7: 'Temmuz',
-  8: 'Ağustos',
-  9: 'Eylül',
-  10: 'Ekim',
-  11: 'Kasım',
-  12: 'Aralık',
-};
-const _dayNames = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'];
+import '../../../../shared/utils/date_labels.dart';
 
 /// Antrenör 5 · Takvimim (Takvimim sekmesi kökü) — admin'in aylık
 /// takvimiyle (bkz. admin_calendar_panel.dart) birebir aynı tasarım:
@@ -190,7 +175,7 @@ class _TrainerCalendarPanelState extends BasePanelState<TrainerCalendarPanel> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              '${_monthNames[month.month]} ${month.year}',
+                              ref.watch(dateLabelsProvider).monthYear(month),
                               style: typography.headingSmall.copyWith(
                                 color: colors.onSurface,
                                 fontSize: 17,
@@ -218,7 +203,10 @@ class _TrainerCalendarPanelState extends BasePanelState<TrainerCalendarPanel> {
                         const SizedBox(height: AppSpacing.sm),
                         Row(
                           children: [
-                            for (final name in _dayNames)
+                            for (final name
+                                in ref
+                                    .watch(dateLabelsProvider)
+                                    .weekdayShortList)
                               Expanded(
                                 child: Text(
                                   name,
@@ -331,7 +319,9 @@ class _TrainerCalendarPanelState extends BasePanelState<TrainerCalendarPanel> {
                   ),
                   const SizedBox(height: AppSpacing.lg),
                   Text(
-                    '${state.selectedDate.day} ${_monthNames[state.selectedDate.month]}',
+                    ref
+                        .watch(dateLabelsProvider)
+                        .dayMonthLong(state.selectedDate),
                     style: typography.caption.copyWith(
                       color: colors.onSurfaceMuted,
                       letterSpacing: 1.2,

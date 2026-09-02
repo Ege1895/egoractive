@@ -1,29 +1,16 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../core/remote_config/remote_config_service.dart';
 import '../../../core/router/app_router.dart';
 import '../domain/measurement_metric.dart';
 import '../domain/measurement_point.dart';
 import '../domain/measurement_series.dart';
 import '../domain/measurements_state.dart';
 import '../service/measurements_write_service.dart';
+import '../../../shared/utils/date_labels.dart';
 
 part 'measurements_controller.g.dart';
-
-const _monthAbbrev = {
-  1: 'Oca',
-  2: 'Şub',
-  3: 'Mar',
-  4: 'Nis',
-  5: 'May',
-  6: 'Haz',
-  7: 'Tem',
-  8: 'Ağu',
-  9: 'Eyl',
-  10: 'Eki',
-  11: 'Kas',
-  12: 'Ara',
-};
 
 @riverpod
 Stream<String?> _memberGender(_MemberGenderRef ref, String uid) {
@@ -80,7 +67,12 @@ _Entry? _entryAtOrBefore(List<_Entry> entries, DateTime target) {
 /// önceki en yakın kayda) ait değerleri gösterir; verilmezse her metriğin
 /// en son kaydı kullanılır. Grafik/trend her zaman tüm geçmişi gösterir,
 /// tarih seçiminden etkilenmez.
-MeasurementsState _toState(List<_Entry> entries, {DateTime? selectedDate}) {
+MeasurementsState _toState(
+  List<_Entry> entries,
+  DateLabels labels,
+  String noChangeLabel, {
+  DateTime? selectedDate,
+}) {
   final series = <MeasurementMetric, MeasurementSeries>{};
   final points = <MeasurementMetric, MeasurementPoint>{};
   final recordedDates = entries.map((e) => e.$1).toSet().toList()
@@ -93,9 +85,7 @@ MeasurementsState _toState(List<_Entry> entries, {DateTime? selectedDate}) {
     // Aynı ay içinde birden fazla ölçüm olabildiği için (bkz. Melis
     // örneği: 20 Ağustos + 25 Ağustos) sadece ay kısaltması çubukları
     // ayırt edilemez hale getiriyordu — gün de eklendi.
-    final months = withMetric
-        .map((e) => '${e.$1.day} ${_monthAbbrev[e.$1.month] ?? ''}')
-        .toList();
+    final months = withMetric.map((e) => labels.dayMonthShort(e.$1)).toList();
     final values = withMetric.map((e) => e.$2[metric]!).toList();
     final totalDelta = values.last - values.first;
     series[metric] = MeasurementSeries(
@@ -131,10 +121,9 @@ MeasurementsState _toState(List<_Entry> entries, {DateTime? selectedDate}) {
     points[metric] = MeasurementPoint(
       metric: metric,
       value: targetValue.toStringAsFixed(1).replaceAll('.', ','),
-      delta: _formatDelta(diff, zeroLabel: 'değişim yok', unit: metric.unit),
+      delta: _formatDelta(diff, zeroLabel: noChangeLabel, unit: metric.unit),
       isImprovement: diff <= 0,
-      since:
-          '${target.$1.day} ${_monthAbbrev[target.$1.month]} ${target.$1.year}',
+      since: labels.dayMonthYear(target.$1),
       fx: layout?.fx ?? 0,
       fy: layout?.fy ?? 0,
       side: layout?.side ?? AvatarSide.left,
@@ -212,7 +201,12 @@ class MeasurementsController extends _$MeasurementsController {
       );
     }
 
-    final real = _toState(entries, selectedDate: selectedDate);
+    final real = _toState(
+      entries,
+      ref.watch(dateLabelsProvider),
+      ref.watch(rcTextProvider(RemoteConfigKeys.measurementsNoChangeLabel)),
+      selectedDate: selectedDate,
+    );
     // real.points sadece en az bir kez ölçülmüş metrikleri içerir —
     // varsayılan selectedMetric (bel) o üye hiç bel ölçmediyse burada
     // karşılık bulamaz, o durumda gerçekten ölçülmüş ilk metriğe düşülür.

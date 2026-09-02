@@ -37,3 +37,16 @@ export async function resolveGymTimeZone(gymId: string | undefined): Promise<str
 export function resolveNotificationLocale(timeZone: string): "tr" | "en" {
   return timeZone === DEFAULT_TIME_ZONE ? "tr" : "en";
 }
+
+/**
+ * Bir KULLANICIYA gidecek e-posta/bildirim için dil — kullanıcının salonunun
+ * bulunduğu yere göre (push bildirimleriyle aynı kural, bkz.
+ * [resolveNotificationLocale]). Kullanıcı ya da salon bulunamazsa varsayılan
+ * saat diliminin dili kullanılır.
+ */
+export async function resolveUserLocale(uid: string | undefined): Promise<"tr" | "en"> {
+  if (!uid) return resolveNotificationLocale(DEFAULT_TIME_ZONE);
+  const userDoc = await getFirestore().collection("users").doc(uid).get();
+  const gymId = userDoc.data()?.gymId as string | undefined;
+  return resolveNotificationLocale(await resolveGymTimeZone(gymId));
+}

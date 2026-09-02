@@ -3,6 +3,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/theme/theme_controller.dart';
 import '../domain/admin_feedback_entry.dart';
 import '../repository/admin_feedback_repository.dart';
+import '../../../shared/utils/date_labels.dart';
 
 part 'admin_feedback_controller.g.dart';
 
@@ -73,7 +74,9 @@ Stream<AdminFeedbackSummary> _feedbackForGym(
   String gymId,
   DateTime month,
 ) {
-  return ref.watch(adminFeedbackRepositoryProvider).watchSummary(gymId, month);
+  return ref
+      .watch(adminFeedbackRepositoryProvider)
+      .watchSummary(gymId, month, ref.watch(dateLabelsProvider));
 }
 
 @riverpod

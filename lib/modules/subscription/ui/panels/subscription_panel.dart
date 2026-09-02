@@ -14,49 +14,7 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_back_button.dart';
 import '../../controller/subscription_controller.dart';
 import '../../domain/subscription_state.dart';
-
-const _monthNamesShortTr = {
-  1: 'Oca',
-  2: 'Şub',
-  3: 'Mar',
-  4: 'Nis',
-  5: 'May',
-  6: 'Haz',
-  7: 'Tem',
-  8: 'Ağu',
-  9: 'Eyl',
-  10: 'Eki',
-  11: 'Kas',
-  12: 'Ara',
-};
-const _monthNamesLongTr = {
-  1: 'Ocak',
-  2: 'Şubat',
-  3: 'Mart',
-  4: 'Nisan',
-  5: 'Mayıs',
-  6: 'Haziran',
-  7: 'Temmuz',
-  8: 'Ağustos',
-  9: 'Eylül',
-  10: 'Ekim',
-  11: 'Kasım',
-  12: 'Aralık',
-};
-const _monthNamesShortEn = {
-  1: 'Jan',
-  2: 'Feb',
-  3: 'Mar',
-  4: 'Apr',
-  5: 'May',
-  6: 'Jun',
-  7: 'Jul',
-  8: 'Aug',
-  9: 'Sep',
-  10: 'Oct',
-  11: 'Nov',
-  12: 'Dec',
-};
+import '../../../../shared/utils/date_labels.dart';
 
 /// Mağazadan gerçek ücretsiz deneme süresi okunabildiyse (bkz.
 /// `SubscriptionProduct.trialDays`) onu gösterir — hardcode "aylık"/"2 ay
@@ -156,19 +114,13 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
     return result;
   }
 
-  String _dateLong(DateTime date, String locale) {
-    final months = locale == 'tr' ? _monthNamesLongTr : _monthNamesShortEn;
-    final month = months[date.month] ?? '';
-    return locale == 'tr' ? "${date.day} $month" : '$month ${date.day}';
-  }
+  // Ay adı ve gün/ay sırası artık `DateLabels` üzerinden RC'den geliyor —
+  // burada `locale == 'tr'` diye dallanan iki ayrı map tutulmuyor.
+  String _dateLong(DateTime date, DateLabels labels) =>
+      labels.dayMonthLong(date);
 
-  String _dateShort(DateTime date, String locale) {
-    final months = locale == 'tr' ? _monthNamesShortTr : _monthNamesShortEn;
-    final month = months[date.month] ?? '';
-    return locale == 'tr'
-        ? '${date.day} $month ${date.year}'
-        : '$month ${date.day}, ${date.year}';
-  }
+  String _dateShort(DateTime date, DateLabels labels) =>
+      labels.dayMonthYear(date);
 
   @override
   Widget build(BuildContext context) {
@@ -492,6 +444,7 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
     final colors = context.appColors;
     final typography = context.appTypography;
     final locale = ref.watch(localeControllerProvider);
+    final dateLabels = ref.watch(dateLabelsProvider);
     final productId = subscription.productId;
     final isYearly = productId != null && _isYearly(productId);
     final matchingProduct = products
@@ -596,7 +549,7 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
                       ),
                       value: subscription.expiresAt == null
                           ? '—'
-                          : _dateShort(subscription.expiresAt!, locale),
+                          : _dateShort(subscription.expiresAt!, dateLabels),
                     ),
                   ),
                   const SizedBox(width: AppSpacing.sm),
@@ -608,7 +561,7 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
                       ),
                       value: subscription.startedAt == null
                           ? '—'
-                          : _dateShort(subscription.startedAt!, locale),
+                          : _dateShort(subscription.startedAt!, dateLabels),
                     ),
                   ),
                 ],
@@ -690,6 +643,7 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
     final colors = context.appColors;
     final typography = context.appTypography;
     final locale = ref.watch(localeControllerProvider);
+    final dateLabels = ref.watch(dateLabelsProvider);
     final restricted = rc.subscriptionRestrictedOperations
         .map((raw) => (raw['label_$locale'] as String?) ?? '')
         .where((s) => s.isNotEmpty)
@@ -720,7 +674,7 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
                     RemoteConfigKeys.subscriptionExpiredBannerTitle,
                     locale,
                   ),
-                  {'date': _dateLong(subscription.expiresAt!, locale)},
+                  {'date': _dateLong(subscription.expiresAt!, dateLabels)},
                 ),
           titleColor: colors.error,
           body: rc.getText(

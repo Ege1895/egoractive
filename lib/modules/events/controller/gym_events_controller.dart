@@ -4,26 +4,13 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/theme/theme_controller.dart';
 import '../domain/gym_event.dart';
 import '../repository/gym_events_repository.dart';
+import '../../../shared/utils/date_labels.dart';
 
 part 'gym_events_controller.g.dart';
 
-const _monthAbbrev = {
-  1: 'Oca',
-  2: 'Şub',
-  3: 'Mar',
-  4: 'Nis',
-  5: 'May',
-  6: 'Haz',
-  7: 'Tem',
-  8: 'Ağu',
-  9: 'Eyl',
-  10: 'Eki',
-  11: 'Kas',
-  12: 'Ara',
-};
-
 @riverpod
 Stream<List<GymEvent>> _eventsForGym(_EventsForGymRef ref, String gymId) {
+  final labels = ref.watch(dateLabelsProvider);
   final now = Timestamp.now();
   return FirebaseFirestore.instance
       .collection('events')
@@ -31,10 +18,16 @@ Stream<List<GymEvent>> _eventsForGym(_EventsForGymRef ref, String gymId) {
       .where('dateTime', isGreaterThanOrEqualTo: now)
       .orderBy('dateTime')
       .snapshots()
-      .map((snapshot) => snapshot.docs.map(_toGymEvent).toList());
+      .map(
+        (snapshot) =>
+            snapshot.docs.map((doc) => _toGymEvent(doc, labels)).toList(),
+      );
 }
 
-GymEvent _toGymEvent(QueryDocumentSnapshot<Map<String, dynamic>> doc) {
+GymEvent _toGymEvent(
+  QueryDocumentSnapshot<Map<String, dynamic>> doc,
+  DateLabels labels,
+) {
   final data = doc.data();
   final dateTime = (data['dateTime'] as Timestamp).toDate();
   final time =
@@ -47,7 +40,7 @@ GymEvent _toGymEvent(QueryDocumentSnapshot<Map<String, dynamic>> doc) {
     name: (data['name'] as String?) ?? '',
     location: (data['location'] as String?) ?? '',
     day: dateTime.day.toString().padLeft(2, '0'),
-    month: _monthAbbrev[dateTime.month] ?? '',
+    month: labels.monthShort(dateTime.month),
     meta: '${(data['location'] as String?) ?? ''} · $time',
     joined: attendeeIds.length,
     capacity: (data['capacity'] as num?)?.toInt(),

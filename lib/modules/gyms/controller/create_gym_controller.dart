@@ -14,6 +14,7 @@ import '../domain/gym_profile.dart';
 import '../service/create_gym_service.dart';
 import 'gym_profile_controller.dart';
 import 'gym_theme_controller.dart';
+import '../../../core/remote_config/remote_config_service.dart';
 
 part 'create_gym_controller.g.dart';
 
@@ -132,7 +133,11 @@ class CreateGymController extends _$CreateGymController {
       );
       await _extractPalette(file);
     } catch (_) {
-      state = state.copyWith(errorMessage: 'Logo seçilemedi. Tekrar dene.');
+      state = state.copyWith(
+        errorMessage: ref.read(
+          rcTextProvider(RemoteConfigKeys.gymsCreateLogoPickError),
+        ),
+      );
     }
   }
 
@@ -202,18 +207,21 @@ class CreateGymController extends _$CreateGymController {
       state = state.copyWith(
         isSubmitting: false,
         phoneError: e.code == 'already-exists'
-            ? 'Bu numarayla kayıtlı bir hesap zaten var. Giriş yapmayı dene.'
+            ? ref.read(
+                rcTextProvider(RemoteConfigKeys.gymsCreatePhoneTakenError),
+              )
             : null,
         errorMessage: e.code == 'already-exists'
             ? null
-            : 'Salon oluşturulamadı. Bağlantını kontrol edip tekrar dene.',
+            : ref.read(rcTextProvider(RemoteConfigKeys.gymsCreateGenericError)),
       );
       return null;
     } catch (_) {
       state = state.copyWith(
         isSubmitting: false,
-        errorMessage:
-            'Salon oluşturulamadı. Bağlantını kontrol edip tekrar dene.',
+        errorMessage: ref.read(
+          rcTextProvider(RemoteConfigKeys.gymsCreateGenericError),
+        ),
       );
       return null;
     }
@@ -222,8 +230,12 @@ class CreateGymController extends _$CreateGymController {
   /// Her boş/geçersiz alan için ayrı bir hata mesajı yazar, geçerliyse
   /// `true` döner.
   bool _validate(GymProfile profile) {
-    final nameError = profile.name.trim().isEmpty ? 'Salon adı gerekli.' : null;
-    final cityError = profile.city.trim().isEmpty ? 'Şehir gerekli.' : null;
+    final nameError = profile.name.trim().isEmpty
+        ? ref.read(rcTextProvider(RemoteConfigKeys.gymsCreateNameRequiredError))
+        : null;
+    final cityError = profile.city.trim().isEmpty
+        ? ref.read(rcTextProvider(RemoteConfigKeys.gymsCreateCityRequiredError))
+        : null;
     final addressError = profile.address.trim().isEmpty
         ? 'Adres gerekli.'
         : null;
@@ -231,7 +243,9 @@ class CreateGymController extends _$CreateGymController {
     // (AppPhoneField'ın phone_numbers_parser tabanlı doğrulaması).
     final phoneError = profile.isPhoneValid
         ? null
-        : 'Geçerli bir cep telefonu numarası gir.';
+        : ref.read(
+            rcTextProvider(RemoteConfigKeys.commonInvalidMobilePhoneError),
+          );
 
     if (nameError == null &&
         cityError == null &&

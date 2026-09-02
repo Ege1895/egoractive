@@ -7,6 +7,7 @@ import '../../modules/subscription/ui/panels/subscription_panel.dart';
 import '../constants/app_spacing.dart';
 import '../panels/panel_stack_controller.dart';
 import '../theme/app_theme.dart';
+import '../remote_config/remote_config_service.dart';
 
 /// F6-3 — admin'in hangi sekmede olursa olsun salonun aboneliğinin sona
 /// erdiğini FARK ETMESİ için `AppTabShell.topBanner`'a yerleştirilen sabit,
@@ -38,17 +39,29 @@ class SubscriptionStatusBanner extends ConsumerWidget {
     return Material(
       color: colors.errorContainer,
       child: InkWell(
-        onTap: () => ref.read(panelStackControllerProvider.notifier).push(const SubscriptionPanel()),
+        onTap: () => ref
+            .read(panelStackControllerProvider.notifier)
+            .push(const SubscriptionPanel()),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenEdge, vertical: AppSpacing.sm),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.screenEdge,
+            vertical: AppSpacing.sm,
+          ),
           child: Row(
             children: [
               Icon(Icons.error_outline, color: colors.error, size: 18),
               const SizedBox(width: AppSpacing.sm),
               Expanded(
                 child: Text(
-                  'Aboneliğinin süresi doldu — yeni işlem yapabilmek için yenile.',
-                  style: typography.bodyMedium.copyWith(color: colors.error, fontSize: 13),
+                  ref.watch(
+                    rcTextProvider(
+                      RemoteConfigKeys.subscriptionStatusBannerExpired,
+                    ),
+                  ),
+                  style: typography.bodyMedium.copyWith(
+                    color: colors.error,
+                    fontSize: 13,
+                  ),
                 ),
               ),
               Icon(Icons.chevron_right, color: colors.error, size: 18),

@@ -8,34 +8,11 @@ import '../../controller/trainer_home_controller.dart';
 import '../../controller/trainer_profile_controller.dart';
 import '../../domain/pending_confirmation.dart';
 import '../../domain/schedule_slot.dart';
+import '../../../../shared/utils/date_labels.dart';
 
-const _weekdayNames = {
-  1: 'Pazartesi',
-  2: 'Salı',
-  3: 'Çarşamba',
-  4: 'Perşembe',
-  5: 'Cuma',
-  6: 'Cumartesi',
-  7: 'Pazar',
-};
-const _monthNames = {
-  1: 'Ocak',
-  2: 'Şubat',
-  3: 'Mart',
-  4: 'Nisan',
-  5: 'Mayıs',
-  6: 'Haziran',
-  7: 'Temmuz',
-  8: 'Ağustos',
-  9: 'Eylül',
-  10: 'Ekim',
-  11: 'Kasım',
-  12: 'Aralık',
-};
-
-String _todayLabel() {
+String _todayLabel(DateLabels labels) {
   final now = DateTime.now();
-  return '${_weekdayNames[now.weekday]}, ${now.day} ${_monthNames[now.month]}';
+  return labels.weekdayWithDate(now.weekday, labels.dayMonthLong(now));
 }
 
 /// Antrenör 1 · Ana Sayfa (Ana Sayfa sekmesi kökü) — bugünkü program +
@@ -85,7 +62,7 @@ class TrainerHomePanel extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        _todayLabel(),
+                        _todayLabel(ref.watch(dateLabelsProvider)),
                         style: typography.caption.copyWith(
                           color: colors.onSurfaceMuted,
                         ),

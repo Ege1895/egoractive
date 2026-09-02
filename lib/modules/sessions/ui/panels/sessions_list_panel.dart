@@ -7,22 +7,7 @@ import '../../../../core/theme/app_theme.dart';
 import '../../controller/sessions_controller.dart';
 import '../../domain/session.dart';
 import '../../domain/sessions_state.dart';
-
-const _monthAbbrev = {
-  1: 'Oca',
-  2: 'Şub',
-  3: 'Mar',
-  4: 'Nis',
-  5: 'May',
-  6: 'Haz',
-  7: 'Tem',
-  8: 'Ağu',
-  9: 'Eyl',
-  10: 'Eki',
-  11: 'Kas',
-  12: 'Ara',
-};
-const _dayNames = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Pzr'];
+import '../../../../shared/utils/date_labels.dart';
 
 /// Üye · Derslerim — liste / takvim geçişi.
 class SessionsListPanel extends ConsumerStatefulWidget {
@@ -388,7 +373,7 @@ class _SessionsCalendarView extends ConsumerWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    '${_monthAbbrev[month.month]} ${month.year}',
+                    '${ref.watch(dateLabelsProvider).monthShort(month.month)} ${month.year}',
                     style: typography.headingSmall.copyWith(
                       color: colors.onSurface,
                       fontSize: 17,
@@ -416,7 +401,8 @@ class _SessionsCalendarView extends ConsumerWidget {
               const SizedBox(height: AppSpacing.sm),
               Row(
                 children: [
-                  for (final name in _dayNames)
+                  for (final name
+                      in ref.watch(dateLabelsProvider).weekdayShortList)
                     Expanded(
                       child: Text(
                         name,
@@ -523,7 +509,7 @@ class _SessionsCalendarView extends ConsumerWidget {
         ),
         const SizedBox(height: AppSpacing.lg),
         Text(
-          '${selectedDay.day} ${_monthAbbrev[selectedDay.month]}',
+          ref.watch(dateLabelsProvider).dayMonthShort(selectedDay),
           style: typography.caption.copyWith(
             color: colors.onSurfaceMuted,
             letterSpacing: 1.2,

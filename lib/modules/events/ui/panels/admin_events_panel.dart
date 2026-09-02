@@ -301,7 +301,14 @@ class _EventCard extends ConsumerWidget {
                                 ),
                               ),
                               Text(
-                                event.capacityLabel,
+                                event.capacityLabel(
+                                  ref.watch(
+                                    rcTextProvider(
+                                      RemoteConfigKeys
+                                          .eventsUnlimitedCapacityLabel,
+                                    ),
+                                  ),
+                                ),
                                 style: typography.headingSmall.copyWith(
                                   color: colors.onSurfaceVariant,
                                   fontSize: 15,

@@ -2,18 +2,49 @@ import { getFirestore } from "firebase-admin/firestore";
 import { onSchedule } from "firebase-functions/v2/scheduler";
 import * as logger from "firebase-functions/logger";
 
-import { formatMonthLabelTr } from "../shared/format";
 import { withFailureAlerting } from "../shared/function-health";
 import { queueEmail } from "../shared/mail";
 import { currentMonthRange, isLastDayOfMonth } from "../shared/monthly-schedule";
+import { resolveNotificationLocale, safeTimeZone } from "../shared/notification-locale";
+import { formatMonthInZone } from "../shared/timezone-math";
 
-function buildHtml(gymName: string, monthLabel: string, average: number, totalCount: number): string {
+/**
+ * Metinler salonun bulunduğu yere göre — haftalık/aylık salon raporlarıyla
+ * aynı kural (bkz. `notification-locale.ts`). Önceden bu özet dilden
+ * bağımsız olarak Türkçe gidiyordu; ay adı da `formatMonthLabelTr` ile
+ * sabit Türkçe biçimleniyordu.
+ */
+const COPY = {
+  tr: {
+    subjectSuffix: "Aylık Geri Bildirim Özeti",
+    heading: "Aylık Geri Bildirim Özeti",
+    average: "Ortalama puan",
+    total: "Toplam değerlendirme",
+    fallbackGymName: "Salonunuz",
+  },
+  en: {
+    subjectSuffix: "Monthly Feedback Summary",
+    heading: "Monthly Feedback Summary",
+    average: "Average rating",
+    total: "Total reviews",
+    fallbackGymName: "Your gym",
+  },
+} as const;
+
+function buildHtml(
+  gymName: string,
+  monthLabel: string,
+  average: number,
+  totalCount: number,
+  locale: "tr" | "en",
+): string {
+  const copy = COPY[locale];
   return `
-    <h2>${gymName} · Aylık Geri Bildirim Özeti</h2>
+    <h2>${gymName} · ${copy.heading}</h2>
     <p>${monthLabel}</p>
     <table cellpadding="8" style="border-collapse: collapse;">
-      <tr><td>Ortalama puan</td><td><b>${totalCount === 0 ? "—" : average.toFixed(1)}</b> / 5</td></tr>
-      <tr><td>Toplam değerlendirme</td><td><b>${totalCount}</b></td></tr>
+      <tr><td>${copy.average}</td><td><b>${totalCount === 0 ? "—" : average.toFixed(1)}</b> / 5</td></tr>
+      <tr><td>${copy.total}</td><td><b>${totalCount}</b></td></tr>
     </table>
   `;
 }
@@ -33,7 +64,6 @@ export const monthlyFeedbackSummary = onSchedule(
 
     const db = getFirestore();
     const { monthStart, monthEnd } = currentMonthRange(now);
-    const monthLabel = formatMonthLabelTr(monthStart);
 
     const gymsSnapshot = await db.collection("gyms").get();
     for (const gymDoc of gymsSnapshot.docs) {
@@ -51,14 +81,20 @@ export const monthlyFeedbackSummary = onSchedule(
         .where("createdAt", "<", monthEnd)
         .get();
 
+      const timeZone = safeTimeZone(data.timeZone as string | undefined);
+      const locale = resolveNotificationLocale(timeZone);
+      const copy = COPY[locale];
+      const monthLabel = formatMonthInZone(monthStart, timeZone, locale);
+      const gymName = (data.name as string | undefined) ?? copy.fallbackGymName;
+
       const totalCount = snapshot.size;
       const totalStars = snapshot.docs.reduce((sum, doc) => sum + ((doc.data().stars as number | undefined) ?? 0), 0);
       const average = totalCount === 0 ? 0 : totalStars / totalCount;
 
       await queueEmail({
         to: email,
-        subject: `${(data.name as string | undefined) ?? "Salon"} · Aylık Geri Bildirim Özeti`,
-        html: buildHtml((data.name as string | undefined) ?? "Salonunuz", monthLabel, average, totalCount),
+        subject: `${gymName} · ${copy.subjectSuffix}`,
+        html: buildHtml(gymName, monthLabel, average, totalCount, locale),
       });
     }
   }),
