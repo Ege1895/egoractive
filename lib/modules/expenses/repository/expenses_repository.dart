@@ -6,7 +6,7 @@ import '../service/expenses_service.dart';
 part 'expenses_repository.g.dart';
 
 abstract interface class ExpensesRepository {
-  Stream<ExpensesState> watchMonth(String gymId);
+  Stream<ExpensesState> watchMonth(String gymId, DateTime month);
   Future<void> addExpense({
     required String gymId,
     required String category,
@@ -23,7 +23,8 @@ class ExpensesRepositoryImpl implements ExpensesRepository {
   final ExpensesService _service;
 
   @override
-  Stream<ExpensesState> watchMonth(String gymId) => _service.watchMonth(gymId);
+  Stream<ExpensesState> watchMonth(String gymId, DateTime month) =>
+      _service.watchMonth(gymId, month);
 
   @override
   Future<void> addExpense({

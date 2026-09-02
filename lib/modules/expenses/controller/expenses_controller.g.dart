@@ -6,7 +6,29 @@ part of 'expenses_controller.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$expensesForGymHash() => r'02108df89e12f795e86d87b5bd8cd2128cb8f573';
+String _$expensesCanGoNextMonthHash() =>
+    r'b45b204019dceec77e30032c9175563e194f7602';
+
+/// Panelde "sonraki ay" okunu pasifleştirmek için — `notifier`'ı `watch`
+/// etmek yeniden çizim TETİKLEMEZ (state değişimini dinlemez), bu yüzden
+/// türetilmiş bir provider olarak duruyor.
+///
+/// Copied from [expensesCanGoNextMonth].
+@ProviderFor(expensesCanGoNextMonth)
+final expensesCanGoNextMonthProvider = AutoDisposeProvider<bool>.internal(
+  expensesCanGoNextMonth,
+  name: r'expensesCanGoNextMonthProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$expensesCanGoNextMonthHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef ExpensesCanGoNextMonthRef = AutoDisposeProviderRef<bool>;
+String _$expensesForGymHash() => r'0925aedc35954fa7f279106e9ba1e25db3a2b008';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -39,15 +61,15 @@ class _ExpensesForGymFamily extends Family<AsyncValue<ExpensesState>> {
   const _ExpensesForGymFamily();
 
   /// See also [_expensesForGym].
-  _ExpensesForGymProvider call(String gymId) {
-    return _ExpensesForGymProvider(gymId);
+  _ExpensesForGymProvider call(String gymId, DateTime month) {
+    return _ExpensesForGymProvider(gymId, month);
   }
 
   @override
   _ExpensesForGymProvider getProviderOverride(
     covariant _ExpensesForGymProvider provider,
   ) {
-    return call(provider.gymId);
+    return call(provider.gymId, provider.month);
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -68,9 +90,9 @@ class _ExpensesForGymFamily extends Family<AsyncValue<ExpensesState>> {
 /// See also [_expensesForGym].
 class _ExpensesForGymProvider extends AutoDisposeStreamProvider<ExpensesState> {
   /// See also [_expensesForGym].
-  _ExpensesForGymProvider(String gymId)
+  _ExpensesForGymProvider(String gymId, DateTime month)
     : this._internal(
-        (ref) => _expensesForGym(ref as _ExpensesForGymRef, gymId),
+        (ref) => _expensesForGym(ref as _ExpensesForGymRef, gymId, month),
         from: _expensesForGymProvider,
         name: r'_expensesForGymProvider',
         debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
@@ -80,6 +102,7 @@ class _ExpensesForGymProvider extends AutoDisposeStreamProvider<ExpensesState> {
         allTransitiveDependencies:
             _ExpensesForGymFamily._allTransitiveDependencies,
         gymId: gymId,
+        month: month,
       );
 
   _ExpensesForGymProvider._internal(
@@ -90,9 +113,11 @@ class _ExpensesForGymProvider extends AutoDisposeStreamProvider<ExpensesState> {
     required super.debugGetCreateSourceHash,
     required super.from,
     required this.gymId,
+    required this.month,
   }) : super.internal();
 
   final String gymId;
+  final DateTime month;
 
   @override
   Override overrideWith(
@@ -108,6 +133,7 @@ class _ExpensesForGymProvider extends AutoDisposeStreamProvider<ExpensesState> {
         allTransitiveDependencies: null,
         debugGetCreateSourceHash: null,
         gymId: gymId,
+        month: month,
       ),
     );
   }
@@ -119,13 +145,16 @@ class _ExpensesForGymProvider extends AutoDisposeStreamProvider<ExpensesState> {
 
   @override
   bool operator ==(Object other) {
-    return other is _ExpensesForGymProvider && other.gymId == gymId;
+    return other is _ExpensesForGymProvider &&
+        other.gymId == gymId &&
+        other.month == month;
   }
 
   @override
   int get hashCode {
     var hash = _SystemHash.combine(0, runtimeType.hashCode);
     hash = _SystemHash.combine(hash, gymId.hashCode);
+    hash = _SystemHash.combine(hash, month.hashCode);
 
     return _SystemHash.finish(hash);
   }
@@ -136,6 +165,9 @@ class _ExpensesForGymProvider extends AutoDisposeStreamProvider<ExpensesState> {
 mixin _ExpensesForGymRef on AutoDisposeStreamProviderRef<ExpensesState> {
   /// The parameter `gymId` of this provider.
   String get gymId;
+
+  /// The parameter `month` of this provider.
+  DateTime get month;
 }
 
 class _ExpensesForGymProviderElement
@@ -145,6 +177,8 @@ class _ExpensesForGymProviderElement
 
   @override
   String get gymId => (origin as _ExpensesForGymProvider).gymId;
+  @override
+  DateTime get month => (origin as _ExpensesForGymProvider).month;
 }
 
 String _$expenseCategoriesHash() => r'f5e0bab4ea58b5fc632430e5d0c2f534d5952192';
@@ -171,8 +205,34 @@ final expenseCategoriesProvider =
 // ignore: unused_element
 typedef ExpenseCategoriesRef =
     AutoDisposeStreamProviderRef<List<ExpenseCategoryOption>>;
+String _$expensesSelectedMonthHash() =>
+    r'3d105713c6b7a17ff8d125650ed9487031f00918';
+
+/// Finans panelinde görüntülenen ay (ayın ilk günü). Varsayılan: içinde
+/// bulunulan ay. Önceden gider listesi `DateTime.now()`'a sabitliydi, yani
+/// ay değişince bir önceki ayın girdileri hiç görülemiyordu (kullanıcı
+/// raporu, 2026-09-02).
+///
+/// İleri gitmek içinde bulunulan ayla SINIRLI — gider tarihleri geleceğe
+/// girilebilse de, kullanıcıyı boş aylarda sonsuza kadar ilerletmenin bir
+/// faydası yok; [canGoNext] bunu panelde butonu pasifleştirmek için açar.
+///
+/// Copied from [ExpensesSelectedMonth].
+@ProviderFor(ExpensesSelectedMonth)
+final expensesSelectedMonthProvider =
+    AutoDisposeNotifierProvider<ExpensesSelectedMonth, DateTime>.internal(
+      ExpensesSelectedMonth.new,
+      name: r'expensesSelectedMonthProvider',
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$expensesSelectedMonthHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
+
+typedef _$ExpensesSelectedMonth = AutoDisposeNotifier<DateTime>;
 String _$expensesControllerHash() =>
-    r'66b75ff0c9ba0b1638bb145125e9f9fc343df84d';
+    r'17ad25f30d731d5090f65b28134302cb8db6d54d';
 
 /// See also [ExpensesController].
 @ProviderFor(ExpensesController)

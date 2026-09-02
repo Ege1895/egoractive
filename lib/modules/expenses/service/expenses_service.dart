@@ -40,10 +40,14 @@ const _monthAbbrev = {
 class ExpensesService {
   const ExpensesService();
 
-  Stream<ExpensesState> watchMonth(String gymId) {
-    final now = DateTime.now();
-    final monthStart = DateTime(now.year, now.month, 1);
-    final monthEnd = DateTime(now.year, now.month + 1, 1);
+  /// [month] gösterilecek ayın herhangi bir günü olabilir; ayın ilk gününe
+  /// normalize edilir. Önceden `DateTime.now()` sabit kullanılıyordu, yani
+  /// SADECE içinde bulunulan ay görülebiliyordu — ay değiştiğinde bir önceki
+  /// ayın girilmiş giderleri erişilemez hale geliyordu (kullanıcı raporu,
+  /// 2026-09-02). Artık panel ay seçebiliyor (bkz. `ExpensesSelectedMonth`).
+  Stream<ExpensesState> watchMonth(String gymId, DateTime month) {
+    final monthStart = DateTime(month.year, month.month, 1);
+    final monthEnd = DateTime(month.year, month.month + 1, 1);
 
     return FirebaseFirestore.instance
         .collection('expenses')
@@ -66,7 +70,8 @@ class ExpensesService {
             entries,
           );
           return ExpensesState(
-            monthLabel: '${_monthNamesLong[now.month]} ${now.year}',
+            monthLabel:
+                '${_monthNamesLong[monthStart.month]} ${monthStart.year}',
             revenueRatioLabel: revenueRatioLabel,
             entries: entries,
           );

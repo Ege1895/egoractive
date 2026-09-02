@@ -112,18 +112,46 @@ class AdminExpensesPanel extends ConsumerWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          ref
-                              .watch(
-                                rcTextProvider(
-                                  RemoteConfigKeys.expensesMonthlyTotalLabel,
+                        // Ay geçişi — geçmiş ayların giderleri de görülebilsin
+                        // diye (önceden liste içinde bulunulan aya sabitti).
+                        Row(
+                          children: [
+                            _MonthArrow(
+                              icon: Icons.chevron_left,
+                              onTap: () => ref
+                                  .read(expensesSelectedMonthProvider.notifier)
+                                  .previous(),
+                            ),
+                            Expanded(
+                              child: Text(
+                                ref
+                                    .watch(
+                                      rcTextProvider(
+                                        RemoteConfigKeys
+                                            .expensesMonthlyTotalLabel,
+                                      ),
+                                    )
+                                    .replaceAll('{month}', state.monthLabel),
+                                textAlign: TextAlign.center,
+                                style: typography.bodyMedium.copyWith(
+                                  color: colors.onSurfaceMuted,
+                                  fontSize: 13,
                                 ),
-                              )
-                              .replaceAll('{month}', state.monthLabel),
-                          style: typography.bodyMedium.copyWith(
-                            color: colors.onSurfaceMuted,
-                            fontSize: 13,
-                          ),
+                              ),
+                            ),
+                            _MonthArrow(
+                              icon: Icons.chevron_right,
+                              // İçinde bulunulan aydan ileri gidilemez.
+                              onTap: ref.watch(expensesCanGoNextMonthProvider)
+                                  ? () => ref
+                                        .read(
+                                          expensesSelectedMonthProvider
+                                              .notifier,
+                                        )
+                                        .next()
+                                  : null,
+                            ),
+                          ],
                         ),
                         const SizedBox(height: AppSpacing.xs),
                         Text(
@@ -352,6 +380,38 @@ class _ExpenseRow extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Finans panelindeki ay geçiş oku. [onTap] `null` verilirse pasif görünür
+/// (içinde bulunulan aydayken "sonraki" oku).
+class _MonthArrow extends StatelessWidget {
+  const _MonthArrow({required this.icon, required this.onTap});
+
+  final IconData icon;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+    final enabled = onTap != null;
+    return Material(
+      color: Colors.transparent,
+      shape: const CircleBorder(),
+      child: InkWell(
+        customBorder: const CircleBorder(),
+        onTap: onTap,
+        child: SizedBox(
+          width: 36,
+          height: 36,
+          child: Icon(
+            icon,
+            size: 22,
+            color: enabled ? colors.onSurfaceVariant : colors.outlineStrong,
+          ),
+        ),
       ),
     );
   }

@@ -211,27 +211,23 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
               ),
             ),
             Expanded(
-              child: subscription.subscriptionExempt
-                  ? _exemptView(context, rc)
-                  : FutureBuilder<List<SubscriptionProduct>>(
-                      future: _productsFuture,
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return const Center(
-                            child: CircularProgressIndicator(),
-                          );
-                        }
-                        final products = snapshot.data ?? const [];
-                        _ensureSelection(products);
-                        return _buildForState(
-                          context,
-                          products,
-                          subscription,
-                          rc,
-                        );
-                      },
-                    ),
+              // Exempt salon da artık mağaza ürünlerini bekliyor: planı
+              // gerçek fiyat/deneme bilgisiyle göstermek için (önceden
+              // sadece "Yıllık" kelimesi yazıyordu).
+              child: FutureBuilder<List<SubscriptionProduct>>(
+                future: _productsFuture,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  final products = snapshot.data ?? const [];
+                  if (subscription.subscriptionExempt) {
+                    return _exemptView(context, rc, products);
+                  }
+                  _ensureSelection(products);
+                  return _buildForState(context, products, subscription, rc);
+                },
+              ),
             ),
           ],
         ),
@@ -275,10 +271,19 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
   /// hiçbir gerçek `subscriptionStatus`/`subscriptionProductId` olmadığı
   /// için salon otomatik olarak (appAccess üzerinden) zorunlu abonelik
   /// seçim ekranına düşer — tam istenen davranış.
-  Widget _exemptView(BuildContext context, RemoteConfigService rc) {
+  Widget _exemptView(
+    BuildContext context,
+    RemoteConfigService rc,
+    List<SubscriptionProduct> products,
+  ) {
     final colors = context.appColors;
     final typography = context.appTypography;
     final locale = ref.watch(localeControllerProvider);
+    // Mağazadan gelen GERÇEK yıllık ürün — fiyat, açıklama ve deneme
+    // etiketiyle birlikte gösterilir. Mağaza henüz yanıt vermediyse ya da
+    // ürün bulunamadıysa (ör. store kurulumu tamamlanmamış) eski davranışa,
+    // yani sadece "Yıllık" kelimesine düşülür.
+    final yearlyProduct = products.where((p) => _isYearly(p.id)).firstOrNull;
     final planName = ref.watch(
       rcTextProvider(RemoteConfigKeys.subscriptionYearlyPlanFallback),
     );
@@ -321,10 +326,10 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
                         ),
                         const SizedBox(height: AppSpacing.xs),
                         Text(
-                          planName,
+                          yearlyProduct?.title ?? planName,
                           style: typography.headingLarge.copyWith(
                             color: colors.onSurface,
-                            fontSize: 26,
+                            fontSize: yearlyProduct == null ? 26 : 20,
                           ),
                         ),
                       ],
@@ -375,6 +380,22 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
             ],
           ),
         ),
+        // Mağazadan çekilen gerçek plan kartı — fiyat, "2 ay bedava" gibi
+        // deneme etiketi ve açıklama dahil. `showSelector: false`: bu bir
+        // seçenek değil, salonun sahip olduğu planın gösterimi (seçilecek
+        // bir şey yok, dokunulamaz).
+        if (yearlyProduct != null) ...[
+          const SizedBox(height: AppSpacing.lg),
+          _PlanCard(
+            product: yearlyProduct,
+            selected: true,
+            enabled: true,
+            showSelector: false,
+            onTap: null,
+            badge: rc.getText(RemoteConfigKeys.subscriptionYearlyBadge, locale),
+            subLabel: _planSubLabel(yearlyProduct, true, rc, locale),
+          ),
+        ],
         const SizedBox(height: AppSpacing.lg),
         _IncludedFeaturesCard(rc: rc, locale: locale),
       ],
@@ -1139,6 +1160,7 @@ class _PlanCard extends StatelessWidget {
     required this.subLabel,
     required this.onTap,
     this.pendingLabel,
+    this.showSelector = true,
   });
 
   final SubscriptionProduct product;
@@ -1148,6 +1170,12 @@ class _PlanCard extends StatelessWidget {
   final String subLabel;
   final VoidCallback? onTap;
   final String? pendingLabel;
+
+  /// `false` ise seçim dairesi (radio) hiç çizilmez — kart bir SEÇENEK değil,
+  /// "sahip olunan plan"ın gösterimi olduğunda kullanılır (bkz.
+  /// `_exemptView`: ödeme yapmayacak salona planı olduğu gibi gösteriliyor,
+  /// ama seçilecek bir şey yok).
+  final bool showSelector;
 
   @override
   Widget build(BuildContext context) {
@@ -1180,34 +1208,36 @@ class _PlanCard extends StatelessWidget {
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.only(top: 3),
-                      child: Container(
-                        width: 22,
-                        height: 22,
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: selected
-                                ? colors.primary
-                                : colors.outlineStrong,
-                            width: 2,
+                    if (showSelector) ...[
+                      Padding(
+                        padding: const EdgeInsets.only(top: 3),
+                        child: Container(
+                          width: 22,
+                          height: 22,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: selected
+                                  ? colors.primary
+                                  : colors.outlineStrong,
+                              width: 2,
+                            ),
                           ),
+                          child: selected
+                              ? Container(
+                                  width: 10,
+                                  height: 10,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: colors.primary,
+                                  ),
+                                )
+                              : null,
                         ),
-                        child: selected
-                            ? Container(
-                                width: 10,
-                                height: 10,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: colors.primary,
-                                ),
-                              )
-                            : null,
                       ),
-                    ),
-                    const SizedBox(width: AppSpacing.md),
+                      const SizedBox(width: AppSpacing.md),
+                    ],
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
