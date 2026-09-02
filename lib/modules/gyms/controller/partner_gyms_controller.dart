@@ -3,6 +3,7 @@ import 'dart:ui' show PlatformDispatcher;
 import 'package:phone_form_field/phone_form_field.dart' show PhoneNumber;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../core/perf/perf_trace.dart';
 import '../domain/partner_gym.dart';
 import '../service/partner_gym_service.dart';
 
@@ -29,7 +30,12 @@ String? deviceCountryCode(DeviceCountryCodeRef ref) =>
 /// hiç göstermemektense tümünü göstermek tercih edilir.
 @riverpod
 Future<List<PartnerGym>> partnerGyms(PartnerGymsRef ref) async {
+  // F10-1 — "Anlaşmalı Salonlar" ölçümü. `listPartnerGyms` callable'ı
+  // girişten ÖNCE çağrıldığı için neredeyse her zaman soğuk başlıyor
+  // (F10-4'ün hedefi).
+  PerfTrace.begin('AKIS_anlasmali_salonlar');
   final all = await ref.watch(partnerGymServiceProvider).fetchAll();
+  PerfTrace.end('AKIS_anlasmali_salonlar');
   final deviceCountry = ref.watch(deviceCountryCodeProvider);
   if (deviceCountry == null) return all;
   return all.where((gym) => _countryOf(gym.phone) == deviceCountry).toList();

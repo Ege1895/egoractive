@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/analytics/analytics_service.dart';
+import '../../../core/perf/perf_trace.dart';
 
 part 'sessions_write_service.g.dart';
 
@@ -86,7 +87,16 @@ class SessionsWriteService {
     required List<({String id, String name})> members,
     required DateTime startTime,
   }) async {
-    if (await _trainerHasConflict(gymId, trainerId, startTime)) {
+    // F10-1 — "Seans oluşturma" ölçümü. Bu akış hiç Cloud Function
+    // kullanmıyor (doğrudan Firestore), yani bildirilen ~60 sn cold
+    // start'la AÇIKLANAMIYOR. Çakışma sorgusu ile transaction ayrı ayrı
+    // ölçülüyor ki darboğazın hangisi olduğu görülebilsin.
+    PerfTrace.begin('AKIS_seans_olustur_toplam');
+    PerfTrace.begin('AKIS_seans_cakisma_sorgusu');
+    final hasConflict = await _trainerHasConflict(gymId, trainerId, startTime);
+    PerfTrace.end('AKIS_seans_cakisma_sorgusu');
+    if (hasConflict) {
+      PerfTrace.end('AKIS_seans_olustur_toplam');
       throw TrainerConflictException(trainerName);
     }
     final endTime = startTime.add(
@@ -117,6 +127,7 @@ class SessionsWriteService {
     // henüz tamamlanmamış/iptal edilmemiş) seans sayısı. Üyeler listesinde
     // gösterilen "Kalan ders" ikisinin toplamı — sadece gerçekten
     // tamamlanmış dersler düşülüyor (bkz. admin_member_summary_mapper.dart).
+    PerfTrace.begin('AKIS_seans_transaction');
     await firestore.runTransaction((transaction) async {
       // Firestore transaction kuralı: tüm okumalar yazmalardan önce olmalı
       // — bu yüzden önce hepsi okunuyor, kota kontrolü ve yazmalar sonra.
@@ -166,6 +177,8 @@ class SessionsWriteService {
         });
       }
     });
+    PerfTrace.end('AKIS_seans_transaction');
+    PerfTrace.end('AKIS_seans_olustur_toplam');
   }
 
   Future<void> rescheduleSession(

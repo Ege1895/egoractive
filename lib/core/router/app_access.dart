@@ -7,6 +7,7 @@ import '../../modules/auth/repository/auth_repository.dart';
 import '../../modules/subscription/controller/subscription_controller.dart';
 import '../../modules/subscription/domain/subscription_state.dart';
 import '../onboarding/onboarding_prefs.dart';
+import '../perf/perf_trace.dart';
 import '../remote_config/remote_config_service.dart';
 import '../theme/theme_controller.dart';
 import 'app_router.dart';
@@ -59,9 +60,15 @@ typedef AppAccess = ({AppAccessKind kind, AppRole? role});
 /// ama bu köprü, aynı belirsizliğe bağlı kalmadan sorunu ortadan kaldırıyor.
 @riverpod
 Stream<AppAccess> appAccess(AppAccessRef ref) async* {
+  // F10-1 — bu zincirin ARDIŞIK olması F10-3'ün hedefi; her adımı ayrı
+  // ölçüyoruz ki paralelleştirmenin kazancı sayıyla gösterilebilsin.
+  PerfTrace.begin('appaccess_toplam');
+  PerfTrace.begin('appaccess_1_role');
   final role = await ref.watch(currentRoleProvider.future);
+  PerfTrace.end('appaccess_1_role');
   debugPrint('[appAccess] role=$role');
   if (role == null) {
+    PerfTrace.end('appaccess_toplam');
     yield (kind: AppAccessKind.signedOut, role: null);
     return;
   }
@@ -76,20 +83,27 @@ Stream<AppAccess> appAccess(AppAccessRef ref) async* {
   // Firestore alanı) tek seferlik bir okuma yeterli; `EmailSetupPanel`
   // doğrulama başarılı olunca bu provider'ı `ref.invalidate` ile elle
   // tazeler (bkz. `otp_verification_panel.dart`).
+  PerfTrace.begin('appaccess_2_email');
   final email = await ref.watch(currentUserEmailProvider.future);
+  PerfTrace.end('appaccess_2_email');
   debugPrint('[appAccess] email=${email == null ? null : "set"}');
   if (email == null) {
+    PerfTrace.end('appaccess_toplam');
     yield (kind: AppAccessKind.emailSetupRequired, role: role);
     return;
   }
 
+  PerfTrace.begin('appaccess_3_gymId');
   final gymId = await ref.watch(activeGymIdProvider.future);
+  PerfTrace.end('appaccess_3_gymId');
   debugPrint('[appAccess] gymId=$gymId');
   if (gymId == null) {
+    PerfTrace.end('appaccess_toplam');
     yield (kind: AppAccessKind.ready, role: role);
     return;
   }
 
+  PerfTrace.begin('appaccess_4_subscription');
   final controller = StreamController<AppAccess>();
   final subscription = ref.listen(subscriptionStateForGymProvider(gymId), (
     previous,
@@ -100,6 +114,10 @@ Stream<AppAccess> appAccess(AppAccessRef ref) async* {
       'hasError=${next.hasError} error=${next.error} value=${next.valueOrNull}',
     );
     next.whenData((state) {
+      // Zincirin son adımı — buraya ilk gelişte toplam süre yazılır
+      // (sonraki abonelik güncellemelerinde `end` sessizce no-op olur).
+      PerfTrace.end('appaccess_4_subscription');
+      PerfTrace.end('appaccess_toplam');
       final active =
           state.subscriptionExempt ||
           state.status == SubscriptionStatus.trial ||

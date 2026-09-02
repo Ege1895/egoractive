@@ -18,6 +18,7 @@ import 'core/locale/locale_prefs.dart';
 import 'core/onboarding/onboarding_prefs.dart';
 import 'core/panels/panel_stack_controller.dart';
 import 'core/panels/panel_stack_view.dart';
+import 'core/perf/perf_trace.dart';
 import 'core/remote_config/remote_config_service.dart';
 import 'core/router/app_access.dart';
 import 'core/router/app_router.dart';
@@ -39,12 +40,22 @@ import 'shared/widgets/app_phone_field_prefs.dart';
 final _providerContainer = ProviderContainer();
 
 void main() async {
+  // F10-1 — açılış zincirinin HER adımı ayrı ölçülüyor: F10-2'de bu
+  // adımların hangileri `runApp()` yolundan çıkarılacaksa, kazancın
+  // gerçekten oradan geldiğini kanıtlayabilmek için.
+  PerfTrace.startApp();
   WidgetsFlutterBinding.ensureInitialized();
+  PerfTrace.begin('firebase_init');
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  PerfTrace.end('firebase_init');
+  PerfTrace.begin('remote_config_init');
   await const RemoteConfigService().init();
+  PerfTrace.end('remote_config_init');
+  PerfTrace.begin('prefs_init');
   await LocalePrefs.init();
   await OnboardingPrefs.init();
   await AppPhoneFieldPrefs.init();
+  PerfTrace.end('prefs_init');
   unawaited(MobileAds.instance.initialize());
   if (debugTestDeviceIds.isNotEmpty) {
     MobileAds.instance.updateRequestConfiguration(
@@ -55,6 +66,7 @@ void main() async {
   // Push bildirim kurulumu opsiyonel bir iyileştirme — burada oluşacak
   // herhangi bir hata (izin reddi, APNS gecikmesi vb.) runApp() çağrısını
   // asla engellememeli, yoksa uygulama açılışta beyaz ekranda takılı kalır.
+  PerfTrace.begin('push_init');
   try {
     await PushNotificationService().init(_providerContainer);
   } on Exception catch (error) {
@@ -62,6 +74,8 @@ void main() async {
       'Push bildirim kurulumu başarısız oldu, uygulama yine de açılıyor: $error',
     );
   }
+  PerfTrace.end('push_init');
+  PerfTrace.begin('deeplink_init');
   try {
     await AppDeepLinkService().init(_providerContainer);
   } on Exception catch (error) {
@@ -69,12 +83,18 @@ void main() async {
       'Deep link kurulumu başarısız oldu, uygulama yine de açılıyor: $error',
     );
   }
+  PerfTrace.end('deeplink_init');
   runApp(
     UncontrolledProviderScope(
       container: _providerContainer,
       child: const EgoractiveApp(),
     ),
   );
+  // Bu geri çağırma ilk kare GERÇEKTEN çizildikten sonra tetiklenir —
+  // "uygulama açılış → ilk kare" hedefinin (F10-2: < 1,5 sn) ölçümü.
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    PerfTrace.sinceAppStart('İLK KARE');
+  });
 }
 
 class EgoractiveApp extends ConsumerWidget {
