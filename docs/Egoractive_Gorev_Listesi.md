@@ -491,7 +491,28 @@ Gerçek cihazda mobil veriyle login ~1,5-2 dk, salon listesi ~1 dk, salon oluşt
 - [ ] `otp_verification_panel.dart`'taki `ref.invalidate(appAccessProvider)` akışı bozulmamış
 - [ ] Gereksiz açılan listener sızmıyor (dispose doğrulandı)
 
-### F10-4 — Cloud Functions'ı iki codebase'e böl (cold start'ı kısalt)
+### F10-4 — Cloud Functions'ı iki codebase'e böl — ❌ ÖLÇÜLDÜ, YAPILMADI (2026-09-02)
+
+**KARAR: Uygulanmadı.** Task yazılırken "cold start'ta %40-60 kazanç" tahmin edilmişti; uygulamadan ÖNCE ölçüldü ve **bu tahmin yanlış çıktı.** Gerçek ölçümler:
+
+| Ölçüm | Sonuç |
+|---|---|
+| Derlenmiş `lib/index.js`'in TAMAMININ yüklenmesi | **107 ms** |
+| `@apple/app-store-server-library` yüklemesi | 34 ms |
+| `google-auth-library` yüklemesi | 13 ms |
+| **Codebase bölerek kazanılacak toplam** | **~47 ms** |
+| Production'da tipik cold start (gerçek loglar) | **1,4 – 3,5 sn** |
+| **Kazanç oranı** | **~%2** |
+
+Production cold start ölçümleri (`Starting new instance` → `STARTUP TCP probe`): `startLogin` 2,6 / 2,4 / 17,6 / 1,8 sn · `verifyLoginOtp` 3,5 / 1,9 / 12,4 / 1,4 sn · `listPartnerGyms` 15,9 / 1,5 sn · `signupGymAdmin` 1,4 / 2,0 / 3,2 / 5,0 sn. **12-17 sn'lik sıçramaların hepsi 1 Eylül 17:48-18:10 aralığında** (kullanıcının demo yaptığı saatler); aynı fonksiyon dakikalar sonra 1,8 sn'ye düşmüş — yani bunlar image'ın host cache'inden düşmesi kaynaklı, kod kaynaklı değil.
+
+**Cold start'ın gerçek kaynağı kod yükleme DEĞİL** (107 ms), container sağlama (image çekme + sandbox kurulumu) — Google'ın altyapısı. Deploy paketi zaten sadece 382 KB (node_modules yüklenmiyor, Cloud Build kendi kuruyor), `@apple`'ı çıkarmak image'da ~6 MB / ~150 MB kazandırır, o da marjinal.
+
+**%2 kazanç karşılığında alınacak riskler** (yeni codebase, paylaşılan kod paketi, deploy topolojisi değişikliği, yanlış `--only` bayrağıyla fonksiyon silme riski) bu takası kötü kılıyor. **Cold start'ı gerçekten bitiren tek yol `minInstances`'tır** (~$8/fonksiyon/ay) — F10-1 ölçümleri alındıktan sonra, hâlâ gerekiyorsa yalnızca `startLogin` + `listPartnerGyms` için değerlendirilmeli (~$16/ay).
+
+<details>
+<summary>Orijinal task tanımı (uygulanmadı, referans için korunuyor)</summary>
+
 **Prompt:** "Tüm fonksiyonlar tek `functions/` paketinden deploy ediliyor; `@apple/app-store-server-library` ve `google-auth-library` gibi ağır bağımlılıklar, basit bir `startLogin` çağrısında bile cold start'ta modül grafiğine giriyor. Auth grubunun bağımlılık kapanışı DOĞRULANDI: sadece `firebase-admin` + `node:crypto`, ağır lib YOK. Yeni bir `functions-auth/` codebase'i oluştur (kendi `package.json`'ı, dependencies SADECE `firebase-admin` + `firebase-functions`) ve şu fonksiyonları taşı: `startLogin`, `verifyLoginOtp`, `sendEmailSetupOtp`, `verifyEmailSetupOtp`, `sendEmailChangeOtp`, `verifyEmailChangeOtp`, `listPartnerGyms`, `signupGymAdmin`, `deleteAccount`. Gereken shared dosyalar: `firestore-paths`, `phone-lookup`, `otp`, `otp-email-template`, `mail`, `login-token`. `firebase.json`'a iki codebase tanımı eklensin (`{source: functions, codebase: default}`, `{source: functions-auth, codebase: auth}`). `functions/src/index.ts`'ten taşınan export'lar kaldırılsın."
 **⚠️ EN BÜYÜK RİSK — paylaşılan dosyalar:** `shared/` dosyaları iki codebase'de de gerekiyor. Seçenekler: (a) kopyala — **YAPMA**, iki kopya sessizce ayrışırsa `firestore-paths.ts` farklılığı veri hatasına yol açar; (b) symlink — tek kaynak ama TS/paketleme sorun çıkarabilir; (c) local npm paketi (`file:../shared`) — **ÖNERİLEN**, en temiz.
 **Diğer notlar:** Fonksiyon isimleri ve bölge DEĞİŞMİYOR → client tarafında hiçbir değişiklik gerekmiyor, URL'ler aynı. `firebase deploy --only functions` artık iki codebase'i birden deploy eder — ilk deploy'da `--only functions:auth` ile başla, mevcut fonksiyonların silinmediğini doğrula.
@@ -503,13 +524,27 @@ Gerçek cihazda mobil veriyle login ~1,5-2 dk, salon listesi ~1 dk, salon oluşt
 - [ ] Salon oluşturma çalışıyor (logo yükleme dahil)
 - [ ] Email değiştirme akışı çalışıyor
 - [ ] **Cold start ölçümü:** deploy sonrası ~15 dk bekle, `startLogin` çağır, logdan boot süresini oku — 18 sn'den belirgin düşüş beklentisi (~7-9 sn)
+</details>
 
-### F10-5 — Ölü kod ve küçük israfların temizliği
+### F10-5 — Ölü kod ve küçük israfların temizliği — ✅ 5a YAPILDI, 5b/5c/5d ÖLÇÜLDÜ VE ATLANDI (2026-09-02)
+
+**✅ 5a — `requestCustomToken` silindi.** Kodda yoktu (F1-10'da kaldırılmış, sadece yorum referansları kalmış) ama production'da canlı duruyordu. `firebase functions:delete` ile silindi; sonrasında `functions:list` ile diğer 36 fonksiyonun sağlam olduğu doğrulandı.
+
+**❌ 5b — `listPartnerGyms` özet dokümanı: ATLANDI, bugün HİÇ hız kazancı yok.** Gerekçe: Firestore, `gyms` koleksiyonunun tamamını **TEK bir sorgu round-trip'inde** döndürüyor (şu an 6 doküman / ~11,8 KB). Tek bir özet dokümanına indirmek de **yine tek round-trip** olurdu — yani kullanıcının gördüğü sürede ölçülebilir bir fark YOK. Kazanç sadece yüksek salon sayısında ortaya çıkar ve o da *gecikme* değil *okuma maliyeti* tarafında (ki ücretsiz kotanın çok altındayız). Karşılığında yeni bir koleksiyon + trigger + backfill + "index dokümanı bayatlarsa yanlış salon listesi gösterme" riski geliyor. Salon sayısı 50+'ye çıkarsa yeniden değerlendirilmeli.
+
+**❌ 5c — `weeklySubscriberSummary` saatlik tetikleme: ATLANDI.** Ayda 720 çalışma, her biri 1 ucuz Firestore point-read (RC cache dokümanı). Ücretsiz kotanın çok altında, kullanıcıya görünen hiçbir etkisi yok. Schedule'ı seyrekleştirmek RC ile saat ayarlama esnekliğini (LiveOps) azaltırdı — takas değmez.
+
+**❌ 5d — `recordSuccess` ekstra okuması: ATLANDI, kritik yolda DEĞİL.** Doğrulandı: `withFailureAlerting` yalnızca scheduled/task/trigger fonksiyonlarını sarıyor. Kullanıcının BEKLEDİĞİ callable'ların (`startLogin`, `verifyLoginOtp`, `listPartnerGyms`, `signupGymAdmin`) hiçbiri sarılı değil — yani bu ekstra okuma hiçbir zaman kullanıcının beklediği sürenin parçası olmuyor. Trigger'lar zaten yazma işleminden SONRA, asenkron çalışıyor.
+
+<details>
+<summary>Orijinal task tanımı (referans için korunuyor)</summary>
+
 **Prompt:** "(a) `requestCustomToken` fonksiyonu kodda YOK ama production'da hâlâ canlı (F1-10'da silinmiş olmalıydı) — `firebase functions:delete requestCustomToken --project egoractive-e92bd --force` ile sil. (b) `listPartnerGyms` her çağrıda tüm `gyms` koleksiyonunu okuyor; bir trigger'la güncel tutulan tek bir `publicGyms/index` özet dokümanına indir (çağrı başına sabit 1 okuma). (c) `weeklySubscriberSummary` saatte bir tetikleniyor (ayda 720 kez) ama işini ayda ~4 kez yapıyor — schedule'ı günde 2-3 kereye indirmeyi değerlendir (RC esnekliği biraz azalır, düşük öncelik). (d) `withFailureAlerting`'deki `recordSuccess` her başarılı trigger çalışmasında fazladan bir `functionHealth` okuması yapıyor — yüksek frekanslı trigger'larda atlanabilir (düşük öncelik)."
 **Kabul kriterleri:**
 - [ ] `firebase functions:list` çıktısında `requestCustomToken` yok
 - [ ] (b) yapıldıysa: Anlaşmalı Salonlar listesi doğru salonları gösteriyor, yeni salon eklenince index tazeleniyor
 - [ ] Tüm mevcut testler geçiyor
+</details>
 
 ---
 
