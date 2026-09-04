@@ -1779,7 +1779,7 @@ class RemoteConfigService {
         'Login ve rapor e-postası *',
     'lbl_members_self_info_email_field_label_tr': 'E-posta adresi',
     'lbl_trainers_info_title_tr': 'Bilgilerim',
-    'lbl_auth_profile_member_caption_tr': '+90 {phone} · Üye',
+    'lbl_auth_profile_member_caption_tr': '{phone} · Üye',
     'lbl_auth_profile_session_reminder_description_tr':
         'Dersinden {minutes} dakika önce bildirim',
     'lbl_auth_splash_title_tr': 'Egoractive',
@@ -2617,7 +2617,7 @@ class RemoteConfigService {
     'lbl_gyms_gym_info_login_report_email_label_en': 'Login & report email *',
     'lbl_members_self_info_email_field_label_en': 'Email address',
     'lbl_trainers_info_title_en': 'My Info',
-    'lbl_auth_profile_member_caption_en': '+90 {phone} · Member',
+    'lbl_auth_profile_member_caption_en': '{phone} · Member',
     'lbl_auth_profile_session_reminder_description_en':
         'Notification {minutes} minutes before your session',
     'lbl_auth_splash_title_en': 'Egoractive',

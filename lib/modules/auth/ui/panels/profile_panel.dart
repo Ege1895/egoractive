@@ -14,6 +14,7 @@ import '../../controller/auth_controller.dart';
 import '../../controller/member_profile_controller.dart';
 import 'delete_account_confirm_panel.dart';
 import 'language_select_panel.dart';
+import '../../../../shared/utils/phone_display.dart';
 
 /// Üye 8 · Profilim (Profil sekmesi kökü).
 class ProfilePanel extends ConsumerWidget {
@@ -98,7 +99,10 @@ class ProfilePanel extends ConsumerWidget {
                                             .authProfileMemberCaption,
                                       ),
                                     )
-                                    .replaceAll('{phone}', profile.phoneE164),
+                                    .replaceAll(
+                                      '{phone}',
+                                      formatPhoneForDisplay(profile.phoneE164),
+                                    ),
                                 style: typography.bodyMedium.copyWith(
                                   color: colors.onSurfaceVariant,
                                   fontSize: 14,

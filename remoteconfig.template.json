@@ -1480,13 +1480,14 @@
     },
     "lbl_auth_profile_member_caption_tr": {
       "defaultValue": {
-        "value": "+90 {phone} · Üye"
+        "value": "{phone} · Üye"
       },
-      "valueType": "STRING"
+      "valueType": "STRING",
+      "description": "Profil ekranındaki alt satır. {phone} ÜLKE KODUYLA BİRLİKTE gelir (bkz. shared/utils/phone_display.dart) — buraya ayrıca '+90' yazma."
     },
     "lbl_auth_profile_member_caption_en": {
       "defaultValue": {
-        "value": "+90 {phone} · Member"
+        "value": "{phone} · Member"
       },
       "valueType": "STRING"
     },
