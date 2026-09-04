@@ -6,7 +6,8 @@
     "measure": "tsx measure_query_latency.ts",
     "backfill-planned-sessions": "tsx backfill_planned_sessions_count.ts",
     "backfill-trainer-stats": "tsx backfill_monthly_trainer_stats.ts",
-    "backfill-phone-index": "tsx backfill_phone_index.ts"
+    "backfill-phone-index": "tsx backfill_phone_index.ts",
+    "enable-closed-test": "tsx enable_closed_test_accounts.ts"
   },
   "dependencies": {
     "firebase-admin": "^13.10.0"
