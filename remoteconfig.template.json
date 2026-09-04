@@ -10106,6 +10106,84 @@
         "value": "At {time} · {attendeeCount} people signed up so far"
       },
       "valueType": "STRING"
+    },
+    "lbl_gyms_themes_delete_confirm_title_tr": {
+      "defaultValue": {
+        "value": "Tema silinsin mi?"
+      },
+      "valueType": "STRING",
+      "description": "Kayıtlı bir temanın silinmesi için açılan onay diyaloğunun başlığı."
+    },
+    "lbl_gyms_themes_delete_confirm_title_en": {
+      "defaultValue": {
+        "value": "Delete this theme?"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_themes_delete_confirm_body_tr": {
+      "defaultValue": {
+        "value": "{name} teması kayıtlı temalar arasından kaldırılacak. Bu işlem geri alınamaz."
+      },
+      "valueType": "STRING",
+      "description": "Tema silme onay diyaloğunun gövdesi. {name} temanın adıyla değişir."
+    },
+    "lbl_gyms_themes_delete_confirm_body_en": {
+      "defaultValue": {
+        "value": "{name} will be removed from your saved themes. This cannot be undone."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_themes_delete_confirm_cta_tr": {
+      "defaultValue": {
+        "value": "Evet, sil"
+      },
+      "valueType": "STRING",
+      "description": "Tema silme onay diyaloğundaki onay butonu."
+    },
+    "lbl_gyms_themes_delete_confirm_cta_en": {
+      "defaultValue": {
+        "value": "Yes, delete"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_themes_delete_busy_label_tr": {
+      "defaultValue": {
+        "value": "Siliniyor…"
+      },
+      "valueType": "STRING",
+      "description": "Tema silinirken onay butonunda gösterilen metin."
+    },
+    "lbl_gyms_themes_delete_busy_label_en": {
+      "defaultValue": {
+        "value": "Deleting…"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_themes_delete_error_tr": {
+      "defaultValue": {
+        "value": "Tema silinemedi, tekrar dene."
+      },
+      "valueType": "STRING",
+      "description": "Tema silme başarısız olduğunda diyalog içinde gösterilen hata."
+    },
+    "lbl_gyms_themes_delete_error_en": {
+      "defaultValue": {
+        "value": "Could not delete the theme, please try again."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_themes_delete_button_label_tr": {
+      "defaultValue": {
+        "value": "Temayı sil"
+      },
+      "valueType": "STRING",
+      "description": "Tema kartındaki eksi butonunun erişilebilirlik etiketi (ekran okuyucu)."
+    },
+    "lbl_gyms_themes_delete_button_label_en": {
+      "defaultValue": {
+        "value": "Delete theme"
+      },
+      "valueType": "STRING"
     }
   }
 }

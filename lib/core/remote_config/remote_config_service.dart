@@ -1534,6 +1534,13 @@ abstract final class RemoteConfigKeys {
 
   static const eventsNotFoundError = 'lbl_events_not_found_error';
   static const eventsLoadError = 'lbl_events_load_error';
+  static const gymsThemesDeleteConfirmTitle = 'lbl_gyms_themes_delete_confirm_title';
+  static const gymsThemesDeleteConfirmBody = 'lbl_gyms_themes_delete_confirm_body';
+  static const gymsThemesDeleteConfirmCta = 'lbl_gyms_themes_delete_confirm_cta';
+  static const gymsThemesDeleteBusyLabel = 'lbl_gyms_themes_delete_busy_label';
+  static const gymsThemesDeleteError = 'lbl_gyms_themes_delete_error';
+  static const gymsThemesDeleteButtonLabel = 'lbl_gyms_themes_delete_button_label';
+
 }
 
 /// Firebase Remote Config'e tip güvenli erişim katmanı. `FirebaseRemoteConfig.instance`
@@ -3645,6 +3652,18 @@ class RemoteConfigService {
     'lbl_events_not_found_error_en': 'Event not found.',
     'lbl_events_load_error_tr': 'Etkinlik yüklenemedi, tekrar dene.',
     'lbl_events_load_error_en': 'Could not load the event, please try again.',
+    'lbl_gyms_themes_delete_confirm_title_tr': 'Tema silinsin mi?',
+    'lbl_gyms_themes_delete_confirm_title_en': 'Delete this theme?',
+    'lbl_gyms_themes_delete_confirm_body_tr': '{name} teması kayıtlı temalar arasından kaldırılacak. Bu işlem geri alınamaz.',
+    'lbl_gyms_themes_delete_confirm_body_en': '{name} will be removed from your saved themes. This cannot be undone.',
+    'lbl_gyms_themes_delete_confirm_cta_tr': 'Evet, sil',
+    'lbl_gyms_themes_delete_confirm_cta_en': 'Yes, delete',
+    'lbl_gyms_themes_delete_busy_label_tr': 'Siliniyor…',
+    'lbl_gyms_themes_delete_busy_label_en': 'Deleting…',
+    'lbl_gyms_themes_delete_error_tr': 'Tema silinemedi, tekrar dene.',
+    'lbl_gyms_themes_delete_error_en': 'Could not delete the theme, please try again.',
+    'lbl_gyms_themes_delete_button_label_tr': 'Temayı sil',
+    'lbl_gyms_themes_delete_button_label_en': 'Delete theme',
   };
 
   /// Ders/seans onay bildiriminin kaç dakika önce gönderileceği.
