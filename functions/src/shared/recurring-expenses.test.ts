@@ -5,7 +5,6 @@ import {
   addMonths,
   clampDayToMonth,
   compareMonths,
-  maxRecurringCatchUpMonths,
   monthKey,
   parseMonthKey,
   pendingRecurringMonths,
@@ -43,30 +42,36 @@ test("clampDayToMonth 31'i kısa aylara çeker", () => {
 });
 
 // Kullanıcı raporundaki asıl senaryo: Ağustos'a "her ay tekrar et" ile
-// girilen kira, Eylül'de görünmüyordu.
-test("şablon ayının kendisi üretilmez, sonraki ay üretilir", () => {
+// girilen kira, yılın kalan TÜM aylarında görünmeli (takvimde ileriye dönük).
+test("şablon ayından yıl sonuna kadar tüm aylar üretilir", () => {
   assert.deepEqual(
     pendingRecurringMonths({
       templateMonth: { year: 2026, month: 8 },
       materializedThrough: undefined,
       currentMonth: { year: 2026, month: 9 },
     }),
-    [{ year: 2026, month: 9 }],
+    [9, 10, 11, 12].map((month) => ({ year: 2026, month })),
   );
 });
 
-test("aradaki tüm boş aylar tek seferde doldurulur", () => {
+// Yıl sınırı: 2027 için admin gideri yeniden girer.
+test("sonraki yıla taşmaz", () => {
+  const months = pendingRecurringMonths({
+    templateMonth: { year: 2026, month: 11 },
+    materializedThrough: undefined,
+    currentMonth: { year: 2027, month: 2 },
+  });
+  assert.deepEqual(months, [{ year: 2026, month: 12 }]);
+});
+
+test("Aralık'a girilen şablon hiç kopya üretmez", () => {
   assert.deepEqual(
     pendingRecurringMonths({
-      templateMonth: { year: 2026, month: 11 },
+      templateMonth: { year: 2026, month: 12 },
       materializedThrough: undefined,
-      currentMonth: { year: 2027, month: 2 },
+      currentMonth: { year: 2026, month: 12 },
     }),
-    [
-      { year: 2026, month: 12 },
-      { year: 2027, month: 1 },
-      { year: 2027, month: 2 },
-    ],
+    [],
   );
 });
 
@@ -88,17 +93,35 @@ test("her şey üretilmişse boş döner — günlük çalışmanın normal hâl
   assert.deepEqual(
     pendingRecurringMonths({
       templateMonth: { year: 2026, month: 8 },
-      materializedThrough: "2026-09",
+      materializedThrough: "2026-12",
       currentMonth: { year: 2026, month: 9 },
     }),
     [],
   );
 });
 
-test("geleceğe tarihli şablon için henüz kopya üretilmez", () => {
+// Gelecek aya tarihli bir şablon da yıl sonuna kadar doldurulur — takvimde
+// ileriye bakan admin sabit gideri görebilsin diye.
+test("geleceğe tarihli şablon da kendi yılını doldurur", () => {
   assert.deepEqual(
     pendingRecurringMonths({
-      templateMonth: { year: 2026, month: 11 },
+      templateMonth: { year: 2026, month: 10 },
+      materializedThrough: undefined,
+      currentMonth: { year: 2026, month: 9 },
+    }),
+    [
+      { year: 2026, month: 11 },
+      { year: 2026, month: 12 },
+    ],
+  );
+});
+
+// Çok eski bir şablon, kendi yılı çoktan bittiği için hiç kopya üretmez —
+// `maxMonths` penceresi zaten o yılın çok ilerisinde.
+test("çok eski şablon yeni kopya üretmez", () => {
+  assert.deepEqual(
+    pendingRecurringMonths({
+      templateMonth: { year: 2015, month: 1 },
       materializedThrough: undefined,
       currentMonth: { year: 2026, month: 9 },
     }),
@@ -106,15 +129,17 @@ test("geleceğe tarihli şablon için henüz kopya üretilmez", () => {
   );
 });
 
-test("çok eski şablonda sadece son maxMonths ay doldurulur", () => {
+// Geçmiş boşluklar da doldurulur ama yine yıl sonunda durur: fonksiyon uzun
+// süre çalışmamışsa Ocak'ta girilen şablon Aralık'a kadar tamamlanır.
+test("geçmiş boşluklar yıl sonuna kadar tamamlanır", () => {
   const months = pendingRecurringMonths({
-    templateMonth: { year: 2015, month: 1 },
+    templateMonth: { year: 2026, month: 1 },
     materializedThrough: undefined,
     currentMonth: { year: 2026, month: 9 },
   });
-  assert.equal(months.length, maxRecurringCatchUpMonths);
-  assert.deepEqual(months[months.length - 1], { year: 2026, month: 9 });
-  assert.deepEqual(months[0], addMonths({ year: 2026, month: 9 }, -(maxRecurringCatchUpMonths - 1)));
+  assert.equal(months.length, 11);
+  assert.deepEqual(months[0], { year: 2026, month: 2 });
+  assert.deepEqual(months[months.length - 1], { year: 2026, month: 12 });
 });
 
 test("imleç şablondan eskiyse yok sayılır (bozuk/elle yazılmış veri)", () => {
@@ -124,6 +149,6 @@ test("imleç şablondan eskiyse yok sayılır (bozuk/elle yazılmış veri)", ()
       materializedThrough: "2020-01",
       currentMonth: { year: 2026, month: 9 },
     }),
-    [{ year: 2026, month: 9 }],
+    [9, 10, 11, 12].map((month) => ({ year: 2026, month })),
   );
 });
