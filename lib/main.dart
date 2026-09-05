@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'dart:ui' show PlatformDispatcher;
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_quill/flutter_quill.dart';
@@ -48,6 +50,22 @@ void main() async {
   PerfTrace.begin('firebase_init');
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   PerfTrace.end('firebase_init');
+
+  // Kapalı testte uygulama testerların cihazında hiç açılmadan çöktü ve
+  // elimizde tek veri "crash oluyor" mailiydi; yığın izini ancak emülatörde
+  // temiz kurulum yaparak üretebildik (bkz. `android/app/proguard-rules.pro`).
+  // Crashlytics, aynı durumda çökmeyi doğrudan konsola taşıyor.
+  //
+  // `Firebase.initializeApp`'ten HEMEN sonra kuruluyor: daha erkeye almak
+  // mümkün değil (Firebase başlatılmadan Crashlytics örneği yok), bu yüzden
+  // Firebase'den önce oluşan native çökmeler yine yakalanamaz — Android/iOS
+  // SDK'sı süreç kuruluşunda kendi handler'ını taktığı için pratikte
+  // çoğu native çökme yine de rapor edilir.
+  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+  PlatformDispatcher.instance.onError = (Object error, StackTrace stack) {
+    FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+    return true;
+  };
   // F10-2 — bu üçü de SharedPreferences (yerel disk, ağ yok) ve ilk kare
   // çizilmeden hazır olmaları gerekiyor (dil seçimi, onboarding durumu,
   // son seçilen ülke kodu). Ardışık yerine paralel bekleniyor.
