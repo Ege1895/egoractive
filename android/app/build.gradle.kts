@@ -56,6 +56,13 @@ android {
             } else {
                 signingConfigs.getByName("debug")
             }
+            // R8 full mode (AGP 8 varsayılanı), Room'un yansımayla
+            // örneklediği `*_Impl` kurucularını siliyordu; uygulama TEMİZ
+            // kurulumda açılmadan çöküyordu (bkz. proguard-rules.pro).
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro",
+            )
         }
     }
 }
