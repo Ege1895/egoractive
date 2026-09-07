@@ -1344,6 +1344,10 @@ abstract final class RemoteConfigKeys {
   static const feedbackEmptyFilterLabel = 'lbl_feedback_empty_filter_label';
   static const trainersAddTrainerNameHint =
       'lbl_trainers_add_trainer_name_hint';
+  static const trainersSelfTrainerToggleTitle =
+      'lbl_trainers_self_trainer_toggle_title';
+  static const trainersSelfTrainerToggleNote =
+      'lbl_trainers_self_trainer_toggle_note';
   static const trainersManagementTrainerCountSuffix =
       'lbl_trainers_management_trainer_count_suffix';
   static const trainersAddTrainerSavingLabel =
@@ -2444,6 +2448,12 @@ class RemoteConfigService {
     'lbl_feedback_empty_month_label_tr': 'Bu ay hiç geri bildirim yok.',
     'lbl_feedback_empty_filter_label_tr': 'Bu puanda geri bildirim yok.',
     'lbl_trainers_add_trainer_name_hint_tr': 'Emre Kaya',
+    'lbl_trainers_self_trainer_toggle_title_tr':
+        'Kendimi antrenör olarak ekle',
+    'lbl_trainers_self_trainer_toggle_note_tr':
+        'Salonda ders de veriyorsan seç — adın antrenör listelerinde '
+        'çıkar, kendine seans ve grup dersi atayabilirsin. Telefon ve '
+        'e-posta gerekmez, giriş bilgilerin değişmez.',
     'lbl_trainers_management_trainer_count_suffix_tr': '{count} kişi',
     'lbl_trainers_add_trainer_saving_label_tr': 'Ekleniyor…',
     'lbl_trainers_edit_trainer_form_title_tr': 'Antrenörü düzenle',
@@ -3292,6 +3302,12 @@ class RemoteConfigService {
     'lbl_feedback_empty_month_label_en': 'No feedback this month.',
     'lbl_feedback_empty_filter_label_en': 'No feedback with this rating.',
     'lbl_trainers_add_trainer_name_hint_en': 'John Smith',
+    'lbl_trainers_self_trainer_toggle_title_en':
+        'Add myself as a trainer',
+    'lbl_trainers_self_trainer_toggle_note_en':
+        'Choose this if you also coach — your name appears in trainer '
+        'lists so you can assign sessions and group classes to yourself. '
+        'No phone or email needed; your login stays the same.',
     'lbl_trainers_management_trainer_count_suffix_en': '{count} people',
     'lbl_trainers_add_trainer_saving_label_en': 'Adding…',
     'lbl_trainers_edit_trainer_form_title_en': 'Edit trainer',

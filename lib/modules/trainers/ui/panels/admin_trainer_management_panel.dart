@@ -267,6 +267,7 @@ class _TrainerFormSheetState extends ConsumerState<_TrainerFormSheet> {
     ...?widget.existing?.specialties,
   };
   bool _isSaving = false;
+  bool _addSelfAsTrainer = false;
   String? _nameError;
   String? _phoneError;
   String? _errorMessage;
@@ -289,6 +290,33 @@ class _TrainerFormSheetState extends ConsumerState<_TrainerFormSheet> {
       _isSaving = true;
       _errorMessage = null;
     });
+    // F11-1 — admin kendini ekliyorsa telefon hiç okunmaz, tekrar kontrolü
+    // de yapılmaz: gölge antrenör dokümanına `phoneNumber` yazılmıyor.
+    if (_addSelfAsTrainer) {
+      try {
+        await ref
+            .read(adminTrainersControllerProvider.notifier)
+            .addSelfAsTrainer(
+              name: name,
+              specialties: _selectedSpecialties.isEmpty
+                  ? ['Fonksiyonel']
+                  : _selectedSpecialties.toList(),
+            );
+      } catch (_) {
+        if (mounted) {
+          setState(() {
+            _isSaving = false;
+            _errorMessage = ref.read(
+              rcTextProvider(RemoteConfigKeys.trainersAddTrainerError),
+            );
+          });
+        }
+        return;
+      }
+      if (mounted) Navigator.of(context).pop();
+      return;
+    }
+
     // Antrenör telefonu opsiyonel — sadece ülke kodu seçilip hane
     // girilmediyse (nsn boş) boş gönderilir.
     final enteredNumber = _phoneController.value;
@@ -393,6 +421,28 @@ class _TrainerFormSheetState extends ConsumerState<_TrainerFormSheet> {
             ),
           ),
           const SizedBox(height: AppSpacing.lg),
+          // Toggle sadece YENİ antrenör eklerken ve admin daha önce kendini
+          // eklememişken görünür — `trainerProfileUid` yazılıysa (pasife
+          // alınmış olsa bile) ikinci bir gölge doküman açılmamalı.
+          if (!_isEditing && ref.watch(selfTrainerProfileUidProvider) == null)
+            _SelfTrainerToggle(
+              title: ref.watch(
+                rcTextProvider(RemoteConfigKeys.trainersSelfTrainerToggleTitle),
+              ),
+              note: ref.watch(
+                rcTextProvider(RemoteConfigKeys.trainersSelfTrainerToggleNote),
+              ),
+              value: _addSelfAsTrainer,
+              onTap: () => setState(() {
+                _addSelfAsTrainer = !_addSelfAsTrainer;
+                if (_addSelfAsTrainer) {
+                  // Toggle'dan önce girilmiş numara ekranda kalmasın —
+                  // alan pasifleşiyor ve değeri hiç okunmuyor.
+                  _phoneController.value = initialPhoneNumber();
+                  _phoneError = null;
+                }
+              }),
+            ),
           AppTextField(
             label: ref.watch(
               rcTextProvider(RemoteConfigKeys.trainersFullNameFieldLabel),
@@ -409,6 +459,7 @@ class _TrainerFormSheetState extends ConsumerState<_TrainerFormSheet> {
               rcTextProvider(RemoteConfigKeys.commonTelefonLabel),
             ),
             controller: _phoneController,
+            enabled: !_addSelfAsTrainer,
             errorText: _phoneError,
             onChanged: (_, _) {
               if (_phoneError != null) setState(() => _phoneError = null);
@@ -590,6 +641,80 @@ class _SpecialtyPickerRow extends StatelessWidget {
             if (selected) Icon(Icons.check, color: colors.primary, size: 20),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// F11-1 — "Kendimi antrenör olarak ekle" anahtarı. Görsel dili
+/// `trainer_permissions_edit_panel.dart`'taki `_PermissionToggle` ile aynı;
+/// o widget dosyasına private olduğu için burada tekrar tanımlanıyor.
+class _SelfTrainerToggle extends StatelessWidget {
+  const _SelfTrainerToggle({
+    required this.title,
+    required this.note,
+    required this.value,
+    required this.onTap,
+  });
+
+  final String title;
+  final String note;
+  final bool value;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+    final typography = context.appTypography;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.md),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: typography.bodyLarge.copyWith(
+                    color: colors.onSurface,
+                    fontSize: 15,
+                  ),
+                ),
+                Text(
+                  note,
+                  style: typography.caption.copyWith(
+                    color: colors.onSurfaceMuted,
+                    height: 1.4,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: AppSpacing.md),
+          GestureDetector(
+            onTap: onTap,
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 150),
+              width: 52,
+              height: 32,
+              padding: const EdgeInsets.all(3),
+              decoration: BoxDecoration(
+                color: value ? colors.primary : colors.surfaceRaised,
+                borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
+              ),
+              alignment: value ? Alignment.centerRight : Alignment.centerLeft,
+              child: Container(
+                width: 26,
+                height: 26,
+                decoration: BoxDecoration(
+                  color: colors.onSurface,
+                  shape: BoxShape.circle,
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

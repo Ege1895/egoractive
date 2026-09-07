@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../core/router/app_router.dart';
 import '../../../core/theme/theme_controller.dart';
 import '../../members/controller/admin_members_controller.dart';
 import '../domain/admin_trainer_summary.dart';
@@ -33,6 +34,32 @@ Stream<List<QueryDocumentSnapshot<Map<String, dynamic>>>> _trainerDocsForGym(
             .where((doc) => doc.data()['isActive'] != false)
             .toList(),
       );
+}
+
+@riverpod
+Stream<Map<String, dynamic>?> _selfUserDoc(_SelfUserDocRef ref, String uid) {
+  return FirebaseFirestore.instance
+      .collection('users')
+      .doc(uid)
+      .snapshots()
+      .map((doc) => doc.data());
+}
+
+/// F11-1 — admin kendini antrenör olarak eklediyse, oluşan "gölge antrenör"
+/// dokümanının id'si; eklemediyse `null`.
+///
+/// Kaynak BİLEREK adminin KENDİ dokümanındaki `trainerProfileUid` alanı,
+/// antrenör listesi değil: antrenörlükten çıkıldığında gölge doküman
+/// `isActive: false` ile listeden düşer ([_trainerDocsForGym] filtresi) ama
+/// bağlantı korunmalı — aksi halde toggle yeniden görünür ve İKİNCİ bir
+/// gölge doküman açılır, aylık istatistikler iki kayda bölünürdü (bkz.
+/// görev listesi F11-5).
+@riverpod
+String? selfTrainerProfileUid(SelfTrainerProfileUidRef ref) {
+  final uid = ref.watch(authStateProvider).valueOrNull?.uid;
+  if (uid == null) return null;
+  final data = ref.watch(_selfUserDocProvider(uid)).valueOrNull;
+  return data?['trainerProfileUid'] as String?;
 }
 
 /// `gyms/{gymId}` bilinmediği (henüz gerçek bir salon yoksa) çağrılmaz — bu
@@ -97,6 +124,57 @@ class AdminTrainersController extends _$AdminTrainersController {
       // createdAt'ın antrenör karşılığı, önceden hiç yazılmıyordu.
       'createdAt': FieldValue.serverTimestamp(),
     });
+  }
+
+  /// F11-1 — admin kendisini antrenör olarak ekler ("gölge antrenör").
+  /// [addTrainer]'dan üç farkı var:
+  ///
+  /// 1. `phoneNumber` ve `email` alanları HİÇ yazılmaz (boş string olarak da
+  ///    değil). `startLogin`'in iki kimlik sorgusu da (`phoneNumber ==` ve
+  ///    `emailLower ==`) alanı olmayan dokümanı asla bulamaz, dolayısıyla bu
+  ///    doküman giriş yapamaz ve adminin kendi giriş kimliğiyle çakışmaz.
+  ///    `onUserWriteSyncPhoneIndex` de numarasız dokümanda hiçbir şey
+  ///    yazmadığı için `phoneIndex` kirlenmez.
+  /// 2. `notificationProxyUid` ile antrenöre giden push bildirimleri adminin
+  ///    cihazına yönlendirilir — token KOPYALANMAZ, işaret edilir (bkz.
+  ///    görev F11-2, `functions/src/shared/staff-notifications.ts`).
+  /// 3. Adminin kendi dokümanına `trainerProfileUid` yazılır. Bu alan
+  ///    antrenörlükten çıkılsa bile silinmez; F11-5 aynı dokümanı yeniden
+  ///    aktive eder, böylece aylık istatistikler ikiye bölünmez.
+  ///
+  /// İki yazma tek `WriteBatch`'te: ikincisi başarısız olursa sahipsiz bir
+  /// gölge doküman kalır, toggle tekrar görünür ve kullanıcı ikinci bir
+  /// doküman açardı.
+  Future<void> addSelfAsTrainer({
+    required String name,
+    required List<String> specialties,
+  }) async {
+    final gymId = ref.read(activeGymIdProvider).valueOrNull;
+    if (gymId == null) {
+      throw StateError('Aktif salon bulunamadı.');
+    }
+    final adminUid = ref.read(authStateProvider).valueOrNull?.uid;
+    if (adminUid == null) {
+      throw StateError('Oturum bulunamadı.');
+    }
+
+    final firestore = FirebaseFirestore.instance;
+    final shadowRef = firestore.collection('users').doc();
+    await (firestore.batch()
+          ..set(shadowRef, {
+            'name': name,
+            'nameLower': name.toLowerCase(),
+            'role': 'trainer',
+            'gymId': gymId,
+            'specialties': specialties,
+            'isActive': true,
+            'notificationProxyUid': adminUid,
+            'createdAt': FieldValue.serverTimestamp(),
+          })
+          ..update(firestore.collection('users').doc(adminUid), {
+            'trainerProfileUid': shadowRef.id,
+          }))
+        .commit();
   }
 
   Future<void> updateTrainer({

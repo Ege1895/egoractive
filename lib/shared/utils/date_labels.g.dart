@@ -6,7 +6,7 @@ part of 'date_labels.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$dateLabelsHash() => r'4bc5ae82a89f2256c64797515e70365868aa97c2';
+String _$dateLabelsHash() => r'16c31fca89d1c871bbc299ca6cddd0bf44c98028';
 
 /// Ay/gün adlarını RC'den okuyan tek kaynak. Widget'lar `ref.watch` ile
 /// (dil değişince otomatik yeniden çizilir), controller'lar `ref.read` ile

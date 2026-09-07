@@ -158,7 +158,7 @@ class _TodayScheduleForTrainerProviderElement
 }
 
 String _$pendingConfirmationsForTrainerHash() =>
-    r'8425335c7bd4b595ca0e1737a6056ae29cfb5792';
+    r'47d9aa9b81420c3ecd56ce45d515e4960c8b0988';
 
 /// F3-5 — antrenörün onayını bekleyen, bitiş saati geçmiş ama hâlâ
 /// `planned` kalan seanslar. Her biri için üyenin güncel

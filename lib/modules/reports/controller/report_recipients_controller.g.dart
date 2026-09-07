@@ -149,7 +149,7 @@ class _RecipientsForGymProviderElement
 }
 
 String _$reportRecipientsControllerHash() =>
-    r'b3e7c15be25cb140c2f251f45a9f983f721b4349';
+    r'1388458404bc068d07260ca158c27576add1da7c';
 
 /// F5-2/F5-15 — haftalık/aylık salon raporunun gönderileceği e-posta.
 ///
