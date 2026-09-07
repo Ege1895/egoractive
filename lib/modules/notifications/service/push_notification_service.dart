@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -8,6 +9,9 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/panels/panel_stack_controller.dart';
+import '../../../core/router/app_access.dart';
+import '../../../core/router/app_router.dart';
+import '../../sessions/ui/panels/admin_session_management_panel.dart';
 import '../../feedback/ui/panels/feedback_panel.dart';
 import '../../sessions/ui/panels/attendance_confirm_panel.dart';
 import '../../trainers/ui/panels/trainer_calendar_panel.dart';
@@ -129,7 +133,7 @@ class PushNotificationService {
 
     final initialMessage = await FirebaseMessaging.instance.getInitialMessage();
     if (initialMessage != null) {
-      _navigateForData(container, initialMessage.data);
+      unawaited(_navigateForData(container, initialMessage.data));
     }
   }
 
@@ -196,7 +200,10 @@ class PushNotificationService {
   /// gidiliyordu. Cloud Functions tarafı zaten her push'ta `data.type`
   /// gönderiyor (bkz. session-reminder-check.ts, session-completion-check.ts,
   /// feedback-reminder-check.ts, send-manual-notification.ts).
-  void _navigateForPayload(ProviderContainer container, String? payload) {
+  Future<void> _navigateForPayload(
+    ProviderContainer container,
+    String? payload,
+  ) async {
     if (payload == null) return;
     Map<String, dynamic> data;
     try {
@@ -204,24 +211,28 @@ class PushNotificationService {
     } catch (_) {
       return;
     }
-    _navigateForData(container, data);
+    await _navigateForData(container, data);
   }
 
-  void _navigateForData(
+  Future<void> _navigateForData(
     ProviderContainer container,
     Map<String, dynamic> data,
-  ) {
+  ) async {
     final panelStack = container.read(panelStackControllerProvider.notifier);
     switch (data['type'] as String?) {
       case 'session_reminder':
         panelStack.push(const AttendanceConfirmPanel());
+      // Antrenör "Dersini onaylar mısın?" push'una dokununca doğrudan
+      // Takvimim'e, o seansın tarihi seçili ve "Dersi onayla" sheet'i
+      // otomatik açık şekilde gitmeli — genel onay bekleyenler listesine
+      // değil (önceden TrainerNotificationsPanel açılıyordu).
+      // `trainer_session_reminder` ("bugün şu seansların var") önceden hiç
+      // yönlendirilmiyordu, aynı ekran onun da doğru hedefi.
       case 'session_completion':
-        // Antrenör "Dersini onaylar mısın?" push'una dokununca doğrudan
-        // Takvimim'e, o seansın tarihi seçili ve "Dersi onayla" sheet'i
-        // otomatik açık şekilde gitmeli — genel onay bekleyenler listesine
-        // değil (önceden TrainerNotificationsPanel açılıyordu).
-        panelStack.push(
-          TrainerCalendarPanel(focusSessionId: data['sessionId'] as String?),
+      case 'trainer_session_reminder':
+        await _navigateToSessionPanelForRole(
+          container,
+          data['sessionId'] as String?,
         );
       case 'feedback_reminder':
         panelStack.push(const FeedbackPanel());
@@ -247,5 +258,38 @@ class PushNotificationService {
         // plana getirmekle yetinilir.
         break;
     }
+  }
+
+  /// F11-4 — antrenöre giden seans bildirimleri, "gölge antrenör"
+  /// senaryosunda ADMIN'in cihazına düşüyor (`notificationProxyUid`
+  /// yönlendirmesi, bkz. `functions/src/shared/staff-notifications.ts`).
+  /// Admin oturumunda [TrainerCalendarPanel] açmak boş bir ekran demek: o
+  /// panel oturumdaki uid ile sorguluyor, gölge antrenörün seansları ise
+  /// admin uid'siyle eşleşmiyor.
+  ///
+  /// Rol okuması `app_deep_link_service.dart`'taki desenle aynı: ayrı/erken
+  /// bir `currentRoleProvider` okuması YAPILMIYOR, uygulamanın kendi UI'ının
+  /// da beklediği [appAccessProvider] beklenir — böylece bildirim hiçbir
+  /// zaman normal giriş akışının önüne geçmez/onunla yarışmaz. Erişim
+  /// `ready` değilse (hâlâ giriş ekranı, salon askıya alınmış vb.) sessizce
+  /// yok sayılır.
+  Future<void> _navigateToSessionPanelForRole(
+    ProviderContainer container,
+    String? sessionId,
+  ) async {
+    final access = await container.read(appAccessProvider.future);
+    if (access.kind != AppAccessKind.ready) return;
+    final panelStack = container.read(panelStackControllerProvider.notifier);
+    if (access.role == AppRole.admin) {
+      // Admin panelinde seans odaklama YOK: panel bugünü açıyor ve iki
+      // bildirim de aynı gün içinde gidiyor (ders bitişi / o günün
+      // seansları), dolayısıyla doğru gün zaten seçili geliyor. Panelin
+      // gün seçimi ay bazlı slot listesiyle senkron olmadığı için (yerel
+      // `_date` vs. `adminCalendarController`) başka bir aya atlamak
+      // yanlış günün seanslarını gösterirdi.
+      panelStack.push(const AdminSessionManagementPanel());
+      return;
+    }
+    panelStack.push(TrainerCalendarPanel(focusSessionId: sessionId));
   }
 }
