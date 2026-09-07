@@ -718,16 +718,86 @@ Ayrıca kazanç zaten küçük: RC yanıtı gzip'li geldiği ve JSON çok tekrar
 
 **Prompt:** "Gerçek cihazda (emulator değil, push gerektiği için) aşağıdaki senaryoyu baştan sona çalıştır ve her adımı işaretle."
 
+### Deploy sırası — ZORUNLU: sunucu → RC → client
+
+Ters sırada gölge antrenörün bildirimleri **sessizce** hiçbir yere gitmez (gölge dokümanda `fcmTokens` alanı hiç yok, yönlendirme de canlıda değil).
+
+**1) Cloud Functions + Security Rules**
+
+Deploy öncesi (predeploy zaten lint+build çalıştırıyor, bu ek olarak rules testleri):
+```
+cd functions && export PATH="/opt/homebrew/opt/openjdk/bin:$PATH" && npm test && npm run test:rules
+```
+
+```
+firebase deploy --only functions,firestore:rules
+```
+
+Dar kapsam istenirse — F11-2'nin dokunduğu 4 fonksiyon:
+```
+firebase deploy --only functions:sendSessionCompletionTask,functions:sendTrainerSessionReminderTask,functions:sendEventReminderTask,functions:sendGroupSessionReminderTask,firestore:rules
+```
+
+⚠️ Rules deploy'u kademesiz ve anında herkese gider (RİSK 2). İlk 10 dakika Crashlytics'te `PERMISSION_DENIED` var mı kontrol et.
+
+**2) Remote Config**
+```
+firebase deploy --only remoteconfig
+```
+
+**3) Client sürümü** — `CLAUDE.md` §7 gereği build number artırılır ve İKİ platform da çalıştırılır:
+```
+sed -i '' 's/^version: 1.0.0+19$/version: 1.0.0+20/' pubspec.yaml && flutter pub get
+```
+```
+flutter build appbundle --release && cp build/app/outputs/bundle/release/app-release.aab "build/app/outputs/bundle/release/20 (1.0.0).aab"
+```
+```
+flutter build ios --no-codesign --debug
+```
+iOS build'i atlama — `ios/Flutter/Generated.xcconfig` yalnızca gerçek bir iOS build komutuyla yenilenir, `flutter pub get` yetmez. Sonrasında Xcode'da Product → Archive ile YENİ archive al.
+
+### Hazırlık
+
+Yetki Ayarları'ndan gölge antrenörün "seans bitince kaç dakika sonra tamamlama sorusu gitsin" süresini **1 dakikaya** çek (`trainerReminderDelayMinutes`, varsayılan 30 — bkz. `shared/trainer-completion-delay.ts`). `session_completion` push'unu beklenebilir sürede tetiklemenin tek pratik yolu bu.
+
 **Kabul kriterleri:**
-- [ ] Admin kendini antrenör olarak ekliyor, listede görünüyor
-- [ ] Kendine bireysel seans atıyor; seans hatırlatma push'u ADMIN cihazına geliyor
-- [ ] "Dersini onaylar mısın?" push'u geliyor, dokununca doğru ekran açılıyor (F11-4)
-- [ ] Seansı admin panelinden tamamlıyor, üyenin `remainingSessions` değeri düşüyor
-- [ ] Kendine grup dersi atıyor; grup dersi hatırlatmasında **tek** bildirim geliyor (antrenör metni — admin metni `excludeTokens` ile eleniyor, bkz. commit 47caf86)
+
+*A — Ekleme (F11-1)*
+- [ ] Toggle açılınca telefon alanı pasifleşiyor ve girilmiş numara temizleniyor
+- [ ] Oluşan dokümanda `phoneNumber` ve `email` alanları YOK; `notificationProxyUid` admin uid'sine eşit, `isActive: true`
+- [ ] `phoneIndex` koleksiyonunda yeni doküman OLUŞMADI
+- [ ] Admin dokümanında `trainerProfileUid` yazılı
+- [ ] Çıkış yapıp telefonla tekrar girince ADMIN olarak giriliyor (gölge kayda düşmüyor)
+- [ ] Listede "Sen" rozetiyle görünüyor; ekleme sheet'inde toggle artık yok
+
+*B — Atama ve bildirim (F11-2, F11-4)*
+- [ ] Seans oluşturma sheet'indeki antrenör listesinde kendi adı çıkıyor
+- [ ] Bitişi ~2 dk sonra olan bir seans için "Dersini onaylar mısın?" push'u ADMIN cihazına geliyor
+- [ ] Bildirime dokununca boş ekran değil, admin seans yönetim ekranı açılıyor
+- [ ] Seans admin panelinden tamamlanıyor, üyenin `remainingSessions` değeri düşüyor
+
+*C — Çift bildirim kontrolü*
+- [ ] Grup dersi hatırlatmasında TEK bildirim geliyor (antrenör metni; admin metni `excludeTokens` ile eleniyor — bkz. commit 47caf86)
 - [ ] Etkinlik personel hatırlatmasında tek bildirim geliyor
+
+*D — Token dayanıklılığı (F11-2'nin asıl kazancı)*
+- [ ] Çıkış yapıp tekrar girildikten (token yenilendikten) SONRA oluşturulan seansın bildirimi hâlâ geliyor — kopyalama yaklaşımı burada kırılırdı
+
+*E — Rapor*
 - [ ] Haftalık rapor mailinde antrenör performans tablosunda gölge antrenör satırı, doğru seans sayılarıyla görünüyor
-- [ ] Uygulamadan çıkış yapıp tekrar giriliyor; bildirimler hâlâ geliyor (token yenilenmesi yönlendirmeyi bozmuyor — F11-2'nin asıl kazancı bu)
-- [ ] Antrenörlükten çıkılıyor, bildirimler kesiliyor, geçmiş rapor bozulmuyor
+
+*F — Çıkış ve geri dönüş (F11-5)*
+- [ ] "Antrenörlükten çık" sonrası antrenör listelerinden ve seans/grup dersi seçicilerinden düşüyor, yeni bildirim gelmiyor
+- [ ] Geçmiş raporlarda o dönemin seansları hâlâ görünüyor
+- [ ] Toggle tekrar görünüyor; açılınca YENİ doküman oluşmuyor, aynı doküman `isActive: true` oluyor ve `deactivatedAt`/`deactivatedBy` siliniyor
+
+*G — Regresyon (rules deploy'u TÜM kullanıcıları etkiliyor)*
+- [ ] Üye kendi profilinden ad/telefon güncelleyebiliyor
+- [ ] Admin yeni üye ve normal (telefonlu) antrenör ekleyebiliyor
+- [ ] Antrenör hesabıyla giriş yapılıp kendi takvimi görülebiliyor
+
+**Geri dönüş:** 1. ve 2. adım tek `firebase deploy` ile eski commit'ten geri alınır. Oluşmuş gölge doküman "Antrenörlükten çık" ile pasifleşir; kalıcı/geri alınamaz veri dönüşümü yok.
 
 ---
 

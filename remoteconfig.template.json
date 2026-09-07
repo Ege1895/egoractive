@@ -8888,6 +8888,90 @@
       },
       "valueType": "STRING"
     },
+    "lbl_trainers_self_trainer_toggle_title_tr": {
+      "defaultValue": {
+        "value": "Kendimi antrenör olarak ekle"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_self_trainer_toggle_note_tr": {
+      "defaultValue": {
+        "value": "Salonda ders de veriyorsan seç — adın antrenör listelerinde çıkar, kendine seans ve grup dersi atayabilirsin. Telefon ve e-posta gerekmez, giriş bilgilerin değişmez."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_self_trainer_badge_tr": {
+      "defaultValue": {
+        "value": "Sen"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_self_leave_button_tr": {
+      "defaultValue": {
+        "value": "Antrenörlükten çık"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_self_leave_confirm_title_tr": {
+      "defaultValue": {
+        "value": "Antrenörlükten çıkmak istiyor musun?"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_self_leave_confirm_body_tr": {
+      "defaultValue": {
+        "value": "Adın antrenör listelerinden kalkar, sana yeni seans ve grup dersi atanamaz. Geçmiş seansların ve raporlardaki verilerin olduğu gibi kalır. Admin hesabın etkilenmez, istediğin zaman tekrar ekleyebilirsin."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_self_leave_confirm_cta_tr": {
+      "defaultValue": {
+        "value": "Evet, çık"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_self_trainer_toggle_title_en": {
+      "defaultValue": {
+        "value": "Add myself as a trainer"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_self_trainer_toggle_note_en": {
+      "defaultValue": {
+        "value": "Choose this if you also coach — your name appears in trainer lists so you can assign sessions and group classes to yourself. No phone or email needed; your login stays the same."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_self_trainer_badge_en": {
+      "defaultValue": {
+        "value": "You"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_self_leave_button_en": {
+      "defaultValue": {
+        "value": "Stop being a trainer"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_self_leave_confirm_title_en": {
+      "defaultValue": {
+        "value": "Stop being a trainer?"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_self_leave_confirm_body_en": {
+      "defaultValue": {
+        "value": "Your name is removed from trainer lists and no new sessions or group classes can be assigned to you. Your past sessions and report data remain unchanged. Your admin account is not affected and you can add yourself again at any time."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_self_leave_confirm_cta_en": {
+      "defaultValue": {
+        "value": "Yes, stop"
+      },
+      "valueType": "STRING"
+    },
     "lbl_trainers_delete_button_tr": {
       "defaultValue": {
         "value": "Antrenörü sil"
