@@ -2,6 +2,7 @@ import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../notifications/service/push_notification_service.dart';
 import '../domain/auth_login_exception.dart';
 import '../domain/otp_exception.dart';
 import '../repository/auth_repository.dart';
@@ -109,7 +110,14 @@ class AuthService {
     await FirebaseAuth.instance.signOut();
   }
 
-  Future<void> signOut() => FirebaseAuth.instance.signOut();
+  /// Çıkmadan ÖNCE bu cihazın push token'ı hesabın dokümanından siliniyor —
+  /// sıra önemli, `users/{uid}` yazması imzalı oturum gerektiriyor. Aksi
+  /// halde token dokümanda kalıyor ve cihaz, çıkış yapıldıktan sonra da o
+  /// hesabın bildirimlerini almaya devam ediyordu.
+  Future<void> signOut() async {
+    await PushNotificationService.removeTokenForCurrentUser();
+    await FirebaseAuth.instance.signOut();
+  }
 
   Future<String> _callVerify(String name, Map<String, dynamic> data) async {
     try {

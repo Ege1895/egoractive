@@ -103,7 +103,16 @@ class PushNotificationService {
     // dolu değere geçtiğinde) token tekrar okunup kaydediliyor.
     String? lastSavedForUid;
     FirebaseAuth.instance.authStateChanges().listen((user) async {
-      if (user == null || user.uid == lastSavedForUid) return;
+      // Çıkışta token artık dokümandan siliniyor (bkz.
+      // [removeTokenForCurrentUser]) — bayrak burada sıfırlanmazsa AYNI
+      // hesaba tekrar girildiğinde `user.uid == lastSavedForUid` olacağı
+      // için token bir daha hiç yazılmaz ve kullanıcı sessizce bildirim
+      // alamaz hale gelirdi.
+      if (user == null) {
+        lastSavedForUid = null;
+        return;
+      }
+      if (user.uid == lastSavedForUid) return;
       lastSavedForUid = user.uid;
       try {
         final token = await FirebaseMessaging.instance.getToken();
@@ -121,6 +130,35 @@ class PushNotificationService {
     final initialMessage = await FirebaseMessaging.instance.getInitialMessage();
     if (initialMessage != null) {
       _navigateForData(container, initialMessage.data);
+    }
+  }
+
+  /// [_saveToken]'ın tersi — çıkışta BU cihazın token'ını
+  /// `users/{uid}.fcmTokens`'tan çıkarır. Token silinmediği için oturum
+  /// kapandıktan sonra da cihaz o hesabın bildirimlerini almaya devam
+  /// ediyordu; aynı cihazdan ikinci bir hesaba girildiğinde (salon tableti,
+  /// cihaz devri, adminin ayrı bir antrenör hesabı kullanması) iki hesabın
+  /// bildirimleri birden düşüyor ve yanlış role ait deep link'ler açılıyordu.
+  ///
+  /// Çağıran taraf HENÜZ `signOut()` etmemiş olmalı: `users/{uid}` üzerinde
+  /// self-update imzalı oturum gerektiriyor (firestore.rules
+  /// `match /users/{uid}` → `allow update`).
+  ///
+  /// Hesap SİLME akışında bilerek çağrılmıyor: `deleteAccount` Cloud
+  /// Function'ı `users/{uid}` dokümanının tamamını siliyor, buradaki yazma
+  /// ise silinmiş dokümanla yarışıp onu diriltebilirdi.
+  static Future<void> removeTokenForCurrentUser() async {
+    try {
+      final uid = FirebaseAuth.instance.currentUser?.uid;
+      if (uid == null) return;
+      final token = await FirebaseMessaging.instance.getToken();
+      if (token == null) return;
+      await FirebaseFirestore.instance.collection('users').doc(uid).update({
+        'fcmTokens': FieldValue.arrayRemove([token]),
+      });
+    } on Exception {
+      // Kasıtlı: token temizliği başarısız olsa bile (ağ yok, doküman
+      // silinmiş, izin reddedilmiş) çıkış akışı ASLA durmamalı.
     }
   }
 

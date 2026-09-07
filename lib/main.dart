@@ -237,6 +237,10 @@ class _AppRootState extends ConsumerState<_AppRoot> {
     switch (access.kind) {
       case AppAccessKind.signedOut:
         if (FirebaseAuth.instance.currentUser != null) {
+          // `AuthService.signOut()` yolunu atlayan iki yerden biri — bu
+          // cihazın push token'ı temizlenmezse oturum kapandıktan sonra da
+          // hesabın bildirimleri bu cihaza düşmeye devam eder.
+          await PushNotificationService.removeTokenForCurrentUser();
           await FirebaseAuth.instance.signOut();
         }
         panelStack.replaceRoot(const PhoneLoginPanel());
@@ -254,6 +258,7 @@ class _AppRootState extends ConsumerState<_AppRoot> {
               RemoteConfigKeys.authLoginErrorSubscriptionInactive,
               ref.read(localeControllerProvider),
             );
+        await PushNotificationService.removeTokenForCurrentUser();
         await FirebaseAuth.instance.signOut();
         panelStack.replaceRoot(PhoneLoginPanel(errorBanner: message));
       case AppAccessKind.subscriptionOnboarding:
