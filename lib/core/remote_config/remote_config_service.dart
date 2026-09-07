@@ -1327,6 +1327,13 @@ abstract final class RemoteConfigKeys {
   static const trainersDeleteConfirmTitle = 'lbl_trainers_delete_confirm_title';
   static const trainersDeleteConfirmBody = 'lbl_trainers_delete_confirm_body';
   static const trainersDeleteConfirmCta = 'lbl_trainers_delete_confirm_cta';
+  static const trainersSelfLeaveButton = 'lbl_trainers_self_leave_button';
+  static const trainersSelfLeaveConfirmTitle =
+      'lbl_trainers_self_leave_confirm_title';
+  static const trainersSelfLeaveConfirmBody =
+      'lbl_trainers_self_leave_confirm_body';
+  static const trainersSelfLeaveConfirmCta =
+      'lbl_trainers_self_leave_confirm_cta';
   static const trainersDeleteError = 'lbl_trainers_delete_error';
   static const groupSessionsCancelConfirmTitle =
       'lbl_group_sessions_cancel_confirm_title';
@@ -2432,6 +2439,15 @@ class RemoteConfigService {
         '{name} artık uygulamaya giriş yapamayacak ve antrenör listesinde görünmeyecek. Geçmiş seansları, grup dersleri ve raporlardaki verileri olduğu gibi kalır.',
     'lbl_trainers_delete_confirm_cta_tr': 'Evet, sil',
     'lbl_trainers_delete_error_tr': 'Antrenör silinemedi, tekrar dene.',
+    'lbl_trainers_self_leave_button_tr': 'Antrenörlükten çık',
+    'lbl_trainers_self_leave_confirm_title_tr':
+        'Antrenörlükten çıkmak istiyor musun?',
+    'lbl_trainers_self_leave_confirm_body_tr':
+        'Adın antrenör listelerinden kalkar, sana yeni seans ve grup dersi '
+        'atanamaz. Geçmiş seansların ve raporlardaki verilerin olduğu gibi '
+        'kalır. Admin hesabın etkilenmez, istediğin zaman tekrar '
+        'ekleyebilirsin.',
+    'lbl_trainers_self_leave_confirm_cta_tr': 'Evet, çık',
     'lbl_group_sessions_cancel_confirm_title_tr':
         'Dersi iptal etmek istiyor musun?',
     'lbl_group_sessions_cancel_confirm_body_tr':
@@ -3288,6 +3304,14 @@ class RemoteConfigService {
         '{name} will no longer be able to sign in and will not appear in the trainer list. Past sessions, group classes and report data remain unchanged.',
     'lbl_trainers_delete_confirm_cta_en': 'Yes, delete',
     'lbl_trainers_delete_error_en': 'Trainer could not be deleted, try again.',
+    'lbl_trainers_self_leave_button_en': 'Stop being a trainer',
+    'lbl_trainers_self_leave_confirm_title_en': 'Stop being a trainer?',
+    'lbl_trainers_self_leave_confirm_body_en':
+        'Your name is removed from trainer lists and no new sessions or '
+        'group classes can be assigned to you. Your past sessions and report '
+        'data remain unchanged. Your admin account is not affected and you '
+        'can add yourself again at any time.',
+    'lbl_trainers_self_leave_confirm_cta_en': 'Yes, stop',
     'lbl_group_sessions_cancel_confirm_title_en': 'Cancel this class?',
     'lbl_group_sessions_cancel_confirm_body_en':
         'The class stays in the list, marked as "Cancelled". Members who joined will see it as cancelled.',

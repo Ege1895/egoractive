@@ -54,6 +54,10 @@ class _AdminTrainerDetailPanelState
     final memberCountText = ref
         .watch(rcTextProvider(RemoteConfigKeys.trainersMemberCountSuffix))
         .replaceAll('{count}', '${trainer.memberCount}');
+    // F11-5 — bu kayıt adminin kendi "gölge antrenör" profili mi? Silme
+    // aksiyonunun metni ve onay diyaloğu buna göre değişiyor.
+    final isOwnTrainerProfile =
+        ref.watch(selfTrainerProfileProvider)?.uid == trainer.id;
 
     return Scaffold(
       body: SafeArea(
@@ -294,12 +298,25 @@ class _AdminTrainerDetailPanelState
                     counts: (b) => b.weekly,
                   ),
                   const SizedBox(height: AppSpacing.xl),
+                  // F11-5 — admin kendi gölge antrenör kaydına bakıyorsa
+                  // "sil" değil "antrenörlükten çık": aynı `deactivateTrainer`
+                  // çağrısı ama farklı metin. Admin hesabı etkilenmiyor,
+                  // `trainerProfileUid` bağı korunuyor ve kayıt daha sonra
+                  // aynı doküman üzerinden yeniden aktive edilebiliyor.
                   AppButton(
                     label: ref.watch(
-                      rcTextProvider(RemoteConfigKeys.trainersDeleteButton),
+                      rcTextProvider(
+                        isOwnTrainerProfile
+                            ? RemoteConfigKeys.trainersSelfLeaveButton
+                            : RemoteConfigKeys.trainersDeleteButton,
+                      ),
                     ),
                     variant: AppButtonVariant.secondary,
-                    onPressed: () => _showDeleteDialog(trainer.id, trainer.name),
+                    onPressed: () => _showDeleteDialog(
+                      trainer.id,
+                      trainer.name,
+                      isOwnTrainerProfile: isOwnTrainerProfile,
+                    ),
                   ),
                 ],
               ),
@@ -317,17 +334,35 @@ class _AdminTrainerDetailPanelState
   /// üzerinden (aynı diyalog grup dersi/etkinlik iptalinde de kullanılıyor).
   /// Diyalog yazma tamamlanana kadar açık kalır, hata içeride gösterilir;
   /// onay metni verinin KALDIĞINI açıkça söylüyor.
-  Future<void> _showDeleteDialog(String trainerId, String trainerName) async {
+  Future<void> _showDeleteDialog(
+    String trainerId,
+    String trainerName, {
+    required bool isOwnTrainerProfile,
+  }) async {
     final deleted = await showAppConfirmDialog(
       context: context,
       title: ref.read(
-        rcTextProvider(RemoteConfigKeys.trainersDeleteConfirmTitle),
+        rcTextProvider(
+          isOwnTrainerProfile
+              ? RemoteConfigKeys.trainersSelfLeaveConfirmTitle
+              : RemoteConfigKeys.trainersDeleteConfirmTitle,
+        ),
       ),
       message: ref
-          .read(rcTextProvider(RemoteConfigKeys.trainersDeleteConfirmBody))
+          .read(
+            rcTextProvider(
+              isOwnTrainerProfile
+                  ? RemoteConfigKeys.trainersSelfLeaveConfirmBody
+                  : RemoteConfigKeys.trainersDeleteConfirmBody,
+            ),
+          )
           .replaceAll('{name}', trainerName),
       confirmLabel: ref.read(
-        rcTextProvider(RemoteConfigKeys.trainersDeleteConfirmCta),
+        rcTextProvider(
+          isOwnTrainerProfile
+              ? RemoteConfigKeys.trainersSelfLeaveConfirmCta
+              : RemoteConfigKeys.trainersDeleteConfirmCta,
+        ),
       ),
       cancelLabel: ref.read(rcTextProvider(RemoteConfigKeys.commonVazgec)),
       busyLabel: ref.read(rcTextProvider(RemoteConfigKeys.membersSavingLabel)),

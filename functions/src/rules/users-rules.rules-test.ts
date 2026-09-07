@@ -164,6 +164,22 @@ test("admin KENDİ dokümanına trainerProfileUid yazabilir", async () => {
   await assertSucceeds(updateDoc(doc(db, "users", "admin1"), { trainerProfileUid: "golge" }));
 });
 
+// F11-5 — antrenörlükten çıkıp tekrar eklenirken YENİ doküman açılmıyor,
+// mevcut gölge doküman `isActive: true` ile canlandırılıyor.
+test("admin gölge antrenör dokümanını yeniden aktive edebilir", async () => {
+  await seedUser("golge", {
+    role: "trainer",
+    gymId: GYM_ID,
+    name: "Ege",
+    isActive: false,
+    notificationProxyUid: "admin1",
+  });
+  const db = dbFor("admin1", "admin");
+  await assertSucceeds(
+    updateDoc(doc(db, "users", "golge"), { isActive: true, name: "Ege", specialties: ["Fonksiyonel"] }),
+  );
+});
+
 test("admin BAŞKA salonun kullanıcısına dokunamaz", async () => {
   await seedUser("yabanci", { role: "member", gymId: "baskaGym", name: "X" });
   const db = dbFor("admin1", "admin");

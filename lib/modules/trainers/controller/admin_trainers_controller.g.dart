@@ -166,26 +166,24 @@ class _TrainerDocsForGymProviderElement
   String get gymId => (origin as _TrainerDocsForGymProvider).gymId;
 }
 
-String _$selfUserDocHash() => r'3f32846abce36422a2b47fcf7c2731a79b62a9c0';
+String _$userDocHash() => r'2d3ca41d66c38656ca768742bd53e7ab4b0e824b';
 
-/// See also [_selfUserDoc].
-@ProviderFor(_selfUserDoc)
-const _selfUserDocProvider = _SelfUserDocFamily();
+/// See also [_userDoc].
+@ProviderFor(_userDoc)
+const _userDocProvider = _UserDocFamily();
 
-/// See also [_selfUserDoc].
-class _SelfUserDocFamily extends Family<AsyncValue<Map<String, dynamic>?>> {
-  /// See also [_selfUserDoc].
-  const _SelfUserDocFamily();
+/// See also [_userDoc].
+class _UserDocFamily extends Family<AsyncValue<Map<String, dynamic>?>> {
+  /// See also [_userDoc].
+  const _UserDocFamily();
 
-  /// See also [_selfUserDoc].
-  _SelfUserDocProvider call(String uid) {
-    return _SelfUserDocProvider(uid);
+  /// See also [_userDoc].
+  _UserDocProvider call(String uid) {
+    return _UserDocProvider(uid);
   }
 
   @override
-  _SelfUserDocProvider getProviderOverride(
-    covariant _SelfUserDocProvider provider,
-  ) {
+  _UserDocProvider getProviderOverride(covariant _UserDocProvider provider) {
     return call(provider.uid);
   }
 
@@ -201,28 +199,27 @@ class _SelfUserDocFamily extends Family<AsyncValue<Map<String, dynamic>?>> {
       _allTransitiveDependencies;
 
   @override
-  String? get name => r'_selfUserDocProvider';
+  String? get name => r'_userDocProvider';
 }
 
-/// See also [_selfUserDoc].
-class _SelfUserDocProvider
+/// See also [_userDoc].
+class _UserDocProvider
     extends AutoDisposeStreamProvider<Map<String, dynamic>?> {
-  /// See also [_selfUserDoc].
-  _SelfUserDocProvider(String uid)
+  /// See also [_userDoc].
+  _UserDocProvider(String uid)
     : this._internal(
-        (ref) => _selfUserDoc(ref as _SelfUserDocRef, uid),
-        from: _selfUserDocProvider,
-        name: r'_selfUserDocProvider',
+        (ref) => _userDoc(ref as _UserDocRef, uid),
+        from: _userDocProvider,
+        name: r'_userDocProvider',
         debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
             ? null
-            : _$selfUserDocHash,
-        dependencies: _SelfUserDocFamily._dependencies,
-        allTransitiveDependencies:
-            _SelfUserDocFamily._allTransitiveDependencies,
+            : _$userDocHash,
+        dependencies: _UserDocFamily._dependencies,
+        allTransitiveDependencies: _UserDocFamily._allTransitiveDependencies,
         uid: uid,
       );
 
-  _SelfUserDocProvider._internal(
+  _UserDocProvider._internal(
     super._createNotifier, {
     required super.name,
     required super.dependencies,
@@ -236,12 +233,12 @@ class _SelfUserDocProvider
 
   @override
   Override overrideWith(
-    Stream<Map<String, dynamic>?> Function(_SelfUserDocRef provider) create,
+    Stream<Map<String, dynamic>?> Function(_UserDocRef provider) create,
   ) {
     return ProviderOverride(
       origin: this,
-      override: _SelfUserDocProvider._internal(
-        (ref) => create(ref as _SelfUserDocRef),
+      override: _UserDocProvider._internal(
+        (ref) => create(ref as _UserDocRef),
         from: from,
         name: null,
         dependencies: null,
@@ -254,12 +251,12 @@ class _SelfUserDocProvider
 
   @override
   AutoDisposeStreamProviderElement<Map<String, dynamic>?> createElement() {
-    return _SelfUserDocProviderElement(this);
+    return _UserDocProviderElement(this);
   }
 
   @override
   bool operator ==(Object other) {
-    return other is _SelfUserDocProvider && other.uid == uid;
+    return other is _UserDocProvider && other.uid == uid;
   }
 
   @override
@@ -273,50 +270,53 @@ class _SelfUserDocProvider
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-mixin _SelfUserDocRef on AutoDisposeStreamProviderRef<Map<String, dynamic>?> {
+mixin _UserDocRef on AutoDisposeStreamProviderRef<Map<String, dynamic>?> {
   /// The parameter `uid` of this provider.
   String get uid;
 }
 
-class _SelfUserDocProviderElement
+class _UserDocProviderElement
     extends AutoDisposeStreamProviderElement<Map<String, dynamic>?>
-    with _SelfUserDocRef {
-  _SelfUserDocProviderElement(super.provider);
+    with _UserDocRef {
+  _UserDocProviderElement(super.provider);
 
   @override
-  String get uid => (origin as _SelfUserDocProvider).uid;
+  String get uid => (origin as _UserDocProvider).uid;
 }
 
-String _$selfTrainerProfileUidHash() =>
-    r'65ef8d563f79ed2b43c6c66aa8b8daeac487f3cf';
+String _$selfTrainerProfileHash() =>
+    r'38a8a1b8218194aeb3e32789389cd99f2745c012';
 
-/// F11-1 — admin kendini antrenör olarak eklediyse, oluşan "gölge antrenör"
-/// dokümanının id'si; eklemediyse `null`.
+/// F11-1/F11-5 — admin kendini antrenör olarak eklediyse, oluşan "gölge
+/// antrenör" dokümanının id'si ve aktiflik durumu; hiç eklemediyse `null`.
 ///
-/// Kaynak BİLEREK adminin KENDİ dokümanındaki `trainerProfileUid` alanı,
-/// antrenör listesi değil: antrenörlükten çıkıldığında gölge doküman
-/// `isActive: false` ile listeden düşer ([_trainerDocsForGym] filtresi) ama
-/// bağlantı korunmalı — aksi halde toggle yeniden görünür ve İKİNCİ bir
-/// gölge doküman açılır, aylık istatistikler iki kayda bölünürdü (bkz.
-/// görev listesi F11-5).
+/// Bağlantının kaynağı BİLEREK adminin KENDİ dokümanındaki
+/// `trainerProfileUid` alanı, antrenör listesi değil: antrenörlükten
+/// çıkıldığında gölge doküman `isActive: false` ile listeden düşer
+/// ([_trainerDocsForGym] filtresi) ama bağ korunmalı — aksi halde ekleme
+/// akışı İKİNCİ bir gölge doküman açar ve aylık istatistikler iki kayda
+/// bölünürdü. Bu yüzden `trainerProfileUid` bir daha hiç silinmiyor;
+/// "antrenör mü" sorusunun cevabı gölge dokümanın `isActive` alanı.
 ///
-/// Copied from [selfTrainerProfileUid].
-@ProviderFor(selfTrainerProfileUid)
-final selfTrainerProfileUidProvider = AutoDisposeProvider<String?>.internal(
-  selfTrainerProfileUid,
-  name: r'selfTrainerProfileUidProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$selfTrainerProfileUidHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+/// Copied from [selfTrainerProfile].
+@ProviderFor(selfTrainerProfile)
+final selfTrainerProfileProvider =
+    AutoDisposeProvider<({String uid, bool isActive})?>.internal(
+      selfTrainerProfile,
+      name: r'selfTrainerProfileProvider',
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$selfTrainerProfileHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-typedef SelfTrainerProfileUidRef = AutoDisposeProviderRef<String?>;
+typedef SelfTrainerProfileRef =
+    AutoDisposeProviderRef<({String uid, bool isActive})?>;
 String _$adminTrainersControllerHash() =>
-    r'2cc6020d3631f1d0d2a0a6bc6ab072aad9232fc9';
+    r'cd5fdd5a3dc40cc2be3a10f92caf920a2fd34472';
 
 /// `gyms/{gymId}` bilinmediği (henüz gerçek bir salon yoksa) çağrılmaz — bu
 /// durumda [AdminTrainersController] mock listeye düşer (bkz.

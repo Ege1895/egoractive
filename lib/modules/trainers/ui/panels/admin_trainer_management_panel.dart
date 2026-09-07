@@ -424,7 +424,11 @@ class _TrainerFormSheetState extends ConsumerState<_TrainerFormSheet> {
           // Toggle sadece YENİ antrenör eklerken ve admin daha önce kendini
           // eklememişken görünür — `trainerProfileUid` yazılıysa (pasife
           // alınmış olsa bile) ikinci bir gölge doküman açılmamalı.
-          if (!_isEditing && ref.watch(selfTrainerProfileUidProvider) == null)
+          // F11-1/F11-5 — toggle yalnızca YENİ ekleme modunda görünür ve
+          // ya hiç eklenmemişse ya da antrenörlükten çıkılmışsa (pasif gölge
+          // doküman) çıkar. İkinci durumda ekleme değil, MEVCUT dokümanın
+          // yeniden aktivasyonu yapılır (bkz. `addSelfAsTrainer`).
+          if (!_isEditing && ref.watch(selfTrainerProfileProvider)?.isActive != true)
             _SelfTrainerToggle(
               title: ref.watch(
                 rcTextProvider(RemoteConfigKeys.trainersSelfTrainerToggleTitle),

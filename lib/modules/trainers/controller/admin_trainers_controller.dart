@@ -37,7 +37,7 @@ Stream<List<QueryDocumentSnapshot<Map<String, dynamic>>>> _trainerDocsForGym(
 }
 
 @riverpod
-Stream<Map<String, dynamic>?> _selfUserDoc(_SelfUserDocRef ref, String uid) {
+Stream<Map<String, dynamic>?> _userDoc(_UserDocRef ref, String uid) {
   return FirebaseFirestore.instance
       .collection('users')
       .doc(uid)
@@ -45,21 +45,34 @@ Stream<Map<String, dynamic>?> _selfUserDoc(_SelfUserDocRef ref, String uid) {
       .map((doc) => doc.data());
 }
 
-/// F11-1 — admin kendini antrenör olarak eklediyse, oluşan "gölge antrenör"
-/// dokümanının id'si; eklemediyse `null`.
+/// F11-1/F11-5 — admin kendini antrenör olarak eklediyse, oluşan "gölge
+/// antrenör" dokümanının id'si ve aktiflik durumu; hiç eklemediyse `null`.
 ///
-/// Kaynak BİLEREK adminin KENDİ dokümanındaki `trainerProfileUid` alanı,
-/// antrenör listesi değil: antrenörlükten çıkıldığında gölge doküman
-/// `isActive: false` ile listeden düşer ([_trainerDocsForGym] filtresi) ama
-/// bağlantı korunmalı — aksi halde toggle yeniden görünür ve İKİNCİ bir
-/// gölge doküman açılır, aylık istatistikler iki kayda bölünürdü (bkz.
-/// görev listesi F11-5).
+/// Bağlantının kaynağı BİLEREK adminin KENDİ dokümanındaki
+/// `trainerProfileUid` alanı, antrenör listesi değil: antrenörlükten
+/// çıkıldığında gölge doküman `isActive: false` ile listeden düşer
+/// ([_trainerDocsForGym] filtresi) ama bağ korunmalı — aksi halde ekleme
+/// akışı İKİNCİ bir gölge doküman açar ve aylık istatistikler iki kayda
+/// bölünürdü. Bu yüzden `trainerProfileUid` bir daha hiç silinmiyor;
+/// "antrenör mü" sorusunun cevabı gölge dokümanın `isActive` alanı.
 @riverpod
-String? selfTrainerProfileUid(SelfTrainerProfileUidRef ref) {
+({String uid, bool isActive})? selfTrainerProfile(SelfTrainerProfileRef ref) {
   final uid = ref.watch(authStateProvider).valueOrNull?.uid;
   if (uid == null) return null;
-  final data = ref.watch(_selfUserDocProvider(uid)).valueOrNull;
-  return data?['trainerProfileUid'] as String?;
+  final adminData = ref.watch(_userDocProvider(uid)).valueOrNull;
+  final shadowUid = adminData?['trainerProfileUid'] as String?;
+  if (shadowUid == null) return null;
+
+  final shadowData = ref.watch(_userDocProvider(shadowUid)).valueOrNull;
+  // Doküman henüz yüklenmediyse AKTİF varsayılıyor: `isActive` alanı hiç
+  // yazılmamış eski kayıtlar da aktif sayıldığı için ([_trainerDocsForGym]
+  // ile aynı kural) varsayılanın `true` olması tutarlı, ayrıca yükleme
+  // anında ekleme akışının bir an "yeniden aktive et" durumuna düşmesini
+  // önlüyor.
+  return (
+    uid: shadowUid,
+    isActive: (shadowData?['isActive'] as bool?) ?? true,
+  );
 }
 
 /// `gyms/{gymId}` bilinmediği (henüz gerçek bir salon yoksa) çağrılmaz — bu
@@ -145,6 +158,11 @@ class AdminTrainersController extends _$AdminTrainersController {
   /// İki yazma tek `WriteBatch`'te: ikincisi başarısız olursa sahipsiz bir
   /// gölge doküman kalır, toggle tekrar görünür ve kullanıcı ikinci bir
   /// doküman açardı.
+  ///
+  /// F11-5 — daha önce eklenip antrenörlükten çıkılmışsa YENİ doküman
+  /// açılmaz, mevcut gölge doküman yeniden aktive edilir: seanslar, aylık
+  /// istatistikler ve rapor satırları tek bir `trainerId` altında kalmalı.
+  /// İsim/uzmanlıklar formdan gelen güncel değerlerle tazelenir.
   Future<void> addSelfAsTrainer({
     required String name,
     required List<String> specialties,
@@ -159,6 +177,22 @@ class AdminTrainersController extends _$AdminTrainersController {
     }
 
     final firestore = FirebaseFirestore.instance;
+    final existing = ref.read(selfTrainerProfileProvider);
+    if (existing != null) {
+      await firestore.collection('users').doc(existing.uid).update({
+        'name': name,
+        'nameLower': name.toLowerCase(),
+        'specialties': specialties,
+        'isActive': true,
+        // `deactivateTrainer`'ın bıraktığı izler temizlenir, yoksa aktif bir
+        // antrenörün dokümanında "ne zaman/kim tarafından pasife alındı"
+        // bilgisi asılı kalırdı.
+        'deactivatedAt': FieldValue.delete(),
+        'deactivatedBy': FieldValue.delete(),
+      });
+      return;
+    }
+
     final shadowRef = firestore.collection('users').doc();
     await (firestore.batch()
           ..set(shadowRef, {
