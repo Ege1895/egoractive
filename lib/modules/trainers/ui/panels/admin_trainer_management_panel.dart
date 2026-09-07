@@ -41,6 +41,11 @@ class _AdminTrainerManagementPanelState
     final memberCountText = ref.watch(
       rcTextProvider(RemoteConfigKeys.trainersMemberCountSuffix),
     );
+    // F11-6 — adminin kendi gölge antrenör kaydı listede ayırt edilebilsin.
+    final selfTrainerUid = ref.watch(selfTrainerProfileProvider)?.uid;
+    final selfBadgeText = ref.watch(
+      rcTextProvider(RemoteConfigKeys.trainersSelfTrainerBadge),
+    );
 
     return Scaffold(
       body: SafeArea(
@@ -97,6 +102,9 @@ class _AdminTrainerManagementPanelState
                     _TrainerRow(
                       trainer: trainer,
                       memberCountText: memberCountText,
+                      selfBadge: trainer.id == selfTrainerUid
+                          ? selfBadgeText
+                          : null,
                       onTap: () => ref
                           .read(panelStackControllerProvider.notifier)
                           .push(AdminTrainerDetailPanel(trainer: trainer)),
@@ -167,11 +175,16 @@ class _TrainerRow extends StatelessWidget {
     required this.trainer,
     required this.memberCountText,
     required this.onTap,
+    this.selfBadge,
   });
 
   final AdminTrainerSummary trainer;
   final String memberCountText;
   final VoidCallback onTap;
+
+  /// Dolu ise satır adminin KENDİ antrenör kaydı — adın yanında rozet
+  /// gösterilir (F11-6).
+  final String? selfBadge;
 
   @override
   Widget build(BuildContext context) {
@@ -215,12 +228,40 @@ class _TrainerRow extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        trainer.name,
-                        style: typography.headingSmall.copyWith(
-                          color: colors.onSurface,
-                          fontSize: 16,
-                        ),
+                      Row(
+                        children: [
+                          Flexible(
+                            child: Text(
+                              trainer.name,
+                              overflow: TextOverflow.ellipsis,
+                              style: typography.headingSmall.copyWith(
+                                color: colors.onSurface,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ),
+                          if (selfBadge != null) ...[
+                            const SizedBox(width: AppSpacing.sm),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: AppSpacing.sm,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color: colors.primaryContainer,
+                                borderRadius: BorderRadius.circular(
+                                  AppSpacing.radiusPill,
+                                ),
+                              ),
+                              child: Text(
+                                selfBadge!,
+                                style: typography.caption.copyWith(
+                                  color: colors.onPrimaryContainer,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ],
                       ),
                       Text(
                         '${trainer.specialties.join(", ")} · '
@@ -273,6 +314,13 @@ class _TrainerFormSheetState extends ConsumerState<_TrainerFormSheet> {
   String? _errorMessage;
 
   bool get _isEditing => widget.existing != null;
+
+  /// F11-6 — düzenlenen kayıt adminin kendi gölge antrenör profili mi?
+  /// Öyleyse telefon alanı pasif ve kaydetmede `phoneNumber` HİÇ yazılmaz
+  /// (bkz. `AdminTrainersController.updateTrainer`).
+  bool get _isEditingSelfTrainer =>
+      _isEditing &&
+      ref.read(selfTrainerProfileProvider)?.uid == widget.existing!.id;
 
   Future<void> _submit() async {
     final name = _nameController.text.trim();
@@ -327,7 +375,7 @@ class _TrainerFormSheetState extends ConsumerState<_TrainerFormSheet> {
     // hiç değişmediyse (kendi mevcut kaydına karşı) kontrol atlanır, aksi
     // halde antrenör kendi numarasıyla "zaten kayıtlı" hatası alırdı.
     final phoneChanged = phoneNumber != (widget.existing?.phone ?? '');
-    if (phoneNumber.isNotEmpty && phoneChanged) {
+    if (!_isEditingSelfTrainer && phoneNumber.isNotEmpty && phoneChanged) {
       final isTaken = await ref
           .read(trainerRegistrationServiceProvider)
           .phoneNumberIsTaken(phoneNumber);
@@ -352,7 +400,7 @@ class _TrainerFormSheetState extends ConsumerState<_TrainerFormSheet> {
         await notifier.updateTrainer(
           id: widget.existing!.id,
           name: name,
-          phoneNumber: phoneNumber,
+          phoneNumber: _isEditingSelfTrainer ? null : phoneNumber,
           specialties: specialties,
         );
       } else {
@@ -463,7 +511,7 @@ class _TrainerFormSheetState extends ConsumerState<_TrainerFormSheet> {
               rcTextProvider(RemoteConfigKeys.commonTelefonLabel),
             ),
             controller: _phoneController,
-            enabled: !_addSelfAsTrainer,
+            enabled: !_addSelfAsTrainer && !_isEditingSelfTrainer,
             errorText: _phoneError,
             onChanged: (_, _) {
               if (_phoneError != null) setState(() => _phoneError = null);

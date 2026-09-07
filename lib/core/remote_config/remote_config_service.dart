@@ -1327,6 +1327,7 @@ abstract final class RemoteConfigKeys {
   static const trainersDeleteConfirmTitle = 'lbl_trainers_delete_confirm_title';
   static const trainersDeleteConfirmBody = 'lbl_trainers_delete_confirm_body';
   static const trainersDeleteConfirmCta = 'lbl_trainers_delete_confirm_cta';
+  static const trainersSelfTrainerBadge = 'lbl_trainers_self_trainer_badge';
   static const trainersSelfLeaveButton = 'lbl_trainers_self_leave_button';
   static const trainersSelfLeaveConfirmTitle =
       'lbl_trainers_self_leave_confirm_title';
@@ -2439,6 +2440,7 @@ class RemoteConfigService {
         '{name} artık uygulamaya giriş yapamayacak ve antrenör listesinde görünmeyecek. Geçmiş seansları, grup dersleri ve raporlardaki verileri olduğu gibi kalır.',
     'lbl_trainers_delete_confirm_cta_tr': 'Evet, sil',
     'lbl_trainers_delete_error_tr': 'Antrenör silinemedi, tekrar dene.',
+    'lbl_trainers_self_trainer_badge_tr': 'Sen',
     'lbl_trainers_self_leave_button_tr': 'Antrenörlükten çık',
     'lbl_trainers_self_leave_confirm_title_tr':
         'Antrenörlükten çıkmak istiyor musun?',
@@ -3304,6 +3306,7 @@ class RemoteConfigService {
         '{name} will no longer be able to sign in and will not appear in the trainer list. Past sessions, group classes and report data remain unchanged.',
     'lbl_trainers_delete_confirm_cta_en': 'Yes, delete',
     'lbl_trainers_delete_error_en': 'Trainer could not be deleted, try again.',
+    'lbl_trainers_self_trainer_badge_en': 'You',
     'lbl_trainers_self_leave_button_en': 'Stop being a trainer',
     'lbl_trainers_self_leave_confirm_title_en': 'Stop being a trainer?',
     'lbl_trainers_self_leave_confirm_body_en':

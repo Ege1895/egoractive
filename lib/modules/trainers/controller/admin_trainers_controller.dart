@@ -211,15 +211,20 @@ class AdminTrainersController extends _$AdminTrainersController {
         .commit();
   }
 
+  /// [phoneNumber] `null` ise alan HİÇ yazılmaz — boş string yazmak da
+  /// olmazdı: gölge antrenör dokümanında (F11-1) `phoneNumber` alanının
+  /// bulunmaması bilinçli bir tasarım, düzenleme sırasında alanın boş bir
+  /// değerle oluşturulması o kaydı gereksizce kimlik sorgularının konusu
+  /// haline getirirdi.
   Future<void> updateTrainer({
     required String id,
     required String name,
-    required String phoneNumber,
+    required String? phoneNumber,
     required List<String> specialties,
   }) async {
     await FirebaseFirestore.instance.collection('users').doc(id).update({
       'name': name,
-      'phoneNumber': phoneNumber,
+      'phoneNumber': ?phoneNumber,
       'specialties': specialties,
     });
   }

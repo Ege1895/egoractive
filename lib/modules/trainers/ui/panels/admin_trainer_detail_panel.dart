@@ -168,8 +168,20 @@ class _AdminTrainerDetailPanelState
                                 ),
                               ),
                               const SizedBox(height: AppSpacing.xs),
+                              // F11-6 — gölge antrenör kaydında telefon
+                              // BİLEREK yok; boş bir '—' yerine bunun kimin
+                              // kaydı olduğunu söylemek daha bilgilendirici.
                               Text(
-                                trainer.phone.isEmpty ? '—' : trainer.phone,
+                                isOwnTrainerProfile
+                                    ? ref.watch(
+                                        rcTextProvider(
+                                          RemoteConfigKeys
+                                              .trainersSelfTrainerBadge,
+                                        ),
+                                      )
+                                    : (trainer.phone.isEmpty
+                                          ? '—'
+                                          : trainer.phone),
                                 style: typography.bodyMedium.copyWith(
                                   color: colors.onSurfaceMuted,
                                 ),
