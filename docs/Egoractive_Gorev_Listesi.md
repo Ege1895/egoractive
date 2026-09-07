@@ -588,3 +588,151 @@ Ayrıca kazanç zaten küçük: RC yanıtı gzip'li geldiği ve JSON çok tekrar
 **`rcTextProvider` tazeleme sinyali:** F10-2'nin notunda açıklanan davranış (RC değişiklikleri bir sonraki açılışta görünür) kabul edilebilir bulunmazsa, `rcVersionProvider` deseniyle çözülebilir. Dikkat: 889 widget'ın aynı anda yeniden çizilmesi frame hitch'e yol açabilir.
 
 **App Check:** Şu an kurulu değil (`"app":"MISSING"`). Güvenlik konusu, performans değil — ayrı ele alınmalı.
+
+---
+
+## FAZ 11 — Admin'in Kendini Antrenör Olarak Eklemesi (Gölge Antrenör)
+
+**Problem:** Pilot salonda adminin kendisi aynı zamanda antrenör. Telefon numarası admin hesabına bağlı olduğu için aynı numarayla ikinci bir hesap açılamıyor; seans ve grup dersi atarken kendi adı antrenör listesinde çıkmıyor.
+
+**Seçilen çözüm — "gölge antrenör":** Admin, "Antrenör Ekle" akışındaki bir toggle ile `users` koleksiyonuna kendisi için **telefonsuz ve e-postasız** bir `role: 'trainer'` dokümanı açar. Bu doküman hiçbir zaman giriş yapamaz (kimlik sorgularının ikisi de eşleşmez), sadece "atanabilir antrenör" olarak var olur. Antrenöre giden push bildirimleri, gölge dokümandaki `notificationProxyUid` alanı üzerinden adminin cihazına yönlendirilir.
+
+**Neden bu yol (değerlendirilen alternatifler):**
+- `role` alanını bitmask'e çevirmek (`admin|trainer`) — ~6 gün, `firestore.rules`'taki 41 `myRole()` kullanımı + custom claim zinciri + kırıcı şema migration'ı gerektiriyor. Rules dilinde bitwise operatör olmadığı için kazancı da sınırlı.
+- `role` string kalıp yanına `isTrainer` bayrağı — ~2 gün, tek kimlik üretmesi açısından daha temiz ama antrenör sorgularını ve claim/rules tarafını yine de elliyor.
+- Aynı telefon/e-posta ile ikinci doküman — **YAPILAMAZ.** `sendEmailSetupOtp` aynı e-postayı ikinci hesaba vermiyor (`already-exists`), ve `findUserByPhone` `.limit(1)` ile sorguladığı için iki dokümandan biri doküman ID sırasına göre kalıcı olarak erişilemez hale geliyor — %50 ihtimalle adminin kendi hesabı.
+
+**Bu yolun kabul edilen bedelleri:** Adminin antrenör kimliği ayrı bir dokümanda yaşıyor (ikinci bir "kişi" kaydı). Admin dokümanında isim tutulmadığı için raporlarda isim tekrarı oluşmuyor. Antrenör görünümü/shell'i açılmıyor — admin zaten kendi panelinden seans tamamlayabiliyor (`admin_session_management_panel.dart`, rules'ta `sessions` update dalı admin için salonun tamamını kapsıyor).
+
+**Doğrulanmış önkoşullar (kod okunarak teyit edildi, tekrar araştırmaya gerek yok):**
+- Telefon hiçbir yerde SMS ile doğrulanmıyor; OTP e-postaya gidiyor. Telefon sadece bir tanımlayıcı.
+- `admin_trainer_management_panel.dart:302` — telefon tekrar kontrolü `phoneNumber.isNotEmpty` koşuluna bağlı, yani boş telefon bugün de kabul ediliyor.
+- `resolvePhoneIndexSync` boş/olmayan numarada `phoneIndex`'e hiçbir şey yazmıyor.
+- `deactivateTrainer`, Auth kaydı hiç olmayan uid'ler için `auth/user-not-found`'u zaten yutuyor (lazy account creation).
+- Antrenör sayısı hiçbir limit/abonelik hesabına girmiyor, sadece ekranda gösteriliyor.
+- `onUserRoleAssigned` gölge doküman için hep `auth/user-not-found` verip yeniden denenecek; bu hata `isIgnorable` ile alarm dışı bırakılmış durumda. Bugün de her yeni antrenör/üye için ilk girişe kadar aynısı oluyor — kabul edilen gürültü.
+
+---
+
+**Canlı etki (kod okunarak doğrulandı) — geliştirirken bunlara göre hareket edilecek:**
+
+*Mevcut kullanıcılar için veri göçü, zorunlu güncelleme ve yeniden giriş YOK.* Hiçbir mevcut dokümana dokunulmuyor; `notificationProxyUid`/`trainerProfileUid` yeni alanlar. `role`, custom claim'ler, `phoneIndex` ve giriş akışı değişmiyor. Antrenör sorguları `gymId` filtreli olduğu için gölge antrenör sadece kendi salonunun admin ekranlarında görünür. Üyeye giden 5 bildirim yolu (`send-session-reminder-task`, `community-broadcast`, `feedback-reminder-check`, `send-manual-notification`, `notify-member-package-quota`) bu fazın dokunduğu yerlerden token okumuyor — kapsam dışı. Eski uygulama sürümleri sorunsuz çalışmaya devam eder (proxy alanı olmayan dokümanlar için sunucu davranışı birebir aynı).
+
+**🔴 RİSK 1 — F11-2 tüm salonların personel bildirimlerinin ortak yolunda.** `fetchTokensForUids`/`fetchGymStaffTokens`, gölge antrenörü hiç kullanmayan salonlarda da antrenör seans hatırlatması, grup dersi hatırlatması, etkinlik personel hatırlatması ve "dersini onaylar mısın?" push'unu besliyor. Buradaki bir hata bildirimleri **sessizce** keser — hata görünmez, sadece push gelmez (`sendEachForMulticast`'in dönüş değeri hiçbir yerde incelenmiyor). Bu yüzden regresyon kriteri ve birim testleri zorunlu, deploy sonrası canlı teyit şart.
+
+**🔴 RİSK 2 — F11-3 rules deploy'u anında ve herkese birden yayılır.** Kademeli çıkış yok; yanlış bir koşul tüm kullanıcıları aynı anda `PERMISSION_DENIED`'a düşürür. Kısıtlanacak alanların bugün hiçbir canlı akışta yazılmadığı DOĞRULANDI: `member_registration_service` (name, nameLower, phoneNumber, role, gymId, trainerId, trainerName, createdAt, gender, canConfirmAttendance), `addTrainer` ve `updateOwnInfo` (name, nameLower, phoneNumber) `email`/`emailLower`'a dokunmuyor; `signupGymAdmin` Admin SDK olduğu için rules'a tabi değil. Yani kısıtlama bugün kimsenin kullanmadığı bir kapıyı kapatıyor — yine de emulator testleri olmadan deploy EDİLMEZ.
+
+**⚠️ DEPLOY SIRASI — önce sunucu, sonra client:** `F11-2 + F11-3` (Cloud Functions + rules) → sonra `F11-1, F11-4, F11-6` (store sürümü). Ters sırada, admin gölge antrenörü oluşturur ama yönlendirme canlıda olmadığı için o antrenörün bildirimleri **hiçbir yere gitmez** (gölge dokümanda `fcmTokens` alanı hiç yok) ve bu sessizce olur. F11-2 client değişikliği gerektirmediği için bu sırayı tutturmak kolay.
+
+**Geri dönüş:** F11-2/F11-3 tek `firebase deploy` ile eski haline döner. Oluşturulmuş gölge doküman `deactivateTrainer` ile pasife alınır; seanslar ve rapor satırları geçmişte kalır. Kalıcı/geri alınamaz hiçbir veri dönüşümü yok.
+
+---
+
+### F11-1 — Gölge antrenör dokümanının oluşturulması (client)
+
+**Prompt:** "`admin_trainer_management_panel.dart`'taki antrenör ekleme sheet'ine, formun en üstüne 'Kendimi antrenör olarak ekle' toggle'ı ekle (varsayılan kapalı, metin Remote Config'ten). Toggle açıkken telefon alanı boşaltılıp `enabled: false` yapılsın ve tekrar kontrolüne hiç girilmesin; sadece ad-soyad ve uzmanlıklar girilir. `AdminTrainersController`'a `addSelfAsTrainer({name, specialties})` metodu ekle: `users` koleksiyonuna `{name, nameLower, role: 'trainer', gymId, specialties, createdAt: serverTimestamp(), isActive: true, notificationProxyUid: <adminUid>}` yazar — `phoneNumber` ve `email` alanlarını HİÇ yazmaz (boş string de değil, alan hiç bulunmaz). Aynı işlemde adminin kendi `users/{adminUid}` dokümanına `trainerProfileUid: <yeni doküman id>` yazılır; bu alan bir daha silinmez (F11-5'te tekrar açma bunun üzerinden çalışır). Admin dokümanında `trainerProfileUid` zaten varsa toggle hiç gösterilmez."
+
+**Kabul kriterleri:**
+- [ ] Toggle kapalıyken mevcut antrenör ekleme akışı bit birebir aynı davranıyor
+- [ ] Oluşan dokümanda `phoneNumber` ve `email` alanları YOK (Firestore Console'da doğrulanır)
+- [ ] `phoneIndex` koleksiyonuna hiçbir doküman yazılmadı
+- [ ] `startLogin`, adminin telefonuyla çağrıldığında hâlâ ADMIN dokümanını döndürüyor
+- [ ] Gölge antrenör, seans oluşturma sheet'i ve grup dersi panelindeki antrenör seçicilerinde görünüyor
+- [ ] `trainerProfileUid` yazılı adminde toggle görünmüyor
+- [ ] Toggle etiketi/açıklaması Remote Config'e **iki dilde de** (`_tr`/`_en`) girildi — girilmezse etiket boş görünür, sürüm çıkmadan kontrol edilmeli
+- [ ] `flutter analyze` temiz, mevcut testler geçiyor
+
+---
+
+### F11-2 — Bildirim token yönlendirmesi (`notificationProxyUid`)
+
+**Prompt:** "`functions/src/shared/staff-notifications.ts`'te token çözümlemesine yönlendirme ekle: bir `users` dokümanında `notificationProxyUid` alanı varsa, o dokümanın kendi `fcmTokens`'ı yerine işaret edilen dokümanın `fcmTokens`'ı kullanılır. Yönlendirme TEK adım — proxy'nin proxy'si takip edilmez (sonsuz döngü koruması), işaret edilen doküman yoksa boş liste döner. `fetchTokensForUids` (satır 43) ve `fetchGymStaffTokens` (satır 60) bu mantığı kullanacak. `send-session-completion-task.ts:79` bugün antrenör dokümanını doğrudan okuyup `fcmTokens`'ı alıyor — onu `fetchTokensForUids([trainerId], db)` çağrısına dönüştür ki yönlendirme tek yerde kalsın. Çözümleme mantığını saf bir fonksiyon olarak ayır ve `staff-notifications.test.ts` desenine uygun birim testleri yaz."
+
+**Kabul kriterleri:**
+- [ ] Proxy'si olmayan dokümanlar için davranış birebir aynı (regresyon yok)
+- [ ] Proxy'si olan doküman için işaret edilen dokümanın token'ları dönüyor
+- [ ] Proxy zinciri (A→B→C) takip edilmiyor, tek adımda duruyor
+- [ ] İşaret edilen doküman silinmişse boş liste dönüyor, fonksiyon çökmüyor
+- [ ] `send-session-completion-task.ts` artık `fcmTokens`'ı doğrudan okumuyor
+- [ ] `npm test` ve `npx tsc --noEmit` temiz
+- [ ] **Client tarafında hiçbir değişiklik yok** — bu görev store güncellemesi gerektirmez
+- [ ] Deploy sonrası ilk gün, gölge antrenörü OLMAYAN bir salonda gerçek bir antrenör seans hatırlatmasının gittiği teyit edildi (sessiz kesinti riski — bkz. RİSK 1)
+
+---
+
+### F11-3 — `notificationProxyUid`/`trainerProfileUid` alanlarını Security Rules ile koru
+
+**Prompt:** "`firestore.rules`'ta `match /users/{uid}` altındaki `allow update` kuralının self-update dalı bugün sadece `email`/`emailLower` alanlarını koruyor. Bu listeye `notificationProxyUid` ve `trainerProfileUid` alanlarını da ekle — bir üye/antrenör kendi dokümanına `notificationProxyUid` yazarak KENDİ bildirimlerini başka bir kullanıcının cihazına yönlendirebilir (kendi verisini kurbanın telefonuna sızdırma + spam vektörü). Bu alanları sadece admin dalı ve Admin SDK yazabilmeli. AYRICA: `allow create` dalında hiçbir alan kısıtı yok; `email`/`emailLower`'ın oluşturma anında client'tan yazılabilmesi, `update`'teki 'email sadece OTP sonrası Admin SDK ile yazılır' kuralını deliyor — create dalına da aynı kısıtı ekle."
+
+**Kabul kriterleri:**
+- [ ] Üye/antrenör kendi dokümanına `notificationProxyUid` yazamıyor (rules testi)
+- [ ] Üye/antrenör kendi dokümanına `trainerProfileUid` yazamıyor
+- [ ] Client oluşturma akışları `email`/`emailLower` yazamıyor
+- [ ] Admin, gölge antrenör dokümanını (F11-1) hâlâ oluşturabiliyor
+- [ ] Mevcut ad/telefon güncelleme akışları (`updateOwnInfo`) bozulmadı
+- [ ] Üye ekleme (`member_registration_service`) ve antrenör ekleme (`addTrainer`) akışları bozulmadı
+- [ ] Admin, KENDİ dokümanına `trainerProfileUid` yazabiliyor (self-update dalı bunu engelliyor ama admin dalı `gymId` eşleşmesiyle izin veriyor — OR mantığı doğrulanmalı)
+- [ ] Emulator'da rules testleriyle doğrulandı — rules deploy'u kademeli değil, testsiz çıkılmaz (bkz. RİSK 2)
+
+---
+
+### F11-4 — Antrenör bildirimlerinin admin oturumunda doğru ekrana açılması
+
+**Prompt:** "`push_notification_service.dart`'taki `_navigateForData`, `session_completion` tipinde `TrainerCalendarPanel`'e gidiyor. Gölge antrenör senaryosunda bu bildirim ADMİN cihazına düşüyor ama panel `FirebaseAuth.currentUser.uid` (= admin uid) ile sorgu yaptığı için boş ekran açılıyor. `session_completion` ve `trainer_session_reminder` tiplerinde aktif rol admin ise `AdminSessionManagementPanel`'e (mümkünse `sessionId` odaklı) yönlendir; rol antrenörse mevcut davranış korunur. Rol okuması için `app_deep_link_service.dart:57`'deki desen izlenmeli — ayrı/erken bir `currentRoleProvider` okuması yapılmaz, `appAccessProvider` beklenir."
+
+**Kabul kriterleri:**
+- [ ] Admin oturumunda `session_completion` bildirimine dokunulunca boş ekran değil, ilgili seansın yönetim ekranı açılıyor
+- [ ] Antrenör oturumunda mevcut davranış (Takvimim + onay sheet'i) değişmedi
+- [ ] Bildirim, giriş yapılmamış durumda geldiğinde normal giriş akışının önüne geçmiyor
+
+---
+
+### F11-5 — Antrenörlükten çıkma / tekrar açma
+
+**Prompt:** "Antrenör listesinde gölge antrenör satırı için (adminin `trainerProfileUid`'i ile eşleşen doküman) 'Antrenörü sil' yerine 'Antrenörlükten çık' aksiyonu göster. Bu aksiyon `deactivateTrainer` callable'ını çağırır (`isActive: false`) — geçmiş seanslar, aylık istatistikler ve rapor satırları KORUNUR. Adminin `trainerProfileUid` alanı SİLİNMEZ; toggle'ın açık/kapalı durumu gölge dokümanın `isActive` alanından okunur. Tekrar açılırsa yeni doküman oluşturulmaz, aynı doküman `isActive: true` yapılır (istatistiklerin bölünmemesi için). `deactivateTrainer`'daki `trainerId === callerUid` guard'ı bu akışta tetiklenmiyor (uid'ler farklı), doğrulanmalı."
+
+**Kabul kriterleri:**
+- [ ] Antrenörlükten çıkınca gölge antrenör, seans/grup dersi atama listelerinde görünmüyor
+- [ ] `fetchGymStaffTokens` artık bu dokümanı toplamıyor (`isActive !== false` filtresi)
+- [ ] Geçmiş raporlarda o dönemin seansları hâlâ görünüyor
+- [ ] Tekrar açıldığında YENİ doküman oluşmuyor, aynı doküman canlanıyor
+- [ ] Aylık istatistik bucket'ı bölünmüyor
+
+---
+
+### F11-6 — Antrenör listesi ve detay ekranlarında telefonsuz antrenör
+
+**Prompt:** "Antrenör listesi ve antrenör detay ekranlarında `phoneNumber` alanı boş/eksik olan antrenör için telefon satırı gösterilmesin (ya da '—' gösterilsin, tutarlı olan hangisiyse). Gölge antrenör satırında adminin kendisi olduğunu belirten bir rozet/etiket göster. Düzenleme formunda bu satır açıldığında telefon alanı pasif kalır."
+
+**Kabul kriterleri:**
+- [ ] Boş telefonlu antrenör satırı bozuk/boş bir alan göstermiyor
+- [ ] Gölge antrenör listede ayırt edilebiliyor
+- [ ] Düzenleme formunda telefon alanı pasif, kaydetme telefon yazmaya çalışmıyor
+- [ ] Bugün elle telefonsuz eklenmiş antrenörler varsa (mevcut form buna zaten izin veriyor) onların satırı da düzgün görünüyor — bu görev sadece gölge antrenörü değil, o kayıtları da etkiler
+
+---
+
+### F11-7 — Uçtan uca doğrulama (manuel senaryo)
+
+**Prompt:** "Gerçek cihazda (emulator değil, push gerektiği için) aşağıdaki senaryoyu baştan sona çalıştır ve her adımı işaretle."
+
+**Kabul kriterleri:**
+- [ ] Admin kendini antrenör olarak ekliyor, listede görünüyor
+- [ ] Kendine bireysel seans atıyor; seans hatırlatma push'u ADMIN cihazına geliyor
+- [ ] "Dersini onaylar mısın?" push'u geliyor, dokununca doğru ekran açılıyor (F11-4)
+- [ ] Seansı admin panelinden tamamlıyor, üyenin `remainingSessions` değeri düşüyor
+- [ ] Kendine grup dersi atıyor; grup dersi hatırlatmasında **tek** bildirim geliyor (antrenör metni — admin metni `excludeTokens` ile eleniyor, bkz. commit 47caf86)
+- [ ] Etkinlik personel hatırlatmasında tek bildirim geliyor
+- [ ] Haftalık rapor mailinde antrenör performans tablosunda gölge antrenör satırı, doğru seans sayılarıyla görünüyor
+- [ ] Uygulamadan çıkış yapıp tekrar giriliyor; bildirimler hâlâ geliyor (token yenilenmesi yönlendirmeyi bozmuyor — F11-2'nin asıl kazancı bu)
+- [ ] Antrenörlükten çıkılıyor, bildirimler kesiliyor, geçmiş rapor bozulmuyor
+
+---
+
+### FAZ 11 kapsamı DIŞINDA bırakılanlar
+
+**Grup dersi/etkinlik katılımcı listeleri.** `send-group-session-reminder-task.ts:122` ve `send-event-reminder-task.ts:106` `attendeeIds`'teki uid'lerin `fcmTokens`'ını DOĞRUDAN okuyor, `notificationProxyUid` yönlendirmesini bilmiyor. Bugün sorun değil: katılımcı listelerine sadece üyeler giriyor, gölge antrenör giriş yapamadığı için kendini derse ekleyemiyor. "Antrenör de derse katılımcı olarak eklenebilsin" denirse yönlendirmenin bu iki noktaya da taşınması gerekir.
+
+**Adminin kendi antrenörlük performansını antrenör gözüyle görmesi.** Gölge antrenörün "Seans Raporum" karşılığı yok; admin salon raporlarından ve antrenör performans tablosundan takip eder. İstenirse admin paneline ayrı bir "Benim seanslarım" sekmesi olarak eklenebilir.
+
+**Çoklu rol mimarisi (bitmask / `roles` dizisi).** Gölge antrenör, `role` alanının anlamına hiç dokunmadığı için bu geçişi engellemiyor; ileride gerçekten gerekirse ayrı bir faz olarak ele alınır. Geçiş planı ve dosya envanteri bu konuşmada çıkarıldı, gerekirse yeniden üretilebilir.
