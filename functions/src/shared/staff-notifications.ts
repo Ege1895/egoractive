@@ -60,6 +60,28 @@ export async function fetchGymStaffTokens(
     .flatMap((doc) => (doc.data().fcmTokens as string[] | undefined) ?? []);
 }
 
+/**
+ * `keep` listesinden, `exclude` içinde de bulunan token'ları çıkarır.
+ *
+ * Aynı bildirim olayında birden fazla `sendPushToTokens` çağrısı yapılan
+ * yerlerde gerekli: `sendPushToTokens` kendi içinde tekilleştirme yapıyor
+ * ama bu SADECE tek bir çağrının içindeki tekrarları eler, iki ayrı çağrı
+ * birbirinden habersizdir. Bir cihaz her iki listede de bulunuyorsa
+ * (ör. hem dersin antrenörü hem salonun admini olan bir kullanıcı, ya da
+ * aynı cihazdan iki hesaba girilmiş olması) aynı ders için arka arkaya iki
+ * bildirim alırdı.
+ *
+ * Etkinlik hatırlatmasında (`send-event-reminder-task.ts`) bu sorun yok,
+ * çünkü orada iki grup TEK listede birleştirilip tek çağrıyla gönderiliyor
+ * — metinleri aynı olduğu için bu mümkün. Metinler farklı olduğunda
+ * birleştirme yapılamaz, o zaman bu eleme gerekir.
+ */
+export function excludeTokens(keep: readonly string[], exclude: readonly string[]): string[] {
+  if (exclude.length === 0) return [...keep];
+  const excluded = new Set(exclude);
+  return keep.filter((token) => !excluded.has(token));
+}
+
 /** Token listesini 500'lük parçalara bölerek gönderir; boş listede hiç çağrı yapmaz. */
 export async function sendPushToTokens(
   tokens: readonly string[],

@@ -7,7 +7,14 @@ import { broadcastToGymMembers } from "../shared/community-broadcast";
 import { withFailureAlerting } from "../shared/function-health";
 import { getCachedRemoteConfigTemplate } from "../shared/remote-config-cache";
 import { readLocalizedNotificationText } from "../shared/notification-text";
-import { fetchGymStaffTokens, fetchTokensForUids, firstName, formatNameList, sendPushToTokens } from "../shared/staff-notifications";
+import {
+  excludeTokens,
+  fetchGymStaffTokens,
+  fetchTokensForUids,
+  firstName,
+  formatNameList,
+  sendPushToTokens,
+} from "../shared/staff-notifications";
 import { resolveGymTimeZone, resolveNotificationLocale } from "../shared/notification-locale";
 import { formatTimeInZone } from "../shared/timezone-math";
 
@@ -149,7 +156,14 @@ export const sendGroupSessionReminderTask = onTaskDispatched(
       { type: "group_session_trainer_reminder", groupSessionId },
     );
 
-    const adminTokens = await fetchGymStaffTokens(data.gymId, "admin", db);
+    // Antrenör ve admin metinleri FARKLI olduğu için iki ayrı gönderim
+    // yapılıyor; bu yüzden admin listesinden, antrenör gönderimine zaten
+    // dahil olmuş token'lar çıkarılıyor. Aksi halde hem dersin antrenörü
+    // hem salonun admini olan bir kullanıcı (ya da aynı cihazdan iki
+    // hesaba girilmiş olması) aynı ders için iki bildirim alırdı —
+    // `sendPushToTokens`'ın kendi tekilleştirmesi tek çağrının içiyle
+    // sınırlı, iki çağrı arasını görmüyor.
+    const adminTokens = excludeTokens(await fetchGymStaffTokens(data.gymId, "admin", db), trainerTokens);
     await sendPushToTokens(
       adminTokens,
       {
