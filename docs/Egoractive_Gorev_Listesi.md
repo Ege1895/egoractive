@@ -674,6 +674,8 @@ Ayrıca kazanç zaten küçük: RC yanıtı gzip'li geldiği ve JSON çok tekrar
 - [ ] Admin, KENDİ dokümanına `trainerProfileUid` yazabiliyor (self-update dalı bunu engelliyor ama admin dalı `gymId` eşleşmesiyle izin veriyor — OR mantığı doğrulanmalı)
 - [ ] Emulator'da rules testleriyle doğrulandı — rules deploy'u kademeli değil, testsiz çıkılmaz (bkz. RİSK 2)
 
+> Rules testleri `functions/src/rules/*.rules-test.ts` altında, `cd functions && npm run test:rules` ile (Firestore emulator'ı `firebase emulators:exec` içinde açılır). `npm test`'in globu (`*.test.js`) bu dosyaları BİLEREK kapsamıyor — emulator gerektirdikleri için ayrı komut. Emulator Java istiyor: `export PATH="/opt/homebrew/opt/openjdk/bin:$PATH"`.
+
 ---
 
 ### F11-4 — Antrenör bildirimlerinin admin oturumunda doğru ekrana açılması

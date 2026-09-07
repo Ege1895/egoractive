@@ -3,6 +3,7 @@
   "scripts": {
     "lint": "eslint .",
     "test": "npm run build && node --test lib/**/*.test.js",
+    "test:rules": "npm run build && firebase emulators:exec --only firestore --project egoractive-rules-test \"node --test lib/rules/*.rules-test.js\"",
     "build": "tsc",
     "build:watch": "tsc --watch",
     "serve": "npm run build && firebase emulators:start --only functions",
@@ -25,10 +26,12 @@
   },
   "private": true,
   "devDependencies": {
+    "@firebase/rules-unit-testing": "^5.0.2",
     "@typescript-eslint/eslint-plugin": "^8.66.0",
     "@typescript-eslint/parser": "^8.66.0",
     "eslint": "^10.8.0",
     "eslint-config-prettier": "^10.1.8",
+    "firebase": "^12.18.0",
     "prettier": "^3.9.6",
     "typescript": "^6.0.3"
   }

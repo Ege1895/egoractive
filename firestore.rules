@@ -130,9 +130,32 @@ service cloud.firestore {
         (myRole() == 'trainer' && resource.data.trainerId == request.auth.uid && gymSubscriptionActive(myGymId()))
       );
 
+      // F11-3 — client'ın KENDİ dokümanına asla yazamayacağı kimlik alanları:
+      // - `email`/`emailLower` yalnızca OTP doğrulaması sonrası Cloud
+      //   Functions (Admin SDK, kuralları atlar) tarafından yazılır. Bu kural
+      //   önceden sadece `update`'te vardı; `create`'te hiçbir alan kısıtı
+      //   olmadığı için aynı koruma hesap OLUŞTURMA anında atlanabiliyordu.
+      // - `notificationProxyUid` bir kullanıcının bildirimlerinin BAŞKA bir
+      //   cihaza gitmesini sağlıyor (bkz. `staff-notifications.ts`
+      //   `resolveTokenSource`). Kendi kendine yazılabilseydi herkes kendi
+      //   bildirimlerini bir başkasının telefonuna düşürebilirdi.
+      // - `trainerProfileUid` admin ile gölge antrenör dokümanı arasındaki
+      //   bağ; sadece admin kurar.
+      //
+      // Admin dalında `notificationProxyUid`/`trainerProfileUid` BİLEREK
+      // serbest: gölge antrenörü oluşturan ve kendi dokümanına bağlayan
+      // yazma (`addSelfAsTrainer`) o daldan geçiyor.
+      function selfProtectedFields() {
+        return ['email', 'emailLower', 'notificationProxyUid', 'trainerProfileUid'];
+      }
+
       allow create: if isSignedIn() && (
-        request.auth.uid == uid ||
-        (myRole() == 'admin' && request.resource.data.gymId == myGymId() && gymSubscriptionActive(myGymId()))
+        (request.auth.uid == uid &&
+          !request.resource.data.keys().hasAny(selfProtectedFields())) ||
+        (myRole() == 'admin' &&
+          request.resource.data.gymId == myGymId() &&
+          gymSubscriptionActive(myGymId()) &&
+          !request.resource.data.keys().hasAny(['email', 'emailLower']))
       );
 
       allow update: if isSignedIn() && (
@@ -140,9 +163,10 @@ service cloud.firestore {
         // SDK (Cloud Functions, kuralları atlar) üzerinden yazılabilir; yani
         // sadece OTP doğrulaması sonrası (verifyEmailSetupOtp/
         // verifyEmailChangeOtp). Client kendi dokümanını güncellerken
-        // (ör. updateOwnInfo — ad/telefon) bu iki alana dokunamaz.
+        // (ör. updateOwnInfo — ad/telefon) bu alanlara dokunamaz; korunan
+        // alanların tamamı için bkz. `selfProtectedFields()`.
         (request.auth.uid == uid &&
-          !request.resource.data.diff(resource.data).affectedKeys().hasAny(['email', 'emailLower'])) ||
+          !request.resource.data.diff(resource.data).affectedKeys().hasAny(selfProtectedFields())) ||
         (myRole() == 'admin' &&
           resource.data.gymId == myGymId() &&
           request.resource.data.gymId == myGymId()) ||
