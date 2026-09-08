@@ -145,8 +145,19 @@ service cloud.firestore {
       // Admin dalında `notificationProxyUid`/`trainerProfileUid` BİLEREK
       // serbest: gölge antrenörü oluşturan ve kendi dokümanına bağlayan
       // yazma (`addSelfAsTrainer`) o daldan geçiyor.
+      // `email`/`emailLower` HİÇBİR client dalından yazılamaz — ne kullanıcı
+      // kendi dokümanına, ne admin bir üyenin dokümanına. Tek yazan taraf
+      // OTP doğrulaması sonrası Cloud Functions (Admin SDK, kuralları
+      // atlar). F12-6: admin dalında bu kısıt YOKTU; bir admin kendi
+      // salonundaki bir üyenin `emailLower`'ını kendi adresiyle aynı
+      // yaparak `startLogin`'in `.limit(1)` sorgusunda kimlik belirsizliği
+      // yaratabilirdi.
+      function emailFields() {
+        return ['email', 'emailLower'];
+      }
+
       function selfProtectedFields() {
-        return ['email', 'emailLower', 'notificationProxyUid', 'trainerProfileUid'];
+        return emailFields().concat(['notificationProxyUid', 'trainerProfileUid']);
       }
 
       allow create: if isSignedIn() && (
@@ -155,7 +166,7 @@ service cloud.firestore {
         (myRole() == 'admin' &&
           request.resource.data.gymId == myGymId() &&
           gymSubscriptionActive(myGymId()) &&
-          !request.resource.data.keys().hasAny(['email', 'emailLower']))
+          !request.resource.data.keys().hasAny(emailFields()))
       );
 
       allow update: if isSignedIn() && (
@@ -167,9 +178,13 @@ service cloud.firestore {
         // alanların tamamı için bkz. `selfProtectedFields()`.
         (request.auth.uid == uid &&
           !request.resource.data.diff(resource.data).affectedKeys().hasAny(selfProtectedFields())) ||
+        // `notificationProxyUid`/`trainerProfileUid` bu dalda BİLEREK serbest:
+        // gölge antrenörü kuran ve admin dokümanına bağlayan yazma
+        // (`addSelfAsTrainer`, F11-1) buradan geçiyor.
         (myRole() == 'admin' &&
           resource.data.gymId == myGymId() &&
-          request.resource.data.gymId == myGymId()) ||
+          request.resource.data.gymId == myGymId() &&
+          !request.resource.data.diff(resource.data).affectedKeys().hasAny(emailFields())) ||
         // F3-5 — antrenör, seans oluşturma/iptal/tamamlama transaction'ının
         // parçası olarak üyenin SADECE remainingSessions ve
         // plannedSessionsCount alanlarını günceller (bkz.

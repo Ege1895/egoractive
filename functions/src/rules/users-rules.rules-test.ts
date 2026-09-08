@@ -202,6 +202,42 @@ test("admin gymId filtresi olmadan üye sorgulayamaz", async () => {
   await assertFails(getDocs(query(collection(db, "users"), where("trainerId", "==", "trainer1"))));
 });
 
+// F12-6 — admin dalında `email`/`emailLower` kısıtı YOKTU: bir admin kendi
+// salonundaki bir üyenin e-postasını yazabiliyordu. Hiçbir client akışı
+// bunu yapmıyor ama "email sadece OTP sonrası Admin SDK ile yazılır"
+// değişmezi bu daldan delinebiliyordu.
+test("admin bir üyenin email/emailLower alanını yazamaz", async () => {
+  await seedUser("uye1", { role: "member", gymId: GYM_ID, name: "Ayşe" });
+  const db = dbFor("admin1", "admin");
+  await assertFails(updateDoc(doc(db, "users", "uye1"), { email: "a@b.com" }));
+  await assertFails(updateDoc(doc(db, "users", "uye1"), { emailLower: "a@b.com" }));
+});
+
+test("admin üyenin diğer alanlarını hâlâ güncelleyebilir", async () => {
+  await seedUser("uye1", { role: "member", gymId: GYM_ID, name: "Ayşe", trainerName: "Berk" });
+  const db = dbFor("admin1", "admin");
+  await assertSucceeds(
+    updateDoc(doc(db, "users", "uye1"), {
+      name: "Ayşe Yılmaz",
+      phoneNumber: "+905551112233",
+      trainerName: "Ege",
+      remainingSessions: 10,
+    }),
+  );
+});
+
+test("admin üye OLUŞTURURKEN de email yazamaz", async () => {
+  const db = dbFor("admin1", "admin");
+  await assertFails(
+    setDoc(doc(db, "users", "yeniUye"), {
+      name: "Ayşe",
+      role: "member",
+      gymId: GYM_ID,
+      emailLower: "a@b.com",
+    }),
+  );
+});
+
 test("admin BAŞKA salonun kullanıcısına dokunamaz", async () => {
   await seedUser("yabanci", { role: "member", gymId: "baskaGym", name: "X" });
   const db = dbFor("admin1", "admin");
