@@ -910,13 +910,24 @@ cd scripts && GOOGLE_APPLICATION_CREDENTIALS=... CONFIRM_PRODUCTION_BACKFILL=yes
 
 **Ne oluyor:** `deleteAccount`, `measurements/{uid}/entries` alt koleksiyonuna dokunmuyor. Bu kayıtlar `firestore.rules`'ta açıkça "kişisel/hassas sağlık verisi (F0-4 gizlilik politikası kapsamında)" diye nitelendirilmiş. "Hesabımı sil" dedikten sonra sağlık verisinin sunucuda kalması, uygulamanın kendi gizlilik metniyle çelişebilir.
 
-**Prompt:** "`deleteAccount`'ta `measurements/{uid}/entries` alt koleksiyonunun tamamını sil (Admin SDK `recursiveDelete` ya da sayfalı batch silme). AYRICA karar verilmesi gereken bir nokta var, önce sor: üyenin seansları (`sessions` where `memberId == uid`) ve geri bildirimleri KALSIN mı? Bunlar salon raporlarının parçası; silinirse geçmiş raporlar değişir, kalırsa silinmiş bir kullanıcının adı raporlarda görünmeye devam eder. İki seçeneğin de sonucunu yaz, kararı kullanıcıya bırak."
+**Prompt:** "`deleteAccount`'ta `measurements/{uid}/entries` alt koleksiyonunun tamamını sil (Admin SDK `recursiveDelete` ya da sayfalı batch silme)."
+
+**ÜRÜN KARARI (2026-09-09):** Seans ve geri bildirim verisi, **isim dahil olduğu gibi KORUNUR**. Silinen bir üyenin adı raporlarda görünmeye devam etmeli — bunlar salonun işletme kayıtları, geçmiş raporların geriye dönük değişmesi kabul edilemez. Anonimleştirme de yapılmayacak.
+
+Bu karar **ek bir geliştirme gerektirmiyor**, çünkü mevcut şema zaten böyle çalışıyor (kodda doğrulandı):
+- `sessions` dokümanları `memberName`'i yazma anında kopyalıyor (`sessions_write_service.dart:163`)
+- `feedback` dokümanları `memberName`/`trainerName`'i kopyalıyor (`feedback_service.dart:31`)
+- Admin takvimi ve raporlar ismi bu dokümanlardan okuyor, `users/{uid}`'e bakmıyor (`admin_calendar_controller.dart:142`)
+
+Yani `users/{uid}` silindikten sonra da raporlar eksiksiz kalıyor. Silinmiş üyeye ait dokümanlara bakan akışlar da nazikçe davranıyor: `send-session-reminder-task.ts:95` üye dokümanını bulamayınca "token yok, atlandı" deyip çıkıyor.
+
+Ölçüm verisinin silinip seans kaydının kalması **bilinçli bir ayrım**: ölçümler hassas sağlık verisi ve hesap kapandıktan sonra bir işletme ihtiyacı karşılamıyor; seans kayıtları ise salonun kendi ticari kaydı.
 
 **Kabul kriterleri:**
-- [ ] Hesap silindikten sonra `measurements/{uid}` altında doküman kalmıyor
-- [ ] Silme işlemi büyük ölçüm geçmişinde de timeout'a düşmüyor
-- [ ] Seans/geri bildirim verisi için verilen karar `docs/`'ta yazılı
-- [ ] `docs/Abonelik_Iptal_Rehberi.docx` benzeri bir kullanıcı-veri rehberi varsa güncellendi
+- [x] Hesap silindikten sonra `measurements/{uid}` altında doküman kalmıyor
+- [x] Silme işlemi büyük ölçüm geçmişinde de timeout'a düşmüyor (`recursiveDelete`/BulkWriter)
+- [x] Seans/geri bildirim verisi için verilen karar dokümante edildi (yukarıda)
+- [ ] Gizlilik politikası metni bu ayrımı yansıtıyor mu — kontrol edilmeli (ölçüm verisi siliniyor, seans kayıtları saklanıyor)
 
 ---
 
