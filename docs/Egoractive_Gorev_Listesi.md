@@ -808,3 +808,141 @@ Yetki Ayarları'ndan gölge antrenörün "seans bitince kaç dakika sonra tamaml
 **Adminin kendi antrenörlük performansını antrenör gözüyle görmesi.** Gölge antrenörün "Seans Raporum" karşılığı yok; admin salon raporlarından ve antrenör performans tablosundan takip eder. İstenirse admin paneline ayrı bir "Benim seanslarım" sekmesi olarak eklenebilir.
 
 **Çoklu rol mimarisi (bitmask / `roles` dizisi).** Gölge antrenör, `role` alanının anlamına hiç dokunmadığı için bu geçişi engellemiyor; ileride gerçekten gerekirse ayrı bir faz olarak ele alınır. Geçiş planı ve dosya envanteri bu konuşmada çıkarıldı, gerekirse yeniden üretilebilir.
+
+---
+
+## FAZ 12 — Veri Tutarlılığı ve Temizlik
+
+**Nereden çıktı:** `users/{uid}.fcmTokens` dizisinin sınırsız büyümesi araştırılırken (çözümü: çıkışta silme `455daf8`, token yenilenince eskisini silme `fcab08d`, ölü token temizliği `4adcebd` + `scripts/prune_dead_fcm_tokens.ts`) aynı desenin başka yerlerde de olup olmadığı tarandı. Üç aile bulundu: (A) eklenip hiç silinmeyen kayıtlar, (B) yenilenince eski kopyası güncellenmeyen denormalize alanlar, (C) silinen kaydın geride bıraktığı atıflar.
+
+**Taramada TEMİZ çıkanlar** (tekrar araştırmaya gerek yok): `otpRequests` (doküman id'si `purpose+uid`, her istekte üzerine yazılıyor — sınırlı), Cloud Tasks (`session-scheduled-tasks.ts:103` yeniden planlamada eskisini iptal ediyor), `attendeeIds` (dersten çıkışta `arrayRemove` var), `phoneIndex` (trigger eskisini siliyor), antrenör istatistikleri (`FieldValue.increment` simetrik, delta negatif olabiliyor), `functionHealth`/`monthlyTrainerStats`/`reportSnapshots`/`subscriptionTransactions` (sınırlı ya da bilinçli tarihçe).
+
+---
+
+### F12-1 — Hesap silinince kontenjan listelerindeki hayalet üyeyi temizle
+
+**Öncelik: yüksek — kullanıcıya görünen hata.**
+
+**Ne oluyor:** `deleteAccount` yalnızca `users/{uid}` dokümanını ve Auth hesabını siliyor ([delete-account.ts:23](functions/src/callable/delete-account.ts:23)). Üyenin uid'si `groupSessions.attendeeIds` ve `events.attendeeIds` dizilerinde kalıyor. Kontenjan `attendeeIds.size()` üzerinden hesaplandığı için (`firestore.rules` → `withinCapacity()`, ayrıca `CapacityService`), silinmiş üye **kalıcı olarak bir yer işgal ediyor**: ders dolu görünüyor ama değil, başka kimse katılamıyor.
+
+**Prompt:** "`functions/src/callable/delete-account.ts`'te `users/{uid}` silinmeden ÖNCE, kullanıcının uid'sini taşıyan kontenjan listelerinden çıkar: `groupSessions` ve `events` koleksiyonlarında `where('attendeeIds', 'array-contains', uid)` sorgusuyla bulunan dokümanlarda `arrayRemove(uid)` uygula. Silme akışının tamamı bir kullanıcı eylemi olduğu için temizlik başarısız olursa hesap silme YİNE de tamamlanmalı — temizlik hatası loglanır ama fırlatılmaz (bkz. `dead-token-cleanup.ts`'teki aynı desen). Yalnızca GELECEK dersleri değil tüm eşleşmeleri temizle: geçmiş bir dersin katılımcı listesinde silinmiş uid kalması da rapor sayımlarını bozar."
+
+**Kabul kriterleri:**
+- [ ] Hesabı silinen üye hiçbir `groupSessions`/`events` dokümanının `attendeeIds`'inde kalmıyor
+- [ ] Kontenjan yeniden doğru hesaplanıyor (dolu görünen ders açılıyor)
+- [ ] Temizlik hatası hesap silmeyi engellemiyor
+- [ ] `functions` testleri geçiyor
+
+---
+
+### F12-2 — Antrenör adı değişince üye sayısının sıfırlanması
+
+**Öncelik: yüksek — kullanıcıya görünen hata.**
+
+**Ne oluyor:** `AdminTrainersController.build()` üye sayısını **isimle** eşleştiriyor (`countByTrainerName[doc.data()['name']]`, [admin_trainers_controller.dart:88](lib/modules/trainers/controller/admin_trainers_controller.dart:88) civarı). `updateTrainer` ise yalnızca antrenörün kendi dokümanını güncelliyor, üye dokümanlarındaki denormalize `trainerName` alanına dokunmuyor. Sonuç: antrenörün adı düzeltilir düzeltilmez listede **üye sayısı 0'a düşüyor**, üyeler hâlâ ona bağlı olduğu hâlde. Üye ekranlarında da eski ad görünmeye devam ediyor.
+
+Not: antrenörün KENDİ üye listesi (`trainer_members_controller.dart:21`) zaten `trainerId` ile filtreliyor — yani doğru desen kod tabanında mevcut, sadece bu sayım yanlış alanı kullanıyor.
+
+**Prompt:** "(a) `AdminTrainersController.build()` içindeki üye sayımını `trainerName` yerine `trainerId` üzerinden yap — isim değişse bile sayım bozulmasın. (b) `updateTrainer`, antrenörün adı değiştiğinde o antrenöre bağlı üye dokümanlarındaki denormalize `trainerName` alanını da güncellesin (`where('trainerId', isEqualTo: id)` ile bulunan üyeler, batch'li). Üye sayısı yüksek salonlarda 500'lük batch sınırına dikkat. (c) Adın değişmediği düzenlemelerde bu ek yazma HİÇ yapılmasın."
+
+**Kabul kriterleri:**
+- [ ] Antrenörün adı değiştirildikten sonra üye sayısı doğru kalıyor
+- [ ] Üye ekranlarında antrenörün YENİ adı görünüyor
+- [ ] Ad değişmeyen düzenlemede üye dokümanlarına yazma yapılmıyor
+- [ ] 500'den fazla üyesi olan antrenörde de çalışıyor
+
+---
+
+### F12-3 — `mail` koleksiyonunun sınırsız büyümesi ve açık OTP kodu
+
+**Öncelik: orta (maliyet) / yüksek (gizlilik).**
+
+**Ne oluyor:** [mail.ts:9](functions/src/shared/mail.ts:9) her e-posta için `collection("mail").add({...})` yapıyor ve **hiçbir yerde silme yok**. Her giriş OTP'si, her haftalık salon raporu, her aylık rapor ve her abone özeti kalıcı bir doküman bırakıyor — büyüme `fcmTokens`'tan hızlı.
+
+İkinci ve daha önemli tarafı: dokümanın `message.html` alanı e-postanın tam gövdesi, yani OTP e-postalarında **giriş kodunun düz metin hâli** ([otp.ts:66](functions/src/shared/otp.ts:66)). `otpRequests` kodu tuzlanmış hash olarak tutuyor (orada doğru yapılmış) ama `mail` dokümanı aynı kodu açıkta ve süresiz bırakıyor. Kod 5 dakikada geçersizleştiği için istismar edilebilir değil, ama alıcı adresleriyle birlikte kalıcı bir arşiv birikiyor.
+
+**Prompt:** "Gönderilen e-posta dokümanlarına yaşam süresi ver. Önce Trigger Email eklentisinin (`firestore-send-email@0.2.10`) gönderim sonrası silme/TTL ayarı var mı bak; varsa onu kullan. Yoksa `mail` dokümanlarına `expiresAt` alanı yazıp Firestore TTL politikası tanımla (ör. 30 gün). Mevcut birikmiş dokümanlar için `scripts/` altında tek seferlik bir temizlik script'i yaz — diğer script'lerdeki güvenlik desenini birebir uygula (varsayılan emulator, production için `--allow-production` + `CONFIRM_PRODUCTION_BACKFILL=yes`, `--dry-run` desteği)."
+
+**Kabul kriterleri:**
+- [ ] Yeni e-posta dokümanları belirlenen süre sonunda otomatik siliniyor
+- [ ] E-posta gönderimi bozulmadı (OTP ve raporlar ulaşıyor)
+- [ ] Birikmiş dokümanlar için script yazıldı ve önce `--dry-run` ile raporlandı
+- [ ] Karar dokümante edildi: hangi süre, neden
+
+---
+
+### F12-4 — Hesap silinince kişisel sağlık verisi de silinsin
+
+**Öncelik: yüksek (gizlilik/uyumluluk).**
+
+**Ne oluyor:** `deleteAccount`, `measurements/{uid}/entries` alt koleksiyonuna dokunmuyor. Bu kayıtlar `firestore.rules`'ta açıkça "kişisel/hassas sağlık verisi (F0-4 gizlilik politikası kapsamında)" diye nitelendirilmiş. "Hesabımı sil" dedikten sonra sağlık verisinin sunucuda kalması, uygulamanın kendi gizlilik metniyle çelişebilir.
+
+**Prompt:** "`deleteAccount`'ta `measurements/{uid}/entries` alt koleksiyonunun tamamını sil (Admin SDK `recursiveDelete` ya da sayfalı batch silme). AYRICA karar verilmesi gereken bir nokta var, önce sor: üyenin seansları (`sessions` where `memberId == uid`) ve geri bildirimleri KALSIN mı? Bunlar salon raporlarının parçası; silinirse geçmiş raporlar değişir, kalırsa silinmiş bir kullanıcının adı raporlarda görünmeye devam eder. İki seçeneğin de sonucunu yaz, kararı kullanıcıya bırak."
+
+**Kabul kriterleri:**
+- [ ] Hesap silindikten sonra `measurements/{uid}` altında doküman kalmıyor
+- [ ] Silme işlemi büyük ölçüm geçmişinde de timeout'a düşmüyor
+- [ ] Seans/geri bildirim verisi için verilen karar `docs/`'ta yazılı
+- [ ] `docs/Abonelik_Iptal_Rehberi.docx` benzeri bir kullanıcı-veri rehberi varsa güncellendi
+
+---
+
+### F12-5 — Grup dersi `trainerNames` alanının bayatlaması
+
+**Öncelik: düşük (kozmetik).**
+
+**Ne oluyor:** [group_sessions_write_service.dart:39](lib/modules/group_sessions/service/group_sessions_write_service.dart:39) `trainerNames`/`trainerName` alanlarını dersin oluşturulduğu andaki isimlerle yazıyor. Antrenörün adı sonradan değişirse GELECEKTEKİ dersler eski adı göstermeye devam ediyor.
+
+**Prompt:** "F12-2'deki isim güncelleme akışına, `startTime`'ı GELECEKTE olan `groupSessions` dokümanlarının `trainerNames`/`trainerName` alanlarını da tazelemeyi ekle. GEÇMİŞ dersler BİLEREK dokunulmadan bırakılmalı: bir dersin kaydı, dersi o gün kimin verdiğini göstermeli — sonradan değişen isim geçmişi yeniden yazmamalı."
+
+**Kabul kriterleri:**
+- [ ] Ad değişikliği sonrası gelecekteki grup derslerinde yeni ad görünüyor
+- [ ] Geçmiş derslerde eski ad korunuyor
+- [ ] Antrenörü olmayan/atanmamış derslerde akış çökmüyor
+
+---
+
+### F12-6 — `allow update`'in admin dalındaki `email`/`emailLower` açığı
+
+**Öncelik: orta (güvenlik, istismar edilmiyor).**
+
+**Ne oluyor:** F11-3'te `create` dalı ve self-update dalı korumaya alındı, ama `update`'in **admin dalında** alan kısıtı yok: bir admin kendi salonundaki bir üyenin `email`/`emailLower` alanını yazabilir. Hiçbir client akışı bunu yapmıyor (13 yazma noktası tek tek kontrol edildi) ama "email sadece OTP doğrulaması sonrası Admin SDK ile yazılır" değişmezi bu daldan hâlâ delinebilir. Bir adminin bir üyenin `emailLower`'ını kendi adresiyle aynı yapması, `startLogin`'in `.limit(1)` sorgusunda kimlik belirsizliği yaratabilir.
+
+**Prompt:** "`firestore.rules`'ta `match /users/{uid}` → `allow update`'in admin dalına `email`/`emailLower` kısıtı ekle. `notificationProxyUid`/`trainerProfileUid` o dalda SERBEST kalmalı — `addSelfAsTrainer` oradan geçiyor (F11-1). Emulator rules testleri ekle: admin bir üyenin adını değiştirebiliyor ama e-postasını değiştiremiyor."
+
+**Kabul kriterleri:**
+- [ ] Admin, üyenin `email`/`emailLower` alanını yazamıyor
+- [ ] Admin, üyenin diğer alanlarını (ad, telefon, paket) hâlâ yazabiliyor
+- [ ] `addSelfAsTrainer` akışı bozulmadı
+- [ ] `npm run test:rules` geçiyor
+
+---
+
+### F12-7 — Admin seans takviminde ay uyumsuzluğu
+
+**Öncelik: orta — yanlış veri gösteriyor.**
+
+**Ne oluyor:** `AdminSessionManagementPanel` seçili günü yerel `_date` alanında tutuyor ([admin_session_management_panel.dart:32](lib/modules/sessions/ui/panels/admin_session_management_panel.dart:32)) ama slot listesini `adminCalendarController`'ın ayına göre indeksliyor (`slotsByDayOfMonth[_date.day]`). Panel `selectDate()`'i hiç çağırmadığı için, panelin kendi tarih seçicisiyle **başka bir aya geçilince yanlış ayın aynı gün numarasındaki seansları** gösteriliyor. FAZ 11'den önce de var; F11-4'te admin bildirimine seans odaklaması koymamamın sebebi buydu.
+
+**Prompt:** "`AdminSessionManagementPanel`'deki yerel `_date` ile `adminCalendarController`'ın `selectedDate`'ini tek kaynağa indir: tarih değişimlerinde `ref.read(adminCalendarControllerProvider.notifier).selectDate(date)` çağrılsın ve panel seçili günü controller state'inden okusun. Tarih seçici, ileri/geri ok tuşları ve seans oluşturma sheet'ine geçen tarih dahil tüm kullanım noktalarını kapsa."
+
+**Kabul kriterleri:**
+- [ ] Başka bir aya geçilince o ayın doğru seansları görünüyor
+- [ ] İleri/geri ok tuşlarıyla ay sınırı geçildiğinde de doğru
+- [ ] Seans oluşturma sheet'ine doğru tarih gidiyor
+- [ ] Bu düzeltmeden sonra F11-4'teki admin bildirim yönlendirmesine seans odaklaması eklenebilir mi, değerlendirildi
+
+---
+
+### F12-8 — Antrenörlüğe geri dönerken formun boş açılması
+
+**Öncelik: düşük (UX).**
+
+**Ne oluyor:** F11-5'te antrenörlükten çıkıp tekrar eklenirken ekleme sheet'i boş açılıyor; admin adını yeniden yazmak zorunda. Yazdığı isim mevcut gölge dokümanı güncelliyor, yani veri kaybı yok — sadece gereksiz bir adım.
+
+**Prompt:** "Ekleme sheet'i, `selfTrainerProfile` dolu ama pasifken (yani yeniden aktivasyon durumunda) ad ve uzmanlık alanlarını mevcut gölge dokümandaki değerlerle ön-doldursun."
+
+**Kabul kriterleri:**
+- [ ] Yeniden ekleme akışında ad ve uzmanlıklar dolu geliyor
+- [ ] İlk kez ekleme akışında form boş açılmaya devam ediyor
+- [ ] Ön-doldurulmuş değerler değiştirilip kaydedilebiliyor
