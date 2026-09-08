@@ -56,7 +56,8 @@ Stream<Map<String, dynamic>?> _userDoc(_UserDocRef ref, String uid) {
 /// bölünürdü. Bu yüzden `trainerProfileUid` bir daha hiç silinmiyor;
 /// "antrenör mü" sorusunun cevabı gölge dokümanın `isActive` alanı.
 @riverpod
-({String uid, bool isActive})? selfTrainerProfile(SelfTrainerProfileRef ref) {
+({String uid, bool isActive, String name, List<String> specialties})?
+selfTrainerProfile(SelfTrainerProfileRef ref) {
   final uid = ref.watch(authStateProvider).valueOrNull?.uid;
   if (uid == null) return null;
   final adminData = ref.watch(_userDocProvider(uid)).valueOrNull;
@@ -72,6 +73,13 @@ Stream<Map<String, dynamic>?> _userDoc(_UserDocRef ref, String uid) {
   return (
     uid: shadowUid,
     isActive: (shadowData?['isActive'] as bool?) ?? true,
+    // F12-8 — antrenörlüğe geri dönerken form bunlarla ön-doldurulur;
+    // gölge doküman listede olmadığı için (pasifken filtreleniyor) tek
+    // kaynak burası.
+    name: (shadowData?['name'] as String?) ?? '',
+    specialties:
+        (shadowData?['specialties'] as List?)?.whereType<String>().toList() ??
+        const <String>[],
   );
 }
 

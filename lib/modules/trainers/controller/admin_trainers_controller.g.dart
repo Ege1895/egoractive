@@ -285,7 +285,7 @@ class _UserDocProviderElement
 }
 
 String _$selfTrainerProfileHash() =>
-    r'38a8a1b8218194aeb3e32789389cd99f2745c012';
+    r'b7312c4b7812e3ad0c539edc6823d2a02dd647a6';
 
 /// F11-1/F11-5 — admin kendini antrenör olarak eklediyse, oluşan "gölge
 /// antrenör" dokümanının id'si ve aktiflik durumu; hiç eklemediyse `null`.
@@ -301,7 +301,9 @@ String _$selfTrainerProfileHash() =>
 /// Copied from [selfTrainerProfile].
 @ProviderFor(selfTrainerProfile)
 final selfTrainerProfileProvider =
-    AutoDisposeProvider<({String uid, bool isActive})?>.internal(
+    AutoDisposeProvider<
+      ({String uid, bool isActive, String name, List<String> specialties})?
+    >.internal(
       selfTrainerProfile,
       name: r'selfTrainerProfileProvider',
       debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
@@ -314,9 +316,11 @@ final selfTrainerProfileProvider =
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef SelfTrainerProfileRef =
-    AutoDisposeProviderRef<({String uid, bool isActive})?>;
+    AutoDisposeProviderRef<
+      ({String uid, bool isActive, String name, List<String> specialties})?
+    >;
 String _$adminTrainersControllerHash() =>
-    r'7df4a8de171edc49638771a2240a6e8908cbdec7';
+    r'1eb114cfa08b254ef9f5d38016858ce06cfce548';
 
 /// `gyms/{gymId}` bilinmediği (henüz gerçek bir salon yoksa) çağrılmaz — bu
 /// durumda [AdminTrainersController] mock listeye düşer (bkz.

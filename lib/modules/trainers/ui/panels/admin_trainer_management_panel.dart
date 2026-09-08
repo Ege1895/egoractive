@@ -487,12 +487,23 @@ class _TrainerFormSheetState extends ConsumerState<_TrainerFormSheet> {
               value: _addSelfAsTrainer,
               onTap: () => setState(() {
                 _addSelfAsTrainer = !_addSelfAsTrainer;
-                if (_addSelfAsTrainer) {
-                  // Toggle'dan önce girilmiş numara ekranda kalmasın —
-                  // alan pasifleşiyor ve değeri hiç okunmuyor.
-                  _phoneController.value = initialPhoneNumber();
-                  _phoneError = null;
-                }
+                if (!_addSelfAsTrainer) return;
+                // Toggle'dan önce girilmiş numara ekranda kalmasın —
+                // alan pasifleşiyor ve değeri hiç okunmuyor.
+                _phoneController.value = initialPhoneNumber();
+                _phoneError = null;
+                _nameError = null;
+                // F12-8 — daha önce eklenip antrenörlükten çıkılmışsa
+                // (`addSelfAsTrainer` aynı dokümanı canlandırıyor) form
+                // mevcut değerlerle geliyor; admin adını tekrar yazmak
+                // zorunda kalmasın. İlk kez eklemede profil `null` olduğu
+                // için form boş açılmaya devam eder.
+                final profile = ref.read(selfTrainerProfileProvider);
+                if (profile == null) return;
+                _nameController.text = profile.name;
+                _selectedSpecialties
+                  ..clear()
+                  ..addAll(profile.specialties);
               }),
             ),
           AppTextField(
