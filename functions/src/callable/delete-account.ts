@@ -1,7 +1,9 @@
 import { getAuth } from "firebase-admin/auth";
 import { getFirestore } from "firebase-admin/firestore";
 import { HttpsError, onCall } from "firebase-functions/v2/https";
+import * as logger from "firebase-functions/logger";
 
+import { removeFromAttendeeLists } from "../shared/attendee-cleanup";
 import { userDoc } from "../shared/firestore-paths";
 
 /**
@@ -20,7 +22,22 @@ export const deleteAccount = onCall(async (request) => {
     throw new HttpsError("unauthenticated", "Bu işlem için oturum açmış olman gerekiyor.");
   }
 
-  await getFirestore().doc(userDoc(uid)).delete();
+  const db = getFirestore();
+
+  // F12-1 — doküman silinmeden ÖNCE katılım listeleri temizleniyor.
+  // Hata YUTULUYOR: temizlik başarısız diye kullanıcıyı hesabını
+  // silemez hâlde bırakmak (Apple'ın zorunlu kıldığı akış, bkz. F2-8)
+  // hayalet bir katılımcıdan daha kötü olurdu.
+  try {
+    const updated = await removeFromAttendeeLists(uid, db);
+    if (updated > 0) {
+      logger.info(`Hesap silme: ${uid}, ${updated} katılım listesinden çıkarıldı.`);
+    }
+  } catch (error) {
+    logger.warn(`Hesap silme: ${uid} için katılım listesi temizliği başarısız, silme yine de sürdürülüyor.`, error);
+  }
+
+  await db.doc(userDoc(uid)).delete();
   await getAuth().deleteUser(uid);
 
   return { ok: true };
