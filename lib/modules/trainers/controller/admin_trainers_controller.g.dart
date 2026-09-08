@@ -316,7 +316,7 @@ final selfTrainerProfileProvider =
 typedef SelfTrainerProfileRef =
     AutoDisposeProviderRef<({String uid, bool isActive})?>;
 String _$adminTrainersControllerHash() =>
-    r'cd5fdd5a3dc40cc2be3a10f92caf920a2fd34472';
+    r'7df4a8de171edc49638771a2240a6e8908cbdec7';
 
 /// `gyms/{gymId}` bilinmediği (henüz gerçek bir salon yoksa) çağrılmaz — bu
 /// durumda [AdminTrainersController] mock listeye düşer (bkz.

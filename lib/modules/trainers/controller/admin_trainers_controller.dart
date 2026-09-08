@@ -90,23 +90,27 @@ class AdminTrainersController extends _$AdminTrainersController {
     if (docs == null) return const [];
 
     // `memberCount`, trainer dokümanında tutulmuyor — üye dokümanlarındaki
-    // denormalize `trainerName` alanıyla sayılıyor (aynı üye listesi zaten
+    // `trainerId` alanıyla sayılıyor (aynı üye listesi zaten
     // AdminMembersController üzerinden canlı izleniyor).
+    //
+    // F12-2 — sayım önceden denormalize `trainerName` alanıyla, yani İSİMLE
+    // eşleştiriliyordu. `updateTrainer` üye dokümanlarındaki bu alana
+    // dokunmadığı için antrenörün adı düzeltilir düzeltilmez eşleşme
+    // kopuyor ve üye sayısı sıfıra düşüyordu. Kimlik alanı hiç değişmiyor,
+    // bu yüzden sayım artık `trainerId` üzerinden.
     final members = ref.watch(adminMembersControllerProvider);
-    final countByTrainerName = <String, int>{};
+    final countByTrainerId = <String, int>{};
     for (final member in members) {
-      if (member.trainerName.isEmpty) continue;
-      countByTrainerName[member.trainerName] =
-          (countByTrainerName[member.trainerName] ?? 0) + 1;
+      if (member.trainerId.isEmpty) continue;
+      countByTrainerId[member.trainerId] =
+          (countByTrainerId[member.trainerId] ?? 0) + 1;
     }
 
     return docs
         .map(
           (doc) => adminTrainerSummaryFromDoc(
             doc,
-            memberCount:
-                countByTrainerName[(doc.data()['name'] as String?)?.trim()] ??
-                0,
+            memberCount: countByTrainerId[doc.id] ?? 0,
           ),
         )
         .toList();
@@ -222,10 +226,61 @@ class AdminTrainersController extends _$AdminTrainersController {
     required String? phoneNumber,
     required List<String> specialties,
   }) async {
-    await FirebaseFirestore.instance.collection('users').doc(id).update({
+    final firestore = FirebaseFirestore.instance;
+    final ref = firestore.collection('users').doc(id);
+
+    // İsim değişip değişmediği UI'dan gelen kopyaya değil, dokümanın
+    // KENDİ güncel değerine bakılarak belirleniyor — panel bayat bir
+    // kopya taşıyor olabilir.
+    final previousName = (await ref.get()).data()?['name'] as String?;
+
+    await ref.update({
       'name': name,
       'phoneNumber': ?phoneNumber,
       'specialties': specialties,
     });
+
+    if (previousName != null && previousName != name) {
+      await _propagateTrainerName(trainerId: id, name: name);
+    }
+  }
+
+  /// F12-2 — antrenörün adı değiştiğinde üye dokümanlarındaki denormalize
+  /// `trainerName` alanını tazeler.
+  ///
+  /// Bu alan üyeye "antrenörün kim" bilgisini göstermek için tutuluyor;
+  /// güncellenmediğinde üye ekranlarında eski ad kalıyordu. Sayım artık
+  /// `trainerId` üzerinden yapıldığı için üye SAYISI bu yazmaya bağlı
+  /// değil — burada düzeltilen şey yalnızca gösterim.
+  ///
+  /// Sorgu `gymId` filtresini ZORUNLU olarak taşıyor: `firestore.rules`'ta
+  /// admin'in `users` okuması `resource.data.gymId == myGymId()` şartına
+  /// bağlı ve Firestore, bir liste sorgusuna ancak kuralın kullandığı alan
+  /// sorgunun kendi filtresinde de varsa izin veriyor.
+  Future<void> _propagateTrainerName({
+    required String trainerId,
+    required String name,
+  }) async {
+    final gymId = ref.read(activeGymIdProvider).valueOrNull;
+    if (gymId == null) return;
+
+    final firestore = FirebaseFirestore.instance;
+    final members = await firestore
+        .collection('users')
+        .where('gymId', isEqualTo: gymId)
+        .where('trainerId', isEqualTo: trainerId)
+        .get();
+    if (members.docs.isEmpty) return;
+
+    // Firestore'un 500 işlem sınırı — kalabalık bir antrenörde tek batch
+    // yetmezdi.
+    const batchLimit = 400;
+    for (var i = 0; i < members.docs.length; i += batchLimit) {
+      final batch = firestore.batch();
+      for (final doc in members.docs.skip(i).take(batchLimit)) {
+        batch.update(doc.reference, {'trainerName': name});
+      }
+      await batch.commit();
+    }
   }
 }

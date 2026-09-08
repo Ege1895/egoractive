@@ -33,6 +33,7 @@ AdminMemberSummary adminMemberSummaryFromDoc(
     name: name,
     phone: (data['phoneNumber'] as String?) ?? '',
     trainerName: (data['trainerName'] as String?) ?? '',
+    trainerId: (data['trainerId'] as String?) ?? '',
     remainingSessions: totalRemaining,
     unplannedSessions: unplanned,
     packageEndDate: packageEndDate == null

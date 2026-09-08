@@ -8,7 +8,7 @@ import {
   RulesTestEnvironment,
 } from "@firebase/rules-unit-testing";
 import { readFileSync } from "node:fs";
-import { setDoc, doc, updateDoc, getDoc } from "firebase/firestore";
+import { setDoc, doc, updateDoc, getDoc, getDocs, query, collection, where } from "firebase/firestore";
 
 /**
  * F11-3 — `match /users/{uid}` yazma kurallarının emulator testleri.
@@ -178,6 +178,28 @@ test("admin gölge antrenör dokümanını yeniden aktive edebilir", async () =>
   await assertSucceeds(
     updateDoc(doc(db, "users", "golge"), { isActive: true, name: "Ege", specialties: ["Fonksiyonel"] }),
   );
+});
+
+// F12-2 — antrenörün adı değişince üye dokümanlarındaki denormalize
+// `trainerName` güncelleniyor. Bunun için admin, üyeleri trainerId ile
+// sorguluyor; rules admin okumasını `gymId` şartına bağladığı ve Firestore
+// liste sorgusuna ancak o alan sorgunun kendi filtresinde de varsa izin
+// verdiği için sorgu gymId'yi ZORUNLU taşıyor.
+test("admin kendi salonundaki üyeleri gymId+trainerId ile sorgulayabilir", async () => {
+  await seedUser("uye1", { role: "member", gymId: GYM_ID, trainerId: "trainer1", trainerName: "Berk" });
+  const db = dbFor("admin1", "admin");
+  const snapshot = await assertSucceeds(
+    getDocs(query(collection(db, "users"), where("gymId", "==", GYM_ID), where("trainerId", "==", "trainer1"))),
+  );
+  assert.equal((snapshot as { size: number }).size, 1);
+});
+
+// gymId filtresi olmadan aynı sorgu reddedilmeli — düşerse yukarıdaki
+// filtrenin gerçekten zorunlu olduğu kanıtlanmış olmuyor.
+test("admin gymId filtresi olmadan üye sorgulayamaz", async () => {
+  await seedUser("uye1", { role: "member", gymId: GYM_ID, trainerId: "trainer1" });
+  const db = dbFor("admin1", "admin");
+  await assertFails(getDocs(query(collection(db, "users"), where("trainerId", "==", "trainer1"))));
 });
 
 test("admin BAŞKA salonun kullanıcısına dokunamaz", async () => {
