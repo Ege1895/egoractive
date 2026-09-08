@@ -11,6 +11,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/panels/panel_stack_controller.dart';
 import '../../../core/router/app_access.dart';
 import '../../../core/router/app_router.dart';
+import '../../sessions/controller/admin_calendar_controller.dart';
 import '../../sessions/ui/panels/admin_session_management_panel.dart';
 import '../../feedback/ui/panels/feedback_panel.dart';
 import '../../sessions/ui/panels/attendance_confirm_panel.dart';
@@ -320,15 +321,41 @@ class PushNotificationService {
     if (access.kind != AppAccessKind.ready) return;
     final panelStack = container.read(panelStackControllerProvider.notifier);
     if (access.role == AppRole.admin) {
-      // Admin panelinde seans odaklama YOK: panel bugünü açıyor ve iki
-      // bildirim de aynı gün içinde gidiyor (ders bitişi / o günün
-      // seansları), dolayısıyla doğru gün zaten seçili geliyor. Panelin
-      // gün seçimi ay bazlı slot listesiyle senkron olmadığı için (yerel
-      // `_date` vs. `adminCalendarController`) başka bir aya atlamak
-      // yanlış günün seanslarını gösterirdi.
+      await _selectSessionDayForAdmin(container, sessionId);
       panelStack.push(const AdminSessionManagementPanel());
       return;
     }
     panelStack.push(TrainerCalendarPanel(focusSessionId: sessionId));
+  }
+
+  /// Admin paneli açılmadan önce takvimi SEANSIN gününe alır.
+  ///
+  /// F12-7'den önce bu mümkün değildi: panel seçili günü yerel state'inde
+  /// tutuyordu ve dışarıdan değiştirilemiyordu, üstelik ay bazlı slot
+  /// listesiyle senkron olmadığı için başka bir aya atlamak yanlış günün
+  /// seanslarını gösterirdi. Seçili gün artık `adminCalendarController`'da.
+  ///
+  /// "Bugün" varsaymak çoğu zaman doğru olurdu (iki bildirim de aynı gün
+  /// gidiyor) ama gece yarısını geçen bir durumda — ör. 23:50'de biten bir
+  /// dersin tamamlama sorusu — yanlış güne düşerdi.
+  Future<void> _selectSessionDayForAdmin(
+    ProviderContainer container,
+    String? sessionId,
+  ) async {
+    if (sessionId == null) return;
+    try {
+      final doc = await FirebaseFirestore.instance
+          .collection('sessions')
+          .doc(sessionId)
+          .get();
+      final startTime = (doc.data()?['startTime'] as Timestamp?)?.toDate();
+      if (startTime == null) return;
+      container
+          .read(adminCalendarControllerProvider.notifier)
+          .selectDate(startTime);
+    } on Exception {
+      // Kasıtlı: seans okunamazsa panel yine açılsın, sadece seçili gün
+      // değişmemiş olur.
+    }
   }
 }
