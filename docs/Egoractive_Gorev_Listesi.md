@@ -863,11 +863,44 @@ Not: antrenörün KENDİ üye listesi (`trainer_members_controller.dart:21`) zat
 
 **Prompt:** "Gönderilen e-posta dokümanlarına yaşam süresi ver. Önce Trigger Email eklentisinin (`firestore-send-email@0.2.10`) gönderim sonrası silme/TTL ayarı var mı bak; varsa onu kullan. Yoksa `mail` dokümanlarına `expiresAt` alanı yazıp Firestore TTL politikası tanımla (ör. 30 gün). Mevcut birikmiş dokümanlar için `scripts/` altında tek seferlik bir temizlik script'i yaz — diğer script'lerdeki güvenlik desenini birebir uygula (varsayılan emulator, production için `--allow-production` + `CONFIRM_PRODUCTION_BACKFILL=yes`, `--dry-run` desteği)."
 
+**YAPILDI — uygulanan çözüm:**
+
+Trigger Email eklentisinin (`firestore-send-email@0.2.10`) kendi TTL desteği varmış ve `never` olarak duruyormuş. `firebase ext:info` çıktısıyla doğrulandı: eklenti dokümanlara **`delivery.expireAt`** alanını yazıyor, ama **Firestore TTL politikasını kendisi kurmuyor** — o ayrıca tanımlanmalı.
+
+Seçilen süre **7 gün**. Gerekçe: gönderim sorunlarını (bounce, SMTP hatası) incelemek için fazlasıyla yeterli, buna karşılık OTP kodunun düz metin durduğu pencereyi kısa tutuyor. Tek satırlık bir ayar, gerekirse değiştirilebilir.
+
+⚠️ **`extensions/firestore-send-email.env` gitignore'da** (`.gitignore:56`, içinde SMTP kimlik bilgisi var) — yani bu ayar commit'e GİRMEZ, her ortamda elle uygulanmalı. Uygulanan değerler:
+
+```
+TTL_EXPIRE_TYPE=day
+TTL_EXPIRE_VALUE=7
+```
+
+**Kalan iki adım (elle çalıştırılacak):**
+
+1. Eklenti ayarını yayına al:
+```
+firebase deploy --only extensions
+```
+
+2. Firestore TTL politikasını `mail` koleksiyonu için tanımla — eklenti alanı yazıyor ama politikayı kurmuyor:
+```
+gcloud firestore fields ttls update delivery.expireAt --collection-group=mail --enable-ttl --project=egoractive-e92bd
+```
+(ya da Firebase Console → Firestore → TTL)
+
+3. Birikmiş eski dokümanlar için `scripts/prune_old_mail_docs.ts` — TTL yalnızca AYARDAN SONRA yazılan dokümanları etkiliyor; eskilerde `delivery.expireAt` alanı hiç olmadığı için politika onlara asla dokunmaz:
+```
+cd scripts && GOOGLE_APPLICATION_CREDENTIALS=... CONFIRM_PRODUCTION_BACKFILL=yes npm run prune-old-mail -- --allow-production --dry-run
+```
+
 **Kabul kriterleri:**
-- [ ] Yeni e-posta dokümanları belirlenen süre sonunda otomatik siliniyor
+- [ ] `firebase deploy --only extensions` çalıştırıldı
+- [ ] TTL politikası `delivery.expireAt` için tanımlı (Console'da görünüyor)
+- [ ] Yeni gönderilen bir e-postanın dokümanında `delivery.expireAt` alanı var
 - [ ] E-posta gönderimi bozulmadı (OTP ve raporlar ulaşıyor)
-- [ ] Birikmiş dokümanlar için script yazıldı ve önce `--dry-run` ile raporlandı
-- [ ] Karar dokümante edildi: hangi süre, neden
+- [ ] Birikmiş dokümanlar `--dry-run` ile raporlandı, sonra silindi
+- [ ] 7 gün sonra kontrol: TTL politikası eski dokümanları gerçekten siliyor
 
 ---
 

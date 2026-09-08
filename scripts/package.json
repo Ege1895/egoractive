@@ -8,7 +8,8 @@
     "backfill-trainer-stats": "tsx backfill_monthly_trainer_stats.ts",
     "backfill-phone-index": "tsx backfill_phone_index.ts",
     "enable-closed-test": "tsx enable_closed_test_accounts.ts",
-    "prune-dead-tokens": "tsx prune_dead_fcm_tokens.ts"
+    "prune-dead-tokens": "tsx prune_dead_fcm_tokens.ts",
+    "prune-old-mail": "tsx prune_old_mail_docs.ts"
   },
   "dependencies": {
     "firebase-admin": "^13.10.0"
