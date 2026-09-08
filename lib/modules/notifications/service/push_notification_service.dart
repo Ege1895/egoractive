@@ -14,6 +14,7 @@ import '../../../core/router/app_router.dart';
 import '../../sessions/ui/panels/admin_session_management_panel.dart';
 import '../../feedback/ui/panels/feedback_panel.dart';
 import '../../sessions/ui/panels/attendance_confirm_panel.dart';
+import 'push_token_prefs.dart';
 import '../../trainers/ui/panels/trainer_calendar_panel.dart';
 import '../../../firebase_options.dart';
 import '../../events/ui/panels/event_detail_panel.dart';
@@ -169,9 +170,47 @@ class PushNotificationService {
   Future<void> _saveToken(String token) async {
     final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid == null) return;
-    await FirebaseFirestore.instance.collection('users').doc(uid).set({
+    final doc = FirebaseFirestore.instance.collection('users').doc(uid);
+    await doc.set({
       'fcmTokens': FieldValue.arrayUnion([token]),
     }, SetOptions(merge: true));
+    await _removeSupersededToken(doc, token);
+  }
+
+  /// Token yenilendiğinde ESKİSİNİ dokümandan çıkarır. Bu olmadan
+  /// `fcmTokens` her yenilemede (FCM rotasyonu, yeniden kurulum, yedekten
+  /// geri yükleme) bir eleman büyüyor ve hiç küçülmüyordu; ölü token'lara
+  /// gönderim yapılmaya devam ediyor, doküman her bildirimde daha pahalı
+  /// okunuyordu.
+  ///
+  /// Sıra bilinçli — önce YENİ token yazılıyor, sonra eskisi siliniyor:
+  /// ikinci yazma başarısız olursa geriye fazladan ölü bir token kalır
+  /// (zararsız, bir sonraki yenilemede temizlenir), ters sırada ise
+  /// kullanıcı hiç token'ı olmayan bir aralığa düşer ve bildirim alamazdı.
+  /// Tek bir `update` içinde `arrayRemove` + `arrayUnion` birleştirilemiyor
+  /// (Firestore aynı alan için iki transform kabul etmiyor), o yüzden ayrı
+  /// yazma.
+  ///
+  /// Sadece AÇIK ÇIKIŞ yapılmadan token değiştiği durumu kapatır; çıkışta
+  /// silme [removeTokenForCurrentUser]'da. İkisi birlikte, cihaz elden
+  /// çıkarılmadığı sürece dizinin sınırsız büyümesini durduruyor.
+  Future<void> _removeSupersededToken(
+    DocumentReference<Map<String, dynamic>> doc,
+    String currentToken,
+  ) async {
+    try {
+      final previous = await PushTokenPrefs.read();
+      if (previous != null && previous != currentToken) {
+        await doc.update({
+          'fcmTokens': FieldValue.arrayRemove([previous]),
+        });
+      }
+      await PushTokenPrefs.write(currentToken);
+    } on Exception {
+      // Kasıtlı: temizlik başarısız olsa bile YENİ token yazılmış durumda,
+      // yani bildirimler çalışmaya devam eder. Bir sonraki yenilemede
+      // tekrar denenir.
+    }
   }
 
   Future<void> _showForegroundNotification(RemoteMessage message) async {
