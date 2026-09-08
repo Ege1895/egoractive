@@ -245,18 +245,19 @@ class AdminTrainersController extends _$AdminTrainersController {
     }
   }
 
-  /// F12-2 — antrenörün adı değiştiğinde üye dokümanlarındaki denormalize
-  /// `trainerName` alanını tazeler.
+  /// Antrenörün adı değiştiğinde, adın KOPYALANMIŞ olarak tutulduğu
+  /// yerleri tazeler: üye dokümanları (F12-2) ve gelecekteki grup dersleri
+  /// (F12-5). Bu kopyalar gösterim içindir; üye SAYISI artık `trainerId`
+  /// üzerinden hesaplandığı için ona bağlı değil.
   ///
-  /// Bu alan üyeye "antrenörün kim" bilgisini göstermek için tutuluyor;
-  /// güncellenmediğinde üye ekranlarında eski ad kalıyordu. Sayım artık
-  /// `trainerId` üzerinden yapıldığı için üye SAYISI bu yazmaya bağlı
-  /// değil — burada düzeltilen şey yalnızca gösterim.
+  /// Tüm yazmalar TEK bir listede toplanıp birlikte batch'leniyor: iki ayrı
+  /// tarama iki ayrı batch turu açsaydı, ikincisi hata verdiğinde isim
+  /// yarı güncellenmiş bir durumda kalırdı.
   ///
-  /// Sorgu `gymId` filtresini ZORUNLU olarak taşıyor: `firestore.rules`'ta
-  /// admin'in `users` okuması `resource.data.gymId == myGymId()` şartına
-  /// bağlı ve Firestore, bir liste sorgusuna ancak kuralın kullandığı alan
-  /// sorgunun kendi filtresinde de varsa izin veriyor.
+  /// Sorgular `gymId` filtresini ZORUNLU olarak taşıyor: `firestore.rules`
+  /// hem `users` hem `groupSessions` okumasını `gymId == myGymId()` şartına
+  /// bağlıyor ve Firestore, bir liste sorgusuna ancak kuralın kullandığı
+  /// alan sorgunun kendi filtresinde de varsa izin veriyor.
   Future<void> _propagateTrainerName({
     required String trainerId,
     required String name,
@@ -264,23 +265,97 @@ class AdminTrainersController extends _$AdminTrainersController {
     final gymId = ref.read(activeGymIdProvider).valueOrNull;
     if (gymId == null) return;
 
-    final firestore = FirebaseFirestore.instance;
-    final members = await firestore
-        .collection('users')
-        .where('gymId', isEqualTo: gymId)
-        .where('trainerId', isEqualTo: trainerId)
-        .get();
-    if (members.docs.isEmpty) return;
+    final updates = [
+      ...await _memberNameUpdates(gymId: gymId, trainerId: trainerId, name: name),
+      ...await _upcomingGroupSessionNameUpdates(
+        gymId: gymId,
+        trainerId: trainerId,
+        name: name,
+      ),
+    ];
+    if (updates.isEmpty) return;
 
     // Firestore'un 500 işlem sınırı — kalabalık bir antrenörde tek batch
     // yetmezdi.
     const batchLimit = 400;
-    for (var i = 0; i < members.docs.length; i += batchLimit) {
+    final firestore = FirebaseFirestore.instance;
+    for (var i = 0; i < updates.length; i += batchLimit) {
       final batch = firestore.batch();
-      for (final doc in members.docs.skip(i).take(batchLimit)) {
-        batch.update(doc.reference, {'trainerName': name});
+      for (final update in updates.skip(i).take(batchLimit)) {
+        batch.update(update.$1, update.$2);
       }
       await batch.commit();
     }
+  }
+
+  Future<List<(DocumentReference<Map<String, dynamic>>, Map<String, dynamic>)>>
+  _memberNameUpdates({
+    required String gymId,
+    required String trainerId,
+    required String name,
+  }) async {
+    final members = await FirebaseFirestore.instance
+        .collection('users')
+        .where('gymId', isEqualTo: gymId)
+        .where('trainerId', isEqualTo: trainerId)
+        .get();
+    return members.docs
+        .map((doc) => (doc.reference, {'trainerName': name}))
+        .toList();
+  }
+
+  /// F12-5 — GELECEKTEKİ grup derslerindeki antrenör adı anlık görüntüsünü
+  /// tazeler. GEÇMİŞ dersler BİLEREK dokunulmadan bırakılıyor: bir dersin
+  /// kaydı, dersi o gün kimin verdiğini göstermeli — sonradan değişen bir
+  /// isim geçmişi yeniden yazmamalı.
+  ///
+  /// Sorgu `gymId` + `startTime` üzerinden (mevcut composite index, bkz.
+  /// `firestore.indexes.json`); antrenör eşleşmesi CLIENT tarafında
+  /// yapılıyor. `trainerIds array-contains` filtresini sorguya eklemek yeni
+  /// bir composite index gerektirirdi ve bir salonun gelecekteki ders sayısı
+  /// zaten küçük.
+  Future<List<(DocumentReference<Map<String, dynamic>>, Map<String, dynamic>)>>
+  _upcomingGroupSessionNameUpdates({
+    required String gymId,
+    required String trainerId,
+    required String name,
+  }) async {
+    final upcoming = await FirebaseFirestore.instance
+        .collection('groupSessions')
+        .where('gymId', isEqualTo: gymId)
+        .where('startTime', isGreaterThan: Timestamp.fromDate(DateTime.now()))
+        .get();
+
+    final updates =
+        <(DocumentReference<Map<String, dynamic>>, Map<String, dynamic>)>[];
+    for (final doc in upcoming.docs) {
+      final data = doc.data();
+      final ids =
+          (data['trainerIds'] as List?)?.whereType<String>().toList() ??
+          const <String>[];
+      final index = ids.indexOf(trainerId);
+      if (index == -1) continue;
+
+      // `trainerIds` ve `trainerNames` aynı sırayla yazılıyor (bkz.
+      // `create_group_session_controller.dart` — ikisi de aynı seçili
+      // antrenör listesinden üretiliyor), eşleme buna dayanıyor. Uzunluklar
+      // tutmuyorsa (elle düzenlenmiş/bozuk kayıt) dokunulmuyor: yanlış
+      // antrenörün adını ezmek, bayat bir isimden daha kötü.
+      final names =
+          (data['trainerNames'] as List?)?.whereType<String>().toList() ??
+          const <String>[];
+      if (index >= names.length) continue;
+      if (names[index] == name) continue;
+
+      final refreshed = [...names]..[index] = name;
+      updates.add((doc.reference, {
+        'trainerNames': refreshed,
+        // Tekil `trainerName` geriye dönük uyumluluk için tutuluyor ve
+        // yazma servisinde de aynı şekilde üretiliyor (bkz.
+        // `group_sessions_write_service.dart:40`).
+        'trainerName': refreshed.join(', '),
+      }));
+    }
+    return updates;
   }
 }
