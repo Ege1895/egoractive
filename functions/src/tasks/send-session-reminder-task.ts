@@ -4,6 +4,7 @@ import { RemoteConfigTemplate } from "firebase-admin/remote-config";
 import { onTaskDispatched, Request } from "firebase-functions/v2/tasks";
 import * as logger from "firebase-functions/logger";
 
+import { pruneDeadTokens } from "../shared/dead-token-cleanup";
 import { withFailureAlerting } from "../shared/function-health";
 import { resolveGymTimeZone, resolveNotificationLocale } from "../shared/notification-locale";
 import { getCachedRemoteConfigTemplate } from "../shared/remote-config-cache";
@@ -114,7 +115,7 @@ export const sendSessionReminderTask = onTaskDispatched(
       trainerName: sessionData.trainerName?.trim() || FALLBACK_TRAINER_NAME[locale],
     };
 
-    await getMessaging().sendEachForMulticast({
+    const response = await getMessaging().sendEachForMulticast({
       tokens: fcmTokens,
       notification: {
         title: readNotificationText(template, "lbl_notif_session_reminder_title", locale, vars),
@@ -122,6 +123,7 @@ export const sendSessionReminderTask = onTaskDispatched(
       },
       data: { type: "session_reminder", sessionId },
     });
+    await pruneDeadTokens(fcmTokens, response);
 
     await sessionRef.update({ confirmationRequested: true });
   }),

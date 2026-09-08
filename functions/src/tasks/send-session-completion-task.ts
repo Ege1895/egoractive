@@ -4,6 +4,7 @@ import { RemoteConfigTemplate } from "firebase-admin/remote-config";
 import { onTaskDispatched, Request } from "firebase-functions/v2/tasks";
 import * as logger from "firebase-functions/logger";
 
+import { pruneDeadTokens } from "../shared/dead-token-cleanup";
 import { withFailureAlerting } from "../shared/function-health";
 import { resolveGymTimeZone, resolveNotificationLocale } from "../shared/notification-locale";
 import { fetchTokensForUids } from "../shared/staff-notifications";
@@ -98,7 +99,7 @@ export const sendSessionCompletionTask = onTaskDispatched(
     const locale = resolveNotificationLocale(await resolveGymTimeZone(sessionData.gymId));
     const vars = { memberName: sessionData.memberName?.trim() || (locale === "tr" ? "Üyen" : "Your member") };
 
-    await getMessaging().sendEachForMulticast({
+    const response = await getMessaging().sendEachForMulticast({
       tokens: fcmTokens,
       notification: {
         title: readNotificationText(template, "lbl_notif_session_completion_title", locale, vars),
@@ -106,6 +107,7 @@ export const sendSessionCompletionTask = onTaskDispatched(
       },
       data: { type: "session_completion", sessionId },
     });
+    await pruneDeadTokens(fcmTokens, response);
 
     await sessionRef.update({ completionPushSent: true });
   }),

@@ -4,6 +4,7 @@ import { RemoteConfigTemplate } from "firebase-admin/remote-config";
 import { onSchedule } from "firebase-functions/v2/scheduler";
 import * as logger from "firebase-functions/logger";
 
+import { pruneDeadTokens } from "../shared/dead-token-cleanup";
 import { withFailureAlerting } from "../shared/function-health";
 import { isFeedbackReminderDue } from "../shared/monthly-schedule";
 import { resolveGymTimeZone, resolveNotificationLocale } from "../shared/notification-locale";
@@ -75,7 +76,7 @@ export const feedbackReminderCheck = onSchedule(
       if (fcmTokens.length === 0) continue;
 
       const locale = await getGymLocale(data.gymId as string | undefined);
-      await getMessaging().sendEachForMulticast({
+      const response = await getMessaging().sendEachForMulticast({
         tokens: fcmTokens,
         notification: {
           title: readNotificationText(template, "lbl_notif_feedback_reminder_title", locale),
@@ -83,6 +84,7 @@ export const feedbackReminderCheck = onSchedule(
         },
         data: { type: "feedback_reminder" },
       });
+      await pruneDeadTokens(fcmTokens, response);
     }
 
     logger.info(`Geri bildirim hatırlatması ${membersSnapshot.size} üyeye gönderildi.`);

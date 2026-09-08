@@ -4,6 +4,7 @@ import { onTaskDispatched, Request } from "firebase-functions/v2/tasks";
 import * as logger from "firebase-functions/logger";
 
 import { broadcastToGymMembers } from "../shared/community-broadcast";
+import { pruneDeadTokens } from "../shared/dead-token-cleanup";
 import { withFailureAlerting } from "../shared/function-health";
 import { getCachedRemoteConfigTemplate } from "../shared/remote-config-cache";
 import { readLocalizedNotificationText } from "../shared/notification-text";
@@ -122,7 +123,7 @@ export const sendGroupSessionReminderTask = onTaskDispatched(
       const fcmTokens = attendeeDocs.flatMap((doc) => (doc.data()?.fcmTokens as string[] | undefined) ?? []);
       if (fcmTokens.length > 0) {
         const vars = { className, time };
-        await getMessaging().sendEachForMulticast({
+        const response = await getMessaging().sendEachForMulticast({
           tokens: fcmTokens,
           notification: {
             title: readLocalizedNotificationText(template, "lbl_notif_group_session_reminder_title", locale, vars, DEFAULT_TEXT),
@@ -130,6 +131,7 @@ export const sendGroupSessionReminderTask = onTaskDispatched(
           },
           data: { type: "group_session_reminder", groupSessionId },
         });
+        await pruneDeadTokens(fcmTokens, response);
       } else {
         logger.info(`Grup dersi ${groupSessionId} katılımcılarının hiçbirinde kayıtlı FCM token yok, hatırlatma atlandı.`);
       }

@@ -3,6 +3,7 @@ import { getMessaging } from "firebase-admin/messaging";
 import { RemoteConfigTemplate } from "firebase-admin/remote-config";
 import { HttpsError, onCall } from "firebase-functions/v2/https";
 
+import { pruneDeadTokens } from "../shared/dead-token-cleanup";
 import { userDoc, usersCollection } from "../shared/firestore-paths";
 import { getCachedRemoteConfigTemplate } from "../shared/remote-config-cache";
 
@@ -112,6 +113,7 @@ export const sendManualNotification = onCall(async (request) => {
       data: { type: "manual_notification" },
     });
     sentCount += response.successCount;
+    await pruneDeadTokens(tokenChunk, response);
   }
 
   return { sentCount };

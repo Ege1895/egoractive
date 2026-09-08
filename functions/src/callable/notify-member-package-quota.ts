@@ -3,6 +3,7 @@ import { getMessaging } from "firebase-admin/messaging";
 import { RemoteConfigTemplate } from "firebase-admin/remote-config";
 import { HttpsError, onCall } from "firebase-functions/v2/https";
 
+import { pruneDeadTokens } from "../shared/dead-token-cleanup";
 import { userDoc } from "../shared/firestore-paths";
 import { resolveGymTimeZone, resolveNotificationLocale } from "../shared/notification-locale";
 import { readLocalizedNotificationText } from "../shared/notification-text";
@@ -82,7 +83,7 @@ export const notifyMemberPackageQuota = onCall(async (request) => {
   const vars = { remaining: String(totalRemaining) };
   const baseKey = alert === "none" ? "lbl_notif_package_none" : "lbl_notif_package_ending_soon";
 
-  await getMessaging().sendEachForMulticast({
+  const response = await getMessaging().sendEachForMulticast({
     tokens: fcmTokens,
     notification: {
       title: readLocalizedNotificationText(template, `${baseKey}_title`, locale, vars, DEFAULT_TEXT),
@@ -90,6 +91,7 @@ export const notifyMemberPackageQuota = onCall(async (request) => {
     },
     data: { type: "member_package_quota", alert },
   });
+  await pruneDeadTokens(fcmTokens, response);
 
   return { sent: true };
 });
