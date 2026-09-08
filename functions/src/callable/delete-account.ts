@@ -3,7 +3,7 @@ import { getFirestore } from "firebase-admin/firestore";
 import { HttpsError, onCall } from "firebase-functions/v2/https";
 import * as logger from "firebase-functions/logger";
 
-import { removeFromAttendeeLists } from "../shared/attendee-cleanup";
+import { deleteMeasurementHistory, removeFromAttendeeLists } from "../shared/account-cleanup";
 import { userDoc } from "../shared/firestore-paths";
 
 /**
@@ -35,6 +35,18 @@ export const deleteAccount = onCall(async (request) => {
     }
   } catch (error) {
     logger.warn(`Hesap silme: ${uid} için katılım listesi temizliği başarısız, silme yine de sürdürülüyor.`, error);
+  }
+
+  // F12-4 — kişisel sağlık verisi (vücut ölçümleri) de siliniyor.
+  // Hata burada `error` seviyesinde loglanıyor (yukarıdaki `warn`'dan
+  // farklı olarak): hayalet bir katılımcı kozmetik bir tutarsızlık, ama
+  // silinmesi gereken sağlık verisinin sunucuda kalması gizlilik taahhüdünü
+  // ihlal eder — gözden kaçmamalı. Yine de hesap silme SÜRDÜRÜLÜYOR;
+  // kullanıcıyı hesabını silemez hâlde bırakmak daha kötü olurdu.
+  try {
+    await deleteMeasurementHistory(uid, db);
+  } catch (error) {
+    logger.error(`Hesap silme: ${uid} için ölçüm geçmişi SİLİNEMEDİ, elle temizlenmeli.`, error);
   }
 
   await db.doc(userDoc(uid)).delete();

@@ -1,6 +1,13 @@
 import { FieldValue, Firestore } from "firebase-admin/firestore";
 
 /**
+ * Hesap silinirken `users/{uid}` dokümanının DIŞINDA kalan, kullanıcıya ait
+ * verilerin temizliği. `deleteAccount` uzun süre yalnızca kullanıcı
+ * dokümanını ve Auth kaydını siliyordu; geride kalanlar için bkz. görev
+ * listesi F12-1 (kontenjan listeleri) ve F12-4 (sağlık verisi).
+ */
+
+/**
  * Kontenjanlı katılım listesi tutan KÖK koleksiyonlar. `firestore-paths.ts`
  * bunlar için `gyms/{gymId}/...` altında yardımcılar tanımlıyor ama gerçek
  * şema kök seviyede (bkz. oradaki `expenses` notu, aynı durum) —
@@ -42,4 +49,24 @@ export async function removeFromAttendeeLists(uid: string, db: Firestore): Promi
     }
   }
   return updated;
+}
+
+/**
+ * F12-4 — kullanıcının vücut ölçümü geçmişini (`measurements/{uid}/entries`)
+ * tamamen siler.
+ *
+ * `firestore.rules` bu kayıtları açıkça "kişisel/hassas sağlık verisi
+ * (F0-4 gizlilik politikası kapsamında)" diye niteliyor. `deleteAccount`
+ * bu alt koleksiyona dokunmuyordu; "hesabımı sil" dendikten sonra sağlık
+ * verisinin sunucuda kalması uygulamanın kendi gizlilik metniyle çelişir.
+ *
+ * `recursiveDelete` kullanılıyor: alt koleksiyon uzun bir geçmişte
+ * yüzlerce doküman tutabilir ve BulkWriter bunu kendi içinde
+ * parçalayıp paralel yürütüyor — elle sayfalamaya gerek yok. Ara
+ * `measurements/{uid}` dokümanı hiç yazılmamış olabilir (alt koleksiyon
+ * doğrudan oluşturuluyor); `recursiveDelete` bu durumda da alt
+ * koleksiyonu siler.
+ */
+export async function deleteMeasurementHistory(uid: string, db: Firestore): Promise<void> {
+  await db.recursiveDelete(db.collection("measurements").doc(uid));
 }

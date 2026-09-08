@@ -3,7 +3,7 @@ import test from "node:test";
 
 import type { Firestore } from "firebase-admin/firestore";
 
-import { removeFromAttendeeLists } from "./attendee-cleanup";
+import { removeFromAttendeeLists } from "./account-cleanup";
 
 interface RecordedUpdate {
   collection: string;
