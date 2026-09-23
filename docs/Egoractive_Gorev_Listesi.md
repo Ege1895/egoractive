@@ -990,3 +990,134 @@ Yani `users/{uid}` silindikten sonra da raporlar eksiksiz kalıyor. Silinmiş ü
 - [ ] Yeniden ekleme akışında ad ve uzmanlıklar dolu geliyor
 - [ ] İlk kez ekleme akışında form boş açılmaya devam ediyor
 - [ ] Ön-doldurulmuş değerler değiştirilip kaydedilebiliyor
+
+---
+
+## FAZ 13 — Prod Hazırlık (store review öncesi)
+
+**Nereden çıktı:** 2026-09-24'te yapılan uçtan uca prod hazırlık denetimi. Aşağıdaki 6 madde, üretim build'i review'a gönderilmeden ÖNCE kapatılmalı. F13-1 ve F13-2 doğrudan red sebebi; F13-3…F13-5 güvenlik; F13-6 kullanıcıya sahte veri gösteriyor.
+
+**Denetimde TEMİZ çıkanlar** (tekrar araştırmaya gerek yok): Remote Config anahtar tutarlılığı (804 metin + 23 config anahtarının tamamı template'te var), AdMob (debug'da test ID / release'de gerçek ID, `debugTestDeviceIds` boş), `PerfTrace` (release'de tam no-op), Crashlytics bağlantısı, Android imzalama (`key.properties` mevcut), `firestore.rules`'ta açık kural yok, izinler minimal (Android tek izin; iOS foto izni metni var, kamera kullanılmıyor), kod tabanında hiç TODO/FIXME yok, tüm testler geçiyor (Flutter 176, functions 130, rules 18).
+
+---
+
+### F13-1 — "Satın alımları geri yükle" (Apple Guideline 3.1.1)
+
+**🔴 Doğrudan red sebebi.** Reviewer bunu bizzat deniyor (ikinci cihaz ya da sil-kur).
+
+**Ne eksik:** `restorePurchases()` kod tabanında HİÇ çağrılmıyor. Alıcı taraf hazır — `subscription_controller.dart:167` gelen `PurchaseStatus.restored` olaylarını zaten işliyor — sadece tetikleyen UI yok.
+
+**Neden sadece uyum meselesi değil:** [subscription_controller.dart:170](lib/modules/subscription/controller/subscription_controller.dart:170) bilinçli olarak, `verifyPurchase` hata verse bile işlemi `completePurchase` ile kapatıyor (kullanıcı "mağaza bekleniyor" ekranında kilitli kalmasın diye). Bedeli: işlem mağaza kuyruğundan düşüyor ve bir sonraki açılışta TEKRAR SUNULMUYOR. Ağ koptuğu ya da Cloud Function hata verdiği bir anda ödeme alınmış ama salon pasif kalmış olur — bunu düzeltmenin tek yolu restore. Ayrıca ertelenmiş işlemler (Ask to Buy, SCA), `lbl_subscription_account_already_used_error` durumu ve `resetGymSubscription` sonrası yeniden bağlanma da bu akışa muhtaç.
+
+**Prompt:** "`subscription_panel.dart`'a (ve abonelik zorunluysa `subscription_onboarding_panel.dart`'a) 'Satın alımları geri yükle' aksiyonu ekle; `SubscriptionPurchaseService`'e `restorePurchases()` çağrısını geçir. Gelen `PurchaseStatus.restored` olayları zaten `_onPurchaseUpdate`'te işleniyor, oraya dokunma. Sonucu kullanıcıya bildir: geri yüklenecek satın alım BULUNAMADIĞINDA da sessiz kalma — `purchaseStream`'e hiç olay düşmeyeceği için bir zaman aşımı/boş sonuç durumu gerekiyor, aksi halde kullanıcı sonsuz bir yükleniyor durumunda kalır. Buton ve sonuç metinleri Remote Config'e TR/EN eklenmeli (`lbl_subscription_restore_*`)."
+
+**Kabul kriterleri:**
+- [ ] Abonelik ekranında görünür bir "Satın alımları geri yükle" aksiyonu var
+- [ ] Aktif aboneliği olan bir hesapta, uygulama silinip kurulduktan sonra restore salonu tekrar aktif ediyor
+- [ ] Hiç satın alımı olmayan hesapta anlamlı bir "bulunamadı" mesajı çıkıyor, ekran takılmıyor
+- [ ] Restore sırasında `verifyPurchase` hata verirse kullanıcıya hata gösteriliyor, işlem yine finish ediliyor (mevcut davranışla tutarlı)
+- [ ] Metinler RC'de iki dilde, `remoteconfig.template.json`'a da eklendi (kod varsayılanı TEK BAŞINA yeterli değil)
+
+---
+
+### F13-2 — Uygulama içi Kullanım Şartları (EULA) + Gizlilik Politikası (Apple Guideline 3.1.2)
+
+**🔴 Doğrudan red sebebi.** Otomatik yenilenen abonelik satan uygulamalarda bu linkler binary'nin İÇİNDE olmak zorunda; App Store Connect metadata'sına yazmak yetmiyor.
+
+**Ne eksik:** `lib/` altında tek bir dış URL yok (denetimde doğrulandı — çıkan sonuçlar yalnızca freezed'in üretilmiş dosya başlıklarıydı). `Egoractive_Manuel_Gorevler.md`'de F0-4 olarak en baştan beri açık duruyor.
+
+**Önkoşul (insan işi, kod değil):** İki metnin yazılıp kalıcı bir URL'de yayınlanması gerekiyor (GitHub Pages / Firebase Hosting). Gizlilik metni şu ayrımı yansıtmalı — hesap silinince ölçüm/sağlık verisi SİLİNİYOR ama seans ve geri bildirim kayıtları isimle KORUNUYOR (bkz. F12-4 ürün kararı).
+
+**Prompt:** "Profil ekranına ve abonelik ekranına (satın alma noktasında da görünmeli, Apple şartı) 'Kullanım Şartları' ve 'Gizlilik Politikası' satırları ekle; `url_launcher` (zaten bağımlılıkta, pubspec:62) ile aç. URL'ler Remote Config'ten okunmalı (`cfg_terms_url`, `cfg_privacy_url`) — store güncellemesi olmadan değiştirilebilsin. Link açılamazsa sessizce yutma, kullanıcıya bilgi ver."
+
+**Kabul kriterleri:**
+- [ ] İki metin de canlı bir URL'de yayında
+- [ ] Profil ekranından ikisine de erişiliyor
+- [ ] Abonelik/satın alma ekranından ikisine de erişiliyor
+- [ ] URL'ler RC'den geliyor, `remoteconfig.template.json`'a eklendi
+- [ ] App Store Connect ve Play Console'daki gizlilik politikası alanlarına aynı URL girildi
+- [ ] Play Console "Veri Güvenliği" formu dolduruldu (telefon, e-posta, sağlık/ölçüm verisi, push token)
+
+---
+
+### F13-3 — OTP bypass bayrağının üretimde temizlenmesi
+
+**🔴 Güvenlik.** `users/{uid}.otpBypassEnabled === true` olan hesaplara sabit `000000` koduyla giriliyor, e-posta bile gönderilmiyor ([otp.ts:77](functions/src/shared/otp.ts:77)). Kodun kendi uyarısı: *"bu bayrak açık olan bir hesaba, telefon numarasını bilen HERKES girebilir"*.
+
+**Mekanizma KODDA kalmalı** — kapalı test/demo akışı için bilinçli olarak veriye bağlı tasarlandı. Kapatılması gereken şey VERİDEKİ bayrak.
+
+**Prompt:** "(a) `scripts/enable_closed_test_accounts.ts --revoke` zaten var (satır 62) ama SADECE dosyada sabit yazılı 3 uid'yi kapsıyor. Üretimde bu bayrağı taşıyan BAŞKA doküman kalmadığını garanti etmek için `users` koleksiyonunu `where('otpBypassEnabled','==',true)` ile tarayıp raporlayan/temizleyen küçük bir script yaz — diğer script'lerdeki güvenlik desenini birebir uygula (varsayılan emulator, production için `--allow-production` + `CONFIRM_PRODUCTION_BACKFILL=yes`, `--dry-run`). (b) Bu kontrolü yayın öncesi kontrol listesine kalıcı bir madde olarak ekle: her store gönderiminden önce çalıştırılmalı."
+
+**Kabul kriterleri:**
+- [ ] Script `--dry-run` ile çalıştırıldı, bayrağı taşıyan doküman sayısı raporlandı
+- [ ] Üretimde `otpBypassEnabled: true` taşıyan doküman SAYISI SIFIR
+- [ ] Kontrol, yayın öncesi kontrol listesine yazıldı
+- [ ] Mekanizmanın kendisi (kod) korundu — kapalı test tekrar açılabilmeli
+
+---
+
+### F13-4 — Salon logosu yazma yetkisini daralt
+
+**🔴 Güvenlik.** `storage.rules`'ta `gym_logos/{fileName}` yazma yetkisi "giriş yapmış herhangi biri" ve dosya adı tahmin edilebilir: `gym_logos/{gymId}.png` ([gym_logo_service.dart:32](lib/modules/gyms/service/gym_logo_service.dart:32)). Herhangi bir üye başka bir salonun logosunu ezebilir. Kuralın kendi yorumunda "rol/salon bazlı ince kapsam F2-6 ile eklenecek" yazıyor — yapılmamış.
+
+**Prompt:** "`storage.rules`'taki `gym_logos/{fileName}` yazma kuralını, dosyayı yalnızca O SALONUN admin'i yazabilecek şekilde daralt. Custom claim'ler Storage kurallarında `request.auth.token` üzerinden okunabiliyor (`role`, `gymId` — `onUserRoleAssigned` tarafından yazılıyor), yani Firestore okumasına gerek yok: dosya adının `{gymId}.png` olması şartıyla `request.auth.token.gymId` ile eşleşmeli ve `request.auth.token.role == 'admin'` olmalı. Mevcut contentType/boyut kısıtları korunmalı. Okuma `if true` kalmalı — logo üye giriş ekranında da gösteriliyor. Salon oluşturma akışında (`create_gym_controller.dart`) logonun HANGİ aşamada yüklendiğini kontrol et: claim henüz atanmamışken yükleniyorsa bu kural o akışı kırar, o durumda yükleme claim atandıktan sonraya alınmalı."
+
+**Kabul kriterleri:**
+- [ ] Admin kendi salonunun logosunu yükleyebiliyor
+- [ ] Başka salonun admin'i / üye / antrenör o dosyayı yazamıyor
+- [ ] Salon OLUŞTURMA akışındaki ilk logo yüklemesi çalışmaya devam ediyor (claim zamanlaması doğrulandı)
+- [ ] Logo hâlâ giriş yapmamış kullanıcıya da görünüyor
+- [ ] Storage kuralları için emulator testi yazıldı
+
+---
+
+### F13-5 — App Check
+
+**🔴 Güvenlik.** Kurulu değil (`firebase_app_check` pubspec'te yok). Callable'lar (`startLogin`, `listPartnerGyms`, `signupGymAdmin`…) ve Firestore, proje yapılandırmasını ele geçiren herkes tarafından doğrudan çağrılabilir durumda. Loglarda `deleteAccount`'a gelen kimliksiz bir GET isteği görüldü — yani uç noktalar dışarıdan taranıyor.
+
+**Prompt:** "`firebase_app_check` paketini ekle, iOS'ta DeviceCheck/App Attest, Android'de Play Integrity sağlayıcılarıyla kur; debug build'ler için debug provider'ı ayarla ve debug token'ının üretime sızmadığından emin ol. Firebase Console'da ÖNCE 'monitoring' modunda aç, gerçek trafikte doğrulanmamış istek oranını izle, sıfırlandığını gördükten SONRA enforcement'a geç — doğrudan zorunlu kılmak yayındaki eski build'leri kilitler. Hangi servislerde (Functions, Firestore, Storage) zorunlu kılınacağı ayrı ayrı kararlaştırılmalı."
+
+**Kabul kriterleri:**
+- [ ] Paket kurulu, iki platformda da sağlayıcı yapılandırılmış
+- [ ] Console'da monitoring modunda veri akıyor
+- [ ] Doğrulanmamış istek oranı izlendi ve kabul edilebilir seviyeye indi
+- [ ] Enforcement açılacak servisler kararlaştırıldı ve dokümante edildi
+- [ ] Debug provider yalnızca debug build'de aktif
+
+---
+
+### F13-6 — Mock veri fallback'lerini kapat
+
+**🟠 Kullanıcıya sahte veri gösteriyor.** Dört controller, kimlik/salon bilgisi henüz YÜKLENİRKEN mock listeye düşüyor — `isLoading` kontrolü yok:
+
+| Dosya | Satır |
+|---|---|
+| `admin_members_controller.dart` | 54 |
+| `admin_trainers_controller.dart` | 94 |
+| `trainer_members_controller.dart` | 60 |
+| `trainer_report_controller.dart` | 184 |
+
+Aynı hata `discover_controller.dart`, `trainer_home_controller.dart` ve `sessions_controller.dart`'ta ZATEN düzeltilmiş; o dosyaların yorumlarında yaşanmış gerçek bug anlatılıyor: *"kullanıcı o an sahte bir öğeye dokunursa gerçek olmayan bir ID ile Firestore'a yazma denemesi hataya düşüyordu"*. Doğru desen `studio_packages_controller.dart:63` ve `gym_events_controller.dart:61`'de de mevcut (`if (gymIdAsync.isLoading) return const [];`).
+
+**Prompt:** "Dört controller'ı mevcut doğru desene geçir: kimlik/salon bilgisi YÜKLENİYORKEN mock'a değil BOŞ listeye düşülsün; mock yalnızca gerçekten oturum/salon YOKKA kullanılsın. Deseni `studio_packages_controller.dart:63`'ten birebir al. Ayrıca değerlendir ve karar öner: bu mock repository'ler üretimde hâlâ bir işe yarıyor mu, yoksa tamamen kaldırılmalı mı? Kaldırmak daha temiz olurdu ama salon-yok akışlarında ekranların ne göstereceği ayrıca kararlaştırılmalı — bu kararı kullanıcıya sor, tek başına kaldırma."
+
+**Kabul kriterleri:**
+- [ ] Dört controller'da da yükleme penceresinde mock dönmüyor
+- [ ] Gerçek kullanıcıda "Berk Aydın"/"Ayşe Yılmaz" hiçbir ekranda görünmüyor
+- [ ] Salon/oturum gerçekten yokken ekranlar boş listeyle düzgün davranıyor (boş durum metni)
+- [ ] Mock repository'lerin kaderi hakkında karar verildi ve dokümante edildi
+
+---
+
+### FAZ 13 kapsamı DIŞINDA — ama yayın öncesi takipte
+
+Bunlar denetimde çıktı, red sebebi değil; ayrı ele alınacak:
+
+- **F11-7 hiç yapılmadı.** FAZ 11'in tamamı (gölge antrenör, `notificationProxyUid` yönlendirmesi, antrenörlükten çıkma) gerçek cihazda bir kez bile denenmedi. Kod canlıda, davranış doğrulanmamış.
+- **F12-3'ün iki elle adımı** (`firebase deploy --only extensions` + `mail` için TTL politikası) — yapılmadığı sürece `mail` koleksiyonu büyümeye ve OTP kodları düz metin birikmeye devam ediyor.
+- **İki temizlik script'i çalıştırılmadı:** `prune_dead_fcm_tokens.ts`, `prune_old_mail_docs.ts`.
+- **12 korumasız `debugPrint`** — release build'de de cihaz log'una yazıyor (`[appAccess] role=`, `gymId=`, `email=set`). `kDebugMode` guard'ı yok.
+- **`ITSAppUsesNonExemptEncryption` Info.plist'te yok** — her yüklemede export compliance sorusu çıkıyor.
+- **Android `minifyEnabled` açıkça ayarlanmamış** (varsayılan kapalı) → 84 MB `.aab`.
+- **35 commit `main`'e merge edilmemiş** — üretim build'i `feature/theme-delete-and-recurring-year` dalından alınıyor.
+- **RC'de kodda kullanılmayan 54 `lbl_` anahtarı** — zararsız, temizlik.
