@@ -1433,8 +1433,13 @@ abstract final class RemoteConfigKeys {
   static const subscriptionManagementOpenError =
       'lbl_subscription_management_open_error';
   static const subscriptionExemptNote = 'lbl_subscription_exempt_note';
-  static const cfgTermsUrl = 'cfg_terms_url';
-  static const cfgPrivacyUrl = 'cfg_privacy_url';
+  /// F13-2 — hukuki metinlerin adresleri. Dile BAĞLI (`_tr`/`_en`): Egora
+  /// Games sitesinde iki metnin de TR ve EN sürümleri ayrı URL'lerde
+  /// yayınlanıyor, bu yüzden `cfg_` (dilden bağımsız) değil `lbl_` deseni
+  /// kullanılıyor ve okuma `rcTextProvider` üzerinden aktif dile göre
+  /// yapılıyor.
+  static const commonTermsUrl = 'lbl_common_terms_url';
+  static const commonPrivacyUrl = 'lbl_common_privacy_url';
   static const commonTermsNavLabel = 'lbl_common_terms_nav_label';
   static const commonPrivacyNavLabel = 'lbl_common_privacy_nav_label';
   static const commonLinkOpenError = 'lbl_common_link_open_error';
@@ -2453,8 +2458,8 @@ class RemoteConfigService {
         '{name} artık uygulamaya giriş yapamayacak ve antrenör listesinde görünmeyecek. Geçmiş seansları, grup dersleri ve raporlardaki verileri olduğu gibi kalır.',
     'lbl_trainers_delete_confirm_cta_tr': 'Evet, sil',
     'lbl_trainers_delete_error_tr': 'Antrenör silinemedi, tekrar dene.',
-    'cfg_terms_url': '',
-    'cfg_privacy_url': '',
+    'lbl_common_terms_url_tr': '',
+    'lbl_common_privacy_url_tr': '',
     'lbl_common_terms_nav_label_tr': 'Kullanım Şartları',
     'lbl_common_privacy_nav_label_tr': 'Gizlilik Politikası',
     'lbl_common_link_open_error_tr': 'Bağlantı açılamadı.',
@@ -3335,6 +3340,8 @@ class RemoteConfigService {
         '{name} will no longer be able to sign in and will not appear in the trainer list. Past sessions, group classes and report data remain unchanged.',
     'lbl_trainers_delete_confirm_cta_en': 'Yes, delete',
     'lbl_trainers_delete_error_en': 'Trainer could not be deleted, try again.',
+    'lbl_common_terms_url_en': '',
+    'lbl_common_privacy_url_en': '',
     'lbl_common_terms_nav_label_en': 'Terms of Use',
     'lbl_common_privacy_nav_label_en': 'Privacy Policy',
     'lbl_common_link_open_error_en': 'The link could not be opened.',

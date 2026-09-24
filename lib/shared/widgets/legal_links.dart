@@ -13,8 +13,9 @@ import '../../core/theme/app_theme.dart';
 /// Connect metadata'sına yazmak yeterli değil. Bu yüzden hem profil
 /// ekranında hem de satın alma noktasında (abonelik ekranı) gösteriliyor.
 ///
-/// URL'ler Remote Config'ten geliyor ki metinlerin yeri store güncellemesi
-/// olmadan değiştirilebilsin. **URL boşsa satır hiç gösterilmiyor** — yayına
+/// URL'ler Remote Config'ten, AKTİF DİLE göre geliyor (TR ve EN metinleri
+/// ayrı sayfalarda yayınlanıyor) ki adresler store güncellemesi olmadan
+/// değiştirilebilsin. **URL boşsa satır hiç gösterilmiyor** — yayına
 /// hazır olmayan bir bağlantıyı tıklanabilir yapıp kullanıcıyı boş sayfaya
 /// göndermektense gizlemek doğru; ama bu, iki URL de doldurulmadan
 /// uygulamanın review'a GÖNDERİLEMEYECEĞİ anlamına gelir.
@@ -26,9 +27,14 @@ class LegalLinks extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final rc = ref.watch(remoteConfigServiceProvider);
-    final termsUrl = rc.getString(RemoteConfigKeys.cfgTermsUrl).trim();
-    final privacyUrl = rc.getString(RemoteConfigKeys.cfgPrivacyUrl).trim();
+    // URL'ler dile göre değişiyor (TR/EN metinleri ayrı sayfalarda
+    // yayınlanıyor); `rcTextProvider` aktif dilin sürümünü getirir.
+    final termsUrl = ref
+        .watch(rcTextProvider(RemoteConfigKeys.commonTermsUrl))
+        .trim();
+    final privacyUrl = ref
+        .watch(rcTextProvider(RemoteConfigKeys.commonPrivacyUrl))
+        .trim();
     if (termsUrl.isEmpty && privacyUrl.isEmpty) return const SizedBox.shrink();
 
     final links = [

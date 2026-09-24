@@ -9032,13 +9032,25 @@
       },
       "valueType": "STRING"
     },
-    "cfg_terms_url": {
+    "lbl_common_terms_url_tr": {
       "defaultValue": {
         "value": ""
       },
       "valueType": "STRING"
     },
-    "cfg_privacy_url": {
+    "lbl_common_terms_url_en": {
+      "defaultValue": {
+        "value": ""
+      },
+      "valueType": "STRING"
+    },
+    "lbl_common_privacy_url_tr": {
+      "defaultValue": {
+        "value": ""
+      },
+      "valueType": "STRING"
+    },
+    "lbl_common_privacy_url_en": {
       "defaultValue": {
         "value": ""
       },
