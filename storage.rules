@@ -31,6 +31,8 @@ service firebase.storage {
     match /gym_logos/{fileName} {
       allow read: if true;
       allow write: if request.auth != null
+                   && request.auth.token.role == 'admin'
+                   && fileName == request.auth.token.gymId + '.png'
                    && request.resource.contentType == 'image/png'
                    && request.resource.size < 300 * 1024;
     }
