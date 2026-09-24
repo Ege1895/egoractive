@@ -2458,8 +2458,10 @@ class RemoteConfigService {
         '{name} artık uygulamaya giriş yapamayacak ve antrenör listesinde görünmeyecek. Geçmiş seansları, grup dersleri ve raporlardaki verileri olduğu gibi kalır.',
     'lbl_trainers_delete_confirm_cta_tr': 'Evet, sil',
     'lbl_trainers_delete_error_tr': 'Antrenör silinemedi, tekrar dene.',
-    'lbl_common_terms_url_tr': '',
-    'lbl_common_privacy_url_tr': '',
+    'lbl_common_terms_url_tr':
+        'https://egoragames.com/games/egoractive/terms-of-use/tr/',
+    'lbl_common_privacy_url_tr':
+        'https://egoragames.com/games/egoractive/privacy-policy/tr/',
     'lbl_common_terms_nav_label_tr': 'Kullanım Şartları',
     'lbl_common_privacy_nav_label_tr': 'Gizlilik Politikası',
     'lbl_common_link_open_error_tr': 'Bağlantı açılamadı.',
@@ -3340,8 +3342,10 @@ class RemoteConfigService {
         '{name} will no longer be able to sign in and will not appear in the trainer list. Past sessions, group classes and report data remain unchanged.',
     'lbl_trainers_delete_confirm_cta_en': 'Yes, delete',
     'lbl_trainers_delete_error_en': 'Trainer could not be deleted, try again.',
-    'lbl_common_terms_url_en': '',
-    'lbl_common_privacy_url_en': '',
+    'lbl_common_terms_url_en':
+        'https://egoragames.com/games/egoractive/terms-of-use/en/',
+    'lbl_common_privacy_url_en':
+        'https://egoragames.com/games/egoractive/privacy-policy/en/',
     'lbl_common_terms_nav_label_en': 'Terms of Use',
     'lbl_common_privacy_nav_label_en': 'Privacy Policy',
     'lbl_common_link_open_error_en': 'The link could not be opened.',

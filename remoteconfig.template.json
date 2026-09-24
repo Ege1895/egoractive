@@ -9034,25 +9034,25 @@
     },
     "lbl_common_terms_url_tr": {
       "defaultValue": {
-        "value": ""
+        "value": "https://egoragames.com/games/egoractive/terms-of-use/tr/"
       },
       "valueType": "STRING"
     },
     "lbl_common_terms_url_en": {
       "defaultValue": {
-        "value": ""
+        "value": "https://egoragames.com/games/egoractive/terms-of-use/en/"
       },
       "valueType": "STRING"
     },
     "lbl_common_privacy_url_tr": {
       "defaultValue": {
-        "value": ""
+        "value": "https://egoragames.com/games/egoractive/privacy-policy/tr/"
       },
       "valueType": "STRING"
     },
     "lbl_common_privacy_url_en": {
       "defaultValue": {
-        "value": ""
+        "value": "https://egoragames.com/games/egoractive/privacy-policy/en/"
       },
       "valueType": "STRING"
     },
