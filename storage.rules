@@ -11,6 +11,23 @@ rules_version = '2';
 // bir güvenlik tabanını sağlar).
 service firebase.storage {
   match /b/{bucket}/o {
+    // F13-4 — yazma yetkisi, dosyanın ait olduğu salonun ADMIN'iyle sınırlı.
+    // Önceden "giriş yapmış herhangi biri" yazabiliyordu ve dosya adı
+    // tahmin edilebilir (`gym_logos/{gymId}.png`, bkz. gym_logo_service.dart)
+    // olduğu için herhangi bir üye/antrenör BAŞKA bir salonun logosunu
+    // ezebiliyordu.
+    //
+    // Rol ve salon custom claim'lerden okunuyor (`onUserRoleAssigned`
+    // tarafından yazılıyor) — Firestore okumasına gerek yok.
+    //
+    // Salon OLUŞTURMA akışı bu kuraldan etkilenmez: oradaki ilk logo
+    // yüklemesi `signupGymAdmin` callable'ı içinde Admin SDK ile yapılıyor
+    // (bkz. signup-gym-admin.ts, `gym_logos/${gymRef.id}.png`) ve Admin SDK
+    // kuralları atlar. Client'tan yükleme yalnızca salon kurulduktan SONRA,
+    // admin claim'i çoktan atanmışken gerçekleşiyor.
+    //
+    // Okuma herkese açık kalıyor: logo giriş yapılmamış ekranlarda da
+    // gösteriliyor.
     match /gym_logos/{fileName} {
       allow read: if true;
       allow write: if request.auth != null
