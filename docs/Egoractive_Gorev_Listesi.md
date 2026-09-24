@@ -1059,11 +1059,35 @@ cd scripts && GOOGLE_APPLICATION_CREDENTIALS=... CONFIRM_PRODUCTION_BACKFILL=yes
 
 Temizlemek için aynı komuta `--revoke` ekle.
 
+**ÜRETİM TARAMASI (2026-09-24):** 3 hesapta bayrak açık, hepsi TEK bir salona bağlı — `Egora Saloon` (`VtIqRsgL7qvgcPYW1IRW`, 10 kullanıcı / 29 seans, `subscriptionExempt: true`). Projedeki 6 salondan biri ve gerçek müşteri salonu DEĞİL, demo salon. Gerçek pilot salonların hesaplarında bayrak yok.
+
+| uid | Rol | Telefon |
+|---|---|---|
+| `ifKPfciCrKH0Qqvj2NgI` | admin | +90 555 555 0000 |
+| `r2SHvpzvai6zaP2YYnRt` | trainer | +90 500 500 0000 |
+| `XyrJtfwrt8Ol2ueZiBzI` | member | +90 533 533 0000 |
+
+**🔴 KARAR: Bu üç hesap review süreci boyunca AÇIK KALACAK — şimdi silinmemeli.**
+
+Gerekçe: mekanizma tam olarak store reviewer'ları için yapıldı. Apple girişli uygulamalarda demo hesap bilgisi istiyor; reviewer telefon numarasını girip sabit `000000` koduyla içeri giriyor. Bayrak review'dan ÖNCE kaldırılırsa reviewer giriş yapamaz (OTP kodu bizim kontrolümüzdeki bir e-postaya gider, reviewer göremez) ve uygulama doğrudan reddedilir.
+
+**Doğru sıra:**
+1. **Şimdi:** bayrak açık kalır. Üç hesabın numarası + `000000` kodu App Store Connect ve Play Console'un demo hesap alanlarına girilir (üç rolü de görebilsinler).
+2. **Uygulama ONAYLANIP YAYINA GİRDİKTEN SONRA:** bayrak kaldırılır.
+
+```
+cd scripts && CONFIRM_PRODUCTION_BACKFILL=yes \
+  npm run audit-otp-bypass -- --allow-production --revoke
+```
+
+**Bilinçli olarak kabul edilen risk:** bayrak açıkken numarayı tahmin eden herkes bu hesaplara girebilir ve numaralar tahmin edilebilir (`5555550000`, `5005000000`). Erişilen yer yalnızca demo salon; gerçek müşteri verisi ve ödeme riski yok (`subscriptionExempt`). Yine de gereksiz bir açık pencere — onay gelir gelmez kapatılmalı.
+
 **Kabul kriterleri:**
 - [x] Koleksiyonun tamamını tarayan script yazıldı (sabit uid listesine bağlı değil)
-- [ ] Üretimde çalıştırıldı, bayrağı taşıyan hesap sayısı raporlandı
-- [ ] Üretimde `otpBypassEnabled: true` taşıyan doküman SAYISI SIFIR
-- [ ] Kontrol, yayın öncesi kontrol listesine yazıldı
+- [x] Üretimde çalıştırıldı, bayrağı taşıyan hesap sayısı raporlandı (3)
+- [x] Bayrağı taşıyan hesapların gerçek müşteri salonuna ait OLMADIĞI doğrulandı
+- [ ] Demo hesap bilgileri App Store Connect ve Play Console'a girildi
+- [ ] **YAYIN SONRASI:** `--revoke` çalıştırıldı, bayrağı taşıyan doküman sayısı SIFIR
 - [x] Mekanizmanın kendisi (kod) korundu — kapalı test tekrar açılabilmeli
 
 ---
@@ -1118,6 +1142,19 @@ Aynı hata `discover_controller.dart`, `trainer_home_controller.dart` ve `sessio
 - [ ] Gerçek kullanıcıda "Berk Aydın"/"Ayşe Yılmaz" hiçbir ekranda görünmüyor
 - [ ] Salon/oturum gerçekten yokken ekranlar boş listeyle düzgün davranıyor (boş durum metni)
 - [ ] Mock repository'lerin kaderi hakkında karar verildi ve dokümante edildi
+
+---
+
+### 🔴 YAYIN SONRASI İLK İŞ — unutulmaması gereken
+
+**Demo hesapların OTP bypass bayrağını kaldır** (F13-3). Uygulama onaylanıp yayına girer girmez:
+
+```
+cd scripts && CONFIRM_PRODUCTION_BACKFILL=yes \
+  npm run audit-otp-bypass -- --allow-production --revoke
+```
+
+Review boyunca açık kalması ZORUNLU (reviewer bu hesaplarla giriyor), ama onay sonrası açık kalırsa numarayı tahmin eden herkes demo salona girebilir.
 
 ---
 
