@@ -8972,6 +8972,66 @@
       },
       "valueType": "STRING"
     },
+    "lbl_subscription_restore_button_tr": {
+      "defaultValue": {
+        "value": "Satın alımları geri yükle"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_restore_button_en": {
+      "defaultValue": {
+        "value": "Restore purchases"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_restore_in_progress_tr": {
+      "defaultValue": {
+        "value": "Geri yükleniyor…"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_restore_in_progress_en": {
+      "defaultValue": {
+        "value": "Restoring…"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_restore_success_tr": {
+      "defaultValue": {
+        "value": "Satın alımların geri yüklendi. Aboneliğin birkaç saniye içinde güncellenmezse uygulamayı yeniden aç."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_restore_success_en": {
+      "defaultValue": {
+        "value": "Your purchases were restored. If your subscription does not update within a few seconds, reopen the app."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_restore_empty_tr": {
+      "defaultValue": {
+        "value": "Bu hesapta geri yüklenecek bir satın alım bulunamadı. Aboneliği başka bir Apple/Google hesabıyla aldıysan o hesapla giriş yapman gerekir."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_restore_empty_en": {
+      "defaultValue": {
+        "value": "No purchases were found for this account. If you subscribed with a different Apple/Google account, sign in with that account."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_restore_error_tr": {
+      "defaultValue": {
+        "value": "Satın alımlar geri yüklenemedi, tekrar dene."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_restore_error_en": {
+      "defaultValue": {
+        "value": "Purchases could not be restored, please try again."
+      },
+      "valueType": "STRING"
+    },
     "lbl_trainers_delete_button_tr": {
       "defaultValue": {
         "value": "Antrenörü sil"

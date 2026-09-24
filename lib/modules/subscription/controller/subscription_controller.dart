@@ -27,6 +27,11 @@ Stream<SubscriptionState> subscriptionStateForGym(
   return ref.watch(subscriptionRepositoryProvider).watchState(gymId);
 }
 
+/// Geri yükleme isteğinden sonra mağazadan olay beklenecek süre — hiç satın
+/// alım yoksa `purchaseStream`'e hiçbir şey düşmediği için tek bitiş sinyali
+/// bu.
+const _restoreTimeoutDuration = Duration(seconds: 10);
+
 /// F6-1 — aktif salonun abonelik durumunu okur ve mağaza satın alma akışını
 /// başlatır. Satın alma tamamlandığında `verifySubscriptionPurchase`
 /// callable'ını (F6-1d) çağırıp makbuzu doğrulatır — `gyms/{gymId}`'nin
@@ -45,9 +50,20 @@ class SubscriptionController extends _$SubscriptionController {
   bool _isPurchasing = false;
   String? _pendingProductId;
 
+  // F13-1 — geri yükleme durumu da aynı gerekçeyle örnek alanında tutuluyor:
+  // Firestore'dan gelen her snapshot build()'i tekrar çalıştırıp state'i
+  // sıfırdan üretiyor, bu alanlar `gyms/{gymId}` dokümanının parçası değil.
+  bool _isRestoring = false;
+  String? _restoreMessage;
+  bool _sawRestoredPurchase = false;
+  Timer? _restoreTimeout;
+
   @override
   SubscriptionState build() {
-    ref.onDispose(() => _purchaseSub?.cancel());
+    ref.onDispose(() {
+      _purchaseSub?.cancel();
+      _restoreTimeout?.cancel();
+    });
     _purchaseSub ??= ref
         .watch(subscriptionRepositoryProvider)
         .purchaseUpdates
@@ -61,6 +77,8 @@ class SubscriptionController extends _$SubscriptionController {
     return base.copyWith(
       isPurchasing: _isPurchasing,
       pendingProductId: _pendingProductId,
+      isRestoring: _isRestoring,
+      restoreMessage: _restoreMessage,
     );
   }
 
@@ -158,6 +176,67 @@ class SubscriptionController extends _$SubscriptionController {
     }
   }
 
+  /// F13-1 — Apple Guideline 3.1.1: mağazadaki satın alımı yeniden
+  /// keşfetme yolu. Bu uygulamada yetkilendirme sunucuda durduğu için
+  /// (`gyms/{gymId}.subscriptionStatus`) çoğu "yeni cihaz" senaryosunda
+  /// zaten gerek kalmıyor — ama şu durumlarda TEK kurtarma yolu bu:
+  ///
+  /// * `verifyPurchase` hata verse bile işlem [_onPurchaseUpdate]'te her
+  ///   zaman `completePurchase` ile kapatılıyor (kullanıcı "mağaza
+  ///   bekleniyor" ekranında kilitli kalmasın diye). Bedeli: işlem mağaza
+  ///   kuyruğundan düşüyor ve bir daha kendiliğinden sunulmuyor. Ağ
+  ///   koptuğu bir anda ödeme alınmış ama salon pasif kalmış olabilir.
+  /// * Ertelenmiş işlemler (Ask to Buy, banka doğrulaması) uygulama kapalıyken
+  ///   tamamlanırsa olay kaçar.
+  /// * `resetGymSubscription` sonrası mağazadaki abonelik ile salon
+  ///   dokümanının yeniden bağlanması gerekir.
+  ///
+  /// Sonuç mağazadan bu çağrının dönüşüyle DEĞİL, `purchaseStream`'e düşen
+  /// `restored` olaylarıyla geliyor; hiç satın alım yoksa stream'e hiçbir
+  /// şey düşmüyor. Bu yüzden bir zaman aşımı var: onsuz "satın alımı
+  /// olmayan kullanıcı" sonsuza kadar yükleniyor durumunda kalırdı.
+  Future<void> restorePurchases() async {
+    if (_isRestoring) return;
+    _isRestoring = true;
+    _sawRestoredPurchase = false;
+    _restoreMessage = null;
+    state = state.copyWith(
+      isRestoring: true,
+      restoreMessage: null,
+      purchaseErrorMessage: null,
+    );
+
+    try {
+      await ref.read(subscriptionRepositoryProvider).restorePurchases();
+    } catch (_) {
+      _finishRestore(RemoteConfigKeys.subscriptionRestoreError);
+      return;
+    }
+
+    _restoreTimeout?.cancel();
+    _restoreTimeout = Timer(_restoreTimeoutDuration, () {
+      if (!_isRestoring) return;
+      _finishRestore(
+        _sawRestoredPurchase
+            ? RemoteConfigKeys.subscriptionRestoreSuccess
+            : RemoteConfigKeys.subscriptionRestoreEmpty,
+      );
+    });
+  }
+
+  void _finishRestore(String messageKey) {
+    _restoreTimeout?.cancel();
+    _isRestoring = false;
+    _restoreMessage = ref.read(rcTextProvider(messageKey));
+    state = state.copyWith(isRestoring: false, restoreMessage: _restoreMessage);
+  }
+
+  /// Kullanıcı mesajını temizler (ör. bilgi satırı kapatıldığında).
+  void clearRestoreMessage() {
+    _restoreMessage = null;
+    state = state.copyWith(restoreMessage: null);
+  }
+
   Future<void> _onPurchaseUpdate(List<PurchaseDetails> purchases) async {
     final repo = ref.read(subscriptionRepositoryProvider);
     final gymId = ref.read(activeGymIdProvider).valueOrNull;
@@ -165,6 +244,9 @@ class SubscriptionController extends _$SubscriptionController {
     for (final purchase in purchases) {
       if (purchase.status == PurchaseStatus.purchased ||
           purchase.status == PurchaseStatus.restored) {
+        if (purchase.status == PurchaseStatus.restored) {
+          _sawRestoredPurchase = true;
+        }
         // verifyPurchase (Cloud Functions) ağ/sunucu hatasıyla başarısız
         // olabilir — önceden bu durumda ne completePurchase çağrılıyordu
         // (StoreKit/Play Billing işlemi "pending" kalıp bir sonraki açılışta

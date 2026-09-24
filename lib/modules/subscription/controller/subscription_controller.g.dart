@@ -202,7 +202,7 @@ class _SubscriptionStateForGymProviderElement
 }
 
 String _$subscriptionControllerHash() =>
-    r'8fdcdc590aa247291a21035531460931b8ca690a';
+    r'c3e12eb4d56444bc1ce31919ca185a53453c3434';
 
 /// F6-1 — aktif salonun abonelik durumunu okur ve mağaza satın alma akışını
 /// başlatır. Satın alma tamamlandığında `verifySubscriptionPurchase`

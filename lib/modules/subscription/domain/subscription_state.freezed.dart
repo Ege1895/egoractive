@@ -42,6 +42,14 @@ mixin _$SubscriptionState {
   /// plan kartının "bekleniyor" durumunda gösterileceğini belirler.
   String? get pendingProductId => throw _privateConstructorUsedError;
 
+  /// F13-1 — "Satın alımları geri yükle" akışı sürüyor mu.
+  bool get isRestoring => throw _privateConstructorUsedError;
+
+  /// Geri yükleme akışının SONUCU (başarılı / satın alım bulunamadı /
+  /// hata). [purchaseErrorMessage]'dan ayrı tutuluyor: geri yüklemede
+  /// "bulunamadı" bir hata değil, bilgilendirme.
+  String? get restoreMessage => throw _privateConstructorUsedError;
+
   /// Satın alma hatası (network, mağaza reddi, doğrulama başarısızlığı).
   /// Kullanıcı kendi isteğiyle iptal ederse (`PurchaseStatus.canceled`)
   /// bu alan boş kalır — o zaten kendi kararı, hata değil.
@@ -72,6 +80,8 @@ abstract class $SubscriptionStateCopyWith<$Res> {
     bool trialUsed,
     bool subscriptionExempt,
     String? pendingProductId,
+    bool isRestoring,
+    String? restoreMessage,
     String? purchaseErrorMessage,
   });
 }
@@ -101,6 +111,8 @@ class _$SubscriptionStateCopyWithImpl<$Res, $Val extends SubscriptionState>
     Object? trialUsed = null,
     Object? subscriptionExempt = null,
     Object? pendingProductId = freezed,
+    Object? isRestoring = null,
+    Object? restoreMessage = freezed,
     Object? purchaseErrorMessage = freezed,
   }) {
     return _then(
@@ -145,6 +157,14 @@ class _$SubscriptionStateCopyWithImpl<$Res, $Val extends SubscriptionState>
                 ? _value.pendingProductId
                 : pendingProductId // ignore: cast_nullable_to_non_nullable
                       as String?,
+            isRestoring: null == isRestoring
+                ? _value.isRestoring
+                : isRestoring // ignore: cast_nullable_to_non_nullable
+                      as bool,
+            restoreMessage: freezed == restoreMessage
+                ? _value.restoreMessage
+                : restoreMessage // ignore: cast_nullable_to_non_nullable
+                      as String?,
             purchaseErrorMessage: freezed == purchaseErrorMessage
                 ? _value.purchaseErrorMessage
                 : purchaseErrorMessage // ignore: cast_nullable_to_non_nullable
@@ -175,6 +195,8 @@ abstract class _$$SubscriptionStateImplCopyWith<$Res>
     bool trialUsed,
     bool subscriptionExempt,
     String? pendingProductId,
+    bool isRestoring,
+    String? restoreMessage,
     String? purchaseErrorMessage,
   });
 }
@@ -203,6 +225,8 @@ class __$$SubscriptionStateImplCopyWithImpl<$Res>
     Object? trialUsed = null,
     Object? subscriptionExempt = null,
     Object? pendingProductId = freezed,
+    Object? isRestoring = null,
+    Object? restoreMessage = freezed,
     Object? purchaseErrorMessage = freezed,
   }) {
     return _then(
@@ -247,6 +271,14 @@ class __$$SubscriptionStateImplCopyWithImpl<$Res>
             ? _value.pendingProductId
             : pendingProductId // ignore: cast_nullable_to_non_nullable
                   as String?,
+        isRestoring: null == isRestoring
+            ? _value.isRestoring
+            : isRestoring // ignore: cast_nullable_to_non_nullable
+                  as bool,
+        restoreMessage: freezed == restoreMessage
+            ? _value.restoreMessage
+            : restoreMessage // ignore: cast_nullable_to_non_nullable
+                  as String?,
         purchaseErrorMessage: freezed == purchaseErrorMessage
             ? _value.purchaseErrorMessage
             : purchaseErrorMessage // ignore: cast_nullable_to_non_nullable
@@ -270,6 +302,8 @@ class _$SubscriptionStateImpl implements _SubscriptionState {
     this.trialUsed = false,
     this.subscriptionExempt = false,
     this.pendingProductId,
+    this.isRestoring = false,
+    this.restoreMessage,
     this.purchaseErrorMessage,
   });
 
@@ -312,6 +346,17 @@ class _$SubscriptionStateImpl implements _SubscriptionState {
   @override
   final String? pendingProductId;
 
+  /// F13-1 — "Satın alımları geri yükle" akışı sürüyor mu.
+  @override
+  @JsonKey()
+  final bool isRestoring;
+
+  /// Geri yükleme akışının SONUCU (başarılı / satın alım bulunamadı /
+  /// hata). [purchaseErrorMessage]'dan ayrı tutuluyor: geri yüklemede
+  /// "bulunamadı" bir hata değil, bilgilendirme.
+  @override
+  final String? restoreMessage;
+
   /// Satın alma hatası (network, mağaza reddi, doğrulama başarısızlığı).
   /// Kullanıcı kendi isteğiyle iptal ederse (`PurchaseStatus.canceled`)
   /// bu alan boş kalır — o zaten kendi kararı, hata değil.
@@ -320,7 +365,7 @@ class _$SubscriptionStateImpl implements _SubscriptionState {
 
   @override
   String toString() {
-    return 'SubscriptionState(status: $status, trialStartedAt: $trialStartedAt, trialEndsAt: $trialEndsAt, startedAt: $startedAt, expiresAt: $expiresAt, productId: $productId, isPurchasing: $isPurchasing, trialUsed: $trialUsed, subscriptionExempt: $subscriptionExempt, pendingProductId: $pendingProductId, purchaseErrorMessage: $purchaseErrorMessage)';
+    return 'SubscriptionState(status: $status, trialStartedAt: $trialStartedAt, trialEndsAt: $trialEndsAt, startedAt: $startedAt, expiresAt: $expiresAt, productId: $productId, isPurchasing: $isPurchasing, trialUsed: $trialUsed, subscriptionExempt: $subscriptionExempt, pendingProductId: $pendingProductId, isRestoring: $isRestoring, restoreMessage: $restoreMessage, purchaseErrorMessage: $purchaseErrorMessage)';
   }
 
   @override
@@ -347,6 +392,10 @@ class _$SubscriptionStateImpl implements _SubscriptionState {
                 other.subscriptionExempt == subscriptionExempt) &&
             (identical(other.pendingProductId, pendingProductId) ||
                 other.pendingProductId == pendingProductId) &&
+            (identical(other.isRestoring, isRestoring) ||
+                other.isRestoring == isRestoring) &&
+            (identical(other.restoreMessage, restoreMessage) ||
+                other.restoreMessage == restoreMessage) &&
             (identical(other.purchaseErrorMessage, purchaseErrorMessage) ||
                 other.purchaseErrorMessage == purchaseErrorMessage));
   }
@@ -364,6 +413,8 @@ class _$SubscriptionStateImpl implements _SubscriptionState {
     trialUsed,
     subscriptionExempt,
     pendingProductId,
+    isRestoring,
+    restoreMessage,
     purchaseErrorMessage,
   );
 
@@ -391,6 +442,8 @@ abstract class _SubscriptionState implements SubscriptionState {
     final bool trialUsed,
     final bool subscriptionExempt,
     final String? pendingProductId,
+    final bool isRestoring,
+    final String? restoreMessage,
     final String? purchaseErrorMessage,
   }) = _$SubscriptionStateImpl;
 
@@ -428,6 +481,16 @@ abstract class _SubscriptionState implements SubscriptionState {
   /// plan kartının "bekleniyor" durumunda gösterileceğini belirler.
   @override
   String? get pendingProductId;
+
+  /// F13-1 — "Satın alımları geri yükle" akışı sürüyor mu.
+  @override
+  bool get isRestoring;
+
+  /// Geri yükleme akışının SONUCU (başarılı / satın alım bulunamadı /
+  /// hata). [purchaseErrorMessage]'dan ayrı tutuluyor: geri yüklemede
+  /// "bulunamadı" bir hata değil, bilgilendirme.
+  @override
+  String? get restoreMessage;
 
   /// Satın alma hatası (network, mağaza reddi, doğrulama başarısızlığı).
   /// Kullanıcı kendi isteğiyle iptal ederse (`PurchaseStatus.canceled`)

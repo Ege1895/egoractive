@@ -429,6 +429,7 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
               ? null
               : () => _purchaseOrMockStart(_selectedProductId!),
         ),
+        _RestorePurchasesRow(subscription: subscription),
       ],
     );
   }
@@ -1710,6 +1711,66 @@ class _PendingCta extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+
+/// F13-1 — Apple Guideline 3.1.1: "Satın alımları geri yükle".
+///
+/// Abonelik satın alma noktasında görünür olmalı; reviewer bunu bizzat
+/// deniyor (ikinci cihaz ya da sil-kur). Sonuç mesajı hem başarıyı hem
+/// "satın alım bulunamadı" durumunu kapsıyor — ikincisi bir HATA değil,
+/// bu yüzden hata rengiyle değil normal metin rengiyle gösteriliyor.
+class _RestorePurchasesRow extends ConsumerWidget {
+  const _RestorePurchasesRow({required this.subscription});
+
+  final SubscriptionState subscription;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final colors = context.appColors;
+    final typography = context.appTypography;
+
+    return Padding(
+      padding: const EdgeInsets.only(top: AppSpacing.md),
+      child: Column(
+        children: [
+          if (subscription.restoreMessage != null) ...[
+            Text(
+              subscription.restoreMessage!,
+              textAlign: TextAlign.center,
+              style: typography.bodyMedium.copyWith(
+                color: colors.onSurfaceMuted,
+                fontSize: 13,
+              ),
+            ),
+            const SizedBox(height: AppSpacing.sm),
+          ],
+          TextButton(
+            onPressed: subscription.isRestoring
+                ? null
+                : () => ref
+                      .read(subscriptionControllerProvider.notifier)
+                      .restorePurchases(),
+            child: Text(
+              ref.watch(
+                rcTextProvider(
+                  subscription.isRestoring
+                      ? RemoteConfigKeys.subscriptionRestoreInProgress
+                      : RemoteConfigKeys.subscriptionRestoreButton,
+                ),
+              ),
+              style: typography.bodyMedium.copyWith(
+                color: subscription.isRestoring
+                    ? colors.onSurfaceMuted
+                    : colors.primary,
+                fontSize: 13,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -1433,6 +1433,14 @@ abstract final class RemoteConfigKeys {
   static const subscriptionManagementOpenError =
       'lbl_subscription_management_open_error';
   static const subscriptionExemptNote = 'lbl_subscription_exempt_note';
+  static const subscriptionRestoreButton =
+      'lbl_subscription_restore_button';
+  static const subscriptionRestoreInProgress =
+      'lbl_subscription_restore_in_progress';
+  static const subscriptionRestoreSuccess =
+      'lbl_subscription_restore_success';
+  static const subscriptionRestoreEmpty = 'lbl_subscription_restore_empty';
+  static const subscriptionRestoreError = 'lbl_subscription_restore_error';
 
   /// `[{label_tr, label_en}]` — abonelikte dahil olan özellik listesi.
   static const subscriptionIncludedFeatures =
@@ -2440,6 +2448,17 @@ class RemoteConfigService {
         '{name} artık uygulamaya giriş yapamayacak ve antrenör listesinde görünmeyecek. Geçmiş seansları, grup dersleri ve raporlardaki verileri olduğu gibi kalır.',
     'lbl_trainers_delete_confirm_cta_tr': 'Evet, sil',
     'lbl_trainers_delete_error_tr': 'Antrenör silinemedi, tekrar dene.',
+    'lbl_subscription_restore_button_tr': 'Satın alımları geri yükle',
+    'lbl_subscription_restore_in_progress_tr': 'Geri yükleniyor…',
+    'lbl_subscription_restore_success_tr':
+        'Satın alımların geri yüklendi. Aboneliğin birkaç saniye içinde '
+        'güncellenmezse uygulamayı yeniden aç.',
+    'lbl_subscription_restore_empty_tr':
+        'Bu hesapta geri yüklenecek bir satın alım bulunamadı. Aboneliği '
+        'başka bir Apple/Google hesabıyla aldıysan o hesapla giriş yapman '
+        'gerekir.',
+    'lbl_subscription_restore_error_tr':
+        'Satın alımlar geri yüklenemedi, tekrar dene.',
     'lbl_trainers_self_trainer_badge_tr': 'Sen',
     'lbl_trainers_self_leave_button_tr': 'Antrenörlükten çık',
     'lbl_trainers_self_leave_confirm_title_tr':
@@ -3306,6 +3325,16 @@ class RemoteConfigService {
         '{name} will no longer be able to sign in and will not appear in the trainer list. Past sessions, group classes and report data remain unchanged.',
     'lbl_trainers_delete_confirm_cta_en': 'Yes, delete',
     'lbl_trainers_delete_error_en': 'Trainer could not be deleted, try again.',
+    'lbl_subscription_restore_button_en': 'Restore purchases',
+    'lbl_subscription_restore_in_progress_en': 'Restoring…',
+    'lbl_subscription_restore_success_en':
+        'Your purchases were restored. If your subscription does not update '
+        'within a few seconds, reopen the app.',
+    'lbl_subscription_restore_empty_en':
+        'No purchases were found for this account. If you subscribed with a '
+        'different Apple/Google account, sign in with that account.',
+    'lbl_subscription_restore_error_en':
+        'Purchases could not be restored, please try again.',
     'lbl_trainers_self_trainer_badge_en': 'You',
     'lbl_trainers_self_leave_button_en': 'Stop being a trainer',
     'lbl_trainers_self_leave_confirm_title_en': 'Stop being a trainer?',

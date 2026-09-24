@@ -37,6 +37,14 @@ class SubscriptionState with _$SubscriptionState {
     /// plan kartının "bekleniyor" durumunda gösterileceğini belirler.
     String? pendingProductId,
 
+    /// F13-1 — "Satın alımları geri yükle" akışı sürüyor mu.
+    @Default(false) bool isRestoring,
+
+    /// Geri yükleme akışının SONUCU (başarılı / satın alım bulunamadı /
+    /// hata). [purchaseErrorMessage]'dan ayrı tutuluyor: geri yüklemede
+    /// "bulunamadı" bir hata değil, bilgilendirme.
+    String? restoreMessage,
+
     /// Satın alma hatası (network, mağaza reddi, doğrulama başarısızlığı).
     /// Kullanıcı kendi isteğiyle iptal ederse (`PurchaseStatus.canceled`)
     /// bu alan boş kalır — o zaten kendi kararı, hata değil.

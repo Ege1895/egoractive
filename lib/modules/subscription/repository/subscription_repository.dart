@@ -16,6 +16,9 @@ abstract interface class SubscriptionRepository {
   /// `true` dönerse kullanıcı mağaza sayfasını iptal etmiştir — bkz.
   /// `SubscriptionPurchaseService.buySubscription`.
   Future<bool> buySubscription(String productId);
+
+  /// Apple Guideline 3.1.1 — geçmiş satın alımları mağazadan geri ister.
+  Future<void> restorePurchases();
   Future<void> completePurchase(PurchaseDetails purchase);
   Future<void> verifyPurchase({required String gymId, required PurchaseDetails purchase});
 
@@ -38,6 +41,9 @@ class SubscriptionRepositoryImpl implements SubscriptionRepository {
 
   @override
   Stream<List<PurchaseDetails>> get purchaseUpdates => _purchaseService.purchaseUpdates;
+
+  @override
+  Future<void> restorePurchases() => _purchaseService.restorePurchases();
 
   @override
   Future<bool> isAvailable() => _purchaseService.isAvailable();

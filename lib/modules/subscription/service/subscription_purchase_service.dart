@@ -29,6 +29,13 @@ class SubscriptionPurchaseService {
 
   Future<bool> isAvailable() => _iap.isAvailable();
 
+  /// F13-1 — mağazanın, bu hesabın geçmiş/geçerli satın alımlarını yeniden
+  /// `purchaseStream`'e sunmasını ister. Sonuç bu çağrının dönüşünde DEĞİL,
+  /// stream'e düşen `PurchaseStatus.restored` olaylarında gelir; hiç satın
+  /// alım yoksa stream'e HİÇBİR ŞEY düşmez (bkz. `SubscriptionController`
+  /// bunu bir zaman aşımıyla ele alıyor).
+  Future<void> restorePurchases() => _iap.restorePurchases();
+
   Future<List<SubscriptionProduct>> fetchProducts({required String locale}) async {
     final response = await _iap.queryProductDetails(gymSubscriptionProductIds);
     _cache
