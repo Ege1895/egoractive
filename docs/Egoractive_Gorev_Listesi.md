@@ -1028,7 +1028,9 @@ Yani `users/{uid}` silindikten sonra da raporlar eksiksiz kalıyor. Silinmiş ü
 
 **Önkoşul (insan işi, kod değil):** İki metnin yazılıp kalıcı bir URL'de yayınlanması gerekiyor (GitHub Pages / Firebase Hosting). Gizlilik metni şu ayrımı yansıtmalı — hesap silinince ölçüm/sağlık verisi SİLİNİYOR ama seans ve geri bildirim kayıtları isimle KORUNUYOR (bkz. F12-4 ürün kararı).
 
-**Prompt:** "Profil ekranına ve abonelik ekranına (satın alma noktasında da görünmeli, Apple şartı) 'Kullanım Şartları' ve 'Gizlilik Politikası' satırları ekle; `url_launcher` (zaten bağımlılıkta, pubspec:62) ile aç. URL'ler Remote Config'ten okunmalı (`cfg_terms_url`, `cfg_privacy_url`) — store güncellemesi olmadan değiştirilebilsin. Link açılamazsa sessizce yutma, kullanıcıya bilgi ver."
+**Prompt:** "Profil ekranına ve abonelik ekranına (satın alma noktasında da görünmeli, Apple şartı) 'Kullanım Şartları' ve 'Gizlilik Politikası' satırları ekle; `url_launcher` (zaten bağımlılıkta, pubspec:62) ile aç. URL'ler Remote Config'ten okunmalı — store güncellemesi olmadan değiştirilebilsin. Link açılamazsa sessizce yutma, kullanıcıya bilgi ver."
+
+**UYGULANAN (2026-09-24):** Egora Games sitesinde iki metnin de TR ve EN sürümleri AYRI URL'lerde yayınlandığı için anahtarlar dile BAĞLI seçildi: `lbl_common_terms_url_tr/_en` ve `lbl_common_privacy_url_tr/_en`, okuma `rcTextProvider` üzerinden. Dört değerin de RC'ye girilmesi gerekiyor — yalnızca TR doldurulursa İngilizce kullanan kullanıcıda bağlantılar hiç görünmez.
 
 **Kabul kriterleri:**
 - [ ] İki metin de canlı bir URL'de yayında
