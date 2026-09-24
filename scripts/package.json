@@ -9,7 +9,8 @@
     "backfill-phone-index": "tsx backfill_phone_index.ts",
     "enable-closed-test": "tsx enable_closed_test_accounts.ts",
     "prune-dead-tokens": "tsx prune_dead_fcm_tokens.ts",
-    "prune-old-mail": "tsx prune_old_mail_docs.ts"
+    "prune-old-mail": "tsx prune_old_mail_docs.ts",
+    "audit-otp-bypass": "tsx audit_otp_bypass.ts"
   },
   "dependencies": {
     "firebase-admin": "^13.10.0"

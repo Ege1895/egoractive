@@ -1048,11 +1048,21 @@ Yani `users/{uid}` silindikten sonra da raporlar eksiksiz kalıyor. Silinmiş ü
 
 **Prompt:** "(a) `scripts/enable_closed_test_accounts.ts --revoke` zaten var (satır 62) ama SADECE dosyada sabit yazılı 3 uid'yi kapsıyor. Üretimde bu bayrağı taşıyan BAŞKA doküman kalmadığını garanti etmek için `users` koleksiyonunu `where('otpBypassEnabled','==',true)` ile tarayıp raporlayan/temizleyen küçük bir script yaz — diğer script'lerdeki güvenlik desenini birebir uygula (varsayılan emulator, production için `--allow-production` + `CONFIRM_PRODUCTION_BACKFILL=yes`, `--dry-run`). (b) Bu kontrolü yayın öncesi kontrol listesine kalıcı bir madde olarak ekle: her store gönderiminden önce çalıştırılmalı."
 
+**YAPILDI (kod tarafı):** `scripts/audit_otp_bypass.ts` — `users` koleksiyonunun TAMAMINI `where('otpBypassEnabled','==',true)` ile tarar. Varsayılan davranış sadece raporlama; silmek için `--revoke` gerekir. Bayrağı açık hesap bulursa çıkış kodu `1` döner, böylece yayın öncesi kontrol listesinde otomatik bir kapı olarak kullanılabilir.
+
+```
+cd scripts && GOOGLE_APPLICATION_CREDENTIALS=... CONFIRM_PRODUCTION_BACKFILL=yes \
+  npm run audit-otp-bypass -- --allow-production
+```
+
+Temizlemek için aynı komuta `--revoke` ekle.
+
 **Kabul kriterleri:**
-- [ ] Script `--dry-run` ile çalıştırıldı, bayrağı taşıyan doküman sayısı raporlandı
+- [x] Koleksiyonun tamamını tarayan script yazıldı (sabit uid listesine bağlı değil)
+- [ ] Üretimde çalıştırıldı, bayrağı taşıyan hesap sayısı raporlandı
 - [ ] Üretimde `otpBypassEnabled: true` taşıyan doküman SAYISI SIFIR
 - [ ] Kontrol, yayın öncesi kontrol listesine yazıldı
-- [ ] Mekanizmanın kendisi (kod) korundu — kapalı test tekrar açılabilmeli
+- [x] Mekanizmanın kendisi (kod) korundu — kapalı test tekrar açılabilmeli
 
 ---
 
