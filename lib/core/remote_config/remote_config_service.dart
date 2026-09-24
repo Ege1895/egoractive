@@ -1433,6 +1433,11 @@ abstract final class RemoteConfigKeys {
   static const subscriptionManagementOpenError =
       'lbl_subscription_management_open_error';
   static const subscriptionExemptNote = 'lbl_subscription_exempt_note';
+  static const cfgTermsUrl = 'cfg_terms_url';
+  static const cfgPrivacyUrl = 'cfg_privacy_url';
+  static const commonTermsNavLabel = 'lbl_common_terms_nav_label';
+  static const commonPrivacyNavLabel = 'lbl_common_privacy_nav_label';
+  static const commonLinkOpenError = 'lbl_common_link_open_error';
   static const subscriptionRestoreButton =
       'lbl_subscription_restore_button';
   static const subscriptionRestoreInProgress =
@@ -2448,6 +2453,11 @@ class RemoteConfigService {
         '{name} artık uygulamaya giriş yapamayacak ve antrenör listesinde görünmeyecek. Geçmiş seansları, grup dersleri ve raporlardaki verileri olduğu gibi kalır.',
     'lbl_trainers_delete_confirm_cta_tr': 'Evet, sil',
     'lbl_trainers_delete_error_tr': 'Antrenör silinemedi, tekrar dene.',
+    'cfg_terms_url': '',
+    'cfg_privacy_url': '',
+    'lbl_common_terms_nav_label_tr': 'Kullanım Şartları',
+    'lbl_common_privacy_nav_label_tr': 'Gizlilik Politikası',
+    'lbl_common_link_open_error_tr': 'Bağlantı açılamadı.',
     'lbl_subscription_restore_button_tr': 'Satın alımları geri yükle',
     'lbl_subscription_restore_in_progress_tr': 'Geri yükleniyor…',
     'lbl_subscription_restore_success_tr':
@@ -3325,6 +3335,9 @@ class RemoteConfigService {
         '{name} will no longer be able to sign in and will not appear in the trainer list. Past sessions, group classes and report data remain unchanged.',
     'lbl_trainers_delete_confirm_cta_en': 'Yes, delete',
     'lbl_trainers_delete_error_en': 'Trainer could not be deleted, try again.',
+    'lbl_common_terms_nav_label_en': 'Terms of Use',
+    'lbl_common_privacy_nav_label_en': 'Privacy Policy',
+    'lbl_common_link_open_error_en': 'The link could not be opened.',
     'lbl_subscription_restore_button_en': 'Restore purchases',
     'lbl_subscription_restore_in_progress_en': 'Restoring…',
     'lbl_subscription_restore_success_en':

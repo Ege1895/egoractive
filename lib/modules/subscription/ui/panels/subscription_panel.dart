@@ -12,6 +12,7 @@ import '../../../../core/panels/panel_stack_controller.dart';
 import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_back_button.dart';
+import '../../../../shared/widgets/legal_links.dart';
 import '../../controller/subscription_controller.dart';
 import '../../domain/subscription_state.dart';
 import '../../../../shared/utils/date_labels.dart';
@@ -430,6 +431,10 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
               : () => _purchaseOrMockStart(_selectedProductId!),
         ),
         _RestorePurchasesRow(subscription: subscription),
+        // F13-2 — Apple 3.1.2, bu bağlantıların SATIN ALMA NOKTASINDA da
+        // bulunmasını istiyor; profil ekranındaki kopya tek başına yeterli
+        // sayılmıyor.
+        const LegalLinks(centered: true),
       ],
     );
   }

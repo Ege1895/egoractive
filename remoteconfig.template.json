@@ -9032,6 +9032,54 @@
       },
       "valueType": "STRING"
     },
+    "cfg_terms_url": {
+      "defaultValue": {
+        "value": ""
+      },
+      "valueType": "STRING"
+    },
+    "cfg_privacy_url": {
+      "defaultValue": {
+        "value": ""
+      },
+      "valueType": "STRING"
+    },
+    "lbl_common_terms_nav_label_tr": {
+      "defaultValue": {
+        "value": "Kullanım Şartları"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_common_terms_nav_label_en": {
+      "defaultValue": {
+        "value": "Terms of Use"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_common_privacy_nav_label_tr": {
+      "defaultValue": {
+        "value": "Gizlilik Politikası"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_common_privacy_nav_label_en": {
+      "defaultValue": {
+        "value": "Privacy Policy"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_common_link_open_error_tr": {
+      "defaultValue": {
+        "value": "Bağlantı açılamadı."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_common_link_open_error_en": {
+      "defaultValue": {
+        "value": "The link could not be opened."
+      },
+      "valueType": "STRING"
+    },
     "lbl_trainers_delete_button_tr": {
       "defaultValue": {
         "value": "Antrenörü sil"
