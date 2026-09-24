@@ -90,7 +90,15 @@ selfTrainerProfile(SelfTrainerProfileRef ref) {
 class AdminTrainersController extends _$AdminTrainersController {
   @override
   List<AdminTrainerSummary> build() {
-    final gymId = ref.watch(activeGymIdProvider).valueOrNull;
+    final gymIdAsync = ref.watch(activeGymIdProvider);
+    // F13-6 — provider ilk izlendiğinde henüz sonuçlanmamış olabilir; bu
+    // durum "gerçekten salon yok" ile AYNI DEĞİL. O ana kadar mock'a
+    // düşülürse kullanıcı bir an sahte veriyi gerçekmiş gibi görür ve
+    // dokunduğunda var olmayan bir ID ile Firestore'a yazma denenir (bkz.
+    // `discover_controller.dart`/`trainer_home_controller.dart` — aynı hata
+    // orada yaşandı ve düzeltildi).
+    if (gymIdAsync.isLoading) return const [];
+    final gymId = gymIdAsync.valueOrNull;
     if (gymId == null) {
       return ref.watch(adminTrainersRepositoryProvider).loadTrainers();
     }
