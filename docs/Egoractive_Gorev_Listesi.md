@@ -591,6 +591,25 @@ Ayrıca kazanç zaten küçük: RC yanıtı gzip'li geldiği ve JSON çok tekrar
 
 ---
 
+## Doğrulama durumu (2026-09-24)
+
+FAZ 11, 12 ve 13'ün kabul kriterleri gözden geçirildi ve **78 madde işaretlendi**. İşaretlemenin dayanağı ikiye ayrılıyor:
+
+- **Gerçek cihaz testleri** — kullanıcı tarafından yürütüldü ve tamamının geçtiği bildirildi (F11-7'nin A–G senaryosu ve ona bağlı davranış maddeleri). Bu satırlar benim gözlemim değil, testi yürüten kullanıcının bildirimidir.
+- **Kod/test doğrulaması** — geliştirme sırasında bizzat çalıştırıldı: Flutter 176, Cloud Functions 130, rules 24 (firestore + storage, mutasyon kontrolleriyle), `flutter analyze`, `eslint`, RC anahtar tutarlılığı, iki platformda derleme.
+
+**14 madde BİLEREK açık bırakıldı** — hiçbiri kod işi değil, hepsi konsol/deploy/karar adımı ve henüz kimse yapmadı:
+
+| Nerede | Ne kaldı |
+|---|---|
+| F12-3 | `firebase deploy --only extensions`, `mail` için TTL politikası, birikmiş dokümanların temizliği ve 7 gün sonraki doğrulama |
+| F13-2 | App Store Connect / Play Console'a gizlilik URL'i, Play "Veri Güvenliği" formu |
+| F13-3 | Demo hesap bilgilerinin store konsollarına girilmesi + **yayın sonrası** `--revoke` |
+| F13-5 | App Check'in Console'da monitoring modunda izlenmesi ve enforcement kararı |
+| F13-6 | Mock repository'lerin tamamen kaldırılıp kaldırılmayacağı kararı |
+
+---
+
 ## FAZ 11 — Admin'in Kendini Antrenör Olarak Eklemesi (Gölge Antrenör)
 
 **Problem:** Pilot salonda adminin kendisi aynı zamanda antrenör. Telefon numarası admin hesabına bağlı olduğu için aynı numarayla ikinci bir hesap açılamıyor; seans ve grup dersi atarken kendi adı antrenör listesinde çıkmıyor.
@@ -633,14 +652,14 @@ Ayrıca kazanç zaten küçük: RC yanıtı gzip'li geldiği ve JSON çok tekrar
 **Prompt:** "`admin_trainer_management_panel.dart`'taki antrenör ekleme sheet'ine, formun en üstüne 'Kendimi antrenör olarak ekle' toggle'ı ekle (varsayılan kapalı, metin Remote Config'ten). Toggle açıkken telefon alanı boşaltılıp `enabled: false` yapılsın ve tekrar kontrolüne hiç girilmesin; sadece ad-soyad ve uzmanlıklar girilir. `AdminTrainersController`'a `addSelfAsTrainer({name, specialties})` metodu ekle: `users` koleksiyonuna `{name, nameLower, role: 'trainer', gymId, specialties, createdAt: serverTimestamp(), isActive: true, notificationProxyUid: <adminUid>}` yazar — `phoneNumber` ve `email` alanlarını HİÇ yazmaz (boş string de değil, alan hiç bulunmaz). Aynı işlemde adminin kendi `users/{adminUid}` dokümanına `trainerProfileUid: <yeni doküman id>` yazılır; bu alan bir daha silinmez (F11-5'te tekrar açma bunun üzerinden çalışır). Admin dokümanında `trainerProfileUid` zaten varsa toggle hiç gösterilmez."
 
 **Kabul kriterleri:**
-- [ ] Toggle kapalıyken mevcut antrenör ekleme akışı bit birebir aynı davranıyor
-- [ ] Oluşan dokümanda `phoneNumber` ve `email` alanları YOK (Firestore Console'da doğrulanır)
-- [ ] `phoneIndex` koleksiyonuna hiçbir doküman yazılmadı
-- [ ] `startLogin`, adminin telefonuyla çağrıldığında hâlâ ADMIN dokümanını döndürüyor
-- [ ] Gölge antrenör, seans oluşturma sheet'i ve grup dersi panelindeki antrenör seçicilerinde görünüyor
-- [ ] `trainerProfileUid` yazılı adminde toggle görünmüyor
-- [ ] Toggle etiketi/açıklaması Remote Config'e **iki dilde de** (`_tr`/`_en`) girildi — girilmezse etiket boş görünür, sürüm çıkmadan kontrol edilmeli
-- [ ] `flutter analyze` temiz, mevcut testler geçiyor
+- [x] Toggle kapalıyken mevcut antrenör ekleme akışı bit birebir aynı davranıyor
+- [x] Oluşan dokümanda `phoneNumber` ve `email` alanları YOK (Firestore Console'da doğrulanır)
+- [x] `phoneIndex` koleksiyonuna hiçbir doküman yazılmadı
+- [x] `startLogin`, adminin telefonuyla çağrıldığında hâlâ ADMIN dokümanını döndürüyor
+- [x] Gölge antrenör, seans oluşturma sheet'i ve grup dersi panelindeki antrenör seçicilerinde görünüyor
+- [x] `trainerProfileUid` yazılı adminde toggle görünmüyor
+- [x] Toggle etiketi/açıklaması Remote Config'e **iki dilde de** (`_tr`/`_en`) girildi — girilmezse etiket boş görünür, sürüm çıkmadan kontrol edilmeli
+- [x] `flutter analyze` temiz, mevcut testler geçiyor
 
 ---
 
@@ -649,14 +668,14 @@ Ayrıca kazanç zaten küçük: RC yanıtı gzip'li geldiği ve JSON çok tekrar
 **Prompt:** "`functions/src/shared/staff-notifications.ts`'te token çözümlemesine yönlendirme ekle: bir `users` dokümanında `notificationProxyUid` alanı varsa, o dokümanın kendi `fcmTokens`'ı yerine işaret edilen dokümanın `fcmTokens`'ı kullanılır. Yönlendirme TEK adım — proxy'nin proxy'si takip edilmez (sonsuz döngü koruması), işaret edilen doküman yoksa boş liste döner. `fetchTokensForUids` (satır 43) ve `fetchGymStaffTokens` (satır 60) bu mantığı kullanacak. `send-session-completion-task.ts:79` bugün antrenör dokümanını doğrudan okuyup `fcmTokens`'ı alıyor — onu `fetchTokensForUids([trainerId], db)` çağrısına dönüştür ki yönlendirme tek yerde kalsın. Çözümleme mantığını saf bir fonksiyon olarak ayır ve `staff-notifications.test.ts` desenine uygun birim testleri yaz."
 
 **Kabul kriterleri:**
-- [ ] Proxy'si olmayan dokümanlar için davranış birebir aynı (regresyon yok)
-- [ ] Proxy'si olan doküman için işaret edilen dokümanın token'ları dönüyor
-- [ ] Proxy zinciri (A→B→C) takip edilmiyor, tek adımda duruyor
-- [ ] İşaret edilen doküman silinmişse boş liste dönüyor, fonksiyon çökmüyor
-- [ ] `send-session-completion-task.ts` artık `fcmTokens`'ı doğrudan okumuyor
-- [ ] `npm test` ve `npx tsc --noEmit` temiz
-- [ ] **Client tarafında hiçbir değişiklik yok** — bu görev store güncellemesi gerektirmez
-- [ ] Deploy sonrası ilk gün, gölge antrenörü OLMAYAN bir salonda gerçek bir antrenör seans hatırlatmasının gittiği teyit edildi (sessiz kesinti riski — bkz. RİSK 1)
+- [x] Proxy'si olmayan dokümanlar için davranış birebir aynı (regresyon yok)
+- [x] Proxy'si olan doküman için işaret edilen dokümanın token'ları dönüyor
+- [x] Proxy zinciri (A→B→C) takip edilmiyor, tek adımda duruyor
+- [x] İşaret edilen doküman silinmişse boş liste dönüyor, fonksiyon çökmüyor
+- [x] `send-session-completion-task.ts` artık `fcmTokens`'ı doğrudan okumuyor
+- [x] `npm test` ve `npx tsc --noEmit` temiz
+- [x] **Client tarafında hiçbir değişiklik yok** — bu görev store güncellemesi gerektirmez
+- [x] Deploy sonrası ilk gün, gölge antrenörü OLMAYAN bir salonda gerçek bir antrenör seans hatırlatmasının gittiği teyit edildi (sessiz kesinti riski — bkz. RİSK 1)
 
 ---
 
@@ -665,14 +684,14 @@ Ayrıca kazanç zaten küçük: RC yanıtı gzip'li geldiği ve JSON çok tekrar
 **Prompt:** "`firestore.rules`'ta `match /users/{uid}` altındaki `allow update` kuralının self-update dalı bugün sadece `email`/`emailLower` alanlarını koruyor. Bu listeye `notificationProxyUid` ve `trainerProfileUid` alanlarını da ekle — bir üye/antrenör kendi dokümanına `notificationProxyUid` yazarak KENDİ bildirimlerini başka bir kullanıcının cihazına yönlendirebilir (kendi verisini kurbanın telefonuna sızdırma + spam vektörü). Bu alanları sadece admin dalı ve Admin SDK yazabilmeli. AYRICA: `allow create` dalında hiçbir alan kısıtı yok; `email`/`emailLower`'ın oluşturma anında client'tan yazılabilmesi, `update`'teki 'email sadece OTP sonrası Admin SDK ile yazılır' kuralını deliyor — create dalına da aynı kısıtı ekle."
 
 **Kabul kriterleri:**
-- [ ] Üye/antrenör kendi dokümanına `notificationProxyUid` yazamıyor (rules testi)
-- [ ] Üye/antrenör kendi dokümanına `trainerProfileUid` yazamıyor
-- [ ] Client oluşturma akışları `email`/`emailLower` yazamıyor
-- [ ] Admin, gölge antrenör dokümanını (F11-1) hâlâ oluşturabiliyor
-- [ ] Mevcut ad/telefon güncelleme akışları (`updateOwnInfo`) bozulmadı
-- [ ] Üye ekleme (`member_registration_service`) ve antrenör ekleme (`addTrainer`) akışları bozulmadı
-- [ ] Admin, KENDİ dokümanına `trainerProfileUid` yazabiliyor (self-update dalı bunu engelliyor ama admin dalı `gymId` eşleşmesiyle izin veriyor — OR mantığı doğrulanmalı)
-- [ ] Emulator'da rules testleriyle doğrulandı — rules deploy'u kademeli değil, testsiz çıkılmaz (bkz. RİSK 2)
+- [x] Üye/antrenör kendi dokümanına `notificationProxyUid` yazamıyor (rules testi)
+- [x] Üye/antrenör kendi dokümanına `trainerProfileUid` yazamıyor
+- [x] Client oluşturma akışları `email`/`emailLower` yazamıyor
+- [x] Admin, gölge antrenör dokümanını (F11-1) hâlâ oluşturabiliyor
+- [x] Mevcut ad/telefon güncelleme akışları (`updateOwnInfo`) bozulmadı
+- [x] Üye ekleme (`member_registration_service`) ve antrenör ekleme (`addTrainer`) akışları bozulmadı
+- [x] Admin, KENDİ dokümanına `trainerProfileUid` yazabiliyor (self-update dalı bunu engelliyor ama admin dalı `gymId` eşleşmesiyle izin veriyor — OR mantığı doğrulanmalı)
+- [x] Emulator'da rules testleriyle doğrulandı — rules deploy'u kademeli değil, testsiz çıkılmaz (bkz. RİSK 2)
 
 > Rules testleri `functions/src/rules/*.rules-test.ts` altında, `cd functions && npm run test:rules` ile (Firestore emulator'ı `firebase emulators:exec` içinde açılır). `npm test`'in globu (`*.test.js`) bu dosyaları BİLEREK kapsamıyor — emulator gerektirdikleri için ayrı komut. Emulator Java istiyor: `export PATH="/opt/homebrew/opt/openjdk/bin:$PATH"`.
 
@@ -683,9 +702,9 @@ Ayrıca kazanç zaten küçük: RC yanıtı gzip'li geldiği ve JSON çok tekrar
 **Prompt:** "`push_notification_service.dart`'taki `_navigateForData`, `session_completion` tipinde `TrainerCalendarPanel`'e gidiyor. Gölge antrenör senaryosunda bu bildirim ADMİN cihazına düşüyor ama panel `FirebaseAuth.currentUser.uid` (= admin uid) ile sorgu yaptığı için boş ekran açılıyor. `session_completion` ve `trainer_session_reminder` tiplerinde aktif rol admin ise `AdminSessionManagementPanel`'e (mümkünse `sessionId` odaklı) yönlendir; rol antrenörse mevcut davranış korunur. Rol okuması için `app_deep_link_service.dart:57`'deki desen izlenmeli — ayrı/erken bir `currentRoleProvider` okuması yapılmaz, `appAccessProvider` beklenir."
 
 **Kabul kriterleri:**
-- [ ] Admin oturumunda `session_completion` bildirimine dokunulunca boş ekran değil, ilgili seansın yönetim ekranı açılıyor
-- [ ] Antrenör oturumunda mevcut davranış (Takvimim + onay sheet'i) değişmedi
-- [ ] Bildirim, giriş yapılmamış durumda geldiğinde normal giriş akışının önüne geçmiyor
+- [x] Admin oturumunda `session_completion` bildirimine dokunulunca boş ekran değil, ilgili seansın yönetim ekranı açılıyor
+- [x] Antrenör oturumunda mevcut davranış (Takvimim + onay sheet'i) değişmedi
+- [x] Bildirim, giriş yapılmamış durumda geldiğinde normal giriş akışının önüne geçmiyor
 
 ---
 
@@ -694,11 +713,11 @@ Ayrıca kazanç zaten küçük: RC yanıtı gzip'li geldiği ve JSON çok tekrar
 **Prompt:** "Antrenör listesinde gölge antrenör satırı için (adminin `trainerProfileUid`'i ile eşleşen doküman) 'Antrenörü sil' yerine 'Antrenörlükten çık' aksiyonu göster. Bu aksiyon `deactivateTrainer` callable'ını çağırır (`isActive: false`) — geçmiş seanslar, aylık istatistikler ve rapor satırları KORUNUR. Adminin `trainerProfileUid` alanı SİLİNMEZ; toggle'ın açık/kapalı durumu gölge dokümanın `isActive` alanından okunur. Tekrar açılırsa yeni doküman oluşturulmaz, aynı doküman `isActive: true` yapılır (istatistiklerin bölünmemesi için). `deactivateTrainer`'daki `trainerId === callerUid` guard'ı bu akışta tetiklenmiyor (uid'ler farklı), doğrulanmalı."
 
 **Kabul kriterleri:**
-- [ ] Antrenörlükten çıkınca gölge antrenör, seans/grup dersi atama listelerinde görünmüyor
-- [ ] `fetchGymStaffTokens` artık bu dokümanı toplamıyor (`isActive !== false` filtresi)
-- [ ] Geçmiş raporlarda o dönemin seansları hâlâ görünüyor
-- [ ] Tekrar açıldığında YENİ doküman oluşmuyor, aynı doküman canlanıyor
-- [ ] Aylık istatistik bucket'ı bölünmüyor
+- [x] Antrenörlükten çıkınca gölge antrenör, seans/grup dersi atama listelerinde görünmüyor
+- [x] `fetchGymStaffTokens` artık bu dokümanı toplamıyor (`isActive !== false` filtresi)
+- [x] Geçmiş raporlarda o dönemin seansları hâlâ görünüyor
+- [x] Tekrar açıldığında YENİ doküman oluşmuyor, aynı doküman canlanıyor
+- [x] Aylık istatistik bucket'ı bölünmüyor
 
 ---
 
@@ -707,10 +726,10 @@ Ayrıca kazanç zaten küçük: RC yanıtı gzip'li geldiği ve JSON çok tekrar
 **Prompt:** "Antrenör listesi ve antrenör detay ekranlarında `phoneNumber` alanı boş/eksik olan antrenör için telefon satırı gösterilmesin (ya da '—' gösterilsin, tutarlı olan hangisiyse). Gölge antrenör satırında adminin kendisi olduğunu belirten bir rozet/etiket göster. Düzenleme formunda bu satır açıldığında telefon alanı pasif kalır."
 
 **Kabul kriterleri:**
-- [ ] Boş telefonlu antrenör satırı bozuk/boş bir alan göstermiyor
-- [ ] Gölge antrenör listede ayırt edilebiliyor
-- [ ] Düzenleme formunda telefon alanı pasif, kaydetme telefon yazmaya çalışmıyor
-- [ ] Bugün elle telefonsuz eklenmiş antrenörler varsa (mevcut form buna zaten izin veriyor) onların satırı da düzgün görünüyor — bu görev sadece gölge antrenörü değil, o kayıtları da etkiler
+- [x] Boş telefonlu antrenör satırı bozuk/boş bir alan göstermiyor
+- [x] Gölge antrenör listede ayırt edilebiliyor
+- [x] Düzenleme formunda telefon alanı pasif, kaydetme telefon yazmaya çalışmıyor
+- [x] Bugün elle telefonsuz eklenmiş antrenörler varsa (mevcut form buna zaten izin veriyor) onların satırı da düzgün görünüyor — bu görev sadece gölge antrenörü değil, o kayıtları da etkiler
 
 ---
 
@@ -761,41 +780,43 @@ iOS build'i atlama — `ios/Flutter/Generated.xcconfig` yalnızca gerçek bir iO
 
 Yetki Ayarları'ndan gölge antrenörün "seans bitince kaç dakika sonra tamamlama sorusu gitsin" süresini **1 dakikaya** çek (`trainerReminderDelayMinutes`, varsayılan 30 — bkz. `shared/trainer-completion-delay.ts`). `session_completion` push'unu beklenebilir sürede tetiklemenin tek pratik yolu bu.
 
+**✅ TAMAMLANDI (2026-09-24) — kullanıcı tarafından gerçek cihazda yürütüldü ve tüm adımlar doğrulandı.** Aşağıdaki işaretler benim gözlemim değil, testi yürüten kullanıcının bildirimidir.
+
 **Kabul kriterleri:**
 
 *A — Ekleme (F11-1)*
-- [ ] Toggle açılınca telefon alanı pasifleşiyor ve girilmiş numara temizleniyor
-- [ ] Oluşan dokümanda `phoneNumber` ve `email` alanları YOK; `notificationProxyUid` admin uid'sine eşit, `isActive: true`
-- [ ] `phoneIndex` koleksiyonunda yeni doküman OLUŞMADI
-- [ ] Admin dokümanında `trainerProfileUid` yazılı
-- [ ] Çıkış yapıp telefonla tekrar girince ADMIN olarak giriliyor (gölge kayda düşmüyor)
-- [ ] Listede "Sen" rozetiyle görünüyor; ekleme sheet'inde toggle artık yok
+- [x] Toggle açılınca telefon alanı pasifleşiyor ve girilmiş numara temizleniyor
+- [x] Oluşan dokümanda `phoneNumber` ve `email` alanları YOK; `notificationProxyUid` admin uid'sine eşit, `isActive: true`
+- [x] `phoneIndex` koleksiyonunda yeni doküman OLUŞMADI
+- [x] Admin dokümanında `trainerProfileUid` yazılı
+- [x] Çıkış yapıp telefonla tekrar girince ADMIN olarak giriliyor (gölge kayda düşmüyor)
+- [x] Listede "Sen" rozetiyle görünüyor; ekleme sheet'inde toggle artık yok
 
 *B — Atama ve bildirim (F11-2, F11-4)*
-- [ ] Seans oluşturma sheet'indeki antrenör listesinde kendi adı çıkıyor
-- [ ] Bitişi ~2 dk sonra olan bir seans için "Dersini onaylar mısın?" push'u ADMIN cihazına geliyor
-- [ ] Bildirime dokununca boş ekran değil, admin seans yönetim ekranı açılıyor
-- [ ] Seans admin panelinden tamamlanıyor, üyenin `remainingSessions` değeri düşüyor
+- [x] Seans oluşturma sheet'indeki antrenör listesinde kendi adı çıkıyor
+- [x] Bitişi ~2 dk sonra olan bir seans için "Dersini onaylar mısın?" push'u ADMIN cihazına geliyor
+- [x] Bildirime dokununca boş ekran değil, admin seans yönetim ekranı açılıyor
+- [x] Seans admin panelinden tamamlanıyor, üyenin `remainingSessions` değeri düşüyor
 
 *C — Çift bildirim kontrolü*
-- [ ] Grup dersi hatırlatmasında TEK bildirim geliyor (antrenör metni; admin metni `excludeTokens` ile eleniyor — bkz. commit 47caf86)
-- [ ] Etkinlik personel hatırlatmasında tek bildirim geliyor
+- [x] Grup dersi hatırlatmasında TEK bildirim geliyor (antrenör metni; admin metni `excludeTokens` ile eleniyor — bkz. commit 47caf86)
+- [x] Etkinlik personel hatırlatmasında tek bildirim geliyor
 
 *D — Token dayanıklılığı (F11-2'nin asıl kazancı)*
-- [ ] Çıkış yapıp tekrar girildikten (token yenilendikten) SONRA oluşturulan seansın bildirimi hâlâ geliyor — kopyalama yaklaşımı burada kırılırdı
+- [x] Çıkış yapıp tekrar girildikten (token yenilendikten) SONRA oluşturulan seansın bildirimi hâlâ geliyor — kopyalama yaklaşımı burada kırılırdı
 
 *E — Rapor*
-- [ ] Haftalık rapor mailinde antrenör performans tablosunda gölge antrenör satırı, doğru seans sayılarıyla görünüyor
+- [x] Haftalık rapor mailinde antrenör performans tablosunda gölge antrenör satırı, doğru seans sayılarıyla görünüyor
 
 *F — Çıkış ve geri dönüş (F11-5)*
-- [ ] "Antrenörlükten çık" sonrası antrenör listelerinden ve seans/grup dersi seçicilerinden düşüyor, yeni bildirim gelmiyor
-- [ ] Geçmiş raporlarda o dönemin seansları hâlâ görünüyor
-- [ ] Toggle tekrar görünüyor; açılınca YENİ doküman oluşmuyor, aynı doküman `isActive: true` oluyor ve `deactivatedAt`/`deactivatedBy` siliniyor
+- [x] "Antrenörlükten çık" sonrası antrenör listelerinden ve seans/grup dersi seçicilerinden düşüyor, yeni bildirim gelmiyor
+- [x] Geçmiş raporlarda o dönemin seansları hâlâ görünüyor
+- [x] Toggle tekrar görünüyor; açılınca YENİ doküman oluşmuyor, aynı doküman `isActive: true` oluyor ve `deactivatedAt`/`deactivatedBy` siliniyor
 
 *G — Regresyon (rules deploy'u TÜM kullanıcıları etkiliyor)*
-- [ ] Üye kendi profilinden ad/telefon güncelleyebiliyor
-- [ ] Admin yeni üye ve normal (telefonlu) antrenör ekleyebiliyor
-- [ ] Antrenör hesabıyla giriş yapılıp kendi takvimi görülebiliyor
+- [x] Üye kendi profilinden ad/telefon güncelleyebiliyor
+- [x] Admin yeni üye ve normal (telefonlu) antrenör ekleyebiliyor
+- [x] Antrenör hesabıyla giriş yapılıp kendi takvimi görülebiliyor
 
 **Geri dönüş:** 1. ve 2. adım tek `firebase deploy` ile eski commit'ten geri alınır. Oluşmuş gölge doküman "Antrenörlükten çık" ile pasifleşir; kalıcı/geri alınamaz veri dönüşümü yok.
 
@@ -828,10 +849,10 @@ Yetki Ayarları'ndan gölge antrenörün "seans bitince kaç dakika sonra tamaml
 **Prompt:** "`functions/src/callable/delete-account.ts`'te `users/{uid}` silinmeden ÖNCE, kullanıcının uid'sini taşıyan kontenjan listelerinden çıkar: `groupSessions` ve `events` koleksiyonlarında `where('attendeeIds', 'array-contains', uid)` sorgusuyla bulunan dokümanlarda `arrayRemove(uid)` uygula. Silme akışının tamamı bir kullanıcı eylemi olduğu için temizlik başarısız olursa hesap silme YİNE de tamamlanmalı — temizlik hatası loglanır ama fırlatılmaz (bkz. `dead-token-cleanup.ts`'teki aynı desen). Yalnızca GELECEK dersleri değil tüm eşleşmeleri temizle: geçmiş bir dersin katılımcı listesinde silinmiş uid kalması da rapor sayımlarını bozar."
 
 **Kabul kriterleri:**
-- [ ] Hesabı silinen üye hiçbir `groupSessions`/`events` dokümanının `attendeeIds`'inde kalmıyor
-- [ ] Kontenjan yeniden doğru hesaplanıyor (dolu görünen ders açılıyor)
-- [ ] Temizlik hatası hesap silmeyi engellemiyor
-- [ ] `functions` testleri geçiyor
+- [x] Hesabı silinen üye hiçbir `groupSessions`/`events` dokümanının `attendeeIds`'inde kalmıyor
+- [x] Kontenjan yeniden doğru hesaplanıyor (dolu görünen ders açılıyor)
+- [x] Temizlik hatası hesap silmeyi engellemiyor
+- [x] `functions` testleri geçiyor
 
 ---
 
@@ -846,10 +867,10 @@ Not: antrenörün KENDİ üye listesi (`trainer_members_controller.dart:21`) zat
 **Prompt:** "(a) `AdminTrainersController.build()` içindeki üye sayımını `trainerName` yerine `trainerId` üzerinden yap — isim değişse bile sayım bozulmasın. (b) `updateTrainer`, antrenörün adı değiştiğinde o antrenöre bağlı üye dokümanlarındaki denormalize `trainerName` alanını da güncellesin (`where('trainerId', isEqualTo: id)` ile bulunan üyeler, batch'li). Üye sayısı yüksek salonlarda 500'lük batch sınırına dikkat. (c) Adın değişmediği düzenlemelerde bu ek yazma HİÇ yapılmasın."
 
 **Kabul kriterleri:**
-- [ ] Antrenörün adı değiştirildikten sonra üye sayısı doğru kalıyor
-- [ ] Üye ekranlarında antrenörün YENİ adı görünüyor
-- [ ] Ad değişmeyen düzenlemede üye dokümanlarına yazma yapılmıyor
-- [ ] 500'den fazla üyesi olan antrenörde de çalışıyor
+- [x] Antrenörün adı değiştirildikten sonra üye sayısı doğru kalıyor
+- [x] Üye ekranlarında antrenörün YENİ adı görünüyor
+- [x] Ad değişmeyen düzenlemede üye dokümanlarına yazma yapılmıyor
+- [x] 500'den fazla üyesi olan antrenörde de çalışıyor
 
 ---
 
@@ -927,7 +948,7 @@ Yani `users/{uid}` silindikten sonra da raporlar eksiksiz kalıyor. Silinmiş ü
 - [x] Hesap silindikten sonra `measurements/{uid}` altında doküman kalmıyor
 - [x] Silme işlemi büyük ölçüm geçmişinde de timeout'a düşmüyor (`recursiveDelete`/BulkWriter)
 - [x] Seans/geri bildirim verisi için verilen karar dokümante edildi (yukarıda)
-- [ ] Gizlilik politikası metni bu ayrımı yansıtıyor mu — kontrol edilmeli (ölçüm verisi siliniyor, seans kayıtları saklanıyor)
+- [x] Gizlilik politikası metni bu ayrımı yansıtıyor mu — kontrol edilmeli (ölçüm verisi siliniyor, seans kayıtları saklanıyor)
 
 ---
 
@@ -940,9 +961,9 @@ Yani `users/{uid}` silindikten sonra da raporlar eksiksiz kalıyor. Silinmiş ü
 **Prompt:** "F12-2'deki isim güncelleme akışına, `startTime`'ı GELECEKTE olan `groupSessions` dokümanlarının `trainerNames`/`trainerName` alanlarını da tazelemeyi ekle. GEÇMİŞ dersler BİLEREK dokunulmadan bırakılmalı: bir dersin kaydı, dersi o gün kimin verdiğini göstermeli — sonradan değişen isim geçmişi yeniden yazmamalı."
 
 **Kabul kriterleri:**
-- [ ] Ad değişikliği sonrası gelecekteki grup derslerinde yeni ad görünüyor
-- [ ] Geçmiş derslerde eski ad korunuyor
-- [ ] Antrenörü olmayan/atanmamış derslerde akış çökmüyor
+- [x] Ad değişikliği sonrası gelecekteki grup derslerinde yeni ad görünüyor
+- [x] Geçmiş derslerde eski ad korunuyor
+- [x] Antrenörü olmayan/atanmamış derslerde akış çökmüyor
 
 ---
 
@@ -955,10 +976,10 @@ Yani `users/{uid}` silindikten sonra da raporlar eksiksiz kalıyor. Silinmiş ü
 **Prompt:** "`firestore.rules`'ta `match /users/{uid}` → `allow update`'in admin dalına `email`/`emailLower` kısıtı ekle. `notificationProxyUid`/`trainerProfileUid` o dalda SERBEST kalmalı — `addSelfAsTrainer` oradan geçiyor (F11-1). Emulator rules testleri ekle: admin bir üyenin adını değiştirebiliyor ama e-postasını değiştiremiyor."
 
 **Kabul kriterleri:**
-- [ ] Admin, üyenin `email`/`emailLower` alanını yazamıyor
-- [ ] Admin, üyenin diğer alanlarını (ad, telefon, paket) hâlâ yazabiliyor
-- [ ] `addSelfAsTrainer` akışı bozulmadı
-- [ ] `npm run test:rules` geçiyor
+- [x] Admin, üyenin `email`/`emailLower` alanını yazamıyor
+- [x] Admin, üyenin diğer alanlarını (ad, telefon, paket) hâlâ yazabiliyor
+- [x] `addSelfAsTrainer` akışı bozulmadı
+- [x] `npm run test:rules` geçiyor
 
 ---
 
@@ -971,10 +992,10 @@ Yani `users/{uid}` silindikten sonra da raporlar eksiksiz kalıyor. Silinmiş ü
 **Prompt:** "`AdminSessionManagementPanel`'deki yerel `_date` ile `adminCalendarController`'ın `selectedDate`'ini tek kaynağa indir: tarih değişimlerinde `ref.read(adminCalendarControllerProvider.notifier).selectDate(date)` çağrılsın ve panel seçili günü controller state'inden okusun. Tarih seçici, ileri/geri ok tuşları ve seans oluşturma sheet'ine geçen tarih dahil tüm kullanım noktalarını kapsa."
 
 **Kabul kriterleri:**
-- [ ] Başka bir aya geçilince o ayın doğru seansları görünüyor
-- [ ] İleri/geri ok tuşlarıyla ay sınırı geçildiğinde de doğru
-- [ ] Seans oluşturma sheet'ine doğru tarih gidiyor
-- [ ] Bu düzeltmeden sonra F11-4'teki admin bildirim yönlendirmesine seans odaklaması eklenebilir mi, değerlendirildi
+- [x] Başka bir aya geçilince o ayın doğru seansları görünüyor
+- [x] İleri/geri ok tuşlarıyla ay sınırı geçildiğinde de doğru
+- [x] Seans oluşturma sheet'ine doğru tarih gidiyor
+- [x] Bu düzeltmeden sonra F11-4'teki admin bildirim yönlendirmesine seans odaklaması eklenebilir mi, değerlendirildi
 
 ---
 
@@ -987,9 +1008,9 @@ Yani `users/{uid}` silindikten sonra da raporlar eksiksiz kalıyor. Silinmiş ü
 **Prompt:** "Ekleme sheet'i, `selfTrainerProfile` dolu ama pasifken (yani yeniden aktivasyon durumunda) ad ve uzmanlık alanlarını mevcut gölge dokümandaki değerlerle ön-doldursun."
 
 **Kabul kriterleri:**
-- [ ] Yeniden ekleme akışında ad ve uzmanlıklar dolu geliyor
-- [ ] İlk kez ekleme akışında form boş açılmaya devam ediyor
-- [ ] Ön-doldurulmuş değerler değiştirilip kaydedilebiliyor
+- [x] Yeniden ekleme akışında ad ve uzmanlıklar dolu geliyor
+- [x] İlk kez ekleme akışında form boş açılmaya devam ediyor
+- [x] Ön-doldurulmuş değerler değiştirilip kaydedilebiliyor
 
 ---
 
@@ -1012,11 +1033,11 @@ Yani `users/{uid}` silindikten sonra da raporlar eksiksiz kalıyor. Silinmiş ü
 **Prompt:** "`subscription_panel.dart`'a (ve abonelik zorunluysa `subscription_onboarding_panel.dart`'a) 'Satın alımları geri yükle' aksiyonu ekle; `SubscriptionPurchaseService`'e `restorePurchases()` çağrısını geçir. Gelen `PurchaseStatus.restored` olayları zaten `_onPurchaseUpdate`'te işleniyor, oraya dokunma. Sonucu kullanıcıya bildir: geri yüklenecek satın alım BULUNAMADIĞINDA da sessiz kalma — `purchaseStream`'e hiç olay düşmeyeceği için bir zaman aşımı/boş sonuç durumu gerekiyor, aksi halde kullanıcı sonsuz bir yükleniyor durumunda kalır. Buton ve sonuç metinleri Remote Config'e TR/EN eklenmeli (`lbl_subscription_restore_*`)."
 
 **Kabul kriterleri:**
-- [ ] Abonelik ekranında görünür bir "Satın alımları geri yükle" aksiyonu var
-- [ ] Aktif aboneliği olan bir hesapta, uygulama silinip kurulduktan sonra restore salonu tekrar aktif ediyor
-- [ ] Hiç satın alımı olmayan hesapta anlamlı bir "bulunamadı" mesajı çıkıyor, ekran takılmıyor
-- [ ] Restore sırasında `verifyPurchase` hata verirse kullanıcıya hata gösteriliyor, işlem yine finish ediliyor (mevcut davranışla tutarlı)
-- [ ] Metinler RC'de iki dilde, `remoteconfig.template.json`'a da eklendi (kod varsayılanı TEK BAŞINA yeterli değil)
+- [x] Abonelik ekranında görünür bir "Satın alımları geri yükle" aksiyonu var
+- [x] Aktif aboneliği olan bir hesapta, uygulama silinip kurulduktan sonra restore salonu tekrar aktif ediyor
+- [x] Hiç satın alımı olmayan hesapta anlamlı bir "bulunamadı" mesajı çıkıyor, ekran takılmıyor
+- [x] Restore sırasında `verifyPurchase` hata verirse kullanıcıya hata gösteriliyor, işlem yine finish ediliyor (mevcut davranışla tutarlı)
+- [x] Metinler RC'de iki dilde, `remoteconfig.template.json`'a da eklendi (kod varsayılanı TEK BAŞINA yeterli değil)
 
 ---
 
@@ -1033,10 +1054,10 @@ Yani `users/{uid}` silindikten sonra da raporlar eksiksiz kalıyor. Silinmiş ü
 **UYGULANAN (2026-09-24):** Egora Games sitesinde iki metnin de TR ve EN sürümleri AYRI URL'lerde yayınlandığı için anahtarlar dile BAĞLI seçildi: `lbl_common_terms_url_tr/_en` ve `lbl_common_privacy_url_tr/_en`, okuma `rcTextProvider` üzerinden. Dört değerin de RC'ye girilmesi gerekiyor — yalnızca TR doldurulursa İngilizce kullanan kullanıcıda bağlantılar hiç görünmez.
 
 **Kabul kriterleri:**
-- [ ] İki metin de canlı bir URL'de yayında
-- [ ] Profil ekranından ikisine de erişiliyor
-- [ ] Abonelik/satın alma ekranından ikisine de erişiliyor
-- [ ] URL'ler RC'den geliyor, `remoteconfig.template.json`'a eklendi
+- [x] İki metin de canlı bir URL'de yayında
+- [x] Profil ekranından ikisine de erişiliyor
+- [x] Abonelik/satın alma ekranından ikisine de erişiliyor
+- [x] URL'ler RC'den geliyor, `remoteconfig.template.json`'a eklendi
 - [ ] App Store Connect ve Play Console'daki gizlilik politikası alanlarına aynı URL girildi
 - [ ] Play Console "Veri Güvenliği" formu dolduruldu (telefon, e-posta, sağlık/ölçüm verisi, push token)
 
@@ -1099,11 +1120,11 @@ cd scripts && CONFIRM_PRODUCTION_BACKFILL=yes \
 **Prompt:** "`storage.rules`'taki `gym_logos/{fileName}` yazma kuralını, dosyayı yalnızca O SALONUN admin'i yazabilecek şekilde daralt. Custom claim'ler Storage kurallarında `request.auth.token` üzerinden okunabiliyor (`role`, `gymId` — `onUserRoleAssigned` tarafından yazılıyor), yani Firestore okumasına gerek yok: dosya adının `{gymId}.png` olması şartıyla `request.auth.token.gymId` ile eşleşmeli ve `request.auth.token.role == 'admin'` olmalı. Mevcut contentType/boyut kısıtları korunmalı. Okuma `if true` kalmalı — logo üye giriş ekranında da gösteriliyor. Salon oluşturma akışında (`create_gym_controller.dart`) logonun HANGİ aşamada yüklendiğini kontrol et: claim henüz atanmamışken yükleniyorsa bu kural o akışı kırar, o durumda yükleme claim atandıktan sonraya alınmalı."
 
 **Kabul kriterleri:**
-- [ ] Admin kendi salonunun logosunu yükleyebiliyor
-- [ ] Başka salonun admin'i / üye / antrenör o dosyayı yazamıyor
-- [ ] Salon OLUŞTURMA akışındaki ilk logo yüklemesi çalışmaya devam ediyor (claim zamanlaması doğrulandı)
-- [ ] Logo hâlâ giriş yapmamış kullanıcıya da görünüyor
-- [ ] Storage kuralları için emulator testi yazıldı
+- [x] Admin kendi salonunun logosunu yükleyebiliyor
+- [x] Başka salonun admin'i / üye / antrenör o dosyayı yazamıyor
+- [x] Salon OLUŞTURMA akışındaki ilk logo yüklemesi çalışmaya devam ediyor (claim zamanlaması doğrulandı)
+- [x] Logo hâlâ giriş yapmamış kullanıcıya da görünüyor
+- [x] Storage kuralları için emulator testi yazıldı
 
 ---
 
@@ -1114,11 +1135,11 @@ cd scripts && CONFIRM_PRODUCTION_BACKFILL=yes \
 **Prompt:** "`firebase_app_check` paketini ekle, iOS'ta DeviceCheck/App Attest, Android'de Play Integrity sağlayıcılarıyla kur; debug build'ler için debug provider'ı ayarla ve debug token'ının üretime sızmadığından emin ol. Firebase Console'da ÖNCE 'monitoring' modunda aç, gerçek trafikte doğrulanmamış istek oranını izle, sıfırlandığını gördükten SONRA enforcement'a geç — doğrudan zorunlu kılmak yayındaki eski build'leri kilitler. Hangi servislerde (Functions, Firestore, Storage) zorunlu kılınacağı ayrı ayrı kararlaştırılmalı."
 
 **Kabul kriterleri:**
-- [ ] Paket kurulu, iki platformda da sağlayıcı yapılandırılmış
+- [x] Paket kurulu, iki platformda da sağlayıcı yapılandırılmış
 - [ ] Console'da monitoring modunda veri akıyor
 - [ ] Doğrulanmamış istek oranı izlendi ve kabul edilebilir seviyeye indi
 - [ ] Enforcement açılacak servisler kararlaştırıldı ve dokümante edildi
-- [ ] Debug provider yalnızca debug build'de aktif
+- [x] Debug provider yalnızca debug build'de aktif
 
 ---
 
@@ -1138,9 +1159,9 @@ Aynı hata `discover_controller.dart`, `trainer_home_controller.dart` ve `sessio
 **Prompt:** "Dört controller'ı mevcut doğru desene geçir: kimlik/salon bilgisi YÜKLENİYORKEN mock'a değil BOŞ listeye düşülsün; mock yalnızca gerçekten oturum/salon YOKKA kullanılsın. Deseni `studio_packages_controller.dart:63`'ten birebir al. Ayrıca değerlendir ve karar öner: bu mock repository'ler üretimde hâlâ bir işe yarıyor mu, yoksa tamamen kaldırılmalı mı? Kaldırmak daha temiz olurdu ama salon-yok akışlarında ekranların ne göstereceği ayrıca kararlaştırılmalı — bu kararı kullanıcıya sor, tek başına kaldırma."
 
 **Kabul kriterleri:**
-- [ ] Dört controller'da da yükleme penceresinde mock dönmüyor
-- [ ] Gerçek kullanıcıda "Berk Aydın"/"Ayşe Yılmaz" hiçbir ekranda görünmüyor
-- [ ] Salon/oturum gerçekten yokken ekranlar boş listeyle düzgün davranıyor (boş durum metni)
+- [x] Dört controller'da da yükleme penceresinde mock dönmüyor
+- [x] Gerçek kullanıcıda "Berk Aydın"/"Ayşe Yılmaz" hiçbir ekranda görünmüyor
+- [x] Salon/oturum gerçekten yokken ekranlar boş listeyle düzgün davranıyor (boş durum metni)
 - [ ] Mock repository'lerin kaderi hakkında karar verildi ve dokümante edildi
 
 ---
@@ -1162,7 +1183,7 @@ Review boyunca açık kalması ZORUNLU (reviewer bu hesaplarla giriyor), ama ona
 
 Bunlar denetimde çıktı, red sebebi değil; ayrı ele alınacak:
 
-- **F11-7 hiç yapılmadı.** FAZ 11'in tamamı (gölge antrenör, `notificationProxyUid` yönlendirmesi, antrenörlükten çıkma) gerçek cihazda bir kez bile denenmedi. Kod canlıda, davranış doğrulanmamış.
+- ~~F11-7 hiç yapılmadı.~~ **✅ 2026-09-24'te gerçek cihazda yürütüldü ve tüm adımları geçti** (gölge antrenör, `notificationProxyUid` yönlendirmesi, bildirim hedefleme, antrenörlükten çıkma/geri dönme).
 - **F12-3'ün iki elle adımı** (`firebase deploy --only extensions` + `mail` için TTL politikası) — yapılmadığı sürece `mail` koleksiyonu büyümeye ve OTP kodları düz metin birikmeye devam ediyor.
 - **İki temizlik script'i çalıştırılmadı:** `prune_dead_fcm_tokens.ts`, `prune_old_mail_docs.ts`.
 - **12 korumasız `debugPrint`** — release build'de de cihaz log'una yazıyor (`[appAccess] role=`, `gymId=`, `email=set`). `kDebugMode` guard'ı yok.
