@@ -22,6 +22,7 @@ import 'core/panels/panel_stack_controller.dart';
 import 'core/panels/panel_stack_view.dart';
 import 'core/perf/perf_trace.dart';
 import 'core/remote_config/remote_config_service.dart';
+import 'core/security/app_check_service.dart';
 import 'core/router/app_access.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_color_scheme.dart';
@@ -50,6 +51,12 @@ void main() async {
   PerfTrace.begin('firebase_init');
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   PerfTrace.end('firebase_init');
+
+  // F13-5 — App Check, Firebase başlatıldıktan HEMEN sonra ve diğer Firebase
+  // servisleri kullanılmadan ÖNCE etkinleştirilmeli; sonra etkinleştirilirse
+  // ilk istekler token'sız gider. Enforcement Console'dan açılana kadar
+  // davranışı değiştirmez (bkz. AppCheckService).
+  await AppCheckService.activate();
 
   // Kapalı testte uygulama testerların cihazında hiç açılmadan çöktü ve
   // elimizde tek veri "crash oluyor" mailiydi; yığın izini ancak emülatörde
