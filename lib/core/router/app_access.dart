@@ -176,7 +176,14 @@ Stream<AppAccess> appAccess(AppAccessRef ref) async* {
     // dispose edilene kadar açık kalmasın diye hemen kapatılıyor
     // (`ref.onDispose` yine de çalışır, iki kez kapatmak güvenli).
     subscription.close();
-    await controller.close();
+    // `close()` BEKLENMEZ: tek aboneli bir StreamController'da `close()`'un
+    // döndürdüğü future, `done` olayı bir dinleyiciye teslim edilince
+    // tamamlanır. Bu controller'ı dinleyen tek satır aşağıdaki
+    // `yield* controller.stream` ve oraya hiç varılmıyor — `await` konulursa
+    // generator sonsuza kadar askıda kalır, hiçbir zaman
+    // `emailSetupRequired` yield edilmez ve kullanıcı giriş başarılı olduğu
+    // halde OTP ekranında donar (üretim buildinde yaşandı, 2026-09-27).
+    unawaited(controller.close());
     PerfTrace.end('appaccess_toplam');
     yield (kind: AppAccessKind.emailSetupRequired, role: role);
     return;
