@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
+import 'package:in_app_purchase_android/in_app_purchase_android.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/locale/locale_controller.dart';
@@ -137,6 +138,18 @@ class SubscriptionController extends _$SubscriptionController {
   /// kalmaya devam ediyor çünkü o zaten kendi kararı.
   Future<void> purchase(String productId) async {
     if (_isPurchasing) return;
+
+    // F13-7 — Android'de aktif bir aboneliği olan salon BAŞKA bir plana
+    // geçiyorsa (aylık → yıllık), eski satın alma Play'e devredilmeli.
+    // Devredilmezse Play bunu bir değişiklik değil YENİ bir abonelik sayar
+    // ve salon iki kez ücretlendirilir — üstelik uygulama içinde her şey
+    // doğru görünür, çift ödeme yalnızca Play makbuzunda fark edilir.
+    //
+    // `_isPurchasing` bilerek bu adımdan SONRA kuruluyor: aşağıdaki
+    // `restorePurchases` çağrısı `_onPurchaseUpdate`'i tetikleyip satın alma
+    // durumunu sıfırlayabilirdi.
+    final replacing = await _resolvePurchaseToReplace(productId);
+
     _isPurchasing = true;
     _pendingProductId = productId;
     state = state.copyWith(
@@ -157,7 +170,7 @@ class SubscriptionController extends _$SubscriptionController {
       // üzerinden `_onPurchaseUpdate`'e gelir.
       final userCanceled = await ref
           .read(subscriptionRepositoryProvider)
-          .buySubscription(productId);
+          .buySubscription(productId, replacing: replacing);
       if (userCanceled && _isPurchasing && _pendingProductId == productId) {
         _isPurchasing = false;
         _pendingProductId = null;
@@ -174,6 +187,39 @@ class SubscriptionController extends _$SubscriptionController {
         ),
       );
     }
+  }
+
+  /// Yükseltmede devredilecek eski aboneliği bulur; yoksa `null` döner.
+  ///
+  /// Önbellek yalnızca bu oturumda görülen satın almaları taşıdığı için
+  /// (uygulama yeniden açıldığında boştur) gerekirse `restorePurchases`
+  /// çağrılıp mağazanın mevcut aboneliği akışa düşürmesi bekleniyor. Bu
+  /// bekleme sınırlı: token gelmezse yükseltme ENGELLENMİYOR, düz satın
+  /// alma olarak sürüyor — kullanıcıyı "yükseltemiyorum" diye kilitlemek,
+  /// nadir bir çift abonelik riskinden daha kötü bir sonuç olurdu.
+  Future<GooglePlayPurchaseDetails?> _resolvePurchaseToReplace(
+    String productId,
+  ) async {
+    final repo = ref.read(subscriptionRepositoryProvider);
+    // Aktif abonelik yoksa devredilecek bir şey de yok.
+    if (state.status != SubscriptionStatus.active) return null;
+    if (state.productId == productId) return null;
+
+    final cached = repo.androidPurchaseToReplace(productId);
+    if (cached != null) return cached;
+
+    try {
+      await repo.restorePurchases();
+    } catch (_) {
+      return null;
+    }
+
+    for (var i = 0; i < 10; i++) {
+      await Future<void>.delayed(const Duration(milliseconds: 300));
+      final found = repo.androidPurchaseToReplace(productId);
+      if (found != null) return found;
+    }
+    return null;
   }
 
   /// F13-1 — Apple Guideline 3.1.1: mağazadaki satın alımı yeniden
@@ -242,6 +288,12 @@ class SubscriptionController extends _$SubscriptionController {
     final gymId = ref.read(activeGymIdProvider).valueOrNull;
 
     for (final purchase in purchases) {
+      // F13-7 — yükseltmede devredilecek eski aboneliğin token'ı yalnızca
+      // bu akıştan elde edilebiliyor, o yüzden her satın alma önbelleğe
+      // alınıyor (doğrulamadan ÖNCE: doğrulama hata verse bile token'ı
+      // bilmemiz gerekiyor).
+      repo.rememberPurchase(purchase);
+
       if (purchase.status == PurchaseStatus.purchased ||
           purchase.status == PurchaseStatus.restored) {
         if (purchase.status == PurchaseStatus.restored) {

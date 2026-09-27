@@ -1,6 +1,8 @@
 import 'dart:io' show Platform;
 
 import 'package:in_app_purchase/in_app_purchase.dart';
+import 'package:in_app_purchase_android/billing_client_wrappers.dart';
+import 'package:in_app_purchase_android/in_app_purchase_android.dart';
 import 'package:in_app_purchase_storekit/in_app_purchase_storekit.dart';
 import 'package:in_app_purchase_storekit/store_kit_2_wrappers.dart' as sk2;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -17,6 +19,16 @@ part 'subscription_purchase_service.g.dart';
 class SubscriptionPurchaseService {
   final InAppPurchase _iap = InAppPurchase.instance;
   final Map<String, ProductDetails> _cache = {};
+
+  /// F13-7 — Android'de yükseltme (aylık → yıllık) için GEREKLİ olan mevcut
+  /// satın alma kayıtları, ürün kimliğine göre.
+  ///
+  /// Play, farklı bir ürün kimliği satın alındığında bunu kendiliğinden bir
+  /// "plan değişikliği" saymaz; eski satın almanın token'ı açıkça
+  /// gönderilmezse salon İKİ aboneliğe birden sahip olur ve iki kez
+  /// ücretlendirilir. Token'a ulaşmanın tek yolu `purchaseStream`'e düşen
+  /// [PurchaseDetails] nesneleri olduğu için burada tutuluyor.
+  final Map<String, GooglePlayPurchaseDetails> _androidPurchases = {};
 
   /// Son `fetchProducts()` çağrısı mağazadan gerçek ürün alamayıp
   /// [mockSubscriptionProducts]'a düştü mü — `SubscriptionOnboardingPanel`
@@ -98,7 +110,32 @@ class SubscriptionPurchaseService {
   /// bekleme durumunu hemen sıfırlayabilir); `false` ise satın alma
   /// sürüyordur/tamamlanmıştır — sonucu her zamanki gibi [purchaseUpdates]
   /// akışından bekle.
-  Future<bool> buySubscription(String productId) async {
+  /// `purchaseStream`'e düşen her satın almayı önbelleğe alır — yükseltmede
+  /// eski aboneliğin token'ı buradan okunuyor. iOS'ta gerek yok: aynı
+  /// abonelik grubundaki ürünler arasında geçişi StoreKit kendisi yönetiyor.
+  void rememberPurchase(PurchaseDetails purchase) {
+    if (purchase is! GooglePlayPurchaseDetails) return;
+    if (!gymSubscriptionProductIds.contains(purchase.productID)) return;
+    if (purchase.status != PurchaseStatus.purchased &&
+        purchase.status != PurchaseStatus.restored) {
+      return;
+    }
+    _androidPurchases[purchase.productID] = purchase;
+  }
+
+  /// [productId] DIŞINDAKİ salon aboneliklerinden önbellekte olanı döner —
+  /// yani "yükseltirken devredilecek eski abonelik".
+  GooglePlayPurchaseDetails? androidPurchaseToReplace(String productId) {
+    for (final entry in _androidPurchases.entries) {
+      if (entry.key != productId) return entry.value;
+    }
+    return null;
+  }
+
+  Future<bool> buySubscription(
+    String productId, {
+    GooglePlayPurchaseDetails? replacing,
+  }) async {
     final details = _cache[productId];
     if (details == null) {
       throw StateError('Ürün bilgisi bulunamadı, önce fetchProducts() çağrılmalı: $productId');
@@ -119,7 +156,22 @@ class SubscriptionPurchaseService {
       final result = await sk2.SK2Product.purchase(productId);
       return result == sk2.SK2ProductPurchaseResult.userCancelled;
     }
-    await _iap.buyNonConsumable(purchaseParam: PurchaseParam(productDetails: details));
+    // F13-7 — `replacing` doluysa bu bir YÜKSELTME: eski satın alma token'ı
+    // Play'e devrediliyor, böylece Play eskisini kapatıp yenisini açıyor.
+    // `chargeFullPrice`, Play Console'daki "Ödemeyi hemen al" ayarının
+    // karşılığı: yeni planın tamamı hemen tahsil edilir, eski plandan kalan
+    // süre krediye eklenir.
+    await _iap.buyNonConsumable(
+      purchaseParam: replacing == null
+          ? PurchaseParam(productDetails: details)
+          : GooglePlayPurchaseParam(
+              productDetails: details,
+              changeSubscriptionParam: ChangeSubscriptionParam(
+                oldPurchaseDetails: replacing,
+                replacementMode: ReplacementMode.chargeFullPrice,
+              ),
+            ),
+    );
     return false;
   }
 

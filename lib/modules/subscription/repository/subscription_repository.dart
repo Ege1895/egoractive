@@ -1,4 +1,5 @@
 import 'package:in_app_purchase/in_app_purchase.dart';
+import 'package:in_app_purchase_android/in_app_purchase_android.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../domain/subscription_state.dart';
@@ -15,10 +16,23 @@ abstract interface class SubscriptionRepository {
   Future<List<SubscriptionProduct>> fetchProducts({required String locale});
   /// `true` dönerse kullanıcı mağaza sayfasını iptal etmiştir — bkz.
   /// `SubscriptionPurchaseService.buySubscription`.
-  Future<bool> buySubscription(String productId);
+  ///
+  /// [replacing] doluysa bu bir YÜKSELTME'dir (Android): eski abonelik
+  /// Play'e devredilir, yenisi onun yerine geçer.
+  Future<bool> buySubscription(
+    String productId, {
+    GooglePlayPurchaseDetails? replacing,
+  });
 
   /// Apple Guideline 3.1.1 — geçmiş satın alımları mağazadan geri ister.
   Future<void> restorePurchases();
+
+  /// Yükseltmede devredilecek eski aboneliği bulabilmek için gelen her
+  /// satın almayı önbelleğe alır (yalnızca Android'de anlamlı).
+  void rememberPurchase(PurchaseDetails purchase);
+
+  /// [productId] dışındaki, önbellekteki aktif Android aboneliği.
+  GooglePlayPurchaseDetails? androidPurchaseToReplace(String productId);
   Future<void> completePurchase(PurchaseDetails purchase);
   Future<void> verifyPurchase({required String gymId, required PurchaseDetails purchase});
 
@@ -46,6 +60,14 @@ class SubscriptionRepositoryImpl implements SubscriptionRepository {
   Future<void> restorePurchases() => _purchaseService.restorePurchases();
 
   @override
+  void rememberPurchase(PurchaseDetails purchase) =>
+      _purchaseService.rememberPurchase(purchase);
+
+  @override
+  GooglePlayPurchaseDetails? androidPurchaseToReplace(String productId) =>
+      _purchaseService.androidPurchaseToReplace(productId);
+
+  @override
   Future<bool> isAvailable() => _purchaseService.isAvailable();
 
   @override
@@ -53,7 +75,8 @@ class SubscriptionRepositoryImpl implements SubscriptionRepository {
       _purchaseService.fetchProducts(locale: locale);
 
   @override
-  Future<bool> buySubscription(String productId) => _purchaseService.buySubscription(productId);
+  Future<bool> buySubscription(String productId, {GooglePlayPurchaseDetails? replacing}) =>
+      _purchaseService.buySubscription(productId, replacing: replacing);
 
   @override
   Future<void> completePurchase(PurchaseDetails purchase) => _purchaseService.completePurchase(purchase);
