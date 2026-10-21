@@ -16,6 +16,7 @@ import '../../../../shared/widgets/legal_links.dart';
 import '../../controller/subscription_controller.dart';
 import '../../domain/subscription_state.dart';
 import '../widgets/plan_labels.dart';
+import '../widgets/restore_purchases_button.dart';
 import '../widgets/subscription_products_unavailable.dart';
 import '../../../../shared/utils/date_labels.dart';
 
@@ -441,7 +442,7 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
                     .read(subscriptionControllerProvider.notifier)
                     .purchase(_selectedProductId!),
         ),
-        _PurchaseFooter(subscription: subscription),
+        const _PurchaseFooter(),
       ],
     );
   }
@@ -648,7 +649,7 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
             ),
             onTap: _openStoreSubscriptionManagement,
           ),
-        if (showYearlyUpgrade) _PurchaseFooter(subscription: subscription),
+        if (showYearlyUpgrade) const _PurchaseFooter(),
       ],
     );
   }
@@ -825,7 +826,7 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
                     .read(subscriptionControllerProvider.notifier)
                     .purchase(_selectedProductId!),
         ),
-        _PurchaseFooter(subscription: subscription),
+        const _PurchaseFooter(),
       ],
     );
   }
@@ -1736,71 +1737,17 @@ class _PendingCta extends StatelessWidget {
 /// Politikası bağlantıları. Profil ekranındaki kopya tek başına yeterli
 /// sayılmıyor; bağlantıların satın alma butonunun yanında olması gerekiyor.
 class _PurchaseFooter extends StatelessWidget {
-  const _PurchaseFooter({required this.subscription});
-
-  final SubscriptionState subscription;
+  const _PurchaseFooter();
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _RestorePurchasesRow(subscription: subscription),
+        const SizedBox(height: AppSpacing.sm),
+        const RestorePurchasesButton(),
         const LegalLinks(centered: true),
       ],
-    );
-  }
-}
-
-class _RestorePurchasesRow extends ConsumerWidget {
-  const _RestorePurchasesRow({required this.subscription});
-
-  final SubscriptionState subscription;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final colors = context.appColors;
-    final typography = context.appTypography;
-
-    return Padding(
-      padding: const EdgeInsets.only(top: AppSpacing.md),
-      child: Column(
-        children: [
-          if (subscription.restoreMessage != null) ...[
-            Text(
-              subscription.restoreMessage!,
-              textAlign: TextAlign.center,
-              style: typography.bodyMedium.copyWith(
-                color: colors.onSurfaceMuted,
-                fontSize: 13,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.sm),
-          ],
-          TextButton(
-            onPressed: subscription.isRestoring
-                ? null
-                : () => ref
-                      .read(subscriptionControllerProvider.notifier)
-                      .restorePurchases(),
-            child: Text(
-              ref.watch(
-                rcTextProvider(
-                  subscription.isRestoring
-                      ? RemoteConfigKeys.subscriptionRestoreInProgress
-                      : RemoteConfigKeys.subscriptionRestoreButton,
-                ),
-              ),
-              style: typography.bodyMedium.copyWith(
-                color: subscription.isRestoring
-                    ? colors.onSurfaceMuted
-                    : colors.primary,
-                fontSize: 13,
-              ),
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

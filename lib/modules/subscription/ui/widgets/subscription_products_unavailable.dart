@@ -6,6 +6,7 @@ import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/legal_links.dart';
+import 'restore_purchases_button.dart';
 
 /// Mağazadan abonelik planları alınamadığında (bağlantı hatası, ürün
 /// yapılandırması eksik vb.) abonelik ekranlarında planların yerine
@@ -61,7 +62,8 @@ class SubscriptionProductsUnavailable extends ConsumerWidget {
               ),
               onPressed: onRetry,
             ),
-            const SizedBox(height: AppSpacing.lg),
+            const SizedBox(height: AppSpacing.sm),
+            const RestorePurchasesButton(),
             const LegalLinks(centered: true),
           ],
         ),

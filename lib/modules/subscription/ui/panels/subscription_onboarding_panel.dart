@@ -15,6 +15,7 @@ import '../../controller/subscription_controller.dart';
 import '../../domain/subscription_state.dart';
 import '../../../../shared/widgets/legal_links.dart';
 import '../widgets/plan_labels.dart';
+import '../widgets/restore_purchases_button.dart';
 import '../widgets/subscription_products_unavailable.dart';
 
 /// F6-1e — Yeni salon oluşturan admin'in girişten hemen sonra gördüğü,
@@ -315,8 +316,10 @@ class _SubscriptionOnboardingPanelState
                     .read(subscriptionControllerProvider.notifier)
                     .purchase(_selectedProductId!),
         ),
-        const SizedBox(height: AppSpacing.md),
-        // Apple 3.1.2(c) — bağlantılar satın alma butonunun hemen altında.
+        const SizedBox(height: AppSpacing.xs),
+        // Apple 3.1.1 + 3.1.2(c) — geri yükleme ve hukuki bağlantılar satın
+        // alma butonunun hemen altında, satın almayla ilgili her şey bir arada.
+        const RestorePurchasesButton(),
         const LegalLinks(centered: true),
       ],
     );
