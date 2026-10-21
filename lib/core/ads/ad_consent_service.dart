@@ -4,6 +4,7 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../constants/ad_constants.dart';
+import '../diagnostics/non_fatal.dart';
 
 part 'ad_consent_service.g.dart';
 
@@ -32,7 +33,13 @@ class AdConsentService {
         await ConsentForm.loadAndShowConsentFormIfRequired((_) {});
         completer.complete(await ConsentInformation.instance.canRequestAds());
       },
-      (_) => completer.complete(false),
+      (error) {
+        reportNonFatal(
+          'ads.consent',
+          'UMP ${error.errorCode}: ${error.message}',
+        );
+        completer.complete(false);
+      },
     );
 
     return completer.future;
@@ -40,4 +47,5 @@ class AdConsentService {
 }
 
 @riverpod
-AdConsentService adConsentService(AdConsentServiceRef ref) => const AdConsentService();
+AdConsentService adConsentService(AdConsentServiceRef ref) =>
+    const AdConsentService();

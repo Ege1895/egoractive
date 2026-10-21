@@ -5,6 +5,7 @@ import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:in_app_purchase_android/in_app_purchase_android.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../core/diagnostics/non_fatal.dart';
 import '../../../core/locale/locale_controller.dart';
 import '../../../core/theme/theme_controller.dart';
 import '../domain/subscription_state.dart';
@@ -83,9 +84,16 @@ class SubscriptionController extends _$SubscriptionController {
     );
   }
 
-  Future<List<SubscriptionProduct>> fetchProducts() => ref
-      .read(subscriptionRepositoryProvider)
-      .fetchProducts(locale: ref.read(localeControllerProvider));
+  Future<List<SubscriptionProduct>> fetchProducts() async {
+    try {
+      return await ref
+          .read(subscriptionRepositoryProvider)
+          .fetchProducts(locale: ref.read(localeControllerProvider));
+    } catch (error, stack) {
+      reportNonFatal('subscription.products', error, stack);
+      rethrow;
+    }
+  }
 
   /// `isPurchasing`, satın alma sadece başlatılırken değil — mağaza
   /// penceresi açıkken sonuç [_onPurchaseUpdate] üzerinden gelene kadar
@@ -136,7 +144,8 @@ class SubscriptionController extends _$SubscriptionController {
         _pendingProductId = null;
         state = state.copyWith(isPurchasing: false, pendingProductId: null);
       }
-    } catch (_) {
+    } catch (error, stack) {
+      reportNonFatal('subscription.purchase', error, stack);
       _isPurchasing = false;
       _pendingProductId = null;
       state = state.copyWith(
@@ -214,7 +223,8 @@ class SubscriptionController extends _$SubscriptionController {
 
     try {
       await ref.read(subscriptionRepositoryProvider).restorePurchases();
-    } catch (_) {
+    } catch (error, stack) {
+      reportNonFatal('subscription.restore', error, stack);
       _finishRestore(RemoteConfigKeys.subscriptionRestoreError);
       return;
     }
