@@ -31,6 +31,13 @@ Her adımdan sonra kısa bir durum ver. Canlıyı etkileyen her işlemden (deplo
 - **Hedef: build 28** = 27 + FAZ 14.
 - `pubspec.yaml` şu an `1.0.0+27`.
 
+## 1b. 2026-10-21 oturum sonu güncellemesi (bunu önce oku)
+
+- **F14-2 commitlendi ve pushlandı** (`ed48e9f`) — aşağıdaki 2. bölüm artık yalnızca bilgi amaçlı; deploy (3. bölüm) hâlâ yapılmadı.
+- **F14-1 commitlendi ve pushlandı** (`638d497`): `_PurchaseFooter` (geri yükle + bağlantılar) deneme/süresi dolmuş/yıllığa geç ekranlarında; `LegalLinks` muaf, onboarding ve "tekrar dene" ekranlarında; plan kartında yenilenme dönemi (`plan_labels.dart`, RC `lbl_subscription_period_monthly/yearly`); ürün sorgusuna 15 sn zaman aşımı (emülatörde sonsuz yükleme yeniden üretildi ve düzeltildi). Emülatörde görsel olarak doğrulandı. Yıllık planın aylık karşılığı (birim fiyat) eklenmedi — Apple "uygunsa" diyor, isteğe bağlı.
+- **YENİ GÖREV F14-7 — abonelik test hesabı (canlı veri, onay al):** Demo salon muaf olduğu için abonelik ekranında satın alma butonu YOK; reviewer demo hesapla abonelik test edemiyor. Muaf OLMAYAN, aboneliği olmayan ayrı bir demo salon + admin oluştur: telefon `+905555550001`, `otpBypassEnabled: true`, `email` dolu (başka hesapta kullanılmayan), custom claim `role: admin` + `gymId`. Mevcut admin/salon oluşturma Cloud Function'larını ve `scripts/enable_closed_test_accounts.ts`'i incele, aynı yolla oluştur. App Review Notes metni bu hesabı varsayıyor. Yayın sonrası OTP bypass kapatılırken bu hesap da listeye girmeli.
+- Kullanıcı yaptı: Paid Apps Agreement onaylandı, abonelik Availability ayarlandı, Privacy Policy URL dolu. Ekran görüntüsü, IAP gönderimi, build 28, ekran kaydı build'den sonra.
+
 ## 2. Çalışma dizinindeki commitlenmemiş değişiklikler (ilk iş)
 
 F14-2 kodu hazır ama commitlenmedi. `git status` ile doğrula; beklenen:
