@@ -135,7 +135,7 @@
     },
     "cfg_subscription_mock_start_enabled": {
       "defaultValue": {
-        "value": "true"
+        "value": "false"
       },
       "description": "true iken mağaza ürünleri yoksa admin gerçek satın alma yapmadan trial başlatabilir (mock). Store canlı olunca client otomatik gerçek akışa geçer — bu sadece ek bir güvenlik kapağı.",
       "valueType": "BOOLEAN"
@@ -9730,6 +9730,45 @@
     "lbl_subscription_start_error_en": {
       "defaultValue": {
         "value": "Could not start, please try again."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_products_unavailable_title_tr": {
+      "defaultValue": {
+        "value": "Abonelik planları yüklenemedi"
+      },
+      "valueType": "STRING",
+      "description": "Mağazadan abonelik planları alınamadığında başlık."
+    },
+    "lbl_subscription_products_unavailable_title_en": {
+      "defaultValue": {
+        "value": "Couldn't load subscription plans"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_products_unavailable_body_tr": {
+      "defaultValue": {
+        "value": "Mağazaya şu an ulaşılamıyor. İnternet bağlantını kontrol edip tekrar dene."
+      },
+      "valueType": "STRING",
+      "description": "Mağazadan abonelik planları alınamadığında açıklama."
+    },
+    "lbl_subscription_products_unavailable_body_en": {
+      "defaultValue": {
+        "value": "The store can't be reached right now. Check your internet connection and try again."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_products_retry_tr": {
+      "defaultValue": {
+        "value": "Tekrar dene"
+      },
+      "valueType": "STRING",
+      "description": "Abonelik planları yüklenemediğinde yeniden deneme butonu."
+    },
+    "lbl_subscription_products_retry_en": {
+      "defaultValue": {
+        "value": "Try again"
       },
       "valueType": "STRING"
     },

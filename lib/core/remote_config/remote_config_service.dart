@@ -75,12 +75,9 @@ abstract final class RemoteConfigKeys {
 
   /// `true` iken yeni oluşturulan bir salonun admin'i, girişten hemen sonra
   /// zorunlu [SubscriptionOnboardingPanel]'e (geri butonu yok, pakete abone
-  /// olmadan atlanamaz) yönlendirilir. Mağaza ürünleri (App Store Connect/
-  /// Play Console) henüz canlıya alınmadıysa `SubscriptionPurchaseService`
-  /// mock veriyle açar (bkz. `mockSubscriptionProducts`) — ekran boş
-  /// kalmaz, tasarım/test amaçlı görüntülenip gezilebilir; gerçek satın alma
-  /// denemesi güvenle başarısız olur. Gerekirse test amaçlı Console'dan
-  /// `false` yapılabilir (`allowPastDatetimeCreation` ile aynı desen).
+  /// olmadan atlanamaz) yönlendirilir. Mağaza ürünleri alınamazsa ekran
+  /// planların yerine "tekrar dene" durumunu gösterir. Gerekirse test
+  /// amaçlı Console'dan `false` yapılabilir (`allowPastDatetimeCreation` ile aynı desen).
   static const requireSubscriptionOnboarding =
       'cfg_require_subscription_onboarding';
 
@@ -1508,6 +1505,14 @@ abstract final class RemoteConfigKeys {
   static const notificationsSelectMemberError =
       'lbl_notifications_select_member_error';
   static const subscriptionStartError = 'lbl_subscription_start_error';
+
+  /// Mağazadan abonelik planları alınamadığında planların yerine gösterilen
+  /// durum ([SubscriptionProductsUnavailable]).
+  static const subscriptionProductsUnavailableTitle =
+      'lbl_subscription_products_unavailable_title';
+  static const subscriptionProductsUnavailableBody =
+      'lbl_subscription_products_unavailable_body';
+  static const subscriptionProductsRetry = 'lbl_subscription_products_retry';
   static const subscriptionPurchaseStartError =
       'lbl_subscription_purchase_start_error';
   static const subscriptionAccountAlreadyUsedError =
@@ -3608,7 +3613,17 @@ class RemoteConfigService {
     'lbl_notifications_select_member_error_en':
         'Select at least one member first.',
     'lbl_subscription_start_error_tr': 'Başlatılamadı, tekrar dene.',
+    'lbl_subscription_products_unavailable_title_tr':
+        'Abonelik planları yüklenemedi',
+    'lbl_subscription_products_unavailable_body_tr':
+        'Mağazaya şu an ulaşılamıyor. İnternet bağlantını kontrol edip tekrar dene.',
+    'lbl_subscription_products_retry_tr': 'Tekrar dene',
     'lbl_subscription_start_error_en': 'Could not start, please try again.',
+    'lbl_subscription_products_unavailable_title_en':
+        "Couldn't load subscription plans",
+    'lbl_subscription_products_unavailable_body_en':
+        "The store can't be reached right now. Check your internet connection and try again.",
+    'lbl_subscription_products_retry_en': 'Try again',
     'lbl_subscription_purchase_start_error_tr':
         'Satın alma başlatılamadı, mağaza bağlantısını kontrol edip tekrar dene.',
     'lbl_subscription_purchase_start_error_en':

@@ -13,6 +13,7 @@ import '../../../../shared/widgets/app_loading_indicator.dart';
 import '../../../auth/controller/auth_controller.dart';
 import '../../controller/subscription_controller.dart';
 import '../../domain/subscription_state.dart';
+import '../widgets/subscription_products_unavailable.dart';
 
 /// F6-1e — Yeni salon oluşturan admin'in girişten hemen sonra gördüğü,
 /// atlanamayan abonelik başlatma ekranı. `app_access.dart`/`main.dart`'ın
@@ -43,9 +44,7 @@ class _SubscriptionOnboardingPanelState
   @override
   void initState() {
     super.initState();
-    _productsFuture = ref
-        .read(subscriptionControllerProvider.notifier)
-        .fetchProducts();
+    _loadProducts();
   }
 
   @override
@@ -53,6 +52,12 @@ class _SubscriptionOnboardingPanelState
 
   bool _isYearly(String productId) =>
       productId == gymYearlySubscriptionProductId;
+
+  void _loadProducts() {
+    _productsFuture = ref
+        .read(subscriptionControllerProvider.notifier)
+        .fetchProducts();
+  }
 
   /// Satın alma CTA'sındaki `{plan}` yer tutucusu için — mağazadan gelen ham
   /// ürün başlığı ("Egoractive Business - Yıllık Plan" gibi, App Store
@@ -155,6 +160,11 @@ class _SubscriptionOnboardingPanelState
                       return const Center(child: AppLoadingIndicator());
                     }
                     final products = snapshot.data ?? const [];
+                    if (snapshot.hasError || products.isEmpty) {
+                      return SubscriptionProductsUnavailable(
+                        onRetry: () => setState(_loadProducts),
+                      );
+                    }
                     _ensureSelection(products);
                     return _buildBody(
                       context,
@@ -202,9 +212,7 @@ class _SubscriptionOnboardingPanelState
               RemoteConfigKeys.subscriptionOnboardingNoProducts,
               locale,
             ),
-            style: typography.bodyMedium.copyWith(
-              color: colors.onSurfaceMuted,
-            ),
+            style: typography.bodyMedium.copyWith(color: colors.onSurfaceMuted),
           )
         else
           for (final product in products)
@@ -215,11 +223,17 @@ class _SubscriptionOnboardingPanelState
                 selected: product.id == _selectedProductId,
                 busy: subscription.isPurchasing,
                 badge: _isYearly(product.id)
-                    ? rc.getText(RemoteConfigKeys.subscriptionYearlyBadge, locale)
+                    ? rc.getText(
+                        RemoteConfigKeys.subscriptionYearlyBadge,
+                        locale,
+                      )
                     : null,
                 subLabel: _isYearly(product.id)
                     ? rc.getText(RemoteConfigKeys.subscriptionYearlySub, locale)
-                    : rc.getText(RemoteConfigKeys.subscriptionMonthlySub, locale),
+                    : rc.getText(
+                        RemoteConfigKeys.subscriptionMonthlySub,
+                        locale,
+                      ),
                 onTap: subscription.isPurchasing
                     ? null
                     : () => setState(() => _selectedProductId = product.id),
@@ -271,7 +285,10 @@ class _SubscriptionOnboardingPanelState
                   {'plan': _planWord(selected.id)},
                 )
               : _fill(
-                  rc.getText(RemoteConfigKeys.subscriptionOnboardingCta, locale),
+                  rc.getText(
+                    RemoteConfigKeys.subscriptionOnboardingCta,
+                    locale,
+                  ),
                   {'plan': _planWord(selected.id), 'days': days},
                 ),
           caption: subscription.trialUsed
@@ -283,27 +300,18 @@ class _SubscriptionOnboardingPanelState
                   {'store': _storeName},
                 )
               : _fill(
-                  rc.getText(RemoteConfigKeys.subscriptionOnboardingCaption, locale),
+                  rc.getText(
+                    RemoteConfigKeys.subscriptionOnboardingCaption,
+                    locale,
+                  ),
                   {'days': days, 'store': _storeName},
                 ),
           busy: subscription.isPurchasing,
           onTap: _selectedProductId == null || subscription.isPurchasing
               ? null
-              : () {
-                  final controller = ref.read(
-                    subscriptionControllerProvider.notifier,
-                  );
-                  // GEÇİCİ — mağaza ürünleri henüz canlı değilken (bkz.
-                  // SubscriptionPurchaseService.lastFetchWasMock) gerçek
-                  // satın alma yerine mock başlatmayı kullan; store
-                  // ürünleri canlı olunca bu otomatik olarak gerçek akışa
-                  // döner, elle bir şey değiştirmen gerekmez.
-                  if (controller.lastFetchWasMock) {
-                    controller.startMockSubscription(_selectedProductId!);
-                  } else {
-                    controller.purchase(_selectedProductId!);
-                  }
-                },
+              : () => ref
+                    .read(subscriptionControllerProvider.notifier)
+                    .purchase(_selectedProductId!),
         ),
       ],
     );
@@ -335,7 +343,9 @@ class _OnboardingPlanCard extends StatelessWidget {
     return Opacity(
       opacity: busy && !selected ? 0.45 : 1,
       child: Material(
-        color: selected ? colors.primary.withValues(alpha: 0.08) : colors.surface,
+        color: selected
+            ? colors.primary.withValues(alpha: 0.08)
+            : colors.surface,
         borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
         child: InkWell(
           onTap: onTap,
@@ -444,7 +454,9 @@ class _OnboardingPlanCard extends StatelessWidget {
                     Text(
                       subLabel,
                       style: typography.caption.copyWith(
-                        color: selected ? colors.secondary : colors.onSurfaceMuted,
+                        color: selected
+                            ? colors.secondary
+                            : colors.onSurfaceMuted,
                         fontSize: 12,
                       ),
                     ),
@@ -574,7 +586,9 @@ class _OnboardingCta extends StatelessWidget {
                       label,
                       style: typography.headingSmall.copyWith(
                         fontSize: 17,
-                        color: disabled ? colors.onSurfaceMuted : colors.onPrimary,
+                        color: disabled
+                            ? colors.onSurfaceMuted
+                            : colors.onPrimary,
                       ),
                     ),
             ),

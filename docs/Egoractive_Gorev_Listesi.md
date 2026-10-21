@@ -1191,3 +1191,104 @@ Bunlar denetimde çıktı, red sebebi değil; ayrı ele alınacak:
 - **Android `minifyEnabled` açıkça ayarlanmamış** (varsayılan kapalı) → 84 MB `.aab`.
 - **35 commit `main`'e merge edilmemiş** — üretim build'i `feature/theme-delete-and-recurring-year` dalından alınıyor.
 - **RC'de kodda kullanılmayan 54 `lbl_` anahtarı** — zararsız, temizlik.
+
+---
+
+## FAZ 14 — Apple İncelemesi: Abonelik Uyumluluğu (3.1.2(c) + 2.1(b))
+
+**Bağlam (2026-10-21):** App Store, 1.0 (24)'ü üçüncü kez reddetti. Üç gerekçe:
+
+1. **3.1.2(c):** Uygulama içinde Kullanım Koşulları (EULA) ve Gizlilik Politikası bağlantıları satın alma noktasında yok; App Store açıklamasında da Kullanım Koşulları bağlantısı yok (her dilde olmalı).
+2. **2.1(b):** İki abonelik ürünü (aylık/yıllık) incelemeye hiç gönderilmemiş. Apple ürünlerle birlikte **yeni bir build** istiyor.
+3. **2.1(b):** Plana dokununca "hiçbir işlem ilerlemedi" (iPad Air 11 inç, iPadOS 27.0.1).
+
+**Kök neden analizi:**
+- Ürünler gönderilmediği için reviewer cihazında StoreKit hiç ürün döndürmedi. Uygulama bu durumda **sahte (mock) planlar** gösteriyor (`subscription_purchase_service.dart:57`, `mockSubscriptionProducts` — `subscription_state.dart:91`). Plana dokununca Apple ödeme penceresi yerine `startMockSubscription` Cloud Function'ı çağrılıyor (`subscription_panel.dart:930` `_purchaseOrMockStart`). Reviewer'ın gördüğü "hiçbir şey olmadı" budur.
+- `startMockSubscription` (`functions/src/callable/start-mock-subscription.ts`) **ödeme almadan** salonu `trial` yapıyor ve her çağrıda `trialStartedAt`'ı sıfırlıyor → sınırsız ücretsiz deneme. RC `cfg_subscription_mock_start_enabled` canlıda `true`; Play'deki build 25'te de aktif. Apple bunu 3.1.1 (IAP dışı içerik açma) sayar — mevcut redlerden daha ağır.
+- Hukuki bağlantılar (`LegalLinks`) yalnızca **bir** satın alma noktasında var. Demo salon muaf (`subscriptionExempt: true`) olduğu için reviewer büyük ihtimalle bağlantısız `_exemptView`'ı gördü.
+
+| Satın alma noktası | Dosya / metot | `LegalLinks` |
+|---|---|---|
+| Muaf salon abonelik ekranı | `subscription_panel.dart` `_exemptView` (~227) | ❌ |
+| Deneme/abonesiz salon | `subscription_panel.dart` `_trialView` (~360) | ✅ (satır 437) |
+| Aktif abone — "yıllığa geç" | `subscription_panel.dart` `_activeView` (~444) | ❌ |
+| Süresi dolmuş/iptal | `subscription_panel.dart` `_expiredView` (~643) | ❌ |
+| Satın alma sürüyor | `subscription_panel.dart` `_pendingView` (~817) | ❌ (kontrol et) |
+| Yeni salonun zorunlu paywall'ı | `subscription_onboarding_panel.dart` | ❌ |
+
+**🔴 KRİTİK hatırlatma (CLAUDE.md):** Bu faz abonelik sistemine dokunuyor. Her task sonunda `functions/src/http/reset-gym-subscription.ts` (`resetGymSubscription`) ve `docs/Abonelik_Iptal_Rehberi.docx`'ün etkilenip etkilenmediği kontrol edilmeli. Mock akışı `subscriptionHistory`'ye `source: "mock"` kayıtları yazmıştı — sıfırlama aracının bunları da kapsayıp kapsamadığı F14-2'de değerlendirilmeli.
+
+---
+
+### F14-1 — Hukuki bağlantıları TÜM satın alma noktalarına ekle (Apple 3.1.2(c))
+
+**Prompt:** "`LegalLinks(centered: true)` widget'ını yukarıdaki tablodaki her satın alma noktasına, satın alma butonunun hemen altına ekle (`_trialView`'daki yerleşimi örnek al). `subscription_onboarding_panel.dart` dahil. Bağlantılar RC `lbl_common_terms_url_*` / `lbl_common_privacy_url_*`'tan geliyor; URL boşsa `LegalLinks` satırı gizliyor — canlı RC'de iki dilde de dolu olduğunu doğrula. Ayrıca her plan kartında Apple'ın istediği üç bilginin görünür olduğunu doğrula: **abonelik adı, süre (aylık/yıllık), fiyat** (yıllıkta mümkünse aylık karşılığı). Eksikse ekle; metinler RC'den gelmeli (hardcode yok)."
+
+**Kabul kriterleri:**
+- [ ] Altı satın alma noktasının hepsinde Kullanım Koşulları + Gizlilik bağlantısı görünüyor ve tıklanınca doğru dildeki sayfayı açıyor
+- [ ] Her plan kartında ad, süre ve fiyat görünüyor
+- [ ] iPad (iPad Air 11 inç) ve iPhone'da bağlantılar ekranda görünür (taşma/kırpılma yok)
+- [ ] Widget testi: her görünümde `LegalLinks` render ediliyor
+
+### F14-2 — Mock abonelik yolunu kaldır (Apple 2.1(b) + 3.1.1 riski)
+
+**Prompt:** "Mağaza ürün döndürmediğinde sahte plan gösterme ve `startMockSubscription` ile ödeme almadan deneme başlatma akışını kaldır. Yerine: ürünler yüklenemezse planların yerine açık bir hata mesajı ve 'Tekrar dene' butonu göster (metinler RC'den). `_purchaseOrMockStart` doğrudan `controller.purchase`'a dönsün; `lastFetchWasMock` ve `mockSubscriptionProducts` kaldırılsın. `startMockSubscription` callable'ı `functions/src/index.ts`'den çıkarılıp deploy'da silinsin. Canlıdaki eski sürümler (Play build 25) hâlâ çağırabileceği için silmeden ÖNCE RC'de `cfg_subscription_mock_start_enabled=false` yap. Satın alma başarısız olduğunda (ürün yok, StoreKit hatası, iptal dışı her durum) kullanıcıya görünür bir mesaj gösterildiğinden emin ol — sessiz kalan hiçbir dal olmasın."
+
+**Kabul kriterleri:**
+- [~] RC `cfg_subscription_mock_start_enabled=false` — şablonda yapıldı, **canlıya deploy edilmedi**
+- [x] Ürün yüklenemezse hata + tekrar dene görünüyor; sahte fiyat hiçbir yerde görünmüyor (kod + widget testi; cihazda görsel doğrulama yapılmadı)
+- [x] Plana dokunmak her zaman gerçek `purchase`'ı çağırıyor (mock dalı silindi)
+- [~] `startMockSubscription` kaynaktan ve `index.ts`'den kaldırıldı (`git rm`), **deploy ile silinmedi**
+- [ ] `resetGymSubscription` ve `Abonelik_Iptal_Rehberi.docx` değerlendirildi (mock kayıtlar)
+- [ ] Firestore'da `subscriptionHistory` altında `source: "mock"` kayıtlarının hangi salonlarda olduğu listelendi; temizlik kararı kullanıcıya soruldu
+
+### F14-3 — Sessiz hataları logla (teşhis)
+
+**Prompt:** "Şu yerlerde hata sessizce yutuluyor, hepsine hata kodunu yazan `debugPrint` + Crashlytics non-fatal ekle (davranış değişmesin): `ad_consent_service.dart` hata callback'i, `ad_banner_widget.dart` `onAdFailedToLoad`, `ad_interstitial_gate.dart` `onAdFailedToLoad`/`onAdFailedToShowFullScreenContent`, abonelik ürün sorgusu (`queryProductDetails` boş/hata) ve satın alma hataları."
+
+**Kabul kriterleri:**
+- [ ] Reklam ve rıza hataları logda kodlarıyla görünüyor
+- [ ] Ürün yüklenemediğinde ve satın alma başarısız olduğunda Crashlytics'e non-fatal düşüyor
+
+### F14-4 — Üye demo hesabına e-posta ekle (veri, build gerektirmez)
+
+`+905335330000` (`XyrJtfwrt8Ol2ueZiBzI`) dokümanında `email`/`emailLower` boş → reviewer üye hesabıyla girince "E-posta adresini ekle" ekranında kalıyor (OTP bypass bu ekranda geçmiyor). Kullanıcının belirleyeceği, başka hesapta kullanılmayan bir adres yazılmalı.
+
+- [ ] Adres kullanıcıdan alındı ve yazıldı
+- [ ] Emülatörde üye demo hesabıyla `000000` → doğrudan ana ekran
+
+### F14-5 — Build 28 + sandbox satın alma testi (göndermeden ÖNCE)
+
+**Prompt:** "F14-1…F14-3 bittikten sonra build numarasını 28 yap, iki platformun build'ini al (CLAUDE.md §7). Build'i TestFlight'a yükle. Gerçek bir iPhone ve iPad'de sandbox test hesabıyla aylık ve yıllık planı ayrı ayrı satın al; Apple ödeme penceresinin açıldığını, aboneliğin aktifleştiğini (`subscriptionStatus: active`), 'satın alımları geri yükle'nin çalıştığını ve hukuki bağlantıların açıldığını doğrula. Bu akışın ekran kaydını al (Apple cevapta istiyor)."
+
+**Kabul kriterleri:**
+- [ ] Build 28 iki platformda alındı, commitlendi, pushlandı
+- [ ] App Store Connect'te sandbox test hesabı var
+- [ ] iPhone + iPad'de iki plan da sandbox'ta satın alınabiliyor
+- [ ] Ekran kaydı hazır (bağlantılar + plan seçimi + Apple ödeme penceresi)
+- [ ] (İsteğe bağlı) iPad görünümü kontrol edildi — reviewer iPad kullanıyor
+
+### F14-6 — App Store Connect (kullanıcı tarafı)
+
+- [ ] **Business → Agreements:** Paid Apps Agreement "Active"; banka ve vergi bilgileri tamam
+- [ ] İki abonelik aynı abonelik grubunda; görünen ad, açıklama, TR+EN dil, fiyat dolu
+- [ ] Her aboneliğe **App Review ekran görüntüsü** eklendi; durum "Ready to Submit"
+- [ ] Sürüm 1.0 → **In-App Purchases and Subscriptions** bölümünde iki ürün de seçili
+- [ ] Sürümün build'i 28
+- [ ] **Açıklama (TR ve EN):** sonuna Kullanım Koşulları ve Gizlilik Politikası bağlantıları eklendi
+- [ ] **Privacy Policy URL** alanı dolu (TR ve EN); isteğe bağlı: EULA alanına kendi koşullarımız
+- [ ] **Notes:** abonelik ekranına nasıl gidileceği + iş modeli özeti + demo hesaplar
+- [ ] Apple'ın mesajına ekran kaydıyla cevap verildi, ardından incelemeye gönderildi
+- [ ] Web sitesi: destek, hesap silme ve `app-ads.txt` sayfaları yayında (bkz. konuşma notu 2026-10-21)
+
+### FAZ 14 — Oturum sonu durumu (2026-10-21)
+
+**Commitlenmemiş çalışma dizini (F14-2 kodu):**
+- Silindi: `functions/src/callable/start-mock-subscription.ts` (+ `functions/src/index.ts` export'u), `mockSubscriptionProducts` (`subscription_state.dart`), `lastFetchWasMock`/`startMockSubscription` (purchase service, verification service, repository, controller), `_purchaseOrMockStart` (`subscription_panel.dart`).
+- Eklendi: `SubscriptionProductsUnavailableException` (`subscription_purchase_service.dart` — boş/hatalı ürün yanıtında fırlatılır), `lib/modules/subscription/ui/widgets/subscription_products_unavailable.dart` (hata + "Tekrar dene"), RC anahtarları `lbl_subscription_products_unavailable_title/_body`, `lbl_subscription_products_retry` (kod varsayılanları + `remoteconfig.template.json`), `test/modules/subscription/subscription_products_unavailable_test.dart`.
+- `remoteconfig.template.json`: yeni anahtarlar + `cfg_subscription_mock_start_enabled` → `false`.
+- Doğrulama: `flutter analyze lib` = eski 10 info, `flutter test` 182/182, functions `npm test` 130/130.
+
+**App Store Connect'te tespit edilen yeni bulgu:** Abonelik sayfası "You must set availability for your subscription" diyor → aboneliklerin satış ülkeleri seçilmemiş. StoreKit'in reviewer cihazında boş dönmesinin en olası sebebi bu (mock değil). Ayrıca "Review Information screenshot" eksik.
+
+**Sıradaki adımlar:** `docs/Sonraki_Oturum_Promptu.md`.

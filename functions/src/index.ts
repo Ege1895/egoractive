@@ -13,7 +13,6 @@ export { deleteAccount } from "./callable/delete-account";
 export { deactivateTrainer } from "./callable/deactivate-trainer";
 export { listPartnerGyms } from "./callable/list-partner-gyms";
 export { verifySubscriptionPurchase } from "./callable/verify-subscription-purchase";
-export { startMockSubscription } from "./callable/start-mock-subscription";
 export { sendManualNotification } from "./callable/send-manual-notification";
 export { onUserRoleAssigned } from "./triggers/on-user-role-assigned";
 export { onUserWriteSyncPhoneIndex } from "./triggers/on-user-write-sync-phone-index";

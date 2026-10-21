@@ -87,46 +87,6 @@ class SubscriptionController extends _$SubscriptionController {
       .read(subscriptionRepositoryProvider)
       .fetchProducts(locale: ref.read(localeControllerProvider));
 
-  /// Bkz. `SubscriptionPurchaseService.lastFetchWasMock` — `fetchProducts()`
-  /// tamamlanana kadar `false`.
-  bool get lastFetchWasMock =>
-      ref.read(subscriptionRepositoryProvider).lastFetchWasMock;
-
-  /// GEÇİCİ — mağaza ürünleri henüz canlı değilken [purchase] yerine bunu
-  /// çağırır (bkz. `startMockSubscription` callable'ındaki yorum). Gerçek
-  /// bir mağaza işlemi olmadığı için `_onPurchaseUpdate` akışından
-  /// geçmiyor — başarı/hata burada doğrudan ele alınıyor.
-  Future<void> startMockSubscription(String productId) async {
-    if (_isPurchasing) return;
-    final gymId = ref.read(activeGymIdProvider).valueOrNull;
-    if (gymId == null) return;
-    _isPurchasing = true;
-    _pendingProductId = productId;
-    state = state.copyWith(
-      isPurchasing: true,
-      pendingProductId: productId,
-      purchaseErrorMessage: null,
-    );
-    try {
-      await ref
-          .read(subscriptionRepositoryProvider)
-          .startMockSubscription(gymId: gymId, productId: productId);
-      _isPurchasing = false;
-      _pendingProductId = null;
-      state = state.copyWith(isPurchasing: false, pendingProductId: null);
-    } catch (_) {
-      _isPurchasing = false;
-      _pendingProductId = null;
-      state = state.copyWith(
-        isPurchasing: false,
-        pendingProductId: null,
-        purchaseErrorMessage: ref.read(
-          rcTextProvider(RemoteConfigKeys.subscriptionStartError),
-        ),
-      );
-    }
-  }
-
   /// `isPurchasing`, satın alma sadece başlatılırken değil — mağaza
   /// penceresi açıkken sonuç [_onPurchaseUpdate] üzerinden gelene kadar
   /// (satın alındı/geri yüklendi/hata/iptal) `true` kalır, ekran "mağaza

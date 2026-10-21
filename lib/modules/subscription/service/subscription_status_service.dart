@@ -16,31 +16,40 @@ class SubscriptionStatusService {
   final RemoteConfigService _remoteConfig;
 
   Stream<SubscriptionState> watchState(String gymId) {
-    return FirebaseFirestore.instance.collection('gyms').doc(gymId).snapshots().map((doc) {
-      final data = doc.data();
-      final statusRaw = data?['subscriptionStatus'] as String?;
-      final status = SubscriptionStatus.values.firstWhere(
-        (s) => s.name == statusRaw,
-        orElse: () => SubscriptionStatus.none,
-      );
-      final trialStartedAt = (data?['trialStartedAt'] as Timestamp?)?.toDate();
-      final trialEndsAt = trialStartedAt?.add(Duration(days: _remoteConfig.trialDurationDays));
+    return FirebaseFirestore.instance
+        .collection('gyms')
+        .doc(gymId)
+        .snapshots()
+        .map((doc) {
+          final data = doc.data();
+          final statusRaw = data?['subscriptionStatus'] as String?;
+          final status = SubscriptionStatus.values.firstWhere(
+            (s) => s.name == statusRaw,
+            orElse: () => SubscriptionStatus.none,
+          );
+          final trialStartedAt = (data?['trialStartedAt'] as Timestamp?)
+              ?.toDate();
+          final trialEndsAt = trialStartedAt?.add(
+            Duration(days: _remoteConfig.trialDurationDays),
+          );
 
-      return SubscriptionState(
-        status: status,
-        trialStartedAt: trialStartedAt,
-        trialEndsAt: trialEndsAt,
-        startedAt: (data?['subscriptionStartedAt'] as Timestamp?)?.toDate(),
-        expiresAt: (data?['subscriptionExpiresAt'] as Timestamp?)?.toDate(),
-        productId: data?['subscriptionProductId'] as String?,
-        trialUsed: (data?['trialUsed'] as bool?) ?? false,
-        subscriptionExempt: (data?['subscriptionExempt'] as bool?) ?? false,
-      );
-    });
+          return SubscriptionState(
+            status: status,
+            trialStartedAt: trialStartedAt,
+            trialEndsAt: trialEndsAt,
+            startedAt: (data?['subscriptionStartedAt'] as Timestamp?)?.toDate(),
+            expiresAt: (data?['subscriptionExpiresAt'] as Timestamp?)?.toDate(),
+            productId: data?['subscriptionProductId'] as String?,
+            trialUsed: (data?['trialUsed'] as bool?) ?? false,
+            subscriptionExempt: (data?['subscriptionExempt'] as bool?) ?? false,
+          );
+        });
   }
 }
 
 @riverpod
-SubscriptionStatusService subscriptionStatusService(SubscriptionStatusServiceRef ref) {
+SubscriptionStatusService subscriptionStatusService(
+  SubscriptionStatusServiceRef ref,
+) {
   return SubscriptionStatusService(ref.watch(remoteConfigServiceProvider));
 }

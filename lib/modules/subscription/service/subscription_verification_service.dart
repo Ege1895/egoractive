@@ -13,8 +13,13 @@ part 'subscription_verification_service.g.dart';
 class SubscriptionVerificationService {
   const SubscriptionVerificationService();
 
-  Future<void> verifyPurchase({required String gymId, required PurchaseDetails purchase}) {
-    final callable = FirebaseFunctions.instance.httpsCallable('verifySubscriptionPurchase');
+  Future<void> verifyPurchase({
+    required String gymId,
+    required PurchaseDetails purchase,
+  }) {
+    final callable = FirebaseFunctions.instance.httpsCallable(
+      'verifySubscriptionPurchase',
+    );
     return callable.call<void>({
       'gymId': gymId,
       'productId': purchase.productID,
@@ -22,18 +27,11 @@ class SubscriptionVerificationService {
       'verificationData': purchase.verificationData.serverVerificationData,
     });
   }
-
-  /// GEÇİCİ — mağaza ürünleri henüz canlı değilken (bkz.
-  /// `SubscriptionPurchaseService.lastFetchWasMock`) gerçek satın alma
-  /// yerine bunu çağırır — `startMockSubscription` callable'ı gerçek bir
-  /// doğrulama yapmadan salonu `trial`a geçirir.
-  Future<void> startMockSubscription({required String gymId, required String productId}) {
-    final callable = FirebaseFunctions.instance.httpsCallable('startMockSubscription');
-    return callable.call<void>({'gymId': gymId, 'productId': productId});
-  }
 }
 
 @riverpod
-SubscriptionVerificationService subscriptionVerificationService(SubscriptionVerificationServiceRef ref) {
+SubscriptionVerificationService subscriptionVerificationService(
+  SubscriptionVerificationServiceRef ref,
+) {
   return const SubscriptionVerificationService();
 }

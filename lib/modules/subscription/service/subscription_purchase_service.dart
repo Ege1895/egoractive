@@ -30,13 +30,6 @@ class SubscriptionPurchaseService {
   /// [PurchaseDetails] nesneleri olduğu için burada tutuluyor.
   final Map<String, GooglePlayPurchaseDetails> _androidPurchases = {};
 
-  /// Son `fetchProducts()` çağrısı mağazadan gerçek ürün alamayıp
-  /// [mockSubscriptionProducts]'a düştü mü — `SubscriptionOnboardingPanel`
-  /// bunu görüp CTA'yı gerçek satın alma yerine `startMockSubscription`
-  /// callable'ına yönlendirir (bkz. o dosyadaki yorum). Mağaza gerçek ürün
-  /// döndürmeye başlar başlamaz bu otomatik olarak `false` olur.
-  bool lastFetchWasMock = false;
-
   Stream<List<PurchaseDetails>> get purchaseUpdates => _iap.purchaseStream;
 
   Future<bool> isAvailable() => _iap.isAvailable();
@@ -48,21 +41,26 @@ class SubscriptionPurchaseService {
   /// bunu bir zaman aşımıyla ele alıyor).
   Future<void> restorePurchases() => _iap.restorePurchases();
 
-  Future<List<SubscriptionProduct>> fetchProducts({required String locale}) async {
+  Future<List<SubscriptionProduct>> fetchProducts({
+    required String locale,
+  }) async {
     final response = await _iap.queryProductDetails(gymSubscriptionProductIds);
     _cache
       ..clear()
       ..addEntries(response.productDetails.map((p) => MapEntry(p.id, p)));
 
-    lastFetchWasMock = response.productDetails.isEmpty;
-    if (lastFetchWasMock) {
-      // Mağaza ürünleri henüz App Store Connect/Play Console'da
-      // yayınlanmadıysa (bkz. docs/Abonelik_Store_Kurulumu.md) gerçek bir
-      // yanıt hiç gelmez — ekran boş kalıp test/inceleme için kullanılamaz
-      // hale gelirdi. `_cache` boş bırakılır (mock ürünler için satın alma
-      // denemesi zaten `buySubscription`'da StateError ile güvenle
-      // reddedilir), sadece görüntüleme için sahte veri döndürülür.
-      return mockSubscriptionProducts(locale);
+    // Mağaza ürün döndürmezse (bağlantı hatası, ürün yapılandırması ya da
+    // bölge uygunluğu eksik, Paid Apps Agreement yürürlükte değil) ekranda
+    // sahte plan göstermek yerine hata fırlatılır; abonelik ekranları bunu
+    // "tekrar dene" durumu olarak gösterir. Önceden burada mock planlar
+    // dönüyordu ve plana dokunmak ödeme almadan deneme başlatıyordu —
+    // Apple incelemesinde "plana dokununca hiçbir şey olmadı" reddine yol
+    // açtı (2026-10-21).
+    if (response.error != null || response.productDetails.isEmpty) {
+      throw SubscriptionProductsUnavailableException(
+        response.error?.message ??
+            'notFound: ${response.notFoundIDs.join(', ')}',
+      );
     }
 
     return response.productDetails
@@ -88,7 +86,8 @@ class SubscriptionPurchaseService {
   /// üzerinden (sıfır fiyatlı `pricingPhase`) benzer şekilde eklenmeli.
   int? _freeTrialDays(ProductDetails product) {
     if (product is! AppStoreProduct2Details) return null;
-    final offers = product.sk2Product.subscription?.promotionalOffers ?? const [];
+    final offers =
+        product.sk2Product.subscription?.promotionalOffers ?? const [];
     final freeTrial = offers
         .where(
           (o) =>
@@ -138,7 +137,9 @@ class SubscriptionPurchaseService {
   }) async {
     final details = _cache[productId];
     if (details == null) {
-      throw StateError('Ürün bilgisi bulunamadı, önce fetchProducts() çağrılmalı: $productId');
+      throw StateError(
+        'Ürün bilgisi bulunamadı, önce fetchProducts() çağrılmalı: $productId',
+      );
     }
     if (Platform.isIOS) {
       // `InAppPurchase.buyNonConsumable`, StoreKit2 altyapısında native
@@ -175,10 +176,23 @@ class SubscriptionPurchaseService {
     return false;
   }
 
-  Future<void> completePurchase(PurchaseDetails purchase) => _iap.completePurchase(purchase);
+  Future<void> completePurchase(PurchaseDetails purchase) =>
+      _iap.completePurchase(purchase);
 }
 
 @riverpod
-SubscriptionPurchaseService subscriptionPurchaseService(SubscriptionPurchaseServiceRef ref) {
+SubscriptionPurchaseService subscriptionPurchaseService(
+  SubscriptionPurchaseServiceRef ref,
+) {
   return SubscriptionPurchaseService();
+}
+
+/// Mağazadan abonelik ürünleri alınamadığında `fetchProducts` bunu fırlatır.
+class SubscriptionProductsUnavailableException implements Exception {
+  const SubscriptionProductsUnavailableException(this.reason);
+
+  final String reason;
+
+  @override
+  String toString() => 'SubscriptionProductsUnavailableException: $reason';
 }

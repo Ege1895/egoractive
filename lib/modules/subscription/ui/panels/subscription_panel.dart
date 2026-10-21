@@ -15,6 +15,7 @@ import '../../../../shared/widgets/app_back_button.dart';
 import '../../../../shared/widgets/legal_links.dart';
 import '../../controller/subscription_controller.dart';
 import '../../domain/subscription_state.dart';
+import '../widgets/subscription_products_unavailable.dart';
 import '../../../../shared/utils/date_labels.dart';
 
 /// Mağazadan gerçek ücretsiz deneme süresi okunabildiyse (bkz.
@@ -71,9 +72,7 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
   @override
   void initState() {
     super.initState();
-    _productsFuture = ref
-        .read(subscriptionControllerProvider.notifier)
-        .fetchProducts();
+    _loadProducts();
   }
 
   @override
@@ -85,6 +84,12 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
 
   bool _isYearly(String productId) =>
       productId == gymYearlySubscriptionProductId;
+
+  void _loadProducts() {
+    _productsFuture = ref
+        .read(subscriptionControllerProvider.notifier)
+        .fetchProducts();
+  }
 
   /// Satın alma CTA'sındaki `{plan}` yer tutucusu için — mağazadan gelen ham
   /// ürün başlığı ("Egoractive Business — Yıllık" gibi) yerine sadece
@@ -176,6 +181,19 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
                   final products = snapshot.data ?? const [];
                   if (subscription.subscriptionExempt) {
                     return _exemptView(context, rc, products);
+                  }
+                  // Aktif abone planlara ihtiyaç duymadan durumunu görebilmeli;
+                  // ürünler yüklenemezse yalnızca "yıllığa geç" kartı gizlenir.
+                  // Satın alma gerektiren diğer durumlarda sahte plan yerine
+                  // "tekrar dene" gösterilir.
+                  final needsProducts =
+                      subscription.isPurchasing ||
+                      subscription.status != SubscriptionStatus.active;
+                  if (needsProducts &&
+                      (snapshot.hasError || products.isEmpty)) {
+                    return SubscriptionProductsUnavailable(
+                      onRetry: () => setState(_loadProducts),
+                    );
                   }
                   _ensureSelection(products);
                   return _buildForState(context, products, subscription, rc);
@@ -428,7 +446,9 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
           ),
           onTap: _selectedProductId == null
               ? null
-              : () => _purchaseOrMockStart(_selectedProductId!),
+              : () => ref
+                    .read(subscriptionControllerProvider.notifier)
+                    .purchase(_selectedProductId!),
         ),
         _RestorePurchasesRow(subscription: subscription),
         // F13-2 — Apple 3.1.2, bu bağlantıların SATIN ALMA NOKTASINDA da
@@ -623,7 +643,9 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
               rc.getText(RemoteConfigKeys.subscriptionPurchaseCaption, locale),
               {'store': _storeName},
             ),
-            onTap: () => _purchaseOrMockStart(yearlyProduct.id),
+            onTap: () => ref
+                .read(subscriptionControllerProvider.notifier)
+                .purchase(yearlyProduct.id),
           )
         else
           _SecondaryCta(
@@ -806,7 +828,9 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
           ),
           onTap: _selectedProductId == null
               ? null
-              : () => _purchaseOrMockStart(_selectedProductId!),
+              : () => ref
+                    .read(subscriptionControllerProvider.notifier)
+                    .purchase(_selectedProductId!),
         ),
       ],
     );
@@ -922,19 +946,6 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
     'store': _storeName,
     'storeAccount': _storeAccountName,
   };
-
-  /// GEÇİCİ — mağaza ürünleri henüz canlı değilken (bkz.
-  /// `SubscriptionPurchaseService.lastFetchWasMock`) gerçek satın alma
-  /// yerine mock başlatmayı kullan; store canlı olunca otomatik gerçek
-  /// akışa döner.
-  void _purchaseOrMockStart(String productId) {
-    final controller = ref.read(subscriptionControllerProvider.notifier);
-    if (controller.lastFetchWasMock) {
-      controller.startMockSubscription(productId);
-    } else {
-      controller.purchase(productId);
-    }
-  }
 
   /// "Aboneliği yönet" — cihazın kendi abonelik yönetim sayfasını açar.
   /// Uygulama içinde plan değişikliği/iptal işlemi yok, hepsi mağazada.
@@ -1719,7 +1730,6 @@ class _PendingCta extends StatelessWidget {
     );
   }
 }
-
 
 /// F13-1 — Apple Guideline 3.1.1: "Satın alımları geri yükle".
 ///

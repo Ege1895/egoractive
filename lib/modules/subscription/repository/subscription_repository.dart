@@ -14,6 +14,7 @@ abstract interface class SubscriptionRepository {
   Stream<List<PurchaseDetails>> get purchaseUpdates;
   Future<bool> isAvailable();
   Future<List<SubscriptionProduct>> fetchProducts({required String locale});
+
   /// `true` dönerse kullanıcı mağaza sayfasını iptal etmiştir — bkz.
   /// `SubscriptionPurchaseService.buySubscription`.
   ///
@@ -34,27 +35,30 @@ abstract interface class SubscriptionRepository {
   /// [productId] dışındaki, önbellekteki aktif Android aboneliği.
   GooglePlayPurchaseDetails? androidPurchaseToReplace(String productId);
   Future<void> completePurchase(PurchaseDetails purchase);
-  Future<void> verifyPurchase({required String gymId, required PurchaseDetails purchase});
-
-  /// Son `fetchProducts()` çağrısı gerçek mağaza ürünü bulamayıp mock
-  /// veriye mi düştü — bkz. `SubscriptionPurchaseService.lastFetchWasMock`.
-  bool get lastFetchWasMock;
-
-  Future<void> startMockSubscription({required String gymId, required String productId});
+  Future<void> verifyPurchase({
+    required String gymId,
+    required PurchaseDetails purchase,
+  });
 }
 
 class SubscriptionRepositoryImpl implements SubscriptionRepository {
-  const SubscriptionRepositoryImpl(this._statusService, this._purchaseService, this._verificationService);
+  const SubscriptionRepositoryImpl(
+    this._statusService,
+    this._purchaseService,
+    this._verificationService,
+  );
 
   final SubscriptionStatusService _statusService;
   final SubscriptionPurchaseService _purchaseService;
   final SubscriptionVerificationService _verificationService;
 
   @override
-  Stream<SubscriptionState> watchState(String gymId) => _statusService.watchState(gymId);
+  Stream<SubscriptionState> watchState(String gymId) =>
+      _statusService.watchState(gymId);
 
   @override
-  Stream<List<PurchaseDetails>> get purchaseUpdates => _purchaseService.purchaseUpdates;
+  Stream<List<PurchaseDetails>> get purchaseUpdates =>
+      _purchaseService.purchaseUpdates;
 
   @override
   Future<void> restorePurchases() => _purchaseService.restorePurchases();
@@ -75,23 +79,24 @@ class SubscriptionRepositoryImpl implements SubscriptionRepository {
       _purchaseService.fetchProducts(locale: locale);
 
   @override
-  Future<bool> buySubscription(String productId, {GooglePlayPurchaseDetails? replacing}) =>
-      _purchaseService.buySubscription(productId, replacing: replacing);
+  Future<bool> buySubscription(
+    String productId, {
+    GooglePlayPurchaseDetails? replacing,
+  }) => _purchaseService.buySubscription(productId, replacing: replacing);
 
   @override
-  Future<void> completePurchase(PurchaseDetails purchase) => _purchaseService.completePurchase(purchase);
+  Future<void> completePurchase(PurchaseDetails purchase) =>
+      _purchaseService.completePurchase(purchase);
 
   @override
-  Future<void> verifyPurchase({required String gymId, required PurchaseDetails purchase}) {
-    return _verificationService.verifyPurchase(gymId: gymId, purchase: purchase);
-  }
-
-  @override
-  bool get lastFetchWasMock => _purchaseService.lastFetchWasMock;
-
-  @override
-  Future<void> startMockSubscription({required String gymId, required String productId}) {
-    return _verificationService.startMockSubscription(gymId: gymId, productId: productId);
+  Future<void> verifyPurchase({
+    required String gymId,
+    required PurchaseDetails purchase,
+  }) {
+    return _verificationService.verifyPurchase(
+      gymId: gymId,
+      purchase: purchase,
+    );
   }
 }
 
