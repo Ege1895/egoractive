@@ -44,7 +44,9 @@ Her adımdan sonra kısa bir durum ver. Canlıyı etkileyen her işlemden (deplo
 - **Build 28 alındı, commitlendi, pushlandı** (`ed44dbc`): `28 (1.0.0).aab` (versionCode=28 doğrulandı), iOS `FLUTTER_BUILD_NUMBER=28`.
 - **Canlı RC ↔ şablon farkı kontrol edildi:** canlıda olup şablonda olmayan parametre YOK; fark yalnızca 10 yeni metin anahtarı + `cfg_subscription_mock_start_enabled` true→false. Deploy güvenli, **kullanıcı onayı bekleniyor**.
 - **F14-7 değişti:** abonelik test hesabını kullanıcı uygulamadan kendisi oluşturacak (yeni salon → zorunlu abonelik ekranı, abone olmadan kapatacak). Bize kalan: o hesaba `otpBypassEnabled: true` yazmak (onayla) ve Notes'taki numarayı güncellemek. Bu hesap girişte doğrudan abonelik ekranını açar.
-- F14-4 için e-posta adresi kullanıcıdan bekleniyor.
+- F14-4 için e-posta adresi kullanıcıdan bekleniyor (kullanıcının boş adresi kalmadı; seçenekler: üye demo hesabını notlardan çıkarmak ya da bypass hesaplarının e-posta kurulumunu atlaması için kod değişikliği).
+- **DEPLOY YAPILDI (2026-10-21):** Remote Config canlıda (10 yeni anahtar, mock bayrağı false); functions deploy başarılı, `startMockSubscription` silindi (`firebase functions:list` ile doğrulandı).
+- **`egoragames@gmail.com` Texas Gym admininden (`K8UXu6FR5nPAw5o6KNOH`, +905333003030) kaldırıldı** (kullanıcı isteği); kullanıcı bu adresle abonelik test hesabı/salonu oluşturacak. Texas Gym admini sonraki girişte e-posta kurulum ekranına düşer.
 
 ## 2. Çalışma dizinindeki commitlenmemiş değişiklikler (ilk iş)
 
