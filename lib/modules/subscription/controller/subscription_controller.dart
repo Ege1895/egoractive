@@ -253,6 +253,18 @@ class SubscriptionController extends _$SubscriptionController {
     state = state.copyWith(restoreMessage: null);
   }
 
+  /// Yalnızca mağazanın tamamlanmasını beklediği satın almalar tamamlanır
+  /// (eklentinin önerdiği `pendingCompletePurchase` kontrolü); iptal ve
+  /// boş kayıtlar atlanır. Tamamlama hatası akışı asla kesmez.
+  Future<void> _completeSafely(PurchaseDetails purchase) async {
+    if (!purchase.pendingCompletePurchase) return;
+    try {
+      await ref.read(subscriptionRepositoryProvider).completePurchase(purchase);
+    } catch (error, stack) {
+      reportNonFatal('subscription.complete', error, stack);
+    }
+  }
+
   Future<void> _onPurchaseUpdate(List<PurchaseDetails> purchases) async {
     final repo = ref.read(subscriptionRepositoryProvider);
     final gymId = ref.read(activeGymIdProvider).valueOrNull;
@@ -302,7 +314,7 @@ class SubscriptionController extends _$SubscriptionController {
                   );
           }
         }
-        await repo.completePurchase(purchase);
+        await _completeSafely(purchase);
         _isPurchasing = false;
         _pendingProductId = null;
         state = state.copyWith(
@@ -312,7 +324,13 @@ class SubscriptionController extends _$SubscriptionController {
         );
       } else if (purchase.status == PurchaseStatus.error ||
           purchase.status == PurchaseStatus.canceled) {
-        await repo.completePurchase(purchase);
+        // Bekleme durumu ÖNCE kapatılır. Android'de kullanıcı Play ödeme
+        // penceresini kapatınca eklenti Play'e özgü olmayan, boş bir kayıt
+        // gönderiyor; önceden ona `completePurchase` çağrılıyor, eklenti tip
+        // dönüşümünde hata fırlatıyor ve aşağıdaki satırlara hiç
+        // gelinmediği için ekran sonsuza kadar "yükleniyor"da kalıyordu
+        // (gerçek cihazda yaşandı, 2026-10-22).
+        await _completeSafely(purchase);
         _isPurchasing = false;
         _pendingProductId = null;
         state = state.copyWith(

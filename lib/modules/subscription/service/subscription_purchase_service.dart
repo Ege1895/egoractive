@@ -1,5 +1,6 @@
 import 'dart:io' show Platform;
 
+import 'package:flutter/foundation.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:in_app_purchase_android/billing_client_wrappers.dart';
 import 'package:in_app_purchase_android/in_app_purchase_android.dart';
@@ -56,9 +57,15 @@ class SubscriptionPurchaseService {
           onTimeout: () =>
               throw const SubscriptionProductsUnavailableException('timeout'),
         );
+    // Play, bir aboneliğin base plan'ını ve her teklifini (ör. 14 günlük
+    // ücretsiz deneme) AYRI bir ürün kaydı olarak döndürüyor; teklif
+    // tanımlanınca ekranda aynı plan iki kez (biri "Ücretsiz" fiyatlı)
+    // çıkıyor ve hangi teklifin satın alınacağı belirsiz kalıyordu. Her
+    // abonelik için tek kayıt seçilir (bkz. [_pickAndroidOffer]).
+    final products = _onePerProduct(response.productDetails);
     _cache
       ..clear()
-      ..addEntries(response.productDetails.map((p) => MapEntry(p.id, p)));
+      ..addEntries(products.map((p) => MapEntry(p.id, p)));
 
     // Mağaza ürün döndürmezse (bağlantı hatası, ürün yapılandırması ya da
     // bölge uygunluğu eksik, Paid Apps Agreement yürürlükte değil) ekranda
@@ -74,46 +81,7 @@ class SubscriptionPurchaseService {
       );
     }
 
-    return response.productDetails
-        .map(
-          (p) => SubscriptionProduct(
-            id: p.id,
-            title: p.title,
-            description: p.description,
-            price: p.price,
-            trialDays: _freeTrialDays(p),
-          ),
-        )
-        .toList();
-  }
-
-  /// Mağazada bu ürün için tanımlı ücretsiz deneme (Introductory Offer →
-  /// Free Trial) varsa gün cinsinden süresini döner — bulunamazsa `null`
-  /// (ekran bu durumda RC'deki sabit metne düşer, bkz. `SubscriptionProduct`
-  /// yorumu). Şu an sadece iOS/StoreKit2 destekleniyor: Android/Play
-  /// Billing tarafı, Play Console kurulumu tamamlanmadan (henüz gerçek
-  /// ürün dönmediği için) test edilemiyor — kurulum bittiğinde
-  /// `GooglePlayProductDetails.productDetails.subscriptionOfferDetails`
-  /// üzerinden (sıfır fiyatlı `pricingPhase`) benzer şekilde eklenmeli.
-  int? _freeTrialDays(ProductDetails product) {
-    if (product is! AppStoreProduct2Details) return null;
-    final offers =
-        product.sk2Product.subscription?.promotionalOffers ?? const [];
-    final freeTrial = offers
-        .where(
-          (o) =>
-              o.type == sk2.SK2SubscriptionOfferType.introductory &&
-              o.paymentMode == sk2.SK2SubscriptionOfferPaymentMode.freeTrial,
-        )
-        .firstOrNull;
-    if (freeTrial == null) return null;
-    final unitDays = switch (freeTrial.period.unit) {
-      sk2.SK2SubscriptionPeriodUnit.day => 1,
-      sk2.SK2SubscriptionPeriodUnit.week => 7,
-      sk2.SK2SubscriptionPeriodUnit.month => 30,
-      sk2.SK2SubscriptionPeriodUnit.year => 365,
-    };
-    return freeTrial.period.value * unitDays;
+    return products.map(toSubscriptionProduct).toList();
   }
 
   /// `true` dönerse kullanıcı mağaza sayfasını iptal etmiştir (çağıran taraf
@@ -189,6 +157,116 @@ class SubscriptionPurchaseService {
 
   Future<void> completePurchase(PurchaseDetails purchase) =>
       _iap.completePurchase(purchase);
+}
+
+/// Mağaza ürünlerini ekranda gösterilecek abonelik listesine çevirir:
+/// Android'de her abonelik için tek teklif seçilir, fiyat yenilenme
+/// fiyatıdır, deneme süresi seçilen tekliften okunur.
+@visibleForTesting
+List<ProductDetails> selectSubscriptionOffers(List<ProductDetails> all) =>
+    _onePerProduct(all);
+
+@visibleForTesting
+SubscriptionProduct toSubscriptionProduct(ProductDetails p) =>
+    SubscriptionProduct(
+      id: p.id,
+      title: p.title,
+      description: p.description,
+      price: _recurringPrice(p),
+      trialDays: _freeTrialDays(p),
+    );
+
+/// iOS'ta her abonelik zaten tek kayıttır. Android'de aynı abonelik için
+/// gelen kayıtlardan [_pickAndroidOffer] ile biri seçilir.
+List<ProductDetails> _onePerProduct(List<ProductDetails> all) {
+  final byId = <String, List<ProductDetails>>{};
+  for (final p in all) {
+    byId.putIfAbsent(p.id, () => []).add(p);
+  }
+  return [
+    for (final offers in byId.values)
+      offers.length == 1 ? offers.single : _pickAndroidOffer(offers),
+  ];
+}
+
+/// Play yalnızca kullanıcının UYGUN olduğu teklifleri döndürür; bu yüzden
+/// listede ücretsiz deneme teklifi varsa kullanıcı denemeye uygundur ve
+/// o seçilir (Play penceresi "14 gün ücretsiz, sonra …" gösterir). Yoksa
+/// (ör. daha önce abone olmuş hesap) teklifsiz base plan seçilir.
+ProductDetails _pickAndroidOffer(List<ProductDetails> offers) {
+  final google = offers.whereType<GooglePlayProductDetails>().toList();
+  final freeTrial = google.where((p) => _freeTrialPhase(p) != null);
+  if (freeTrial.isNotEmpty) return freeTrial.first;
+  final basePlan = google.where((p) => _offerOf(p)?.offerId == null);
+  return basePlan.isNotEmpty ? basePlan.first : offers.first;
+}
+
+SubscriptionOfferDetailsWrapper? _offerOf(GooglePlayProductDetails p) {
+  final index = p.subscriptionIndex;
+  final offers = p.productDetails.subscriptionOfferDetails;
+  if (index == null || offers == null || index >= offers.length) return null;
+  return offers[index];
+}
+
+PricingPhaseWrapper? _freeTrialPhase(GooglePlayProductDetails p) {
+  final phases = _offerOf(p)?.pricingPhases ?? const [];
+  if (phases.length < 2 || phases.first.priceAmountMicros != 0) return null;
+  return phases.first;
+}
+
+/// Planın kartta gösterilecek fiyatı. Android'de deneme teklifinin ilk
+/// aşaması "Ücretsiz" olduğu için yenilenen (son) aşamanın fiyatı
+/// kullanılır; iOS'ta ürün fiyatı zaten yenilenme fiyatıdır.
+String _recurringPrice(ProductDetails p) {
+  if (p is GooglePlayProductDetails) {
+    final phases = _offerOf(p)?.pricingPhases;
+    if (phases != null && phases.isNotEmpty) {
+      return phases.last.formattedPrice;
+    }
+  }
+  return p.price;
+}
+
+/// Mağazada bu ürün için tanımlı ücretsiz deneme (Introductory Offer →
+/// Free Trial) varsa gün cinsinden süresini döner — bulunamazsa `null`
+/// (ekran bu durumda RC'deki sabit metne düşer, bkz. `SubscriptionProduct`
+/// yorumu). Android'de seçilen teklifin sıfır fiyatlı ilk aşamasından,
+/// iOS'ta StoreKit2'nin tanıtım teklifinden okunur.
+int? _freeTrialDays(ProductDetails product) {
+  if (product is GooglePlayProductDetails) {
+    final phase = _freeTrialPhase(product);
+    return phase == null ? null : _isoPeriodDays(phase.billingPeriod);
+  }
+  if (product is! AppStoreProduct2Details) return null;
+  final offers = product.sk2Product.subscription?.promotionalOffers ?? const [];
+  final freeTrial = offers
+      .where(
+        (o) =>
+            o.type == sk2.SK2SubscriptionOfferType.introductory &&
+            o.paymentMode == sk2.SK2SubscriptionOfferPaymentMode.freeTrial,
+      )
+      .firstOrNull;
+  if (freeTrial == null) return null;
+  final unitDays = switch (freeTrial.period.unit) {
+    sk2.SK2SubscriptionPeriodUnit.day => 1,
+    sk2.SK2SubscriptionPeriodUnit.week => 7,
+    sk2.SK2SubscriptionPeriodUnit.month => 30,
+    sk2.SK2SubscriptionPeriodUnit.year => 365,
+  };
+  return freeTrial.period.value * unitDays;
+}
+
+/// Play'in ISO 8601 süre biçimi (P14D, P2W, P1M, P1Y) → gün.
+int? _isoPeriodDays(String period) {
+  final match = RegExp(r'^P(\d+)([DWMY])$').firstMatch(period);
+  if (match == null) return null;
+  final value = int.parse(match.group(1)!);
+  return switch (match.group(2)) {
+    'D' => value,
+    'W' => value * 7,
+    'M' => value * 30,
+    _ => value * 365,
+  };
 }
 
 @riverpod
