@@ -42,9 +42,11 @@ Her adımdan sonra kısa bir durum ver. Canlıyı etkileyen her işlemden (deplo
 
 App Store'a **build 30 + iki abonelik + abonelik grubu** aynı gönderimde incelemeye gönderildi (önce sürüm tek başına gitmişti; iptal edilip üçü birlikte gönderildi). Notes, açıklama bağlantıları, EULA, IAP ekran görüntüleri, ekran kayıtlı cevap tamam (kullanıcı beyanı).
 
+**Android (2026-10-22):** build 31 (`dbffec4`) Play'e gidecek: Play ödeme penceresi kapatılınca sonsuz yüklenme düzeltildi, ücretsiz deneme teklifi seçimi eklendi (`e97d4f8`). Play Console'da iki aboneliğe 14 günlük ücretsiz deneme TEKLİFİ (offer) tanımlanmalı ve etkinleştirilmeli; base plan'daki "Ek süre / ücretsiz kullanım süresi" deneme DEĞİL, ödeme başarısızlığı ek süresidir. App Store'da build 30 incelemede kalabilir (değişiklikler yalnızca Android).
+
 **Onay sonrası yapılacaklar:**
 - Dört test hesabının OTP bypass'ını kapat: admin `ifKPfciCrKH0Qqvj2NgI`, antrenör `r2SHvpzvai6zaP2YYnRt`, üye `XyrJtfwrt8Ol2ueZiBzI`, abonelik testi `ku8Tv1mTYsgyO8nnKTwN` (GymFit) → `cd scripts && CONFIRM_PRODUCTION_BACKFILL=yes npm run audit-otp-bypass -- --allow-production --revoke`. Play incelemesi de bitmiş olmalı.
-- Play'e `30 (1.0.0).aab` (canlıda 25 var, giriş donması içeriyor).
+- Play'e `31 (1.0.0).aab` (canlıda 25 var, giriş donması içeriyor).
 - Texas Gym admininin (`K8UXu6FR5nPAw5o6KNOH`) e-postası kaldırıldı; sonraki girişinde e-posta kurulumu ister.
 - İsteğe bağlı iyileştirmeler: aktif abone ekranında (yıllık abone) geri yükle + bağlantılar her zaman görünsün; abonelik ürünlerine İngilizce yerelleştirme (ASC); siteye `account-deletion` sayfası (Kullanım Koşulları'ndaki bağlantı 404) ve Apple EULA bölümü (TR+EN).
 
