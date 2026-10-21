@@ -1513,6 +1513,11 @@ abstract final class RemoteConfigKeys {
   static const subscriptionProductsUnavailableBody =
       'lbl_subscription_products_unavailable_body';
   static const subscriptionProductsRetry = 'lbl_subscription_products_retry';
+
+  /// Plan kartında fiyatın altındaki satırın başı — yenilenme dönemi
+  /// (Apple 3.1.2(c): süre satın alma noktasında açıkça görünmeli).
+  static const subscriptionPeriodMonthly = 'lbl_subscription_period_monthly';
+  static const subscriptionPeriodYearly = 'lbl_subscription_period_yearly';
   static const subscriptionPurchaseStartError =
       'lbl_subscription_purchase_start_error';
   static const subscriptionAccountAlreadyUsedError =
@@ -3618,12 +3623,16 @@ class RemoteConfigService {
     'lbl_subscription_products_unavailable_body_tr':
         'Mağazaya şu an ulaşılamıyor. İnternet bağlantını kontrol edip tekrar dene.',
     'lbl_subscription_products_retry_tr': 'Tekrar dene',
+    'lbl_subscription_period_monthly_tr': 'Her ay yenilenir',
+    'lbl_subscription_period_yearly_tr': 'Her yıl yenilenir',
     'lbl_subscription_start_error_en': 'Could not start, please try again.',
     'lbl_subscription_products_unavailable_title_en':
         "Couldn't load subscription plans",
     'lbl_subscription_products_unavailable_body_en':
         "The store can't be reached right now. Check your internet connection and try again.",
     'lbl_subscription_products_retry_en': 'Try again',
+    'lbl_subscription_period_monthly_en': 'Renews monthly',
+    'lbl_subscription_period_yearly_en': 'Renews yearly',
     'lbl_subscription_purchase_start_error_tr':
         'Satın alma başlatılamadı, mağaza bağlantısını kontrol edip tekrar dene.',
     'lbl_subscription_purchase_start_error_en':

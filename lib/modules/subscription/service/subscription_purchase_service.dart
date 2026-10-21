@@ -17,6 +17,8 @@ part 'subscription_purchase_service.g.dart';
 /// `verifySubscriptionPurchase` callable'ında (F6-1d) yapılır, bu servis
 /// sadece mağaza API'siyle konuşur.
 class SubscriptionPurchaseService {
+  static const _productQueryTimeout = Duration(seconds: 15);
+
   final InAppPurchase _iap = InAppPurchase.instance;
   final Map<String, ProductDetails> _cache = {};
 
@@ -44,7 +46,16 @@ class SubscriptionPurchaseService {
   Future<List<SubscriptionProduct>> fetchProducts({
     required String locale,
   }) async {
-    final response = await _iap.queryProductDetails(gymSubscriptionProductIds);
+    // Mağaza servisine hiç ulaşılamazsa (ör. Play Store'u olmayan cihaz,
+    // bağlantı kopukluğu) sorgu HİÇ dönmüyor ve ekran sonsuza kadar
+    // yükleniyordu. Zaman aşımında da "Tekrar dene" durumuna düşülür.
+    final response = await _iap
+        .queryProductDetails(gymSubscriptionProductIds)
+        .timeout(
+          _productQueryTimeout,
+          onTimeout: () =>
+              throw const SubscriptionProductsUnavailableException('timeout'),
+        );
     _cache
       ..clear()
       ..addEntries(response.productDetails.map((p) => MapEntry(p.id, p)));

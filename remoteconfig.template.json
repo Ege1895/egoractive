@@ -9772,6 +9772,32 @@
       },
       "valueType": "STRING"
     },
+    "lbl_subscription_period_monthly_tr": {
+      "defaultValue": {
+        "value": "Her ay yenilenir"
+      },
+      "valueType": "STRING",
+      "description": "Plan kartında yenilenme dönemi (aylık)."
+    },
+    "lbl_subscription_period_monthly_en": {
+      "defaultValue": {
+        "value": "Renews monthly"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_period_yearly_tr": {
+      "defaultValue": {
+        "value": "Her yıl yenilenir"
+      },
+      "valueType": "STRING",
+      "description": "Plan kartında yenilenme dönemi (yıllık)."
+    },
+    "lbl_subscription_period_yearly_en": {
+      "defaultValue": {
+        "value": "Renews yearly"
+      },
+      "valueType": "STRING"
+    },
     "lbl_subscription_purchase_start_error_tr": {
       "defaultValue": {
         "value": "Satın alma başlatılamadı, mağaza bağlantısını kontrol edip tekrar dene."

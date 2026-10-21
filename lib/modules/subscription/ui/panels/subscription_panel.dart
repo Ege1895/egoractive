@@ -15,6 +15,7 @@ import '../../../../shared/widgets/app_back_button.dart';
 import '../../../../shared/widgets/legal_links.dart';
 import '../../controller/subscription_controller.dart';
 import '../../domain/subscription_state.dart';
+import '../widgets/plan_labels.dart';
 import '../widgets/subscription_products_unavailable.dart';
 import '../../../../shared/utils/date_labels.dart';
 
@@ -23,23 +24,6 @@ import '../../../../shared/utils/date_labels.dart';
 /// bedava" metinleri sadece mağaza bu bilgiyi döndürmediğinde (fallback)
 /// kullanılır. `_PlanList` ve aktif abone ekranındaki yıllığa geçiş kartı
 /// aynı mantığı paylaşır.
-String _planSubLabel(
-  SubscriptionProduct product,
-  bool isYearly,
-  RemoteConfigService rc,
-  String locale,
-) {
-  final days = product.trialDays;
-  if (days != null) {
-    return rc
-        .getText(RemoteConfigKeys.subscriptionTrialSubLabel, locale)
-        .replaceAll('{days}', '$days');
-  }
-  return isYearly
-      ? rc.getText(RemoteConfigKeys.subscriptionYearlySub, locale)
-      : rc.getText(RemoteConfigKeys.subscriptionMonthlySub, locale);
-}
-
 /// F6-1 — Admin · Ayarlar > Abonelik. Sadece admin hesapları bu panele
 /// ulaşabilir (girişi `AdminSettingsPanel`/`subscription_write_gate.dart`/
 /// `subscription_status_banner.dart` — hepsi admin akışına ait).
@@ -364,11 +348,18 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
             showSelector: false,
             onTap: null,
             badge: rc.getText(RemoteConfigKeys.subscriptionYearlyBadge, locale),
-            subLabel: _planSubLabel(yearlyProduct, true, rc, locale),
+            subLabel: planSubLabel(
+              yearlyProduct,
+              isYearly: true,
+              rc: rc,
+              locale: locale,
+            ),
           ),
         ],
         const SizedBox(height: AppSpacing.lg),
         _IncludedFeaturesCard(rc: rc, locale: locale),
+        const SizedBox(height: AppSpacing.lg),
+        const LegalLinks(centered: true),
       ],
     );
   }
@@ -450,11 +441,7 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
                     .read(subscriptionControllerProvider.notifier)
                     .purchase(_selectedProductId!),
         ),
-        _RestorePurchasesRow(subscription: subscription),
-        // F13-2 — Apple 3.1.2, bu bağlantıların SATIN ALMA NOKTASINDA da
-        // bulunmasını istiyor; profil ekranındaki kopya tek başına yeterli
-        // sayılmıyor.
-        const LegalLinks(centered: true),
+        _PurchaseFooter(subscription: subscription),
       ],
     );
   }
@@ -626,7 +613,12 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
             selected: _yearlyUpgradeSelected,
             enabled: true,
             badge: rc.getText(RemoteConfigKeys.subscriptionYearlyBadge, locale),
-            subLabel: _planSubLabel(yearlyProduct, true, rc, locale),
+            subLabel: planSubLabel(
+              yearlyProduct,
+              isYearly: true,
+              rc: rc,
+              locale: locale,
+            ),
             onTap: () => setState(
               () => _yearlyUpgradeSelected = !_yearlyUpgradeSelected,
             ),
@@ -656,6 +648,7 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
             ),
             onTap: _openStoreSubscriptionManagement,
           ),
+        if (showYearlyUpgrade) _PurchaseFooter(subscription: subscription),
       ],
     );
   }
@@ -832,6 +825,7 @@ class _SubscriptionPanelState extends BasePanelState<SubscriptionPanel> {
                     .read(subscriptionControllerProvider.notifier)
                     .purchase(_selectedProductId!),
         ),
+        _PurchaseFooter(subscription: subscription),
       ],
     );
   }
@@ -1107,11 +1101,11 @@ class _PlanList extends StatelessWidget {
               badge: isYearly(product.id)
                   ? rc.getText(RemoteConfigKeys.subscriptionYearlyBadge, locale)
                   : null,
-              subLabel: _planSubLabel(
+              subLabel: planSubLabel(
                 product,
-                isYearly(product.id),
-                rc,
-                locale,
+                isYearly: isYearly(product.id),
+                rc: rc,
+                locale: locale,
               ),
               onTap: enabled ? () => onSelect(product.id) : null,
               pendingLabel: product.id == pendingId ? pendingLabel : null,
@@ -1737,6 +1731,27 @@ class _PendingCta extends StatelessWidget {
 /// deniyor (ikinci cihaz ya da sil-kur). Sonuç mesajı hem başarıyı hem
 /// "satın alım bulunamadı" durumunu kapsıyor — ikincisi bir HATA değil,
 /// bu yüzden hata rengiyle değil normal metin rengiyle gösteriliyor.
+/// Apple 3.1.2(c) — her satın alma noktasının altında aynı düzen:
+/// "Satın alımları geri yükle" ve ardından Kullanım Koşulları + Gizlilik
+/// Politikası bağlantıları. Profil ekranındaki kopya tek başına yeterli
+/// sayılmıyor; bağlantıların satın alma butonunun yanında olması gerekiyor.
+class _PurchaseFooter extends StatelessWidget {
+  const _PurchaseFooter({required this.subscription});
+
+  final SubscriptionState subscription;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _RestorePurchasesRow(subscription: subscription),
+        const LegalLinks(centered: true),
+      ],
+    );
+  }
+}
+
 class _RestorePurchasesRow extends ConsumerWidget {
   const _RestorePurchasesRow({required this.subscription});
 

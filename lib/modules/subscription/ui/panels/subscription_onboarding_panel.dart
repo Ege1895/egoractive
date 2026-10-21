@@ -13,6 +13,8 @@ import '../../../../shared/widgets/app_loading_indicator.dart';
 import '../../../auth/controller/auth_controller.dart';
 import '../../controller/subscription_controller.dart';
 import '../../domain/subscription_state.dart';
+import '../../../../shared/widgets/legal_links.dart';
+import '../widgets/plan_labels.dart';
 import '../widgets/subscription_products_unavailable.dart';
 
 /// F6-1e — Yeni salon oluşturan admin'in girişten hemen sonra gördüğü,
@@ -228,12 +230,12 @@ class _SubscriptionOnboardingPanelState
                         locale,
                       )
                     : null,
-                subLabel: _isYearly(product.id)
-                    ? rc.getText(RemoteConfigKeys.subscriptionYearlySub, locale)
-                    : rc.getText(
-                        RemoteConfigKeys.subscriptionMonthlySub,
-                        locale,
-                      ),
+                subLabel: planSubLabel(
+                  product,
+                  isYearly: _isYearly(product.id),
+                  rc: rc,
+                  locale: locale,
+                ),
                 onTap: subscription.isPurchasing
                     ? null
                     : () => setState(() => _selectedProductId = product.id),
@@ -313,6 +315,9 @@ class _SubscriptionOnboardingPanelState
                     .read(subscriptionControllerProvider.notifier)
                     .purchase(_selectedProductId!),
         ),
+        const SizedBox(height: AppSpacing.md),
+        // Apple 3.1.2(c) — bağlantılar satın alma butonunun hemen altında.
+        const LegalLinks(centered: true),
       ],
     );
   }
