@@ -38,6 +38,14 @@ Her adımdan sonra kısa bir durum ver. Canlıyı etkileyen her işlemden (deplo
 - **YENİ GÖREV F14-7 — abonelik test hesabı (canlı veri, onay al):** Demo salon muaf olduğu için abonelik ekranında satın alma butonu YOK; reviewer demo hesapla abonelik test edemiyor. Muaf OLMAYAN, aboneliği olmayan ayrı bir demo salon + admin oluştur: telefon `+905555550001`, `otpBypassEnabled: true`, `email` dolu (başka hesapta kullanılmayan), custom claim `role: admin` + `gymId`. Mevcut admin/salon oluşturma Cloud Function'larını ve `scripts/enable_closed_test_accounts.ts`'i incele, aynı yolla oluştur. App Review Notes metni bu hesabı varsayıyor. Yayın sonrası OTP bypass kapatılırken bu hesap da listeye girmeli.
 - Kullanıcı yaptı: Paid Apps Agreement onaylandı, abonelik Availability ayarlandı, Privacy Policy URL dolu. Ekran görüntüsü, IAP gönderimi, build 28, ekran kaydı build'den sonra.
 
+## 1c. İkinci oturum ilerlemesi
+
+- **F14-3 commitlendi** (`9cc404a`): `core/diagnostics/non_fatal.dart` → `reportNonFatal`.
+- **Build 28 alındı, commitlendi, pushlandı** (`ed44dbc`): `28 (1.0.0).aab` (versionCode=28 doğrulandı), iOS `FLUTTER_BUILD_NUMBER=28`.
+- **Canlı RC ↔ şablon farkı kontrol edildi:** canlıda olup şablonda olmayan parametre YOK; fark yalnızca 10 yeni metin anahtarı + `cfg_subscription_mock_start_enabled` true→false. Deploy güvenli, **kullanıcı onayı bekleniyor**.
+- **F14-7 değişti:** abonelik test hesabını kullanıcı uygulamadan kendisi oluşturacak (yeni salon → zorunlu abonelik ekranı, abone olmadan kapatacak). Bize kalan: o hesaba `otpBypassEnabled: true` yazmak (onayla) ve Notes'taki numarayı güncellemek. Bu hesap girişte doğrudan abonelik ekranını açar.
+- F14-4 için e-posta adresi kullanıcıdan bekleniyor.
+
 ## 2. Çalışma dizinindeki commitlenmemiş değişiklikler (ilk iş)
 
 F14-2 kodu hazır ama commitlenmedi. `git status` ile doğrula; beklenen:
