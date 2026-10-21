@@ -38,6 +38,16 @@ Her adımdan sonra kısa bir durum ver. Canlıyı etkileyen her işlemden (deplo
 - **YENİ GÖREV F14-7 — abonelik test hesabı (canlı veri, onay al):** Demo salon muaf olduğu için abonelik ekranında satın alma butonu YOK; reviewer demo hesapla abonelik test edemiyor. Muaf OLMAYAN, aboneliği olmayan ayrı bir demo salon + admin oluştur: telefon `+905555550001`, `otpBypassEnabled: true`, `email` dolu (başka hesapta kullanılmayan), custom claim `role: admin` + `gymId`. Mevcut admin/salon oluşturma Cloud Function'larını ve `scripts/enable_closed_test_accounts.ts`'i incele, aynı yolla oluştur. App Review Notes metni bu hesabı varsayıyor. Yayın sonrası OTP bypass kapatılırken bu hesap da listeye girmeli.
 - Kullanıcı yaptı: Paid Apps Agreement onaylandı, abonelik Availability ayarlandı, Privacy Policy URL dolu. Ekran görüntüsü, IAP gönderimi, build 28, ekran kaydı build'den sonra.
 
+## 1d. GÖNDERİLDİ (2026-10-21 gece)
+
+App Store'a **build 30 + iki abonelik + abonelik grubu** aynı gönderimde incelemeye gönderildi (önce sürüm tek başına gitmişti; iptal edilip üçü birlikte gönderildi). Notes, açıklama bağlantıları, EULA, IAP ekran görüntüleri, ekran kayıtlı cevap tamam (kullanıcı beyanı).
+
+**Onay sonrası yapılacaklar:**
+- Dört test hesabının OTP bypass'ını kapat: admin `ifKPfciCrKH0Qqvj2NgI`, antrenör `r2SHvpzvai6zaP2YYnRt`, üye `XyrJtfwrt8Ol2ueZiBzI`, abonelik testi `ku8Tv1mTYsgyO8nnKTwN` (GymFit) → `cd scripts && CONFIRM_PRODUCTION_BACKFILL=yes npm run audit-otp-bypass -- --allow-production --revoke`. Play incelemesi de bitmiş olmalı.
+- Play'e `30 (1.0.0).aab` (canlıda 25 var, giriş donması içeriyor).
+- Texas Gym admininin (`K8UXu6FR5nPAw5o6KNOH`) e-postası kaldırıldı; sonraki girişinde e-posta kurulumu ister.
+- İsteğe bağlı iyileştirmeler: aktif abone ekranında (yıllık abone) geri yükle + bağlantılar her zaman görünsün; abonelik ürünlerine İngilizce yerelleştirme (ASC); siteye `account-deletion` sayfası (Kullanım Koşulları'ndaki bağlantı 404) ve Apple EULA bölümü (TR+EN).
+
 ## 1c. İkinci oturum ilerlemesi
 
 - **F14-3 commitlendi** (`9cc404a`): `core/diagnostics/non_fatal.dart` → `reportNonFatal`.
