@@ -41,7 +41,7 @@ Her adımdan sonra kısa bir durum ver. Canlıyı etkileyen her işlemden (deplo
 ## 1c. İkinci oturum ilerlemesi
 
 - **F14-3 commitlendi** (`9cc404a`): `core/diagnostics/non_fatal.dart` → `reportNonFatal`.
-- **Build 28 alındı, commitlendi, pushlandı** (`ed44dbc`): `28 (1.0.0).aab` (versionCode=28 doğrulandı), iOS `FLUTTER_BUILD_NUMBER=28`.
+- **Build 29 alındı (`32d3735`), mağazalara gönderilecek olan bu; build 28 alındı, commitlendi, pushlandı** (`ed44dbc`): `28 (1.0.0).aab` (versionCode=28 doğrulandı), iOS `FLUTTER_BUILD_NUMBER=28`.
 - **Canlı RC ↔ şablon farkı kontrol edildi:** canlıda olup şablonda olmayan parametre YOK; fark yalnızca 10 yeni metin anahtarı + `cfg_subscription_mock_start_enabled` true→false. Deploy güvenli, **kullanıcı onayı bekleniyor**.
 - **F14-7 değişti:** abonelik test hesabını kullanıcı uygulamadan kendisi oluşturacak (yeni salon → zorunlu abonelik ekranı, abone olmadan kapatacak). Bize kalan: o hesaba `otpBypassEnabled: true` yazmak (onayla) ve Notes'taki numarayı güncellemek. Bu hesap girişte doğrudan abonelik ekranını açar.
 - **F14-4 TAMAM:** üye demo hesabına (`XyrJtfwrt8Ol2ueZiBzI`, +905335330000) `meliskorkmz07@gmail.com` yazıldı; emülatörde temiz kurulumla `000000` → doğrudan üye ana ekranı (`email=set`, `ready`).
