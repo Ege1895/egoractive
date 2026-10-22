@@ -180,7 +180,15 @@ Future<TrainerReportState> reportForTrainer(
 class TrainerReportController extends _$TrainerReportController {
   @override
   TrainerReportState build() {
-    final uid = ref.watch(authStateProvider).valueOrNull?.uid;
+    final authAsync = ref.watch(authStateProvider);
+    // F13-6 — provider ilk izlendiğinde henüz sonuçlanmamış olabilir; bu
+    // durum "gerçekten oturum yok" ile AYNI DEĞİL. O ana kadar mock'a
+    // düşülürse kullanıcı bir an sahte veriyi gerçekmiş gibi görür ve
+    // dokunduğunda var olmayan bir ID ile Firestore'a yazma denenir (bkz.
+    // `discover_controller.dart`/`trainer_home_controller.dart` — aynı hata
+    // orada yaşandı ve düzeltildi).
+    if (authAsync.isLoading) return _loadingState();
+    final uid = authAsync.valueOrNull?.uid;
     if (uid == null) {
       return ref.watch(trainerReportRepositoryProvider).loadInitial();
     }

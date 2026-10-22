@@ -22,6 +22,13 @@ mixin _$AdminMemberSummary {
   String get name => throw _privateConstructorUsedError;
   String get phone => throw _privateConstructorUsedError;
   String get trainerName => throw _privateConstructorUsedError;
+
+  /// F12-2 — üye sayımı ve antrenör eşlemesi bunun üzerinden yapılır;
+  /// [trainerName] yalnızca GÖSTERİM içindir. Sayım isimle yapıldığında
+  /// antrenörün adı değiştirilir değiştirilmez üye sayısı sıfıra
+  /// düşüyordu. Varsayılan boş: mock/salon-yok akışları bu alanı
+  /// doldurmuyor, oralarda sayım da yapılmıyor.
+  String get trainerId => throw _privateConstructorUsedError;
   int get remainingSessions => throw _privateConstructorUsedError;
 
   /// Henüz takvime hiç girilmemiş, gerçekten yeni bir seans için
@@ -54,6 +61,7 @@ abstract class $AdminMemberSummaryCopyWith<$Res> {
     String name,
     String phone,
     String trainerName,
+    String trainerId,
     int remainingSessions,
     int unplannedSessions,
     String packageEndDate,
@@ -81,6 +89,7 @@ class _$AdminMemberSummaryCopyWithImpl<$Res, $Val extends AdminMemberSummary>
     Object? name = null,
     Object? phone = null,
     Object? trainerName = null,
+    Object? trainerId = null,
     Object? remainingSessions = null,
     Object? unplannedSessions = null,
     Object? packageEndDate = null,
@@ -107,6 +116,10 @@ class _$AdminMemberSummaryCopyWithImpl<$Res, $Val extends AdminMemberSummary>
             trainerName: null == trainerName
                 ? _value.trainerName
                 : trainerName // ignore: cast_nullable_to_non_nullable
+                      as String,
+            trainerId: null == trainerId
+                ? _value.trainerId
+                : trainerId // ignore: cast_nullable_to_non_nullable
                       as String,
             remainingSessions: null == remainingSessions
                 ? _value.remainingSessions
@@ -145,6 +158,7 @@ abstract class _$$AdminMemberSummaryImplCopyWith<$Res>
     String name,
     String phone,
     String trainerName,
+    String trainerId,
     int remainingSessions,
     int unplannedSessions,
     String packageEndDate,
@@ -171,6 +185,7 @@ class __$$AdminMemberSummaryImplCopyWithImpl<$Res>
     Object? name = null,
     Object? phone = null,
     Object? trainerName = null,
+    Object? trainerId = null,
     Object? remainingSessions = null,
     Object? unplannedSessions = null,
     Object? packageEndDate = null,
@@ -197,6 +212,10 @@ class __$$AdminMemberSummaryImplCopyWithImpl<$Res>
         trainerName: null == trainerName
             ? _value.trainerName
             : trainerName // ignore: cast_nullable_to_non_nullable
+                  as String,
+        trainerId: null == trainerId
+            ? _value.trainerId
+            : trainerId // ignore: cast_nullable_to_non_nullable
                   as String,
         remainingSessions: null == remainingSessions
             ? _value.remainingSessions
@@ -228,6 +247,7 @@ class _$AdminMemberSummaryImpl implements _AdminMemberSummary {
     required this.name,
     required this.phone,
     required this.trainerName,
+    this.trainerId = '',
     required this.remainingSessions,
     required this.unplannedSessions,
     required this.packageEndDate,
@@ -244,6 +264,15 @@ class _$AdminMemberSummaryImpl implements _AdminMemberSummary {
   final String phone;
   @override
   final String trainerName;
+
+  /// F12-2 — üye sayımı ve antrenör eşlemesi bunun üzerinden yapılır;
+  /// [trainerName] yalnızca GÖSTERİM içindir. Sayım isimle yapıldığında
+  /// antrenörün adı değiştirilir değiştirilmez üye sayısı sıfıra
+  /// düşüyordu. Varsayılan boş: mock/salon-yok akışları bu alanı
+  /// doldurmuyor, oralarda sayım da yapılmıyor.
+  @override
+  @JsonKey()
+  final String trainerId;
   @override
   final int remainingSessions;
 
@@ -262,7 +291,7 @@ class _$AdminMemberSummaryImpl implements _AdminMemberSummary {
 
   @override
   String toString() {
-    return 'AdminMemberSummary(id: $id, initials: $initials, name: $name, phone: $phone, trainerName: $trainerName, remainingSessions: $remainingSessions, unplannedSessions: $unplannedSessions, packageEndDate: $packageEndDate, status: $status)';
+    return 'AdminMemberSummary(id: $id, initials: $initials, name: $name, phone: $phone, trainerName: $trainerName, trainerId: $trainerId, remainingSessions: $remainingSessions, unplannedSessions: $unplannedSessions, packageEndDate: $packageEndDate, status: $status)';
   }
 
   @override
@@ -277,6 +306,8 @@ class _$AdminMemberSummaryImpl implements _AdminMemberSummary {
             (identical(other.phone, phone) || other.phone == phone) &&
             (identical(other.trainerName, trainerName) ||
                 other.trainerName == trainerName) &&
+            (identical(other.trainerId, trainerId) ||
+                other.trainerId == trainerId) &&
             (identical(other.remainingSessions, remainingSessions) ||
                 other.remainingSessions == remainingSessions) &&
             (identical(other.unplannedSessions, unplannedSessions) ||
@@ -294,6 +325,7 @@ class _$AdminMemberSummaryImpl implements _AdminMemberSummary {
     name,
     phone,
     trainerName,
+    trainerId,
     remainingSessions,
     unplannedSessions,
     packageEndDate,
@@ -319,6 +351,7 @@ abstract class _AdminMemberSummary implements AdminMemberSummary {
     required final String name,
     required final String phone,
     required final String trainerName,
+    final String trainerId,
     required final int remainingSessions,
     required final int unplannedSessions,
     required final String packageEndDate,
@@ -335,6 +368,14 @@ abstract class _AdminMemberSummary implements AdminMemberSummary {
   String get phone;
   @override
   String get trainerName;
+
+  /// F12-2 — üye sayımı ve antrenör eşlemesi bunun üzerinden yapılır;
+  /// [trainerName] yalnızca GÖSTERİM içindir. Sayım isimle yapıldığında
+  /// antrenörün adı değiştirilir değiştirilmez üye sayısı sıfıra
+  /// düşüyordu. Varsayılan boş: mock/salon-yok akışları bu alanı
+  /// doldurmuyor, oralarda sayım da yapılmıyor.
+  @override
+  String get trainerId;
   @override
   int get remainingSessions;
 

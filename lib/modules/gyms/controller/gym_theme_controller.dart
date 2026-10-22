@@ -103,6 +103,39 @@ class GymThemeController extends _$GymThemeController {
     await selectTheme(theme.id);
   }
 
+  /// Admin'in kendi eklediği bir temayı kayıtlı temalar arasından kaldırır.
+  /// Hazır temalar (bkz. [isGymThemeDeletable]) çağrılsa bile korunur.
+  ///
+  /// [showAppConfirmDialog] hatayı diyaloğun İÇİNDE gösterip kullanıcıya
+  /// tekrar deneme şansı verdiği için, yazma başarısız olursa state geri
+  /// alınıp hata YENİDEN FIRLATILIYOR — burada `errorMessage`'a yazmak,
+  /// diyalog kapandıktan sonra panelin tepesinde alakasız bir hata
+  /// bırakırdı (bkz. [addTheme]'deki farklı, diyalogsuz akış).
+  Future<void> deleteTheme(String id) async {
+    if (!isGymThemeDeletable(id)) return;
+    final previousThemes = state.themes;
+    final remaining = previousThemes.where((t) => t.id != id).toList();
+    if (remaining.isEmpty) return;
+
+    state = state.copyWith(themes: remaining, errorMessage: null);
+    final gymId = ref.read(activeGymIdProvider).valueOrNull;
+    if (gymId != null) {
+      try {
+        await ref.read(gymThemeRepositoryProvider).savePresets(gymId, remaining);
+      } catch (_) {
+        state = state.copyWith(themes: previousThemes);
+        rethrow;
+      }
+    }
+
+    // Silinen tema o an SEÇİLİ olabilir; bu durumda hem `themeColors`
+    // hem de global [ThemeController] hâlâ silinmiş temanın rengini
+    // taşır. Varsayılan temaya dönerek ikisini de tutarlı hale getiriyoruz.
+    if (state.activeThemeId == id) {
+      await selectTheme(remaining.first.id);
+    }
+  }
+
   Future<void> toggleWatermark() async {
     final previous = state.watermarkEnabled;
     final enabled = !previous;

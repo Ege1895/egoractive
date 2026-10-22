@@ -14,6 +14,8 @@ import '../../controller/auth_controller.dart';
 import '../../controller/member_profile_controller.dart';
 import 'delete_account_confirm_panel.dart';
 import 'language_select_panel.dart';
+import '../../../../shared/utils/phone_display.dart';
+import '../../../../shared/widgets/legal_links.dart';
 
 /// Üye 8 · Profilim (Profil sekmesi kökü).
 class ProfilePanel extends ConsumerWidget {
@@ -98,7 +100,10 @@ class ProfilePanel extends ConsumerWidget {
                                             .authProfileMemberCaption,
                                       ),
                                     )
-                                    .replaceAll('{phone}', profile.phoneE164),
+                                    .replaceAll(
+                                      '{phone}',
+                                      formatPhoneForDisplay(profile.phoneE164),
+                                    ),
                                 style: typography.bodyMedium.copyWith(
                                   color: colors.onSurfaceVariant,
                                   fontSize: 14,
@@ -170,6 +175,10 @@ class ProfilePanel extends ConsumerWidget {
                     ),
                     onTap: () => panelStack.push(const LanguageSelectPanel()),
                   ),
+                  // F13-2 — Apple 3.1.2: bu bağlantılar binary'nin içinde
+                  // bulunmak zorunda. URL'ler RC'de boşsa satırlar hiç
+                  // görünmez (bkz. LegalLinks).
+                  const LegalLinks(),
                   Container(
                     constraints: const BoxConstraints(minHeight: 56),
                     child: Row(

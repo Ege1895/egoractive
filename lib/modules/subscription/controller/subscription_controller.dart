@@ -2,8 +2,10 @@ import 'dart:async';
 
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
+import 'package:in_app_purchase_android/in_app_purchase_android.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../core/diagnostics/non_fatal.dart';
 import '../../../core/locale/locale_controller.dart';
 import '../../../core/theme/theme_controller.dart';
 import '../domain/subscription_state.dart';
@@ -27,6 +29,11 @@ Stream<SubscriptionState> subscriptionStateForGym(
   return ref.watch(subscriptionRepositoryProvider).watchState(gymId);
 }
 
+/// Geri yükleme isteğinden sonra mağazadan olay beklenecek süre — hiç satın
+/// alım yoksa `purchaseStream`'e hiçbir şey düşmediği için tek bitiş sinyali
+/// bu.
+const _restoreTimeoutDuration = Duration(seconds: 10);
+
 /// F6-1 — aktif salonun abonelik durumunu okur ve mağaza satın alma akışını
 /// başlatır. Satın alma tamamlandığında `verifySubscriptionPurchase`
 /// callable'ını (F6-1d) çağırıp makbuzu doğrulatır — `gyms/{gymId}`'nin
@@ -45,9 +52,20 @@ class SubscriptionController extends _$SubscriptionController {
   bool _isPurchasing = false;
   String? _pendingProductId;
 
+  // F13-1 — geri yükleme durumu da aynı gerekçeyle örnek alanında tutuluyor:
+  // Firestore'dan gelen her snapshot build()'i tekrar çalıştırıp state'i
+  // sıfırdan üretiyor, bu alanlar `gyms/{gymId}` dokümanının parçası değil.
+  bool _isRestoring = false;
+  String? _restoreMessage;
+  bool _sawRestoredPurchase = false;
+  Timer? _restoreTimeout;
+
   @override
   SubscriptionState build() {
-    ref.onDispose(() => _purchaseSub?.cancel());
+    ref.onDispose(() {
+      _purchaseSub?.cancel();
+      _restoreTimeout?.cancel();
+    });
     _purchaseSub ??= ref
         .watch(subscriptionRepositoryProvider)
         .purchaseUpdates
@@ -61,50 +79,19 @@ class SubscriptionController extends _$SubscriptionController {
     return base.copyWith(
       isPurchasing: _isPurchasing,
       pendingProductId: _pendingProductId,
+      isRestoring: _isRestoring,
+      restoreMessage: _restoreMessage,
     );
   }
 
-  Future<List<SubscriptionProduct>> fetchProducts() => ref
-      .read(subscriptionRepositoryProvider)
-      .fetchProducts(locale: ref.read(localeControllerProvider));
-
-  /// Bkz. `SubscriptionPurchaseService.lastFetchWasMock` — `fetchProducts()`
-  /// tamamlanana kadar `false`.
-  bool get lastFetchWasMock =>
-      ref.read(subscriptionRepositoryProvider).lastFetchWasMock;
-
-  /// GEÇİCİ — mağaza ürünleri henüz canlı değilken [purchase] yerine bunu
-  /// çağırır (bkz. `startMockSubscription` callable'ındaki yorum). Gerçek
-  /// bir mağaza işlemi olmadığı için `_onPurchaseUpdate` akışından
-  /// geçmiyor — başarı/hata burada doğrudan ele alınıyor.
-  Future<void> startMockSubscription(String productId) async {
-    if (_isPurchasing) return;
-    final gymId = ref.read(activeGymIdProvider).valueOrNull;
-    if (gymId == null) return;
-    _isPurchasing = true;
-    _pendingProductId = productId;
-    state = state.copyWith(
-      isPurchasing: true,
-      pendingProductId: productId,
-      purchaseErrorMessage: null,
-    );
+  Future<List<SubscriptionProduct>> fetchProducts() async {
     try {
-      await ref
+      return await ref
           .read(subscriptionRepositoryProvider)
-          .startMockSubscription(gymId: gymId, productId: productId);
-      _isPurchasing = false;
-      _pendingProductId = null;
-      state = state.copyWith(isPurchasing: false, pendingProductId: null);
-    } catch (_) {
-      _isPurchasing = false;
-      _pendingProductId = null;
-      state = state.copyWith(
-        isPurchasing: false,
-        pendingProductId: null,
-        purchaseErrorMessage: ref.read(
-          rcTextProvider(RemoteConfigKeys.subscriptionStartError),
-        ),
-      );
+          .fetchProducts(locale: ref.read(localeControllerProvider));
+    } catch (error, stack) {
+      reportNonFatal('subscription.products', error, stack);
+      rethrow;
     }
   }
 
@@ -119,6 +106,18 @@ class SubscriptionController extends _$SubscriptionController {
   /// kalmaya devam ediyor çünkü o zaten kendi kararı.
   Future<void> purchase(String productId) async {
     if (_isPurchasing) return;
+
+    // F13-7 — Android'de aktif bir aboneliği olan salon BAŞKA bir plana
+    // geçiyorsa (aylık → yıllık), eski satın alma Play'e devredilmeli.
+    // Devredilmezse Play bunu bir değişiklik değil YENİ bir abonelik sayar
+    // ve salon iki kez ücretlendirilir — üstelik uygulama içinde her şey
+    // doğru görünür, çift ödeme yalnızca Play makbuzunda fark edilir.
+    //
+    // `_isPurchasing` bilerek bu adımdan SONRA kuruluyor: aşağıdaki
+    // `restorePurchases` çağrısı `_onPurchaseUpdate`'i tetikleyip satın alma
+    // durumunu sıfırlayabilirdi.
+    final replacing = await _resolvePurchaseToReplace(productId);
+
     _isPurchasing = true;
     _pendingProductId = productId;
     state = state.copyWith(
@@ -139,13 +138,14 @@ class SubscriptionController extends _$SubscriptionController {
       // üzerinden `_onPurchaseUpdate`'e gelir.
       final userCanceled = await ref
           .read(subscriptionRepositoryProvider)
-          .buySubscription(productId);
+          .buySubscription(productId, replacing: replacing);
       if (userCanceled && _isPurchasing && _pendingProductId == productId) {
         _isPurchasing = false;
         _pendingProductId = null;
         state = state.copyWith(isPurchasing: false, pendingProductId: null);
       }
-    } catch (_) {
+    } catch (error, stack) {
+      reportNonFatal('subscription.purchase', error, stack);
       _isPurchasing = false;
       _pendingProductId = null;
       state = state.copyWith(
@@ -158,13 +158,129 @@ class SubscriptionController extends _$SubscriptionController {
     }
   }
 
+  /// Yükseltmede devredilecek eski aboneliği bulur; yoksa `null` döner.
+  ///
+  /// Önbellek yalnızca bu oturumda görülen satın almaları taşıdığı için
+  /// (uygulama yeniden açıldığında boştur) gerekirse `restorePurchases`
+  /// çağrılıp mağazanın mevcut aboneliği akışa düşürmesi bekleniyor. Bu
+  /// bekleme sınırlı: token gelmezse yükseltme ENGELLENMİYOR, düz satın
+  /// alma olarak sürüyor — kullanıcıyı "yükseltemiyorum" diye kilitlemek,
+  /// nadir bir çift abonelik riskinden daha kötü bir sonuç olurdu.
+  Future<GooglePlayPurchaseDetails?> _resolvePurchaseToReplace(
+    String productId,
+  ) async {
+    final repo = ref.read(subscriptionRepositoryProvider);
+    // Aktif abonelik yoksa devredilecek bir şey de yok.
+    if (state.status != SubscriptionStatus.active) return null;
+    if (state.productId == productId) return null;
+
+    final cached = repo.androidPurchaseToReplace(productId);
+    if (cached != null) return cached;
+
+    try {
+      await repo.restorePurchases();
+    } catch (_) {
+      return null;
+    }
+
+    for (var i = 0; i < 10; i++) {
+      await Future<void>.delayed(const Duration(milliseconds: 300));
+      final found = repo.androidPurchaseToReplace(productId);
+      if (found != null) return found;
+    }
+    return null;
+  }
+
+  /// F13-1 — Apple Guideline 3.1.1: mağazadaki satın alımı yeniden
+  /// keşfetme yolu. Bu uygulamada yetkilendirme sunucuda durduğu için
+  /// (`gyms/{gymId}.subscriptionStatus`) çoğu "yeni cihaz" senaryosunda
+  /// zaten gerek kalmıyor — ama şu durumlarda TEK kurtarma yolu bu:
+  ///
+  /// * `verifyPurchase` hata verse bile işlem [_onPurchaseUpdate]'te her
+  ///   zaman `completePurchase` ile kapatılıyor (kullanıcı "mağaza
+  ///   bekleniyor" ekranında kilitli kalmasın diye). Bedeli: işlem mağaza
+  ///   kuyruğundan düşüyor ve bir daha kendiliğinden sunulmuyor. Ağ
+  ///   koptuğu bir anda ödeme alınmış ama salon pasif kalmış olabilir.
+  /// * Ertelenmiş işlemler (Ask to Buy, banka doğrulaması) uygulama kapalıyken
+  ///   tamamlanırsa olay kaçar.
+  /// * `resetGymSubscription` sonrası mağazadaki abonelik ile salon
+  ///   dokümanının yeniden bağlanması gerekir.
+  ///
+  /// Sonuç mağazadan bu çağrının dönüşüyle DEĞİL, `purchaseStream`'e düşen
+  /// `restored` olaylarıyla geliyor; hiç satın alım yoksa stream'e hiçbir
+  /// şey düşmüyor. Bu yüzden bir zaman aşımı var: onsuz "satın alımı
+  /// olmayan kullanıcı" sonsuza kadar yükleniyor durumunda kalırdı.
+  Future<void> restorePurchases() async {
+    if (_isRestoring) return;
+    _isRestoring = true;
+    _sawRestoredPurchase = false;
+    _restoreMessage = null;
+    state = state.copyWith(
+      isRestoring: true,
+      restoreMessage: null,
+      purchaseErrorMessage: null,
+    );
+
+    try {
+      await ref.read(subscriptionRepositoryProvider).restorePurchases();
+    } catch (error, stack) {
+      reportNonFatal('subscription.restore', error, stack);
+      _finishRestore(RemoteConfigKeys.subscriptionRestoreError);
+      return;
+    }
+
+    _restoreTimeout?.cancel();
+    _restoreTimeout = Timer(_restoreTimeoutDuration, () {
+      if (!_isRestoring) return;
+      _finishRestore(
+        _sawRestoredPurchase
+            ? RemoteConfigKeys.subscriptionRestoreSuccess
+            : RemoteConfigKeys.subscriptionRestoreEmpty,
+      );
+    });
+  }
+
+  void _finishRestore(String messageKey) {
+    _restoreTimeout?.cancel();
+    _isRestoring = false;
+    _restoreMessage = ref.read(rcTextProvider(messageKey));
+    state = state.copyWith(isRestoring: false, restoreMessage: _restoreMessage);
+  }
+
+  /// Kullanıcı mesajını temizler (ör. bilgi satırı kapatıldığında).
+  void clearRestoreMessage() {
+    _restoreMessage = null;
+    state = state.copyWith(restoreMessage: null);
+  }
+
+  /// Yalnızca mağazanın tamamlanmasını beklediği satın almalar tamamlanır
+  /// (eklentinin önerdiği `pendingCompletePurchase` kontrolü); iptal ve
+  /// boş kayıtlar atlanır. Tamamlama hatası akışı asla kesmez.
+  Future<void> _completeSafely(PurchaseDetails purchase) async {
+    if (!purchase.pendingCompletePurchase) return;
+    try {
+      await ref.read(subscriptionRepositoryProvider).completePurchase(purchase);
+    } catch (error, stack) {
+      reportNonFatal('subscription.complete', error, stack);
+    }
+  }
+
   Future<void> _onPurchaseUpdate(List<PurchaseDetails> purchases) async {
     final repo = ref.read(subscriptionRepositoryProvider);
     final gymId = ref.read(activeGymIdProvider).valueOrNull;
 
     for (final purchase in purchases) {
+      // F13-7 — yükseltmede devredilecek eski aboneliğin token'ı yalnızca
+      // bu akıştan elde edilebiliyor, o yüzden her satın alma önbelleğe
+      // alınıyor (doğrulamadan ÖNCE: doğrulama hata verse bile token'ı
+      // bilmemiz gerekiyor).
+      repo.rememberPurchase(purchase);
+
       if (purchase.status == PurchaseStatus.purchased ||
           purchase.status == PurchaseStatus.restored) {
+        if (purchase.status == PurchaseStatus.restored) {
+          _sawRestoredPurchase = true;
+        }
         // verifyPurchase (Cloud Functions) ağ/sunucu hatasıyla başarısız
         // olabilir — önceden bu durumda ne completePurchase çağrılıyordu
         // (StoreKit/Play Billing işlemi "pending" kalıp bir sonraki açılışta
@@ -198,7 +314,7 @@ class SubscriptionController extends _$SubscriptionController {
                   );
           }
         }
-        await repo.completePurchase(purchase);
+        await _completeSafely(purchase);
         _isPurchasing = false;
         _pendingProductId = null;
         state = state.copyWith(
@@ -208,7 +324,13 @@ class SubscriptionController extends _$SubscriptionController {
         );
       } else if (purchase.status == PurchaseStatus.error ||
           purchase.status == PurchaseStatus.canceled) {
-        await repo.completePurchase(purchase);
+        // Bekleme durumu ÖNCE kapatılır. Android'de kullanıcı Play ödeme
+        // penceresini kapatınca eklenti Play'e özgü olmayan, boş bir kayıt
+        // gönderiyor; önceden ona `completePurchase` çağrılıyor, eklenti tip
+        // dönüşümünde hata fırlatıyor ve aşağıdaki satırlara hiç
+        // gelinmediği için ekran sonsuza kadar "yükleniyor"da kalıyordu
+        // (gerçek cihazda yaşandı, 2026-10-22).
+        await _completeSafely(purchase);
         _isPurchasing = false;
         _pendingProductId = null;
         state = state.copyWith(

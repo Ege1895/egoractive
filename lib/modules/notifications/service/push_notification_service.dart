@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -8,8 +9,13 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/panels/panel_stack_controller.dart';
+import '../../../core/router/app_access.dart';
+import '../../../core/router/app_router.dart';
+import '../../sessions/controller/admin_calendar_controller.dart';
+import '../../sessions/ui/panels/admin_session_management_panel.dart';
 import '../../feedback/ui/panels/feedback_panel.dart';
 import '../../sessions/ui/panels/attendance_confirm_panel.dart';
+import 'push_token_prefs.dart';
 import '../../trainers/ui/panels/trainer_calendar_panel.dart';
 import '../../../firebase_options.dart';
 import '../../events/ui/panels/event_detail_panel.dart';
@@ -103,7 +109,16 @@ class PushNotificationService {
     // dolu değere geçtiğinde) token tekrar okunup kaydediliyor.
     String? lastSavedForUid;
     FirebaseAuth.instance.authStateChanges().listen((user) async {
-      if (user == null || user.uid == lastSavedForUid) return;
+      // Çıkışta token artık dokümandan siliniyor (bkz.
+      // [removeTokenForCurrentUser]) — bayrak burada sıfırlanmazsa AYNI
+      // hesaba tekrar girildiğinde `user.uid == lastSavedForUid` olacağı
+      // için token bir daha hiç yazılmaz ve kullanıcı sessizce bildirim
+      // alamaz hale gelirdi.
+      if (user == null) {
+        lastSavedForUid = null;
+        return;
+      }
+      if (user.uid == lastSavedForUid) return;
       lastSavedForUid = user.uid;
       try {
         final token = await FirebaseMessaging.instance.getToken();
@@ -120,16 +135,83 @@ class PushNotificationService {
 
     final initialMessage = await FirebaseMessaging.instance.getInitialMessage();
     if (initialMessage != null) {
-      _navigateForData(container, initialMessage.data);
+      unawaited(_navigateForData(container, initialMessage.data));
+    }
+  }
+
+  /// [_saveToken]'ın tersi — çıkışta BU cihazın token'ını
+  /// `users/{uid}.fcmTokens`'tan çıkarır. Token silinmediği için oturum
+  /// kapandıktan sonra da cihaz o hesabın bildirimlerini almaya devam
+  /// ediyordu; aynı cihazdan ikinci bir hesaba girildiğinde (salon tableti,
+  /// cihaz devri, adminin ayrı bir antrenör hesabı kullanması) iki hesabın
+  /// bildirimleri birden düşüyor ve yanlış role ait deep link'ler açılıyordu.
+  ///
+  /// Çağıran taraf HENÜZ `signOut()` etmemiş olmalı: `users/{uid}` üzerinde
+  /// self-update imzalı oturum gerektiriyor (firestore.rules
+  /// `match /users/{uid}` → `allow update`).
+  ///
+  /// Hesap SİLME akışında bilerek çağrılmıyor: `deleteAccount` Cloud
+  /// Function'ı `users/{uid}` dokümanının tamamını siliyor, buradaki yazma
+  /// ise silinmiş dokümanla yarışıp onu diriltebilirdi.
+  static Future<void> removeTokenForCurrentUser() async {
+    try {
+      final uid = FirebaseAuth.instance.currentUser?.uid;
+      if (uid == null) return;
+      final token = await FirebaseMessaging.instance.getToken();
+      if (token == null) return;
+      await FirebaseFirestore.instance.collection('users').doc(uid).update({
+        'fcmTokens': FieldValue.arrayRemove([token]),
+      });
+    } on Exception {
+      // Kasıtlı: token temizliği başarısız olsa bile (ağ yok, doküman
+      // silinmiş, izin reddedilmiş) çıkış akışı ASLA durmamalı.
     }
   }
 
   Future<void> _saveToken(String token) async {
     final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid == null) return;
-    await FirebaseFirestore.instance.collection('users').doc(uid).set({
+    final doc = FirebaseFirestore.instance.collection('users').doc(uid);
+    await doc.set({
       'fcmTokens': FieldValue.arrayUnion([token]),
     }, SetOptions(merge: true));
+    await _removeSupersededToken(doc, token);
+  }
+
+  /// Token yenilendiğinde ESKİSİNİ dokümandan çıkarır. Bu olmadan
+  /// `fcmTokens` her yenilemede (FCM rotasyonu, yeniden kurulum, yedekten
+  /// geri yükleme) bir eleman büyüyor ve hiç küçülmüyordu; ölü token'lara
+  /// gönderim yapılmaya devam ediyor, doküman her bildirimde daha pahalı
+  /// okunuyordu.
+  ///
+  /// Sıra bilinçli — önce YENİ token yazılıyor, sonra eskisi siliniyor:
+  /// ikinci yazma başarısız olursa geriye fazladan ölü bir token kalır
+  /// (zararsız, bir sonraki yenilemede temizlenir), ters sırada ise
+  /// kullanıcı hiç token'ı olmayan bir aralığa düşer ve bildirim alamazdı.
+  /// Tek bir `update` içinde `arrayRemove` + `arrayUnion` birleştirilemiyor
+  /// (Firestore aynı alan için iki transform kabul etmiyor), o yüzden ayrı
+  /// yazma.
+  ///
+  /// Sadece AÇIK ÇIKIŞ yapılmadan token değiştiği durumu kapatır; çıkışta
+  /// silme [removeTokenForCurrentUser]'da. İkisi birlikte, cihaz elden
+  /// çıkarılmadığı sürece dizinin sınırsız büyümesini durduruyor.
+  Future<void> _removeSupersededToken(
+    DocumentReference<Map<String, dynamic>> doc,
+    String currentToken,
+  ) async {
+    try {
+      final previous = await PushTokenPrefs.read();
+      if (previous != null && previous != currentToken) {
+        await doc.update({
+          'fcmTokens': FieldValue.arrayRemove([previous]),
+        });
+      }
+      await PushTokenPrefs.write(currentToken);
+    } on Exception {
+      // Kasıtlı: temizlik başarısız olsa bile YENİ token yazılmış durumda,
+      // yani bildirimler çalışmaya devam eder. Bir sonraki yenilemede
+      // tekrar denenir.
+    }
   }
 
   Future<void> _showForegroundNotification(RemoteMessage message) async {
@@ -158,7 +240,10 @@ class PushNotificationService {
   /// gidiliyordu. Cloud Functions tarafı zaten her push'ta `data.type`
   /// gönderiyor (bkz. session-reminder-check.ts, session-completion-check.ts,
   /// feedback-reminder-check.ts, send-manual-notification.ts).
-  void _navigateForPayload(ProviderContainer container, String? payload) {
+  Future<void> _navigateForPayload(
+    ProviderContainer container,
+    String? payload,
+  ) async {
     if (payload == null) return;
     Map<String, dynamic> data;
     try {
@@ -166,24 +251,28 @@ class PushNotificationService {
     } catch (_) {
       return;
     }
-    _navigateForData(container, data);
+    await _navigateForData(container, data);
   }
 
-  void _navigateForData(
+  Future<void> _navigateForData(
     ProviderContainer container,
     Map<String, dynamic> data,
-  ) {
+  ) async {
     final panelStack = container.read(panelStackControllerProvider.notifier);
     switch (data['type'] as String?) {
       case 'session_reminder':
         panelStack.push(const AttendanceConfirmPanel());
+      // Antrenör "Dersini onaylar mısın?" push'una dokununca doğrudan
+      // Takvimim'e, o seansın tarihi seçili ve "Dersi onayla" sheet'i
+      // otomatik açık şekilde gitmeli — genel onay bekleyenler listesine
+      // değil (önceden TrainerNotificationsPanel açılıyordu).
+      // `trainer_session_reminder` ("bugün şu seansların var") önceden hiç
+      // yönlendirilmiyordu, aynı ekran onun da doğru hedefi.
       case 'session_completion':
-        // Antrenör "Dersini onaylar mısın?" push'una dokununca doğrudan
-        // Takvimim'e, o seansın tarihi seçili ve "Dersi onayla" sheet'i
-        // otomatik açık şekilde gitmeli — genel onay bekleyenler listesine
-        // değil (önceden TrainerNotificationsPanel açılıyordu).
-        panelStack.push(
-          TrainerCalendarPanel(focusSessionId: data['sessionId'] as String?),
+      case 'trainer_session_reminder':
+        await _navigateToSessionPanelForRole(
+          container,
+          data['sessionId'] as String?,
         );
       case 'feedback_reminder':
         panelStack.push(const FeedbackPanel());
@@ -208,6 +297,65 @@ class PushNotificationService {
         // ilgisiz bir onay ekranına zorlamak yerine uygulamayı sadece ön
         // plana getirmekle yetinilir.
         break;
+    }
+  }
+
+  /// F11-4 — antrenöre giden seans bildirimleri, "gölge antrenör"
+  /// senaryosunda ADMIN'in cihazına düşüyor (`notificationProxyUid`
+  /// yönlendirmesi, bkz. `functions/src/shared/staff-notifications.ts`).
+  /// Admin oturumunda [TrainerCalendarPanel] açmak boş bir ekran demek: o
+  /// panel oturumdaki uid ile sorguluyor, gölge antrenörün seansları ise
+  /// admin uid'siyle eşleşmiyor.
+  ///
+  /// Rol okuması `app_deep_link_service.dart`'taki desenle aynı: ayrı/erken
+  /// bir `currentRoleProvider` okuması YAPILMIYOR, uygulamanın kendi UI'ının
+  /// da beklediği [appAccessProvider] beklenir — böylece bildirim hiçbir
+  /// zaman normal giriş akışının önüne geçmez/onunla yarışmaz. Erişim
+  /// `ready` değilse (hâlâ giriş ekranı, salon askıya alınmış vb.) sessizce
+  /// yok sayılır.
+  Future<void> _navigateToSessionPanelForRole(
+    ProviderContainer container,
+    String? sessionId,
+  ) async {
+    final access = await container.read(appAccessProvider.future);
+    if (access.kind != AppAccessKind.ready) return;
+    final panelStack = container.read(panelStackControllerProvider.notifier);
+    if (access.role == AppRole.admin) {
+      await _selectSessionDayForAdmin(container, sessionId);
+      panelStack.push(const AdminSessionManagementPanel());
+      return;
+    }
+    panelStack.push(TrainerCalendarPanel(focusSessionId: sessionId));
+  }
+
+  /// Admin paneli açılmadan önce takvimi SEANSIN gününe alır.
+  ///
+  /// F12-7'den önce bu mümkün değildi: panel seçili günü yerel state'inde
+  /// tutuyordu ve dışarıdan değiştirilemiyordu, üstelik ay bazlı slot
+  /// listesiyle senkron olmadığı için başka bir aya atlamak yanlış günün
+  /// seanslarını gösterirdi. Seçili gün artık `adminCalendarController`'da.
+  ///
+  /// "Bugün" varsaymak çoğu zaman doğru olurdu (iki bildirim de aynı gün
+  /// gidiyor) ama gece yarısını geçen bir durumda — ör. 23:50'de biten bir
+  /// dersin tamamlama sorusu — yanlış güne düşerdi.
+  Future<void> _selectSessionDayForAdmin(
+    ProviderContainer container,
+    String? sessionId,
+  ) async {
+    if (sessionId == null) return;
+    try {
+      final doc = await FirebaseFirestore.instance
+          .collection('sessions')
+          .doc(sessionId)
+          .get();
+      final startTime = (doc.data()?['startTime'] as Timestamp?)?.toDate();
+      if (startTime == null) return;
+      container
+          .read(adminCalendarControllerProvider.notifier)
+          .selectDate(startTime);
+    } on Exception {
+      // Kasıtlı: seans okunamazsa panel yine açılsın, sadece seçili gün
+      // değişmemiş olur.
     }
   }
 }

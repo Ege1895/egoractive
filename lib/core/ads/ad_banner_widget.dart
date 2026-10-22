@@ -50,7 +50,9 @@ class _AdBannerWidgetState extends ConsumerState<AdBannerWidget> {
   }
 
   Future<void> _maybeLoadAd() async {
-    final canRequestAds = await ref.read(adConsentServiceProvider).ensureConsent();
+    final canRequestAds = await ref
+        .read(adConsentServiceProvider)
+        .ensureConsent();
     if (!mounted || !canRequestAds || !ref.read(shouldShowAdsProvider)) return;
     _loadAd();
   }
@@ -64,7 +66,12 @@ class _AdBannerWidgetState extends ConsumerState<AdBannerWidget> {
         onAdLoaded: (_) {
           if (mounted) setState(() => _isLoaded = true);
         },
-        onAdFailedToLoad: (ad, _) {
+        onAdFailedToLoad: (ad, error) {
+          // Doluluk olmaması (no fill) olağan; Crashlytics'i gürültüye
+          // boğmamak için yalnızca loga yazılıyor.
+          debugPrint(
+            '[ads.banner] yüklenemedi ${error.code}: ${error.message}',
+          );
           ad.dispose();
           if (mounted) setState(() => _isLoaded = false);
           _bannerAd = null;

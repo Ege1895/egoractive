@@ -135,7 +135,7 @@
     },
     "cfg_subscription_mock_start_enabled": {
       "defaultValue": {
-        "value": "true"
+        "value": "false"
       },
       "description": "true iken mağaza ürünleri yoksa admin gerçek satın alma yapmadan trial başlatabilir (mock). Store canlı olunca client otomatik gerçek akışa geçer — bu sadece ek bir güvenlik kapağı.",
       "valueType": "BOOLEAN"
@@ -1480,13 +1480,14 @@
     },
     "lbl_auth_profile_member_caption_tr": {
       "defaultValue": {
-        "value": "+90 {phone} · Üye"
+        "value": "{phone} · Üye"
       },
-      "valueType": "STRING"
+      "valueType": "STRING",
+      "description": "Profil ekranındaki alt satır. {phone} ÜLKE KODUYLA BİRLİKTE gelir (bkz. shared/utils/phone_display.dart) — buraya ayrıca '+90' yazma."
     },
     "lbl_auth_profile_member_caption_en": {
       "defaultValue": {
-        "value": "+90 {phone} · Member"
+        "value": "{phone} · Member"
       },
       "valueType": "STRING"
     },
@@ -8887,6 +8888,210 @@
       },
       "valueType": "STRING"
     },
+    "lbl_trainers_self_trainer_toggle_title_tr": {
+      "defaultValue": {
+        "value": "Kendimi antrenör olarak ekle"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_self_trainer_toggle_note_tr": {
+      "defaultValue": {
+        "value": "Salonda ders de veriyorsan seç — adın antrenör listelerinde çıkar, kendine seans ve grup dersi atayabilirsin. Telefon ve e-posta gerekmez, giriş bilgilerin değişmez."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_self_trainer_badge_tr": {
+      "defaultValue": {
+        "value": "Sen"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_self_leave_button_tr": {
+      "defaultValue": {
+        "value": "Antrenörlükten çık"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_self_leave_confirm_title_tr": {
+      "defaultValue": {
+        "value": "Antrenörlükten çıkmak istiyor musun?"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_self_leave_confirm_body_tr": {
+      "defaultValue": {
+        "value": "Adın antrenör listelerinden kalkar, sana yeni seans ve grup dersi atanamaz. Geçmiş seansların ve raporlardaki verilerin olduğu gibi kalır. Admin hesabın etkilenmez, istediğin zaman tekrar ekleyebilirsin."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_self_leave_confirm_cta_tr": {
+      "defaultValue": {
+        "value": "Evet, çık"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_self_trainer_toggle_title_en": {
+      "defaultValue": {
+        "value": "Add myself as a trainer"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_self_trainer_toggle_note_en": {
+      "defaultValue": {
+        "value": "Choose this if you also coach — your name appears in trainer lists so you can assign sessions and group classes to yourself. No phone or email needed; your login stays the same."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_self_trainer_badge_en": {
+      "defaultValue": {
+        "value": "You"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_self_leave_button_en": {
+      "defaultValue": {
+        "value": "Stop being a trainer"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_self_leave_confirm_title_en": {
+      "defaultValue": {
+        "value": "Stop being a trainer?"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_self_leave_confirm_body_en": {
+      "defaultValue": {
+        "value": "Your name is removed from trainer lists and no new sessions or group classes can be assigned to you. Your past sessions and report data remain unchanged. Your admin account is not affected and you can add yourself again at any time."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_trainers_self_leave_confirm_cta_en": {
+      "defaultValue": {
+        "value": "Yes, stop"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_restore_button_tr": {
+      "defaultValue": {
+        "value": "Satın alımları geri yükle"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_restore_button_en": {
+      "defaultValue": {
+        "value": "Restore purchases"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_restore_in_progress_tr": {
+      "defaultValue": {
+        "value": "Geri yükleniyor…"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_restore_in_progress_en": {
+      "defaultValue": {
+        "value": "Restoring…"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_restore_success_tr": {
+      "defaultValue": {
+        "value": "Satın alımların geri yüklendi. Aboneliğin birkaç saniye içinde güncellenmezse uygulamayı yeniden aç."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_restore_success_en": {
+      "defaultValue": {
+        "value": "Your purchases were restored. If your subscription does not update within a few seconds, reopen the app."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_restore_empty_tr": {
+      "defaultValue": {
+        "value": "Bu hesapta geri yüklenecek bir satın alım bulunamadı. Aboneliği başka bir Apple/Google hesabıyla aldıysan o hesapla giriş yapman gerekir."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_restore_empty_en": {
+      "defaultValue": {
+        "value": "No purchases were found for this account. If you subscribed with a different Apple/Google account, sign in with that account."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_restore_error_tr": {
+      "defaultValue": {
+        "value": "Satın alımlar geri yüklenemedi, tekrar dene."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_restore_error_en": {
+      "defaultValue": {
+        "value": "Purchases could not be restored, please try again."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_common_terms_url_tr": {
+      "defaultValue": {
+        "value": "https://egoragames.com/games/egoractive/terms-of-use/tr/"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_common_terms_url_en": {
+      "defaultValue": {
+        "value": "https://egoragames.com/games/egoractive/terms-of-use/en/"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_common_privacy_url_tr": {
+      "defaultValue": {
+        "value": "https://egoragames.com/games/egoractive/privacy-policy/tr/"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_common_privacy_url_en": {
+      "defaultValue": {
+        "value": "https://egoragames.com/games/egoractive/privacy-policy/en/"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_common_terms_nav_label_tr": {
+      "defaultValue": {
+        "value": "Kullanım Şartları"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_common_terms_nav_label_en": {
+      "defaultValue": {
+        "value": "Terms of Use"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_common_privacy_nav_label_tr": {
+      "defaultValue": {
+        "value": "Gizlilik Politikası"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_common_privacy_nav_label_en": {
+      "defaultValue": {
+        "value": "Privacy Policy"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_common_link_open_error_tr": {
+      "defaultValue": {
+        "value": "Bağlantı açılamadı."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_common_link_open_error_en": {
+      "defaultValue": {
+        "value": "The link could not be opened."
+      },
+      "valueType": "STRING"
+    },
     "lbl_trainers_delete_button_tr": {
       "defaultValue": {
         "value": "Antrenörü sil"
@@ -9528,6 +9733,71 @@
       },
       "valueType": "STRING"
     },
+    "lbl_subscription_products_unavailable_title_tr": {
+      "defaultValue": {
+        "value": "Abonelik planları yüklenemedi"
+      },
+      "valueType": "STRING",
+      "description": "Mağazadan abonelik planları alınamadığında başlık."
+    },
+    "lbl_subscription_products_unavailable_title_en": {
+      "defaultValue": {
+        "value": "Couldn't load subscription plans"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_products_unavailable_body_tr": {
+      "defaultValue": {
+        "value": "Mağazaya şu an ulaşılamıyor. İnternet bağlantını kontrol edip tekrar dene."
+      },
+      "valueType": "STRING",
+      "description": "Mağazadan abonelik planları alınamadığında açıklama."
+    },
+    "lbl_subscription_products_unavailable_body_en": {
+      "defaultValue": {
+        "value": "The store can't be reached right now. Check your internet connection and try again."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_products_retry_tr": {
+      "defaultValue": {
+        "value": "Tekrar dene"
+      },
+      "valueType": "STRING",
+      "description": "Abonelik planları yüklenemediğinde yeniden deneme butonu."
+    },
+    "lbl_subscription_products_retry_en": {
+      "defaultValue": {
+        "value": "Try again"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_period_monthly_tr": {
+      "defaultValue": {
+        "value": "Her ay yenilenir"
+      },
+      "valueType": "STRING",
+      "description": "Plan kartında yenilenme dönemi (aylık)."
+    },
+    "lbl_subscription_period_monthly_en": {
+      "defaultValue": {
+        "value": "Renews monthly"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_subscription_period_yearly_tr": {
+      "defaultValue": {
+        "value": "Her yıl yenilenir"
+      },
+      "valueType": "STRING",
+      "description": "Plan kartında yenilenme dönemi (yıllık)."
+    },
+    "lbl_subscription_period_yearly_en": {
+      "defaultValue": {
+        "value": "Renews yearly"
+      },
+      "valueType": "STRING"
+    },
     "lbl_subscription_purchase_start_error_tr": {
       "defaultValue": {
         "value": "Satın alma başlatılamadı, mağaza bağlantısını kontrol edip tekrar dene."
@@ -10104,6 +10374,84 @@
     "lbl_notif_event_staff_reminder_body_no_location_en": {
       "defaultValue": {
         "value": "At {time} · {attendeeCount} people signed up so far"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_themes_delete_confirm_title_tr": {
+      "defaultValue": {
+        "value": "Tema silinsin mi?"
+      },
+      "valueType": "STRING",
+      "description": "Kayıtlı bir temanın silinmesi için açılan onay diyaloğunun başlığı."
+    },
+    "lbl_gyms_themes_delete_confirm_title_en": {
+      "defaultValue": {
+        "value": "Delete this theme?"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_themes_delete_confirm_body_tr": {
+      "defaultValue": {
+        "value": "{name} teması kayıtlı temalar arasından kaldırılacak. Bu işlem geri alınamaz."
+      },
+      "valueType": "STRING",
+      "description": "Tema silme onay diyaloğunun gövdesi. {name} temanın adıyla değişir."
+    },
+    "lbl_gyms_themes_delete_confirm_body_en": {
+      "defaultValue": {
+        "value": "{name} will be removed from your saved themes. This cannot be undone."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_themes_delete_confirm_cta_tr": {
+      "defaultValue": {
+        "value": "Evet, sil"
+      },
+      "valueType": "STRING",
+      "description": "Tema silme onay diyaloğundaki onay butonu."
+    },
+    "lbl_gyms_themes_delete_confirm_cta_en": {
+      "defaultValue": {
+        "value": "Yes, delete"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_themes_delete_busy_label_tr": {
+      "defaultValue": {
+        "value": "Siliniyor…"
+      },
+      "valueType": "STRING",
+      "description": "Tema silinirken onay butonunda gösterilen metin."
+    },
+    "lbl_gyms_themes_delete_busy_label_en": {
+      "defaultValue": {
+        "value": "Deleting…"
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_themes_delete_error_tr": {
+      "defaultValue": {
+        "value": "Tema silinemedi, tekrar dene."
+      },
+      "valueType": "STRING",
+      "description": "Tema silme başarısız olduğunda diyalog içinde gösterilen hata."
+    },
+    "lbl_gyms_themes_delete_error_en": {
+      "defaultValue": {
+        "value": "Could not delete the theme, please try again."
+      },
+      "valueType": "STRING"
+    },
+    "lbl_gyms_themes_delete_button_label_tr": {
+      "defaultValue": {
+        "value": "Temayı sil"
+      },
+      "valueType": "STRING",
+      "description": "Tema kartındaki eksi butonunun erişilebilirlik etiketi (ekran okuyucu)."
+    },
+    "lbl_gyms_themes_delete_button_label_en": {
+      "defaultValue": {
+        "value": "Delete theme"
       },
       "valueType": "STRING"
     }

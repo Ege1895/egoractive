@@ -6,7 +6,7 @@ part of 'gym_rules_controller.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$rulesForGymHash() => r'5d7e2e1f23991bbeaf824d18f43925ed5062b96f';
+String _$rulesForGymHash() => r'2b42ff2f25883b2918e499162b60d27be4445c4c';
 
 /// Copied from Dart SDK
 class _SystemHash {

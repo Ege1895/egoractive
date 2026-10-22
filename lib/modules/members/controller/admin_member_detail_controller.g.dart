@@ -362,7 +362,7 @@ class _LatestPackageForMemberProviderElement
 }
 
 String _$sessionHistoryForAdminMemberHash() =>
-    r'09927307a94c5970fab1f84da86a29b6934f58e7';
+    r'd6fba2aadafe2e55f5564ca38faa1201eca49ba0';
 
 /// `gymId` filtresi `_latestPackageForMember`'daki aynı sebeple eklendi —
 /// `sessions` okuma kuralı da `resource.data.gymId == myGymId()` istiyor,
@@ -519,7 +519,7 @@ class _SessionHistoryForAdminMemberProviderElement
 }
 
 String _$metricSeriesForAdminMemberHash() =>
-    r'9af9255bd8ccdc5f51875a65e2b493ff18337f1c';
+    r'8ad1cbb2b4f0c07a9439630aafa4ae62162c5f9c';
 
 /// Ölçüm modülünün `measurements/{memberId}/entries` koleksiyonundan
 /// admin'in üye detayındaki dropdown'ın 3 metriğinin (kilo/bel çevresi/
@@ -691,7 +691,7 @@ class _MetricSeriesForAdminMemberProviderElement
 }
 
 String _$adminMemberDetailControllerHash() =>
-    r'93bcdc0e41ebe3419b38f55866bb206c3bbeae9a';
+    r'b522106e5dea0817afd46f27a012919227861dc0';
 
 abstract class _$AdminMemberDetailController
     extends BuildlessAutoDisposeNotifier<AdminMemberDetail> {

@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import '../constants/ad_constants.dart';
+import '../diagnostics/non_fatal.dart';
 import 'ad_consent_service.dart';
 import 'ad_gate.dart';
 import 'home_return_signal.dart';
@@ -77,7 +78,11 @@ class _AdInterstitialGateState extends ConsumerState<AdInterstitialGate> {
               dismissedAd.dispose();
               _isShowing = false;
             },
-            onAdFailedToShowFullScreenContent: (failedAd, _) {
+            onAdFailedToShowFullScreenContent: (failedAd, error) {
+              reportNonFatal(
+                'ads.interstitial.show',
+                '${error.code}: ${error.message}',
+              );
               failedAd.dispose();
               _isShowing = false;
             },
@@ -85,7 +90,10 @@ class _AdInterstitialGateState extends ConsumerState<AdInterstitialGate> {
           ad.show();
           completer.complete(true);
         },
-        onAdFailedToLoad: (_) {
+        onAdFailedToLoad: (error) {
+          debugPrint(
+            '[ads.interstitial] yüklenemedi ${error.code}: ${error.message}',
+          );
           _isShowing = false;
           completer.complete(false);
         },

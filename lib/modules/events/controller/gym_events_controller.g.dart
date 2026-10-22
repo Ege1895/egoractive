@@ -6,7 +6,7 @@ part of 'gym_events_controller.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$eventsForGymHash() => r'b4d1c5d60c52303fa2a6f7abd3fd3b72ef93fcff';
+String _$eventsForGymHash() => r'eb177bb9c1ad1a75214b2d95abf49fd285a76947';
 
 /// Copied from Dart SDK
 class _SystemHash {

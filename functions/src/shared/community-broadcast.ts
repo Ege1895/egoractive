@@ -1,6 +1,8 @@
 import { getFirestore } from "firebase-admin/firestore";
 import { getMessaging } from "firebase-admin/messaging";
 
+import { pruneDeadTokens } from "./dead-token-cleanup";
+
 /** Firebase Cloud Messaging'in `sendEachForMulticast` başına izin verdiği azami token sayısı. */
 const FCM_MULTICAST_CHUNK_SIZE = 500;
 
@@ -38,6 +40,7 @@ export async function broadcastToGymMembers(
   if (fcmTokens.length === 0) return;
 
   for (const tokenChunk of chunk(fcmTokens, FCM_MULTICAST_CHUNK_SIZE)) {
-    await getMessaging().sendEachForMulticast({ tokens: tokenChunk, notification, data });
+    const response = await getMessaging().sendEachForMulticast({ tokens: tokenChunk, notification, data });
+    await pruneDeadTokens(tokenChunk, response);
   }
 }

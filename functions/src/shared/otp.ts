@@ -69,6 +69,56 @@ export async function sendOtpToEmail(params: {
   return { ok: true };
 }
 
+/**
+ * Google Play kapalı testi için ayrılmış demo hesaplarının sabit kodu.
+ * GİZLİ DEĞİLDİR — Play Console'daki "Test credentials" alanında testerlara
+ * açıkça veriliyor, gizli tutmanın bir anlamı yok.
+ */
+export const testAccountOtpCode = "000000";
+
+/** Sabit kodun geçerlilik süresi: tester akışın ortasında takılmasın diye uzun. */
+const TEST_ACCOUNT_OTP_TTL_MS = 30 * 24 * 60 * 60_000;
+
+/**
+ * OTP dokümanını SABİT bir kodla yazar ve e-posta GÖNDERMEZ — yalnızca
+ * `users/{uid}.otpBypassEnabled === true` olan demo hesapları için.
+ *
+ * Neden e-posta atlanıp kod tamamen kaldırılmıyor: `verifyLoginOtp` ve
+ * client'ın kod ekranı olduğu gibi çalışmaya devam etsin diye. Kodu tümden
+ * atlamak client'ta da değişiklik (ve yeni bir store build'i) gerektirirdi;
+ * bu yol, halihazırda yayında olan build ile çalışıyor.
+ *
+ * Gerçek kullanıcı akışından farkları bilinçli: 60 saniyelik yeniden gönderim
+ * bekleme süresi uygulanmaz (tester arka arkaya deneyebilsin) ve kod uzun
+ * süre geçerlidir.
+ *
+ * ⚠️ Bu bayrak açık olan bir hesaba, telefon numarasını/e-postasını bilen
+ * HERKES girebilir. Sadece kapalı testteki demo hesaplarında açık kalmalı;
+ * test bitince `otpBypassEnabled` alanı Console'dan kaldırılmalı.
+ */
+export async function storeTestAccountOtp(params: {
+  purpose: OtpPurpose;
+  uid: string;
+  email: string;
+}): Promise<void> {
+  const firestore = getFirestore();
+  const ref = firestore.doc(otpRequestDoc(otpDocId(params.purpose, params.uid)));
+  const salt = randomBytes(16).toString("hex");
+  await ref.set({
+    purpose: params.purpose,
+    uid: params.uid,
+    email: params.email,
+    codeHash: hashOtp(testAccountOtpCode, salt),
+    salt,
+    attempts: 0,
+    maxAttempts: MAX_ATTEMPTS,
+    consumed: false,
+    testAccount: true,
+    expiresAt: Timestamp.fromMillis(Date.now() + TEST_ACCOUNT_OTP_TTL_MS),
+    lastSentAt: Timestamp.now(),
+  });
+}
+
 export type VerifyOtpResult =
   | { ok: true; email: string }
   | { ok: false; reason: "expired" | "locked" | "invalid" };

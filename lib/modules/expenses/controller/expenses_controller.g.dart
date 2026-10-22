@@ -28,7 +28,7 @@ final expensesCanGoNextMonthProvider = AutoDisposeProvider<bool>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef ExpensesCanGoNextMonthRef = AutoDisposeProviderRef<bool>;
-String _$expensesForGymHash() => r'0925aedc35954fa7f279106e9ba1e25db3a2b008';
+String _$expensesForGymHash() => r'1fddfed206992025e6bc2f7230b78f33c4a204d8';
 
 /// Copied from Dart SDK
 class _SystemHash {

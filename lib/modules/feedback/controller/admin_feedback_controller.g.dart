@@ -27,7 +27,7 @@ final adminFeedbackCanGoNextMonthProvider = AutoDisposeProvider<bool>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef AdminFeedbackCanGoNextMonthRef = AutoDisposeProviderRef<bool>;
-String _$feedbackForGymHash() => r'85660558787a52944f68ee196759c5c1349c5faa';
+String _$feedbackForGymHash() => r'99bb39e8ff6e836134fc63fdcdadddb3f15e852d';
 
 /// Copied from Dart SDK
 class _SystemHash {

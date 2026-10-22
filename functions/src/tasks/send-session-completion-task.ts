@@ -4,8 +4,10 @@ import { RemoteConfigTemplate } from "firebase-admin/remote-config";
 import { onTaskDispatched, Request } from "firebase-functions/v2/tasks";
 import * as logger from "firebase-functions/logger";
 
+import { pruneDeadTokens } from "../shared/dead-token-cleanup";
 import { withFailureAlerting } from "../shared/function-health";
 import { resolveGymTimeZone, resolveNotificationLocale } from "../shared/notification-locale";
+import { fetchTokensForUids } from "../shared/staff-notifications";
 import { getCachedRemoteConfigTemplate } from "../shared/remote-config-cache";
 
 const DEFAULT_TEXT: Record<string, { tr: string; en: string }> = {
@@ -75,8 +77,11 @@ export const sendSessionCompletionTask = onTaskDispatched(
     const trainerId = sessionData.trainerId;
     if (!trainerId) return;
 
-    const trainerDoc = await db.collection("users").doc(trainerId).get();
-    const fcmTokens = (trainerDoc.data()?.fcmTokens as string[] | undefined) ?? [];
+    // F11-2 — doküman doğrudan okunup `fcmTokens` alınmıyor: gölge antrenör
+    // dokümanında bu alan hiç yok, bildirimleri `notificationProxyUid` ile
+    // admin'in cihazına yönlendiriliyor. Yönlendirme mantığı tek yerde
+    // (`staff-notifications.ts`) yaşasın diye ortak yardımcı kullanılıyor.
+    const fcmTokens = await fetchTokensForUids([trainerId], db);
     if (fcmTokens.length === 0) {
       logger.info(`Antrenör ${trainerId} için kayıtlı FCM token yok, atlandı.`);
       await sessionRef.update({ completionPushSent: true });
@@ -94,7 +99,7 @@ export const sendSessionCompletionTask = onTaskDispatched(
     const locale = resolveNotificationLocale(await resolveGymTimeZone(sessionData.gymId));
     const vars = { memberName: sessionData.memberName?.trim() || (locale === "tr" ? "Üyen" : "Your member") };
 
-    await getMessaging().sendEachForMulticast({
+    const response = await getMessaging().sendEachForMulticast({
       tokens: fcmTokens,
       notification: {
         title: readNotificationText(template, "lbl_notif_session_completion_title", locale, vars),
@@ -102,6 +107,7 @@ export const sendSessionCompletionTask = onTaskDispatched(
       },
       data: { type: "session_completion", sessionId },
     });
+    await pruneDeadTokens(fcmTokens, response);
 
     await sessionRef.update({ completionPushSent: true });
   }),

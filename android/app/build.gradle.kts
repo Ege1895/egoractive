@@ -5,6 +5,7 @@ plugins {
     id("com.android.application")
     // START: FlutterFire Configuration
     id("com.google.gms.google-services")
+    id("com.google.firebase.crashlytics")
     // END: FlutterFire Configuration
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
@@ -56,6 +57,13 @@ android {
             } else {
                 signingConfigs.getByName("debug")
             }
+            // R8 full mode (AGP 8 varsayılanı), Room'un yansımayla
+            // örneklediği `*_Impl` kurucularını siliyordu; uygulama TEMİZ
+            // kurulumda açılmadan çöküyordu (bkz. proguard-rules.pro).
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro",
+            )
         }
     }
 }

@@ -12,6 +12,13 @@ class AdminMemberSummary with _$AdminMemberSummary {
     required String name,
     required String phone,
     required String trainerName,
+
+    /// F12-2 — üye sayımı ve antrenör eşlemesi bunun üzerinden yapılır;
+    /// [trainerName] yalnızca GÖSTERİM içindir. Sayım isimle yapıldığında
+    /// antrenörün adı değiştirilir değiştirilmez üye sayısı sıfıra
+    /// düşüyordu. Varsayılan boş: mock/salon-yok akışları bu alanı
+    /// doldurmuyor, oralarda sayım da yapılmıyor.
+    @Default('') String trainerId,
     required int remainingSessions,
 
     /// Henüz takvime hiç girilmemiş, gerçekten yeni bir seans için

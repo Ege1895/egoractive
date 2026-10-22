@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'dart:ui' show PlatformDispatcher;
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_quill/flutter_quill.dart';
@@ -20,6 +22,7 @@ import 'core/panels/panel_stack_controller.dart';
 import 'core/panels/panel_stack_view.dart';
 import 'core/perf/perf_trace.dart';
 import 'core/remote_config/remote_config_service.dart';
+import 'core/security/app_check_service.dart';
 import 'core/router/app_access.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_color_scheme.dart';
@@ -48,6 +51,28 @@ void main() async {
   PerfTrace.begin('firebase_init');
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   PerfTrace.end('firebase_init');
+
+  // F13-5 — App Check, Firebase başlatıldıktan HEMEN sonra ve diğer Firebase
+  // servisleri kullanılmadan ÖNCE etkinleştirilmeli; sonra etkinleştirilirse
+  // ilk istekler token'sız gider. Enforcement Console'dan açılana kadar
+  // davranışı değiştirmez (bkz. AppCheckService).
+  await AppCheckService.activate();
+
+  // Kapalı testte uygulama testerların cihazında hiç açılmadan çöktü ve
+  // elimizde tek veri "crash oluyor" mailiydi; yığın izini ancak emülatörde
+  // temiz kurulum yaparak üretebildik (bkz. `android/app/proguard-rules.pro`).
+  // Crashlytics, aynı durumda çökmeyi doğrudan konsola taşıyor.
+  //
+  // `Firebase.initializeApp`'ten HEMEN sonra kuruluyor: daha erkeye almak
+  // mümkün değil (Firebase başlatılmadan Crashlytics örneği yok), bu yüzden
+  // Firebase'den önce oluşan native çökmeler yine yakalanamaz — Android/iOS
+  // SDK'sı süreç kuruluşunda kendi handler'ını taktığı için pratikte
+  // çoğu native çökme yine de rapor edilir.
+  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+  PlatformDispatcher.instance.onError = (Object error, StackTrace stack) {
+    FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+    return true;
+  };
   // F10-2 — bu üçü de SharedPreferences (yerel disk, ağ yok) ve ilk kare
   // çizilmeden hazır olmaları gerekiyor (dil seçimi, onboarding durumu,
   // son seçilen ülke kodu). Ardışık yerine paralel bekleniyor.
@@ -219,6 +244,10 @@ class _AppRootState extends ConsumerState<_AppRoot> {
     switch (access.kind) {
       case AppAccessKind.signedOut:
         if (FirebaseAuth.instance.currentUser != null) {
+          // `AuthService.signOut()` yolunu atlayan iki yerden biri — bu
+          // cihazın push token'ı temizlenmezse oturum kapandıktan sonra da
+          // hesabın bildirimleri bu cihaza düşmeye devam eder.
+          await PushNotificationService.removeTokenForCurrentUser();
           await FirebaseAuth.instance.signOut();
         }
         panelStack.replaceRoot(const PhoneLoginPanel());
@@ -236,6 +265,7 @@ class _AppRootState extends ConsumerState<_AppRoot> {
               RemoteConfigKeys.authLoginErrorSubscriptionInactive,
               ref.read(localeControllerProvider),
             );
+        await PushNotificationService.removeTokenForCurrentUser();
         await FirebaseAuth.instance.signOut();
         panelStack.replaceRoot(PhoneLoginPanel(errorBanner: message));
       case AppAccessKind.subscriptionOnboarding:

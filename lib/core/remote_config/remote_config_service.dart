@@ -75,12 +75,9 @@ abstract final class RemoteConfigKeys {
 
   /// `true` iken yeni oluşturulan bir salonun admin'i, girişten hemen sonra
   /// zorunlu [SubscriptionOnboardingPanel]'e (geri butonu yok, pakete abone
-  /// olmadan atlanamaz) yönlendirilir. Mağaza ürünleri (App Store Connect/
-  /// Play Console) henüz canlıya alınmadıysa `SubscriptionPurchaseService`
-  /// mock veriyle açar (bkz. `mockSubscriptionProducts`) — ekran boş
-  /// kalmaz, tasarım/test amaçlı görüntülenip gezilebilir; gerçek satın alma
-  /// denemesi güvenle başarısız olur. Gerekirse test amaçlı Console'dan
-  /// `false` yapılabilir (`allowPastDatetimeCreation` ile aynı desen).
+  /// olmadan atlanamaz) yönlendirilir. Mağaza ürünleri alınamazsa ekran
+  /// planların yerine "tekrar dene" durumunu gösterir. Gerekirse test
+  /// amaçlı Console'dan `false` yapılabilir (`allowPastDatetimeCreation` ile aynı desen).
   static const requireSubscriptionOnboarding =
       'cfg_require_subscription_onboarding';
 
@@ -1327,6 +1324,14 @@ abstract final class RemoteConfigKeys {
   static const trainersDeleteConfirmTitle = 'lbl_trainers_delete_confirm_title';
   static const trainersDeleteConfirmBody = 'lbl_trainers_delete_confirm_body';
   static const trainersDeleteConfirmCta = 'lbl_trainers_delete_confirm_cta';
+  static const trainersSelfTrainerBadge = 'lbl_trainers_self_trainer_badge';
+  static const trainersSelfLeaveButton = 'lbl_trainers_self_leave_button';
+  static const trainersSelfLeaveConfirmTitle =
+      'lbl_trainers_self_leave_confirm_title';
+  static const trainersSelfLeaveConfirmBody =
+      'lbl_trainers_self_leave_confirm_body';
+  static const trainersSelfLeaveConfirmCta =
+      'lbl_trainers_self_leave_confirm_cta';
   static const trainersDeleteError = 'lbl_trainers_delete_error';
   static const groupSessionsCancelConfirmTitle =
       'lbl_group_sessions_cancel_confirm_title';
@@ -1344,6 +1349,10 @@ abstract final class RemoteConfigKeys {
   static const feedbackEmptyFilterLabel = 'lbl_feedback_empty_filter_label';
   static const trainersAddTrainerNameHint =
       'lbl_trainers_add_trainer_name_hint';
+  static const trainersSelfTrainerToggleTitle =
+      'lbl_trainers_self_trainer_toggle_title';
+  static const trainersSelfTrainerToggleNote =
+      'lbl_trainers_self_trainer_toggle_note';
   static const trainersManagementTrainerCountSuffix =
       'lbl_trainers_management_trainer_count_suffix';
   static const trainersAddTrainerSavingLabel =
@@ -1421,6 +1430,24 @@ abstract final class RemoteConfigKeys {
   static const subscriptionManagementOpenError =
       'lbl_subscription_management_open_error';
   static const subscriptionExemptNote = 'lbl_subscription_exempt_note';
+  /// F13-2 — hukuki metinlerin adresleri. Dile BAĞLI (`_tr`/`_en`): Egora
+  /// Games sitesinde iki metnin de TR ve EN sürümleri ayrı URL'lerde
+  /// yayınlanıyor, bu yüzden `cfg_` (dilden bağımsız) değil `lbl_` deseni
+  /// kullanılıyor ve okuma `rcTextProvider` üzerinden aktif dile göre
+  /// yapılıyor.
+  static const commonTermsUrl = 'lbl_common_terms_url';
+  static const commonPrivacyUrl = 'lbl_common_privacy_url';
+  static const commonTermsNavLabel = 'lbl_common_terms_nav_label';
+  static const commonPrivacyNavLabel = 'lbl_common_privacy_nav_label';
+  static const commonLinkOpenError = 'lbl_common_link_open_error';
+  static const subscriptionRestoreButton =
+      'lbl_subscription_restore_button';
+  static const subscriptionRestoreInProgress =
+      'lbl_subscription_restore_in_progress';
+  static const subscriptionRestoreSuccess =
+      'lbl_subscription_restore_success';
+  static const subscriptionRestoreEmpty = 'lbl_subscription_restore_empty';
+  static const subscriptionRestoreError = 'lbl_subscription_restore_error';
 
   /// `[{label_tr, label_en}]` — abonelikte dahil olan özellik listesi.
   static const subscriptionIncludedFeatures =
@@ -1478,6 +1505,19 @@ abstract final class RemoteConfigKeys {
   static const notificationsSelectMemberError =
       'lbl_notifications_select_member_error';
   static const subscriptionStartError = 'lbl_subscription_start_error';
+
+  /// Mağazadan abonelik planları alınamadığında planların yerine gösterilen
+  /// durum ([SubscriptionProductsUnavailable]).
+  static const subscriptionProductsUnavailableTitle =
+      'lbl_subscription_products_unavailable_title';
+  static const subscriptionProductsUnavailableBody =
+      'lbl_subscription_products_unavailable_body';
+  static const subscriptionProductsRetry = 'lbl_subscription_products_retry';
+
+  /// Plan kartında fiyatın altındaki satırın başı — yenilenme dönemi
+  /// (Apple 3.1.2(c): süre satın alma noktasında açıkça görünmeli).
+  static const subscriptionPeriodMonthly = 'lbl_subscription_period_monthly';
+  static const subscriptionPeriodYearly = 'lbl_subscription_period_yearly';
   static const subscriptionPurchaseStartError =
       'lbl_subscription_purchase_start_error';
   static const subscriptionAccountAlreadyUsedError =
@@ -1534,6 +1574,13 @@ abstract final class RemoteConfigKeys {
 
   static const eventsNotFoundError = 'lbl_events_not_found_error';
   static const eventsLoadError = 'lbl_events_load_error';
+  static const gymsThemesDeleteConfirmTitle = 'lbl_gyms_themes_delete_confirm_title';
+  static const gymsThemesDeleteConfirmBody = 'lbl_gyms_themes_delete_confirm_body';
+  static const gymsThemesDeleteConfirmCta = 'lbl_gyms_themes_delete_confirm_cta';
+  static const gymsThemesDeleteBusyLabel = 'lbl_gyms_themes_delete_busy_label';
+  static const gymsThemesDeleteError = 'lbl_gyms_themes_delete_error';
+  static const gymsThemesDeleteButtonLabel = 'lbl_gyms_themes_delete_button_label';
+
 }
 
 /// Firebase Remote Config'e tip güvenli erişim katmanı. `FirebaseRemoteConfig.instance`
@@ -1772,7 +1819,7 @@ class RemoteConfigService {
         'Login ve rapor e-postası *',
     'lbl_members_self_info_email_field_label_tr': 'E-posta adresi',
     'lbl_trainers_info_title_tr': 'Bilgilerim',
-    'lbl_auth_profile_member_caption_tr': '+90 {phone} · Üye',
+    'lbl_auth_profile_member_caption_tr': '{phone} · Üye',
     'lbl_auth_profile_session_reminder_description_tr':
         'Dersinden {minutes} dakika önce bildirim',
     'lbl_auth_splash_title_tr': 'Egoractive',
@@ -2421,6 +2468,34 @@ class RemoteConfigService {
         '{name} artık uygulamaya giriş yapamayacak ve antrenör listesinde görünmeyecek. Geçmiş seansları, grup dersleri ve raporlardaki verileri olduğu gibi kalır.',
     'lbl_trainers_delete_confirm_cta_tr': 'Evet, sil',
     'lbl_trainers_delete_error_tr': 'Antrenör silinemedi, tekrar dene.',
+    'lbl_common_terms_url_tr':
+        'https://egoragames.com/games/egoractive/terms-of-use/tr/',
+    'lbl_common_privacy_url_tr':
+        'https://egoragames.com/games/egoractive/privacy-policy/tr/',
+    'lbl_common_terms_nav_label_tr': 'Kullanım Şartları',
+    'lbl_common_privacy_nav_label_tr': 'Gizlilik Politikası',
+    'lbl_common_link_open_error_tr': 'Bağlantı açılamadı.',
+    'lbl_subscription_restore_button_tr': 'Satın alımları geri yükle',
+    'lbl_subscription_restore_in_progress_tr': 'Geri yükleniyor…',
+    'lbl_subscription_restore_success_tr':
+        'Satın alımların geri yüklendi. Aboneliğin birkaç saniye içinde '
+        'güncellenmezse uygulamayı yeniden aç.',
+    'lbl_subscription_restore_empty_tr':
+        'Bu hesapta geri yüklenecek bir satın alım bulunamadı. Aboneliği '
+        'başka bir Apple/Google hesabıyla aldıysan o hesapla giriş yapman '
+        'gerekir.',
+    'lbl_subscription_restore_error_tr':
+        'Satın alımlar geri yüklenemedi, tekrar dene.',
+    'lbl_trainers_self_trainer_badge_tr': 'Sen',
+    'lbl_trainers_self_leave_button_tr': 'Antrenörlükten çık',
+    'lbl_trainers_self_leave_confirm_title_tr':
+        'Antrenörlükten çıkmak istiyor musun?',
+    'lbl_trainers_self_leave_confirm_body_tr':
+        'Adın antrenör listelerinden kalkar, sana yeni seans ve grup dersi '
+        'atanamaz. Geçmiş seansların ve raporlardaki verilerin olduğu gibi '
+        'kalır. Admin hesabın etkilenmez, istediğin zaman tekrar '
+        'ekleyebilirsin.',
+    'lbl_trainers_self_leave_confirm_cta_tr': 'Evet, çık',
     'lbl_group_sessions_cancel_confirm_title_tr':
         'Dersi iptal etmek istiyor musun?',
     'lbl_group_sessions_cancel_confirm_body_tr':
@@ -2437,6 +2512,12 @@ class RemoteConfigService {
     'lbl_feedback_empty_month_label_tr': 'Bu ay hiç geri bildirim yok.',
     'lbl_feedback_empty_filter_label_tr': 'Bu puanda geri bildirim yok.',
     'lbl_trainers_add_trainer_name_hint_tr': 'Emre Kaya',
+    'lbl_trainers_self_trainer_toggle_title_tr':
+        'Kendimi antrenör olarak ekle',
+    'lbl_trainers_self_trainer_toggle_note_tr':
+        'Salonda ders de veriyorsan seç — adın antrenör listelerinde '
+        'çıkar, kendine seans ve grup dersi atayabilirsin. Telefon ve '
+        'e-posta gerekmez, giriş bilgilerin değişmez.',
     'lbl_trainers_management_trainer_count_suffix_tr': '{count} kişi',
     'lbl_trainers_add_trainer_saving_label_tr': 'Ekleniyor…',
     'lbl_trainers_edit_trainer_form_title_tr': 'Antrenörü düzenle',
@@ -2610,7 +2691,7 @@ class RemoteConfigService {
     'lbl_gyms_gym_info_login_report_email_label_en': 'Login & report email *',
     'lbl_members_self_info_email_field_label_en': 'Email address',
     'lbl_trainers_info_title_en': 'My Info',
-    'lbl_auth_profile_member_caption_en': '+90 {phone} · Member',
+    'lbl_auth_profile_member_caption_en': '{phone} · Member',
     'lbl_auth_profile_session_reminder_description_en':
         'Notification {minutes} minutes before your session',
     'lbl_auth_splash_title_en': 'Egoractive',
@@ -3271,6 +3352,32 @@ class RemoteConfigService {
         '{name} will no longer be able to sign in and will not appear in the trainer list. Past sessions, group classes and report data remain unchanged.',
     'lbl_trainers_delete_confirm_cta_en': 'Yes, delete',
     'lbl_trainers_delete_error_en': 'Trainer could not be deleted, try again.',
+    'lbl_common_terms_url_en':
+        'https://egoragames.com/games/egoractive/terms-of-use/en/',
+    'lbl_common_privacy_url_en':
+        'https://egoragames.com/games/egoractive/privacy-policy/en/',
+    'lbl_common_terms_nav_label_en': 'Terms of Use',
+    'lbl_common_privacy_nav_label_en': 'Privacy Policy',
+    'lbl_common_link_open_error_en': 'The link could not be opened.',
+    'lbl_subscription_restore_button_en': 'Restore purchases',
+    'lbl_subscription_restore_in_progress_en': 'Restoring…',
+    'lbl_subscription_restore_success_en':
+        'Your purchases were restored. If your subscription does not update '
+        'within a few seconds, reopen the app.',
+    'lbl_subscription_restore_empty_en':
+        'No purchases were found for this account. If you subscribed with a '
+        'different Apple/Google account, sign in with that account.',
+    'lbl_subscription_restore_error_en':
+        'Purchases could not be restored, please try again.',
+    'lbl_trainers_self_trainer_badge_en': 'You',
+    'lbl_trainers_self_leave_button_en': 'Stop being a trainer',
+    'lbl_trainers_self_leave_confirm_title_en': 'Stop being a trainer?',
+    'lbl_trainers_self_leave_confirm_body_en':
+        'Your name is removed from trainer lists and no new sessions or '
+        'group classes can be assigned to you. Your past sessions and report '
+        'data remain unchanged. Your admin account is not affected and you '
+        'can add yourself again at any time.',
+    'lbl_trainers_self_leave_confirm_cta_en': 'Yes, stop',
     'lbl_group_sessions_cancel_confirm_title_en': 'Cancel this class?',
     'lbl_group_sessions_cancel_confirm_body_en':
         'The class stays in the list, marked as "Cancelled". Members who joined will see it as cancelled.',
@@ -3285,6 +3392,12 @@ class RemoteConfigService {
     'lbl_feedback_empty_month_label_en': 'No feedback this month.',
     'lbl_feedback_empty_filter_label_en': 'No feedback with this rating.',
     'lbl_trainers_add_trainer_name_hint_en': 'John Smith',
+    'lbl_trainers_self_trainer_toggle_title_en':
+        'Add myself as a trainer',
+    'lbl_trainers_self_trainer_toggle_note_en':
+        'Choose this if you also coach — your name appears in trainer '
+        'lists so you can assign sessions and group classes to yourself. '
+        'No phone or email needed; your login stays the same.',
     'lbl_trainers_management_trainer_count_suffix_en': '{count} people',
     'lbl_trainers_add_trainer_saving_label_en': 'Adding…',
     'lbl_trainers_edit_trainer_form_title_en': 'Edit trainer',
@@ -3505,7 +3618,21 @@ class RemoteConfigService {
     'lbl_notifications_select_member_error_en':
         'Select at least one member first.',
     'lbl_subscription_start_error_tr': 'Başlatılamadı, tekrar dene.',
+    'lbl_subscription_products_unavailable_title_tr':
+        'Abonelik planları yüklenemedi',
+    'lbl_subscription_products_unavailable_body_tr':
+        'Mağazaya şu an ulaşılamıyor. İnternet bağlantını kontrol edip tekrar dene.',
+    'lbl_subscription_products_retry_tr': 'Tekrar dene',
+    'lbl_subscription_period_monthly_tr': 'Her ay yenilenir',
+    'lbl_subscription_period_yearly_tr': 'Her yıl yenilenir',
     'lbl_subscription_start_error_en': 'Could not start, please try again.',
+    'lbl_subscription_products_unavailable_title_en':
+        "Couldn't load subscription plans",
+    'lbl_subscription_products_unavailable_body_en':
+        "The store can't be reached right now. Check your internet connection and try again.",
+    'lbl_subscription_products_retry_en': 'Try again',
+    'lbl_subscription_period_monthly_en': 'Renews monthly',
+    'lbl_subscription_period_yearly_en': 'Renews yearly',
     'lbl_subscription_purchase_start_error_tr':
         'Satın alma başlatılamadı, mağaza bağlantısını kontrol edip tekrar dene.',
     'lbl_subscription_purchase_start_error_en':
@@ -3645,6 +3772,18 @@ class RemoteConfigService {
     'lbl_events_not_found_error_en': 'Event not found.',
     'lbl_events_load_error_tr': 'Etkinlik yüklenemedi, tekrar dene.',
     'lbl_events_load_error_en': 'Could not load the event, please try again.',
+    'lbl_gyms_themes_delete_confirm_title_tr': 'Tema silinsin mi?',
+    'lbl_gyms_themes_delete_confirm_title_en': 'Delete this theme?',
+    'lbl_gyms_themes_delete_confirm_body_tr': '{name} teması kayıtlı temalar arasından kaldırılacak. Bu işlem geri alınamaz.',
+    'lbl_gyms_themes_delete_confirm_body_en': '{name} will be removed from your saved themes. This cannot be undone.',
+    'lbl_gyms_themes_delete_confirm_cta_tr': 'Evet, sil',
+    'lbl_gyms_themes_delete_confirm_cta_en': 'Yes, delete',
+    'lbl_gyms_themes_delete_busy_label_tr': 'Siliniyor…',
+    'lbl_gyms_themes_delete_busy_label_en': 'Deleting…',
+    'lbl_gyms_themes_delete_error_tr': 'Tema silinemedi, tekrar dene.',
+    'lbl_gyms_themes_delete_error_en': 'Could not delete the theme, please try again.',
+    'lbl_gyms_themes_delete_button_label_tr': 'Temayı sil',
+    'lbl_gyms_themes_delete_button_label_en': 'Delete theme',
   };
 
   /// Ders/seans onay bildiriminin kaç dakika önce gönderileceği.

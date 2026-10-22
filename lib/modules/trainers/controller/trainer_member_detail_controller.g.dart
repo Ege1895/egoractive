@@ -157,7 +157,7 @@ class _TrainerDetailStreamForIdProviderElement
 }
 
 String _$sessionHistoryForMemberHash() =>
-    r'cbd0e14665f538c1411a36a30de5ae339f781f12';
+    r'08bea89a3b2fd9a604547b61fe9dc18d98c95b7a';
 
 /// Bir index gerektirmemek için sadece `trainerId` eşitliğiyle sorgulanır
 /// (bkz. trainer_home_controller/trainer_calendar_controller'daki aynı
@@ -325,7 +325,7 @@ class _SessionHistoryForMemberProviderElement
 }
 
 String _$metricSeriesForMemberHash() =>
-    r'f822604a41e7a67c573bacf8fb76a366289cfdff';
+    r'eaaabcaac5a1a34076027d42d722b5f79d8271f9';
 
 /// Ölçüm modülünün `measurements/{memberId}/entries` koleksiyonundan
 /// antrenörün üye detayındaki dropdown'ın 3 metriğinin (kilo/bel çevresi/

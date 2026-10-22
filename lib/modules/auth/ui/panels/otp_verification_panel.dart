@@ -247,6 +247,15 @@ class _OtpVerificationPanelState extends BasePanelState<OtpVerificationPanel> {
     // login/activation — signInWithCustomToken zaten çalıştı; appAccess
     // custom claim'e değil tek seferlik email okumasına dayandığı için
     // (bkz. currentUserEmailProvider) elle tazelenmesi gerekiyor.
+    //
+    // `currentUserEmailProvider` de AYRICA tazeleniyor: o provider bu oturum
+    // açılmadan ÖNCE bir kez çalışmış ve "oturum yok → null" sonucunu
+    // önbelleğe almış oluyor. Yalnızca `appAccessProvider` invalidate
+    // edilirse kapı yeniden çalışır ama email'i yine bu bayat `null`'dan
+    // okur; kullanıcı email'i Firestore'da DOLU olduğu hâlde email kurulum
+    // akışına düşerdi (üretim buildinde yaşandı, 2026-09-27 — uygulama
+    // kapatılıp açılınca düzeliyordu, çünkü provider sıfırdan hesaplanıyordu).
+    ref.invalidate(currentUserEmailProvider);
     ref.invalidate(appAccessProvider);
   }
 

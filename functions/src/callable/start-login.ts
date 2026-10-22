@@ -4,7 +4,7 @@ import { HttpsError, onCall } from "firebase-functions/v2/https";
 import { gymDoc, usersCollection } from "../shared/firestore-paths";
 import { findUserByPhone } from "../shared/phone-lookup";
 import { isDeactivated } from "../shared/user-active";
-import { sendOtpToEmail } from "../shared/otp";
+import { sendOtpToEmail, storeTestAccountOtp } from "../shared/otp";
 
 const RATE_LIMIT_WINDOW_MS = 60_000;
 const RATE_LIMIT_MAX_REQUESTS = 5;
@@ -85,6 +85,24 @@ export const startLogin = onCall(async (request) => {
   }
 
   const email = typeof userData.email === "string" ? userData.email : "";
+
+  // Google Play kapalı testi için ayrılmış demo hesapları: e-posta ile kod
+  // GÖNDERİLMEZ, bunun yerine sabit bir kod yazılır (bkz.
+  // `storeTestAccountOtp`). Testerlar bizim posta kutumuza erişemediği için
+  // normal akışla giremiyorlardı.
+  //
+  // Kontrol, e-posta kurulum kapısından ÖNCE: bu hesapların bir kısmı
+  // admin tarafından telefonla oluşturulmuş ve `email` alanı boş olabilir,
+  // o durumda tester gereksiz yere e-posta kurulum akışına düşerdi.
+  //
+  // Bayrak kodda değil VERİDE (`users/{uid}.otpBypassEnabled`): telefon
+  // numarası repoya girmiyor ve test bitince yeniden deploy etmeden,
+  // Console'dan alanı silerek kapatılabiliyor.
+  if (userData.otpBypassEnabled === true) {
+    await storeTestAccountOtp({ purpose: "login", uid, email: email || value });
+    return { needsEmailSetup: false, uid, email: email || value };
+  }
+
   if (identifierType === "phone" && !email) {
     return { needsEmailSetup: true, uid };
   }

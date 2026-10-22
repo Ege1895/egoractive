@@ -74,6 +74,12 @@ export function clampDayToMonth(day: number, target: YearMonth): number {
  * Bir tekrarlı gider şablonunun hangi aylara kopyalanması gerektiğini döner
  * (kronolojik sırada, şablonun kendi ayı hariç — o zaten gerçek kayıt).
  *
+ * Kapsam ŞABLONUN YILININ SONUNA kadar: Ağustos 2026'ya girilen bir kira,
+ * Eylül'den Aralık 2026'ya kadar tüm aylara kopyalanır ve takvimde ileriye
+ * dönük görünür. 2027 için admin gideri yeniden girer — böylece yıl başında
+ * tutar/karar gözden geçirilmiş oluyor, eski tutar sessizce sonraki yıla
+ * taşınmıyor (ürün kararı, kullanıcı isteği 2026-09-05).
+ *
  * `materializedThrough`, şablon üzerinde tutulan "bu aya kadar üretildi"
  * imleci: kopya doküman SİLİNSE bile o ay yeniden üretilmez. Silinen bir ayı
  * diriltmemek bilinçli — kullanıcı bir ayın kirasını kaldırdıysa ertesi gün
@@ -97,8 +103,13 @@ export function pendingRecurringMonths(params: {
   const oldestAllowed = addMonths(currentMonth, -(maxMonths - 1));
   if (compareMonths(start, oldestAllowed) < 0) start = oldestAllowed;
 
+  // Yıl sonu sınırı: geçmiş boşluklar da, gelecek aylar da şablonun kendi
+  // yılıyla sınırlı. Aralık'a girilen bir şablon hiç kopya üretmez (bir
+  // sonraki ay zaten gelecek yıl).
+  const end: YearMonth = { year: templateMonth.year, month: 12 };
+
   const months: YearMonth[] = [];
-  for (let cursor = start; compareMonths(cursor, currentMonth) <= 0; cursor = addMonths(cursor, 1)) {
+  for (let cursor = start; compareMonths(cursor, end) <= 0; cursor = addMonths(cursor, 1)) {
     months.push(cursor);
   }
   return months;

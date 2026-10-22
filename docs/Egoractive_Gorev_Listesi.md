@@ -588,3 +588,707 @@ Ayrıca kazanç zaten küçük: RC yanıtı gzip'li geldiği ve JSON çok tekrar
 **`rcTextProvider` tazeleme sinyali:** F10-2'nin notunda açıklanan davranış (RC değişiklikleri bir sonraki açılışta görünür) kabul edilebilir bulunmazsa, `rcVersionProvider` deseniyle çözülebilir. Dikkat: 889 widget'ın aynı anda yeniden çizilmesi frame hitch'e yol açabilir.
 
 **App Check:** Şu an kurulu değil (`"app":"MISSING"`). Güvenlik konusu, performans değil — ayrı ele alınmalı.
+
+---
+
+## Doğrulama durumu (2026-09-24)
+
+FAZ 11, 12 ve 13'ün kabul kriterleri gözden geçirildi ve **78 madde işaretlendi**. İşaretlemenin dayanağı ikiye ayrılıyor:
+
+- **Gerçek cihaz testleri** — kullanıcı tarafından yürütüldü ve tamamının geçtiği bildirildi (F11-7'nin A–G senaryosu ve ona bağlı davranış maddeleri). Bu satırlar benim gözlemim değil, testi yürüten kullanıcının bildirimidir.
+- **Kod/test doğrulaması** — geliştirme sırasında bizzat çalıştırıldı: Flutter 176, Cloud Functions 130, rules 24 (firestore + storage, mutasyon kontrolleriyle), `flutter analyze`, `eslint`, RC anahtar tutarlılığı, iki platformda derleme.
+
+**14 madde BİLEREK açık bırakıldı** — hiçbiri kod işi değil, hepsi konsol/deploy/karar adımı ve henüz kimse yapmadı:
+
+| Nerede | Ne kaldı |
+|---|---|
+| F12-3 | `firebase deploy --only extensions`, `mail` için TTL politikası, birikmiş dokümanların temizliği ve 7 gün sonraki doğrulama |
+| F13-2 | App Store Connect / Play Console'a gizlilik URL'i, Play "Veri Güvenliği" formu |
+| F13-3 | Demo hesap bilgilerinin store konsollarına girilmesi + **yayın sonrası** `--revoke` |
+| F13-5 | App Check'in Console'da monitoring modunda izlenmesi ve enforcement kararı |
+| F13-6 | Mock repository'lerin tamamen kaldırılıp kaldırılmayacağı kararı |
+
+---
+
+## FAZ 11 — Admin'in Kendini Antrenör Olarak Eklemesi (Gölge Antrenör)
+
+**Problem:** Pilot salonda adminin kendisi aynı zamanda antrenör. Telefon numarası admin hesabına bağlı olduğu için aynı numarayla ikinci bir hesap açılamıyor; seans ve grup dersi atarken kendi adı antrenör listesinde çıkmıyor.
+
+**Seçilen çözüm — "gölge antrenör":** Admin, "Antrenör Ekle" akışındaki bir toggle ile `users` koleksiyonuna kendisi için **telefonsuz ve e-postasız** bir `role: 'trainer'` dokümanı açar. Bu doküman hiçbir zaman giriş yapamaz (kimlik sorgularının ikisi de eşleşmez), sadece "atanabilir antrenör" olarak var olur. Antrenöre giden push bildirimleri, gölge dokümandaki `notificationProxyUid` alanı üzerinden adminin cihazına yönlendirilir.
+
+**Neden bu yol (değerlendirilen alternatifler):**
+- `role` alanını bitmask'e çevirmek (`admin|trainer`) — ~6 gün, `firestore.rules`'taki 41 `myRole()` kullanımı + custom claim zinciri + kırıcı şema migration'ı gerektiriyor. Rules dilinde bitwise operatör olmadığı için kazancı da sınırlı.
+- `role` string kalıp yanına `isTrainer` bayrağı — ~2 gün, tek kimlik üretmesi açısından daha temiz ama antrenör sorgularını ve claim/rules tarafını yine de elliyor.
+- Aynı telefon/e-posta ile ikinci doküman — **YAPILAMAZ.** `sendEmailSetupOtp` aynı e-postayı ikinci hesaba vermiyor (`already-exists`), ve `findUserByPhone` `.limit(1)` ile sorguladığı için iki dokümandan biri doküman ID sırasına göre kalıcı olarak erişilemez hale geliyor — %50 ihtimalle adminin kendi hesabı.
+
+**Bu yolun kabul edilen bedelleri:** Adminin antrenör kimliği ayrı bir dokümanda yaşıyor (ikinci bir "kişi" kaydı). Admin dokümanında isim tutulmadığı için raporlarda isim tekrarı oluşmuyor. Antrenör görünümü/shell'i açılmıyor — admin zaten kendi panelinden seans tamamlayabiliyor (`admin_session_management_panel.dart`, rules'ta `sessions` update dalı admin için salonun tamamını kapsıyor).
+
+**Doğrulanmış önkoşullar (kod okunarak teyit edildi, tekrar araştırmaya gerek yok):**
+- Telefon hiçbir yerde SMS ile doğrulanmıyor; OTP e-postaya gidiyor. Telefon sadece bir tanımlayıcı.
+- `admin_trainer_management_panel.dart:302` — telefon tekrar kontrolü `phoneNumber.isNotEmpty` koşuluna bağlı, yani boş telefon bugün de kabul ediliyor.
+- `resolvePhoneIndexSync` boş/olmayan numarada `phoneIndex`'e hiçbir şey yazmıyor.
+- `deactivateTrainer`, Auth kaydı hiç olmayan uid'ler için `auth/user-not-found`'u zaten yutuyor (lazy account creation).
+- Antrenör sayısı hiçbir limit/abonelik hesabına girmiyor, sadece ekranda gösteriliyor.
+- `onUserRoleAssigned` gölge doküman için hep `auth/user-not-found` verip yeniden denenecek; bu hata `isIgnorable` ile alarm dışı bırakılmış durumda. Bugün de her yeni antrenör/üye için ilk girişe kadar aynısı oluyor — kabul edilen gürültü.
+
+---
+
+**Canlı etki (kod okunarak doğrulandı) — geliştirirken bunlara göre hareket edilecek:**
+
+*Mevcut kullanıcılar için veri göçü, zorunlu güncelleme ve yeniden giriş YOK.* Hiçbir mevcut dokümana dokunulmuyor; `notificationProxyUid`/`trainerProfileUid` yeni alanlar. `role`, custom claim'ler, `phoneIndex` ve giriş akışı değişmiyor. Antrenör sorguları `gymId` filtreli olduğu için gölge antrenör sadece kendi salonunun admin ekranlarında görünür. Üyeye giden 5 bildirim yolu (`send-session-reminder-task`, `community-broadcast`, `feedback-reminder-check`, `send-manual-notification`, `notify-member-package-quota`) bu fazın dokunduğu yerlerden token okumuyor — kapsam dışı. Eski uygulama sürümleri sorunsuz çalışmaya devam eder (proxy alanı olmayan dokümanlar için sunucu davranışı birebir aynı).
+
+**🔴 RİSK 1 — F11-2 tüm salonların personel bildirimlerinin ortak yolunda.** `fetchTokensForUids`/`fetchGymStaffTokens`, gölge antrenörü hiç kullanmayan salonlarda da antrenör seans hatırlatması, grup dersi hatırlatması, etkinlik personel hatırlatması ve "dersini onaylar mısın?" push'unu besliyor. Buradaki bir hata bildirimleri **sessizce** keser — hata görünmez, sadece push gelmez (`sendEachForMulticast`'in dönüş değeri hiçbir yerde incelenmiyor). Bu yüzden regresyon kriteri ve birim testleri zorunlu, deploy sonrası canlı teyit şart.
+
+**🔴 RİSK 2 — F11-3 rules deploy'u anında ve herkese birden yayılır.** Kademeli çıkış yok; yanlış bir koşul tüm kullanıcıları aynı anda `PERMISSION_DENIED`'a düşürür. Kısıtlanacak alanların bugün hiçbir canlı akışta yazılmadığı DOĞRULANDI: `member_registration_service` (name, nameLower, phoneNumber, role, gymId, trainerId, trainerName, createdAt, gender, canConfirmAttendance), `addTrainer` ve `updateOwnInfo` (name, nameLower, phoneNumber) `email`/`emailLower`'a dokunmuyor; `signupGymAdmin` Admin SDK olduğu için rules'a tabi değil. Yani kısıtlama bugün kimsenin kullanmadığı bir kapıyı kapatıyor — yine de emulator testleri olmadan deploy EDİLMEZ.
+
+**⚠️ DEPLOY SIRASI — önce sunucu, sonra client:** `F11-2 + F11-3` (Cloud Functions + rules) → sonra `F11-1, F11-4, F11-6` (store sürümü). Ters sırada, admin gölge antrenörü oluşturur ama yönlendirme canlıda olmadığı için o antrenörün bildirimleri **hiçbir yere gitmez** (gölge dokümanda `fcmTokens` alanı hiç yok) ve bu sessizce olur. F11-2 client değişikliği gerektirmediği için bu sırayı tutturmak kolay.
+
+**Geri dönüş:** F11-2/F11-3 tek `firebase deploy` ile eski haline döner. Oluşturulmuş gölge doküman `deactivateTrainer` ile pasife alınır; seanslar ve rapor satırları geçmişte kalır. Kalıcı/geri alınamaz hiçbir veri dönüşümü yok.
+
+---
+
+### F11-1 — Gölge antrenör dokümanının oluşturulması (client)
+
+**Prompt:** "`admin_trainer_management_panel.dart`'taki antrenör ekleme sheet'ine, formun en üstüne 'Kendimi antrenör olarak ekle' toggle'ı ekle (varsayılan kapalı, metin Remote Config'ten). Toggle açıkken telefon alanı boşaltılıp `enabled: false` yapılsın ve tekrar kontrolüne hiç girilmesin; sadece ad-soyad ve uzmanlıklar girilir. `AdminTrainersController`'a `addSelfAsTrainer({name, specialties})` metodu ekle: `users` koleksiyonuna `{name, nameLower, role: 'trainer', gymId, specialties, createdAt: serverTimestamp(), isActive: true, notificationProxyUid: <adminUid>}` yazar — `phoneNumber` ve `email` alanlarını HİÇ yazmaz (boş string de değil, alan hiç bulunmaz). Aynı işlemde adminin kendi `users/{adminUid}` dokümanına `trainerProfileUid: <yeni doküman id>` yazılır; bu alan bir daha silinmez (F11-5'te tekrar açma bunun üzerinden çalışır). Admin dokümanında `trainerProfileUid` zaten varsa toggle hiç gösterilmez."
+
+**Kabul kriterleri:**
+- [x] Toggle kapalıyken mevcut antrenör ekleme akışı bit birebir aynı davranıyor
+- [x] Oluşan dokümanda `phoneNumber` ve `email` alanları YOK (Firestore Console'da doğrulanır)
+- [x] `phoneIndex` koleksiyonuna hiçbir doküman yazılmadı
+- [x] `startLogin`, adminin telefonuyla çağrıldığında hâlâ ADMIN dokümanını döndürüyor
+- [x] Gölge antrenör, seans oluşturma sheet'i ve grup dersi panelindeki antrenör seçicilerinde görünüyor
+- [x] `trainerProfileUid` yazılı adminde toggle görünmüyor
+- [x] Toggle etiketi/açıklaması Remote Config'e **iki dilde de** (`_tr`/`_en`) girildi — girilmezse etiket boş görünür, sürüm çıkmadan kontrol edilmeli
+- [x] `flutter analyze` temiz, mevcut testler geçiyor
+
+---
+
+### F11-2 — Bildirim token yönlendirmesi (`notificationProxyUid`)
+
+**Prompt:** "`functions/src/shared/staff-notifications.ts`'te token çözümlemesine yönlendirme ekle: bir `users` dokümanında `notificationProxyUid` alanı varsa, o dokümanın kendi `fcmTokens`'ı yerine işaret edilen dokümanın `fcmTokens`'ı kullanılır. Yönlendirme TEK adım — proxy'nin proxy'si takip edilmez (sonsuz döngü koruması), işaret edilen doküman yoksa boş liste döner. `fetchTokensForUids` (satır 43) ve `fetchGymStaffTokens` (satır 60) bu mantığı kullanacak. `send-session-completion-task.ts:79` bugün antrenör dokümanını doğrudan okuyup `fcmTokens`'ı alıyor — onu `fetchTokensForUids([trainerId], db)` çağrısına dönüştür ki yönlendirme tek yerde kalsın. Çözümleme mantığını saf bir fonksiyon olarak ayır ve `staff-notifications.test.ts` desenine uygun birim testleri yaz."
+
+**Kabul kriterleri:**
+- [x] Proxy'si olmayan dokümanlar için davranış birebir aynı (regresyon yok)
+- [x] Proxy'si olan doküman için işaret edilen dokümanın token'ları dönüyor
+- [x] Proxy zinciri (A→B→C) takip edilmiyor, tek adımda duruyor
+- [x] İşaret edilen doküman silinmişse boş liste dönüyor, fonksiyon çökmüyor
+- [x] `send-session-completion-task.ts` artık `fcmTokens`'ı doğrudan okumuyor
+- [x] `npm test` ve `npx tsc --noEmit` temiz
+- [x] **Client tarafında hiçbir değişiklik yok** — bu görev store güncellemesi gerektirmez
+- [x] Deploy sonrası ilk gün, gölge antrenörü OLMAYAN bir salonda gerçek bir antrenör seans hatırlatmasının gittiği teyit edildi (sessiz kesinti riski — bkz. RİSK 1)
+
+---
+
+### F11-3 — `notificationProxyUid`/`trainerProfileUid` alanlarını Security Rules ile koru
+
+**Prompt:** "`firestore.rules`'ta `match /users/{uid}` altındaki `allow update` kuralının self-update dalı bugün sadece `email`/`emailLower` alanlarını koruyor. Bu listeye `notificationProxyUid` ve `trainerProfileUid` alanlarını da ekle — bir üye/antrenör kendi dokümanına `notificationProxyUid` yazarak KENDİ bildirimlerini başka bir kullanıcının cihazına yönlendirebilir (kendi verisini kurbanın telefonuna sızdırma + spam vektörü). Bu alanları sadece admin dalı ve Admin SDK yazabilmeli. AYRICA: `allow create` dalında hiçbir alan kısıtı yok; `email`/`emailLower`'ın oluşturma anında client'tan yazılabilmesi, `update`'teki 'email sadece OTP sonrası Admin SDK ile yazılır' kuralını deliyor — create dalına da aynı kısıtı ekle."
+
+**Kabul kriterleri:**
+- [x] Üye/antrenör kendi dokümanına `notificationProxyUid` yazamıyor (rules testi)
+- [x] Üye/antrenör kendi dokümanına `trainerProfileUid` yazamıyor
+- [x] Client oluşturma akışları `email`/`emailLower` yazamıyor
+- [x] Admin, gölge antrenör dokümanını (F11-1) hâlâ oluşturabiliyor
+- [x] Mevcut ad/telefon güncelleme akışları (`updateOwnInfo`) bozulmadı
+- [x] Üye ekleme (`member_registration_service`) ve antrenör ekleme (`addTrainer`) akışları bozulmadı
+- [x] Admin, KENDİ dokümanına `trainerProfileUid` yazabiliyor (self-update dalı bunu engelliyor ama admin dalı `gymId` eşleşmesiyle izin veriyor — OR mantığı doğrulanmalı)
+- [x] Emulator'da rules testleriyle doğrulandı — rules deploy'u kademeli değil, testsiz çıkılmaz (bkz. RİSK 2)
+
+> Rules testleri `functions/src/rules/*.rules-test.ts` altında, `cd functions && npm run test:rules` ile (Firestore emulator'ı `firebase emulators:exec` içinde açılır). `npm test`'in globu (`*.test.js`) bu dosyaları BİLEREK kapsamıyor — emulator gerektirdikleri için ayrı komut. Emulator Java istiyor: `export PATH="/opt/homebrew/opt/openjdk/bin:$PATH"`.
+
+---
+
+### F11-4 — Antrenör bildirimlerinin admin oturumunda doğru ekrana açılması
+
+**Prompt:** "`push_notification_service.dart`'taki `_navigateForData`, `session_completion` tipinde `TrainerCalendarPanel`'e gidiyor. Gölge antrenör senaryosunda bu bildirim ADMİN cihazına düşüyor ama panel `FirebaseAuth.currentUser.uid` (= admin uid) ile sorgu yaptığı için boş ekran açılıyor. `session_completion` ve `trainer_session_reminder` tiplerinde aktif rol admin ise `AdminSessionManagementPanel`'e (mümkünse `sessionId` odaklı) yönlendir; rol antrenörse mevcut davranış korunur. Rol okuması için `app_deep_link_service.dart:57`'deki desen izlenmeli — ayrı/erken bir `currentRoleProvider` okuması yapılmaz, `appAccessProvider` beklenir."
+
+**Kabul kriterleri:**
+- [x] Admin oturumunda `session_completion` bildirimine dokunulunca boş ekran değil, ilgili seansın yönetim ekranı açılıyor
+- [x] Antrenör oturumunda mevcut davranış (Takvimim + onay sheet'i) değişmedi
+- [x] Bildirim, giriş yapılmamış durumda geldiğinde normal giriş akışının önüne geçmiyor
+
+---
+
+### F11-5 — Antrenörlükten çıkma / tekrar açma
+
+**Prompt:** "Antrenör listesinde gölge antrenör satırı için (adminin `trainerProfileUid`'i ile eşleşen doküman) 'Antrenörü sil' yerine 'Antrenörlükten çık' aksiyonu göster. Bu aksiyon `deactivateTrainer` callable'ını çağırır (`isActive: false`) — geçmiş seanslar, aylık istatistikler ve rapor satırları KORUNUR. Adminin `trainerProfileUid` alanı SİLİNMEZ; toggle'ın açık/kapalı durumu gölge dokümanın `isActive` alanından okunur. Tekrar açılırsa yeni doküman oluşturulmaz, aynı doküman `isActive: true` yapılır (istatistiklerin bölünmemesi için). `deactivateTrainer`'daki `trainerId === callerUid` guard'ı bu akışta tetiklenmiyor (uid'ler farklı), doğrulanmalı."
+
+**Kabul kriterleri:**
+- [x] Antrenörlükten çıkınca gölge antrenör, seans/grup dersi atama listelerinde görünmüyor
+- [x] `fetchGymStaffTokens` artık bu dokümanı toplamıyor (`isActive !== false` filtresi)
+- [x] Geçmiş raporlarda o dönemin seansları hâlâ görünüyor
+- [x] Tekrar açıldığında YENİ doküman oluşmuyor, aynı doküman canlanıyor
+- [x] Aylık istatistik bucket'ı bölünmüyor
+
+---
+
+### F11-6 — Antrenör listesi ve detay ekranlarında telefonsuz antrenör
+
+**Prompt:** "Antrenör listesi ve antrenör detay ekranlarında `phoneNumber` alanı boş/eksik olan antrenör için telefon satırı gösterilmesin (ya da '—' gösterilsin, tutarlı olan hangisiyse). Gölge antrenör satırında adminin kendisi olduğunu belirten bir rozet/etiket göster. Düzenleme formunda bu satır açıldığında telefon alanı pasif kalır."
+
+**Kabul kriterleri:**
+- [x] Boş telefonlu antrenör satırı bozuk/boş bir alan göstermiyor
+- [x] Gölge antrenör listede ayırt edilebiliyor
+- [x] Düzenleme formunda telefon alanı pasif, kaydetme telefon yazmaya çalışmıyor
+- [x] Bugün elle telefonsuz eklenmiş antrenörler varsa (mevcut form buna zaten izin veriyor) onların satırı da düzgün görünüyor — bu görev sadece gölge antrenörü değil, o kayıtları da etkiler
+
+---
+
+### F11-7 — Uçtan uca doğrulama (manuel senaryo)
+
+**Prompt:** "Gerçek cihazda (emulator değil, push gerektiği için) aşağıdaki senaryoyu baştan sona çalıştır ve her adımı işaretle."
+
+### Deploy sırası — ZORUNLU: sunucu → RC → client
+
+Ters sırada gölge antrenörün bildirimleri **sessizce** hiçbir yere gitmez (gölge dokümanda `fcmTokens` alanı hiç yok, yönlendirme de canlıda değil).
+
+**1) Cloud Functions + Security Rules**
+
+Deploy öncesi (predeploy zaten lint+build çalıştırıyor, bu ek olarak rules testleri):
+```
+cd functions && export PATH="/opt/homebrew/opt/openjdk/bin:$PATH" && npm test && npm run test:rules
+```
+
+```
+firebase deploy --only functions,firestore:rules
+```
+
+Dar kapsam istenirse — F11-2'nin dokunduğu 4 fonksiyon:
+```
+firebase deploy --only functions:sendSessionCompletionTask,functions:sendTrainerSessionReminderTask,functions:sendEventReminderTask,functions:sendGroupSessionReminderTask,firestore:rules
+```
+
+⚠️ Rules deploy'u kademesiz ve anında herkese gider (RİSK 2). İlk 10 dakika Crashlytics'te `PERMISSION_DENIED` var mı kontrol et.
+
+**2) Remote Config**
+```
+firebase deploy --only remoteconfig
+```
+
+**3) Client sürümü** — `CLAUDE.md` §7 gereği build number artırılır ve İKİ platform da çalıştırılır:
+```
+sed -i '' 's/^version: 1.0.0+19$/version: 1.0.0+20/' pubspec.yaml && flutter pub get
+```
+```
+flutter build appbundle --release && cp build/app/outputs/bundle/release/app-release.aab "build/app/outputs/bundle/release/20 (1.0.0).aab"
+```
+```
+flutter build ios --no-codesign --debug
+```
+iOS build'i atlama — `ios/Flutter/Generated.xcconfig` yalnızca gerçek bir iOS build komutuyla yenilenir, `flutter pub get` yetmez. Sonrasında Xcode'da Product → Archive ile YENİ archive al.
+
+### Hazırlık
+
+Yetki Ayarları'ndan gölge antrenörün "seans bitince kaç dakika sonra tamamlama sorusu gitsin" süresini **1 dakikaya** çek (`trainerReminderDelayMinutes`, varsayılan 30 — bkz. `shared/trainer-completion-delay.ts`). `session_completion` push'unu beklenebilir sürede tetiklemenin tek pratik yolu bu.
+
+**✅ TAMAMLANDI (2026-09-24) — kullanıcı tarafından gerçek cihazda yürütüldü ve tüm adımlar doğrulandı.** Aşağıdaki işaretler benim gözlemim değil, testi yürüten kullanıcının bildirimidir.
+
+**Kabul kriterleri:**
+
+*A — Ekleme (F11-1)*
+- [x] Toggle açılınca telefon alanı pasifleşiyor ve girilmiş numara temizleniyor
+- [x] Oluşan dokümanda `phoneNumber` ve `email` alanları YOK; `notificationProxyUid` admin uid'sine eşit, `isActive: true`
+- [x] `phoneIndex` koleksiyonunda yeni doküman OLUŞMADI
+- [x] Admin dokümanında `trainerProfileUid` yazılı
+- [x] Çıkış yapıp telefonla tekrar girince ADMIN olarak giriliyor (gölge kayda düşmüyor)
+- [x] Listede "Sen" rozetiyle görünüyor; ekleme sheet'inde toggle artık yok
+
+*B — Atama ve bildirim (F11-2, F11-4)*
+- [x] Seans oluşturma sheet'indeki antrenör listesinde kendi adı çıkıyor
+- [x] Bitişi ~2 dk sonra olan bir seans için "Dersini onaylar mısın?" push'u ADMIN cihazına geliyor
+- [x] Bildirime dokununca boş ekran değil, admin seans yönetim ekranı açılıyor
+- [x] Seans admin panelinden tamamlanıyor, üyenin `remainingSessions` değeri düşüyor
+
+*C — Çift bildirim kontrolü*
+- [x] Grup dersi hatırlatmasında TEK bildirim geliyor (antrenör metni; admin metni `excludeTokens` ile eleniyor — bkz. commit 47caf86)
+- [x] Etkinlik personel hatırlatmasında tek bildirim geliyor
+
+*D — Token dayanıklılığı (F11-2'nin asıl kazancı)*
+- [x] Çıkış yapıp tekrar girildikten (token yenilendikten) SONRA oluşturulan seansın bildirimi hâlâ geliyor — kopyalama yaklaşımı burada kırılırdı
+
+*E — Rapor*
+- [x] Haftalık rapor mailinde antrenör performans tablosunda gölge antrenör satırı, doğru seans sayılarıyla görünüyor
+
+*F — Çıkış ve geri dönüş (F11-5)*
+- [x] "Antrenörlükten çık" sonrası antrenör listelerinden ve seans/grup dersi seçicilerinden düşüyor, yeni bildirim gelmiyor
+- [x] Geçmiş raporlarda o dönemin seansları hâlâ görünüyor
+- [x] Toggle tekrar görünüyor; açılınca YENİ doküman oluşmuyor, aynı doküman `isActive: true` oluyor ve `deactivatedAt`/`deactivatedBy` siliniyor
+
+*G — Regresyon (rules deploy'u TÜM kullanıcıları etkiliyor)*
+- [x] Üye kendi profilinden ad/telefon güncelleyebiliyor
+- [x] Admin yeni üye ve normal (telefonlu) antrenör ekleyebiliyor
+- [x] Antrenör hesabıyla giriş yapılıp kendi takvimi görülebiliyor
+
+**Geri dönüş:** 1. ve 2. adım tek `firebase deploy` ile eski commit'ten geri alınır. Oluşmuş gölge doküman "Antrenörlükten çık" ile pasifleşir; kalıcı/geri alınamaz veri dönüşümü yok.
+
+---
+
+### FAZ 11 kapsamı DIŞINDA bırakılanlar
+
+**Grup dersi/etkinlik katılımcı listeleri.** `send-group-session-reminder-task.ts:122` ve `send-event-reminder-task.ts:106` `attendeeIds`'teki uid'lerin `fcmTokens`'ını DOĞRUDAN okuyor, `notificationProxyUid` yönlendirmesini bilmiyor. Bugün sorun değil: katılımcı listelerine sadece üyeler giriyor, gölge antrenör giriş yapamadığı için kendini derse ekleyemiyor. "Antrenör de derse katılımcı olarak eklenebilsin" denirse yönlendirmenin bu iki noktaya da taşınması gerekir.
+
+**Adminin kendi antrenörlük performansını antrenör gözüyle görmesi.** Gölge antrenörün "Seans Raporum" karşılığı yok; admin salon raporlarından ve antrenör performans tablosundan takip eder. İstenirse admin paneline ayrı bir "Benim seanslarım" sekmesi olarak eklenebilir.
+
+**Çoklu rol mimarisi (bitmask / `roles` dizisi).** Gölge antrenör, `role` alanının anlamına hiç dokunmadığı için bu geçişi engellemiyor; ileride gerçekten gerekirse ayrı bir faz olarak ele alınır. Geçiş planı ve dosya envanteri bu konuşmada çıkarıldı, gerekirse yeniden üretilebilir.
+
+---
+
+## FAZ 12 — Veri Tutarlılığı ve Temizlik
+
+**Nereden çıktı:** `users/{uid}.fcmTokens` dizisinin sınırsız büyümesi araştırılırken (çözümü: çıkışta silme `455daf8`, token yenilenince eskisini silme `fcab08d`, ölü token temizliği `4adcebd` + `scripts/prune_dead_fcm_tokens.ts`) aynı desenin başka yerlerde de olup olmadığı tarandı. Üç aile bulundu: (A) eklenip hiç silinmeyen kayıtlar, (B) yenilenince eski kopyası güncellenmeyen denormalize alanlar, (C) silinen kaydın geride bıraktığı atıflar.
+
+**Taramada TEMİZ çıkanlar** (tekrar araştırmaya gerek yok): `otpRequests` (doküman id'si `purpose+uid`, her istekte üzerine yazılıyor — sınırlı), Cloud Tasks (`session-scheduled-tasks.ts:103` yeniden planlamada eskisini iptal ediyor), `attendeeIds` (dersten çıkışta `arrayRemove` var), `phoneIndex` (trigger eskisini siliyor), antrenör istatistikleri (`FieldValue.increment` simetrik, delta negatif olabiliyor), `functionHealth`/`monthlyTrainerStats`/`reportSnapshots`/`subscriptionTransactions` (sınırlı ya da bilinçli tarihçe).
+
+---
+
+### F12-1 — Hesap silinince kontenjan listelerindeki hayalet üyeyi temizle
+
+**Öncelik: yüksek — kullanıcıya görünen hata.**
+
+**Ne oluyor:** `deleteAccount` yalnızca `users/{uid}` dokümanını ve Auth hesabını siliyor ([delete-account.ts:23](functions/src/callable/delete-account.ts:23)). Üyenin uid'si `groupSessions.attendeeIds` ve `events.attendeeIds` dizilerinde kalıyor. Kontenjan `attendeeIds.size()` üzerinden hesaplandığı için (`firestore.rules` → `withinCapacity()`, ayrıca `CapacityService`), silinmiş üye **kalıcı olarak bir yer işgal ediyor**: ders dolu görünüyor ama değil, başka kimse katılamıyor.
+
+**Prompt:** "`functions/src/callable/delete-account.ts`'te `users/{uid}` silinmeden ÖNCE, kullanıcının uid'sini taşıyan kontenjan listelerinden çıkar: `groupSessions` ve `events` koleksiyonlarında `where('attendeeIds', 'array-contains', uid)` sorgusuyla bulunan dokümanlarda `arrayRemove(uid)` uygula. Silme akışının tamamı bir kullanıcı eylemi olduğu için temizlik başarısız olursa hesap silme YİNE de tamamlanmalı — temizlik hatası loglanır ama fırlatılmaz (bkz. `dead-token-cleanup.ts`'teki aynı desen). Yalnızca GELECEK dersleri değil tüm eşleşmeleri temizle: geçmiş bir dersin katılımcı listesinde silinmiş uid kalması da rapor sayımlarını bozar."
+
+**Kabul kriterleri:**
+- [x] Hesabı silinen üye hiçbir `groupSessions`/`events` dokümanının `attendeeIds`'inde kalmıyor
+- [x] Kontenjan yeniden doğru hesaplanıyor (dolu görünen ders açılıyor)
+- [x] Temizlik hatası hesap silmeyi engellemiyor
+- [x] `functions` testleri geçiyor
+
+---
+
+### F12-2 — Antrenör adı değişince üye sayısının sıfırlanması
+
+**Öncelik: yüksek — kullanıcıya görünen hata.**
+
+**Ne oluyor:** `AdminTrainersController.build()` üye sayısını **isimle** eşleştiriyor (`countByTrainerName[doc.data()['name']]`, [admin_trainers_controller.dart:88](lib/modules/trainers/controller/admin_trainers_controller.dart:88) civarı). `updateTrainer` ise yalnızca antrenörün kendi dokümanını güncelliyor, üye dokümanlarındaki denormalize `trainerName` alanına dokunmuyor. Sonuç: antrenörün adı düzeltilir düzeltilmez listede **üye sayısı 0'a düşüyor**, üyeler hâlâ ona bağlı olduğu hâlde. Üye ekranlarında da eski ad görünmeye devam ediyor.
+
+Not: antrenörün KENDİ üye listesi (`trainer_members_controller.dart:21`) zaten `trainerId` ile filtreliyor — yani doğru desen kod tabanında mevcut, sadece bu sayım yanlış alanı kullanıyor.
+
+**Prompt:** "(a) `AdminTrainersController.build()` içindeki üye sayımını `trainerName` yerine `trainerId` üzerinden yap — isim değişse bile sayım bozulmasın. (b) `updateTrainer`, antrenörün adı değiştiğinde o antrenöre bağlı üye dokümanlarındaki denormalize `trainerName` alanını da güncellesin (`where('trainerId', isEqualTo: id)` ile bulunan üyeler, batch'li). Üye sayısı yüksek salonlarda 500'lük batch sınırına dikkat. (c) Adın değişmediği düzenlemelerde bu ek yazma HİÇ yapılmasın."
+
+**Kabul kriterleri:**
+- [x] Antrenörün adı değiştirildikten sonra üye sayısı doğru kalıyor
+- [x] Üye ekranlarında antrenörün YENİ adı görünüyor
+- [x] Ad değişmeyen düzenlemede üye dokümanlarına yazma yapılmıyor
+- [x] 500'den fazla üyesi olan antrenörde de çalışıyor
+
+---
+
+### F12-3 — `mail` koleksiyonunun sınırsız büyümesi ve açık OTP kodu
+
+**Öncelik: orta (maliyet) / yüksek (gizlilik).**
+
+**Ne oluyor:** [mail.ts:9](functions/src/shared/mail.ts:9) her e-posta için `collection("mail").add({...})` yapıyor ve **hiçbir yerde silme yok**. Her giriş OTP'si, her haftalık salon raporu, her aylık rapor ve her abone özeti kalıcı bir doküman bırakıyor — büyüme `fcmTokens`'tan hızlı.
+
+İkinci ve daha önemli tarafı: dokümanın `message.html` alanı e-postanın tam gövdesi, yani OTP e-postalarında **giriş kodunun düz metin hâli** ([otp.ts:66](functions/src/shared/otp.ts:66)). `otpRequests` kodu tuzlanmış hash olarak tutuyor (orada doğru yapılmış) ama `mail` dokümanı aynı kodu açıkta ve süresiz bırakıyor. Kod 5 dakikada geçersizleştiği için istismar edilebilir değil, ama alıcı adresleriyle birlikte kalıcı bir arşiv birikiyor.
+
+**Prompt:** "Gönderilen e-posta dokümanlarına yaşam süresi ver. Önce Trigger Email eklentisinin (`firestore-send-email@0.2.10`) gönderim sonrası silme/TTL ayarı var mı bak; varsa onu kullan. Yoksa `mail` dokümanlarına `expiresAt` alanı yazıp Firestore TTL politikası tanımla (ör. 30 gün). Mevcut birikmiş dokümanlar için `scripts/` altında tek seferlik bir temizlik script'i yaz — diğer script'lerdeki güvenlik desenini birebir uygula (varsayılan emulator, production için `--allow-production` + `CONFIRM_PRODUCTION_BACKFILL=yes`, `--dry-run` desteği)."
+
+**YAPILDI — uygulanan çözüm:**
+
+Trigger Email eklentisinin (`firestore-send-email@0.2.10`) kendi TTL desteği varmış ve `never` olarak duruyormuş. `firebase ext:info` çıktısıyla doğrulandı: eklenti dokümanlara **`delivery.expireAt`** alanını yazıyor, ama **Firestore TTL politikasını kendisi kurmuyor** — o ayrıca tanımlanmalı.
+
+Seçilen süre **7 gün**. Gerekçe: gönderim sorunlarını (bounce, SMTP hatası) incelemek için fazlasıyla yeterli, buna karşılık OTP kodunun düz metin durduğu pencereyi kısa tutuyor. Tek satırlık bir ayar, gerekirse değiştirilebilir.
+
+⚠️ **`extensions/firestore-send-email.env` gitignore'da** (`.gitignore:56`, içinde SMTP kimlik bilgisi var) — yani bu ayar commit'e GİRMEZ, her ortamda elle uygulanmalı. Uygulanan değerler:
+
+```
+TTL_EXPIRE_TYPE=day
+TTL_EXPIRE_VALUE=7
+```
+
+**Kalan iki adım (elle çalıştırılacak):**
+
+1. Eklenti ayarını yayına al:
+```
+firebase deploy --only extensions
+```
+
+2. Firestore TTL politikasını `mail` koleksiyonu için tanımla — eklenti alanı yazıyor ama politikayı kurmuyor:
+```
+gcloud firestore fields ttls update delivery.expireAt --collection-group=mail --enable-ttl --project=egoractive-e92bd
+```
+(ya da Firebase Console → Firestore → TTL)
+
+3. Birikmiş eski dokümanlar için `scripts/prune_old_mail_docs.ts` — TTL yalnızca AYARDAN SONRA yazılan dokümanları etkiliyor; eskilerde `delivery.expireAt` alanı hiç olmadığı için politika onlara asla dokunmaz:
+```
+cd scripts && GOOGLE_APPLICATION_CREDENTIALS=... CONFIRM_PRODUCTION_BACKFILL=yes npm run prune-old-mail -- --allow-production --dry-run
+```
+
+**Kabul kriterleri:**
+- [ ] `firebase deploy --only extensions` çalıştırıldı
+- [ ] TTL politikası `delivery.expireAt` için tanımlı (Console'da görünüyor)
+- [ ] Yeni gönderilen bir e-postanın dokümanında `delivery.expireAt` alanı var
+- [ ] E-posta gönderimi bozulmadı (OTP ve raporlar ulaşıyor)
+- [ ] Birikmiş dokümanlar `--dry-run` ile raporlandı, sonra silindi
+- [ ] 7 gün sonra kontrol: TTL politikası eski dokümanları gerçekten siliyor
+
+---
+
+### F12-4 — Hesap silinince kişisel sağlık verisi de silinsin
+
+**Öncelik: yüksek (gizlilik/uyumluluk).**
+
+**Ne oluyor:** `deleteAccount`, `measurements/{uid}/entries` alt koleksiyonuna dokunmuyor. Bu kayıtlar `firestore.rules`'ta açıkça "kişisel/hassas sağlık verisi (F0-4 gizlilik politikası kapsamında)" diye nitelendirilmiş. "Hesabımı sil" dedikten sonra sağlık verisinin sunucuda kalması, uygulamanın kendi gizlilik metniyle çelişebilir.
+
+**Prompt:** "`deleteAccount`'ta `measurements/{uid}/entries` alt koleksiyonunun tamamını sil (Admin SDK `recursiveDelete` ya da sayfalı batch silme)."
+
+**ÜRÜN KARARI (2026-09-09):** Seans ve geri bildirim verisi, **isim dahil olduğu gibi KORUNUR**. Silinen bir üyenin adı raporlarda görünmeye devam etmeli — bunlar salonun işletme kayıtları, geçmiş raporların geriye dönük değişmesi kabul edilemez. Anonimleştirme de yapılmayacak.
+
+Bu karar **ek bir geliştirme gerektirmiyor**, çünkü mevcut şema zaten böyle çalışıyor (kodda doğrulandı):
+- `sessions` dokümanları `memberName`'i yazma anında kopyalıyor (`sessions_write_service.dart:163`)
+- `feedback` dokümanları `memberName`/`trainerName`'i kopyalıyor (`feedback_service.dart:31`)
+- Admin takvimi ve raporlar ismi bu dokümanlardan okuyor, `users/{uid}`'e bakmıyor (`admin_calendar_controller.dart:142`)
+
+Yani `users/{uid}` silindikten sonra da raporlar eksiksiz kalıyor. Silinmiş üyeye ait dokümanlara bakan akışlar da nazikçe davranıyor: `send-session-reminder-task.ts:95` üye dokümanını bulamayınca "token yok, atlandı" deyip çıkıyor.
+
+Ölçüm verisinin silinip seans kaydının kalması **bilinçli bir ayrım**: ölçümler hassas sağlık verisi ve hesap kapandıktan sonra bir işletme ihtiyacı karşılamıyor; seans kayıtları ise salonun kendi ticari kaydı.
+
+**Kabul kriterleri:**
+- [x] Hesap silindikten sonra `measurements/{uid}` altında doküman kalmıyor
+- [x] Silme işlemi büyük ölçüm geçmişinde de timeout'a düşmüyor (`recursiveDelete`/BulkWriter)
+- [x] Seans/geri bildirim verisi için verilen karar dokümante edildi (yukarıda)
+- [x] Gizlilik politikası metni bu ayrımı yansıtıyor mu — kontrol edilmeli (ölçüm verisi siliniyor, seans kayıtları saklanıyor)
+
+---
+
+### F12-5 — Grup dersi `trainerNames` alanının bayatlaması
+
+**Öncelik: düşük (kozmetik).**
+
+**Ne oluyor:** [group_sessions_write_service.dart:39](lib/modules/group_sessions/service/group_sessions_write_service.dart:39) `trainerNames`/`trainerName` alanlarını dersin oluşturulduğu andaki isimlerle yazıyor. Antrenörün adı sonradan değişirse GELECEKTEKİ dersler eski adı göstermeye devam ediyor.
+
+**Prompt:** "F12-2'deki isim güncelleme akışına, `startTime`'ı GELECEKTE olan `groupSessions` dokümanlarının `trainerNames`/`trainerName` alanlarını da tazelemeyi ekle. GEÇMİŞ dersler BİLEREK dokunulmadan bırakılmalı: bir dersin kaydı, dersi o gün kimin verdiğini göstermeli — sonradan değişen isim geçmişi yeniden yazmamalı."
+
+**Kabul kriterleri:**
+- [x] Ad değişikliği sonrası gelecekteki grup derslerinde yeni ad görünüyor
+- [x] Geçmiş derslerde eski ad korunuyor
+- [x] Antrenörü olmayan/atanmamış derslerde akış çökmüyor
+
+---
+
+### F12-6 — `allow update`'in admin dalındaki `email`/`emailLower` açığı
+
+**Öncelik: orta (güvenlik, istismar edilmiyor).**
+
+**Ne oluyor:** F11-3'te `create` dalı ve self-update dalı korumaya alındı, ama `update`'in **admin dalında** alan kısıtı yok: bir admin kendi salonundaki bir üyenin `email`/`emailLower` alanını yazabilir. Hiçbir client akışı bunu yapmıyor (13 yazma noktası tek tek kontrol edildi) ama "email sadece OTP doğrulaması sonrası Admin SDK ile yazılır" değişmezi bu daldan hâlâ delinebilir. Bir adminin bir üyenin `emailLower`'ını kendi adresiyle aynı yapması, `startLogin`'in `.limit(1)` sorgusunda kimlik belirsizliği yaratabilir.
+
+**Prompt:** "`firestore.rules`'ta `match /users/{uid}` → `allow update`'in admin dalına `email`/`emailLower` kısıtı ekle. `notificationProxyUid`/`trainerProfileUid` o dalda SERBEST kalmalı — `addSelfAsTrainer` oradan geçiyor (F11-1). Emulator rules testleri ekle: admin bir üyenin adını değiştirebiliyor ama e-postasını değiştiremiyor."
+
+**Kabul kriterleri:**
+- [x] Admin, üyenin `email`/`emailLower` alanını yazamıyor
+- [x] Admin, üyenin diğer alanlarını (ad, telefon, paket) hâlâ yazabiliyor
+- [x] `addSelfAsTrainer` akışı bozulmadı
+- [x] `npm run test:rules` geçiyor
+
+---
+
+### F12-7 — Admin seans takviminde ay uyumsuzluğu
+
+**Öncelik: orta — yanlış veri gösteriyor.**
+
+**Ne oluyor:** `AdminSessionManagementPanel` seçili günü yerel `_date` alanında tutuyor ([admin_session_management_panel.dart:32](lib/modules/sessions/ui/panels/admin_session_management_panel.dart:32)) ama slot listesini `adminCalendarController`'ın ayına göre indeksliyor (`slotsByDayOfMonth[_date.day]`). Panel `selectDate()`'i hiç çağırmadığı için, panelin kendi tarih seçicisiyle **başka bir aya geçilince yanlış ayın aynı gün numarasındaki seansları** gösteriliyor. FAZ 11'den önce de var; F11-4'te admin bildirimine seans odaklaması koymamamın sebebi buydu.
+
+**Prompt:** "`AdminSessionManagementPanel`'deki yerel `_date` ile `adminCalendarController`'ın `selectedDate`'ini tek kaynağa indir: tarih değişimlerinde `ref.read(adminCalendarControllerProvider.notifier).selectDate(date)` çağrılsın ve panel seçili günü controller state'inden okusun. Tarih seçici, ileri/geri ok tuşları ve seans oluşturma sheet'ine geçen tarih dahil tüm kullanım noktalarını kapsa."
+
+**Kabul kriterleri:**
+- [x] Başka bir aya geçilince o ayın doğru seansları görünüyor
+- [x] İleri/geri ok tuşlarıyla ay sınırı geçildiğinde de doğru
+- [x] Seans oluşturma sheet'ine doğru tarih gidiyor
+- [x] Bu düzeltmeden sonra F11-4'teki admin bildirim yönlendirmesine seans odaklaması eklenebilir mi, değerlendirildi
+
+---
+
+### F12-8 — Antrenörlüğe geri dönerken formun boş açılması
+
+**Öncelik: düşük (UX).**
+
+**Ne oluyor:** F11-5'te antrenörlükten çıkıp tekrar eklenirken ekleme sheet'i boş açılıyor; admin adını yeniden yazmak zorunda. Yazdığı isim mevcut gölge dokümanı güncelliyor, yani veri kaybı yok — sadece gereksiz bir adım.
+
+**Prompt:** "Ekleme sheet'i, `selfTrainerProfile` dolu ama pasifken (yani yeniden aktivasyon durumunda) ad ve uzmanlık alanlarını mevcut gölge dokümandaki değerlerle ön-doldursun."
+
+**Kabul kriterleri:**
+- [x] Yeniden ekleme akışında ad ve uzmanlıklar dolu geliyor
+- [x] İlk kez ekleme akışında form boş açılmaya devam ediyor
+- [x] Ön-doldurulmuş değerler değiştirilip kaydedilebiliyor
+
+---
+
+## FAZ 13 — Prod Hazırlık (store review öncesi)
+
+**Nereden çıktı:** 2026-09-24'te yapılan uçtan uca prod hazırlık denetimi. Aşağıdaki 6 madde, üretim build'i review'a gönderilmeden ÖNCE kapatılmalı. F13-1 ve F13-2 doğrudan red sebebi; F13-3…F13-5 güvenlik; F13-6 kullanıcıya sahte veri gösteriyor.
+
+**Denetimde TEMİZ çıkanlar** (tekrar araştırmaya gerek yok): Remote Config anahtar tutarlılığı (804 metin + 23 config anahtarının tamamı template'te var), AdMob (debug'da test ID / release'de gerçek ID, `debugTestDeviceIds` boş), `PerfTrace` (release'de tam no-op), Crashlytics bağlantısı, Android imzalama (`key.properties` mevcut), `firestore.rules`'ta açık kural yok, izinler minimal (Android tek izin; iOS foto izni metni var, kamera kullanılmıyor), kod tabanında hiç TODO/FIXME yok, tüm testler geçiyor (Flutter 176, functions 130, rules 18).
+
+---
+
+### F13-1 — "Satın alımları geri yükle" (Apple Guideline 3.1.1)
+
+**🔴 Doğrudan red sebebi.** Reviewer bunu bizzat deniyor (ikinci cihaz ya da sil-kur).
+
+**Ne eksik:** `restorePurchases()` kod tabanında HİÇ çağrılmıyor. Alıcı taraf hazır — `subscription_controller.dart:167` gelen `PurchaseStatus.restored` olaylarını zaten işliyor — sadece tetikleyen UI yok.
+
+**Neden sadece uyum meselesi değil:** [subscription_controller.dart:170](lib/modules/subscription/controller/subscription_controller.dart:170) bilinçli olarak, `verifyPurchase` hata verse bile işlemi `completePurchase` ile kapatıyor (kullanıcı "mağaza bekleniyor" ekranında kilitli kalmasın diye). Bedeli: işlem mağaza kuyruğundan düşüyor ve bir sonraki açılışta TEKRAR SUNULMUYOR. Ağ koptuğu ya da Cloud Function hata verdiği bir anda ödeme alınmış ama salon pasif kalmış olur — bunu düzeltmenin tek yolu restore. Ayrıca ertelenmiş işlemler (Ask to Buy, SCA), `lbl_subscription_account_already_used_error` durumu ve `resetGymSubscription` sonrası yeniden bağlanma da bu akışa muhtaç.
+
+**Prompt:** "`subscription_panel.dart`'a (ve abonelik zorunluysa `subscription_onboarding_panel.dart`'a) 'Satın alımları geri yükle' aksiyonu ekle; `SubscriptionPurchaseService`'e `restorePurchases()` çağrısını geçir. Gelen `PurchaseStatus.restored` olayları zaten `_onPurchaseUpdate`'te işleniyor, oraya dokunma. Sonucu kullanıcıya bildir: geri yüklenecek satın alım BULUNAMADIĞINDA da sessiz kalma — `purchaseStream`'e hiç olay düşmeyeceği için bir zaman aşımı/boş sonuç durumu gerekiyor, aksi halde kullanıcı sonsuz bir yükleniyor durumunda kalır. Buton ve sonuç metinleri Remote Config'e TR/EN eklenmeli (`lbl_subscription_restore_*`)."
+
+**Kabul kriterleri:**
+- [x] Abonelik ekranında görünür bir "Satın alımları geri yükle" aksiyonu var
+- [x] Aktif aboneliği olan bir hesapta, uygulama silinip kurulduktan sonra restore salonu tekrar aktif ediyor
+- [x] Hiç satın alımı olmayan hesapta anlamlı bir "bulunamadı" mesajı çıkıyor, ekran takılmıyor
+- [x] Restore sırasında `verifyPurchase` hata verirse kullanıcıya hata gösteriliyor, işlem yine finish ediliyor (mevcut davranışla tutarlı)
+- [x] Metinler RC'de iki dilde, `remoteconfig.template.json`'a da eklendi (kod varsayılanı TEK BAŞINA yeterli değil)
+
+---
+
+### F13-2 — Uygulama içi Kullanım Şartları (EULA) + Gizlilik Politikası (Apple Guideline 3.1.2)
+
+**🔴 Doğrudan red sebebi.** Otomatik yenilenen abonelik satan uygulamalarda bu linkler binary'nin İÇİNDE olmak zorunda; App Store Connect metadata'sına yazmak yetmiyor.
+
+**Ne eksik:** `lib/` altında tek bir dış URL yok (denetimde doğrulandı — çıkan sonuçlar yalnızca freezed'in üretilmiş dosya başlıklarıydı). `Egoractive_Manuel_Gorevler.md`'de F0-4 olarak en baştan beri açık duruyor.
+
+**Önkoşul (insan işi, kod değil):** İki metnin yazılıp kalıcı bir URL'de yayınlanması gerekiyor (GitHub Pages / Firebase Hosting). Gizlilik metni şu ayrımı yansıtmalı — hesap silinince ölçüm/sağlık verisi SİLİNİYOR ama seans ve geri bildirim kayıtları isimle KORUNUYOR (bkz. F12-4 ürün kararı).
+
+**Prompt:** "Profil ekranına ve abonelik ekranına (satın alma noktasında da görünmeli, Apple şartı) 'Kullanım Şartları' ve 'Gizlilik Politikası' satırları ekle; `url_launcher` (zaten bağımlılıkta, pubspec:62) ile aç. URL'ler Remote Config'ten okunmalı — store güncellemesi olmadan değiştirilebilsin. Link açılamazsa sessizce yutma, kullanıcıya bilgi ver."
+
+**UYGULANAN (2026-09-24):** Egora Games sitesinde iki metnin de TR ve EN sürümleri AYRI URL'lerde yayınlandığı için anahtarlar dile BAĞLI seçildi: `lbl_common_terms_url_tr/_en` ve `lbl_common_privacy_url_tr/_en`, okuma `rcTextProvider` üzerinden. Dört değerin de RC'ye girilmesi gerekiyor — yalnızca TR doldurulursa İngilizce kullanan kullanıcıda bağlantılar hiç görünmez.
+
+**Kabul kriterleri:**
+- [x] İki metin de canlı bir URL'de yayında
+- [x] Profil ekranından ikisine de erişiliyor
+- [x] Abonelik/satın alma ekranından ikisine de erişiliyor
+- [x] URL'ler RC'den geliyor, `remoteconfig.template.json`'a eklendi
+- [ ] App Store Connect ve Play Console'daki gizlilik politikası alanlarına aynı URL girildi
+- [ ] Play Console "Veri Güvenliği" formu dolduruldu (telefon, e-posta, sağlık/ölçüm verisi, push token)
+
+---
+
+### F13-3 — OTP bypass bayrağının üretimde temizlenmesi
+
+**🔴 Güvenlik.** `users/{uid}.otpBypassEnabled === true` olan hesaplara sabit `000000` koduyla giriliyor, e-posta bile gönderilmiyor ([otp.ts:77](functions/src/shared/otp.ts:77)). Kodun kendi uyarısı: *"bu bayrak açık olan bir hesaba, telefon numarasını bilen HERKES girebilir"*.
+
+**Mekanizma KODDA kalmalı** — kapalı test/demo akışı için bilinçli olarak veriye bağlı tasarlandı. Kapatılması gereken şey VERİDEKİ bayrak.
+
+**Prompt:** "(a) `scripts/enable_closed_test_accounts.ts --revoke` zaten var (satır 62) ama SADECE dosyada sabit yazılı 3 uid'yi kapsıyor. Üretimde bu bayrağı taşıyan BAŞKA doküman kalmadığını garanti etmek için `users` koleksiyonunu `where('otpBypassEnabled','==',true)` ile tarayıp raporlayan/temizleyen küçük bir script yaz — diğer script'lerdeki güvenlik desenini birebir uygula (varsayılan emulator, production için `--allow-production` + `CONFIRM_PRODUCTION_BACKFILL=yes`, `--dry-run`). (b) Bu kontrolü yayın öncesi kontrol listesine kalıcı bir madde olarak ekle: her store gönderiminden önce çalıştırılmalı."
+
+**YAPILDI (kod tarafı):** `scripts/audit_otp_bypass.ts` — `users` koleksiyonunun TAMAMINI `where('otpBypassEnabled','==',true)` ile tarar. Varsayılan davranış sadece raporlama; silmek için `--revoke` gerekir. Bayrağı açık hesap bulursa çıkış kodu `1` döner, böylece yayın öncesi kontrol listesinde otomatik bir kapı olarak kullanılabilir.
+
+```
+cd scripts && GOOGLE_APPLICATION_CREDENTIALS=... CONFIRM_PRODUCTION_BACKFILL=yes \
+  npm run audit-otp-bypass -- --allow-production
+```
+
+Temizlemek için aynı komuta `--revoke` ekle.
+
+**ÜRETİM TARAMASI (2026-09-24):** 3 hesapta bayrak açık, hepsi TEK bir salona bağlı — `Egora Saloon` (`VtIqRsgL7qvgcPYW1IRW`, 10 kullanıcı / 29 seans, `subscriptionExempt: true`). Projedeki 6 salondan biri ve gerçek müşteri salonu DEĞİL, demo salon. Gerçek pilot salonların hesaplarında bayrak yok.
+
+| uid | Rol | Telefon |
+|---|---|---|
+| `ifKPfciCrKH0Qqvj2NgI` | admin | +90 555 555 0000 |
+| `r2SHvpzvai6zaP2YYnRt` | trainer | +90 500 500 0000 |
+| `XyrJtfwrt8Ol2ueZiBzI` | member | +90 533 533 0000 |
+
+**🔴 KARAR: Bu üç hesap review süreci boyunca AÇIK KALACAK — şimdi silinmemeli.**
+
+Gerekçe: mekanizma tam olarak store reviewer'ları için yapıldı. Apple girişli uygulamalarda demo hesap bilgisi istiyor; reviewer telefon numarasını girip sabit `000000` koduyla içeri giriyor. Bayrak review'dan ÖNCE kaldırılırsa reviewer giriş yapamaz (OTP kodu bizim kontrolümüzdeki bir e-postaya gider, reviewer göremez) ve uygulama doğrudan reddedilir.
+
+**Doğru sıra:**
+1. **Şimdi:** bayrak açık kalır. Üç hesabın numarası + `000000` kodu App Store Connect ve Play Console'un demo hesap alanlarına girilir (üç rolü de görebilsinler).
+2. **Uygulama ONAYLANIP YAYINA GİRDİKTEN SONRA:** bayrak kaldırılır.
+
+```
+cd scripts && CONFIRM_PRODUCTION_BACKFILL=yes \
+  npm run audit-otp-bypass -- --allow-production --revoke
+```
+
+**Bilinçli olarak kabul edilen risk:** bayrak açıkken numarayı tahmin eden herkes bu hesaplara girebilir ve numaralar tahmin edilebilir (`5555550000`, `5005000000`). Erişilen yer yalnızca demo salon; gerçek müşteri verisi ve ödeme riski yok (`subscriptionExempt`). Yine de gereksiz bir açık pencere — onay gelir gelmez kapatılmalı.
+
+**Kabul kriterleri:**
+- [x] Koleksiyonun tamamını tarayan script yazıldı (sabit uid listesine bağlı değil)
+- [x] Üretimde çalıştırıldı, bayrağı taşıyan hesap sayısı raporlandı (3)
+- [x] Bayrağı taşıyan hesapların gerçek müşteri salonuna ait OLMADIĞI doğrulandı
+- [ ] Demo hesap bilgileri App Store Connect ve Play Console'a girildi
+- [ ] **YAYIN SONRASI:** `--revoke` çalıştırıldı, bayrağı taşıyan doküman sayısı SIFIR
+- [x] Mekanizmanın kendisi (kod) korundu — kapalı test tekrar açılabilmeli
+
+---
+
+### F13-4 — Salon logosu yazma yetkisini daralt
+
+**🔴 Güvenlik.** `storage.rules`'ta `gym_logos/{fileName}` yazma yetkisi "giriş yapmış herhangi biri" ve dosya adı tahmin edilebilir: `gym_logos/{gymId}.png` ([gym_logo_service.dart:32](lib/modules/gyms/service/gym_logo_service.dart:32)). Herhangi bir üye başka bir salonun logosunu ezebilir. Kuralın kendi yorumunda "rol/salon bazlı ince kapsam F2-6 ile eklenecek" yazıyor — yapılmamış.
+
+**Prompt:** "`storage.rules`'taki `gym_logos/{fileName}` yazma kuralını, dosyayı yalnızca O SALONUN admin'i yazabilecek şekilde daralt. Custom claim'ler Storage kurallarında `request.auth.token` üzerinden okunabiliyor (`role`, `gymId` — `onUserRoleAssigned` tarafından yazılıyor), yani Firestore okumasına gerek yok: dosya adının `{gymId}.png` olması şartıyla `request.auth.token.gymId` ile eşleşmeli ve `request.auth.token.role == 'admin'` olmalı. Mevcut contentType/boyut kısıtları korunmalı. Okuma `if true` kalmalı — logo üye giriş ekranında da gösteriliyor. Salon oluşturma akışında (`create_gym_controller.dart`) logonun HANGİ aşamada yüklendiğini kontrol et: claim henüz atanmamışken yükleniyorsa bu kural o akışı kırar, o durumda yükleme claim atandıktan sonraya alınmalı."
+
+**Kabul kriterleri:**
+- [x] Admin kendi salonunun logosunu yükleyebiliyor
+- [x] Başka salonun admin'i / üye / antrenör o dosyayı yazamıyor
+- [x] Salon OLUŞTURMA akışındaki ilk logo yüklemesi çalışmaya devam ediyor (claim zamanlaması doğrulandı)
+- [x] Logo hâlâ giriş yapmamış kullanıcıya da görünüyor
+- [x] Storage kuralları için emulator testi yazıldı
+
+---
+
+### F13-5 — App Check
+
+**🔴 Güvenlik.** Kurulu değil (`firebase_app_check` pubspec'te yok). Callable'lar (`startLogin`, `listPartnerGyms`, `signupGymAdmin`…) ve Firestore, proje yapılandırmasını ele geçiren herkes tarafından doğrudan çağrılabilir durumda. Loglarda `deleteAccount`'a gelen kimliksiz bir GET isteği görüldü — yani uç noktalar dışarıdan taranıyor.
+
+**Prompt:** "`firebase_app_check` paketini ekle, iOS'ta DeviceCheck/App Attest, Android'de Play Integrity sağlayıcılarıyla kur; debug build'ler için debug provider'ı ayarla ve debug token'ının üretime sızmadığından emin ol. Firebase Console'da ÖNCE 'monitoring' modunda aç, gerçek trafikte doğrulanmamış istek oranını izle, sıfırlandığını gördükten SONRA enforcement'a geç — doğrudan zorunlu kılmak yayındaki eski build'leri kilitler. Hangi servislerde (Functions, Firestore, Storage) zorunlu kılınacağı ayrı ayrı kararlaştırılmalı."
+
+**Kabul kriterleri:**
+- [x] Paket kurulu, iki platformda da sağlayıcı yapılandırılmış
+- [ ] Console'da monitoring modunda veri akıyor
+- [ ] Doğrulanmamış istek oranı izlendi ve kabul edilebilir seviyeye indi
+- [ ] Enforcement açılacak servisler kararlaştırıldı ve dokümante edildi
+- [x] Debug provider yalnızca debug build'de aktif
+
+---
+
+### F13-6 — Mock veri fallback'lerini kapat
+
+**🟠 Kullanıcıya sahte veri gösteriyor.** Dört controller, kimlik/salon bilgisi henüz YÜKLENİRKEN mock listeye düşüyor — `isLoading` kontrolü yok:
+
+| Dosya | Satır |
+|---|---|
+| `admin_members_controller.dart` | 54 |
+| `admin_trainers_controller.dart` | 94 |
+| `trainer_members_controller.dart` | 60 |
+| `trainer_report_controller.dart` | 184 |
+
+Aynı hata `discover_controller.dart`, `trainer_home_controller.dart` ve `sessions_controller.dart`'ta ZATEN düzeltilmiş; o dosyaların yorumlarında yaşanmış gerçek bug anlatılıyor: *"kullanıcı o an sahte bir öğeye dokunursa gerçek olmayan bir ID ile Firestore'a yazma denemesi hataya düşüyordu"*. Doğru desen `studio_packages_controller.dart:63` ve `gym_events_controller.dart:61`'de de mevcut (`if (gymIdAsync.isLoading) return const [];`).
+
+**Prompt:** "Dört controller'ı mevcut doğru desene geçir: kimlik/salon bilgisi YÜKLENİYORKEN mock'a değil BOŞ listeye düşülsün; mock yalnızca gerçekten oturum/salon YOKKA kullanılsın. Deseni `studio_packages_controller.dart:63`'ten birebir al. Ayrıca değerlendir ve karar öner: bu mock repository'ler üretimde hâlâ bir işe yarıyor mu, yoksa tamamen kaldırılmalı mı? Kaldırmak daha temiz olurdu ama salon-yok akışlarında ekranların ne göstereceği ayrıca kararlaştırılmalı — bu kararı kullanıcıya sor, tek başına kaldırma."
+
+**Kabul kriterleri:**
+- [x] Dört controller'da da yükleme penceresinde mock dönmüyor
+- [x] Gerçek kullanıcıda "Berk Aydın"/"Ayşe Yılmaz" hiçbir ekranda görünmüyor
+- [x] Salon/oturum gerçekten yokken ekranlar boş listeyle düzgün davranıyor (boş durum metni)
+- [ ] Mock repository'lerin kaderi hakkında karar verildi ve dokümante edildi
+
+---
+
+### 🔴 YAYIN SONRASI İLK İŞ — unutulmaması gereken
+
+**Demo hesapların OTP bypass bayrağını kaldır** (F13-3). Uygulama onaylanıp yayına girer girmez:
+
+```
+cd scripts && CONFIRM_PRODUCTION_BACKFILL=yes \
+  npm run audit-otp-bypass -- --allow-production --revoke
+```
+
+Review boyunca açık kalması ZORUNLU (reviewer bu hesaplarla giriyor), ama onay sonrası açık kalırsa numarayı tahmin eden herkes demo salona girebilir.
+
+---
+
+### FAZ 13 kapsamı DIŞINDA — ama yayın öncesi takipte
+
+Bunlar denetimde çıktı, red sebebi değil; ayrı ele alınacak:
+
+- ~~F11-7 hiç yapılmadı.~~ **✅ 2026-09-24'te gerçek cihazda yürütüldü ve tüm adımları geçti** (gölge antrenör, `notificationProxyUid` yönlendirmesi, bildirim hedefleme, antrenörlükten çıkma/geri dönme).
+- **F12-3'ün iki elle adımı** (`firebase deploy --only extensions` + `mail` için TTL politikası) — yapılmadığı sürece `mail` koleksiyonu büyümeye ve OTP kodları düz metin birikmeye devam ediyor.
+- **İki temizlik script'i çalıştırılmadı:** `prune_dead_fcm_tokens.ts`, `prune_old_mail_docs.ts`.
+- **12 korumasız `debugPrint`** — release build'de de cihaz log'una yazıyor (`[appAccess] role=`, `gymId=`, `email=set`). `kDebugMode` guard'ı yok.
+- **`ITSAppUsesNonExemptEncryption` Info.plist'te yok** — her yüklemede export compliance sorusu çıkıyor.
+- **Android `minifyEnabled` açıkça ayarlanmamış** (varsayılan kapalı) → 84 MB `.aab`.
+- **35 commit `main`'e merge edilmemiş** — üretim build'i `feature/theme-delete-and-recurring-year` dalından alınıyor.
+- **RC'de kodda kullanılmayan 54 `lbl_` anahtarı** — zararsız, temizlik.
+
+---
+
+## FAZ 14 — Apple İncelemesi: Abonelik Uyumluluğu (3.1.2(c) + 2.1(b))
+
+**Bağlam (2026-10-21):** App Store, 1.0 (24)'ü üçüncü kez reddetti. Üç gerekçe:
+
+1. **3.1.2(c):** Uygulama içinde Kullanım Koşulları (EULA) ve Gizlilik Politikası bağlantıları satın alma noktasında yok; App Store açıklamasında da Kullanım Koşulları bağlantısı yok (her dilde olmalı).
+2. **2.1(b):** İki abonelik ürünü (aylık/yıllık) incelemeye hiç gönderilmemiş. Apple ürünlerle birlikte **yeni bir build** istiyor.
+3. **2.1(b):** Plana dokununca "hiçbir işlem ilerlemedi" (iPad Air 11 inç, iPadOS 27.0.1).
+
+**Kök neden analizi:**
+- Ürünler gönderilmediği için reviewer cihazında StoreKit hiç ürün döndürmedi. Uygulama bu durumda **sahte (mock) planlar** gösteriyor (`subscription_purchase_service.dart:57`, `mockSubscriptionProducts` — `subscription_state.dart:91`). Plana dokununca Apple ödeme penceresi yerine `startMockSubscription` Cloud Function'ı çağrılıyor (`subscription_panel.dart:930` `_purchaseOrMockStart`). Reviewer'ın gördüğü "hiçbir şey olmadı" budur.
+- `startMockSubscription` (`functions/src/callable/start-mock-subscription.ts`) **ödeme almadan** salonu `trial` yapıyor ve her çağrıda `trialStartedAt`'ı sıfırlıyor → sınırsız ücretsiz deneme. RC `cfg_subscription_mock_start_enabled` canlıda `true`; Play'deki build 25'te de aktif. Apple bunu 3.1.1 (IAP dışı içerik açma) sayar — mevcut redlerden daha ağır.
+- Hukuki bağlantılar (`LegalLinks`) yalnızca **bir** satın alma noktasında var. Demo salon muaf (`subscriptionExempt: true`) olduğu için reviewer büyük ihtimalle bağlantısız `_exemptView`'ı gördü.
+
+| Satın alma noktası | Dosya / metot | `LegalLinks` |
+|---|---|---|
+| Muaf salon abonelik ekranı | `subscription_panel.dart` `_exemptView` (~227) | ❌ |
+| Deneme/abonesiz salon | `subscription_panel.dart` `_trialView` (~360) | ✅ (satır 437) |
+| Aktif abone — "yıllığa geç" | `subscription_panel.dart` `_activeView` (~444) | ❌ |
+| Süresi dolmuş/iptal | `subscription_panel.dart` `_expiredView` (~643) | ❌ |
+| Satın alma sürüyor | `subscription_panel.dart` `_pendingView` (~817) | ❌ (kontrol et) |
+| Yeni salonun zorunlu paywall'ı | `subscription_onboarding_panel.dart` | ❌ |
+
+**🔴 KRİTİK hatırlatma (CLAUDE.md):** Bu faz abonelik sistemine dokunuyor. Her task sonunda `functions/src/http/reset-gym-subscription.ts` (`resetGymSubscription`) ve `docs/Abonelik_Iptal_Rehberi.docx`'ün etkilenip etkilenmediği kontrol edilmeli. Mock akışı `subscriptionHistory`'ye `source: "mock"` kayıtları yazmıştı — sıfırlama aracının bunları da kapsayıp kapsamadığı F14-2'de değerlendirilmeli.
+
+---
+
+### F14-1 — Hukuki bağlantıları TÜM satın alma noktalarına ekle (Apple 3.1.2(c))
+
+**Prompt:** "`LegalLinks(centered: true)` widget'ını yukarıdaki tablodaki her satın alma noktasına, satın alma butonunun hemen altına ekle (`_trialView`'daki yerleşimi örnek al). `subscription_onboarding_panel.dart` dahil. Bağlantılar RC `lbl_common_terms_url_*` / `lbl_common_privacy_url_*`'tan geliyor; URL boşsa `LegalLinks` satırı gizliyor — canlı RC'de iki dilde de dolu olduğunu doğrula. Ayrıca her plan kartında Apple'ın istediği üç bilginin görünür olduğunu doğrula: **abonelik adı, süre (aylık/yıllık), fiyat** (yıllıkta mümkünse aylık karşılığı). Eksikse ekle; metinler RC'den gelmeli (hardcode yok)."
+
+**Kabul kriterleri:**
+- [ ] Altı satın alma noktasının hepsinde Kullanım Koşulları + Gizlilik bağlantısı görünüyor ve tıklanınca doğru dildeki sayfayı açıyor
+- [ ] Her plan kartında ad, süre ve fiyat görünüyor
+- [ ] iPad (iPad Air 11 inç) ve iPhone'da bağlantılar ekranda görünür (taşma/kırpılma yok)
+- [ ] Widget testi: her görünümde `LegalLinks` render ediliyor
+
+### F14-2 — Mock abonelik yolunu kaldır (Apple 2.1(b) + 3.1.1 riski)
+
+**Prompt:** "Mağaza ürün döndürmediğinde sahte plan gösterme ve `startMockSubscription` ile ödeme almadan deneme başlatma akışını kaldır. Yerine: ürünler yüklenemezse planların yerine açık bir hata mesajı ve 'Tekrar dene' butonu göster (metinler RC'den). `_purchaseOrMockStart` doğrudan `controller.purchase`'a dönsün; `lastFetchWasMock` ve `mockSubscriptionProducts` kaldırılsın. `startMockSubscription` callable'ı `functions/src/index.ts`'den çıkarılıp deploy'da silinsin. Canlıdaki eski sürümler (Play build 25) hâlâ çağırabileceği için silmeden ÖNCE RC'de `cfg_subscription_mock_start_enabled=false` yap. Satın alma başarısız olduğunda (ürün yok, StoreKit hatası, iptal dışı her durum) kullanıcıya görünür bir mesaj gösterildiğinden emin ol — sessiz kalan hiçbir dal olmasın."
+
+**Kabul kriterleri:**
+- [~] RC `cfg_subscription_mock_start_enabled=false` — şablonda yapıldı, **canlıya deploy edilmedi**
+- [x] Ürün yüklenemezse hata + tekrar dene görünüyor; sahte fiyat hiçbir yerde görünmüyor (kod + widget testi; cihazda görsel doğrulama yapılmadı)
+- [x] Plana dokunmak her zaman gerçek `purchase`'ı çağırıyor (mock dalı silindi)
+- [~] `startMockSubscription` kaynaktan ve `index.ts`'den kaldırıldı (`git rm`), **deploy ile silinmedi**
+- [ ] `resetGymSubscription` ve `Abonelik_Iptal_Rehberi.docx` değerlendirildi (mock kayıtlar)
+- [ ] Firestore'da `subscriptionHistory` altında `source: "mock"` kayıtlarının hangi salonlarda olduğu listelendi; temizlik kararı kullanıcıya soruldu
+
+### F14-3 — Sessiz hataları logla (teşhis)
+
+**Prompt:** "Şu yerlerde hata sessizce yutuluyor, hepsine hata kodunu yazan `debugPrint` + Crashlytics non-fatal ekle (davranış değişmesin): `ad_consent_service.dart` hata callback'i, `ad_banner_widget.dart` `onAdFailedToLoad`, `ad_interstitial_gate.dart` `onAdFailedToLoad`/`onAdFailedToShowFullScreenContent`, abonelik ürün sorgusu (`queryProductDetails` boş/hata) ve satın alma hataları."
+
+**Kabul kriterleri:**
+- [ ] Reklam ve rıza hataları logda kodlarıyla görünüyor
+- [ ] Ürün yüklenemediğinde ve satın alma başarısız olduğunda Crashlytics'e non-fatal düşüyor
+
+### F14-4 — Üye demo hesabına e-posta ekle (veri, build gerektirmez)
+
+`+905335330000` (`XyrJtfwrt8Ol2ueZiBzI`) dokümanında `email`/`emailLower` boş → reviewer üye hesabıyla girince "E-posta adresini ekle" ekranında kalıyor (OTP bypass bu ekranda geçmiyor). Kullanıcının belirleyeceği, başka hesapta kullanılmayan bir adres yazılmalı.
+
+- [ ] Adres kullanıcıdan alındı ve yazıldı
+- [ ] Emülatörde üye demo hesabıyla `000000` → doğrudan ana ekran
+
+### F14-5 — Build 28 + sandbox satın alma testi (göndermeden ÖNCE)
+
+**Prompt:** "F14-1…F14-3 bittikten sonra build numarasını 28 yap, iki platformun build'ini al (CLAUDE.md §7). Build'i TestFlight'a yükle. Gerçek bir iPhone ve iPad'de sandbox test hesabıyla aylık ve yıllık planı ayrı ayrı satın al; Apple ödeme penceresinin açıldığını, aboneliğin aktifleştiğini (`subscriptionStatus: active`), 'satın alımları geri yükle'nin çalıştığını ve hukuki bağlantıların açıldığını doğrula. Bu akışın ekran kaydını al (Apple cevapta istiyor)."
+
+**Kabul kriterleri:**
+- [ ] Build 28 iki platformda alındı, commitlendi, pushlandı
+- [ ] App Store Connect'te sandbox test hesabı var
+- [ ] iPhone + iPad'de iki plan da sandbox'ta satın alınabiliyor
+- [ ] Ekran kaydı hazır (bağlantılar + plan seçimi + Apple ödeme penceresi)
+- [ ] (İsteğe bağlı) iPad görünümü kontrol edildi — reviewer iPad kullanıyor
+
+### F14-6 — App Store Connect (kullanıcı tarafı)
+
+- [ ] **Business → Agreements:** Paid Apps Agreement "Active"; banka ve vergi bilgileri tamam
+- [ ] İki abonelik aynı abonelik grubunda; görünen ad, açıklama, TR+EN dil, fiyat dolu
+- [ ] Her aboneliğe **App Review ekran görüntüsü** eklendi; durum "Ready to Submit"
+- [ ] Sürüm 1.0 → **In-App Purchases and Subscriptions** bölümünde iki ürün de seçili
+- [ ] Sürümün build'i 28
+- [ ] **Açıklama (TR ve EN):** sonuna Kullanım Koşulları ve Gizlilik Politikası bağlantıları eklendi
+- [ ] **Privacy Policy URL** alanı dolu (TR ve EN); isteğe bağlı: EULA alanına kendi koşullarımız
+- [ ] **Notes:** abonelik ekranına nasıl gidileceği + iş modeli özeti + demo hesaplar
+- [ ] Apple'ın mesajına ekran kaydıyla cevap verildi, ardından incelemeye gönderildi
+- [ ] Web sitesi: destek, hesap silme ve `app-ads.txt` sayfaları yayında (bkz. konuşma notu 2026-10-21)
+
+### FAZ 14 — Oturum sonu durumu (2026-10-21)
+
+**Commitlenmemiş çalışma dizini (F14-2 kodu):**
+- Silindi: `functions/src/callable/start-mock-subscription.ts` (+ `functions/src/index.ts` export'u), `mockSubscriptionProducts` (`subscription_state.dart`), `lastFetchWasMock`/`startMockSubscription` (purchase service, verification service, repository, controller), `_purchaseOrMockStart` (`subscription_panel.dart`).
+- Eklendi: `SubscriptionProductsUnavailableException` (`subscription_purchase_service.dart` — boş/hatalı ürün yanıtında fırlatılır), `lib/modules/subscription/ui/widgets/subscription_products_unavailable.dart` (hata + "Tekrar dene"), RC anahtarları `lbl_subscription_products_unavailable_title/_body`, `lbl_subscription_products_retry` (kod varsayılanları + `remoteconfig.template.json`), `test/modules/subscription/subscription_products_unavailable_test.dart`.
+- `remoteconfig.template.json`: yeni anahtarlar + `cfg_subscription_mock_start_enabled` → `false`.
+- Doğrulama: `flutter analyze lib` = eski 10 info, `flutter test` 182/182, functions `npm test` 130/130.
+
+**App Store Connect'te tespit edilen yeni bulgu:** Abonelik sayfası "You must set availability for your subscription" diyor → aboneliklerin satış ülkeleri seçilmemiş. StoreKit'in reviewer cihazında boş dönmesinin en olası sebebi bu (mock değil). Ayrıca "Review Information screenshot" eksik.
+
+**Sıradaki adımlar:** `docs/Sonraki_Oturum_Promptu.md`.

@@ -8,6 +8,7 @@ import '../../../../core/remote_config/remote_config_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/app_back_button.dart';
 import '../../../../shared/widgets/app_button.dart';
+import '../../../../shared/widgets/app_confirm_dialog.dart';
 import '../../controller/gym_theme_controller.dart';
 import '../../domain/gym_theme.dart';
 import 'add_gym_theme_panel.dart';
@@ -94,6 +95,17 @@ class _GymThemesPanelState extends BasePanelState<GymThemesPanel> {
                       soft: theme.soft,
                       selected: theme.id == state.activeThemeId,
                       onTap: () => controller.selectTheme(theme.id),
+                      // Hazır temalarda buton hiç çizilmiyor (bkz.
+                      // `isGymThemeDeletable`) — pasif bir buton göstermek,
+                      // "neden çalışmıyor?" sorusunu doğururdu.
+                      onDelete: isGymThemeDeletable(theme.id)
+                          ? () => _confirmDeleteTheme(theme)
+                          : null,
+                      deleteLabel: ref.watch(
+                        rcTextProvider(
+                          RemoteConfigKeys.gymsThemesDeleteButtonLabel,
+                        ),
+                      ),
                     ),
                   Material(
                     color: Colors.transparent,
@@ -356,6 +368,35 @@ class _GymThemesPanelState extends BasePanelState<GymThemesPanel> {
   /// gösterimde tekrar dile göre çözülmesi gerekiyor. Kullanıcının kendi
   /// yazdığı özel tema adları (diğer tüm id'ler) veri olarak kalır,
   /// çevrilmez.
+  /// Geri alınamaz aksiyon: ortak onay diyaloğu (`showAppConfirmDialog`)
+  /// kullanılıyor — diyalog, silme TAMAMLANANA kadar açık kalıyor ve hata
+  /// olursa kendi içinde gösterip tekrar denemeye izin veriyor.
+  Future<void> _confirmDeleteTheme(GymTheme theme) async {
+    await showAppConfirmDialog(
+      context: context,
+      title: ref.read(
+        rcTextProvider(RemoteConfigKeys.gymsThemesDeleteConfirmTitle),
+      ),
+      message: ref
+          .read(rcTextProvider(RemoteConfigKeys.gymsThemesDeleteConfirmBody))
+          .replaceAll('{name}', _resolvedPresetName(theme)),
+      confirmLabel: ref.read(
+        rcTextProvider(RemoteConfigKeys.gymsThemesDeleteConfirmCta),
+      ),
+      cancelLabel: ref.read(
+        rcTextProvider(RemoteConfigKeys.commonCancelButton),
+      ),
+      busyLabel: ref.read(
+        rcTextProvider(RemoteConfigKeys.gymsThemesDeleteBusyLabel),
+      ),
+      errorMessage: ref.read(
+        rcTextProvider(RemoteConfigKeys.gymsThemesDeleteError),
+      ),
+      onConfirm: () =>
+          ref.read(gymThemeControllerProvider.notifier).deleteTheme(theme.id),
+    );
+  }
+
   String _resolvedPresetName(GymTheme theme) {
     final key = _presetNameKey(theme.id);
     return key == null ? theme.name : ref.watch(rcTextProvider(key));
@@ -393,6 +434,8 @@ class _ThemeRow extends StatelessWidget {
     required this.soft,
     required this.selected,
     required this.onTap,
+    required this.deleteLabel,
+    this.onDelete,
   });
 
   final String name;
@@ -402,6 +445,10 @@ class _ThemeRow extends StatelessWidget {
   final bool selected;
   final VoidCallback onTap;
 
+  /// `null` ise bu tema silinemez (hazır temalar) ve eksi butonu çizilmez.
+  final VoidCallback? onDelete;
+  final String deleteLabel;
+
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
@@ -409,92 +456,135 @@ class _ThemeRow extends StatelessWidget {
 
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.md),
-      child: Material(
-        color: selected ? primary.withValues(alpha: 0.1) : colors.surface,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
-          child: Container(
-            padding: const EdgeInsets.all(AppSpacing.lg),
-            decoration: BoxDecoration(
+      // Eksi butonu kartın SAĞ ÜSTÜNE bindiriliyor; kartın kendi
+      // `InkWell`'i tüm alanı kapladığı için Stack'te ondan SONRA gelmesi
+      // şart, aksi halde dokunuşu alttaki "temayı seç" davranışı yutardı.
+      child: Stack(
+        children: [
+          Material(
+            color: selected ? primary.withValues(alpha: 0.1) : colors.surface,
+            borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
+            child: InkWell(
+              onTap: onTap,
               borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
-              border: Border.all(
-                color: selected
-                    ? primary.withValues(alpha: 0.5)
-                    : colors.outline,
-              ),
-            ),
-            child: Row(
-              children: [
-                Row(
+              child: Container(
+                padding: const EdgeInsets.all(AppSpacing.lg),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
+                  border: Border.all(
+                    color: selected
+                        ? primary.withValues(alpha: 0.5)
+                        : colors.outline,
+                  ),
+                ),
+                child: Row(
                   children: [
-                    Container(
-                      width: 26,
-                      height: 26,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: primary,
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                    Container(
-                      width: 26,
-                      height: 26,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: soft,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(width: AppSpacing.md),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        name,
-                        style: typography.headingSmall.copyWith(
-                          color: colors.onSurface,
-                          fontSize: 16,
-                        ),
-                      ),
-                      Text(
-                        note,
-                        style: typography.caption.copyWith(
-                          color: colors.onSurfaceMuted,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  width: 22,
-                  height: 22,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: selected ? primary : colors.outlineStrong,
-                      width: 2,
-                    ),
-                  ),
-                  alignment: Alignment.center,
-                  child: selected
-                      ? Container(
-                          width: 10,
-                          height: 10,
+                    Row(
+                      children: [
+                        Container(
+                          width: 26,
+                          height: 26,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             color: primary,
                           ),
-                        )
-                      : null,
+                        ),
+                        const SizedBox(width: 6),
+                        Container(
+                          width: 26,
+                          height: 26,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: soft,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(width: AppSpacing.md),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            name,
+                            style: typography.headingSmall.copyWith(
+                              color: colors.onSurface,
+                              fontSize: 16,
+                            ),
+                          ),
+                          Text(
+                            note,
+                            style: typography.caption.copyWith(
+                              color: colors.onSurfaceMuted,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      width: 22,
+                      height: 22,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: selected ? primary : colors.outlineStrong,
+                          width: 2,
+                        ),
+                      ),
+                      alignment: Alignment.center,
+                      child: selected
+                          ? Container(
+                              width: 10,
+                              height: 10,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: primary,
+                              ),
+                            )
+                          : null,
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
-        ),
+          if (onDelete != null)
+            Positioned(
+              top: 4,
+              right: 4,
+              child: Semantics(
+                button: true,
+                label: deleteLabel,
+                child: Tooltip(
+                  message: deleteLabel,
+                  child: Material(
+                    color: Colors.transparent,
+                    shape: const CircleBorder(),
+                    clipBehavior: Clip.antiAlias,
+                    child: InkWell(
+                      onTap: onDelete,
+                      // Dokunma alanı görünen daireden büyük: 22px'lik bir
+                      // ikon parmakla ıskalanır (Material'ın önerdiği asgari
+                      // 48px'e yakın tutuluyor).
+                      child: SizedBox(
+                        width: 40,
+                        height: 40,
+                        child: Icon(
+                          Icons.remove_circle_outline,
+                          size: 20,
+                          // Yıkıcı bir aksiyon ama her satırda bir tane var;
+                          // kırmızı kullanmak listeyi görsel olarak
+                          // bağırtırdı. Uyarı rengi, asıl kararın verildiği
+                          // onay diyaloğunda kullanılıyor.
+                          color: colors.onSurfaceMuted,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }

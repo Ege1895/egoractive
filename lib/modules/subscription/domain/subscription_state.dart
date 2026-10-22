@@ -1,7 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-import '../../../core/constants/subscription_constants.dart';
-
 part 'subscription_state.freezed.dart';
 
 /// F6-1 — `gyms/{gymId}.subscriptionStatus`'ın olası değerleri. `pastDue`/
@@ -37,6 +35,14 @@ class SubscriptionState with _$SubscriptionState {
     /// plan kartının "bekleniyor" durumunda gösterileceğini belirler.
     String? pendingProductId,
 
+    /// F13-1 — "Satın alımları geri yükle" akışı sürüyor mu.
+    @Default(false) bool isRestoring,
+
+    /// Geri yükleme akışının SONUCU (başarılı / satın alım bulunamadı /
+    /// hata). [purchaseErrorMessage]'dan ayrı tutuluyor: geri yüklemede
+    /// "bulunamadı" bir hata değil, bilgilendirme.
+    String? restoreMessage,
+
     /// Satın alma hatası (network, mağaza reddi, doğrulama başarısızlığı).
     /// Kullanıcı kendi isteğiyle iptal ederse (`PurchaseStatus.canceled`)
     /// bu alan boş kalır — o zaten kendi kararı, hata değil.
@@ -64,34 +70,4 @@ class SubscriptionProduct with _$SubscriptionProduct {
     /// süre asla gösterilmez.
     int? trialDays,
   }) = _SubscriptionProduct;
-}
-
-/// Mağaza ürünleri henüz App Store Connect/Play Console'da yayınlanmadıysa
-/// (bkz. docs/Abonelik_Store_Kurulumu.md) `SubscriptionPurchaseService.fetchProducts()`
-/// gerçek yanıt yerine bunu döner — abonelik ekranları böylece boş kalmaz,
-/// görüntülenip test edilebilir. Bu ürünlerle gerçek satın alma denemesi
-/// (mağazada karşılığı olmadığı için) güvenle başarısız olur.
-///
-/// Fiyatlar gerçek (planlanan) abonelik fiyatlarımız — Türkiye için TL,
-/// diğer tüm bölgeler için USD (mağaza kurulumu tamamlanınca gerçek
-/// fiyatlandırma App Store Connect/Play Console'dan region bazlı
-/// otomatik gelecek, bu sadece görüntüleme amaçlı sabit).
-List<SubscriptionProduct> mockSubscriptionProducts(String locale) {
-  final isTr = locale == 'tr';
-  return [
-    SubscriptionProduct(
-      id: gymMonthlySubscriptionProductId,
-      title: isTr ? 'Aylık' : 'Monthly',
-      description: isTr ? 'Her ay yenilenir' : 'Renews every month',
-      price: isTr ? '₺999,00' : '\$19.99',
-      trialDays: 14,
-    ),
-    SubscriptionProduct(
-      id: gymYearlySubscriptionProductId,
-      title: isTr ? 'Yıllık' : 'Yearly',
-      description: isTr ? '2 ay bedava' : '2 months free',
-      price: isTr ? '₺9.990,00' : '\$199.99',
-      trialDays: 14,
-    ),
-  ];
 }

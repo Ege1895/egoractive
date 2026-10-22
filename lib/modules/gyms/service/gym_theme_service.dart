@@ -50,7 +50,12 @@ class GymThemeService {
               .map(_themeFromMap)
               .whereType<GymTheme>()
               .toList();
-          final themes = presets.isEmpty ? _defaultPresets : presets;
+          // Varsayılan tema her zaman en üstte (bkz. [sortedGymThemes]) —
+          // sıra Firestore dizisinden geldiği için bunu burada garantiliyoruz,
+          // tek tek panellerde değil.
+          final themes = sortedGymThemes(
+            presets.isEmpty ? _defaultPresets : presets,
+          );
 
           final colorsData = data?['themeColors'] as Map<String, dynamic>?;
           final activeThemeId =

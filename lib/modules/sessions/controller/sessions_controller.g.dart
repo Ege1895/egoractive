@@ -7,7 +7,7 @@ part of 'sessions_controller.dart';
 // **************************************************************************
 
 String _$weekActivityForMemberHash() =>
-    r'c1ca7e458070bffad703c362aa1d3d5871990169';
+    r'3b76a6d6f252e82541d8d490e711578d5f145443';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -312,7 +312,7 @@ class _CanConfirmAttendanceForMemberProviderElement
       (origin as _CanConfirmAttendanceForMemberProvider).memberId;
 }
 
-String _$sessionsForMemberHash() => r'f7746ef4946a84f663fa75c87cb5f1eb4505e1b5';
+String _$sessionsForMemberHash() => r'b6a6874c2ffc1ae24384c390e14747c2ddba81cc';
 
 /// See also [_sessionsForMember].
 @ProviderFor(_sessionsForMember)
@@ -440,7 +440,7 @@ class _SessionsForMemberProviderElement
 }
 
 String _$sessionsControllerHash() =>
-    r'96ad243a1591831959b046802b65097203f31dac';
+    r'08d3301ee1b306a3ae97d8e835334c44c1a86927';
 
 /// F3-3 — üyenin kendi seansları gerçek zamanlı `sessions` koleksiyonundan
 /// (memberId == kendi uid'si) okunur. `paymentWarning` hâlâ ayrı, devam eden

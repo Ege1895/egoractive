@@ -316,7 +316,7 @@ final _measurementsSelectedDateProvider =
 
 typedef _$MeasurementsSelectedDate = AutoDisposeNotifier<DateTime?>;
 String _$measurementsControllerHash() =>
-    r'78474616457e505781abf51fcf338dec7e8bec5f';
+    r'b082be92557a3dc24da0c5f2db7d2a53278f2ee0';
 
 /// See also [MeasurementsController].
 @ProviderFor(MeasurementsController)

@@ -29,7 +29,6 @@ class AdminSessionManagementPanel extends BasePanel {
 
 class _AdminSessionManagementPanelState
     extends BasePanelState<AdminSessionManagementPanel> {
-  DateTime _date = DateTime.now();
   _SessionFilter _filter = _SessionFilter.all;
 
   @override
@@ -37,8 +36,14 @@ class _AdminSessionManagementPanelState
     final colors = context.appColors;
     final typography = context.appTypography;
     final calendarState = ref.watch(adminCalendarControllerProvider);
+    // F12-7 — seçili gün YEREL state'te tutulmuyor. Slot listesi
+    // (`slotsByDayOfMonth`) controller'ın seçili AYINA göre üretiliyor;
+    // panel kendi `_date`'ini tutarken başka bir aya geçildiğinde
+    // `slotsByDayOfMonth[_date.day]` yanlış ayın aynı gün numarasındaki
+    // seanslarını gösteriyordu. Tek kaynak artık controller.
+    final date = calendarState.selectedDate;
     final sessions =
-        (calendarState.slotsByDayOfMonth[_date.day] ??
+        (calendarState.slotsByDayOfMonth[date.day] ??
                 const <AdminSessionSlot>[])
             .where(_matchesFilter)
             .toList();
@@ -89,7 +94,7 @@ class _AdminSessionManagementPanelState
                             AppSpacing.radiusInner,
                           ),
                           onTap: () =>
-                              showCreateSessionSheet(context, ref, _date),
+                              showCreateSessionSheet(context, ref, date),
                           child: Container(
                             padding: const EdgeInsets.symmetric(
                               horizontal: AppSpacing.md,
@@ -132,13 +137,13 @@ class _AdminSessionManagementPanelState
                             behavior: HitTestBehavior.opaque,
                             onTap: () => showNativeDatePicker(
                               context: context,
-                              initial: _date,
+                              initial: date,
                               firstDate: DateTime(2020),
                               lastDate: DateTime(2100),
-                              onSelected: (d) => setState(() => _date = d),
+                              onSelected: _selectDate,
                             ),
                             child: Text(
-                              '${_date.day} ${_monthName(_date.month)} ${_weekdayName(_date.weekday)}',
+                              '${date.day} ${_monthName(date.month)} ${_weekdayName(date.weekday)}',
                               style: typography.bodyMedium.copyWith(
                                 color: colors.onSurfaceVariant,
                                 fontSize: 14,
@@ -148,17 +153,14 @@ class _AdminSessionManagementPanelState
                         ),
                         _ArrowButton(
                           icon: Icons.chevron_left,
-                          onTap: () => setState(
-                            () =>
-                                _date = _date.subtract(const Duration(days: 1)),
-                          ),
+                          onTap: () =>
+                              _selectDate(date.subtract(const Duration(days: 1))),
                         ),
                         const SizedBox(width: AppSpacing.sm),
                         _ArrowButton(
                           icon: Icons.chevron_right,
-                          onTap: () => setState(
-                            () => _date = _date.add(const Duration(days: 1)),
-                          ),
+                          onTap: () =>
+                              _selectDate(date.add(const Duration(days: 1))),
                         ),
                       ],
                     ),
@@ -250,12 +252,16 @@ class _AdminSessionManagementPanelState
     );
   }
 
+  void _selectDate(DateTime date) =>
+      ref.read(adminCalendarControllerProvider.notifier).selectDate(date);
+
   DateTime _slotStartTime(AdminSessionSlot slot) {
     final parts = slot.time.split(':');
+    final date = ref.read(adminCalendarControllerProvider).selectedDate;
     return DateTime(
-      _date.year,
-      _date.month,
-      _date.day,
+      date.year,
+      date.month,
+      date.day,
       int.parse(parts[0]),
       int.parse(parts[1]),
     );
