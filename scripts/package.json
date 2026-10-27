@@ -10,9 +10,11 @@
     "enable-closed-test": "tsx enable_closed_test_accounts.ts",
     "prune-dead-tokens": "tsx prune_dead_fcm_tokens.ts",
     "prune-old-mail": "tsx prune_old_mail_docs.ts",
-    "audit-otp-bypass": "tsx audit_otp_bypass.ts"
+    "audit-otp-bypass": "tsx audit_otp_bypass.ts",
+    "import-members": "tsx import_members.ts"
   },
   "dependencies": {
+    "exceljs": "^4.4.0",
     "firebase-admin": "^13.10.0"
   },
   "devDependencies": {
